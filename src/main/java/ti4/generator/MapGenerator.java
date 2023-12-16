@@ -101,7 +101,6 @@ public class MapGenerator {
     private final boolean uploadToDiscord;
     private final boolean debug;
 
-    private HashMap<Player, Integer> userVPs = new HashMap<>();
     private final int width;
     private int height;
     private int mapWidth;
@@ -493,7 +492,6 @@ public class MapGenerator {
         y = strategyCards(y);
 
         int tempY = y;
-        userVPs = new HashMap<>();
         y = objectives(y + 180);
         y = laws(y);
         y = events(y);
@@ -2094,10 +2092,7 @@ public class MapGenerator {
                 tempWidth = controlTokenImage == null ? 20 : controlTokenImage.getWidth();
                 tempHeight = controlTokenImage == null ? 20 : controlTokenImage.getHeight();
 
-                Integer vpCount = userVPs.get(player);
-                if (vpCount == null) {
-                    vpCount = 0;
-                }
+                int vpCount = player.getTotalVictoryPoints();
                 int x = vpCount * width + 5 + tempX;
 
                 drawControlToken(graphics, controlTokenImage, getPlayerByControlMarker(game.getPlayers().values(), controlID), x, y + (tempCounter * tempHeight),
@@ -2291,8 +2286,7 @@ public class MapGenerator {
             graphics.drawString(StringUtils.capitalize(player.getFaction()), point.x + deltaX, point.y + deltaY);
 
             // PAIN VICTORY POINTS
-            Integer vpCount = userVPs.get(player);
-            vpCount = vpCount == null ? 0 : vpCount;
+            int vpCount = player.getTotalVictoryPoints();
             point = PositionMapper.getPlayerStats(Constants.STATS_VP);
             graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
 
@@ -2460,15 +2454,13 @@ public class MapGenerator {
     }
 
     private int objectives(int y) {
-        int x;
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
-        LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(game.getScoredPublicObjectives());
-        LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(game.getRevealedPublicObjectives());
+        Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(game.getScoredPublicObjectives());
+        Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(game.getRevealedPublicObjectives());
         LinkedHashMap<String, Player> players = game.getPlayers();
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
-        HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
         LinkedHashMap<String, Integer> customPublicVP = game.getCustomPublicVP();
         LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> {
             String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
@@ -2477,47 +2469,23 @@ public class MapGenerator {
         Set<String> po1 = publicObjectivesState1.keySet();
         Set<String> po2 = publicObjectivesState2.keySet();
         Set<String> customVP = customPublicVP.keySet();
-        Set<String> secret = secretObjectives.keySet();
 
         graphics.setFont(Storage.getFont26());
         graphics.setColor(new Color(230, 126, 34));
-        Integer[] column = new Integer[1];
-        column[0] = 0;
-        x = 5;
+        int x = 5;
         int y1 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, null, false);
 
-        column[0] = 1;
         x = 801;
         graphics.setColor(new Color(93, 173, 226));
         int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, null, false);
 
-        column[0] = 2;
         x = 1598;
         graphics.setColor(Color.WHITE);
         int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, customPublicVP, false);
 
-        revealedPublicObjectives = new LinkedHashMap<>();
-        scoredPublicObjectives = new LinkedHashMap<>();
-        for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
-            Player player = playerEntry.getValue();
-            Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
-            for (String id : game.getSoToPoList()) {
-                secretsScored.remove(id);
-            }
-            revealedPublicObjectives.putAll(secretsScored);
-            for (String id : secretsScored.keySet()) {
-                scoredPublicObjectives.put(id, List.of(player.getUserID()));
-            }
-        }
-
-        graphics.setColor(Color.RED);
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, customPublicVP, false);
-        if (column[0] != 0) {
-            y += 40;
-        }
-
+        y += 40;
         graphics.setColor(Color.green);
-        displaySftT(y, x, players, column, graphics);
+        displaySftT(y, x, players);
 
         return Math.max(y3, Math.max(y1, y2)) + 15;
     }
@@ -2685,7 +2653,6 @@ public class MapGenerator {
         int x = 5;
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
-        userVPs = new HashMap<>();
 
         LinkedHashMap<String, Player> players = game.getPlayers();
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
@@ -2693,10 +2660,8 @@ public class MapGenerator {
         Set<String> secret = secretObjectives.keySet();
         graphics.setFont(Storage.getFont26());
         graphics.setColor(new Color(230, 126, 34));
-        Integer[] column = new Integer[1];
-        column[0] = 0;
 
-        LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+        Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
         LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
 
         for (String id : secrets.keySet()) {
@@ -2704,14 +2669,14 @@ public class MapGenerator {
         }
         if (player.isSearchWarrant()) {
             graphics.setColor(Color.LIGHT_GRAY);
-            LinkedHashMap<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
+            Map<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
             y = displayObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, customPublicVP, true);
         }
         LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
             secretsScored.remove(id);
         }
-        LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(secretsScored);
+        Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(secretsScored);
         for (String id : secretsScored.keySet()) {
             scoredPublicObjectives.put(id, List.of(player.getUserID()));
         }
@@ -2719,44 +2684,27 @@ public class MapGenerator {
         y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, customPublicVP, true);
         if (player.isSearchWarrant()) {
             return secretsScored.keySet().size() + player.getSecrets().keySet().size();
-        } else {
-            return secretsScored.keySet().size();
         }
+        return secretsScored.keySet().size();
     }
 
-    private int displaySftT(int y, int x, Map<String, Player> players, Integer[] column, Graphics graphics) {
+    private int displaySftT(int y, int x, Map<String, Player> players) {
         for (Player player : players.values()) {
             List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+            int countToThree = 2;
             for (String id : promissoryNotesInPlayArea) {
                 if (id.endsWith("_sftt")) {
-                    switch (column[0]) {
-                        case 0 -> x = 5;
-                        case 1 -> x = 801;
-                        case 2 -> x = 1598;
-                    }
                     Player promissoryNoteOwner = game.getPNOwner(id);
                     if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
                         BotLogger.log(game.getName() + " " + player.getUserName()
                             + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
                         continue;
                     }
-                    //String[] pnSplit = Mapper.getPromissoryNote(id).split(";");
-                    //StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
-                    //for (Player player_ : players.values()) {
-                    //    if (player_ != player) {
-                    //        String playerColor = player_.getColor();
-                    //        String playerFaction = player_.getFaction();
-                    //        if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) ||
-                    //            playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
-                    //            name.append(playerFaction).append(" (").append(playerColor).append(")");
-                    //        }
-                    //    }
-                    //}
                     boolean multiScoring = false;
-                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, 1, true);
-                    column[0]++;
-                    if (column[0] > 2) {
-                        column[0] = 0;
+                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, true);
+                    countToThree++;
+                    if (countToThree > 2) {
+                        countToThree = 0;
                         y += 43;
                     }
                 }
@@ -2807,9 +2755,9 @@ public class MapGenerator {
             boolean multiScoring = Constants.CUSTODIAN.equals(key) || (isFoWPrivate != null && isFoWPrivate);
             if (scoredPlayerID != null) {
                 if (fixedColumn) {
-                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, objectiveWorth, true);
+                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, true);
                 } else {
-                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth);
+                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring);
                 }
             }
             if (fixedColumn) {
@@ -2829,9 +2777,8 @@ public class MapGenerator {
         int y,
         Map<String, Player> players,
         List<String> scoredPlayerID,
-        boolean multiScoring,
-        Integer objectiveWorth) {
-        drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, false);
+        boolean multiScoring) {
+        drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, false);
     }
 
     private void drawScoreControlMarkers(
@@ -2840,7 +2787,6 @@ public class MapGenerator {
         Map<String, Player> players,
         List<String> scoredPlayerID,
         boolean multiScoring,
-        Integer objectiveWorth,
         boolean fixedColumn) {
         try {
             int tempX = 0;
@@ -2859,22 +2805,15 @@ public class MapGenerator {
 
                     BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
 
-                    Integer vpCount = userVPs.get(player);
-                    if (vpCount == null) {
-                        vpCount = 0;
-                    }
                     if (multiScoring) {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
-                        vpCount += frequency * objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
                             drawControlToken(graphics, controlTokenImage, player, x + tempX, y, convertToGeneric, scale);
                             tempX += scoreTokenWidth;
                         }
                     } else {
-                        vpCount += objectiveWorth;
                         drawControlToken(graphics, controlTokenImage, player, x + tempX, y, convertToGeneric, scale);
                     }
-                    userVPs.put(player, vpCount);
                 }
                 if (!multiScoring && !fixedColumn) {
                     tempX += scoreTokenWidth;
