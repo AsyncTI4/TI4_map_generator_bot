@@ -606,6 +606,7 @@ public class Constants {
     public static final String PO2PEAKABLE = "publicObjectives2peakable";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
     public static final String INCLUDE_SCORED = "include_scored";
+    public static final String SO_LIST_SCORED = "list_scored";
 
     public static final String TURN_ORDER = "turn_order";
     public static final String TURN_STATS = "turn_stats";
