@@ -130,9 +130,12 @@ public class Game {
     @Getter
     @Setter
     private String textSize = "medium";
-    @ExportableField @Getter @Setter
+    @ExportableField
+    @Getter
+    @Setter
     private boolean absolMode;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean miltyModMode;
     @Getter
     @Setter
@@ -171,7 +174,9 @@ public class Game {
     @Setter
     @ExportableField
     private String scSetID = "pok";
-    @ExportableField @Getter @Setter
+    @ExportableField
+    @Getter
+    @Setter
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
@@ -688,7 +693,8 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame() || isMiltyModMode());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame()
+            || isMiltyModMode());
     }
 
     public boolean isFrankenGame() {
@@ -1056,6 +1062,7 @@ public class Game {
     public String getActivePlayer() {
         return activePlayer;
     }
+
     public Player getActivePlayerObject() {
         return getPlayer(activePlayer);
     }
@@ -2316,7 +2323,7 @@ public class Game {
     public void addExplore(String id) {
         if (Mapper.getExploreRepresentation(id) != null) {
             int place = ThreadLocalRandom.current().nextInt(explore.size());
-            explore.add(place,id);
+            explore.add(place, id);
         }
         discardExplore.remove(id);
     }
@@ -2970,7 +2977,8 @@ public class Game {
     public List<Player> getRealPlayers() {
         return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
     }
-     @JsonIgnore
+
+    @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
         return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isDummy())).collect(Collectors.toList());
     }
@@ -3482,6 +3490,7 @@ public class Game {
         return false;
     }
 
+    @Nullable
     public Tile getTileFromPlanet(String planetName) {
         for (Tile tile_ : getTileMap().values()) {
             for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
@@ -3571,6 +3580,7 @@ public class Game {
             }
         }
     }
+
     @JsonIgnore
     public void swapInVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
@@ -3598,6 +3608,7 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
+
     @JsonIgnore
     public void swapOutVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
