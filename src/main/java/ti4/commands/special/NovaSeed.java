@@ -32,7 +32,7 @@ public class NovaSeed extends SpecialSubcommandData {
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
+        if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
@@ -46,15 +46,18 @@ public class NovaSeed extends SpecialSubcommandData {
         secondHalfOfNovaSeed(player, event, tile, activeGame);
     }
 
-    public void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game activeGame){
+    public void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game activeGame) {
+        String message1 = "Moments before disaster in game " + activeGame.getName();
+        StellarConverter.postTileInDisasterWatch(activeGame, tile, 1, message1);
+
         //Remove all other players units from the tile in question
-       
         for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 tile.removeAllUnits(player_.getColor());
+                tile.removeAllUnitDamage(player_.getColor());
             }
         }
-        
+
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         space.removeAllTokens();
         activeGame.removeTile(tile.getPosition());
@@ -63,7 +66,13 @@ public class NovaSeed extends SpecialSubcommandData {
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         activeGame.setTile(novaTile);
 
-        if(player.hasLeaderUnlocked("muaathero")){
+        StringBuilder message2 = new StringBuilder();
+        message2.append(tile.getRepresentation());
+        message2.append(" has been stellar converted by ");
+        message2.append(player.getRepresentation());
+        StellarConverter.postTileInDisasterWatch(activeGame, novaTile, 1, message2.toString());
+
+        if (player.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = player.getLeader("muaathero").orElse(null);
             StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
