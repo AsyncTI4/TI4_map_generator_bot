@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
@@ -34,6 +36,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import lombok.Data;
 import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.agenda.ShowDiscardedAgendas;
@@ -4385,8 +4389,95 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveSetupColorChecker(Game activeGame, ButtonInteractionEvent event) {
+    /**
+     * Check all colors in the active game and print out errors and possible solutions if any have too low of a luminance variation
+     */
+    public static void resolveSetupColorChecker(Game activeGame) {
+        @Data
+        class Collision {
+            Player p1, p2;
+            double contrast;
 
+            Collision(Player p1, Player p2, double contrast) {
+                this.p1 = p1;
+                this.p2 = p2;
+                this.contrast = contrast;
+            }
+        }
+
+        List<Player> players = activeGame.getRealPlayers();
+        List<Collision> issues = new ArrayList<>();
+        for (int i = 0; i < players.size(); i++) {
+            Player p1 = players.get(i);
+            for (int j = i + 1; j < players.size(); j++) {
+                Player p2 = players.get(j);
+
+                double l1 = relativeLuminance(MapGenerator.getColor(p1.getColor()));
+                double l2 = relativeLuminance(MapGenerator.getColor(p2.getColor()));
+                double contrast = contrastRatio(l1, l2);
+                if (contrast > 4.5) {
+                    Collision e1 = new Collision(p1, p2, contrast);
+                    issues.add(e1);
+                }
+            }
+        }
+
+        if (issues.size() == 0) return;
+
+        StringBuilder sb = new StringBuilder("### The following pairs of players have colors with a low contrast value:\n");
+        for (Collision issue : issues) {
+            sb.append("> ").append(issue.p1.getRepresentation()).append(" & ").append(issue.p2.getRepresentation()).append("  -> ");
+            sb.append("Ratio = 1:").append(issue.contrast);
+            if (issue.contrast < 2) {
+                sb.append("(very bad!)");
+            }
+            sb.append("\n");
+        }
+
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb.toString());
+    }
+
+    /**
+     * For the sRGB colorspace, the relative luminance of a color is defined as
+     * <p>
+     * L = 0.2126 * R + 0.7152 * G + 0.0722 * B
+     * <p>
+     * where R, G and B are defined as:
+     * <p>
+     * if XsRGB <= 0.03928 then X = XsRGB/12.92 else X = ((XsRGB+0.055)/1.055) ^ 2.4
+     * <p>
+     * -
+     * <p>
+     * and RsRGB, GsRGB, and BsRGB are defined as:
+     * <p>
+     * XsRGB = X8bit/255
+     */
+    private static double relativeLuminance(Color color) {
+        double RsRGB = ((double) color.getRed()) / 255.0;
+        double GsRGB = ((double) color.getGreen()) / 255.0;
+        double BsRGB = ((double) color.getBlue()) / 255.0;
+
+        double r = color.getRed() <= 10 ? RsRGB / 12.92 : Math.pow((RsRGB + 0.055) / 1.055, 2.4);
+        double g = color.getGreen() <= 10 ? GsRGB / 12.92 : Math.pow((GsRGB + 0.055) / 1.055, 2.4);
+        double b = color.getBlue() <= 10 ? BsRGB / 12.92 : Math.pow((BsRGB + 0.055) / 1.055, 2.4);
+
+        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+    }
+
+    /**
+     * To calculate the contrast ratio, the relative luminance of the lighter colour (L1) is divided through the relative luminance of the darker colour (L2):
+     * <p>
+     * (L1 + 0.05) / (L2 + 0.05)
+     * <p>
+     * This results in a value ranging from 1:1 (no contrast at all) to 21:1 (the highest possible contrast).
+     * 
+     * @param L1 The lighter color (higher luminance)
+     * @param L2 the darker color (lower luminance)
+     * @return contrast ratio (1:x)
+     */
+    private static double contrastRatio(double L1, double L2) {
+        if (L1 < L2) return contrastRatio(L2, L1);
+        return (L1 + 0.05) / (L2 + 0.05);
     }
 
     public static void resolveStellar(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
