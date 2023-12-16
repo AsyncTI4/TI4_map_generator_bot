@@ -2483,10 +2483,6 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
         int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, customPublicVP, false);
 
-        y += 40;
-        graphics.setColor(Color.green);
-        displaySftT(y, x, players);
-
         return Math.max(y3, Math.max(y1, y2)) + 15;
     }
 
@@ -2686,31 +2682,6 @@ public class MapGenerator {
             return secretsScored.keySet().size() + player.getSecrets().keySet().size();
         }
         return secretsScored.keySet().size();
-    }
-
-    private int displaySftT(int y, int x, Map<String, Player> players) {
-        for (Player player : players.values()) {
-            List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
-            int countToThree = 2;
-            for (String id : promissoryNotesInPlayArea) {
-                if (id.endsWith("_sftt")) {
-                    Player promissoryNoteOwner = game.getPNOwner(id);
-                    if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
-                        BotLogger.log(game.getName() + " " + player.getUserName()
-                            + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
-                        continue;
-                    }
-                    boolean multiScoring = false;
-                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, true);
-                    countToThree++;
-                    if (countToThree > 2) {
-                        countToThree = 0;
-                        y += 43;
-                    }
-                }
-            }
-        }
-        return y;
     }
 
     private int displayObjectives(

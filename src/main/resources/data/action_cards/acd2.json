@@ -650,7 +650,7 @@
   {
     "alias": "sister_ship",
     "name": "Sister Ship",
-    "phase": "Action",
+    "phase": "Any",
     "window": "After 1 of your ships is destroyed",
     "text": "Produce a matching unit in your home system; reduce the cost of that unit by half, rounded up.",
     "flavorText": "The production of the Van Hauge XVIII had finished in record time. As it left the docking bay, Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
