@@ -8,7 +8,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Planet;
 import ti4.message.MessageHelper;
 
 public class StellarConverter extends StatisticsSubcommandData {
@@ -48,7 +47,7 @@ public class StellarConverter extends StatisticsSubcommandData {
         }
 
         Comparator<Entry<String, Integer>> comparator = (p1, p2) -> {
-            return p1.getValue().compareTo(p2.getValue());
+            return (-1) * p1.getValue().compareTo(p2.getValue());
         };
 
         int index = 1;
