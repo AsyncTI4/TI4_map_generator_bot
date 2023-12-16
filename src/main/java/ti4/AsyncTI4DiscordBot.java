@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -74,6 +76,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
+import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
@@ -100,10 +103,10 @@ public class AsyncTI4DiscordBot {
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
-    public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
+        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
 
         jda = JDABuilder.createDefault(args[0])
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
@@ -129,9 +132,9 @@ public class AsyncTI4DiscordBot {
         }
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
-        
+
         guildPrimaryID = args[2];
-        userID = args[1]; 
+        userID = args[1];
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
@@ -278,7 +281,7 @@ public class AsyncTI4DiscordBot {
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED CHECKING FOR DATA MIGRATIONS");
 
         // BOT IS READY
-        readyToReceiveCommands = true;
+        GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         BotLogger.log("# `" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING GAMES");
 
@@ -288,7 +291,7 @@ public class AsyncTI4DiscordBot {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
-                readyToReceiveCommands = false;
+                GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SAVING GAMES");
@@ -313,7 +316,7 @@ public class AsyncTI4DiscordBot {
      * <li>Developers can execute /developer and /bothelper commands</li>
      * <li>Bothelpers can execute /bothelper commands</li>
      * </ul>
-     * 
+     *
      * Add your test server's role ID to enable access to these commands on your server
      */
     private static void initializeWhitelistedRoles() {
@@ -354,5 +357,20 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
 
         bothelperRoles.removeIf(Objects::isNull);
+    }
+
+    public static boolean isReadyToReceiveCommands() {
+        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+    }
+
+    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, THREAD_POOL)
+            .handle((result, exception) -> {
+                if (exception != null) {
+                    BotLogger.log("Unable to complete async process.", exception);
+                    return null;
+                }
+                return result;
+            });
     }
 }

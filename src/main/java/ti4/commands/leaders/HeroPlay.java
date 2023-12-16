@@ -18,7 +18,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.CombatModHelper;
+import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -233,7 +233,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
         }
-        var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.LEADER, leaderModel.getID(), player.getNumberTurns());
+        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, leaderModel.getID(), player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");

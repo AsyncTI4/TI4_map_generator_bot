@@ -7,6 +7,7 @@ import java.util.List;
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
+    public static final String PREFERS_DISTANCE = "prefers_distance";
     public static final String DRAFT_HAND = "franken_personal_bag";
     public static final String DRAFT_BAG = "franken_bag_to_pass";
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
@@ -749,6 +750,7 @@ public class Constants {
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String CATEGORY = "category";
+    public static final String SEND_JSON_TO_S3 = "send_games_to_s3";
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
     public static final String GAME_END = "end";
     public static final String GAME_HAS_ENDED = "game_has_ended";

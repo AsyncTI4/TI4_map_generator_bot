@@ -42,6 +42,7 @@ import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.ShowUnScoredSOs;
+import ti4.commands.combat.CombatRoll;
 import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
@@ -54,7 +55,6 @@ import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
-import ti4.commands.special.CombatRoll;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
@@ -64,8 +64,8 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -140,12 +140,12 @@ public class ButtonHelper {
     public static void resolveInfantryDeath(Game activeGame, Player player, int amount) {
         if (player.hasInf2Tech()) {
             for (int x = 0; x < amount; x++) {
-                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), rollInfantryRevival(activeGame, player));
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), rollInfantryRevival(player));
             }
         }
     }
 
-    public static List<Button> getDacxiveButtons(Game activeGame, Player player, String planet) {
+    public static List<Button> getDacxiveButtons(String planet) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("dacxive_" + planet, "Resolve Dacxive"));
         buttons.add(Button.danger("deleteButtons", "No Dacxive"));
@@ -179,17 +179,10 @@ public class ButtonHelper {
     }
 
     public static void checkTransactionLegality(Game activeGame, Player player, Player player2) {
-        if (canTheseTwoTransact(activeGame, player, player2)) {
-        }else{
+        if (!canTheseTwoTransact(activeGame, player, player2)) {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " this is a friendly reminder that you are not neighbors with " + player2.getColor());
         }
-        
-    }
-
-    public static void riftUnitsButton(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
-        Tile tile = activeGame.getTileByPosition(buttonID.replace("getRiftButtons_", ""));
-        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), ident + " Use buttons to rift units", getButtonsForRiftingUnitsInSystem(player, activeGame, tile));
     }
 
     public static void riftUnitButton(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
@@ -239,8 +232,7 @@ public class ButtonHelper {
             }
             UnitHolder unitHolder = entry.getValue();
             HashMap<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet planet) {
-            } else {
+            if (!(unitHolder instanceof Planet planet)) {
                 Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
                 for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
                     if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -331,8 +323,7 @@ public class ButtonHelper {
         return activeGame.getPNOwner("ridera") != null || activeGame.getPNOwner("riderm") != null || activeGame.getPNOwner("riderx") != null || activeGame.getPNOwner("ridera") != null;
     }
 
-    public static String rollInfantryRevival(Game activeGame, Player player) {
-
+    public static String rollInfantryRevival(Player player) {
         Die d1 = new Die(6);
         if (player.hasTech("so2")) {
             d1 = new Die(5);
@@ -567,6 +558,10 @@ public class ButtonHelper {
                 continue;
             }
             UnitHolder unitHolder = getUnitHolderFromPlanetName(planet, activeGame);
+            if(unitHolder == null){
+                BotLogger.log("Null unitholder for planet "+planet);
+                continue;
+            }
             Set<String> tokenList = unitHolder.getTokenList();
             if (tokenList.stream().anyMatch(token -> token.contains("dmz_large") || token.contains("dmz"))) {
                 dmzPlanet = planet;
@@ -732,7 +727,7 @@ public class ButtonHelper {
             commanderUnlockCheck(player, activeGame, "mirveda", event);
         }
         if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
-            ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
+            commanderUnlockCheck(player, activeGame, "dihmohn", event);
         }
         if (StringUtils.countMatches(buttonID, "_") < 2) { //TODO: Better explain what this is doing and why this way
             if (activeGame.getComponentAction()) {
@@ -1351,13 +1346,31 @@ public class ButtonHelper {
     public static void updateMap(Game activeGame, GenericInteractionCreateEvent event, String message) {
         String threadName = activeGame.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-        boolean foundsomething = false;
-        FileUpload file = new GenerateMap().saveImage(activeGame, DisplayType.all, event);
-        if (!activeGame.isFoWMode()) {
-            for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    foundsomething = true;
+        MapGenerator.saveImage(activeGame, DisplayType.all, event)
+            .thenApply(fileUpload -> {
+                boolean foundSomething = false;
+                if (!activeGame.isFoWMode()) {
+                    for (ThreadChannel threadChannel_ : threadChannels) {
+                        if (threadChannel_.getName().equals(threadName)) {
+                            foundSomething = true;
 
+                            List<Button> buttonsWeb = new ArrayList<>();
+                            if (!activeGame.isFoWMode()) {
+                                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
+                                buttonsWeb.add(linkToWebsite);
+                            }
+                            buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
+                            buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
+                            buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
+
+                            MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, fileUpload, message, buttonsWeb);
+                        }
+                    }
+                } else {
+                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+                    foundSomething = true;
+                }
+                if (!foundSomething) {
                     List<Button> buttonsWeb = new ArrayList<>();
                     if (!activeGame.isFoWMode()) {
                         Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
@@ -1367,29 +1380,10 @@ public class ButtonHelper {
                     buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                     buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
 
-                    MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, file, message, buttonsWeb);
-
+                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, message, buttonsWeb);
                 }
-            }
-        } else {
-            MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), file);
-            foundsomething = true;
-        }
-        if (!foundsomething) {
-
-            List<Button> buttonsWeb = new ArrayList<>();
-            if (!activeGame.isFoWMode()) {
-                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
-                buttonsWeb.add(linkToWebsite);
-            }
-            buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
-            buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
-            buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
-
-            MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, message, buttonsWeb);
-
-        }
-
+                return fileUpload;
+            });
     }
 
     public static boolean nomadHeroAndDomOrbCheck(Player player, Game activeGame, Tile tile) {
@@ -1901,6 +1895,17 @@ public class ButtonHelper {
                 return;
             }
         }
+        List<Player> playersWithPds2;
+        if (activeGame.isFoWMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
+            playersWithPds2 = new ArrayList<>();
+        } else {
+            playersWithPds2 = tileHasPDS2Cover(p1, activeGame, tile.getPosition());
+        }
+        int context = 0;
+        if (playersWithPds2.size() > 0) {
+            context = 1;
+        }
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
         channel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
             if (activeGame.isFoWMode()) {
@@ -1908,22 +1913,15 @@ public class ButtonHelper {
             } else {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
             }
-            threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, "Resolve here"));
-            
-        });
-        MessageCreateBuilder baseMessageObject2 = new MessageCreateBuilder().addContent("Good luck!");
-        channel.sendMessage(baseMessageObject2.build()).queueAfter(300, TimeUnit.MILLISECONDS, message_ -> {
-            for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    initializeCombatThread(threadChannel_, activeGame, p1, p2, tile, event, spaceOrGround);
-                    return;
-                }
-            }
+            threadChannel.queue(tc -> initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround, systemWithContext));
         });
 
     }
-
     private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
+        initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround, null);
+    }
+
+    private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file) {
         StringBuilder message = new StringBuilder();
         if (activeGame.isFoWMode()) {
             message.append(p1.getRepresentation(true, true));
@@ -1962,7 +1960,12 @@ public class ButtonHelper {
         if (playersWithPds2.size() > 0) {
             context = 1;
         }
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
+        FileUpload systemWithContext;
+        if(file == null){
+           systemWithContext  = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
+        }else{
+            systemWithContext  =  file;
+        }
         MessageHelper.sendMessageWithFile(tc, systemWithContext, "Picture of system", false);
         List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(tc, "Combat", buttons);
@@ -2228,11 +2231,11 @@ public class ButtonHelper {
             buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
 
-        if ((p2.hasUnexhaustedLeader("kortaliagent")) && !activeGame.isFoWMode() && groundOrSpace.equalsIgnoreCase("ground") && p1.getFragments().size() > 0) {
+        if ((p2.hasUnexhaustedLeader("kortaliagent")) && !activeGame.isFoWMode() && "ground".equalsIgnoreCase(groundOrSpace) && p1.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(), "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
-        if (p1.hasUnexhaustedLeader("kortaliagent") && groundOrSpace.equalsIgnoreCase("ground") && p2.getFragments().size() > 0) {
+        if (p1.hasUnexhaustedLeader("kortaliagent") && "ground".equalsIgnoreCase(groundOrSpace) && p2.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(), "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
@@ -2761,9 +2764,11 @@ public class ButtonHelper {
                 }
             }
         }
-
         if (player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
+        }
+        if (player.getTechs().contains("miltymod_hm") && !player.getExhaustedTechs().contains("miltymod_hm")) {
+            endButtons.add(Button.success(finChecker + "exhaustTech_miltymod_hm", "Exhaust Hyper Metabolism"));
         }
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
@@ -3087,7 +3092,7 @@ public class ButtonHelper {
                     buttons.add(sdButton);
                     buttons.add(pdsButton);
                     buttons.add(tgButton);
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame),
                         player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
                 }
             }
@@ -3328,7 +3333,7 @@ public class ButtonHelper {
                 }
             }
         }
-        new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, new HashMap<>(), new ArrayList<>(), rollType);
+        new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, rollType);
         if(buttonID.contains("bombardment") && activeGame.getLaws().containsKey("conventions")){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This is a reminder that conventions of war is in play, so bombardment of cultural planets is illegal. Ignore this message if not relevant");
         }
@@ -3667,7 +3672,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void resolveTransitDiodesStep1(Game activeGame, Player player, ButtonInteractionEvent event) {
+    public static void resolveTransitDiodesStep1(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
@@ -4507,7 +4512,13 @@ public class ButtonHelper {
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
                     if (model != null && (model.getDeepSpaceCannon() || (tilePos.equalsIgnoreCase(adjTilePos) && model.getSpaceCannonDieCount() > 0))) {
-                        playersWithPds2.add(owningPlayer);
+                        if(owningPlayer == player ){
+                            if(FoWHelper.otherPlayersHaveShipsInSystem(player, adjTile, activeGame)){
+                                playersWithPds2.add(owningPlayer);
+                            }
+                        }else{
+                            playersWithPds2.add(owningPlayer);
+                        }
                     }
                 }
             }
@@ -4618,7 +4629,7 @@ public class ButtonHelper {
         msgExtra += activeGame.getPing() + "\nAll players picked SC";
         for (Player player_ : activePlayers) {
             int playersLowestSC = player_.getLowestSC();
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player_, activeGame, Integer.toString(playersLowestSC));
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 nextPlayer = player_; //no further processing, this player has the 0 token
                 break;
@@ -4709,8 +4720,8 @@ public class ButtonHelper {
                 playersWithSCs = -30;
                 if (!activeGame.isFoWMode()) {
                     DisplayType displayType = DisplayType.map;
-                    FileUpload stats_file = new GenerateMap().saveImage(activeGame, displayType, event);
-                    MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), stats_file);
+                    MapGenerator.saveImage(activeGame, displayType, event)
+                            .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
                 }
             }
             if (player.isRealPlayer()) {
