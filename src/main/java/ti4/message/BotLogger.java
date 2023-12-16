@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Helper;
 
@@ -26,7 +28,7 @@ public class BotLogger {
      * @param msg - message to send to the #bot-log channel
      * @e - Exception
      */
-    public static void log(String msg, Exception e) {
+    public static void log(String msg, Throwable e) {
         log(null, msg, e);
     }
 
@@ -50,7 +52,7 @@ public class BotLogger {
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      * @param e Exception
      */
-    public static void log(GenericInteractionCreateEvent event, String msg, Exception e) {
+    public static void log(GenericInteractionCreateEvent event, String msg, Throwable e) {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
         
@@ -58,7 +60,7 @@ public class BotLogger {
         // logger.info(msg);
         System.out.println("[BOT-LOG] " + msg);
 
-        //Adding so we dont cause an exception by attempting to log 
+        //Adding so we don't cause an exception by attempting to log
         if (msg.length() > 2000){
             String ellipses = "...(log message too long)";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
@@ -67,7 +69,6 @@ public class BotLogger {
         if (botLogChannel == null) {
             String name;
             if (event == null) {
-                // System.out.println(e);
                 return;
             } else {
                 name = event.getGuild().getName();

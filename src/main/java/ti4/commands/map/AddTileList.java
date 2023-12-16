@@ -8,10 +8,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddFrontierTokens;
-import ti4.generator.GenerateMap;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
@@ -40,7 +39,7 @@ public class AddTileList extends MapSubcommandData {
         }
         String userID = member.getId();
         GameManager gameManager = GameManager.getInstance();
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game game = gameManager.getUserActiveGame(userID);
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
@@ -48,14 +47,14 @@ public class AddTileList extends MapSubcommandData {
 
         String tileList = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         tileList = tileList.replaceAll(",", "");
-        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveGame);
+        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, game);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
             return;
         }
 
         List<String> badTiles = new ArrayList<>();
-        userActiveGame.clearTileMap();
+        game.clearTileMap();
         for (Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
             String tileID = entry.getValue().toLowerCase();
             if ("-1".equals(tileID)) {
@@ -77,7 +76,7 @@ public class AddTileList extends MapSubcommandData {
             }
             Tile tile = new Tile(tileID, position);
             AddTile.addCustodianToken(tile);
-            userActiveGame.setTile(tile);
+            game.setTile(tile);
         }
 
         if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
@@ -85,24 +84,24 @@ public class AddTileList extends MapSubcommandData {
         try {
             Tile tile;
             tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
-            userActiveGame.setTile(tile);
+            game.setTile(tile);
             if (!tileList.startsWith("{") && !tileList.contains("}")) {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
                 AddTile.addCustodianToken(tile);
-                userActiveGame.setTile(tile);
+                game.setTile(tile);
             }
         } catch (Exception e) {
             BotLogger.log("Could not add setup and Mallice tiles", e);
         }
 
-        if (!userActiveGame.isBaseGameMode()) {
-            new AddFrontierTokens().parsingForTile(event, userActiveGame);
+        if (!game.isBaseGameMode()) {
+            new AddFrontierTokens().parsingForTile(event, game);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
         }
 
-        GameSaveLoadManager.saveMap(userActiveGame, event);
+        GameSaveLoadManager.saveMap(game, event);
 
-        FileUpload file = new GenerateMap().saveImage(userActiveGame, event);
-        MessageHelper.replyToMessage(event, file);
+        MapGenerator.saveImage(game, event)
+            .thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload));
     }
 }

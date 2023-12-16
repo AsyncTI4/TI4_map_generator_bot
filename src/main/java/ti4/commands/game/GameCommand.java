@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,7 +16,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
+import ti4.generator.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -74,19 +75,20 @@ public class GameCommand implements Command {
         if (!undoCommand) {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
-        FileUpload file = new GenerateMap().saveImage(activeGame, event);
-        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
-           // MessageHelper.replyToMessage(event, file);
-            List<Button> buttons = new ArrayList<>();
-            if (!activeGame.isFoWMode()) {
-                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
-                buttons.add(linkToWebsite);
-            }
-            buttons.add(Button.success("cardsInfo", "Cards Info"));
-            buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
-            buttons.add(Button.secondary("showGameAgain", "Show Game"));
-            
-            MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "", buttons);
+        CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(activeGame, event);
+        if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
+            && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)) {
+            fileFuture.thenAccept(fileUpload -> {
+                List<Button> buttons = new ArrayList<>();
+                if (!activeGame.isFoWMode()) {
+                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
+                    buttons.add(linkToWebsite);
+                }
+                buttons.add(Button.success("cardsInfo", "Cards Info"));
+                buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
+                buttons.add(Button.secondary("showGameAgain", "Show Game"));
+                MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, "", buttons);
+            });
         }
     }
 

@@ -1,9 +1,11 @@
 package ti4.commands.status;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -11,10 +13,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
 
 public class ListTurnOrder extends StatusSubcommandData {
     public ListTurnOrder() {
@@ -42,7 +40,7 @@ public class ListTurnOrder extends StatusSubcommandData {
         int naaluSC = 0;
         for (Player player : activeGame.getRealPlayers()) {
             int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeGame, Integer.toString(sc));
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }

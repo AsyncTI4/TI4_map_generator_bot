@@ -1,12 +1,9 @@
 package ti4.commands.admin;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
@@ -27,16 +24,11 @@ public class Statistics extends AdminSubcommandData {
         Map<String, Integer> colorCount = new HashMap<>();
         Map<String, Integer> winnerColorCount = new HashMap<>();
 
-        BufferedImage fakeImage = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = fakeImage.getGraphics();
-
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game activeGame : mapList.values()) {
-            if (activeGame.getName().startsWith("pbd")) {
-                int vp = activeGame.getVp();
-                HashMap<Player, Integer> userVPs = new HashMap<>();
-                new GenerateMap().objectives(activeGame, 0, graphics, userVPs, false);
-                for (Player player : activeGame.getPlayers().values()) {
+        for (Game game : mapList.values()) {
+            if (game.getName().startsWith("pbd")) {
+                int vp = game.getVp();
+                for (Player player : game.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();
                     if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
@@ -48,11 +40,11 @@ public class Statistics extends AdminSubcommandData {
                     }
                 }
                 boolean findWinner = true;
-                for (Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
-                    Integer vpScore = entry.getValue();
+                for (Player player : game.getPlayers().values()) {
+                    int vpScore = player.getTotalVictoryPoints();
                     if (vp <= vpScore) {
-                        String color = entry.getKey().getColor();
-                        String faction = entry.getKey().getFaction();
+                        String color = player.getColor();
+                        String faction = player.getFaction();
 
                         winnerFactionCount.putIfAbsent(faction, 1);
                         winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
@@ -64,30 +56,29 @@ public class Statistics extends AdminSubcommandData {
                     }
                 }
                 if (findWinner) {
-                    Date date = new Date(activeGame.getLastModifiedDate());
+                    Date date = new Date(game.getLastModifiedDate());
                     Date currentDate = new Date();
                     long time_difference = currentDate.getTime() - date.getTime();
                     // Calculate time difference in days
                     long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
                     if (days_difference > 30) {
-                        Integer maxVP = userVPs.values().stream().max(Integer::compareTo).orElse(0);
-                        if (userVPs.values().stream().filter(value -> value.equals(maxVP)).count() == 1) {
-                            for (Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
-                                Integer vpScore = entry.getValue();
-                                if (maxVP.equals(vpScore)) {
-                                    String color = entry.getKey().getColor();
-                                    String faction = entry.getKey().getFaction();
+                        int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
+                        if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
+                            game.getPlayers().values().stream()
+                                .filter(player -> player.getTotalVictoryPoints() == maxVP)
+                                .findFirst()
+                                .ifPresent(player -> {
+                                    String color = player.getColor();
+                                    String faction = player.getFaction();
 
                                     winnerFactionCount.putIfAbsent(faction, 1);
                                     winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
 
                                     winnerColorCount.putIfAbsent(color, 1);
                                     winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
-                                }
-                            }
+                                });
                         }
                     }
-
                 }
             }
         }

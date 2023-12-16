@@ -147,7 +147,7 @@ public class ButtonListener extends ListenerAdapter {
         Game activeGame = GameManager.getInstance().getGame(gameName);
         Player player = activeGame.getPlayer(id);
         player = Helper.getGamePlayer(activeGame, player, event.getMember(), id);
-        if (player == null && !buttonID.equalsIgnoreCase("showGameAgain")) {
+        if (player == null && !"showGameAgain".equalsIgnoreCase(buttonID)) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
@@ -195,7 +195,7 @@ public class ButtonListener extends ListenerAdapter {
         String fowIdentity = player.getRepresentation(false, true);
         String ident = player.getFactionEmoji();
 
-        if (!"ultimateundo".equalsIgnoreCase(buttonID) && !buttonID.equalsIgnoreCase("showGameAgain")) {
+        if (!"ultimateundo".equalsIgnoreCase(buttonID) && !"showGameAgain".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
@@ -1256,7 +1256,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "td" -> { //Transit Diodes
                     player.exhaustTech(tech);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
-                    ButtonHelper.resolveTransitDiodesStep1(activeGame, player, event);
+                    ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
                 }
                 case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                     player.exhaustTech(tech);
