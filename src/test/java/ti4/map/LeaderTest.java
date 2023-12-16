@@ -10,9 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
 
-public class LeaderTest {
+public class LeaderTest extends BaseTi4Test {
     private final String expectedId = "testId";
     private final  String expectedType = "testType";
     private final int expectedTgCount = 1;
