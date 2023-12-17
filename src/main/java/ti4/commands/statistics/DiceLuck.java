@@ -42,14 +42,15 @@ public class DiceLuck extends StatisticsSubcommandData {
         Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        
+
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
             for (Player player : game.getPlayers().values()) {
-                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10()/10.0, player.getActualHits());
-                playerDiceLucks.merge(player.getUserID(), playerDiceLuck, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
-                
+                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
+                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
+                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+
                 if (playerDiceLuck.getKey() == 0) continue;
                 Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
                 playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
@@ -60,33 +61,34 @@ public class DiceLuck extends StatisticsSubcommandData {
             }
         }
 
-      //  HashMap<String, Double> playerMedianDiceLucks = playerAverageDiceLucks.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
+        //  HashMap<String, Double> playerMedianDiceLucks = playerAverageDiceLucks.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**Dice Luck**__\n");
-        
+
         int index = 1;
         Comparator<Entry<String, Entry<Double, Integer>>> comparator = (o1, o2) -> {
-            double o1TurnCount = o1.getValue().getKey();
+            Double o1TurnCount = o1.getValue().getKey();
             Double o2TurnCount = o2.getValue().getKey();
             int o1total = o1.getValue().getValue();
             int o2total = o2.getValue().getValue();
             if (o1TurnCount == 0 || o2TurnCount == 0) return -1;
 
-            Double total1 = o1total/o1TurnCount;
-            Double total2 = o2total/o2TurnCount;
+            Double total1 = o1total / o1TurnCount;
+            Double total2 = o2total / o2TurnCount;
             return total1.compareTo(total2);
         };
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 10, OptionMapping::getAsInt);
-        for (Entry<String, Entry<Double, Integer>> userTurnCountTotalTime : playerDiceLucks.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow).sorted(comparator).limit(topLimit).toList()) {
+        for (Entry<String, Entry<Double, Integer>> userTurnCountTotalTime : playerDiceLucks.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
+            .sorted(comparator).limit(topLimit).toList()) {
             User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
             double expectedHits = userTurnCountTotalTime.getValue().getKey();
             int actualHits = userTurnCountTotalTime.getValue().getValue();
 
             if (user == null || expectedHits == 0 || actualHits == 0) continue;
-            
+
             double averageDiceLuck = actualHits / expectedHits;
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
@@ -94,7 +96,7 @@ public class DiceLuck extends StatisticsSubcommandData {
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" average/expected]");
             sb.append("\n");
-            index++;     
+            index++;
         }
 
         return sb.toString();

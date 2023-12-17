@@ -52,7 +52,6 @@ public class StatisticsCommand implements Command {
         GameSaveLoadManager.saveMap(activeGame, event);
     }
 
-
     protected String getActionDescription() {
         return "Statistics";
     }
@@ -63,6 +62,7 @@ public class StatisticsCommand implements Command {
         subcommands.add(new MedianTurnTime());
         subcommands.add(new CompareAFKTimes());
         subcommands.add(new DiceLuck());
+        subcommands.add(new StellarConverter());
 
         return subcommands;
     }
@@ -70,7 +70,7 @@ public class StatisticsCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

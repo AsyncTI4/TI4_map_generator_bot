@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.GenerateMap.TileStep;
+import ti4.generator.MapGenerator.TileStep;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -218,10 +218,10 @@ public class GenerateTile {
                 throw new Exception("Could not map tile to a position on the map: " + activeGame.getName());
             }
 
-            int tileX = positionPoint.x + offsetX - GenerateMap.TILE_PADDING;
-            int tileY = positionPoint.y + offsetY - GenerateMap.TILE_PADDING;
+            int tileX = positionPoint.x + offsetX - MapGenerator.TILE_PADDING;
+            int tileY = positionPoint.y + offsetY - MapGenerator.TILE_PADDING;
 
-            BufferedImage tileImage = GenerateMap.partialTileImage(tile, activeGame, step, fowPlayer, isFoWPrivate);
+            BufferedImage tileImage = MapGenerator.partialTileImage(tile, activeGame, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
 
         } catch (Exception exception) {
