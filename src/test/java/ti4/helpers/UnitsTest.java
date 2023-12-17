@@ -13,9 +13,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
 
-public class UnitsTest {
+public class UnitsTest extends BaseTi4Test {
     
     @Nested
     class UnitKeyTest {
