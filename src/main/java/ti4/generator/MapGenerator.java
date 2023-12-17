@@ -100,16 +100,16 @@ public class MapGenerator {
     private final DisplayType displayType;
     private final boolean uploadToDiscord;
     private final boolean debug;
-
     private final int width;
-    private int height;
-    private int mapWidth;
+    private final int height;
     private final int heightForGameInfo;
+    private final boolean extraRow;
+
+    private int mapWidth;
     private int minX = -1;
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
-    private boolean extraRow;
     private Boolean isFoWPrivate;
     private Player fowPlayer;
     private long debugAbsoluteStartTime;
@@ -157,16 +157,12 @@ public class MapGenerator {
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         int mapHeight = (ringCount + 1) * 600 + EXTRA_Y * 2;
         mapWidth = (ringCount + 1) * 520 + EXTRA_X * 2;
-        extraRow = false;
-        if ((mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y)) {
+        extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
+        if (extraRow) {
             mapWidth += EXTRA_X;
-            extraRow = true;
         }
 
         width = mapWidth;
-        height = mapHeight + heightStats;
-        int heightStorage = height;
-
         if (displayType == DisplayType.stats) {
             heightForGameInfo = 40;
             height = heightStats;
@@ -175,7 +171,7 @@ public class MapGenerator {
             height = mapHeight + 600;
         } else {
             heightForGameInfo = mapHeight;
-            height = heightStorage;
+            height = mapHeight + heightStats;
         }
 
         ImageIO.setUseCache(false);
