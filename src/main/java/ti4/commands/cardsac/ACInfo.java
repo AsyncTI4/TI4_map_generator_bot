@@ -277,7 +277,7 @@ public class ACInfo extends ACCardsSubcommandData {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.danger("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Button.secondary("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }

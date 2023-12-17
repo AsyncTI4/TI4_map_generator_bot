@@ -218,7 +218,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     List<Button> buttonIon = new ArrayList<>();
                     buttonIon.add(Button.success("addIonStorm_beta_" + tile.getPosition(), "Put down a beta"));
                     buttonIon.add(Button.secondary("addIonStorm_alpha_" + tile.getPosition(), "Put down an alpha"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons", buttonIon);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
                 } else {
                     tile.addToken(tokenFilename, Constants.SPACE);
                     message = "Token added to map";

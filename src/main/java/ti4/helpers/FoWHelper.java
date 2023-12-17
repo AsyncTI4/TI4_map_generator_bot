@@ -369,6 +369,16 @@ public class FoWHelper {
 		}
 		return tiles;
 	}
+	public static boolean isTileAdjacentToAnAnomaly(Game activeGame, String position, Player player) {
+		Tile tile = activeGame.getTileByPosition(position);
+		for(String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, position, player, false)){
+			if(activeGame.getTileByPosition(adjPos).isAnomaly(activeGame)){
+				return true;
+			}
+		}
+		return false;
+
+	}
 
 	public static boolean doesTileHaveWHs(Game activeGame, String position, Player player) {
 		Tile tile = activeGame.getTileByPosition(position);

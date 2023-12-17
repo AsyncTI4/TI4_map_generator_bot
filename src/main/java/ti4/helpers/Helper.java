@@ -661,6 +661,75 @@ public class Helper {
         return planetButtons;
     }
 
+    public static String buildSpentThingsMessageForVoting(Player player, Game activeGame, boolean justVoteTotal){
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        String msg = ButtonHelper.getIdent(player)+" used the following: \n";
+        int votes = 0;
+        int tg = player.getSpentTgsThisWindow();
+        for(String thing : spentThings){
+            int count = 0;
+            String secondHalf = thing.split("_")[1];
+            String flavor = thing.split("_")[0];
+            if(flavor.contains("planet")){
+                count = AgendaHelper.getSpecificPlanetsVoteWorth(player, activeGame, secondHalf);
+            }else{
+                count = Integer.parseInt(thing.split("_")[1]);
+            }
+            if(flavor.contains("tg")){
+                votes = votes + count*2;
+            }else{
+                 votes = votes + count;
+            }
+            msg = msg + "> ";
+            switch (flavor) {
+                case "tg" ->{
+                    msg = msg +  "Spent "+player.getSpentTgsThisWindow()+" tgs for "+tg*2+" votes "+"\n";
+                }
+                case "planet" ->{
+                    msg = msg + Helper.getPlanetRepresentation(secondHalf, activeGame) + " for "+count+" votes "+"\n";
+                }
+                case "absolShard" ->{
+                    msg = msg +  "Used Absol Shard of the Throne for "+count+" votes "+"\n";
+                }
+                case "dsghotg" ->{
+                    msg = msg +  "Exhausted some silly Ghoti Tech for "+count+" votes "+"\n";
+                }
+                case "absolsyncretone" ->{
+                    msg = msg +  "Used Absol Syncretone for "+count+" votes "+"\n";
+                }
+                case "zeal" ->{
+                    msg = msg +  "Used Zeal Ability for "+count+" votes "+"\n";
+                }
+                case "predictive" ->{
+                    msg = msg +  "Used Predictive Intelligence for "+count+" votes "+"\n";
+                }
+                case "specialVotes" ->{
+                    msg = msg +  "Used Special Votes for "+count+" votes "+"\n";
+                }
+                case "representative" ->{
+                    msg = msg +  "Got 1 vote for representative government "+"\n";
+                }
+                case "distinguished" ->{
+                    msg = msg +  "Used the AC Distinguished Councillor for 5 votes "+"\n";
+                }
+                case "absolRexControlRepresentative" ->{
+                    msg = msg +  "Got 1 vote for controlling rex while representative government is in play"+"\n";
+                }
+                case "bloodPact" ->{
+                    msg = msg +  "Got 4 votes from voting the same way as another Blood Pact member"+"\n";
+                }
+                    
+            }
+        }
+        msg = msg + "For a total of **"+votes+"** votes on the outcome "+StringUtils.capitalize(activeGame.getLatestOutcomeVotedFor());
+        if(justVoteTotal){
+            return ""+votes;
+        }
+
+        return msg;
+    }
+
+
     public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth){
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = ButtonHelper.getIdent(player)+" exhausted the following: \n";
@@ -698,7 +767,15 @@ public class Helper {
                             msg = msg + getPlanetRepresentationPlusEmojiPlusInfluence(thing, activeGame) +"\n";
                             inf = inf + planet.getInfluence();
                         }
-                    }else{
+                    }else if(resOrInfOrBoth.equalsIgnoreCase("freelancers")){
+                        if(xxcha){
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            res = res +planet.getSumResourcesInfluence();
+                        }else{
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            res = res + Math.max(planet.getInfluence(),planet.getResources());
+                        }
+                    }else {
                         if(xxcha){
                             msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
                             inf = inf + planet.getSumResourcesInfluence();
@@ -761,7 +838,9 @@ public class Helper {
             msg = msg + "For a total spend of **"+res+" Resources**";
         }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
             msg = msg + "For a total spend of **"+inf+" Influence**";
-        }else{
+        }else if(resOrInfOrBoth.equalsIgnoreCase("freelancers")){
+            msg = msg + "For a total spend of **"+res+" Resources**";
+        }else {
             msg = msg + "For a total spend of **"+res+" Resources** or **"+inf+" Influence**";
         }
         return msg;
