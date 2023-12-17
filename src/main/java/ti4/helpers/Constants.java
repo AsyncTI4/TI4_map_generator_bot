@@ -748,6 +748,7 @@ public class Constants {
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String CATEGORY = "category";
+    public static final String SEND_JSON_TO_S3 = "send_games_to_s3";
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
     public static final String GAME_END = "end";
     public static final String GAME_HAS_ENDED = "game_has_ended";

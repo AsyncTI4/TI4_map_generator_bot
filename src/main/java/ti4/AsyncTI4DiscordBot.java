@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -74,8 +76,8 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
-import ti4.helpers.Storage;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
+import ti4.helpers.Storage;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -130,9 +132,9 @@ public class AsyncTI4DiscordBot {
         }
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
-        
+
         guildPrimaryID = args[2];
-        userID = args[1]; 
+        userID = args[1];
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
@@ -314,7 +316,7 @@ public class AsyncTI4DiscordBot {
      * <li>Developers can execute /developer and /bothelper commands</li>
      * <li>Bothelpers can execute /bothelper commands</li>
      * </ul>
-     * 
+     *
      * Add your test server's role ID to enable access to these commands on your server
      */
     private static void initializeWhitelistedRoles() {
@@ -359,5 +361,16 @@ public class AsyncTI4DiscordBot {
 
     public static boolean isReadyToReceiveCommands() {
         return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.READY_TO_RECEIVE_COMMANDS.toString(), Boolean.class, false);
+    }
+
+    public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, THREAD_POOL)
+            .handle((result, exception) -> {
+                if (exception != null) {
+                    BotLogger.log("Unable to complete async process.", exception);
+                    return null;
+                }
+                return result;
+            });
     }
 }

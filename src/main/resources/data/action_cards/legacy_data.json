@@ -403,5 +403,14 @@
     "text": "Remove any of your command tokens from that system. [Note: 'Into' specifically refers to a destination system, not systems you move 'through'.]",
     "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "impeachment",
+    "name": "Impeachment",
+    "phase": "Any",
+    "window": "At the end of the strategy phase",
+    "text": "If the \"Politics\" strategy card is in another player's play area, take it and give that player 1 of your other strategy cards; otherwise, gain the speaker token.",
+    "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
+    "source": "action_deck_2"
   }
 ]
