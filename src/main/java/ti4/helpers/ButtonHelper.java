@@ -3383,6 +3383,10 @@ public class ButtonHelper {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
+        if(player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(activeGame, activeGame.getActiveSystem(), player)){
+            Button ghostButton = Button.secondary("declareUse_Aetherstream", "Declare Aetherstream").withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
+            buttons.add(ghostButton);
+        }
         if (player.ownsUnit("ghost_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
@@ -5300,7 +5304,7 @@ public class ButtonHelper {
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
                 ButtonHelperAbilities.pillageCheck(p1, activeGame);
                 ButtonHelperAbilities.pillageCheck(p2, activeGame);
-                message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"  ("+ident+" tg went from ("+oldP1Tg+"->"+p1.getTg()+")\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident +" ("+ident2+" tg went from ("+oldP2tg+"->"+p2.getTg()+")";
+                message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"  ."+ident+" tg went from ("+oldP1Tg+"->"+p1.getTg()+")\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident +" ("+ident2+" tg went from ("+oldP2tg+"->"+p2.getTg()+")";
             }
             case "shipOrders" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
