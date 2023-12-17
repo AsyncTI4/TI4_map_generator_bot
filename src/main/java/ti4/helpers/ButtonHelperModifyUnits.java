@@ -586,7 +586,7 @@ public class ButtonHelperModifyUnits {
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
         if(skipbuild.contains("freelancers")){
-             buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "both");
+             buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "freelancers");
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
