@@ -9,12 +9,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class Storage {
-
+    
+    public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
+    public static final String ENV_VAR_DB_PATH = "DB_PATH";
     public static final String MAPS_UNDO = "/maps/undo/";
     public static final String MAPS = "/maps/";
     public static final String MAPS_JSON = "/maps_json/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
+    
+    private static String resourcePath = null;
+    private static String storagePath = null;
+
     private static Font TI_FONT_8;
     private static Font TI_FONT_12;
     private static Font TI_FONT_13;
@@ -229,11 +235,6 @@ public class Storage {
     }
 
     @Nullable
-    public static String getResourcePath() {
-        return System.getenv("RESOURCE_PATH");
-    }
-
-    @Nullable
     public static File getMapStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
@@ -288,6 +289,35 @@ public class Storage {
     }
 
     public static String getStoragePath() {
-        return System.getenv("DB_PATH");
+        if (storagePath != null) {
+            return storagePath;
+        }
+
+        return System.getenv(ENV_VAR_DB_PATH);
+    }
+
+    /**
+     * Allows for storage path overrides instead of using env var. Likely only useful
+     * for testing.
+     */
+    public static void setStoragePath(@Nullable String path) {
+        storagePath = path;
+    }
+
+    @Nullable
+    public static String getResourcePath() {
+        if (resourcePath != null) {
+            return resourcePath;
+        }
+    
+        return System.getenv(ENV_VAR_RESOURCE_PATH);
+    }
+
+    /**
+     * Allows for resource path overrides instead of using env var. Likely only useful
+     * for testing.
+     */
+    public static void setResourcePath(@Nullable String path){
+        resourcePath = path;
     }
 }

@@ -71,7 +71,7 @@ public class Tile {
     @Nullable
     public static String getUnitPath(UnitKey unitID) {
         if (unitID == null) return null;
-        
+
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
             BotLogger.log("Could not find unit: " + unitID);
@@ -252,7 +252,7 @@ public class Tile {
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         if (("44".equals(tileID) || ("45".equals(tileID)))
-                && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
+            && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
             tileName = "S15_Cucumber.png";
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
@@ -266,7 +266,7 @@ public class Tile {
         Boolean hasFog = fog.get(player);
 
         Game activeGame = player.getGame();
-        if(activeGame.isLightFogMode() && player.getFogTiles().containsKey(getPosition())){
+        if (activeGame.isLightFogMode() && player.getFogTiles().containsKey(getPosition())) {
             return false;
         }
         //default all tiles to being foggy to prevent unintended info leaks
@@ -312,8 +312,8 @@ public class Tile {
 
     public List<UnitHolder> getPlanetUnitHolders() {
         List<UnitHolder> planets = new ArrayList<>();
-        for(UnitHolder uH : unitHolders.values()){
-            if(uH instanceof Planet){
+        for (UnitHolder uH : unitHolders.values()) {
+            if (uH instanceof Planet) {
                 planets.add(uH);
             }
         }
@@ -321,10 +321,21 @@ public class Tile {
     }
 
     @JsonIgnore
+    @Nullable
+    public UnitHolder getUnitHolderFromPlanet(String planetName) {
+        for (Map.Entry<String, UnitHolder> unitHolderEntry : this.getUnitHolders().entrySet()) {
+            if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                return unitHolderEntry.getValue();
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public String getRepresentation() {
         try {
-            if (Mapper.getTileRepresentations().get(getTileID()) == null){
-                return getTileID() + "(" + getPosition()+ ")";
+            if (Mapper.getTileRepresentations().get(getTileID()) == null) {
+                return getTileID() + "(" + getPosition() + ")";
             }
             return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
@@ -445,6 +456,7 @@ public class Tile {
         }
         return false;
     }
+
     @JsonIgnore
     public boolean isAnomaly(Game activeGame) {
         if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(activeGame)) {
@@ -489,7 +501,7 @@ public class Tile {
     @JsonIgnore
     public boolean search(String searchString) {
         return getTileID().contains(searchString) ||
-            getPosition().contains(searchString)  ||
+            getPosition().contains(searchString) ||
             getTileModel().search(searchString);
     }
 }

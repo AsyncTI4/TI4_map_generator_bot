@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,8 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -212,58 +215,69 @@ public class Player {
         this.mahactCC = mahactCC;
     }
 
-    public void resetProducedUnits(){
-        producedUnits = new HashMap<>(); 
+    public void resetProducedUnits() {
+        producedUnits = new HashMap<>();
     }
-    public void resetSpentThings(){
+
+    public void resetSpentThings() {
         spentThingsThisWindow = new ArrayList<>();
     }
 
     public HashMap<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
     }
-    public List<String> getSpentThingsThisWindow(){
+
+    public List<String> getSpentThingsThisWindow() {
         return spentThingsThisWindow;
     }
-    public void addSpentThing(String thing){
+
+    public void addSpentThing(String thing) {
         spentThingsThisWindow.add(thing);
     }
-    public void removeSpentThing(String thing){
+
+    public void removeSpentThing(String thing) {
         spentThingsThisWindow.remove(thing);
     }
-    public int getSpentTgsThisWindow(){
-        for(String thing : spentThingsThisWindow){
-            if(thing.contains("tg_")){
+
+    public int getSpentTgsThisWindow() {
+        for (String thing : spentThingsThisWindow) {
+            if (thing.contains("tg_")) {
                 return Integer.parseInt(thing.split("_")[1]);
             }
         }
         return 0;
     }
-    public void increaseTgsSpentThisWindow(int amount){
+
+    public void increaseTgsSpentThisWindow(int amount) {
         int oldTgSpent = getSpentTgsThisWindow();
-        int newTgSpent = oldTgSpent+amount;
-        if(oldTgSpent != 0){
-            removeSpentThing("tg_"+oldTgSpent);
+        int newTgSpent = oldTgSpent + amount;
+        if (oldTgSpent != 0) {
+            removeSpentThing("tg_" + oldTgSpent);
         }
-        addSpentThing("tg_"+newTgSpent);
+        addSpentThing("tg_" + newTgSpent);
     }
-    public void setSpentThings(List<String> things){
+
+    public void setSpentThings(List<String> things) {
         spentThingsThisWindow = things;
     }
+
     public void setProducedUnit(String unit, int count) {
         producedUnits.put(unit, count);
     }
+
     public int getProducedUnit(String unit) {
-        if(producedUnits.get(unit) == null){
+        if (producedUnits.get(unit) == null) {
             return 0;
-        }else{
+        } else {
             return producedUnits.get(unit);
         }
     }
-    public void produceUnit(String unit){
-        int amount = getProducedUnit(unit)+1;
+
+    public void produceUnit(String unit) {
+        int amount = getProducedUnit(unit) + 1;
         producedUnits.put(unit, amount);
     }
+
     public void setProducedUnits(HashMap<String, Integer> displacedUnits) {
         producedUnits = displacedUnits;
     }
@@ -493,7 +507,7 @@ public class Player {
         return prefersDistanceBasedTacticalActions;
     }
 
-    public void setPreferenceForDistanceBasedTacticalActions(boolean preference ) {
+    public void setPreferenceForDistanceBasedTacticalActions(boolean preference) {
         prefersDistanceBasedTacticalActions = preference;
     }
 
@@ -1524,6 +1538,13 @@ public class Player {
         this.tg = tg;
     }
 
+    @JsonIgnore
+    public void gainTg(int tg) {
+        this.tg += tg;
+        ButtonHelperAbilities.pillageCheck(this, getGame());
+        ButtonHelperAgents.resolveArtunoCheck(this, getGame(), tg);
+    }
+
     public void setTurnCount(int turn) {
         turnCount = turn;
     }
@@ -1621,7 +1642,7 @@ public class Player {
         if (comms > commoditiesTotal && commoditiesTotal > 0) {
             comms = commoditiesTotal;
         }
-        if(comms < 0){
+        if (comms < 0) {
             comms = 0;
         }
         commodities = comms;

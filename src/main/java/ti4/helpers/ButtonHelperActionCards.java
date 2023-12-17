@@ -408,6 +408,12 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
+     public static void resolveDistinguished(Player player, Game activeGame, ButtonInteractionEvent event) {
+        player.addSpentThing("distinguished_5");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " added 5 votes to your vote total");
+        event.getMessage().delete().queue();
+     }
+
     public static void resolveUprisingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {

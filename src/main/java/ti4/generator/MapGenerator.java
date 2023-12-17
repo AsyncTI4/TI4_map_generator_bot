@@ -100,16 +100,16 @@ public class MapGenerator {
     private final DisplayType displayType;
     private final boolean uploadToDiscord;
     private final boolean debug;
-
     private final int width;
-    private int height;
-    private int mapWidth;
+    private final int height;
     private final int heightForGameInfo;
+    private final boolean extraRow;
+
+    private int mapWidth;
     private int minX = -1;
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
-    private boolean extraRow;
     private Boolean isFoWPrivate;
     private Player fowPlayer;
     private long debugAbsoluteStartTime;
@@ -157,16 +157,12 @@ public class MapGenerator {
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         int mapHeight = (ringCount + 1) * 600 + EXTRA_Y * 2;
         mapWidth = (ringCount + 1) * 520 + EXTRA_X * 2;
-        extraRow = false;
-        if ((mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y)) {
+        extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
+        if (extraRow) {
             mapWidth += EXTRA_X;
-            extraRow = true;
         }
 
         width = mapWidth;
-        height = mapHeight + heightStats;
-        int heightStorage = height;
-
         if (displayType == DisplayType.stats) {
             heightForGameInfo = 40;
             height = heightStats;
@@ -175,7 +171,7 @@ public class MapGenerator {
             height = mapHeight + 600;
         } else {
             heightForGameInfo = mapHeight;
-            height = heightStorage;
+            height = mapHeight + heightStats;
         }
 
         ImageIO.setUseCache(false);
@@ -2483,10 +2479,6 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
         int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, customPublicVP, false);
 
-        y += 40;
-        graphics.setColor(Color.green);
-        displaySftT(y, x, players);
-
         return Math.max(y3, Math.max(y1, y2)) + 15;
     }
 
@@ -2686,31 +2678,6 @@ public class MapGenerator {
             return secretsScored.keySet().size() + player.getSecrets().keySet().size();
         }
         return secretsScored.keySet().size();
-    }
-
-    private int displaySftT(int y, int x, Map<String, Player> players) {
-        for (Player player : players.values()) {
-            List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
-            int countToThree = 2;
-            for (String id : promissoryNotesInPlayArea) {
-                if (id.endsWith("_sftt")) {
-                    Player promissoryNoteOwner = game.getPNOwner(id);
-                    if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
-                        BotLogger.log(game.getName() + " " + player.getUserName()
-                            + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
-                        continue;
-                    }
-                    boolean multiScoring = false;
-                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, true);
-                    countToThree++;
-                    if (countToThree > 2) {
-                        countToThree = 0;
-                        y += 43;
-                    }
-                }
-            }
-        }
-        return y;
     }
 
     private int displayObjectives(
