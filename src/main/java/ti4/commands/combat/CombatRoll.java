@@ -140,7 +140,7 @@ public class CombatRoll extends CombatSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "There are no units in " + fightingOnUnitHolderName + " on tile " + tile.getPosition()
                             + " for player " + player.getColor() + " "
-                            + player.getFactionEmoji() + "\n"
+                            + player.getFactionEmoji() + " for the combat roll type "+rollType.toString()+"\n"
                             + "Ping bothelper if this seems to be in error.");
 
             return;

@@ -234,9 +234,9 @@ public class Helper {
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return false;
         }
-        if (player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds") || player.getActionCards().containsKey("sabo2") ||
+        if ((player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds") || player.getActionCards().containsKey("sabo2") ||
             player.getActionCards().containsKey("sabo3") || player.getActionCards().containsKey("sabo4")
-            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) {
+            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure") ) {
             return false;
         }
         if (player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
@@ -250,6 +250,111 @@ public class Helper {
         // }else{
         //     return false;
         // }
+    }
+
+    public static void sendAllNames(GenericInteractionCreateEvent event){
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        String names = "";
+        int num = 0;
+
+        for (Game activeGame : mapList.values()) {
+            num++;
+            names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
+    }
+
+    public static List<Player> getInitativeOrder(Game activeGame){
+        HashMap<Integer, Player> order = new HashMap<>();
+        int naaluSC = 0;
+        for (Player player : activeGame.getRealPlayers()) {
+            int sc = player.getLowestSC();
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
+            if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                naaluSC = sc;
+            }
+            order.put(sc, player);
+        }
+        List<Player> initiativeOrder = new ArrayList<>();
+        Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if (naaluSC != 0) {
+            Player p3 = order.get(naaluSC);
+            initiativeOrder.add(p3);
+        }
+        for (int i = 1; i <= max; i++) {
+            if (naaluSC != 0 && i == naaluSC) {
+                continue;
+            }
+            Player p2 = order.get(i);
+            if (p2 != null) {
+                initiativeOrder.add(p2);
+            }
+        }
+        return initiativeOrder;
+
+    }
+    public static List<Player> getInitativeOrderFromThisPlayer(Player p1, Game activeGame){
+        List<Player> players = new ArrayList<>();
+        
+        List<Player> initiativeOrder = getInitativeOrder(activeGame);
+        boolean found = false;
+        for(Player p2 : initiativeOrder){
+            if(p2 == p1){
+                found = true;
+                players.add(p1);
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        for(Player p2 : initiativeOrder){
+            if(p2 == p1){
+                found = false;
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        return players;
+    }
+    public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game activeGame){
+        List<Player> players = new ArrayList<>();
+        boolean found = false;
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                found = true;
+                players.add(player);
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                found = false;
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        return players;
+    }
+
+    public static boolean hasEveryoneResolvedBeforeMe(Player player, String factionsThatHaveResolved, List<Player> orderList){
+        for(Player p2 : orderList){
+            if(p2 == player){
+                return true;
+            }
+            if(!factionsThatHaveResolved.contains(p2.getFaction())){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void checkAllSaboWindows(Game activeGame) {
