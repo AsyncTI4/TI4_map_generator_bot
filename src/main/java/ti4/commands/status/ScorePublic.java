@@ -59,6 +59,8 @@ public class ScorePublic extends StatusSubcommandData {
 	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game activeGame, Player player, int poID) {
 		String both = getNameNEMoji(activeGame, poID);
 		String poName = both.split("_")[0];
+
+		
 		if (poName.toLowerCase().contains("push boundaries")) {
 			int aboveN = 0;
 			for (Player p2 : player.getNeighbouringPlayers()) {

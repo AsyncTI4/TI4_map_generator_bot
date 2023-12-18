@@ -579,6 +579,19 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
+            if(activeGame.getFactionsThatReactedToThis("forcedScoringOrder").equalsIgnoreCase("true")){
+                List<Player> players = Helper.getInitativeOrder(activeGame);
+                String factionsThatHaveResolved = activeGame.getFactionsThatReactedToThis("factionsThatScored");
+                if(!Helper.hasEveryoneResolvedBeforeMe(player, factionsThatHaveResolved, players)){
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) +" the bot has been told to follow a strict public scoring order, and not everyone before you has resolved");
+                    return;
+                }else{
+                    activeGame.setCurrentReacts("factionsThatScored", activeGame.getFactionsThatReactedToThis("factionsThatScored")+"_"+player.getFaction());
+                }
+
+            }else{
+                activeGame.setCurrentReacts("factionsThatScored", activeGame.getFactionsThatReactedToThis("factionsThatScored")+"_"+player.getFaction());
+            }
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
@@ -2225,6 +2238,7 @@ public class ButtonListener extends ListenerAdapter {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
                 case Constants.PO_NO_SCORING -> {
+                    activeGame.setCurrentReacts("factionsThatScored", activeGame.getFactionsThatReactedToThis("factionsThatScored")+"_"+player.getFaction());
                     String message = player.getRepresentation()
                         + " - no Public Objective scored.";
                     if (!activeGame.isFoWMode()) {
@@ -2328,6 +2342,11 @@ public class ButtonListener extends ListenerAdapter {
                     }
 
                     //event.getMessage().delete().queue();
+                }
+                case "forceACertainScoringOrder"->{
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Players will be forced to score in order");
+                    activeGame.setCurrentReacts("forcedScoringOrder", "true");
+                    event.getMessage().delete().queue();
                 }
                 case "proceedToFinalizingVote" -> {
                     AgendaHelper.proceedToFinalizingVote(activeGame, player, event);
@@ -2668,6 +2687,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
+                    int washedCommsPower = player.getCommoditiesTotal()+player.getTg();
                     int commoditiesTotal = player.getCommoditiesTotal();
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
@@ -2675,11 +2695,19 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(0);
                     for (Player p2 : activeGame.getRealPlayers()) {
                         if (p2.getSCs().contains(5) && p2.getCommodities() > 0) {
-                            p2.setTg(p2.getTg() + p2.getCommodities());
-                            p2.setCommodities(0);
-                            ButtonHelperAbilities.pillageCheck(p2, activeGame);
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
-                                p2.getRepresentation(true, true) + " your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                            if(p2.getCommodities() > washedCommsPower){
+                                p2.setTg(p2.getTg() + washedCommsPower);
+                                p2.setCommodities(p2.getCommodities()-washedCommsPower);
+                                ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                                    p2.getRepresentation(true, true) + " "+washedCommsPower+" of your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                            }else{
+                                p2.setTg(p2.getTg() + p2.getCommodities());
+                                p2.setCommodities(0);
+                                ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                                    p2.getRepresentation(true, true) + " your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                            }
                         }
                     }
                     if (!player.getFollowedSCs().contains(5)) {
@@ -3559,7 +3587,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Please select the same planet you dropped the infantry on";
                     List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "place");
                     buttons.add(Button.danger("orbitolDropExhaust", "Pay for mech"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
                     event.getMessage().delete().queue();
                 }
                 case "orbitolDropExhaust" -> ButtonHelperAbilities.oribtalDropExhaust(buttonID, event, activeGame, player, ident);
