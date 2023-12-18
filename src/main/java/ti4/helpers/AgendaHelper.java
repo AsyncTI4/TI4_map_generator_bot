@@ -801,15 +801,18 @@ public class AgendaHelper {
                 if(numV > numVOrig){
                     player.addSpentThing("specialVotes_"+(numV-numVOrig));
                 }
-                if(player.ownsPromissoryNote("bp") || player.getPromissoryNotesInPlayArea().contains("bp")){
-                    for(Player p2 : getLosingVoters(outcome, activeGame)){
-                        if(p2 == player){
-                            continue;
-                        }
-                        if(p2.ownsPromissoryNote("bp") || p2.getPromissoryNotesInPlayArea().contains("bp")){
-                            player.addSpentThing("bloodPact_"+4);
-                            votes = (Integer.parseInt(votes)+4)+"";
-                            break;
+                if (activeGame.getLaws() != null && (activeGame.getLaws().containsKey("rep_govt") || activeGame.getLaws().containsKey("absol_government"))) {
+                }else{
+                    if(player.ownsPromissoryNote("bp") || player.getPromissoryNotesInPlayArea().contains("bp")){
+                        for(Player p2 : getLosingVoters(outcome, activeGame)){
+                            if(p2 == player){
+                                continue;
+                            }
+                            if(p2.ownsPromissoryNote("bp") || p2.getPromissoryNotesInPlayArea().contains("bp")){
+                                player.addSpentThing("bloodPact_"+4);
+                                votes = (Integer.parseInt(votes)+4)+"";
+                                break;
+                            }
                         }
                     }
                 }
