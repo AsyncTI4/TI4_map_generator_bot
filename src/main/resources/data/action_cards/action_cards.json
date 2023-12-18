@@ -1543,7 +1543,7 @@
     "name": "Abyssal Starpaths",
     "phase": "Action",
     "window": "After you activate a system:",
-    "text": "Choose any 2 systems that do not contain planets; those systems are adjacent to until the end of this tactical action.",
+    "text": "Choose any 2 systems that do not contain planets; those 2 systems are adjacent to each other until the end of this tactical action.",
     "flavorText": "The calls of the Ghoti all-mother have left many unsuspecting captains lost in the void.",
     "source": "ds"
   },

@@ -1684,6 +1684,11 @@ public class Player {
     }
 
     public boolean hasTech(String techID) {
+        if(techID.equals("det") || techID.equals("amd")){
+            if(techs.contains("absol_"+techID)){
+                return true;
+            }
+        }
         return techs.contains(techID);
     }
 

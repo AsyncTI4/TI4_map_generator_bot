@@ -38,7 +38,7 @@ import ti4.message.MessageHelper;
 public class GameEnd extends GameSubcommandData {
 
     public GameEnd() {
-        super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
+        super(Constants.GAME_END, "Declare the game has ended");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (Default: True)"));
