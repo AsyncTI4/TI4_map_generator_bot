@@ -833,13 +833,13 @@ public class AgendaHelper {
 
             int[] voteInfo = getVoteTotal(nextInLine, activeGame);
 
-            while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor())) || activeGame.getFactionsThatReactedToThis("Abstain on Agenda").contains(nextInLine.getFaction())) {
+            while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor())) || activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())) {
                 String skippedMessage = realIdentity2
                     + "You are being skipped because the bot believes you cannot vote";
-                if(activeGame.getFactionsThatReactedToThis("Abstain on Agenda").contains(nextInLine.getFaction())){
+                if(activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())){
                     skippedMessage = realIdentity2
                     + "You are being skipped because the you told the bot you wanted to preset an abstain";
-                    activeGame.setCurrentReacts("Abstain on Agenda", activeGame.getFactionsThatReactedToThis("Abstain on Agenda").replace(nextInLine.getFaction(),""));
+                    activeGame.setCurrentReacts("Abstain On Agenda", activeGame.getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(),""));
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
@@ -1231,12 +1231,12 @@ public class AgendaHelper {
             String realIdentity = nextInLine.getRepresentation(true, true);
             int[] voteInfo = getVoteTotal(nextInLine, activeGame);
             int counter = 0;
-            while ((voteInfo[0] < 1 || activeGame.getFactionsThatReactedToThis("Abstain on Agenda").contains(nextInLine.getFaction()))&& counter < 10) {
+            while ((voteInfo[0] < 1 || activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction()))&& counter < 10) {
                 String skippedMessage = realIdentity + "You are being skipped because the bot thinks you cant vote";
-                if(activeGame.getFactionsThatReactedToThis("Abstain on Agenda").contains(nextInLine.getFaction())){
+                if(activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())){
                     skippedMessage = realIdentity
                     + "You are being skipped because the you told the bot you wanted to preset an abstain";
-                    activeGame.setCurrentReacts("Abstain on Agenda", activeGame.getFactionsThatReactedToThis("Abstain on Agenda").replace(nextInLine.getFaction(),""));
+                    activeGame.setCurrentReacts("Abstain On Agenda", activeGame.getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(),""));
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);

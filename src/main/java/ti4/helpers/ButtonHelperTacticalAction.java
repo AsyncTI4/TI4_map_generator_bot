@@ -284,6 +284,8 @@ public class ButtonHelperTacticalAction {
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "tacticalAction", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. "
             + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), "The bot believes you have "+Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false)+" PRODUCTION value in this system");
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
