@@ -310,7 +310,6 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(activeGame.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        writer.write(System.lineSeparator());
         writeCards(activeGame.getPurgedActionCards(), writer, Constants.AC_PURGED);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", activeGame.getAllExplores()));
@@ -1101,7 +1100,7 @@ public class GameSaveLoadManager {
     }
 
     @Nullable
-    private static Game loadMap(File mapFile) {
+    public static Game loadMap(File mapFile) {
         if (mapFile != null) {
             Game activeGame = new Game();
             try (Scanner myReader = new Scanner(mapFile)) {
