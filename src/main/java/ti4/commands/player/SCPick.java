@@ -56,9 +56,7 @@ public class SCPick extends PlayerSubcommandData {
             return;
         }
 
-        Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList();
+        Collection<Player> activePlayers = activeGame.getRealPlayers();
         if (activePlayers.size() == 0) {
             sendMessage("No active players found");
             return;
@@ -187,7 +185,7 @@ public class SCPick extends PlayerSubcommandData {
             boolean foundPlayer = false;
             Player privatePlayer = null;
             for (Player p3 : activeGame.getRealPlayers()) {
-                if(p3.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("politicalStabilityFaction"))){
+                if (p3.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("politicalStabilityFaction"))) {
                     continue;
                 }
                 if (foundPlayer) {

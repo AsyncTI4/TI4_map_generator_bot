@@ -72,8 +72,9 @@ public class Info extends GameSubcommandData {
             .append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/")
             .append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
-        if (activeGame.getEventDeckID() != null && !"null".equals(activeGame.getEventDeckID())) sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/")
-            .append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
+        if (activeGame.getEventDeckID() != null && !"null".equals(activeGame.getEventDeckID()))
+            sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/")
+                .append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(activeGame.getTechnologyDeckID()).append("`").append(NEW_LINE);
         sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/")
             .append(activeGame.getRelicFullDeckSize()).append(NEW_LINE);
@@ -118,9 +119,9 @@ public class Info extends GameSubcommandData {
 
         sb.append("### Other Stats: ").append(NEW_LINE);
         sb.append("Current Phase: ").append(activeGame.getCurrentPhase()).append(NEW_LINE);
-        sb.append("Ring Count: ").append(activeGame.getRingCount()).append(NEW_LINE);
         sb.append("Game Player Count: ").append(activeGame.getPlayerCountForMap()).append(NEW_LINE);
         sb.append("Game Real Player Count: ").append(activeGame.getRealPlayers().size()).append(NEW_LINE);
+        sb.append("SCs per player: ").append(activeGame.getStrategyCardsPerPlayer()).append(NEW_LINE);
         sb.append("Map Images Generated: ").append(activeGame.getMapImageGenerationCount()).append(NEW_LINE);
         sb.append("SC Trade Goods: `").append(activeGame.getScTradeGoods()).append("`").append(NEW_LINE);
         sb.append("Public Objectives: `").append(activeGame.getRevealedPublicObjectives()).append("`").append(NEW_LINE);

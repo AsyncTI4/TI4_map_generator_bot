@@ -220,8 +220,8 @@ public class GameSaveLoadManager {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
                     String msg = "Undoing the last saved command:\n> " + loadedGame.getLatestCommand();
-                    if(loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel){
-                       msg = "Undoing the last saved command:\n> [CLASSIFIED]"; 
+                    if (loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel) {
+                        msg = "Undoing the last saved command:\n> [CLASSIFIED]";
                     }
 
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -459,10 +459,10 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
-        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeGame.getPlayerCountForMap());
+        writer.write(Constants.SC_COUNT_FOR_MAP + " " + activeGame.getStrategyCardsPerPlayer());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RING_COUNT_FOR_MAP + " " + activeGame.getRingCount());
+        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeGame.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.VP_COUNT + " " + activeGame.getVp());
@@ -1414,13 +1414,25 @@ public class GameSaveLoadManager {
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     try {
                         int playerCount = Integer.parseInt(info);
-                        if (playerCount >= 2 && playerCount <= 30) {
+                        if (playerCount >= 1 && playerCount <= 30) {
                             activeGame.setPlayerCountForMap(playerCount);
                         } else {
                             activeGame.setPlayerCountForMap(6);
                         }
                     } catch (Exception e) {
                         activeGame.setPlayerCountForMap(6);
+                    }
+                }
+                case Constants.SC_COUNT_FOR_MAP -> {
+                    try {
+                        int scCount = Integer.parseInt(info);
+                        if (scCount >= 1 && scCount <= 8) {
+                            activeGame.setStrategyCardsPerPlayer(scCount);
+                        } else {
+                            activeGame.setStrategyCardsPerPlayer(1);
+                        }
+                    } catch (Exception e) {
+                        activeGame.setStrategyCardsPerPlayer(1);
                     }
                 }
                 case Constants.ACTIVATION_COUNT -> {
