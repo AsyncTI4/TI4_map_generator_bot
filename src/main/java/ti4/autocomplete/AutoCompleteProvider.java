@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
+import ti4.commands.map.Preset;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
@@ -977,24 +978,44 @@ public class AutoCompleteProvider {
             event.replyChoiceStrings("No Active Map for this Channel").queue();
             return;
         }
-        if (subCommandName.equals(Constants.ADD_TILE)) {
-            if (optionName.equals(Constants.TILE_NAME)) {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                List<Command.Choice> options = TileHelper.getAllTiles().entrySet().stream()
-                    .filter(entry -> entry.getValue().search(enteredValue))
-                    .limit(25)
-                    .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                    .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-                // case Constants.POSITION -> {
-                //     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                //     List<Command.Choice> options = activeGame.getTileMap().entrySet().stream()
-                //         .filter(entry -> entry.getValue().search(enteredValue))
-                //         .limit(25)
-                //         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                //         .collect(Collectors.toList());
-                //     event.replyChoices(options).queue();
-                // }
+
+        switch (subCommandName) {
+            case Constants.ADD_TILE -> {
+                switch (optionName) {
+                    case Constants.TILE_NAME -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        List<Command.Choice> options = TileHelper.getAllTiles().entrySet().stream()
+                            .filter(entry -> entry.getValue().search(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                    // case Constants.POSITION -> {
+                    //     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    //     List<Command.Choice> options = activeGame.getTileMap().entrySet().stream()
+                    //         .filter(entry -> entry.getValue().search(enteredValue))
+                    //         .limit(25)
+                    //         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                    //         .collect(Collectors.toList());
+                    //     event.replyChoices(options).queue();
+                    // }
+                }
+            }
+            case Constants.PRESET -> {
+                switch (optionName) {
+                    case Constants.MAP_TEMPLATE -> {
+                        System.out.println("Found autocomplete");
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+
+                        List<Command.Choice> options = Preset.templates.stream()
+                            .filter(value -> value.contains(enteredValue))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value, value))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
             }
         }
     }

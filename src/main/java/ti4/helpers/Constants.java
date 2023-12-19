@@ -166,7 +166,17 @@ public class Constants {
     public static final String HELP = "help";
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
+
     public static final String PRESET = "preset";
+    public static final String MAP_TEMPLATE = "map_template";
+    public static final String SLICE_1 = "slice_1";
+    public static final String SLICE_2 = "slice_2";
+    public static final String SLICE_3 = "slice_3";
+    public static final String SLICE_4 = "slice_4";
+    public static final String SLICE_5 = "slice_5";
+    public static final String SLICE_6 = "slice_6";
+    public static final String SLICE_7 = "slice_7";
+    public static final String SLICE_8 = "slice_8";
 
     public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";

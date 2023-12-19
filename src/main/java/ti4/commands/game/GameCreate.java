@@ -44,6 +44,9 @@ public class GameCreate extends GameSubcommandData {
         Game game = createNewGame(event, mapName, member);
         reportNewGameCreated(game);
         MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
+        if (event.getMessageChannel().getName().startsWith(game.getName() + "-")) {
+            ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel());
+        }
     }
 
     public static Game createNewGame(SlashCommandInteractionEvent event, String gameName, Member gameOwner) {
@@ -63,7 +66,6 @@ public class GameCreate extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
         }
         GameSaveLoadManager.saveMap(newGame, event);
-        ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel());
         return newGame;
     }
 
