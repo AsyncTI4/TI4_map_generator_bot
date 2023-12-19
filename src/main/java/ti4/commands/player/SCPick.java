@@ -187,6 +187,9 @@ public class SCPick extends PlayerSubcommandData {
             boolean foundPlayer = false;
             Player privatePlayer = null;
             for (Player p3 : activeGame.getRealPlayers()) {
+                if(p3.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("politicalStabilityFaction"))){
+                    continue;
+                }
                 if (foundPlayer) {
                     privatePlayer = p3;
                     foundPlayer = false;

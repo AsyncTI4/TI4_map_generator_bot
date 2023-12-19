@@ -408,6 +408,12 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
+     public static void resolveDistinguished(Player player, Game activeGame, ButtonInteractionEvent event) {
+        player.addSpentThing("distinguished_5");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " added 5 votes to your vote total");
+        event.getMessage().delete().queue();
+     }
+
     public static void resolveUprisingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
@@ -597,6 +603,7 @@ public class ButtonHelperActionCards {
 
     public static void resolvePSStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
+        activeGame.setCurrentReacts("politicalStabilityFaction", player.getFaction());
         for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
@@ -811,7 +818,7 @@ public class ButtonHelperActionCards {
         String agendaID = activeGame.lookAtTopAgenda(0);
         sb.append("1: ");
         if (activeGame.getSentAgendas().get(agendaID) != null) {
-            sb.append("This agenda is currently in somebody's hand. Showing the next agenda");
+            sb.append("This agenda is currently in somebody's hand. Showing the next agenda because thats how it should be by the RULEZ");
             agendaID = activeGame.lookAtTopAgenda(1);
             if (activeGame.getSentAgendas().get(agendaID) != null) {
                 sb.append("This agenda is currently in somebody's hand.");

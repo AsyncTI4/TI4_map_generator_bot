@@ -228,21 +228,21 @@ public class MessageListener extends ListenerAdapter {
                                     long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
                                     int autoPingSpacer = (int) spacer;
                                     int pingNumber = (int) (milliSinceLastTurnChange)/(60 * 60 * multiplier * (int) autoPingSpacer);
-                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * 2)) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 2)) {
                                         ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
-                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * 3)) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 3)) {
                                         ping = realIdentity + " this is a brusk missive stating that while you may sleep, the bot never does (and its been told to ping you about it).";
                                     }
-                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * 4)) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 4)) {
                                         ping = realIdentity
                                             + " this is a sternly worded letter from the bot regarding your noted absence. Do you know how much paperwork this creates? (none in reality but a lot in theory)";
                                     }
-                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * 5)) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 5)) {
                                         ping = realIdentity
                                             + " this is a firm request from the bot that you do something to end this situation. At this rate you will never make the top 100 fastest players";
                                     }
-                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * 6)) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 6)) {
                                         ping = realIdentity
                                             + " Half dozen times the charm they say. I have it on good authority that if you move in the next 10 ms, you're guaranteed to win the next combat you have, bot's honor. Wait too long though and your dice get cursed. ";
                                     }
@@ -314,7 +314,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
 
                                     int maxSoFar = 25;
-                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * maxSoFar)) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * maxSoFar)) {
                                         ping = realIdentity + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time. ";
                                     }
                                     if (pingNumber > maxSoFar + 1 && !activeGame.isFoWMode()) {

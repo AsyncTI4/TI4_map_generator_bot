@@ -1979,7 +1979,7 @@ public class ButtonHelper {
         List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(tc, "Combat", buttons);
         if (playersWithPds2.size() > 0 && !activeGame.isFoWMode() && "space".equalsIgnoreCase(spaceOrGround)) {
-            StringBuilder pdsMessage = new StringBuilder("The following players have pds2 cover in the region, and can use the button to fire it:");
+            StringBuilder pdsMessage = new StringBuilder("The following players have space cannon offense cover in the region, and can use the button to fire it:");
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append(" ").append(playerWithPds.getRepresentation());
             }
@@ -3383,6 +3383,10 @@ public class ButtonHelper {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
+        if(player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(activeGame, activeGame.getActiveSystem(), player)){
+            Button ghostButton = Button.secondary("declareUse_Aetherstream", "Declare Aetherstream").withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
+            buttons.add(ghostButton);
+        }
         if (player.ownsUnit("ghost_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
@@ -4644,7 +4648,7 @@ public class ButtonHelper {
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
                     if (model != null && (model.getDeepSpaceCannon() || (tilePos.equalsIgnoreCase(adjTilePos) && model.getSpaceCannonDieCount() > 0))) {
                         if (owningPlayer == player) {
-                            if (FoWHelper.otherPlayersHaveShipsInSystem(player, adjTile, activeGame)) {
+                            if (FoWHelper.otherPlayersHaveShipsInSystem(player, activeGame.getTileByPosition(tilePos), activeGame)) {
                                 playersWithPds2.add(owningPlayer);
                             }
                         } else {
@@ -5153,6 +5157,11 @@ public class ButtonHelper {
             Button transact = Button.success(finChecker + "transact_TGs_" + p2.getFaction(), "TGs");
             stuffToTransButtons.add(transact);
         }
+        if (p1.getDebtTokenCount(p2.getColor()) > 0) {
+            Button transact = Button.primary(finChecker + "transact_ClearDebt_" + p2.getFaction(), "Clear Debt");
+            stuffToTransButtons.add(transact);
+        }
+        stuffToTransButtons.add(Button.danger(finChecker + "transact_SendDebt_" + p2.getFaction(), "Send Debt"));
         if (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex")) {
             Button transact = Button.success(finChecker + "transact_Comms_" + p2.getFaction(), "Commodities");
             stuffToTransButtons.add(transact);
@@ -5251,6 +5260,22 @@ public class ButtonHelper {
                 String message = "Click the amount of commodities you would like to send";
                 for (int x = 1; x < p1.getCommodities() + 1; x++) {
                     Button transact = Button.success(finChecker + "send_Comms_" + p2.getFaction() + "_" + x, "" + x);
+                    stuffToTransButtons.add(transact);
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
+            }
+            case "ClearDebt" -> {
+                String message = "Click the amount of debt you would like to clear";
+                for (int x = 1; x < p1.getDebtTokenCount(p2.getColor())+1; x++) {
+                    Button transact = Button.success(finChecker + "send_ClearDebt_" + p2.getFaction() + "_" + x, "" + x);
+                    stuffToTransButtons.add(transact);
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
+            }
+            case "SendDebt" -> {
+                String message = "Click the amount of debt you would like to send";
+                for (int x = 1; x < 6; x++) {
+                    Button transact = Button.success(finChecker + "send_SendDebt_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -5398,8 +5423,6 @@ public class ButtonHelper {
                 int newP1Comms = 0;
                 int totalWashPowerP1 = p1.getCommodities() + p1.getTg();
                 int totalWashPowerP2 = p2.getCommodities() + p2.getTg();
-                // 6 comms, 4tg hacan -- p2
-                //4 comms, 1 tg empy -- p1
                 if (oldP1Comms > totalWashPowerP2) {
                     newP1Comms = oldP1Comms - totalWashPowerP2;
 
@@ -5427,6 +5450,14 @@ public class ButtonHelper {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
                 p1.removeRelic(amountToTrans);
                 p2.addRelic(amountToTrans);
+            }
+            case "SendDebt" -> {
+                message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
+                p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
+            }
+            case "ClearDebt" -> {
+                message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
+                p1.removeDebtTokens(p2.getColor(), Integer.parseInt(amountToTrans));
             }
             case "starCharts" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;

@@ -417,6 +417,9 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
         String messageText = player.getRepresentation() +
             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
+        if(playerLeader.getId().equalsIgnoreCase("yssarilagent")){
+            messageText = messageText + "\n" +"Yssaril agent was used as a "+ StringUtils.capitalize(agent.replace("agent","")) + " agent";
+        }
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
             messageText = messageText + "\n" + rest.split("_")[1] + " " + Emojis.getTGorNomadCoinEmoji(activeGame) + " was placed on top of the leader";
