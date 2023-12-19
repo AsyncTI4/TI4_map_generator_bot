@@ -234,9 +234,9 @@ public class Helper {
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return false;
         }
-        if (player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds") || player.getActionCards().containsKey("sabo2") ||
+        if ((player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds") || player.getActionCards().containsKey("sabo2") ||
             player.getActionCards().containsKey("sabo3") || player.getActionCards().containsKey("sabo4")
-            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) {
+            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure") ) {
             return false;
         }
         if (player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
@@ -250,6 +250,111 @@ public class Helper {
         // }else{
         //     return false;
         // }
+    }
+
+    public static void sendAllNames(GenericInteractionCreateEvent event){
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        String names = "";
+        int num = 0;
+
+        for (Game activeGame : mapList.values()) {
+            num++;
+            names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
+    }
+
+    public static List<Player> getInitativeOrder(Game activeGame){
+        HashMap<Integer, Player> order = new HashMap<>();
+        int naaluSC = 0;
+        for (Player player : activeGame.getRealPlayers()) {
+            int sc = player.getLowestSC();
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
+            if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                naaluSC = sc;
+            }
+            order.put(sc, player);
+        }
+        List<Player> initiativeOrder = new ArrayList<>();
+        Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if (naaluSC != 0) {
+            Player p3 = order.get(naaluSC);
+            initiativeOrder.add(p3);
+        }
+        for (int i = 1; i <= max; i++) {
+            if (naaluSC != 0 && i == naaluSC) {
+                continue;
+            }
+            Player p2 = order.get(i);
+            if (p2 != null) {
+                initiativeOrder.add(p2);
+            }
+        }
+        return initiativeOrder;
+
+    }
+    public static List<Player> getInitativeOrderFromThisPlayer(Player p1, Game activeGame){
+        List<Player> players = new ArrayList<>();
+        
+        List<Player> initiativeOrder = getInitativeOrder(activeGame);
+        boolean found = false;
+        for(Player p2 : initiativeOrder){
+            if(p2 == p1){
+                found = true;
+                players.add(p1);
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        for(Player p2 : initiativeOrder){
+            if(p2 == p1){
+                found = false;
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        return players;
+    }
+    public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game activeGame){
+        List<Player> players = new ArrayList<>();
+        boolean found = false;
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                found = true;
+                players.add(player);
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                found = false;
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        return players;
+    }
+
+    public static boolean hasEveryoneResolvedBeforeMe(Player player, String factionsThatHaveResolved, List<Player> orderList){
+        for(Player p2 : orderList){
+            if(p2 == player){
+                return true;
+            }
+            if(!factionsThatHaveResolved.contains(p2.getFaction())){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void checkAllSaboWindows(Game activeGame) {
@@ -661,6 +766,75 @@ public class Helper {
         return planetButtons;
     }
 
+    public static String buildSpentThingsMessageForVoting(Player player, Game activeGame, boolean justVoteTotal){
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        String msg = ButtonHelper.getIdent(player)+" used the following: \n";
+        int votes = 0;
+        int tg = player.getSpentTgsThisWindow();
+        for(String thing : spentThings){
+            int count = 0;
+            String secondHalf = thing.split("_")[1];
+            String flavor = thing.split("_")[0];
+            if(flavor.contains("planet")){
+                count = AgendaHelper.getSpecificPlanetsVoteWorth(player, activeGame, secondHalf);
+            }else{
+                count = Integer.parseInt(thing.split("_")[1]);
+            }
+            if(flavor.contains("tg")){
+                votes = votes + count*2;
+            }else{
+                 votes = votes + count;
+            }
+            msg = msg + "> ";
+            switch (flavor) {
+                case "tg" ->{
+                    msg = msg +  "Spent "+player.getSpentTgsThisWindow()+" tgs for "+tg*2+" votes "+"\n";
+                }
+                case "planet" ->{
+                    msg = msg + Helper.getPlanetRepresentation(secondHalf, activeGame) + " for "+count+" votes "+"\n";
+                }
+                case "absolShard" ->{
+                    msg = msg +  "Used Absol Shard of the Throne for "+count+" votes "+"\n";
+                }
+                case "dsghotg" ->{
+                    msg = msg +  "Exhausted some silly Ghoti Tech for "+count+" votes "+"\n";
+                }
+                case "absolsyncretone" ->{
+                    msg = msg +  "Used Absol Syncretone for "+count+" votes "+"\n";
+                }
+                case "zeal" ->{
+                    msg = msg +  "Used Zeal Ability for "+count+" votes "+"\n";
+                }
+                case "predictive" ->{
+                    msg = msg +  "Used Predictive Intelligence for "+count+" votes "+"\n";
+                }
+                case "specialVotes" ->{
+                    msg = msg +  "Used Special Votes for "+count+" votes "+"\n";
+                }
+                case "representative" ->{
+                    msg = msg +  "Got 1 vote for representative government "+"\n";
+                }
+                case "distinguished" ->{
+                    msg = msg +  "Used the AC Distinguished Councillor for 5 votes "+"\n";
+                }
+                case "absolRexControlRepresentative" ->{
+                    msg = msg +  "Got 1 vote for controlling rex while representative government is in play"+"\n";
+                }
+                case "bloodPact" ->{
+                    msg = msg +  "Got 4 votes from voting the same way as another Blood Pact member"+"\n";
+                }
+                    
+            }
+        }
+        msg = msg + "For a total of **"+votes+"** votes on the outcome "+StringUtils.capitalize(activeGame.getLatestOutcomeVotedFor());
+        if(justVoteTotal){
+            return ""+votes;
+        }
+
+        return msg;
+    }
+
+
     public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth){
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = ButtonHelper.getIdent(player)+" exhausted the following: \n";
@@ -698,7 +872,15 @@ public class Helper {
                             msg = msg + getPlanetRepresentationPlusEmojiPlusInfluence(thing, activeGame) +"\n";
                             inf = inf + planet.getInfluence();
                         }
-                    }else{
+                    }else if(resOrInfOrBoth.equalsIgnoreCase("freelancers")){
+                        if(xxcha){
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            res = res +planet.getSumResourcesInfluence();
+                        }else{
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            res = res + Math.max(planet.getInfluence(),planet.getResources());
+                        }
+                    }else {
                         if(xxcha){
                             msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
                             inf = inf + planet.getSumResourcesInfluence();
@@ -761,7 +943,9 @@ public class Helper {
             msg = msg + "For a total spend of **"+res+" Resources**";
         }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
             msg = msg + "For a total spend of **"+inf+" Influence**";
-        }else{
+        }else if(resOrInfOrBoth.equalsIgnoreCase("freelancers")){
+            msg = msg + "For a total spend of **"+res+" Resources**";
+        }else {
             msg = msg + "For a total spend of **"+res+" Resources** or **"+inf+" Influence**";
         }
         return msg;

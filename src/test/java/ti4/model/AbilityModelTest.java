@@ -7,28 +7,14 @@ import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
+import ti4.testUtils.BaseTi4Test;
 
-public class AbilityModelTest {
-
-    @BeforeAll
-    public static void init() {
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-    }
-
+public class AbilityModelTest extends BaseTi4Test {
     @Test
     public void testAbilities() {
         for (AbilityModel model : Mapper.getAbilities().values()) {

@@ -1,33 +1,17 @@
 package ti4.draft;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ti4.draft.items.*;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Storage;
 import ti4.model.FactionModel;
+import ti4.testUtils.BaseTi4Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class FrankenItemTest {
-
-    @BeforeAll
-    public static void init() {
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-    }
-
-
+public class FrankenItemTest extends BaseTi4Test {
     @Test
     public void testAllCardsGenerateSuccessfully() {
         var factions = FrankenDraft.getAllFrankenLegalFactions();

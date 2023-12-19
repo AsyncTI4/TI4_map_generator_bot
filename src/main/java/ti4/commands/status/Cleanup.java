@@ -41,6 +41,8 @@ public class Cleanup extends StatusSubcommandData {
 
     public void runStatusCleanup(Game activeGame) {
 
+
+
         HashMap<String, Tile> tileMap = activeGame.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
@@ -91,6 +93,10 @@ public class Cleanup extends StatusSubcommandData {
             }
         }
         activeGame.setCurrentReacts("absolMOW", "");
+        activeGame.setCurrentReacts("agendaCount", "0");
+        activeGame.setCurrentReacts("politicalStabilityFaction", "");
+        activeGame.setCurrentReacts("forcedScoringOrder", "");
+        activeGame.setCurrentReacts("factionsThatScored", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
             new SpinTilesInFirstThreeRings().spinRings(activeGame);

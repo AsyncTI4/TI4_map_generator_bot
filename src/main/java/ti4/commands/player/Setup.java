@@ -256,6 +256,9 @@ public class Setup extends PlayerSubcommandData {
                     if (player2.getPersonalPingInterval() > 0) {
                         player.setPersonalPingInterval(player2.getPersonalPingInterval());
                     }
+                    if(player2.doesPlayerPreferDistanceBasedTacticalActions()){
+                        player.setPreferenceForDistanceBasedTacticalActions(true);
+                    }
                 }
             }
         }

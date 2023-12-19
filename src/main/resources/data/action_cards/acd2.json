@@ -3,8 +3,8 @@
     "alias": "ancient_data_archive",
     "name": "Ancient Data Archive",
     "phase": "Action",
-    "window": "Before a player draws a card from an exploration deck or the relic deck",
-    "text": "That player reveals the top 3 cards of that deck, shuffles 2 of those cards back into it, and places the remaining card on top of it.",
+    "window": "Action",
+    "text": "Look at the top 3 cards of an exploration deck or the relic deck, shuffle 2 of those cards back into it, and place the remaining card on top of it.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -13,7 +13,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "During this turn, you can negotiate transactions with players who are not your neighbor. Choose any number of your neighbors. Those players gain 2 commodities.",
+    "text": "During this turn, you can negotiate transactions with players who are not your neighbor. Choose any number of other players. Those players gain 2 commodities.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
     "source": "action_deck_2"
   },
@@ -58,7 +58,7 @@
     "name": "Artifact Research",
     "phase": "Action",
     "window": "When you spend resources to research",
-    "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may discard 2 of your relic fragments to research 1 additional technology.",
+    "text": "Discard 1 of your relic fragments to reduce the resources spent by 4 and ignore 1 of that technology's prerequisites.",
     "flavorText": "The observation team had protested with one voice, threatening to return with fleets should the Creuss continue to bar them from this discovery.",
     "source": "action_deck_2"
   },
@@ -396,15 +396,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "impeachment",
-    "name": "Impeachment",
-    "phase": "Any",
-    "window": "When you would draw action cards as part of the secondary ability of the \"Politics\" strategy card",
-    "text": "The speaker draws 2 action cards instead. Then, they may discard all of their action cards; otherwise, you gain the speaker token.",
-    "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "intrigue",
     "name": "Intrigue",
     "phase": "Agenda",
@@ -444,8 +435,8 @@
     "alias": "mechanized_workforce",
     "name": "Mechanized Workforce",
     "phase": "Action",
-    "window": "When 1 or more of your units use PRODUCTION",
-    "text": "For each mech in the active system, apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 2.",
+    "window": "Action",
+    "text": "Place 1 destroyer in each system that contains 1 of your mechs and does not contain another player's ships.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
   },
@@ -552,8 +543,8 @@
     "alias": "rehashed_debates",
     "name": "Rehashed Debates",
     "phase": "Agenda",
-    "window": "At the end of the agenda phase",
-    "text": "Choose 1 agenda in play or in the discard pile. Players vote on that agenda as if it were just revealed from the agenda deck. Then, each player readies 2 planets they control.",
+    "window": "When an agenda is revealed",
+    "text": "Choose 1 agenda in play or in the discard pile. Then, discard the revealed agenda. Players vote on the chosen agenda instead, as if it were just revealed from the agenda deck.",
     "flavorText": "Ciel was met by a crowd when he arrived at the Senate Possessional. His agreements to fund research on the Ixthian artifact had conjured up doomsayers. They would learn the providence of Winnaran wisdom.",
     "source": "action_deck_2"
   },
@@ -615,8 +606,8 @@
     "alias": "shock_troops",
     "name": "Shock Troops",
     "phase": "Action",
-    "window": "At the start of the first round of a ground combat",
-    "text": "Roll 1 die for each of up to 2 of your participating ground forces. For each result equal to or greater than that unit's combat value, produce 1 hit against your opponent's units; on a result of 9 or 10, produce 1 additional hit.",
+    "window": "After you win a combat that ended during its first round",
+    "text": "Remove your command token from the active system.",
     "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
     "source": "action_deck_2"
   },
@@ -652,8 +643,17 @@
     "name": "Singularity Charge",
     "phase": "Action",
     "window": "At the start of the first round of a combat",
-    "text": "Each participating unit that has SUSTAIN DAMAGE in the active system becomes damaged.",
+    "text": "Each unit that is participating in this combat and has SUSTAIN DAMAGE becomes damaged.",
     "flavorText": "In a barely visible flash, their ships' shields dropped. Mendosa growled, \"Full throttle evasive maneuvers, the Tribesmen have laid a trap!\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "sister_ship",
+    "name": "Sister Ship",
+    "phase": "Any",
+    "window": "After 1 of your ships is destroyed",
+    "text": "Produce a matching unit in your home system; reduce the cost of that unit by half, rounded up.",
+    "flavorText": "The production of the Van Hauge XVIII had finished in record time. As it left the docking bay, Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
   {
@@ -661,8 +661,8 @@
     "name": "Smuggler Routes",
     "phase": "Status",
     "window": "At the start of the status phase",
-    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's units.",
-    "flavorText": "Greg broke out in song, \"But who cares? No big deal. I want more... I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
+    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's ships to gain 1 trade good.",
+    "flavorText": "Greg looked to the skies longingly, \"I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
   {
