@@ -3676,7 +3676,7 @@ public class ButtonHelper {
         //     tile.removeUnit("space",key, amount);
         // }
         activeGame.resetCurrentMovedUnitsFrom1System();
-        Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + activeGame.getActiveSystem(), "Build in this system");
+        Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + activeGame.getActiveSystem(), "Build in this system ("+Helper.getProductionValue(player, activeGame, tile, false)+" PRODUCTION Value)");
         buttons.add(buildButton);
         Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
