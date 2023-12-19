@@ -47,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.game.SetOrder;
@@ -250,6 +251,16 @@ public class Helper {
         // }else{
         //     return false;
         // }
+    }
+
+    public static void giveMeBackMyAgendaButtons(Game activeGame){
+        List<Button> proceedButtons = new ArrayList<>();
+        String msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
+        proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
+        proceedButtons.add(Button.primary("transaction", "Transaction"));
+        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg, proceedButtons);
     }
 
     public static void sendAllNames(GenericInteractionCreateEvent event){
@@ -984,15 +995,68 @@ public class Helper {
             }
             msg = msg + localPlace;
         }
-        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" Resources** (not counting discounts).";
+        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame, true) +" Resources**";
+        if(calculateCostOfProducedUnits(player, activeGame, false) > 2){
+            msg = msg +" (total units produced: "+calculateCostOfProducedUnits(player, activeGame, false)+").";
+        }
         return msg;
     }
 
-    public static int calculateCostOfProducedUnits(Player player, Game activeGame){
+    public static int getProductionValue(Player player, Game activeGame, Tile tile, boolean warfare){
+        int productionValueTotal = 0;
+        if(!warfare){
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                for(UnitKey unit : uH.getUnits().keySet()){
+                    if(unit.getColor().equalsIgnoreCase(player.getColor())){
+                        UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                        int productionValue = unitModel.getProductionValue();
+                        if(unitModel.getAsyncId().equals("sd") && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))){
+                            if(uH instanceof Planet planet){
+                                productionValue = planet.getResources()+ productionValue;
+                            }
+                        }
+                        productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
+                    }
+                }
+                if(player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)){
+                    productionValueTotal = productionValueTotal +1;
+                }
+            }
+            if(tile.isSupernova() && player.hasTech("mr")){
+                productionValueTotal = productionValueTotal +5;
+            }
+        }else{
+            int highestProd = 0;
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                for(UnitKey unit : uH.getUnits().keySet()){
+                    if(unit.getColor().equalsIgnoreCase(player.getColor())){
+                        UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                        if(!unitModel.getAsyncId().equals("sd")){
+                            continue;
+                        }
+                        int productionValue = unitModel.getProductionValue();
+                        if(unitModel.getAsyncId().equals("sd") && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))){
+                            if(uH instanceof Planet planet){
+                                productionValue = planet.getResources()+ productionValue;
+                            }
+                        }
+                        if( productionValue > highestProd){
+                            highestProd = productionValue;
+                        }
+                    }
+                }
+            }
+            productionValueTotal = highestProd;
+        }
+        return productionValueTotal;
+    }
+
+    public static int calculateCostOfProducedUnits(Player player, Game activeGame, boolean wantCost){
         HashMap<String, Integer> producedUnits = player.getCurrentProducedUnits();
         int cost = 0;
         int numInf = 0;
         int numFF = 0;
+        int totalUnits = 0;
         boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");
         for(String unit : producedUnits.keySet()){
             String unit2 = unit.split("_")[0];
@@ -1004,6 +1068,7 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
                 cost = cost + (int)removedUnit.getCost() * producedUnits.get(unit);
+                totalUnits = totalUnits + producedUnits.get(unit);
             }
         }
         if(regulated){
@@ -1012,8 +1077,13 @@ public class Helper {
             cost = cost + (int)((numInf+1)/2);
             cost = cost + (int)((numFF+1)/2);
         }
-
-        return cost;
+        totalUnits = totalUnits + numInf+numFF;
+        if(wantCost){
+            return cost;
+        }else{
+            return totalUnits;
+        }
+        
     }
 
 
