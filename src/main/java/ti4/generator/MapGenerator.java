@@ -2871,6 +2871,9 @@ public class MapGenerator {
         if (color == null) {
             return Color.WHITE;
         }
+        if (color.startsWith("split")) {
+            color = color.replace("split", "");
+        }
         return switch (color) {
             case "black" -> Color.DARK_GRAY;
             case "blue" -> Color.BLUE;
@@ -2900,6 +2903,7 @@ public class MapGenerator {
             case "rose" -> Color.decode("#d59de2");
             case "spring" -> Color.decode("#cedd8e");
             case "ethereal" -> Color.decode("#31559e");
+            case "orca" -> getColor("gray");
             default -> Color.WHITE;
         };
     }

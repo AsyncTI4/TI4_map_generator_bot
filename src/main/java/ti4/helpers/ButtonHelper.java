@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
@@ -84,6 +83,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
@@ -4412,10 +4412,8 @@ public class ButtonHelper {
             for (int j = i + 1; j < players.size(); j++) {
                 Player p2 = players.get(j);
 
-                double l1 = relativeLuminance(MapGenerator.getColor(p1.getColor()));
-                double l2 = relativeLuminance(MapGenerator.getColor(p2.getColor()));
-                double contrast = contrastRatio(l1, l2);
-                if (contrast > 4.5) {
+                double contrast = colorContrast(p1.getColor(), p2.getColor());
+                if (contrast < 4.5) {
                     Collision e1 = new Collision(p1, p2, contrast);
                     issues.add(e1);
                 }
@@ -4426,7 +4424,7 @@ public class ButtonHelper {
 
         StringBuilder sb = new StringBuilder("### The following pairs of players have colors with a low contrast value:\n");
         for (Collision issue : issues) {
-            sb.append("> ").append(issue.p1.getRepresentation()).append(" & ").append(issue.p2.getRepresentation()).append("  -> ");
+            sb.append("> ").append(issue.p1.getRepresentation(false, false)).append(" & ").append(issue.p2.getRepresentation(false, false)).append("  -> ");
             sb.append("Ratio = 1:").append(issue.contrast);
             if (issue.contrast < 2) {
                 sb.append("(very bad!)");
@@ -4435,6 +4433,32 @@ public class ButtonHelper {
         }
 
         MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb.toString());
+    }
+
+    public static double colorContrast(String color1, String color2) {
+        return Math.max(colorPrimaryContrast(color1, color2), colorSecondaryContrast(color1, color2));
+    }
+
+    private static double colorPrimaryContrast(String color1, String color2) {
+        Color c1 = ColorModel.primaryColor(color1);
+        Color c2 = ColorModel.primaryColor(color2);
+        if (c1 == null || c2 == null) return 1;
+
+        double l1 = relativeLuminance(c1);
+        double l2 = relativeLuminance(c2);
+        double contrast = contrastRatio(l1, l2);
+        return contrast;
+    }
+
+    private static double colorSecondaryContrast(String color1, String color2) {
+        Color c1 = ColorModel.secondaryColor(color1);
+        Color c2 = ColorModel.secondaryColor(color2);
+
+        // if there is no secondary color (not a split color), compare on the primary color
+        double l1 = c1 == null ? relativeLuminance(ColorModel.primaryColor(color1)) : relativeLuminance(c1);
+        double l2 = c2 == null ? relativeLuminance(ColorModel.primaryColor(color2)) : relativeLuminance(c2);
+        double contrast = contrastRatio(l1, l2);
+        return contrast;
     }
 
     /**
@@ -4453,6 +4477,7 @@ public class ButtonHelper {
      * XsRGB = X8bit/255
      */
     private static double relativeLuminance(Color color) {
+        if (color == null) return 0;
         double RsRGB = ((double) color.getRed()) / 255.0;
         double GsRGB = ((double) color.getGreen()) / 255.0;
         double BsRGB = ((double) color.getBlue()) / 255.0;
