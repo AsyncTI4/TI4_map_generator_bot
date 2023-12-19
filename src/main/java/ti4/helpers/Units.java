@@ -70,7 +70,7 @@ public class Units {
             return String.format("%s%s%s", colorID, emdash, asyncID());
         }
 
-        UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
+        public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
             this.unitType = unitType;
             this.colorID = colorID;
         }
