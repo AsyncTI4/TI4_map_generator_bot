@@ -62,8 +62,8 @@ public class SCPick extends PlayerSubcommandData {
             return;
         }
 
-        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
-        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
+        int maxSCsPerPlayer = activeGame.getStrategyCardsPerPlayer();
+        if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
@@ -217,7 +217,7 @@ public class SCPick extends PlayerSubcommandData {
         if (activeGame.isReverseSpeakerOrder()) {
             Collections.reverse(activePlayers);
         }
-        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
+        int maxSCsPerPlayer = activeGame.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer < 1) {
             maxSCsPerPlayer = 1;
         }

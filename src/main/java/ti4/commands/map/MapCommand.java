@@ -76,7 +76,8 @@ public class MapCommand implements Command {
         subcommands.add(new RemoveTile());
         subcommands.add(new AddBorderAnomaly());
         subcommands.add(new RemoveBorderAnomaly());
-        subcommands.add(new InitTspmap());
+        //subcommands.add(new InitTspmap());
+        subcommands.add(new Preset());
         return subcommands;
     }
 

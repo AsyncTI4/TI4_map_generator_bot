@@ -567,19 +567,19 @@ public class Emojis {
     public static final String Nebula = "<:nebula:1137029690004090900>";
 
     // TECHNOLOGY
-    public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
+    public static final String PropulsionTech = "<:propulsion:1120031660025577533>";
     public static final String PropulsionDisabled = "<:propulsionDisabled:1120031664458960896>";
     public static final String Propulsion2 = "<:propulsion2:1120031821304959098>";
     public static final String Propulsion3 = "<:propulsion3:1120031823569895584>";
-    public static final String BioticTech = "<:Biotictech:947250608107315210>";
+    public static final String BioticTech = "<:biotic:1120031648151523369>";
     public static final String BioticDisabled = "<:bioticDisabled:1120031652299681963>";
     public static final String Biotic2 = "<:biotic2:1120031649732771841>";
     public static final String Biotic3 = "<:biotic3:1120031651167227944>";
-    public static final String CyberneticTech = "<:Cybernetictech:1092053090720563211>";
+    public static final String CyberneticTech = "<:cybernetic:1120031653432139896>";
     public static final String CyberneticDisabled = "<:cyberneticDisabled:1120031658582737047>";
     public static final String Cybernetic2 = "<:cybernetic2:1120031655374102718>";
     public static final String Cybernetic3 = "<:cybernetic3:1120031656766619658>";
-    public static final String WarfareTech = "<:Warfaretech:1092053103777427468>";
+    public static final String WarfareTech = "<:warfare:1120031666241536082>";
     public static final String WarfareDisabled = "<:warfareDisabled:1120031828384956446>";
     public static final String Warfare2 = "<:warfare2:1120031824891093113>";
     public static final String Warfare3 = "<:warfare3:1120031825851584523>";
@@ -640,7 +640,7 @@ public class Emojis {
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
-    
+
     // SOURCE ICONS
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
