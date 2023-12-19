@@ -2262,7 +2262,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "warfare", "place");
                     String message = player.getRepresentation()
                         + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system. "
-                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame) + "\n"+ "The bot believes you have "+Helper.getProductionValue(player, activeGame, tile, true)+" PRODUCTION value in this system";
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
@@ -3774,7 +3774,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
 
-                player.setTotalExpenses(player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, activeGame));
+                player.setTotalExpenses(player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, activeGame, true));
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
