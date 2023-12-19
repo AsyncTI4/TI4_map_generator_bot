@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -87,6 +89,10 @@ public class Game {
     private DisplayType displayTypeForced;
     @ExportableField
     private int playerCountForMap = 6;
+    @ExportableField
+    @Getter
+    @Setter
+    private int strategyCardsPerPlayer = 1;
     @Getter
     @Setter
     private boolean reverseSpeakerOrder;

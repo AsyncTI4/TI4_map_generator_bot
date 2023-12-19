@@ -3383,7 +3383,7 @@ public class ButtonHelper {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
-        if(player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(activeGame, activeGame.getActiveSystem(), player)){
+        if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(activeGame, activeGame.getActiveSystem(), player)) {
             Button ghostButton = Button.secondary("declareUse_Aetherstream", "Declare Aetherstream").withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
             buttons.add(ghostButton);
         }
@@ -4846,28 +4846,27 @@ public class ButtonHelper {
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game activeGame) {
-        int playersWithSCs = 0;
         activeGame.setCurrentPhase("statusHomework");
-        for (Player player : activeGame.getPlayers().values()) {
-            if (playersWithSCs > 0) {
-                new Cleanup().runStatusCleanup(activeGame);
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing() + "Status Cleanup Run!");
-                playersWithSCs = -30;
-                if (!activeGame.isFoWMode()) {
-                    DisplayType displayType = DisplayType.map;
-                    MapGenerator.saveImage(activeGame, displayType, event)
-                        .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
-                }
-            }
-            if (player.isRealPlayer()) {
-                if (player.getSCs() != null && player.getSCs().size() > 0
-                    && !player.getSCs().contains(0)) {
-                    playersWithSCs = playersWithSCs + 1;
-                }
-            } else {
-                continue;
-            }
 
+        // first do cleanup if necessary
+        int playersWithSCs = 0;
+        for (Player player : activeGame.getRealPlayers()) {
+            if (player.getSCs() != null && player.getSCs().size() > 0 && !player.getSCs().contains(0)) {
+                playersWithSCs++;
+            }
+        }
+
+        if (playersWithSCs > 0) {
+            new Cleanup().runStatusCleanup(activeGame);
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing() + "Status Cleanup Run!");
+            if (!activeGame.isFoWMode()) {
+                DisplayType displayType = DisplayType.map;
+                MapGenerator.saveImage(activeGame, displayType, event)
+                    .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
+            }
+        }
+
+        for (Player player : activeGame.getRealPlayers()) {
             Leader playerLeader = player.getLeader("naaluhero").orElse(null);
 
             if (player.hasLeader("naaluhero") && player.getLeaderByID("naaluhero").isPresent()
@@ -5266,7 +5265,7 @@ public class ButtonHelper {
             }
             case "ClearDebt" -> {
                 String message = "Click the amount of debt you would like to clear";
-                for (int x = 1; x < p1.getDebtTokenCount(p2.getColor())+1; x++) {
+                for (int x = 1; x < p1.getDebtTokenCount(p2.getColor()) + 1; x++) {
                     Button transact = Button.success(finChecker + "send_ClearDebt_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }

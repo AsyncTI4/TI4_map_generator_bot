@@ -72,6 +72,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
+            runMigration("migrateInitStratCardsPerPlayer_121823", DataMigrationManager::migrateInitStratCardsPerPlayer_121823);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -187,7 +188,7 @@ public class DataMigrationManager {
         };
 
         List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
-        int playerCount = activeGame.getRealPlayers().size()+activeGame.getDummies().size();
+        int playerCount = activeGame.getRealPlayers().size() + activeGame.getDummies().size();
 
         ArrayList<String> setup;
         if (playerCount == 6 && activeGame.getRingCount() == 3) {
@@ -657,7 +658,7 @@ public class DataMigrationManager {
         replacements.put("disrupt_logistics", "disrupted_logistics");
         replacements.put("emergency_conscription", "pivoted_plan");
         replacements.put("efficient_protocols", "commercial_applications");
-        replacements.put("fulfillment_protocols","mercenary_contract");
+        replacements.put("fulfillment_protocols", "mercenary_contract");
         replacements.put("graviton_shielding", "commercial_applications");
         replacements.put("magen_engineers", "double_agents");
         replacements.put("production_rider", "foreign_policy");
@@ -677,7 +678,7 @@ public class DataMigrationManager {
             return false;
         }
 
-        for(Player p : game.getRealPlayers()) {
+        for (Player p : game.getRealPlayers()) {
             replaceFrankenItemsInBag_111223(p.getDraftHand());
             replaceFrankenItemsInBag_111223(p.getCurrentDraftBag());
             replaceFrankenItemsInBag_111223(p.getDraftQueue());
@@ -687,9 +688,9 @@ public class DataMigrationManager {
     }
 
     private static void replaceFrankenItemsInBag_111223(DraftBag bag) {
-        for(int i = 0; i < bag.Contents.size(); i++) {
+        for (int i = 0; i < bag.Contents.size(); i++) {
             DraftItem item = bag.Contents.get(i);
-            if (item.ItemId.equals("keleres")){
+            if (item.ItemId.equals("keleres")) {
                 var newItem = DraftItem.Generate(item.ItemCategory, "keleresa");
                 swapBagItem(bag, i, newItem);
                 item = newItem;
@@ -701,40 +702,35 @@ public class DataMigrationManager {
                     units.removeIf((String unit) -> !"mech".equals(Mapper.getUnit(unit).getBaseType()));
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.MECH, units.get(0)));
                 }
-            }
-            else if (item.ItemCategory == DraftItem.Category.FLAGSHIP) {
+            } else if (item.ItemCategory == DraftItem.Category.FLAGSHIP) {
                 if (Mapper.getUnit(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     var units = faction.getUnits();
                     units.removeIf((String unit) -> !"flagship".equals(Mapper.getUnit(unit).getBaseType()));
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.FLAGSHIP, units.get(0)));
                 }
-            }
-            else if (item.ItemCategory == DraftItem.Category.AGENT) {
+            } else if (item.ItemCategory == DraftItem.Category.AGENT) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"agent".equals(Mapper.getLeader(leader).getType()));
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.AGENT, agents.get(0)));
                 }
-            }
-            else if (item.ItemCategory == DraftItem.Category.COMMANDER) {
+            } else if (item.ItemCategory == DraftItem.Category.COMMANDER) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"commander".equals(Mapper.getLeader(leader).getType()));
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.COMMANDER, agents.get(0)));
                 }
-            }
-            else if (item.ItemCategory == DraftItem.Category.HERO) {
+            } else if (item.ItemCategory == DraftItem.Category.HERO) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"hero".equals(Mapper.getLeader(leader).getType()));
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.HERO, agents.get(0)));
                 }
-            }
-            else if (item.ItemCategory == DraftItem.Category.PN) {
+            } else if (item.ItemCategory == DraftItem.Category.PN) {
                 if (Mapper.getPromissoryNoteByID(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> pns = faction.getPromissoryNotes();
@@ -819,4 +815,16 @@ public class DataMigrationManager {
         }
         return false;
     }
+
+    public static boolean migrateInitStratCardsPerPlayer_121823(Game game) {
+        int maxSCsPerPlayer = game.getSCList().size() / game.getRealPlayers().size();
+        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
+
+        if (game.getRealPlayers().size() == 1) maxSCsPerPlayer = 1;
+
+        game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
+
+        return true;
+    }
+
 }
