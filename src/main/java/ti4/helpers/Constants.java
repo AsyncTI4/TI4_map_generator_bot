@@ -1021,4 +1021,6 @@ public class Constants {
     public static final String EVENT_PLAY = "play";
     public static final String SEARCH_EMOJIS = "emojis";
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
+    public static final String RESTORE_GAME = "restore_game";
+    public static final String SAVE_FILE = "save_file";
 }
