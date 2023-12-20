@@ -80,7 +80,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
-    private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
+    public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
         List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
 
         // Sorting the list based on values
