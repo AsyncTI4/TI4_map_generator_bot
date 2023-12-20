@@ -10,13 +10,19 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
+import ti4.helpers.Units.UnitKey;
+import ti4.json.ObjectMapperFactory;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 
 /**
  * Utility test class that allows us to validate our source files are correctly configured
  * for JSON save/restore.
  */
 public final class JsonValidator<T> {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
     
     private JsonValidator() {}
 

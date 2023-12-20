@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.Test;
 
-public class MapperTest {
+import ti4.testUtils.BaseTi4Test;
+
+public class MapperTest extends BaseTi4Test {
     
     @Test
     public void testMapperInit() {

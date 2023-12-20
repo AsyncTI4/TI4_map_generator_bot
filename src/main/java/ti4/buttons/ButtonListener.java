@@ -579,6 +579,19 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
+            if(activeGame.getFactionsThatReactedToThis("forcedScoringOrder").equalsIgnoreCase("true")){
+                List<Player> players = Helper.getInitativeOrder(activeGame);
+                String factionsThatHaveResolved = activeGame.getFactionsThatReactedToThis("factionsThatScored");
+                if(!Helper.hasEveryoneResolvedBeforeMe(player, factionsThatHaveResolved, players)){
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) +" the bot has been told to follow a strict public scoring order, and not everyone before you has resolved");
+                    return;
+                }else{
+                    activeGame.setCurrentReacts("factionsThatScored", activeGame.getFactionsThatReactedToThis("factionsThatScored")+"_"+player.getFaction());
+                }
+
+            }else{
+                activeGame.setCurrentReacts("factionsThatScored", activeGame.getFactionsThatReactedToThis("factionsThatScored")+"_"+player.getFaction());
+            }
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
@@ -827,7 +840,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
             activeGame.setComponentAction(true);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
-            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
             Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 5 influence", buttons);
@@ -2225,6 +2238,7 @@ public class ButtonListener extends ListenerAdapter {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
                 case Constants.PO_NO_SCORING -> {
+                    activeGame.setCurrentReacts("factionsThatScored", activeGame.getFactionsThatReactedToThis("factionsThatScored")+"_"+player.getFaction());
                     String message = player.getRepresentation()
                         + " - no Public Objective scored.";
                     if (!activeGame.isFoWMode()) {
@@ -2248,11 +2262,13 @@ public class ButtonListener extends ListenerAdapter {
                     buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "warfare", "place");
                     String message = player.getRepresentation()
                         + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system. "
-                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame) + "\n"+ "The bot believes you have "+Helper.getProductionValue(player, activeGame, tile, true)+" PRODUCTION value in this system";
                     if (!activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
                     } else {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),"Produce Units", buttons);
                     }
                 }
                 case "getKeleresTechOptions" -> ButtonHelperFactionSpecific.offerKeleresStartingTech(player, activeGame, event);
@@ -2329,6 +2345,11 @@ public class ButtonListener extends ListenerAdapter {
 
                     //event.getMessage().delete().queue();
                 }
+                case "forceACertainScoringOrder"->{
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Players will be forced to score in order");
+                    activeGame.setCurrentReacts("forcedScoringOrder", "true");
+                    event.getMessage().delete().queue();
+                }
                 case "proceedToFinalizingVote" -> {
                     AgendaHelper.proceedToFinalizingVote(activeGame, player, event);
                 }
@@ -2382,7 +2403,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "leadershipExhaust" -> {
                     ButtonHelper.addReaction(event, false, false, "", "");
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
                     Button DoneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeGame.isFoWMode()) {
@@ -2393,7 +2414,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "nekroTechExhaust" -> {
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
                     Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeGame.isFoWMode()) {
@@ -2668,6 +2689,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
+                    int washedCommsPower = player.getCommoditiesTotal()+player.getTg();
                     int commoditiesTotal = player.getCommoditiesTotal();
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
@@ -2675,11 +2697,19 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(0);
                     for (Player p2 : activeGame.getRealPlayers()) {
                         if (p2.getSCs().contains(5) && p2.getCommodities() > 0) {
-                            p2.setTg(p2.getTg() + p2.getCommodities());
-                            p2.setCommodities(0);
-                            ButtonHelperAbilities.pillageCheck(p2, activeGame);
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
-                                p2.getRepresentation(true, true) + " your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                            if(p2.getCommodities() > washedCommsPower){
+                                p2.setTg(p2.getTg() + washedCommsPower);
+                                p2.setCommodities(p2.getCommodities()-washedCommsPower);
+                                ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                                    p2.getRepresentation(true, true) + " "+washedCommsPower+" of your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                            }else{
+                                p2.setTg(p2.getTg() + p2.getCommodities());
+                                p2.setCommodities(0);
+                                ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                                    p2.getRepresentation(true, true) + " your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                            }
                         }
                     }
                     if (!player.getFollowedSCs().contains(5)) {
@@ -3548,7 +3578,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "startChaosMapping" -> ButtonHelperFactionSpecific.firstStepOfChaos(activeGame, player, event);
                 case "useLawsOrder" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), ident + " is paying 1 influence to ignore laws for the turn.");
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
                     Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 1 influence", buttons);
@@ -3559,7 +3589,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Please select the same planet you dropped the infantry on";
                     List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "place");
                     buttons.add(Button.danger("orbitolDropExhaust", "Pay for mech"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
                     event.getMessage().delete().queue();
                 }
                 case "orbitolDropExhaust" -> ButtonHelperAbilities.oribtalDropExhaust(buttonID, event, activeGame, player, ident);
@@ -3746,10 +3776,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
 
-                player.setTotalExpenses(player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, activeGame));
+                player.setTotalExpenses(player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, activeGame, true));
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
-                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
                     buttons.add(sar);
@@ -3865,7 +3895,7 @@ public class ButtonListener extends ListenerAdapter {
         if ("diplomacy".equalsIgnoreCase(buttonID)) {
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, editedMessage, "diplomacy", null);
         }
-        if ("spitItOut".equalsIgnoreCase(buttonID)) {
+        if ("spitItOut".equalsIgnoreCase(buttonID) && !"Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), editedMessage);
         }
         event.getMessage().delete().queue();

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -31,7 +32,7 @@ public class GameCreate extends GameSubcommandData {
         String regex = "^[a-zA-Z0-9]+$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(mapName);
-        if (!matcher.matches()){
+        if (!matcher.matches()) {
             MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return;
         }
@@ -43,11 +44,14 @@ public class GameCreate extends GameSubcommandData {
         Game game = createNewGame(event, mapName, member);
         reportNewGameCreated(game);
         MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
+        if (event.getMessageChannel().getName().startsWith(game.getName() + "-")) {
+            ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel());
+        }
     }
 
     public static Game createNewGame(SlashCommandInteractionEvent event, String gameName, Member gameOwner) {
         Game newGame = new Game();
-        newGame.newGameSetup(); 
+        newGame.newGameSetup();
         String ownerID = gameOwner.getId();
         newGame.setOwnerID(ownerID);
         newGame.setOwnerName(gameOwner.getEffectiveName());

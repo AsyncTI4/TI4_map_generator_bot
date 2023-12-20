@@ -56,16 +56,14 @@ public class SCPick extends PlayerSubcommandData {
             return;
         }
 
-        Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList();
+        Collection<Player> activePlayers = activeGame.getRealPlayers();
         if (activePlayers.size() == 0) {
             sendMessage("No active players found");
             return;
         }
 
-        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
-        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
+        int maxSCsPerPlayer = activeGame.getStrategyCardsPerPlayer();
+        if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
@@ -187,6 +185,9 @@ public class SCPick extends PlayerSubcommandData {
             boolean foundPlayer = false;
             Player privatePlayer = null;
             for (Player p3 : activeGame.getRealPlayers()) {
+                if (p3.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("politicalStabilityFaction"))) {
+                    continue;
+                }
                 if (foundPlayer) {
                     privatePlayer = p3;
                     foundPlayer = false;
@@ -216,7 +217,7 @@ public class SCPick extends PlayerSubcommandData {
         if (activeGame.isReverseSpeakerOrder()) {
             Collections.reverse(activePlayers);
         }
-        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
+        int maxSCsPerPlayer = activeGame.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer < 1) {
             maxSCsPerPlayer = 1;
         }

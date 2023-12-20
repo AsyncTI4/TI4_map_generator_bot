@@ -552,23 +552,23 @@ public class ButtonHelperAbilities {
     }
 
     public static void oribtalDropFollowUp(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), event.getMessage().getContentRaw());
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Button.success("dropAMechToo", "Spend 3 resource to Drop a Mech Too");
         startButtons.add(tacticalAction);
         Button componentAction = Button.danger("finishComponentAction_spitItOut", "Decline Mech");
         startButtons.add(componentAction);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Decide whether to drop mech",
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Decide whether to drop mech",
             startButtons);
         event.getMessage().delete().queue();
     }
 
     public static void oribtalDropExhaust(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
-        Button DoneExhausting = Button.danger("finishComponentAction", "Done Exhausting Planets");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), event.getMessage().getContentRaw());
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
+        Button DoneExhausting = Button.danger("finishComponentAction_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
             "Use Buttons to Pay For The Mech", buttons);
         event.getMessage().delete().queue();
     }
@@ -949,7 +949,7 @@ public class ButtonHelperAbilities {
                 new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry " + planet, activeGame);
             }
         }
-        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
         if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "yin", event);
         }

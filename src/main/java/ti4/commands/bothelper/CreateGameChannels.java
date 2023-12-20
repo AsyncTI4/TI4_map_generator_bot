@@ -178,6 +178,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         for (Member member : members) {
             newGame.addPlayer(member.getId(), member.getEffectiveName());
         }
+        newGame.setPlayerCountForMap(members.size());
+        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / members.size());
 
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
@@ -248,7 +250,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         //AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
             thread.getManager()
-                .setName(newGame.getName() +"-launched - " + thread.getName())
+                .setName(newGame.getName() + "-launched - " + thread.getName())
                 .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                 .setArchived(true)
                 .queue();

@@ -226,6 +226,19 @@ public class TurnEnd extends PlayerSubcommandData {
 
         gameChannel.sendMessage(messageObject).queue();
 
+        int maxVP = 0;
+        for(Player player : activeGame.getRealPlayers()){
+            if(player.getTotalVictoryPoints() > maxVP){
+                maxVP = player.getTotalVictoryPoints();
+            }
+        }
+        if(maxVP+4 > activeGame.getVp()){
+            String msg = "You can use these buttons to force scoring to go in iniative order";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.primary("forceACertainScoringOrder", "Force Scoring in Order"));
+            buttons.add(Button.danger("deleteButtons", "Decline to force order"));
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg, buttons);
+        }
         // return beginning of status phase PNs
         LinkedHashMap<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {

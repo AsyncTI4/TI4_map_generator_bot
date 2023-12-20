@@ -47,8 +47,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
+import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.milty.MiltyDraftManager;
@@ -234,9 +236,9 @@ public class Helper {
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return false;
         }
-        if (player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds") || player.getActionCards().containsKey("sabo2") ||
+        if ((player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds") || player.getActionCards().containsKey("sabo2") ||
             player.getActionCards().containsKey("sabo3") || player.getActionCards().containsKey("sabo4")
-            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) {
+            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure") ) {
             return false;
         }
         if (player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
@@ -250,6 +252,109 @@ public class Helper {
         // }else{
         //     return false;
         // }
+    }
+
+    public static void giveMeBackMyAgendaButtons(Game activeGame){
+        List<Button> proceedButtons = new ArrayList<>();
+        String msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
+        proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
+        proceedButtons.add(Button.primary("transaction", "Transaction"));
+        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg, proceedButtons);
+    }
+
+    public static List<Player> getInitativeOrder(Game activeGame){
+        HashMap<Integer, Player> order = new HashMap<>();
+        int naaluSC = 0;
+        for (Player player : activeGame.getRealPlayers()) {
+            int sc = player.getLowestSC();
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
+            if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                naaluSC = sc;
+            }
+            order.put(sc, player);
+        }
+        List<Player> initiativeOrder = new ArrayList<>();
+        Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if (naaluSC != 0) {
+            Player p3 = order.get(naaluSC);
+            initiativeOrder.add(p3);
+        }
+        for (int i = 1; i <= max; i++) {
+            if (naaluSC != 0 && i == naaluSC) {
+                continue;
+            }
+            Player p2 = order.get(i);
+            if (p2 != null) {
+                initiativeOrder.add(p2);
+            }
+        }
+        return initiativeOrder;
+
+    }
+    public static List<Player> getInitativeOrderFromThisPlayer(Player p1, Game activeGame){
+        List<Player> players = new ArrayList<>();
+        
+        List<Player> initiativeOrder = getInitativeOrder(activeGame);
+        boolean found = false;
+        for(Player p2 : initiativeOrder){
+            if(p2 == p1){
+                found = true;
+                players.add(p1);
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        for(Player p2 : initiativeOrder){
+            if(p2 == p1){
+                found = false;
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        return players;
+    }
+    public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game activeGame){
+        List<Player> players = new ArrayList<>();
+        boolean found = false;
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                found = true;
+                players.add(player);
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                found = false;
+            }else{
+                if(found){
+                    players.add(p2);
+                }
+            }
+        }
+        return players;
+    }
+
+    public static boolean hasEveryoneResolvedBeforeMe(Player player, String factionsThatHaveResolved, List<Player> orderList){
+        for(Player p2 : orderList){
+            if(p2 == player){
+                return true;
+            }
+            if(!factionsThatHaveResolved.contains(p2.getFaction())){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void checkAllSaboWindows(Game activeGame) {
@@ -590,11 +695,11 @@ public class Helper {
         }
         return scButtons;
     }
-    public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Game activeGame) {
-        return getPlanetExhaustButtons(event, player, activeGame, "both");
+    public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame) {
+        return getPlanetExhaustButtons(player, activeGame, "both");
     }
 
-    public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, String whatIsItFor) {
+    public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame, String whatIsItFor) {
         player.resetSpentThings();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -879,15 +984,77 @@ public class Helper {
             }
             msg = msg + localPlace;
         }
-        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" Resources** (not counting discounts).";
+        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame, true) +" Resources**";
+        if(calculateCostOfProducedUnits(player, activeGame, false) > 2){
+            msg = msg +" (total units produced: "+calculateCostOfProducedUnits(player, activeGame, false)+").";
+        }
         return msg;
     }
 
-    public static int calculateCostOfProducedUnits(Player player, Game activeGame){
+    public static int getProductionValue(Player player, Game activeGame, Tile tile, boolean warfare){
+        int productionValueTotal = 0;
+        if(!warfare){
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                for(UnitKey unit : uH.getUnits().keySet()){
+                    if(unit.getColor().equalsIgnoreCase(player.getColor())){
+                        if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                            player.addOwnedUnitByID("tyrantslament");
+                        }
+                        UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                        int productionValue = unitModel.getProductionValue();
+                        if(unitModel.getAsyncId().equals("fs") && player.ownsUnit("ghoti_flagship")){
+                            productionValueTotal = productionValueTotal + player.getFleetCC();
+                        }
+                        if(unitModel.getAsyncId().equals("sd") && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))){
+                            if(uH instanceof Planet planet){
+                                productionValue = planet.getResources()+ productionValue;
+                            }
+                        }
+                        productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
+                    }
+                }
+                if(uH.getName().equalsIgnoreCase("mr") && player.hasTech("iihq") && player.getPlanets().contains("mr")){
+                    productionValueTotal = productionValueTotal + 3;
+                }
+                if(player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)){
+                    productionValueTotal = productionValueTotal +1;
+                }
+            }
+            if(tile.isSupernova() && player.hasTech("mr")){
+                productionValueTotal = productionValueTotal +5;
+            }
+        }else{
+            int highestProd = 0;
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                for(UnitKey unit : uH.getUnits().keySet()){
+                    if(unit.getColor().equalsIgnoreCase(player.getColor())){
+                        UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                        if(!unitModel.getAsyncId().equals("sd")){
+                            continue;
+                        }
+                        int productionValue = unitModel.getProductionValue();
+                        if(unitModel.getAsyncId().equals("sd") && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))){
+                            if(uH instanceof Planet planet){
+                                productionValue = planet.getResources()+ productionValue;
+                            }
+                        }
+                        if( productionValue > highestProd){
+                            highestProd = productionValue;
+                        }
+                    }
+                }
+            }
+            productionValueTotal = highestProd;
+        }
+        return productionValueTotal;
+    }
+
+    public static int calculateCostOfProducedUnits(Player player, Game activeGame, boolean wantCost){
         HashMap<String, Integer> producedUnits = player.getCurrentProducedUnits();
         int cost = 0;
         int numInf = 0;
         int numFF = 0;
+        int totalUnits = 0;
         boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");
         for(String unit : producedUnits.keySet()){
             String unit2 = unit.split("_")[0];
@@ -899,6 +1066,7 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
                 cost = cost + (int)removedUnit.getCost() * producedUnits.get(unit);
+                totalUnits = totalUnits + producedUnits.get(unit);
             }
         }
         if(regulated){
@@ -907,8 +1075,13 @@ public class Helper {
             cost = cost + (int)((numInf+1)/2);
             cost = cost + (int)((numFF+1)/2);
         }
-
-        return cost;
+        totalUnits = totalUnits + numInf+numFF;
+        if(wantCost){
+            return cost;
+        }else{
+            return totalUnits;
+        }
+        
     }
 
 

@@ -94,6 +94,9 @@ public class Cleanup extends StatusSubcommandData {
         }
         activeGame.setCurrentReacts("absolMOW", "");
         activeGame.setCurrentReacts("agendaCount", "0");
+        activeGame.setCurrentReacts("politicalStabilityFaction", "");
+        activeGame.setCurrentReacts("forcedScoringOrder", "");
+        activeGame.setCurrentReacts("factionsThatScored", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
             new SpinTilesInFirstThreeRings().spinRings(activeGame);

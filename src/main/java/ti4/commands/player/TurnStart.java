@@ -123,7 +123,7 @@ public class TurnStart extends PlayerSubcommandData {
                 count++;
             }
         }
-        sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool. Reminder that the bot does not mark you as having followed unless you paid the Strat CC or used an equivalent ability. ");
+        sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool. \n Reminder to double check that you paid the Strat CC or used an equivalent ability. ");
         if (count > 1) {
             sb.append("\nMake sure to resolve the strategy cards in the order they were played.");
         }

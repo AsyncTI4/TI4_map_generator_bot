@@ -451,7 +451,7 @@ public class MapGenerator {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         String timeStamp = getTimeStamp();
-        graphics.drawString(game.getName() + " " +game.getCreationDate()+" - "+ timeStamp, 0, 34);
+        graphics.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
 
         int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
@@ -710,9 +710,9 @@ public class MapGenerator {
                     xDelta = pnInfo(player, xDelta, yPlayArea, game);
                 }
 
-               // if (player.getTechs().isEmpty()) {
-                    xDelta = techInfo(player, xDelta, yPlayArea, game);
-              //  }
+                // if (player.getTechs().isEmpty()) {
+                xDelta = techInfo(player, xDelta, yPlayArea, game);
+                //  }
 
                 if (!player.getNotResearchedFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea);
@@ -1173,12 +1173,11 @@ public class MapGenerator {
                 continue;
             }
 
-
             if (count == null) {
                 count = 0;
             }
             if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && "sd".equals(unitID)) {
-                if(unitCount.get(Mapper.getUnitKey("csd", playerColor)) != null){
+                if (unitCount.get(Mapper.getUnitKey("csd", playerColor)) != null) {
                     count = count + unitCount.get(Mapper.getUnitKey("csd", playerColor));
                 }
 
@@ -1651,9 +1650,9 @@ public class MapGenerator {
     private int techInfo(Player player, int x, int y, Game game) {
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
-    //    if (techs.isEmpty()) {
-     //       return y;
-      //  }
+        //    if (techs.isEmpty()) {
+        //       return y;
+        //  }
 
         Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
@@ -1743,8 +1742,8 @@ public class MapGenerator {
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                if ("dslaner".equalsIgnoreCase(tech)){
-                    drawTextVertically(graphics, ""+player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
+                if ("dslaner".equalsIgnoreCase(tech)) {
+                    drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
                 }
             } else {
                 TechnologyModel techModel = Mapper.getTech(tech);
@@ -2835,9 +2834,12 @@ public class MapGenerator {
         };
     }
 
-    private Color getColor(String color) {
+    public static Color getColor(String color) {
         if (color == null) {
             return Color.WHITE;
+        }
+        if (color.startsWith("split")) {
+            color = color.replace("split", "");
         }
         return switch (color) {
             case "black" -> Color.DARK_GRAY;
@@ -2868,6 +2870,7 @@ public class MapGenerator {
             case "rose" -> Color.decode("#d59de2");
             case "spring" -> Color.decode("#cedd8e");
             case "ethereal" -> Color.decode("#31559e");
+            case "orca" -> getColor("gray");
             default -> Color.WHITE;
         };
     }
@@ -3227,7 +3230,7 @@ public class MapGenerator {
                 } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
                     position = new Point(position.x + 10, position.y + 10);
                 } else if (tokenID.contains(Constants.WORLD_DESTROYED)) {
-                    position = new Point(position.x+4, position.y + 13);
+                    position = new Point(position.x + 4, position.y + 13);
                 }
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
@@ -3279,11 +3282,11 @@ public class MapGenerator {
                     tokenPath.contains(Constants.WORLD_DESTROYED) ||
                     tokenPath.contains(Constants.CONSULATE_TOKEN) ||
                     tokenPath.contains(Constants.GLEDGE_CORE) || tokenPath.contains("freepeople")) {
-                        if(tokenPath.contains(Constants.WORLD_DESTROYED)){
-                            tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
-                        }else{
-                            tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
-                        }
+                    if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
+                        tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
+                    } else {
+                        tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
+                    }
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 70, TILE_PADDING + 45, null);
                 } else {
@@ -3376,9 +3379,9 @@ public class MapGenerator {
 
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = frogPlayer == null
-            || (isCabalJail && FoWHelper.canSeeStatsOfFaction(game,"cabal", frogPlayer))
-            || (isNekroJail && FoWHelper.canSeeStatsOfFaction(game,"nekro", frogPlayer))
-            || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(game,"yssaril", frogPlayer));
+            || (isCabalJail && FoWHelper.canSeeStatsOfFaction(game, "cabal", frogPlayer))
+            || (isNekroJail && FoWHelper.canSeeStatsOfFaction(game, "nekro", frogPlayer))
+            || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(game, "yssaril", frogPlayer));
 
         Point unitOffsetValue = game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
         int spaceX = unitOffsetValue != null ? unitOffsetValue.x : 10;
@@ -3434,19 +3437,22 @@ public class MapGenerator {
                         bulkUnitCount = unitCount;
                     }
                 }
-                if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != null){
+                if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != null) {
                     Player p = game.getPlayerByColorID(unitKey.getColorID()).get();
-                    if ((p.ownsUnit("cabal_spacedock") || p.ownsUnit("cabal_spacedock2")) && unitKey.getUnitType() == UnitType.Spacedock){
+                    if ((p.ownsUnit("cabal_spacedock") || p.ownsUnit("cabal_spacedock2")) && unitKey.getUnitType() == UnitType.Spacedock) {
                         unitPath = unitPath.replace("sd", "csd");
                     }
-                    if (unitKey.getUnitType() == UnitType.TyrantsLament){
+                    if (unitKey.getUnitType() == UnitType.TyrantsLament) {
                         unitPath = unitPath.replace("tyrantslament", "fs");
+                        String name = "tyrant.png";
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                        //spoopy = ImageHelper.read(spoopyPath);
                     }
-                    if (unitKey.getUnitType() == UnitType.Lady){
+                    if (unitKey.getUnitType() == UnitType.Lady) {
                         unitPath = unitPath.replace("lady", "fs");
                     }
                 }
-                
+
                 unitImage = ImageHelper.read(unitPath);
             } catch (Exception e) {
                 BotLogger.log("Could not parse unit file for: " + unitKey, e);
@@ -3479,20 +3485,20 @@ public class MapGenerator {
                 spoopy = ImageHelper.read(spoopypath);
                 //  BotLogger.log("SPOOPY TIME: " + spoopypath);
             }
-            if(unitKey.getUnitType() == UnitType.TyrantsLament){
-                String name = "units_ds_ghemina_lord_wht.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
-                spoopy = ImageHelper.read(spoopyPath);
-                BotLogger.log("SPOOPY TIME: " + spoopyPath);
-            }
-            if(unitKey.getUnitType() == UnitType.Lady){
+            // if(unitKey.getUnitType() == UnitType.TyrantsLament){
+            //     String name = "tyrant.png";
+            //     String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+            //     spoopy = ImageHelper.read(spoopyPath);
+            //     BotLogger.log("SPOOPY TIME: " + spoopyPath);
+            // }
+            if (unitKey.getUnitType() == UnitType.Lady) {
                 String name = "units_ds_ghemina_lady_wht.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
                 spoopy = ImageHelper.read(spoopyPath);
             }
-            if(unitKey.getUnitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")){
+            if (unitKey.getUnitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
                 String name = "units_ds_ghemina_lord_wht.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
                 spoopy = ImageHelper.read(spoopyPath);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();

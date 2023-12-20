@@ -29,11 +29,11 @@ public class InitTspmap extends MapSubcommandData {
         addTspmapEdgeAdjacencies(activeGame);
     }
 
-    public void initializeMap(Game activeGame) {
+    public static void initializeMap(Game activeGame) {
         activeGame.clearAdjacentTileOverrides();
     }
 
-    public void addTspmapHyperlanes(Game activeGame) {
+    public static void addTspmapHyperlanes(Game activeGame) {
         //ring 1
         activeGame.setTile(new Tile(AliasHandler.resolveTile("87a5"), "102"));
         activeGame.setTile(new Tile(AliasHandler.resolveTile("87a0"), "103"));
@@ -60,7 +60,7 @@ public class InitTspmap extends MapSubcommandData {
         activeGame.setTile(new Tile(AliasHandler.resolveTile("89a0"), "527"));
     }
 
-    public void addTspmapEdgeAdjacencies(Game activeGame) {
+    public static void addTspmapEdgeAdjacencies(Game activeGame) {
         activeGame.addAdjacentTileOverride("505", 0, "409");
         activeGame.addAdjacentTileOverride("505", 2, "422");
 

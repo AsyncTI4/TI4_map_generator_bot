@@ -93,10 +93,9 @@ public class AdminCommand implements Command {
         subcommands.add(new SaveMap());
         subcommands.add(new ResetEmojiCache());
         subcommands.add(new ReloadMap());
-        subcommands.add(new FixTheFrankens());
+        subcommands.add(new RestoreGame());
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new DrawSpecificSOForPlayer());
-        subcommands.add(new Statistics());
         subcommands.add(new UpdateThreadArchiveTime());
         return subcommands;
     }

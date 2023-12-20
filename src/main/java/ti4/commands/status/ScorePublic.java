@@ -59,6 +59,8 @@ public class ScorePublic extends StatusSubcommandData {
 	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game activeGame, Player player, int poID) {
 		String both = getNameNEMoji(activeGame, poID);
 		String poName = both.split("_")[0];
+
+		
 		if (poName.toLowerCase().contains("push boundaries")) {
 			int aboveN = 0;
 			for (Player p2 : player.getNeighbouringPlayers()) {
@@ -119,7 +121,7 @@ public class ScorePublic extends StatusSubcommandData {
 		if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument") || poName.toLowerCase().contains("found a golden age")
 			|| poName.toLowerCase().contains("amass wealth") || poName.toLowerCase().contains("manipulate galactic law") || poName.toLowerCase().contains("hold vast reserves")) {
 			String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to score the objective.";
-			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "both");
+			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "both");
 			Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
 			buttons.add(DoneExhausting);
 			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);

@@ -603,6 +603,7 @@ public class ButtonHelperActionCards {
 
     public static void resolvePSStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
+        activeGame.setCurrentReacts("politicalStabilityFaction", player.getFaction());
         for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
@@ -623,7 +624,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveImpersonation(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
         String message = ButtonHelper.getIdent(player) + " Drew Secret Objective";
         activeGame.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {
@@ -817,7 +818,7 @@ public class ButtonHelperActionCards {
         String agendaID = activeGame.lookAtTopAgenda(0);
         sb.append("1: ");
         if (activeGame.getSentAgendas().get(agendaID) != null) {
-            sb.append("This agenda is currently in somebody's hand. Showing the next agenda");
+            sb.append("This agenda is currently in somebody's hand. Showing the next agenda because thats how it should be by the RULEZ");
             agendaID = activeGame.lookAtTopAgenda(1);
             if (activeGame.getSentAgendas().get(agendaID) != null) {
                 sb.append("This agenda is currently in somebody's hand.");
