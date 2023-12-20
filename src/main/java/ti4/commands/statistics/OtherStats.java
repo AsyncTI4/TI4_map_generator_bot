@@ -40,7 +40,8 @@ public class OtherStats extends StatisticsSubcommandData {
             case UNLEASH_THE_NAMES -> sendAllNames(event);
             case UNLEASH_THE_NAMES_DS -> sendAllNames(event, true, false);
             case UNLEASH_THE_NAMES_ABSOL -> sendAllNames(event, false, true);
-            case GAME_LENGTH_4MO -> showFastestGamesInLast4Months(event);
+            case GAME_LENGTH -> showGameLengths(event, null);
+            case GAME_LENGTH_4MO -> showGameLengths(event, 120);
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
@@ -58,6 +59,7 @@ public class OtherStats extends StatisticsSubcommandData {
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
         UNLEASH_THE_NAMES_DS("Unleash the Names DS", "Show all the names of the DS games"),
         UNLEASH_THE_NAMES_ABSOL("Unleash the Names Absol", "Show all the names of Absol games"),
+        GAME_LENGTH("Game Length", "Show game lengths"),
         GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
         COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
@@ -138,20 +140,21 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names);
     }
 
-    public static void showFastestGamesInLast4Months(GenericInteractionCreateEvent event) {
+    public static void showGameLengths(GenericInteractionCreateEvent event, Integer pastDays) {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        if (pastDays == null) pastDays = 3650;
         int num = 0;
         int total = 0;
         HashMap<String, Integer> endedGames = new HashMap<>();
         for (Game activeGame : mapList.values()) {
-            if(activeGame.isHasEnded() && activeGame.getRealPlayers().size() > 2 &&  Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < 120){
+            if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2 && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
                 endedGames.put(activeGame.getName(), dif);
                 total = total + dif;
             }
         }
-        StringBuilder longMsg = new StringBuilder("The number of games that finished in the last 120 days is " + num + ". They are listed below based on the number of days it took to complete\n");
+        StringBuilder longMsg = new StringBuilder("The number of games that finished in the last " + pastDays + " days is " + num + ". They are listed below based on the number of days it took to complete\n");
         Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
         int num2 = 0;
         for (String command : sortedMapAsc.keySet()) {

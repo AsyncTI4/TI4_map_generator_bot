@@ -35,7 +35,7 @@ public class StartPhase extends GameSubcommandData {
             case "unleashTheNames" -> OtherStats.sendAllNames(event);
             case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
             case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);
-            case "unleashTheNamesEnded" -> OtherStats.showFastestGamesInLast4Months(event);
+            case "unleashTheNamesEnded" -> OtherStats.showGameLengths(event, 120);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(activeGame);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
