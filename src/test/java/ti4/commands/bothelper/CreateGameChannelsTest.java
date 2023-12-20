@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class CreateGameChannelsTest {
+import ti4.testUtils.BaseTi4Test;
+
+public class CreateGameChannelsTest extends BaseTi4Test {
     @Test
     public void testGetCategoryNameForGame() {
         assertEquals("PBD #76-100", CreateGameChannels.getCategoryNameForGame("pbd99"));

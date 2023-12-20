@@ -95,7 +95,7 @@ public class Constants {
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
-    public static final String RING_COUNT_FOR_MAP = "ring_count_for_map";
+    public static final String SC_COUNT_FOR_MAP = "sc_count_for_map";
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
@@ -166,6 +166,17 @@ public class Constants {
     public static final String HELP = "help";
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
+
+    public static final String PRESET = "preset";
+    public static final String MAP_TEMPLATE = "map_template";
+    public static final String SLICE_1 = "slice_1";
+    public static final String SLICE_2 = "slice_2";
+    public static final String SLICE_3 = "slice_3";
+    public static final String SLICE_4 = "slice_4";
+    public static final String SLICE_5 = "slice_5";
+    public static final String SLICE_6 = "slice_6";
+    public static final String SLICE_7 = "slice_7";
+    public static final String SLICE_8 = "slice_8";
 
     public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";
@@ -606,6 +617,8 @@ public class Constants {
     public static final String SAVED_BUTTONS = "saved_buttons";
     public static final String PO2PEAKABLE = "publicObjectives2peakable";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
+    public static final String INCLUDE_SCORED = "include_scored";
+    public static final String SO_LIST_SCORED = "list_scored";
 
     public static final String TURN_ORDER = "turn_order";
     public static final String TURN_STATS = "turn_stats";
@@ -1008,4 +1021,6 @@ public class Constants {
     public static final String EVENT_PLAY = "play";
     public static final String SEARCH_EMOJIS = "emojis";
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
+    public static final String RESTORE_GAME = "restore_game";
+    public static final String SAVE_FILE = "save_file";
 }
