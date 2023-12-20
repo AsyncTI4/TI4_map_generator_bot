@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.map.Preset;
+import ti4.commands.statistics.OtherStats;
+import ti4.commands.statistics.OtherStats.SimpleStatistics;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
@@ -692,6 +695,17 @@ public class AutoCompleteProvider {
                     .filter(token -> token.contains(enteredValue))
                     .limit(25)
                     .map(token -> new Command.Choice(token, token))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.STATISTIC -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<SimpleStatistics> stats = Arrays.asList(OtherStats.SimpleStatistics.values());
+                List<Command.Choice> options = stats.stream()
+                    .filter(stat -> stat.search(enteredValue))
+                    .limit(25)
+                    .sorted(Comparator.comparing(SimpleStatistics::getAutoCompleteName))
+                    .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

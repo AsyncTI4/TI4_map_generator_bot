@@ -1023,4 +1023,6 @@ public class Constants {
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
     public static final String RESTORE_GAME = "restore_game";
     public static final String SAVE_FILE = "save_file";
+    public static final String OTHER = "other";
+    public static final String STATISTIC = "statistic";
 }
