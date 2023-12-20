@@ -624,7 +624,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveImpersonation(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
         String message = ButtonHelper.getIdent(player) + " Drew Secret Objective";
         activeGame.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {

@@ -1152,7 +1152,7 @@ public class ButtonHelperAgents {
         String msg = player.getRepresentation(true, true)+ " choose the legendary planet ability that you wish to use";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
 
-        List<Button> buttons2 = Helper.getPlanetExhaustButtons(event, player, activeGame, "both");
+        List<Button> buttons2 = Helper.getPlanetExhaustButtons(player, activeGame, "both");
         Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
         buttons2.add(DoneExhausting);
         String msg2 = player.getRepresentation(true, true)+ " exhaust one planet to pay for the ability";
