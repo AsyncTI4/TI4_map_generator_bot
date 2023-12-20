@@ -220,8 +220,8 @@ public class GameSaveLoadManager {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
                     String msg = "Undoing the last saved command:\n> " + loadedGame.getLatestCommand();
-                    if(loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel){
-                       msg = "Undoing the last saved command:\n> [CLASSIFIED]"; 
+                    if (loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel) {
+                        msg = "Undoing the last saved command:\n> [CLASSIFIED]";
                     }
 
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -310,7 +310,6 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(activeGame.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        writer.write(System.lineSeparator());
         writeCards(activeGame.getPurgedActionCards(), writer, Constants.AC_PURGED);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", activeGame.getAllExplores()));
@@ -459,10 +458,10 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
-        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeGame.getPlayerCountForMap());
+        writer.write(Constants.SC_COUNT_FOR_MAP + " " + activeGame.getStrategyCardsPerPlayer());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RING_COUNT_FOR_MAP + " " + activeGame.getRingCount());
+        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeGame.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.VP_COUNT + " " + activeGame.getVp());
@@ -1101,7 +1100,7 @@ public class GameSaveLoadManager {
     }
 
     @Nullable
-    private static Game loadMap(File mapFile) {
+    public static Game loadMap(File mapFile) {
         if (mapFile != null) {
             Game activeGame = new Game();
             try (Scanner myReader = new Scanner(mapFile)) {
@@ -1414,13 +1413,25 @@ public class GameSaveLoadManager {
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     try {
                         int playerCount = Integer.parseInt(info);
-                        if (playerCount >= 2 && playerCount <= 30) {
+                        if (playerCount >= 1 && playerCount <= 30) {
                             activeGame.setPlayerCountForMap(playerCount);
                         } else {
                             activeGame.setPlayerCountForMap(6);
                         }
                     } catch (Exception e) {
                         activeGame.setPlayerCountForMap(6);
+                    }
+                }
+                case Constants.SC_COUNT_FOR_MAP -> {
+                    try {
+                        int scCount = Integer.parseInt(info);
+                        if (scCount >= 1 && scCount <= 8) {
+                            activeGame.setStrategyCardsPerPlayer(scCount);
+                        } else {
+                            activeGame.setStrategyCardsPerPlayer(1);
+                        }
+                    } catch (Exception e) {
+                        activeGame.setStrategyCardsPerPlayer(1);
                     }
                 }
                 case Constants.ACTIVATION_COUNT -> {

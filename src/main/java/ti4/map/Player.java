@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +35,6 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -1541,8 +1538,6 @@ public class Player {
     @JsonIgnore
     public void gainTg(int tg) {
         this.tg += tg;
-        ButtonHelperAbilities.pillageCheck(this, getGame());
-        ButtonHelperAgents.resolveArtunoCheck(this, getGame(), tg);
     }
 
     public void setTurnCount(int turn) {

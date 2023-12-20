@@ -68,7 +68,7 @@ public class NovaSeed extends SpecialSubcommandData {
 
         StringBuilder message2 = new StringBuilder();
         message2.append(tile.getRepresentation());
-        message2.append(" has been stellar converted by ");
+        message2.append(" has been nova seeded by ");
         message2.append(player.getRepresentation());
         StellarConverter.postTileInDisasterWatch(activeGame, novaTile, 1, message2.toString());
 

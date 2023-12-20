@@ -9,8 +9,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.CombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.testUtils.BaseTi4Test;
 
-public class CombatModHelperTest {
+public class CombatModHelperTest extends BaseTi4Test {
 
     @Test
     public void testNonFighters() {
