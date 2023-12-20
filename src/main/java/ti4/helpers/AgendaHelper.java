@@ -803,12 +803,12 @@ public class AgendaHelper {
                 }
                 if (activeGame.getLaws() != null && (activeGame.getLaws().containsKey("rep_govt") || activeGame.getLaws().containsKey("absol_government"))) {
                 }else{
-                    if(player.ownsPromissoryNote("bp") || player.getPromissoryNotesInPlayArea().contains("bp")){
+                    if(player.ownsPromissoryNote("blood_pact") || player.getPromissoryNotesInPlayArea().contains("blood_pact")){
                         for(Player p2 : getLosingVoters(outcome, activeGame)){
                             if(p2 == player){
                                 continue;
                             }
-                            if(p2.ownsPromissoryNote("bp") || p2.getPromissoryNotesInPlayArea().contains("bp")){
+                            if(p2.ownsPromissoryNote("blood_pact") || p2.getPromissoryNotesInPlayArea().contains("blood_pact")){
                                 player.addSpentThing("bloodPact_"+4);
                                 votes = (Integer.parseInt(votes)+4)+"";
                                 break;
@@ -924,7 +924,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), summary2 + "\n \n");
         activeGame.setCurrentPhase("agendaEnd");
         activeGame.setActivePlayer(null);
-        String resMessage = "You can hold while people resolve shenanigans. If it not an important agenda, you are encouraged to move on and float the shenanigans " + losers.size()
+        String resMessage = "You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans " + losers.size()
             + " players have the opportunity to play deadly plot.";
         if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot"))
             && (losers.size() > 0 || activeGame.isAbsolMode())) {
@@ -1889,6 +1889,7 @@ public class AgendaHelper {
             }
         }
         String editedMessage = Helper.buildSpentThingsMessageForVoting(player, activeGame, false);
+        editedMessage = AgendaHelper.getSummaryOfVotes(activeGame, true) + "\n\n"+editedMessage;
         event.getMessage().editMessage(editedMessage).queue();
         
         
@@ -1994,7 +1995,7 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         String votes = Helper.buildSpentThingsMessageForVoting(player, activeGame, true);
         String msg = Helper.buildSpentThingsMessageForVoting(player, activeGame, false)+ "\n\n"+player.getRepresentation() + " you are currently voting "+votes + " votes. You can confirm this or you can modify this number if the bot missed something.";
-        if(player.getPromissoryNotesInPlayArea().contains("bp")){
+        if(player.getPromissoryNotesInPlayArea().contains("blood_pact")){
             msg = msg + " Any Blood Pact Votes will be automatically added";
         }
         List<Button> buttons = new ArrayList<>();

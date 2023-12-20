@@ -50,6 +50,7 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
+import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.milty.MiltyDraftManager;
@@ -269,8 +270,46 @@ public class Helper {
         int num = 0;
 
         for (Game activeGame : mapList.values()) {
-            num++;
-            names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
+            if(activeGame.getCustomName() != null && !activeGame.getCustomName().isEmpty()){
+                num++;
+                names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
+    }
+    public static void showFastestGamesInLast4Months(GenericInteractionCreateEvent event){
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        int num = 0;
+        int total = 0;
+        HashMap<String, Integer> endedGames = new HashMap<>();
+        for (Game activeGame : mapList.values()) {
+            if(activeGame.isHasEnded() && activeGame.getRealPlayers().size() > 2 &&  Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < 120){
+                num++;
+                int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
+                endedGames.put(activeGame.getName(), dif);
+                total = total + dif;
+            }
+        }
+        StringBuilder longMsg = new StringBuilder("The number of games that finished in the last 120 days is " + num + ". They are listed below based on the number of days it took to complete\n");
+        Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
+        int num2 = 0;
+        for (String command : sortedMapAsc.keySet()) {
+            num2++;
+            longMsg.append(num2+". "+command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
+        }
+        longMsg.append("\n The average completion time of these games is: "+(total/num)+"\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), longMsg.toString());
+    }
+    public static void sendAllNames(GenericInteractionCreateEvent event, boolean ds, boolean absol){
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        String names = "";
+        int num = 0;
+
+        for (Game activeGame : mapList.values()) {
+            if((ds && activeGame.isDiscordantStarsMode()) || (absol && activeGame.isAbsolMode())){
+                num++;
+                names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
+            }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
     }
@@ -706,11 +745,11 @@ public class Helper {
         }
         return scButtons;
     }
-    public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Game activeGame) {
-        return getPlanetExhaustButtons(event, player, activeGame, "both");
+    public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame) {
+        return getPlanetExhaustButtons(player, activeGame, "both");
     }
 
-    public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, String whatIsItFor) {
+    public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame, String whatIsItFor) {
         player.resetSpentThings();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1008,8 +1047,14 @@ public class Helper {
             for(UnitHolder uH : tile.getUnitHolders().values()){
                 for(UnitKey unit : uH.getUnits().keySet()){
                     if(unit.getColor().equalsIgnoreCase(player.getColor())){
+                        if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                            player.addOwnedUnitByID("tyrantslament");
+                        }
                         UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                         int productionValue = unitModel.getProductionValue();
+                        if(unitModel.getAsyncId().equals("fs") && player.ownsUnit("ghoti_flagship")){
+                            productionValueTotal = productionValueTotal + player.getFleetCC();
+                        }
                         if(unitModel.getAsyncId().equals("sd") && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))){
                             if(uH instanceof Planet planet){
                                 productionValue = planet.getResources()+ productionValue;
@@ -1017,6 +1062,9 @@ public class Helper {
                         }
                         productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
                     }
+                }
+                if(uH.getName().equalsIgnoreCase("mr") && player.hasTech("iihq") && player.getPlanets().contains("mr")){
+                    productionValueTotal = productionValueTotal + 3;
                 }
                 if(player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)){
                     productionValueTotal = productionValueTotal +1;

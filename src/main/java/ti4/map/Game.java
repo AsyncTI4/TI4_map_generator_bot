@@ -348,6 +348,10 @@ public class Game {
         return secretObjectives.size();
     }
 
+    public String getEndedDateString(){
+        return Helper.getDateRepresentation(endedDate);
+    }
+
     public boolean hasBorderAnomalyOn(String tile, Integer direction) {
         List<BorderAnomalyHolder> anomaliesOnBorder = borderAnomalies.stream()
             .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)

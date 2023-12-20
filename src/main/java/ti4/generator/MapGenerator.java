@@ -3444,6 +3444,9 @@ public class MapGenerator {
                     }
                     if (unitKey.getUnitType() == UnitType.TyrantsLament) {
                         unitPath = unitPath.replace("tyrantslament", "fs");
+                        String name = "tyrant.png";
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                        //spoopy = ImageHelper.read(spoopyPath);
                     }
                     if (unitKey.getUnitType() == UnitType.Lady) {
                         unitPath = unitPath.replace("lady", "fs");
@@ -3482,12 +3485,12 @@ public class MapGenerator {
                 spoopy = ImageHelper.read(spoopypath);
                 //  BotLogger.log("SPOOPY TIME: " + spoopypath);
             }
-            if (unitKey.getUnitType() == UnitType.TyrantsLament) {
-                String name = "units_ds_ghemina_lord_wht.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
-                spoopy = ImageHelper.read(spoopyPath);
-                BotLogger.log("SPOOPY TIME: " + spoopyPath);
-            }
+            // if(unitKey.getUnitType() == UnitType.TyrantsLament){
+            //     String name = "tyrant.png";
+            //     String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+            //     spoopy = ImageHelper.read(spoopyPath);
+            //     BotLogger.log("SPOOPY TIME: " + spoopyPath);
+            // }
             if (unitKey.getUnitType() == UnitType.Lady) {
                 String name = "units_ds_ghemina_lady_wht.png";
                 String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);

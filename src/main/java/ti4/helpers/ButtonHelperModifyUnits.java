@@ -152,8 +152,15 @@ public class ButtonHelperModifyUnits {
                         ButtonHelper.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "ground");
                     }
                 }
+                if (player2.ownsUnit("keleres_mech") && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) > 0) {
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player,  "inf");
+                    Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+                    buttons.add(DoneExhausting);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you must pay influence due to Keleres mech(s)");
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Click the names of the planets you wish to exhaust", buttons);
+                }
             }
-            if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 1) {
+            if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Button.success("returnFFToSpace_" + tile.getPosition(), "Return Fighters to Space"));
                 b2s.add(Button.danger("deleteButtons", "Delete These Buttons"));
@@ -584,9 +591,9 @@ public class ButtonHelperModifyUnits {
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), playerRep + " " + successMessage);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
         if(skipbuild.contains("freelancers")){
-             buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "freelancers");
+             buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "freelancers");
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));

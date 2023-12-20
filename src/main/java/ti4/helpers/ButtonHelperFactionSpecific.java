@@ -983,7 +983,7 @@ public class ButtonHelperFactionSpecific {
         Tile tile = activeGame.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 " + unit + " " + planet, activeGame);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planet, activeGame);
-        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             ButtonHelper.getIdent(player) + " replaced 1 of their infantry with 1 " + unit + " on " + Helper.getPlanetRepresentation(planet, activeGame) + " using the mech's deploy ability");
         options.add(Button.danger("deleteButtons", "Done Exhausting Planets"));
@@ -1454,7 +1454,7 @@ public class ButtonHelperFactionSpecific {
         String tilePos = buttonID.split("_")[1];
         String toRemove = buttonID.split("_")[2];
         String planet = toRemove.split(" ")[1];
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
         Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), "warsun", activeGame);
