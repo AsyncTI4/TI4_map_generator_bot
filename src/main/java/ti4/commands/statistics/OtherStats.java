@@ -41,10 +41,10 @@ public class OtherStats extends StatisticsSubcommandData {
             case UNLEASH_THE_NAMES_DS -> sendAllNames(event, true, false);
             case UNLEASH_THE_NAMES_ABSOL -> sendAllNames(event, false, true);
             case FASTEST_GAME_IN_PAST_3_MONTHS -> showFastestGamesInLast3Months(event);
-            case MOST_PLAYED_FACTIONS -> showMostPlayedFactions(event);
-            case MOST_PLAYED_COLOURS -> showMostPlayedColour(event);
-            case WINS_PER_FACTION -> showMostWinningFactions(event);
-            case WINS_PER_COLOUR -> showMostWinningColour(event);
+            case FACTIONS_PLAYED -> showMostPlayedFactions(event);
+            case COLOURS_PLAYED -> showMostPlayedColour(event);
+            case FACTION_WINS -> showMostWinningFactions(event);
+            case COLOUR_WINS -> showMostWinningColour(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
@@ -59,10 +59,10 @@ public class OtherStats extends StatisticsSubcommandData {
         UNLEASH_THE_NAMES_DS("Unleash the Names DS", "Show all the names of the DS games"),
         UNLEASH_THE_NAMES_ABSOL("Unleash the Names Absol", "Show all the names of Absol games"),
         FASTEST_GAME_IN_PAST_3_MONTHS("Fastest Game in the past 3 months", "Show the fastest games from the past 3 months"),
-        MOST_PLAYED_FACTIONS("Most Played Factions", "Show the most played factions"),
-        MOST_PLAYED_COLOURS("Most Played Colours", "Show the most played colours"),
-        WINS_PER_FACTION("Wins per Faction", "Show the wins per faction"),
-        WINS_PER_COLOUR("Wins per Colour", "Show the wins per colour");
+        FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
+        COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
+        FACTION_WINS("Wins per Faction", "Show the wins per faction"),
+        COLOUR_WINS("Wins per Colour", "Show the wins per colour");
     
         private final String name;
         private final String description;
@@ -96,7 +96,7 @@ public class OtherStats extends StatisticsSubcommandData {
          * @return the auto-complete name
          */
         public String getAutoCompleteName() {
-            return name + " - " + description;
+            return name + ": " + description;
         }
 
         /**
@@ -121,7 +121,7 @@ public class OtherStats extends StatisticsSubcommandData {
                 names = names + num + ". " + activeGame.getCustomName() + " (" + activeGame.getName() + ")\n";
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names);
     }
 
     public static void sendAllNames(GenericInteractionCreateEvent event, boolean ds, boolean absol) {
@@ -135,10 +135,10 @@ public class OtherStats extends StatisticsSubcommandData {
                 names = names + num + ". " + activeGame.getCustomName() + " (" + activeGame.getName() + ")\n";
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names);
     }
 
-    public static void showFastestGamesInLast3Months(GenericInteractionCreateEvent event){
+    public static void showFastestGamesInLast3Months(GenericInteractionCreateEvent event) {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         int num = 0;
         int total = 0;
@@ -159,7 +159,7 @@ public class OtherStats extends StatisticsSubcommandData {
             longMsg.append(num2+". "+command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
         }
         longMsg.append("\n The average completion time of these games is: "+(total/num)+"\n");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), longMsg.toString());
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths" , longMsg.toString());
     }
 
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
@@ -167,14 +167,12 @@ public class OtherStats extends StatisticsSubcommandData {
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            if (game.getName().startsWith("pbd")) {
-                for (Player player : game.getPlayers().values()) {
-                    String color = player.getColor();
-                    String faction = player.getFaction();
-                    if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                        factionCount.putIfAbsent(faction, 1);
-                        factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
-                    }
+            for (Player player : game.getPlayers().values()) {
+                String color = player.getColor();
+                String faction = player.getFaction();
+                if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
+                    factionCount.putIfAbsent(faction, 1);
+                    factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
                 }
             }
         }
@@ -186,10 +184,10 @@ public class OtherStats extends StatisticsSubcommandData {
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
             .forEach(entry -> 
                 sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 3))
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("x` ")
                     .append(entry.getKey().getFactionEmoji()).append(" ")
-                    .append(entry.getKey().getFactionName())
+                    .append(entry.getKey().getFactionNameWithSourceEmoji())
                     .append("\n")
                 );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
@@ -200,39 +198,37 @@ public class OtherStats extends StatisticsSubcommandData {
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            if (game.getName().startsWith("pbd")) {
-                int vp = game.getVp();
-                boolean findWinner = true;
-                for (Player player : game.getPlayers().values()) {
-                    int vpScore = player.getTotalVictoryPoints();
-                    if (vp <= vpScore) {
-                        String faction = player.getFaction();
+            int vp = game.getVp();
+            boolean findWinner = true;
+            for (Player player : game.getPlayers().values()) {
+                int vpScore = player.getTotalVictoryPoints();
+                if (vp <= vpScore) {
+                    String faction = player.getFaction();
 
-                        winnerFactionCount.putIfAbsent(faction, 1);
-                        winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
+                    winnerFactionCount.putIfAbsent(faction, 1);
+                    winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
 
-                        findWinner = false;
-                    }
+                    findWinner = false;
                 }
-                if (findWinner) {
-                    Date date = new Date(game.getLastModifiedDate());
-                    Date currentDate = new Date();
-                    long time_difference = currentDate.getTime() - date.getTime();
-                    // Calculate time difference in days
-                    long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
-                    if (days_difference > 30) {
-                        int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
-                        if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
-                            game.getPlayers().values().stream()
-                                .filter(player -> player.getTotalVictoryPoints() == maxVP)
-                                .findFirst()
-                                .ifPresent(player -> {
-                                    String faction = player.getFaction();
+            }
+            if (findWinner) {
+                Date date = new Date(game.getLastModifiedDate());
+                Date currentDate = new Date();
+                long time_difference = currentDate.getTime() - date.getTime();
+                // Calculate time difference in days
+                long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
+                if (days_difference > 30) {
+                    int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
+                    if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
+                        game.getPlayers().values().stream()
+                            .filter(player -> player.getTotalVictoryPoints() == maxVP)
+                            .findFirst()
+                            .ifPresent(player -> {
+                                String faction = player.getFaction();
 
-                                    winnerFactionCount.putIfAbsent(faction, 1);
-                                    winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
-                                });
-                        }
+                                winnerFactionCount.putIfAbsent(faction, 1);
+                                winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
+                            });
                     }
                 }
             }
@@ -245,10 +241,10 @@ public class OtherStats extends StatisticsSubcommandData {
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
             .forEach(entry -> 
                 sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 3))
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("x` ")
                     .append(entry.getKey().getFactionEmoji()).append(" ")
-                    .append(entry.getKey().getFactionName())
+                    .append(entry.getKey().getFactionNameWithSourceEmoji())
                     .append("\n")
                 );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
@@ -259,24 +255,23 @@ public class OtherStats extends StatisticsSubcommandData {
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            if (game.getName().startsWith("pbd")) {
-                for (Player player : game.getPlayers().values()) {
-                    String color = player.getColor();
-                    String faction = player.getFaction();
-                    if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                        colorCount.putIfAbsent(color, 1);
-                        colorCount.computeIfPresent(color, (key, integer) -> integer + 1);
-                    }
+            for (Player player : game.getPlayers().values()) {
+                String color = player.getColor();
+                String faction = player.getFaction();
+                if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
+                    colorCount.putIfAbsent(color, 1);
+                    colorCount.computeIfPresent(color, (key, integer) -> integer + 1);
                 }
             }
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Plays per Colour:").append("\n");
         colorCount.entrySet().stream()
+            .filter(e -> Mapper.isValidColor(e.getKey()))
             .sorted(Map.Entry.comparingByValue())
             .forEach(entry -> 
                 sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 3))
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("x` ")
                     .append(Emojis.getColorEmojiWithName(entry.getKey()))
                     .append("\n")
@@ -289,39 +284,37 @@ public class OtherStats extends StatisticsSubcommandData {
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            if (game.getName().startsWith("pbd")) {
-                int vp = game.getVp();
-                boolean findWinner = true;
-                for (Player player : game.getPlayers().values()) {
-                    int vpScore = player.getTotalVictoryPoints();
-                    if (vp <= vpScore) {
-                        String color = player.getColor();
+            int vp = game.getVp();
+            boolean findWinner = true;
+            for (Player player : game.getPlayers().values()) {
+                int vpScore = player.getTotalVictoryPoints();
+                if (vp <= vpScore) {
+                    String color = player.getColor();
 
-                        winnerColorCount.putIfAbsent(color, 1);
-                        winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
+                    winnerColorCount.putIfAbsent(color, 1);
+                    winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
 
-                        findWinner = false;
-                    }
+                    findWinner = false;
                 }
-                if (findWinner) {
-                    Date date = new Date(game.getLastModifiedDate());
-                    Date currentDate = new Date();
-                    long time_difference = currentDate.getTime() - date.getTime();
-                    // Calculate time difference in days
-                    long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
-                    if (days_difference > 30) {
-                        int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
-                        if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
-                            game.getPlayers().values().stream()
-                                .filter(player -> player.getTotalVictoryPoints() == maxVP)
-                                .findFirst()
-                                .ifPresent(player -> {
-                                    String color = player.getColor();
+            }
+            if (findWinner) {
+                Date date = new Date(game.getLastModifiedDate());
+                Date currentDate = new Date();
+                long time_difference = currentDate.getTime() - date.getTime();
+                // Calculate time difference in days
+                long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
+                if (days_difference > 30) {
+                    int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
+                    if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
+                        game.getPlayers().values().stream()
+                            .filter(player -> player.getTotalVictoryPoints() == maxVP)
+                            .findFirst()
+                            .ifPresent(player -> {
+                                String color = player.getColor();
 
-                                    winnerColorCount.putIfAbsent(color, 1);
-                                    winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
-                                });
-                        }
+                                winnerColorCount.putIfAbsent(color, 1);
+                                winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
+                            });
                     }
                 }
             }
@@ -329,10 +322,11 @@ public class OtherStats extends StatisticsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Colour:").append("\n");
         winnerColorCount.entrySet().stream()
+            .filter(e -> Mapper.isValidColor(e.getKey()))
             .sorted(Map.Entry.comparingByValue())
             .forEach(entry -> 
                 sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 3))
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("x` ")
                     .append(Emojis.getColorEmojiWithName(entry.getKey()))
                     .append("\n")
