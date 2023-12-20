@@ -246,9 +246,9 @@
     "alias": "double_agents",
     "name": "Double Agents",
     "phase": "Any",
-    "window": "When another player plays an action card that does not have a component action",
+    "window": "When another player plays an action card that does not have a component action, other than \"Sabotage\"",
     "text": "Cancel and take that action card.",
-    "flavorText": "\"Sorry, love, it's just business,\" Mot Nesretep said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
+    "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
     "source": "action_deck_2"
   },
   {
@@ -328,7 +328,7 @@
     "name": "Foreign Policy",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Give 1 of those actions card to each other player and take the remaining card.",
+    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Then, give 1 of those actions card to each other player and take the remaining card.",
     "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
     "source": "action_deck_2"
   },
@@ -436,7 +436,7 @@
     "name": "Mechanized Workforce",
     "phase": "Action",
     "window": "Action",
-    "text": "Place 1 destroyer in each system that contains 1 of your mechs and does not contain another player's ships.",
+    "text": "Remove 1 or more of your mechs from the game board; gain trade goods equal to the combined cost of those mechs.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
   },
@@ -598,7 +598,7 @@
     "name": "Seized Facility",
     "phase": "Action",
     "window": "When you gain control of a planet that contains another player's structure",
-    "text": "Research a non-faction technology owned by that player; ignore 1 of that technology's prerequisites.",
+    "text": "Gain a non-faction technology owned by that player.",
     "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL YOUR DATA ARE << BELONGS TO US",
     "source": "action_deck_2"
   },
@@ -698,7 +698,7 @@
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
     "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
-    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only as they cleared the blast radius did he loosen his grasp on the stolen plans.",
+    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only as they cleared the blast radius did he loosen his grasp on the stolen schematics.",
     "source": "action_deck_2"
   },
   {
