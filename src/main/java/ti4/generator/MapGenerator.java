@@ -3485,12 +3485,12 @@ public class MapGenerator {
                 spoopy = ImageHelper.read(spoopypath);
                 //  BotLogger.log("SPOOPY TIME: " + spoopypath);
             }
-            if(unitKey.getUnitType() == UnitType.TyrantsLament){
-                String name = "tyrant.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
-                spoopy = ImageHelper.read(spoopyPath);
-                BotLogger.log("SPOOPY TIME: " + spoopyPath);
-            }
+            // if(unitKey.getUnitType() == UnitType.TyrantsLament){
+            //     String name = "tyrant.png";
+            //     String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+            //     spoopy = ImageHelper.read(spoopyPath);
+            //     BotLogger.log("SPOOPY TIME: " + spoopyPath);
+            // }
             if (unitKey.getUnitType() == UnitType.Lady) {
                 String name = "units_ds_ghemina_lady_wht.png";
                 String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);

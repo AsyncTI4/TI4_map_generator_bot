@@ -2871,7 +2871,7 @@ public class ButtonHelper {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentation(true, true));
                         sb.append(" You are getting this ping because SC #").append(sc)
-                            .append(" has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. \n TIP: Double check that you paid the command counter to follow");
+                            .append(" has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. \nTIP: Double check that you paid the command counter to follow\n");
                         if (!activeGame.getFactionsThatReactedToThis("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":")).append("\n");
                         }
