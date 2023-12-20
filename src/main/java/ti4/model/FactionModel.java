@@ -148,4 +148,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         return getFactionName() + " [" + source + "]";
     }
+
+    public String getFactionNameWithSourceEmoji() {
+        return getFactionName() + getSource().emoji();
+    }
 }

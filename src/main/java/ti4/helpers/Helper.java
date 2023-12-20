@@ -264,56 +264,6 @@ public class Helper {
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg, proceedButtons);
     }
 
-    public static void sendAllNames(GenericInteractionCreateEvent event){
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String names = "";
-        int num = 0;
-
-        for (Game activeGame : mapList.values()) {
-            if(activeGame.getCustomName() != null && !activeGame.getCustomName().isEmpty()){
-                num++;
-                names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
-            }
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
-    }
-    public static void showFastestGamesInLast4Months(GenericInteractionCreateEvent event){
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        int num = 0;
-        int total = 0;
-        HashMap<String, Integer> endedGames = new HashMap<>();
-        for (Game activeGame : mapList.values()) {
-            if(activeGame.isHasEnded() && activeGame.getRealPlayers().size() > 2 &&  Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < 120){
-                num++;
-                int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
-                endedGames.put(activeGame.getName(), dif);
-                total = total + dif;
-            }
-        }
-        StringBuilder longMsg = new StringBuilder("The number of games that finished in the last 120 days is " + num + ". They are listed below based on the number of days it took to complete\n");
-        Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
-        int num2 = 0;
-        for (String command : sortedMapAsc.keySet()) {
-            num2++;
-            longMsg.append(num2+". "+command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
-        }
-        longMsg.append("\n The average completion time of these games is: "+(total/num)+"\n");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), longMsg.toString());
-    }
-    public static void sendAllNames(GenericInteractionCreateEvent event, boolean ds, boolean absol){
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String names = "";
-        int num = 0;
-
-        for (Game activeGame : mapList.values()) {
-            if((ds && activeGame.isDiscordantStarsMode()) || (absol && activeGame.isAbsolMode())){
-                num++;
-                names = names + num +". "+activeGame.getCustomName() + " ("+activeGame.getName()+")\n";
-            }
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), names);
-    }
-
     public static List<Player> getInitativeOrder(Game activeGame){
         HashMap<Integer, Player> order = new HashMap<>();
         int naaluSC = 0;
