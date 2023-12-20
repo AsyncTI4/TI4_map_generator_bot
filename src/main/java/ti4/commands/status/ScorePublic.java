@@ -121,7 +121,7 @@ public class ScorePublic extends StatusSubcommandData {
 		if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument") || poName.toLowerCase().contains("found a golden age")
 			|| poName.toLowerCase().contains("amass wealth") || poName.toLowerCase().contains("manipulate galactic law") || poName.toLowerCase().contains("hold vast reserves")) {
 			String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to score the objective.";
-			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "both");
+			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "both");
 			Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
 			buttons.add(DoneExhausting);
 			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);

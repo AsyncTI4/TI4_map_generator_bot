@@ -71,7 +71,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " scored custodians!");
                 String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to spend 6i.";
-                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 buttons.add(DoneExhausting);
                 if (!player.hasAbility("reclamation")) {
@@ -222,12 +222,6 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if ("mr".equalsIgnoreCase(planet) && player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "winnu", event);
-        }
-        if ("mr".equalsIgnoreCase(planet) && player.hasAbility("reclamation")) {
-            new AddUnits().unitParsing(event, player.getColor(),
-                activeGame.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds " + planet, activeGame);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                "Due to the reclamation ability, pds and SD have been added to Mecatol Rex. This is optional though.");
         }
     }
 }

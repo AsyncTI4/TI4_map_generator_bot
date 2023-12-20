@@ -32,6 +32,9 @@ public class StartPhase extends GameSubcommandData {
             case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
             case "unleashTheNames" -> Helper.sendAllNames(event);
+            case "unleashTheNamesDS" -> Helper.sendAllNames(event, true, false);
+            case "unleashTheNamesAbsol" -> Helper.sendAllNames(event, false, true);
+            case "unleashTheNamesEnded" -> Helper.showFastestGamesInLast4Months(event);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(activeGame);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
