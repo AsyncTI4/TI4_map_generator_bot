@@ -11,6 +11,7 @@ import ti4.model.Source.ComponentSource;
 
 @Data
 public class ActionCardModel implements ModelInterface, EmbeddableModel {
+
     private String alias;
     private String name;
     private String phase;

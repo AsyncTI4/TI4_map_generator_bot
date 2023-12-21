@@ -579,7 +579,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
-            if(activeGame.getFactionsThatReactedToThis("forcedScoringOrder").equalsIgnoreCase("true")){
+            if("true".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("forcedScoringOrder"))){
                 List<Player> players = Helper.getInitativeOrder(activeGame);
                 String factionsThatHaveResolved = activeGame.getFactionsThatReactedToThis("factionsThatScored");
                 if(!Helper.hasEveryoneResolvedBeforeMe(player, factionsThatHaveResolved, players)){
@@ -1034,7 +1034,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("getAllTechOfType_")) {
             String techType = buttonID.replace("getAllTechOfType_", "");
-            List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player.getFaction(), player);
+            List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player);
             List<Button> buttons = Helper.getTechButtons(techs, techType, player);
             buttons.add(Button.secondary("acquireATech", "Get Tech of a Different Type"));
             String message = player.getRepresentation() + " Use the buttons to get the tech you want";
