@@ -783,6 +783,7 @@ public class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+    public static final String PLANETS_INFO = "planets_info";
 
     public static final String BAG_DRAFT = "bag_draft";
     public static final String ABILITY = "ability";
