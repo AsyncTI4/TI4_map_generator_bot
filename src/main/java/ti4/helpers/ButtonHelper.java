@@ -1255,13 +1255,13 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void sendAllTechsNTechSkipPlanetsToReady(Game activeGame, GenericInteractionCreateEvent event, Player player) {
+    public static void sendAllTechsNTechSkipPlanetsToReady(Game activeGame, GenericInteractionCreateEvent event, Player player, boolean absol) {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getExhaustedTechs()) {
             buttons.add(Button.success("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
         }
         for (String planet : player.getExhaustedPlanets()) {
-            if ((Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) || checkForTechSkipAttachments(activeGame, planet)) {
+            if (absol || (Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) || checkForTechSkipAttachments(activeGame, planet)) {
                 buttons.add(Button.success("biostimsReady_planet_" + planet, "Ready " + Helper.getPlanetRepresentation(planet, activeGame)));
             }
         }
@@ -1798,8 +1798,10 @@ public class ButtonHelper {
 
     public static void resolveMahactMechAbilityUse(Player mahact, Player target, Game activeGame, Tile tile, ButtonInteractionEvent event) {
         mahact.removeMahactCC(target.getColor());
-        target.setTacticalCC(target.getTacticalCC() - 1);
-        AddCC.addCC(event, target.getColor(), tile);
+        if(!activeGame.getNaaluAgent()){
+            target.setTacticalCC(target.getTacticalCC() - 1);
+            AddCC.addCC(event, target.getColor(), tile);
+        }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, activeGame),
             mahact.getRepresentation(true, true) + " the " + target.getColor() + " cc has been removed from your fleet pool");
         List<Button> conclusionButtons = new ArrayList<>();
@@ -1827,8 +1829,10 @@ public class ButtonHelper {
         mahact.setStrategicCC(mahact.getStrategicCC() - 1);
         mahact.exhaustTech("nf");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(mahact, activeGame, event);
-        target.setTacticalCC(target.getTacticalCC() - 1);
-        AddCC.addCC(event, target.getColor(), tile);
+        if(!activeGame.getNaaluAgent()){
+            target.setTacticalCC(target.getTacticalCC() - 1);
+            AddCC.addCC(event, target.getColor(), tile);
+        }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, activeGame),
             mahact.getRepresentation(true, true) + " you have spent a strat cc");
         List<Button> conclusionButtons = new ArrayList<>();
@@ -2790,6 +2794,9 @@ public class ButtonHelper {
         }
         if (player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
+        }
+        if (player.getTechs().contains("absol_bs") && !player.getExhaustedTechs().contains("absol_bs")) {
+            endButtons.add(Button.success(finChecker + "exhaustTech_absol_bs", "Exhaust Absol Bio-Stims"));
         }
         if (player.getTechs().contains("miltymod_hm") && !player.getExhaustedTechs().contains("miltymod_hm")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_miltymod_hm", "Exhaust Hyper Metabolism"));
