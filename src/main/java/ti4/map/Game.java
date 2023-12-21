@@ -3685,6 +3685,9 @@ public class Game {
             || (eventDeckID != null && !"null".equals(eventDeckID))
             || !"explores_pok".equals(explorationDeckID)
             || !"techs_pok".equals(technologyDeckID)
-            || !"pok".equals(scSetID);
+            || !"pok".equals(scSetID)
+            || Mapper.getFactions().stream()
+            .filter(faction -> !"pok".equals(faction.getSource().name()) && !"base".equals(faction.getSource().name()))
+            .anyMatch(faction -> getFactions().contains(faction.getAlias()));
     }
 }
