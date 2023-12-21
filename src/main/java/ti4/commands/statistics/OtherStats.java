@@ -1,17 +1,17 @@
 package ti4.commands.statistics;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -45,6 +45,7 @@ public class OtherStats extends StatisticsSubcommandData {
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
+            case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
@@ -64,6 +65,7 @@ public class OtherStats extends StatisticsSubcommandData {
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
         COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
+        FACTION_WIN_PERCENT("Faction win percent", "Shows each factions win percent"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour");
     
         private final String name;
@@ -85,7 +87,7 @@ public class OtherStats extends StatisticsSubcommandData {
          * @return the SimpleStatistics enum value, or null if not found
          */
         public static SimpleStatistics fromString(String id) {
-            for (SimpleStatistics stat : SimpleStatistics.values()) {
+            for (SimpleStatistics stat : values()) {
                 if (id.equals(stat.toString())) {
                     return stat;
                 }
@@ -114,30 +116,32 @@ public class OtherStats extends StatisticsSubcommandData {
     // Add new statistic methods here
     public static void sendAllNames(GenericInteractionCreateEvent event) {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String names = "";
+        StringBuilder names = new StringBuilder();
         int num = 0;
 
         for (Game activeGame : mapList.values()) {
             if (activeGame.getCustomName() != null && !activeGame.getCustomName().isEmpty()) {
                 num++;
-                names = names + num + ". " + activeGame.getCustomName() + " (" + activeGame.getName() + ")\n";
+                names.append(num).append(". ").append(activeGame.getCustomName())
+                    .append(" (").append(activeGame.getName()).append(")\n");
             }
         }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names);
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
 
     public static void sendAllNames(GenericInteractionCreateEvent event, boolean ds, boolean absol) {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String names = "";
+        StringBuilder names = new StringBuilder();
         int num = 0;
 
         for (Game activeGame : mapList.values()) {
             if ((ds && activeGame.isDiscordantStarsMode()) || (absol && activeGame.isAbsolMode())) {
                 num++;
-                names = names + num + ". " + activeGame.getCustomName() + " (" + activeGame.getName() + ")\n";
+                names.append(num).append(". ").append(activeGame.getCustomName())
+                    .append(" (").append(activeGame.getName()).append(")\n");
             }
         }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names);
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
 
     public static void showGameLengths(GenericInteractionCreateEvent event, Integer pastDays) {
@@ -145,7 +149,7 @@ public class OtherStats extends StatisticsSubcommandData {
         if (pastDays == null) pastDays = 3650;
         int num = 0;
         int total = 0;
-        HashMap<String, Integer> endedGames = new HashMap<>();
+        Map<String, Integer> endedGames = new HashMap<>();
         for (Game activeGame : mapList.values()) {
             if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2 && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
@@ -159,9 +163,10 @@ public class OtherStats extends StatisticsSubcommandData {
         int num2 = 0;
         for (String command : sortedMapAsc.keySet()) {
             num2++;
-            longMsg.append(num2+". "+command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
+            longMsg.append(num2).append(". ").append(command).append(": ")
+                .append(sortedMapAsc.get(command)).append(" \n");
         }
-        longMsg.append("\n The average completion time of these games is: "+(total/num)+"\n");
+        longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths" , longMsg.toString());
     }
 
@@ -207,9 +212,7 @@ public class OtherStats extends StatisticsSubcommandData {
                 int vpScore = player.getTotalVictoryPoints();
                 if (vp <= vpScore) {
                     String faction = player.getFaction();
-
-                    winnerFactionCount.putIfAbsent(faction, 1);
-                    winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
+                    winnerFactionCount.put(faction, 1 + winnerFactionCount.getOrDefault(faction, 0));
 
                     findWinner = false;
                 }
@@ -228,9 +231,8 @@ public class OtherStats extends StatisticsSubcommandData {
                             .findFirst()
                             .ifPresent(player -> {
                                 String faction = player.getFaction();
-
-                                winnerFactionCount.putIfAbsent(faction, 1);
-                                winnerFactionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
+                                winnerFactionCount.put(faction,
+                                    1 + winnerFactionCount.getOrDefault(faction, 0));
                             });
                     }
                 }
@@ -253,6 +255,56 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
     }
 
+    private static void showFactionWinPercent(GenericInteractionCreateEvent event) {
+        Map<String, Integer> factionWinCount = new HashMap<>();
+        Map<String, Integer> factionGameCount = new HashMap<>();
+        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+            int vpGoal = game.getVp();
+            List<Player> winners = new ArrayList<>();
+            for (Player player : game.getPlayers().values()) {
+                if (vpGoal <= player.getTotalVictoryPoints()) {
+                    winners.add(player);
+                }
+            }
+
+            if (winners.size() != 1) {
+                continue;
+            }
+
+            String winningFaction = winners.get(0).getFaction();
+            factionWinCount.put(winningFaction,
+                1 + factionWinCount.getOrDefault(winningFaction, 0));
+
+            game.getPlayers().values().forEach(player -> {
+                String faction = player.getFaction();
+                factionGameCount.put(faction,
+                    1 + factionGameCount.getOrDefault(faction, 0));
+            });
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Faction Win Percent:").append("\n");
+
+        Mapper.getFactions().stream()
+            .map(faction -> {
+                String factionName = faction.getFactionName();
+                double winCount = factionWinCount.getOrDefault(faction.getFactionName(), 0);
+                double gameCount = factionGameCount.getOrDefault(factionName, 0);
+                return Map.entry(faction, gameCount == 0 ? 0 : 100 * winCount / gameCount);
+            })
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry ->
+                sb.append("`")
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                    .append("%` (")
+                    .append(factionGameCount.getOrDefault(entry.getKey().getFactionName(), 0))
+                    .append(" games) ")
+                    .append(entry.getKey().getFactionEmoji()).append(" ")
+                    .append(entry.getKey().getFactionNameWithSourceEmoji())
+                    .append("\n")
+            );
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+    }
+
     private static void showMostPlayedColour(GenericInteractionCreateEvent event) {
         Map<String, Integer> colorCount = new HashMap<>();
 
@@ -262,8 +314,8 @@ public class OtherStats extends StatisticsSubcommandData {
                 String color = player.getColor();
                 String faction = player.getFaction();
                 if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                    colorCount.putIfAbsent(color, 1);
-                    colorCount.computeIfPresent(color, (key, integer) -> integer + 1);
+                    colorCount.put(color,
+                        1 + colorCount.getOrDefault(color, 0));
                 }
             }
         }
@@ -294,8 +346,7 @@ public class OtherStats extends StatisticsSubcommandData {
                 if (vp <= vpScore) {
                     String color = player.getColor();
 
-                    winnerColorCount.putIfAbsent(color, 1);
-                    winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
+                    winnerColorCount.put(color, 1 + winnerColorCount.getOrDefault(color, 0));
 
                     findWinner = false;
                 }
@@ -314,9 +365,7 @@ public class OtherStats extends StatisticsSubcommandData {
                             .findFirst()
                             .ifPresent(player -> {
                                 String color = player.getColor();
-
-                                winnerColorCount.putIfAbsent(color, 1);
-                                winnerColorCount.computeIfPresent(color, (key, integer) -> integer + 1);
+                                winnerColorCount.put(color, 1 + winnerColorCount.getOrDefault(color, 0));
                             });
                     }
                 }

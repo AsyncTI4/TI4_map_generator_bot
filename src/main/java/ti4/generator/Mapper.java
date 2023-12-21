@@ -25,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
@@ -48,14 +48,13 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
-import ti4.model.Source.ComponentSource;
-import ti4.helpers.Constants;
 
 public class Mapper {
     private static final Properties colors = new Properties();
@@ -817,7 +816,7 @@ public class Mapper {
 
     public static List<String> getFactionIDs() {
         return factions.keySet().stream()
-            .filter(token -> token instanceof String)
+            .filter(Objects::nonNull)
             .sorted()
             .collect(Collectors.toList());
     }
@@ -844,26 +843,26 @@ public class Mapper {
         String displayName = "";
         switch (relatedType) {
             case Constants.AGENDA -> {
-                AgendaModel agenda = Mapper.getAgenda(relatedID);
+                AgendaModel agenda = getAgenda(relatedID);
                 displayName = Emojis.Agenda + " " + agenda.getName();
             }
             case Constants.AC -> {
-                ActionCardModel actionCard = Mapper.getActionCard(relatedID);
+                ActionCardModel actionCard = getActionCard(relatedID);
                 displayName = actionCard.getRepresentation();
             }
             case Constants.PROMISSORY_NOTES -> {
-                PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(relatedID);
+                PromissoryNoteModel pn = getPromissoryNoteByID(relatedID);
                 displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
             }
-            case Constants.TECH -> displayName = Mapper.getTech(relatedID).getRepresentation(true);
-            case Constants.RELIC -> displayName = Mapper.getRelic(relatedID).getSimpleRepresentation();
-            case Constants.ABILITY -> displayName = Mapper.getAbility(relatedID).getRepresentation();
+            case Constants.TECH -> displayName = getTech(relatedID).getRepresentation(true);
+            case Constants.RELIC -> displayName = getRelic(relatedID).getSimpleRepresentation();
+            case Constants.ABILITY -> displayName = getAbility(relatedID).getRepresentation();
             case Constants.UNIT -> {
-                UnitModel unit = Mapper.getUnit(relatedID);
+                UnitModel unit = getUnit(relatedID);
                 displayName = unit.getUnitEmoji() + " "
                     + unit.getName() + " " + unit.getAbility();
             }
-            case Constants.LEADER -> displayName = Mapper.getLeader(relatedID).getRepresentation(true, true, false);
+            case Constants.LEADER -> displayName = getLeader(relatedID).getRepresentation(true, true, false);
             default -> {
             }
         }
