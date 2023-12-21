@@ -282,7 +282,6 @@ public class OtherStats extends StatisticsSubcommandData {
         sb.append("Faction Win Percent:").append("\n");
 
         Mapper.getFactions().stream()
-            .filter(factionModel -> factionModel.getSource().isPok())
             .map(faction -> {
                 double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
