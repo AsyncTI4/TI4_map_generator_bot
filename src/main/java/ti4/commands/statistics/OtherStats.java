@@ -33,6 +33,7 @@ public class OtherStats extends StatisticsSubcommandData {
     private static final String GAME_TYPE_FILTER = "game_type";
     private static final String FOG_FILTER = "is_fog";
     private static final String HOMEBREW_FILTER = "has_homebrew";
+    private static final String HAS_WINNER_FILTER = "has_winner";
 
     public OtherStats() {
         super(Constants.OTHER, "Other Various Statistics");
@@ -42,6 +43,7 @@ public class OtherStats extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
+        addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
     }
 
     @Override
@@ -176,6 +178,7 @@ public class OtherStats extends StatisticsSubcommandData {
             .filter(game -> filterOnGameType(event, game))
             .filter(game -> filterOnFogType(event, game))
             .filter(game -> filterOnHomebrew(event, game))
+            .filter(game -> filterOnHasWinner(event, game))
             .toList();
     }
 
@@ -322,10 +325,14 @@ public class OtherStats extends StatisticsSubcommandData {
         }
     }
 
+    private static boolean filterOnHasWinner(SlashCommandInteractionEvent event, Game game) {
+        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
+        return hasWinnerFilter == null || (hasWinnerFilter && getWinner(game) != null) || (!hasWinnerFilter && getWinner(game) == null);
+    }
+
     private static boolean filterOnHomebrew(SlashCommandInteractionEvent event, Game game) {
         Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
         return homebrewFilter == null || game.hasHomebrew() == homebrewFilter;
-
     }
 
     private static boolean isDiscordantStarsGame(Game game) {
