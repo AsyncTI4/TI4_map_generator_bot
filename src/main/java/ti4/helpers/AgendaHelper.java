@@ -41,6 +41,8 @@ import ti4.commands.status.RevealStage2;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Planet;
@@ -291,6 +293,31 @@ public class AgendaHelper {
                 activeGame.removeLaw(winner);
                 activeGame.putAgendaBackIntoDeckOnTop(winner);
                 new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
+            }
+            if ("rearmament".equalsIgnoreCase(agID)) {
+                 if ("for".equalsIgnoreCase(winner)) {
+                    for(Player player : activeGame.getRealPlayers()){
+                        String message = player.getRepresentation()+" Use buttons to drop a mech on a Home System Planet";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message, Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
+                    }
+                } else {
+                    for(Player player : activeGame.getRealPlayers()){
+                        for(Tile tile : activeGame.getTileMap().values()){
+                            for (UnitHolder capChecker : tile.getUnitHolders().values()) {
+                                int count = capChecker.getUnitCount(UnitType.Mech, player.getColor());
+                                if (count > 0) {
+                                    String colorID = Mapper.getColorID(player.getColor());
+                                    UnitKey mechKey = Mapper.getUnitKey("mech", colorID);
+                                    UnitKey infKey = Mapper.getUnitKey("inf", colorID);
+                                    capChecker.removeUnit(mechKey, count);
+                                    capChecker.addUnit(infKey, count);
+                                }
+                            }
+                        }
+                    }
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Removed all mechs");
+                }
+
             }
             if ("mutiny".equalsIgnoreCase(agID)) {
                 List<Player> winOrLose;
