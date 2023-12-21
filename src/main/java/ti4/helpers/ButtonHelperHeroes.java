@@ -155,7 +155,7 @@ public class ButtonHelperHeroes {
         ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
 
-        List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player.getFaction(), player);
+        List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player);
         List<Button> buttons = Helper.getTechButtons(techs, techType, player, "nekro");
         String message = player.getRepresentation() + " Use the buttons to get the tech you want";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -495,7 +495,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getJolNarHeroSwapInOptions(Player player, Game activeGame, String buttonID) {
         String tech = buttonID.split("_")[1];
         TechnologyModel techM = Mapper.getTech(tech);
-        List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techM.getType().toString(), player.getFaction(), player);
+        List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techM.getType().toString(), player);
         return Helper.getTechButtons(techs, techM.getType().toString(), player, tech);
     }
 
