@@ -203,13 +203,10 @@ public class OtherStats extends StatisticsSubcommandData {
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            for (Player player : game.getPlayers().values()) {
-                String color = player.getColor();
+            for (Player player : game.getRealPlayers()) {
                 String faction = player.getFaction();
-                if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                    factionCount.putIfAbsent(faction, 1);
-                    factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
-                }
+                factionCount.put(faction,
+                    1 + factionCount.getOrDefault(faction, 0));
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -275,7 +272,7 @@ public class OtherStats extends StatisticsSubcommandData {
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
 
-            game.getPlayers().values().forEach(player -> {
+            game.getRealPlayers().forEach(player -> {
                 String faction = player.getFaction();
                 factionGameCount.put(faction,
                     1 + factionGameCount.getOrDefault(faction, 0));
@@ -369,7 +366,7 @@ public class OtherStats extends StatisticsSubcommandData {
 
     private static Player getWinner(Game game) {
         Player winner = null;
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getRealPlayers()) {
             if (game.getVp() <= player.getTotalVictoryPoints()) {
                 if (winner == null) {
                     winner = player;
@@ -394,13 +391,10 @@ public class OtherStats extends StatisticsSubcommandData {
         Map<String, Integer> colorCount = new HashMap<>();
         List<Game> filteredGames = getFilteredGames(event);
         for (Game game : filteredGames) {
-            for (Player player : game.getPlayers().values()) {
+            for (Player player : game.getRealPlayers()) {
                 String color = player.getColor();
-                String faction = player.getFaction();
-                if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                    colorCount.put(color,
-                        1 + colorCount.getOrDefault(color, 0));
-                }
+                colorCount.put(color,
+                    1 + colorCount.getOrDefault(color, 0));
             }
         }
         StringBuilder sb = new StringBuilder();
