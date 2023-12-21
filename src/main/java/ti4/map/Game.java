@@ -700,8 +700,7 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame()
-            || isMiltyModMode());
+        return !hasHomebrew();
     }
 
     public boolean isFrankenGame() {
@@ -3676,18 +3675,18 @@ public class Game {
             || isSpinMode()
             || isHomeBrewSCMode()
             || isCommunityMode()
-            || !"action_cards_pok".equals(acDeckID)
-            || !"secret_objectives_pok".equals(soDeckID)
-            || !"public_stage_1_objectives_pok".equals(stage1PublicDeckID)
-            || !"public_stage_2_objectives_pok".equals(stage2PublicDeckID)
-            || !"relics_pok".equals(relicDeckID)
-            || !"agendas_pok".equals(agendaDeckID)
+            || !List.of("action_cards_pok", "action_cards_basegame", "action_cards_basegame_and_codex1").contains(acDeckID)
+            || !List.of("secret_objectives_pok", "secret_objectives_base").contains(soDeckID)
+            || !List.of("public_stage_1_objectives_pok", "public_stage_1_objectives_base").contains(stage1PublicDeckID)
+            || !List.of("public_stage_2_objectives_pok", "public_stage_2_objectives_base").contains(stage2PublicDeckID)
+            || !List.of("relics_pok", "relics_base").contains(relicDeckID)
+            || !List.of("agendas_pok", "agendas_base_game").contains(agendaDeckID)
+            || !List.of("explores_pok", "explores_base").contains(explorationDeckID)
+            || !List.of("techs_pok", "techs_base").contains(technologyDeckID)
+            || !List.of("pok", "base_game").contains(scSetID)
             || (eventDeckID != null && !"null".equals(eventDeckID))
-            || !"explores_pok".equals(explorationDeckID)
-            || !"techs_pok".equals(technologyDeckID)
-            || !"pok".equals(scSetID)
             || Mapper.getFactions().stream()
-            .filter(faction -> !"pok".equals(faction.getSource().name()) && !"base".equals(faction.getSource().name()))
-            .anyMatch(faction -> getFactions().contains(faction.getAlias()));
+                .filter(faction -> !faction.getSource().isPok())
+                .anyMatch(faction -> getFactions().contains(faction.getAlias()));
     }
 }
