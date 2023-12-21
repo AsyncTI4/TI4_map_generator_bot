@@ -116,6 +116,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new StellarConverter());
         subcommands.add(new RiseOfMessiah());
         subcommands.add(new SwordsToPlowsharesTGGain());
+        subcommands.add(new WormholeResearchFor());
         subcommands.add(new FighterConscription());
         subcommands.add(new SwapSC());
         subcommands.add(new KeleresHeroMentak());

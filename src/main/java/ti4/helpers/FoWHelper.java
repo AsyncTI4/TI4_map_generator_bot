@@ -432,7 +432,7 @@ public class FoWHelper {
 		return !wormholeIDs.isEmpty();
 	}
 
-	public static boolean doesTileHaveAlphaOrBeta(Game activeGame, String position, Player player) {
+	public static boolean doesTileHaveAlphaOrBeta(Game activeGame, String position) {
 		Tile tile = activeGame.getTileByPosition(position);
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
