@@ -5,6 +5,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -26,9 +27,18 @@ import ti4.model.FactionModel;
 
 public class OtherStats extends StatisticsSubcommandData {
 
+    private static final String PLAYER_COUNT_FILTER = "player_count";
+    private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
+    private static final String GAME_TYPE_FILTER = "game_type";
+    private static final String FOG_FILTER = "is_fog";
+
     public OtherStats() {
         super(Constants.OTHER, "Other Various Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
+        addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
+        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. pok, base"));
+        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if it is a fog game or not"));
     }
 
     @Override
@@ -258,10 +268,16 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
     }
 
-    private static void showFactionWinPercent(GenericInteractionCreateEvent event) {
+    private static void showFactionWinPercent(SlashCommandInteractionEvent event) {
+        List<Game> filteredGames = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(game -> filterOnPlayerCount(event, game))
+            .filter(game -> filterOnVictoryPointGoal(event, game))
+            .filter(game -> filterOnGameType(event, game))
+            .filter(game -> filterOnFogType(event, game))
+            .toList();
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : filteredGames) {
             Player winner = getWinner(game);
             if (winner == null) {
                 continue;
@@ -298,6 +314,55 @@ public class OtherStats extends StatisticsSubcommandData {
                     .append("\n")
             );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+    }
+
+    private static boolean filterOnFogType(SlashCommandInteractionEvent event, Game game) {
+        Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
+        return fogFilter == null
+            || (fogFilter && (game.isFoWMode() || game.isLightFogMode()))
+            || (!fogFilter && (!game.isFoWMode() && !game.isLightFogMode())) ;
+    }
+
+    private static boolean filterOnGameType(SlashCommandInteractionEvent event, Game game) {
+        String gameTypeFilter = event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString);
+        if (gameTypeFilter == null) {
+            return true;
+        }
+        switch (gameTypeFilter) {
+            case "base" -> {
+                return game.isBaseGameMode();
+            }
+            case "absol" -> {
+                return game.isAbsolMode();
+            }
+            case "ds" -> {
+                return isDiscordantStarsGame(game);
+            }
+            case "pok" -> {
+                return !game.isBaseGameMode() && !game.isAbsolMode() && !isDiscordantStarsGame(game)
+                    && !game.isMiltyModMode();
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+
+    private static boolean isDiscordantStarsGame(Game game) {
+        return game.isDiscordantStarsMode() ||
+            Mapper.getFactions().stream()
+                .filter(faction -> "ds".equals(faction.getSource().name()))
+                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
+    }
+
+    private static boolean filterOnVictoryPointGoal(SlashCommandInteractionEvent event, Game game) {
+        int victoryPointGoal = event.getOption(VICTORY_POINT_GOAL_FILTER, 0, OptionMapping::getAsInt);
+        return victoryPointGoal <= 0 || game.getVp() == victoryPointGoal;
+    }
+
+    private static boolean filterOnPlayerCount(SlashCommandInteractionEvent event, Game game) {
+        int playerCountFilter = event.getOption(PLAYER_COUNT_FILTER, 0, OptionMapping::getAsInt);
+        return playerCountFilter <= 0 || game.getPlayerCountForMap() == playerCountFilter;
     }
 
     private static Player getWinner(Game game) {

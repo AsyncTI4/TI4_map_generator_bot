@@ -28,8 +28,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -300,7 +298,6 @@ public class Game {
     }
 
     public void newGameSetup() {
-
         secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         actionCards = Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck();
         explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
