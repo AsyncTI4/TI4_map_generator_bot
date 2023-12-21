@@ -1,9 +1,8 @@
 package ti4.commands.statistics;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -262,18 +261,20 @@ public class OtherStats extends StatisticsSubcommandData {
         Map<String, Integer> factionGameCount = new HashMap<>();
         for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
             int vpGoal = game.getVp();
-            List<Player> winners = new ArrayList<>();
+            Player winner = null;
             for (Player player : game.getPlayers().values()) {
                 if (vpGoal <= player.getTotalVictoryPoints()) {
-                    winners.add(player);
+                    if (winner == null || hasLowerInitiative(player, winner)) {
+                        winner = player;
+                    }
                 }
             }
 
-            if (winners.size() != 1) {
+            if (winner == null) {
                 continue;
             }
 
-            String winningFaction = winners.get(0).getFaction();
+            String winningFaction = winner.getFaction();
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
 
@@ -305,6 +306,10 @@ public class OtherStats extends StatisticsSubcommandData {
                     .append("\n")
             );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+    }
+
+    private static boolean hasLowerInitiative(Player player1, Player player2) {
+        return Collections.min(player1.getSCs()) < Collections.min(player2.getSCs());
     }
 
     private static void showMostPlayedColour(GenericInteractionCreateEvent event) {
