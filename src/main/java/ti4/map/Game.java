@@ -700,8 +700,7 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame()
-            || isMiltyModMode());
+        return !hasHomebrew();
     }
 
     public boolean isFrankenGame() {
