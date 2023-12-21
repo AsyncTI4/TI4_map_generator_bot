@@ -1,6 +1,7 @@
 package ti4.commands.statistics;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collections;
 import java.util.Date;
@@ -131,11 +132,12 @@ public class OtherStats extends StatisticsSubcommandData {
         int num = 0;
         List<Game> filteredGames = getFilteredGames(event);
         for (Game game : filteredGames) {
-            if (game.getCustomName() != null && !game.getCustomName().isEmpty()) {
-                num++;
-                names.append(num).append(". ").append(game.getCustomName())
-                    .append(" (").append(game.getName()).append(")\n");
+            num++;
+            names.append(num).append(". ").append(game.getName());
+            if (isNotBlank(game.getCustomName())) {
+                names.append(" (").append(game.getCustomName()).append(")");
             }
+            names.append("\n");
         }
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
