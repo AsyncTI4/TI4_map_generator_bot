@@ -1271,7 +1271,12 @@ public class ButtonListener extends ListenerAdapter {
                 case "bs" -> { //Bio-stims
                     player.exhaustTech(tech);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
-                    ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player);
+                    ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
+                }
+                case "absol_bs" -> { //Bio-stims
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+                    ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
                 }
                 case "td" -> { //Transit Diodes
                     player.exhaustTech(tech);
