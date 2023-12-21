@@ -1,5 +1,7 @@
 package ti4.commands.statistics;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -260,20 +262,10 @@ public class OtherStats extends StatisticsSubcommandData {
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
-            int vpGoal = game.getVp();
-            Player winner = null;
-            for (Player player : game.getPlayers().values()) {
-                if (vpGoal <= player.getTotalVictoryPoints()) {
-                    if (winner == null || hasLowerInitiative(player, winner)) {
-                        winner = player;
-                    }
-                }
-            }
-
+            Player winner = getWinner(game);
             if (winner == null) {
                 continue;
             }
-
             String winningFaction = winner.getFaction();
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
@@ -308,8 +300,27 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
 
-    private static boolean hasLowerInitiative(Player player1, Player player2) {
-        return Collections.min(player1.getSCs()) < Collections.min(player2.getSCs());
+    private static Player getWinner(Game game) {
+        Player winner = null;
+        for (Player player : game.getPlayers().values()) {
+            if (game.getVp() <= player.getTotalVictoryPoints()) {
+                if (winner == null) {
+                    winner = player;
+                } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
+                    winner = getLowestInitiativePlayer(player, winner);
+                } else {
+                    return null;
+                }
+            }
+        }
+        return winner;
+    }
+
+    private static Player getLowestInitiativePlayer(Player player1, Player player2) {
+        if (Collections.min(player1.getSCs()) < Collections.min(player2.getSCs())) {
+            return player1;
+        }
+        return player2;
     }
 
     private static void showMostPlayedColour(GenericInteractionCreateEvent event) {
