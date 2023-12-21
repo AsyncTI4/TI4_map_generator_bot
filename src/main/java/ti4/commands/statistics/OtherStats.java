@@ -67,7 +67,7 @@ public class OtherStats extends StatisticsSubcommandData {
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
         COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
-        FACTION_WIN_PERCENT("Faction win percent", "Shows each factions win percent"),
+        FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour");
     
         private final String name;
@@ -293,7 +293,7 @@ public class OtherStats extends StatisticsSubcommandData {
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
                 return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
             })
-            .sorted(Map.Entry.<FactionModel, Double>comparingByValue().reversed())
+            .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
             .forEach(entry ->
                 sb.append("`")
                     .append(StringUtils.leftPad(entry.getValue().toString(), 4))
