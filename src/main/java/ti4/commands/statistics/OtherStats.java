@@ -53,8 +53,6 @@ public class OtherStats extends StatisticsSubcommandData {
         }
         switch (stat) {
             case UNLEASH_THE_NAMES -> sendAllNames(event);
-            case UNLEASH_THE_NAMES_DS -> sendAllNames(event, true, false);
-            case UNLEASH_THE_NAMES_ABSOL -> sendAllNames(event, false, true);
             case GAME_LENGTH -> showGameLengths(event, null);
             case GAME_LENGTH_4MO -> showGameLengths(event, 120);
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
@@ -74,8 +72,6 @@ public class OtherStats extends StatisticsSubcommandData {
     public enum SimpleStatistics {
         // Add your new statistic here
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
-        UNLEASH_THE_NAMES_DS("Unleash the Names DS", "Show all the names of the DS games"),
-        UNLEASH_THE_NAMES_ABSOL("Unleash the Names Absol", "Show all the names of Absol games"),
         GAME_LENGTH("Game Length", "Show game lengths"),
         GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
@@ -130,32 +126,15 @@ public class OtherStats extends StatisticsSubcommandData {
         }
     }
 
-    // Add new statistic methods here
-    public static void sendAllNames(GenericInteractionCreateEvent event) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+    public static void sendAllNames(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
-
-        for (Game activeGame : mapList.values()) {
-            if (activeGame.getCustomName() != null && !activeGame.getCustomName().isEmpty()) {
+        List<Game> filteredGames = getFilteredGames(event);
+        for (Game game : filteredGames) {
+            if (game.getCustomName() != null && !game.getCustomName().isEmpty()) {
                 num++;
-                names.append(num).append(". ").append(activeGame.getCustomName())
-                    .append(" (").append(activeGame.getName()).append(")\n");
-            }
-        }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
-    }
-
-    public static void sendAllNames(GenericInteractionCreateEvent event, boolean ds, boolean absol) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        StringBuilder names = new StringBuilder();
-        int num = 0;
-
-        for (Game activeGame : mapList.values()) {
-            if ((ds && activeGame.isDiscordantStarsMode()) || (absol && activeGame.isAbsolMode())) {
-                num++;
-                names.append(num).append(". ").append(activeGame.getCustomName())
-                    .append(" (").append(activeGame.getName()).append(")\n");
+                names.append(num).append(". ").append(game.getCustomName())
+                    .append(" (").append(game.getName()).append(")\n");
             }
         }
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
@@ -287,6 +266,7 @@ public class OtherStats extends StatisticsSubcommandData {
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
                 return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
             })
+            .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
             .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
             .forEach(entry ->
                 sb.append("`")
