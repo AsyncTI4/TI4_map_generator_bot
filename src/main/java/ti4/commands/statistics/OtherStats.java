@@ -24,6 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
 public class OtherStats extends StatisticsSubcommandData {
+
     public OtherStats() {
         super(Constants.OTHER, "Other Various Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
@@ -66,7 +67,7 @@ public class OtherStats extends StatisticsSubcommandData {
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
         COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
-        FACTION_WIN_PERCENT("Faction win percent", "Shows each factions win percent"),
+        FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour");
     
         private final String name;
@@ -290,14 +291,14 @@ public class OtherStats extends StatisticsSubcommandData {
             .map(faction -> {
                 double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
-                return Map.entry(faction, gameCount == 0 ? 0 : 100 * winCount / gameCount);
+                return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
             })
-            .sorted(Map.Entry.<FactionModel, Double>comparingByValue().reversed())
+            .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
             .forEach(entry ->
                 sb.append("`")
                     .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("%` (")
-                    .append(factionGameCount.getOrDefault(entry.getKey().getFactionName(), 0))
+                    .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
                     .append(" games) ")
                     .append(entry.getKey().getFactionEmoji()).append(" ")
                     .append(entry.getKey().getFactionNameWithSourceEmoji())
