@@ -3663,4 +3663,28 @@ public class Game {
         return scText;
     }
 
+    @JsonIgnore
+    public boolean hasHomebrew() {
+        return isExtraSecretMode()
+            || isFoWMode()
+            || isLightFogMode()
+            || isDiscordantStarsMode()
+            || isFrankenGame()
+            || isMiltyModMode()
+            || isAbsolMode()
+            || isAllianceMode()
+            || isSpinMode()
+            || isHomeBrewSCMode()
+            || isCommunityMode()
+            || !"action_cards_pok".equals(acDeckID)
+            || !"secret_objectives_pok".equals(soDeckID)
+            || !"public_stage_1_objectives_pok".equals(stage1PublicDeckID)
+            || !"public_stage_2_objectives_pok".equals(stage2PublicDeckID)
+            || !"relics_pok".equals(relicDeckID)
+            || !"agendas_pok".equals(agendaDeckID)
+            || (eventDeckID != null && !"null".equals(eventDeckID))
+            || !"explores_pok".equals(explorationDeckID)
+            || !"techs_pok".equals(technologyDeckID)
+            || !"pok".equals(scSetID);
+    }
 }
