@@ -23,6 +23,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class OtherStats extends StatisticsSubcommandData {
+
     public OtherStats() {
         super(Constants.OTHER, "Other Various Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
@@ -286,17 +287,16 @@ public class OtherStats extends StatisticsSubcommandData {
 
         Mapper.getFactions().stream()
             .map(faction -> {
-                String factionName = faction.getFactionName();
-                double winCount = factionWinCount.getOrDefault(faction.getFactionName(), 0);
-                double gameCount = factionGameCount.getOrDefault(factionName, 0);
-                return Map.entry(faction, gameCount == 0 ? 0 : 100 * winCount / gameCount);
+                double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
+                double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
+                return Map.entry(faction, gameCount == 0 ? 0 : Math.ceil(100 * winCount / gameCount));
             })
             .sorted(Map.Entry.comparingByValue())
             .forEach(entry ->
                 sb.append("`")
                     .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                     .append("%` (")
-                    .append(factionGameCount.getOrDefault(entry.getKey().getFactionName(), 0))
+                    .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
                     .append(" games) ")
                     .append(entry.getKey().getFactionEmoji()).append(" ")
                     .append(entry.getKey().getFactionNameWithSourceEmoji())
