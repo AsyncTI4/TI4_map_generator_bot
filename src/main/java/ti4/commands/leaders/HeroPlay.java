@@ -189,7 +189,7 @@ public class HeroPlay extends LeaderAction {
                 DrawRelic.drawRelicAndNotify(player, event, activeGame);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to do TWO of the avaiable secondaries. (note, all are presented for conveinence, but two is the limit)", buttons);
+                    + " use the button to do TWO of the available secondaries. (note, all are presented for conveinence, but two is the limit)", buttons);
             }
             case "mahacthero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getBenediction1stTileOptions(player, activeGame);

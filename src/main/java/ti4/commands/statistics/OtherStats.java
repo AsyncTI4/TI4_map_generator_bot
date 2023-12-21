@@ -164,10 +164,10 @@ public class OtherStats extends StatisticsSubcommandData {
         int total = 0;
         Map<String, Integer> endedGames = new HashMap<>();
         for (Game activeGame : mapList.values()) {
-            if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2 && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
+            if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2 && (Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays || pastDays > 120)) {
                 num++;
                 int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
-                endedGames.put(activeGame.getName(), dif);
+                endedGames.put(activeGame.getName() + " ("+activeGame.getRealPlayers().size()+"p, "+activeGame.getVp()+"pt)", dif);
                 total = total + dif;
             }
         }
