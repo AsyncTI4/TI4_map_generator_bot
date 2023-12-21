@@ -21,6 +21,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 
 public class OtherStats extends StatisticsSubcommandData {
 
@@ -286,12 +287,13 @@ public class OtherStats extends StatisticsSubcommandData {
         sb.append("Faction Win Percent:").append("\n");
 
         Mapper.getFactions().stream()
+            .filter(factionModel -> factionModel.getSource().isPok())
             .map(faction -> {
                 double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
-                return Map.entry(faction, gameCount == 0 ? 0 : Math.ceil(100 * winCount / gameCount));
+                return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
             })
-            .sorted(Map.Entry.comparingByValue())
+            .sorted(Map.Entry.<FactionModel, Double>comparingByValue().reversed())
             .forEach(entry ->
                 sb.append("`")
                     .append(StringUtils.leftPad(entry.getValue().toString(), 4))
