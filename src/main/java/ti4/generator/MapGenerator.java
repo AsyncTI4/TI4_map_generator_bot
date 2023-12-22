@@ -3563,7 +3563,7 @@ public class MapGenerator {
                 }
 
                 // UNIT TAGS
-                if (i == 0 && !fighterOrInfantry && game.isShowUnitTags()) { //DRAW TAG
+                if (i == 0 && !(UnitType.Infantry.equals(unitKey.getUnitType())) && game.isShowUnitTags()) { //DRAW TAG
                     UnitModel unitModel = game.getUnitFromUnitKey(unitKey);
                     if (player != null && unitModel != null && unitModel.getIsShip()) {
                         //TODO: Only paint the tag of the most expensive ship per player, or if no ships, the "bottom most" unit on a planet
@@ -3636,7 +3636,7 @@ public class MapGenerator {
             case "dn" -> new Point(10, 50); //Dreadnought
             case "ca" -> new Point(0, 40); //Cruiser
             case "cv" -> new Point(0, 40); //Carrier
-            case "gf", "ff" -> new Point(0, 20); //Infantry/Fighter
+            case "gf", "ff" -> new Point(-15, 12); //Infantry/Fighter
             case "dd" -> new Point(-10, 30); //Destroyer
             case "mf" -> new Point(-10, 20); //Mech
             case "pd" -> new Point(-10, 20); //PDS

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -115,13 +117,15 @@ public class Replace extends GameSubcommandData {
         }
 
         Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
+        if (activeGame.getBotMapUpdatesThread() != null) {
+            activeGame.getBotMapUpdatesThread().addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
+        }
         GameSaveLoadManager.saveMap(activeGame, event);
         GameSaveLoadManager.reload(activeGame);
         if (FoWHelper.isPrivateGame(activeGame)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message);
-            MessageHelper.sendMessageToChannel(activeGame.getBotMapUpdatesThread(), player.getRepresentation(true, true) + " pinging you here for visibility");
         }
     }
 }

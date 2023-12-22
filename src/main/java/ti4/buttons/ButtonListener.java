@@ -2229,7 +2229,7 @@ public class ButtonListener extends ListenerAdapter {
                 Button ixthianButton = Button.success("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
                 String msg = "The speaker should roll for Ixthain Artifact. Click this button to roll anyway!";
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), msg, ixthianButton);
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("applytempcombatmod__" + Constants.AC + "__")) {
