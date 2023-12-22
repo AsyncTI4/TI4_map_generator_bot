@@ -264,12 +264,12 @@ public class ButtonHelperHeroes {
         PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
         message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
-        Helper.checkEndGame(activeGame, p2);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message2);
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), message2);
         }
         event.getMessage().delete().queue();
+        Helper.checkEndGame(activeGame, p2);
 
     }
 
