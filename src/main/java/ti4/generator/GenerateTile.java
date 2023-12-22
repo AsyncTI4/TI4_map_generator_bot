@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -101,7 +102,7 @@ public class GenerateTile {
         init(context, focusTile);
         reset();
 
-        HashMap<String, Tile> tilesToDisplay = new HashMap<>(activeGame.getTileMap());
+        Map<String, Tile> tilesToDisplay = new HashMap<>(activeGame.getTileMap());
         Set<String> systemsInRange = getTilesToShow(activeGame, context, focusTile);
         Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
         keysToRemove.removeAll(systemsInRange);
@@ -137,7 +138,7 @@ public class GenerateTile {
         }
 
         try {
-            HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
+            Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
             tileMap.remove(null);
 
             Set<String> tiles = tileMap.keySet();

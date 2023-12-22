@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 public class MoveUnits extends AddRemoveUnits {
 
     private boolean toAction;
-    private HashMap<UnitKey, Integer> unitsDamage = new HashMap<>();
+    private Map<UnitKey, Integer> unitsDamage = new HashMap<>();
     private boolean priorityDmg = true;
 
     @Override

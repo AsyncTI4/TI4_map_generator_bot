@@ -397,7 +397,7 @@ public class FoWHelper {
 			wormholeIDs = new HashSet<>();
 		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -430,7 +430,7 @@ public class FoWHelper {
 			wormholeIDs = new HashSet<>();
 		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -477,7 +477,7 @@ public class FoWHelper {
 			wormholeIDs = new HashSet<>();
 		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -523,7 +523,7 @@ public class FoWHelper {
 				continue;
 			}
 			for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-				HashSet<String> tokenList = unitHolder.getTokenList();
+				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
 						if (token.contains(wormholeID)) {

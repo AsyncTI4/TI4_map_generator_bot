@@ -82,7 +82,7 @@ public class Game {
     private boolean hasHadAStatusPhase;
     private boolean botShushing = true;
     @JsonIgnore
-    private final HashMap<String, UnitHolder> planets = new HashMap<>();
+    private final Map<String, UnitHolder> planets = new HashMap<>();
     @Nullable
     private DisplayType displayTypeForced;
     @ExportableField
@@ -197,10 +197,10 @@ public class Game {
     private String savedMessage;
     @Nullable
     private String botMapUpdatesThreadID;
-    private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
-    private final HashMap<Integer, Boolean> scPlayed = new HashMap<>();
-    private HashMap<String, String> currentAgendaVotes = new HashMap<>();
-    private final HashMap<String, String> checkingForAllReacts = new HashMap<>();
+    private Map<String, Player> players = new LinkedHashMap<>();
+    private final Map<Integer, Boolean> scPlayed = new HashMap<>();
+    private Map<String, String> currentAgendaVotes = new HashMap<>();
+    private final Map<String, String> checkingForAllReacts = new HashMap<>();
     @ExportableField
     private String speaker = "";
     @ExportableField
@@ -234,12 +234,12 @@ public class Game {
     private long autoPingSpacer;
     private List<String> secretObjectives;
     private List<String> actionCards;
-    private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
-    private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
-    private HashMap<String, Integer> slashCommandsUsed = new HashMap<>();
-    private HashMap<String, Integer> actionCardsSabotaged = new HashMap<>();
-    private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
+    private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
+    private Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
+    private Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
+    private Map<String, Integer> slashCommandsUsed = new HashMap<>();
+    private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
+    private Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     @ExportableField
     private String phaseOfGame = "";
     private String currentAgendaInfo = "";
@@ -249,21 +249,21 @@ public class Game {
     @Getter
     private List<String> events = new ArrayList<>();
     @Getter
-    private LinkedHashMap<String, Integer> discardedEvents = new LinkedHashMap<>();
+    private Map<String, Integer> discardedEvents = new LinkedHashMap<>();
     @Getter
     @Setter
-    private LinkedHashMap<String, Integer> eventsInEffect = new LinkedHashMap<>();
-    private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
-    private LinkedHashMap<String, String> lawsInfo = new LinkedHashMap<>();
+    private Map<String, Integer> eventsInEffect = new LinkedHashMap<>();
+    private Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+    private Map<String, Integer> discardAgendas = new LinkedHashMap<>();
+    private Map<String, Integer> sentAgendas = new LinkedHashMap<>();
+    private Map<String, Integer> laws = new LinkedHashMap<>();
+    private Map<String, String> lawsInfo = new LinkedHashMap<>();
     private List<String> messageIDsForSaboReacts = new ArrayList<>();
     @ExportableField
-    private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
-    private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
-    private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+    private Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
+    private Map<String, Integer> customPublicVP = new LinkedHashMap<>();
+    private Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+    private Map<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
     @JsonProperty("adjacentTileOverrides")
     @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
@@ -272,15 +272,15 @@ public class Game {
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
     private List<String> savedButtons = new ArrayList<>();
-    private ArrayList<String> soToPoList = new ArrayList<>();
+    private List<String> soToPoList = new ArrayList<>();
     @JsonIgnore
-    private ArrayList<String> purgedPN = new ArrayList<>();
+    private List<String> purgedPN = new ArrayList<>();
     private List<String> explore;
-    private ArrayList<String> discardExplore = new ArrayList<>();
+    private List<String> discardExplore = new ArrayList<>();
     private List<String> relics;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
-    private final ArrayList<String> runDataMigrations = new ArrayList<>();
+    private final List<String> runDataMigrations = new ArrayList<>();
     private BagDraft activeDraft;
     @JsonIgnore
     @Getter
@@ -380,7 +380,7 @@ public class Game {
         return soNum;
     }
 
-    public HashMap<String, Object> getExportableFieldMap() {
+    public Map<String, Object> getExportableFieldMap() {
         Class<? extends Game> aClass = getClass();
         Field[] fields = aClass.getDeclaredFields();
         HashMap<String, Object> returnValue = new HashMap<>();
@@ -486,11 +486,11 @@ public class Game {
         Collections.shuffle(secretObjectives);
     }
 
-    public void setPurgedPNs(ArrayList<String> purgedPN) {
+    public void setPurgedPNs(List<String> purgedPN) {
         this.purgedPN = purgedPN;
     }
 
-    public ArrayList<String> getPurgedPN() {
+    public List<String> getPurgedPN() {
         return purgedPN;
     }
 
@@ -856,17 +856,17 @@ public class Game {
     }
 
     //Position, Tile
-    private HashMap<String, Tile> tileMap = new HashMap<>();
+    private Map<String, Tile> tileMap = new HashMap<>();
 
-    public HashMap<Integer, Boolean> getScPlayed() {
+    public Map<Integer, Boolean> getScPlayed() {
         return scPlayed;
     }
 
-    public HashMap<String, String> getCurrentAgendaVotes() {
+    public Map<String, String> getCurrentAgendaVotes() {
         return currentAgendaVotes;
     }
 
-    public HashMap<String, String> getMessagesThatICheckedForAllReacts() {
+    public Map<String, String> getMessagesThatICheckedForAllReacts() {
         return checkingForAllReacts;
     }
 
@@ -1082,19 +1082,19 @@ public class Game {
         activeSystem = system;
     }
 
-    public HashMap<String, Integer> getCurrentMovedUnitsFrom1System() {
+    public Map<String, Integer> getCurrentMovedUnitsFrom1System() {
         return displacedUnitsFrom1System;
     }
 
-    public HashMap<String, Integer> getAllSlashCommandsUsed() {
+    public Map<String, Integer> getAllSlashCommandsUsed() {
         return slashCommandsUsed;
     }
 
-    public HashMap<String, Integer> getAllActionCardsSabod() {
+    public Map<String, Integer> getAllActionCardsSabod() {
         return actionCardsSabotaged;
     }
 
-    public HashMap<String, Integer> getMovedUnitsFromCurrentActivation() {
+    public Map<String, Integer> getMovedUnitsFromCurrentActivation() {
         return displacedUnitsFromEntireTacticalAction;
     }
 
@@ -1110,15 +1110,15 @@ public class Game {
         actionCardsSabotaged.put(acName, count);
     }
 
-    public void setCurrentMovedUnitsFrom1System(HashMap<String, Integer> displacedUnits) {
+    public void setCurrentMovedUnitsFrom1System(Map<String, Integer> displacedUnits) {
         displacedUnitsFrom1System = displacedUnits;
     }
 
-    public void setSlashCommandsUsed(HashMap<String, Integer> commands) {
+    public void setSlashCommandsUsed(Map<String, Integer> commands) {
         slashCommandsUsed = commands;
     }
 
-    public void setACSabod(HashMap<String, Integer> acs) {
+    public void setACSabod(Map<String, Integer> acs) {
         actionCardsSabotaged = acs;
     }
 
@@ -1126,7 +1126,7 @@ public class Game {
         displacedUnitsFromEntireTacticalAction.put(unit, count);
     }
 
-    public void setCurrentMovedUnitsFrom1TacticalAction(HashMap<String, Integer> displacedUnits) {
+    public void setCurrentMovedUnitsFrom1TacticalAction(Map<String, Integer> displacedUnits) {
         displacedUnitsFromEntireTacticalAction = displacedUnits;
     }
 
@@ -1272,11 +1272,11 @@ public class Game {
         revealedPublicObjectives.put(id, identifier);
     }
 
-    public LinkedHashMap<Integer, Integer> getScTradeGoods() {
+    public Map<Integer, Integer> getScTradeGoods() {
         return scTradeGoods;
     }
 
-    public void setScTradeGoods(LinkedHashMap<Integer, Integer> scTradeGoods) {
+    public void setScTradeGoods(Map<Integer, Integer> scTradeGoods) {
         this.scTradeGoods = scTradeGoods;
     }
 
@@ -1306,7 +1306,7 @@ public class Game {
         return (new ArrayList<>(getScTradeGoods().keySet()));
     }
 
-    public LinkedHashMap<String, Integer> getRevealedPublicObjectives() {
+    public Map<String, Integer> getRevealedPublicObjectives() {
         return revealedPublicObjectives;
     }
 
@@ -1618,23 +1618,23 @@ public class Game {
         return agendas.remove(id);
     }
 
-    public LinkedHashMap<String, Integer> getCustomPublicVP() {
+    public Map<String, Integer> getCustomPublicVP() {
         return customPublicVP;
     }
 
-    public void setCustomPublicVP(LinkedHashMap<String, Integer> customPublicVP) {
+    public void setCustomPublicVP(Map<String, Integer> customPublicVP) {
         this.customPublicVP = customPublicVP;
     }
 
-    public void setRevealedPublicObjectives(LinkedHashMap<String, Integer> revealedPublicObjectives) {
+    public void setRevealedPublicObjectives(Map<String, Integer> revealedPublicObjectives) {
         this.revealedPublicObjectives = revealedPublicObjectives;
     }
 
-    public void setScoredPublicObjectives(LinkedHashMap<String, List<String>> scoredPublicObjectives) {
+    public void setScoredPublicObjectives(Map<String, List<String>> scoredPublicObjectives) {
         this.scoredPublicObjectives = scoredPublicObjectives;
     }
 
-    public void setCustomAdjacentTiles(LinkedHashMap<String, List<String>> customAdjacentTiles) {
+    public void setCustomAdjacentTiles(Map<String, List<String>> customAdjacentTiles) {
         this.customAdjacentTiles = customAdjacentTiles;
     }
 
@@ -1674,11 +1674,11 @@ public class Game {
         publicObjectives2.remove(key);
     }
 
-    public ArrayList<String> getSoToPoList() {
+    public List<String> getSoToPoList() {
         return soToPoList;
     }
 
-    public void setSoToPoList(ArrayList<String> soToPoList) {
+    public void setSoToPoList(List<String> soToPoList) {
         this.soToPoList = soToPoList;
     }
 
@@ -1690,17 +1690,17 @@ public class Game {
         soToPoList.remove(id);
     }
 
-    public LinkedHashMap<String, List<String>> getScoredPublicObjectives() {
+    public Map<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
     }
 
-    public LinkedHashMap<String, List<String>> getCustomAdjacentTiles() {
+    public Map<String, List<String>> getCustomAdjacentTiles() {
         return customAdjacentTiles;
     }
 
     @JsonGetter
     @JsonSerialize(keyUsing = MapPairKeySerializer.class)
-    public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
+    public Map<Pair<String, Integer>, String> getAdjacentTileOverrides() {
         return adjacencyOverrides;
     }
 
@@ -1712,8 +1712,8 @@ public class Game {
         adjacencyOverrides.put(secondary, primaryTile);
     }
 
-    public void setAdjacentTileOverride(LinkedHashMap<Pair<String, Integer>, String> overrides) {
-        adjacencyOverrides = overrides;
+    public void setAdjacentTileOverride(Map<Pair<String, Integer>, String> overrides) {
+        adjacencyOverrides = new LinkedHashMap<>(overrides);
     }
 
     public void clearAdjacentTileOverrides() {
@@ -1749,11 +1749,11 @@ public class Game {
         return null;
     }
 
-    public LinkedHashMap<String, Integer> getLaws() {
+    public Map<String, Integer> getLaws() {
         return laws;
     }
 
-    public LinkedHashMap<String, String> getLawsInfo() {
+    public Map<String, String> getLawsInfo() {
         return lawsInfo;
     }
 
@@ -1793,16 +1793,16 @@ public class Game {
     }
 
     @JsonSetter
-    public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
+    public void setDiscardAgendas(Map<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
 
-    public void setDiscardedEvents(LinkedHashMap<String, Integer> discardedEvents) {
+    public void setDiscardedEvents(Map<String, Integer> discardedEvents) {
         this.discardedEvents = discardedEvents;
     }
 
     public void setDiscardAgendas(List<String> discardAgendasList) {
-        LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
+        Map<String, Integer> discardAgendas = new LinkedHashMap<>();
         for (String card : discardAgendasList) {
             Collection<Integer> values = discardAgendas.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -1814,15 +1814,15 @@ public class Game {
         this.discardAgendas = discardAgendas;
     }
 
-    public void setSentAgendas(LinkedHashMap<String, Integer> sentAgendas) {
+    public void setSentAgendas(Map<String, Integer> sentAgendas) {
         this.sentAgendas = sentAgendas;
     }
 
-    public void setLaws(LinkedHashMap<String, Integer> laws) {
+    public void setLaws(Map<String, Integer> laws) {
         this.laws = laws;
     }
 
-    public void setLawsInfo(LinkedHashMap<String, String> lawsInfo) {
+    public void setLawsInfo(Map<String, String> lawsInfo) {
         this.lawsInfo = lawsInfo;
     }
 
@@ -1830,11 +1830,11 @@ public class Game {
         return agendas;
     }
 
-    public LinkedHashMap<String, Integer> getSentAgendas() {
+    public Map<String, Integer> getSentAgendas() {
         return sentAgendas;
     }
 
-    public LinkedHashMap<String, Integer> getDiscardAgendas() {
+    public Map<String, Integer> getDiscardAgendas() {
         return discardAgendas;
     }
 
@@ -2219,7 +2219,7 @@ public class Game {
     }
 
     @Nullable
-    public LinkedHashMap<String, Integer> drawActionCard(String userID) {
+    public Map<String, Integer> drawActionCard(String userID) {
         if (!actionCards.isEmpty()) {
             String id = actionCards.get(0);
             Player player = getPlayer(userID);
@@ -2238,7 +2238,7 @@ public class Game {
     }
 
     @Nullable
-    public LinkedHashMap<String, Integer> drawEvent(String userID) {
+    public Map<String, Integer> drawEvent(String userID) {
         if (!events.isEmpty()) {
             String id = events.get(0);
             Player player = getPlayer(userID);
@@ -2256,8 +2256,8 @@ public class Game {
         return null;
     }
 
-    private ArrayList<String> getExplores(String reqType, List<String> superDeck) {
-        ArrayList<String> deck = new ArrayList<>();
+    private List<String> getExplores(String reqType, List<String> superDeck) {
+        List<String> deck = new ArrayList<>();
         for (String id : superDeck) {
             String card = Mapper.getExploreRepresentation(id);
             if (card != null) {
@@ -2271,11 +2271,11 @@ public class Game {
         return deck;
     }
 
-    public ArrayList<String> getExploreDeck(String reqType) {
+    public List<String> getExploreDeck(String reqType) {
         return getExplores(reqType, explore);
     }
 
-    public ArrayList<String> getExploreDiscard(String reqType) {
+    public List<String> getExploreDiscard(String reqType) {
         return getExplores(reqType, discardExplore);
     }
 
@@ -2423,7 +2423,7 @@ public class Game {
     }
 
     @Nullable
-    public LinkedHashMap<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
+    public Map<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
         if (!secretObjectives.isEmpty()) {
             boolean remove = secretObjectives.remove(soID);
             if (remove) {
@@ -2487,7 +2487,7 @@ public class Game {
     public boolean discardActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
-            LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+            Map<String, Integer> actionCards = player.getActionCards();
             String acID = "";
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 if (ac.getValue().equals(acIDNumber)) {
@@ -2507,7 +2507,7 @@ public class Game {
     public boolean purgedActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
-            LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+            Map<String, Integer> actionCards = player.getActionCards();
             String acID = "";
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 if (ac.getValue().equals(acIDNumber)) {
@@ -2528,11 +2528,11 @@ public class Game {
         Collections.shuffle(actionCards);
     }
 
-    public LinkedHashMap<String, Integer> getDiscardActionCards() {
+    public Map<String, Integer> getDiscardActionCards() {
         return discardActionCards;
     }
 
-    public LinkedHashMap<String, Integer> getPurgedActionCards() {
+    public Map<String, Integer> getPurgedActionCards() {
         return purgedActionCards;
     }
 
@@ -2594,7 +2594,7 @@ public class Game {
     public boolean scoreSecretObjective(String userID, Integer soIDNumber, Game activeGame) {
         Player player = getPlayer(userID);
         if (player != null) {
-            LinkedHashMap<String, Integer> secrets = player.getSecrets();
+            Map<String, Integer> secrets = player.getSecrets();
             String soID = "";
             for (Map.Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
@@ -2614,7 +2614,7 @@ public class Game {
     public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
-            LinkedHashMap<String, Integer> secrets = player.getSecretsScored();
+            Map<String, Integer> secrets = player.getSecretsScored();
             String soID = "";
             for (Map.Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
@@ -2634,7 +2634,7 @@ public class Game {
     public boolean unscoreAndShuffleSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
-            LinkedHashMap<String, Integer> secrets = player.getSecretsScored();
+            Map<String, Integer> secrets = player.getSecretsScored();
             String soID = "";
             for (Map.Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
@@ -2655,7 +2655,7 @@ public class Game {
     public boolean discardSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
-            LinkedHashMap<String, Integer> secrets = player.getSecrets();
+            Map<String, Integer> secrets = player.getSecrets();
             String soID = "";
             for (Map.Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
@@ -2674,7 +2674,7 @@ public class Game {
     }
 
     @Nullable
-    public LinkedHashMap<String, Integer> getSecretObjective(String userID) {
+    public Map<String, Integer> getSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {
             return player.getSecrets();
@@ -2683,7 +2683,7 @@ public class Game {
     }
 
     @Nullable
-    public LinkedHashMap<String, Integer> getScoredSecretObjective(String userID) {
+    public Map<String, Integer> getScoredSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {
             return player.getSecretsScored();
@@ -2718,7 +2718,7 @@ public class Game {
         explore = deck;
     }
 
-    public void setExploreDiscard(ArrayList<String> discard) {
+    public void setExploreDiscard(List<String> discard) {
         discardExplore = discard;
     }
 
@@ -2866,16 +2866,16 @@ public class Game {
     }
 
     @JsonSetter
-    public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
+    public void setDiscardActionCards(Map<String, Integer> discardActionCards) {
         this.discardActionCards = discardActionCards;
     }
 
-    public void setPurgedActionCards(LinkedHashMap<String, Integer> purgedActionCards) {
+    public void setPurgedActionCards(Map<String, Integer> purgedActionCards) {
         this.purgedActionCards = purgedActionCards;
     }
 
     public void setDiscardActionCards(List<String> discardActionCardList) {
-        LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
+        Map<String, Integer> discardActionCards = new LinkedHashMap<>();
         for (String card : discardActionCardList) {
             Collection<Integer> values = discardActionCards.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -2888,7 +2888,7 @@ public class Game {
     }
 
     public void setPurgedActionCards(List<String> purgedActionCardList) {
-        LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
+        Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
         for (String card : purgedActionCardList) {
             Collection<Integer> values = purgedActionCards.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -2934,7 +2934,7 @@ public class Game {
         return sb.toString();
     }
 
-    public HashMap<String, Tile> getTileMap() {
+    public Map<String, Tile> getTileMap() {
         return tileMap;
     }
 
@@ -2976,7 +2976,7 @@ public class Game {
         return player;
     }
 
-    public LinkedHashMap<String, Player> getPlayers() {
+    public Map<String, Player> getPlayers() {
         return players;
     }
 
@@ -3005,7 +3005,7 @@ public class Game {
         return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
 
-    public void setPlayers(LinkedHashMap<String, Player> players) {
+    public void setPlayers(Map<String, Player> players) {
         this.players = players;
     }
 
@@ -3078,7 +3078,7 @@ public class Game {
         this.name = name;
     }
 
-    public void setTileMap(HashMap<String, Tile> tileMap) {
+    public void setTileMap(Map<String, Tile> tileMap) {
         this.tileMap = tileMap;
         planets.clear();
     }
@@ -3116,7 +3116,7 @@ public class Game {
         }
     }
 
-    public HashMap<String, UnitHolder> getPlanetsInfo() {
+    public Map<String, UnitHolder> getPlanetsInfo() {
         if (planets.isEmpty()) {
             getPlanets();
         }
@@ -3301,7 +3301,7 @@ public class Game {
         runDataMigrations.add(string);
     }
 
-    public ArrayList<String> getRunMigrations() {
+    public List<String> getRunMigrations() {
         return runDataMigrations;
     }
 

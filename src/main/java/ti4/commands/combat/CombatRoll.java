@@ -188,9 +188,4 @@ public class CombatRoll extends CombatSubcommandData {
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        super.reply(event);
-    }
 }

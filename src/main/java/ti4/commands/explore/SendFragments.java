@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -55,7 +56,7 @@ public class SendFragments extends ExploreSubcommandData {
 
 	public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game activeGame) {
 
-		ArrayList<String> fragments = new ArrayList<>();
+		List<String> fragments = new ArrayList<>();
 		for (String cardID : sender.getFragments()) {
 			String[] card = Mapper.getExploreRepresentation(cardID).split(";");
 			if (card[1].equalsIgnoreCase(trait)) {

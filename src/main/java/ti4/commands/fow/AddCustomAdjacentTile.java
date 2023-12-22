@@ -10,8 +10,8 @@ import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AddCustomAdjacentTile extends FOWSubcommandData {
     public AddCustomAdjacentTile() {
@@ -49,7 +49,7 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);
         if (twoWayOption != null && twoWayOption.getAsBoolean()){
             for (String tile : tiles) {
-                LinkedHashMap<String, List<String>> customAdjacentTiles = activeGame.getCustomAdjacentTiles();
+                Map<String, List<String>> customAdjacentTiles = activeGame.getCustomAdjacentTiles();
                 List<String> customTiles = customAdjacentTiles.get(tile);
                 if (customTiles == null){
                     customTiles = new ArrayList<>();

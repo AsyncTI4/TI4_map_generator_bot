@@ -9,7 +9,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ExploreLookAtTop extends ExploreSubcommandData {
 
@@ -34,8 +34,8 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
             return;
         }
 
-        ArrayList<String> deck = activeGame.getExploreDeck(trait);
-        ArrayList<String> discardPile = activeGame.getExploreDiscard(trait);
+        List<String> deck = activeGame.getExploreDeck(trait);
+        List<String> discardPile = activeGame.getExploreDiscard(trait);
 
         String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
         String playerFactionNameWithEmoji = player.getFactionEmoji();

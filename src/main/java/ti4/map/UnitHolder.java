@@ -10,6 +10,8 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -28,12 +30,12 @@ abstract public class UnitHolder {
     private final Point holderCenterPosition;
 
     // ID, Count
-    private final HashMap<UnitKey, Integer> units = new HashMap<>();
-    private final HashMap<UnitKey, Integer> unitsDamage = new HashMap<>();
+    private final Map<UnitKey, Integer> units = new HashMap<>();
+    private final Map<UnitKey, Integer> unitsDamage = new HashMap<>();
 
-    private final HashSet<String> ccList = new HashSet<>();
-    private final HashSet<String> controlList = new HashSet<>();
-    protected final HashSet<String> tokenList = new HashSet<>();
+    private final Set<String> ccList = new HashSet<>();
+    private final Set<String> controlList = new HashSet<>();
+    protected final Set<String> tokenList = new HashSet<>();
 
     public String getName() {
         return name;
@@ -157,7 +159,7 @@ abstract public class UnitHolder {
         units.keySet().removeIf(key -> key.getColorID().equals(colorID));
     }
 
-    public HashMap<UnitKey, Integer> getUnits() {
+    public Map<UnitKey, Integer> getUnits() {
         return units;
     }
 
@@ -180,7 +182,7 @@ abstract public class UnitHolder {
     }
 
     @JsonProperty("unitsDamage")
-    public HashMap<UnitKey, Integer> getUnitDamage() {
+    public Map<UnitKey, Integer> getUnitDamage() {
         return unitsDamage;
     }
 
@@ -195,15 +197,15 @@ abstract public class UnitHolder {
      * Get the Command Counter list.
      */
     @JsonProperty("commandCounterList")
-    public HashSet<String> getCCList() {
+    public Set<String> getCCList() {
         return ccList;
     }
 
-    public HashSet<String> getTokenList() {
+    public Set<String> getTokenList() {
         return tokenList;
     }
 
-    public HashSet<String> getControlList() {
+    public Set<String> getControlList() {
         return controlList;
     }
 
@@ -211,7 +213,7 @@ abstract public class UnitHolder {
         return holderCenterPosition;
     }
 
-    public HashMap<String, Integer> getUnitAsyncIdsOnHolder(String color) {
+    public Map<String, Integer> getUnitAsyncIdsOnHolder(String color) {
         return new HashMap<>(units.entrySet().stream()
             .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
             .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));

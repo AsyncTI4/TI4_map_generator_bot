@@ -235,7 +235,7 @@ public class ButtonHelper {
             if (representation == null) {
             }
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (!(unitHolder instanceof Planet planet)) {
                 Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
                 for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
@@ -659,7 +659,7 @@ public class ButtonHelper {
     }
 
     public static boolean canIBuildGFInSpace(Game activeGame, Player player, Tile tile, String kindOfBuild) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
 
         if ("freelancers".equalsIgnoreCase(kindOfBuild) || "genericBuild".equalsIgnoreCase(kindOfBuild) || "muaatagent".equalsIgnoreCase(kindOfBuild)) {
             return true;
@@ -2546,7 +2546,7 @@ public class ButtonHelper {
                 // new RemoveUnits().unitParsing(event, player.getColor(), tile, "csd "+capChecker.getName(), activeGame);
                 // new AddUnits().unitParsing(event, player.getColor(), tile, "sd "+capChecker.getName(), activeGame);
             }
-            HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
+            Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
@@ -2566,7 +2566,7 @@ public class ButtonHelper {
         }
         //System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
-        HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player, event);
+        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player, event);
         for (UnitModel unit : unitsByQuantity.keySet()) {
             if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType()) || "mech".equalsIgnoreCase(unit.getBaseType())) {
 
@@ -2637,7 +2637,7 @@ public class ButtonHelper {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-                HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
+                Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
                 for (UnitModel unit : unitsByQuantity.keySet()) {
                     if (unit.getProductionValue() > 0) {
                         if (!tiles.contains(tile)) {
@@ -3843,7 +3843,7 @@ public class ButtonHelper {
 
     public static String buildMessageFromDisplacedUnits(Game activeGame, boolean landing, Player player, String moveOrRemove) {
         String message;
-        HashMap<String, Integer> displacedUnits = activeGame.getCurrentMovedUnitsFrom1System();
+        Map<String, Integer> displacedUnits = activeGame.getCurrentMovedUnitsFrom1System();
         String prefix = " > " + player.getFactionEmoji();
 
         StringBuilder messageBuilder = new StringBuilder();
@@ -3928,7 +3928,7 @@ public class ButtonHelper {
 
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
 
             if (unitHolder instanceof Planet) {
             } else {
@@ -3996,7 +3996,7 @@ public class ButtonHelper {
                 representation = name;
             }
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
 
             if (unitHolder instanceof Planet planet) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -4066,7 +4066,7 @@ public class ButtonHelper {
         }
         buttons.add(doAll);
         buttons.add(concludeMove);
-        HashMap<String, Integer> displacedUnits = activeGame.getCurrentMovedUnitsFrom1System();
+        Map<String, Integer> displacedUnits = activeGame.getCurrentMovedUnitsFrom1System();
         for (String unit : displacedUnits.keySet()) {
             String unitkey;
             String planet = "";
@@ -4124,7 +4124,7 @@ public class ButtonHelper {
                 representation = name;
             }
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet planet) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -4645,7 +4645,7 @@ public class ButtonHelper {
                 representation = name;
             }
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
 
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;

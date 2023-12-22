@@ -1,6 +1,5 @@
 package ti4.commands.player;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -335,7 +334,7 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
-		LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+		Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
 			return false;
@@ -345,7 +344,7 @@ public class Stats extends PlayerSubcommandData {
 			return false;
 		}
 
-		LinkedHashMap<String, Player> players = activeGame.getPlayers();
+		Map<String, Player> players = activeGame.getPlayers();
 		for (Player playerStats : players.values()) {
 			if (playerStats.getSCs().contains(scNumber)) {
 				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "SC #" + scNumber + " is already picked.");

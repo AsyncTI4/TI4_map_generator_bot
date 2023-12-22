@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -755,8 +754,8 @@ public class ButtonListener extends ListenerAdapter {
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2], player, false, activeGame, 1, false);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveExp_Look_")) {
-            ArrayList<String> deck = activeGame.getExploreDeck(buttonID.replace("resolveExp_Look_", ""));
-            ArrayList<String> discardPile = activeGame.getExploreDiscard(buttonID.replace("resolveExp_Look_", ""));
+            List<String> deck = activeGame.getExploreDeck(buttonID.replace("resolveExp_Look_", ""));
+            List<String> discardPile = activeGame.getExploreDiscard(buttonID.replace("resolveExp_Look_", ""));
             ButtonHelper.addReaction(event, true, false, "Looked at top of the " + buttonID.replace("resolveExp_Look_", "") + " deck.", "");
             event.getMessage().delete().queue();
             String traitNameWithEmoji = Emojis.getEmojiFromDiscord(buttonID.replace("resolveExp_Look_", "")) + buttonID.replace("resolveExp_Look_", "");
@@ -786,12 +785,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, true, false, "Looked at top of the Relic deck.", "");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("explore_look_All")) {
-            ArrayList<String> cdeck = activeGame.getExploreDeck("cultural");
-            ArrayList<String> hdeck = activeGame.getExploreDeck("hazardous");
-            ArrayList<String> ideck = activeGame.getExploreDeck("industrial");
-            ArrayList<String> cdiscardPile = activeGame.getExploreDiscard("cultural");
-            ArrayList<String> hdiscardPile = activeGame.getExploreDiscard("hazardous");
-            ArrayList<String> idiscardPile = activeGame.getExploreDiscard("industrial");
+            List<String> cdeck = activeGame.getExploreDeck("cultural");
+            List<String> hdeck = activeGame.getExploreDeck("hazardous");
+            List<String> ideck = activeGame.getExploreDeck("industrial");
+            List<String> cdiscardPile = activeGame.getExploreDiscard("cultural");
+            List<String> hdiscardPile = activeGame.getExploreDiscard("hazardous");
+            List<String> idiscardPile = activeGame.getExploreDiscard("industrial");
             String trait = "cultural";
             String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
             String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
@@ -859,7 +858,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("increaseTGonSC_")) {
             String sc = buttonID.replace("increaseTGonSC_", "");
             int scNum = Integer.parseInt(sc);
-            LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+            Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             int tgCount = scTradeGoods.get(scNum);
             activeGame.setScTradeGood(scNum, (tgCount + 1));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added 1tg to SC #" + scNum + ". There are now " + (tgCount + 1) + " tgs on it.");
@@ -1829,7 +1828,7 @@ public class ButtonListener extends ListenerAdapter {
             String type = typeNAmount.split("_")[0];
             int count = Integer.parseInt(typeNAmount.split("_")[1]);
             List<String> fragmentsToPurge = new ArrayList<>();
-            ArrayList<String> playerFragments = player.getFragments();
+            List<String> playerFragments = player.getFragments();
             for (String fragid : playerFragments) {
                 if (fragid.contains(type.toLowerCase())) {
                     fragmentsToPurge.add(fragid);
@@ -2608,7 +2607,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "proceed_to_strategy" -> {
-                    LinkedHashMap<String, Player> players = activeGame.getPlayers();
+                    Map<String, Player> players = activeGame.getPlayers();
                     for (Player player_ : players.values()) {
                         player_.cleanExhaustedPlanets(false);
                     }

@@ -148,7 +148,7 @@ public class ButtonHelperAgents {
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet) continue;
 
             Map<UnitKey, Integer> tileUnits = new HashMap<>(units);

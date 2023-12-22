@@ -173,7 +173,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (token.equals(Constants.DMZ)) {
                     String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                     tile.addToken(dmzLargeFilename, planetName);
-                    HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                    Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                     UnitHolder planetUnitHolder = unitHolders.get(planetName);
                     UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                     if (planetUnitHolder != null && spaceUnitHolder != null) {
@@ -182,7 +182,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             String color = player_.getColor();
                             planetUnitHolder.removeAllUnits(color);
                         }
-                        HashMap<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                        Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
                         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                             UnitKey key = unitEntry.getKey();
                             if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {

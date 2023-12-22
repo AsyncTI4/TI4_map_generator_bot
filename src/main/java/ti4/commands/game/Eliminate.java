@@ -103,7 +103,7 @@ public class Eliminate extends AddRemovePlayer {
                     }
                 }
                 //discard all of a players ACs
-                LinkedHashMap<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
+                Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
                 for (Map.Entry<String, Integer> ac : acs.entrySet()) {
                     boolean removed = activeGame.discardActionCard(player.getUserID(), ac.getValue());
                     String sb = "Player: " + player.getUserName() + " - " +

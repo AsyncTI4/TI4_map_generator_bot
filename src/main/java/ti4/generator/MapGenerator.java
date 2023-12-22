@@ -502,7 +502,7 @@ public class MapGenerator {
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(new BasicStroke(5));
             int realX = x;
-            HashMap<UnitKey, Integer> unitCount = new HashMap<>();
+            Map<UnitKey, Integer> unitCount = new HashMap<>();
             for (Player player : players) {
                 int baseY = y;
                 x = realX;
@@ -1136,8 +1136,8 @@ public class MapGenerator {
         return x + deltaX + (addedAbilities ? 20 : 0);
     }
 
-    private int reinforcements(Player player, int xDeltaFromRightSide, int y, HashMap<UnitKey, Integer> unitCount) {
-        HashMap<String, Tile> tileMap = game.getTileMap();
+    private int reinforcements(Player player, int xDeltaFromRightSide, int y, Map<UnitKey, Integer> unitCount) {
+        Map<String, Tile> tileMap = game.getTileMap();
         int x = width - 450 - xDeltaFromRightSide;
         drawPAImage(x, y, "pa_reinforcements.png");
         if (unitCount.isEmpty()) {
@@ -1257,8 +1257,8 @@ public class MapGenerator {
         return xDeltaFromRightSide + 450;
     }
 
-    private static void fillUnits(HashMap<UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
-        HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+    private static void fillUnits(Map<UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
             Integer count = unitCount.get(unitKey);
@@ -1455,7 +1455,7 @@ public class MapGenerator {
     }
 
     private int planetInfo(Player player, int x, int y) {
-        HashMap<String, UnitHolder> planetsInfo = game.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = game.getPlanetsInfo();
         List<String> planets = player.getPlanets();
         List<String> exhaustedPlanets = player.getExhaustedPlanets();
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
@@ -2110,13 +2110,13 @@ public class MapGenerator {
     private int strategyCards(int y) {
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         int deltaY = y + 80;
-        LinkedHashMap<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
         Collection<Player> players = game.getPlayers().values();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player : players) {
             scPicked.addAll(player.getSCs());
         }
-        HashMap<Integer, Boolean> scPlayed = game.getScPlayed();
+        Map<Integer, Boolean> scPlayed = game.getScPlayed();
         int x = 20;
         int horizontalSpacingIncrement = 70;
         for (Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
@@ -2297,7 +2297,7 @@ public class MapGenerator {
                 drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soHand);
                 soOffset += 25;
             }
-            ArrayList<String> soToPoList = game.getSoToPoList();
+            List<String> soToPoList = game.getSoToPoList();
             for (String soID : soSet) {
                 if (!soToPoList.contains(soID)) {
                     drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soScored);
@@ -2454,11 +2454,11 @@ public class MapGenerator {
         g2.setStroke(new BasicStroke(3));
         Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(game.getScoredPublicObjectives());
         Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(game.getRevealedPublicObjectives());
-        LinkedHashMap<String, Player> players = game.getPlayers();
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
-        LinkedHashMap<String, Integer> customPublicVP = game.getCustomPublicVP();
-        LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> {
+        Map<String, Player> players = game.getPlayers();
+        Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+        Map<String, Integer> customPublicVP = game.getCustomPublicVP();
+        Map<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> {
             String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
             return nameOfPO != null ? nameOfPO : name;
         }, (key1, key2) -> key1, LinkedHashMap::new));
@@ -2487,8 +2487,8 @@ public class MapGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
 
-        LinkedHashMap<String, Integer> laws = game.getLaws();
-        LinkedHashMap<String, String> lawsInfo = game.getLawsInfo();
+        Map<String, Integer> laws = game.getLaws();
+        Map<String, String> lawsInfo = game.getLawsInfo();
         boolean secondColumn = false;
         for (Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
             String lawID = lawEntry.getKey();
@@ -2574,7 +2574,7 @@ public class MapGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
 
-        LinkedHashMap<String, Integer> events = game.getEventsInEffect();
+        Map<String, Integer> events = game.getEventsInEffect();
         boolean secondColumn = false;
         for (Map.Entry<String, Integer> event : events.entrySet()) {
             String eventID = event.getKey();
@@ -2646,15 +2646,15 @@ public class MapGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
 
-        LinkedHashMap<String, Player> players = game.getPlayers();
-        HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
-        LinkedHashMap<String, Integer> customPublicVP = game.getCustomPublicVP();
+        Map<String, Player> players = game.getPlayers();
+        Map<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
+        Map<String, Integer> customPublicVP = game.getCustomPublicVP();
         Set<String> secret = secretObjectives.keySet();
         graphics.setFont(Storage.getFont26());
         graphics.setColor(new Color(230, 126, 34));
 
         Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
-        LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
+        Map<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
 
         for (String id : secrets.keySet()) {
             scoredPublicObjectives.put(id, List.of(player.getUserID()));
@@ -2664,7 +2664,7 @@ public class MapGenerator {
             Map<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
             y = displayObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, customPublicVP, true);
         }
-        LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
+        Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
             secretsScored.remove(id);
         }
@@ -2686,7 +2686,7 @@ public class MapGenerator {
         Map<String, List<String>> scoredPublicObjectives,
         Map<String, Integer> revealedPublicObjectives,
         Map<String, Player> players,
-        HashMap<String, String> publicObjectivesState,
+        Map<String, String> publicObjectivesState,
         Set<String> po,
         Integer objectiveWorth,
         Map<String, Integer> customPublicVP,
@@ -2808,7 +2808,7 @@ public class MapGenerator {
     }
 
     private Color getSCColor(int sc, Game game) {
-        HashMap<Integer, Boolean> scPlayed = game.getScPlayed();
+        Map<Integer, Boolean> scPlayed = game.getScPlayed();
         if (scPlayed.get(sc) != null) {
             if (scPlayed.get(sc)) {
                 return Color.GRAY;
@@ -3327,7 +3327,7 @@ public class MapGenerator {
     }
 
     private static void addToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder) {
-        HashSet<String> tokenList = unitHolder.getTokenList();
+        Set<String> tokenList = unitHolder.getTokenList();
         Point centerPosition = unitHolder.getHolderCenterPosition();
         int x = 0;
         int y = 0;
@@ -3397,7 +3397,7 @@ public class MapGenerator {
             tempUnits.remove(key);
         }
         units.putAll(tempUnits);
-        HashMap<UnitKey, Integer> unitDamage = unitHolder.getUnitDamage();
+        Map<UnitKey, Integer> unitDamage = unitHolder.getUnitDamage();
         // float scaleOfUnit = 1.0f;
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         if (unitTokenPosition == null) {

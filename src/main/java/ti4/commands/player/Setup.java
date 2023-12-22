@@ -2,7 +2,6 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,7 +76,7 @@ public class Setup extends PlayerSubcommandData {
     }
 
     public void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
@@ -161,7 +160,7 @@ public class Setup extends PlayerSubcommandData {
 
         // STARTING PNs
         player.initPNs();
-        HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+        Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         playerPNs.addAll(setupInfo.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
         if (activeGame.isBaseGameMode()) {
@@ -183,7 +182,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING OWNED UNITS
-        HashSet<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
 
         // SEND STUFF
