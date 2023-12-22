@@ -472,9 +472,9 @@ public class MessageHelper {
 				MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
 				messageCreateBuilder.addContent(smallMessage);
 
-				//add up to 5 embeds if they exist
+				//add a limited amount of embeds if they exist (max 10 per message) TODO: handle additional embeds with iterator
 				if (embeds != null && !embeds.isEmpty()) {
-					messageCreateBuilder.addEmbeds(embeds.stream().limit(5).toList());
+					messageCreateBuilder.addEmbeds(embeds.stream().limit(10).toList());
 				}
 
 				//add first row of buttons if it exists
