@@ -909,8 +909,10 @@ public class ButtonListener extends ListenerAdapter {
             if (actionRow2.size() > 0) {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
             }
-        } else if (buttonID.startsWith("assignDamage_")) {
+        } else if (buttonID.startsWith("assignDamage_")) {//removeThisTypeOfUnit_
             ButtonHelperModifyUnits.assignDamage(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("removeThisTypeOfUnit_")) {
+            ButtonHelperModifyUnits.removeThisTypeOfUnit(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("repairDamage_")) {
             ButtonHelperModifyUnits.repairDamage(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("refreshViewOfSystem_")) {
@@ -2591,6 +2593,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                             player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                     }
+                    ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                 }
@@ -3720,7 +3723,7 @@ public class ButtonListener extends ListenerAdapter {
         buttonID = buttonID.replace("deleteButtons_", "");
         String editedMessage = event.getMessage().getContentRaw();
         if (("Done Gaining CCs".equalsIgnoreCase(buttonLabel)
-            || "Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) && editedMessage.contains("CCs have gone from")) {
+            || "Done Redistributing CCs".equalsIgnoreCase(buttonLabel) || "Done Losing CCs".equalsIgnoreCase(buttonLabel)) && editedMessage.contains("CCs have gone from")) {
 
             String playerRep = player.getRepresentation();
             String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();

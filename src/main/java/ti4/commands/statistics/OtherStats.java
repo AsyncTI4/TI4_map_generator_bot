@@ -1,6 +1,7 @@
 package ti4.commands.statistics;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collections;
 import java.util.Date;
@@ -31,14 +32,18 @@ public class OtherStats extends StatisticsSubcommandData {
     private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     private static final String GAME_TYPE_FILTER = "game_type";
     private static final String FOG_FILTER = "is_fog";
+    private static final String HOMEBREW_FILTER = "has_homebrew";
+    private static final String HAS_WINNER_FILTER = "has_winner";
 
     public OtherStats() {
         super(Constants.OTHER, "Other Various Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
-        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. pok, base"));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if it is a fog game or not"));
+        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
+        addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
+        addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
     }
 
     @Override
@@ -51,8 +56,6 @@ public class OtherStats extends StatisticsSubcommandData {
         }
         switch (stat) {
             case UNLEASH_THE_NAMES -> sendAllNames(event);
-            case UNLEASH_THE_NAMES_DS -> sendAllNames(event, true, false);
-            case UNLEASH_THE_NAMES_ABSOL -> sendAllNames(event, false, true);
             case GAME_LENGTH -> showGameLengths(event, null);
             case GAME_LENGTH_4MO -> showGameLengths(event, 120);
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
@@ -60,6 +63,7 @@ public class OtherStats extends StatisticsSubcommandData {
             case FACTION_WINS -> showMostWinningFactions(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
+            case GAME_COUNT -> showGameCount(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
@@ -71,15 +75,14 @@ public class OtherStats extends StatisticsSubcommandData {
     public enum SimpleStatistics {
         // Add your new statistic here
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
-        UNLEASH_THE_NAMES_DS("Unleash the Names DS", "Show all the names of the DS games"),
-        UNLEASH_THE_NAMES_ABSOL("Unleash the Names Absol", "Show all the names of Absol games"),
         GAME_LENGTH("Game Length", "Show game lengths"),
         GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
         COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
         FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
-        COLOUR_WINS("Wins per Colour", "Show the wins per colour");
+        COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        GAME_COUNT("Total game count", "Shows the total game count");
     
         private final String name;
         private final String description;
@@ -126,45 +129,30 @@ public class OtherStats extends StatisticsSubcommandData {
         }
     }
 
-    // Add new statistic methods here
-    public static void sendAllNames(GenericInteractionCreateEvent event) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+    public static void sendAllNames(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
-
-        for (Game activeGame : mapList.values()) {
-            if (activeGame.getCustomName() != null && !activeGame.getCustomName().isEmpty()) {
-                num++;
-                names.append(num).append(". ").append(activeGame.getCustomName())
-                    .append(" (").append(activeGame.getName()).append(")\n");
+        List<Game> filteredGames = getFilteredGames(event);
+        for (Game game : filteredGames) {
+            num++;
+            names.append(num).append(". ").append(game.getName());
+            if (isNotBlank(game.getCustomName())) {
+                names.append(" (").append(game.getCustomName()).append(")");
             }
+            names.append("\n");
         }
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
     }
 
-    public static void sendAllNames(GenericInteractionCreateEvent event, boolean ds, boolean absol) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        StringBuilder names = new StringBuilder();
-        int num = 0;
-
-        for (Game activeGame : mapList.values()) {
-            if ((ds && activeGame.isDiscordantStarsMode()) || (absol && activeGame.isAbsolMode())) {
-                num++;
-                names.append(num).append(". ").append(activeGame.getCustomName())
-                    .append(" (").append(activeGame.getName()).append(")\n");
-            }
-        }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
-    }
-
-    public static void showGameLengths(GenericInteractionCreateEvent event, Integer pastDays) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+    public static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
+        List<Game> filteredGames = getFilteredGames(event);
         if (pastDays == null) pastDays = 3650;
         int num = 0;
         int total = 0;
         Map<String, Integer> endedGames = new HashMap<>();
-        for (Game activeGame : mapList.values()) {
-            if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2 && (Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays || pastDays > 120)) {
+        for (Game activeGame : filteredGames) {
+            if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2
+                && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
                 endedGames.put(activeGame.getName() + " ("+activeGame.getRealPlayers().size()+"p, "+activeGame.getVp()+"pt)", dif);
@@ -183,18 +171,26 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths" , longMsg.toString());
     }
 
+    private static List<Game> getFilteredGames(SlashCommandInteractionEvent event) {
+        return GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(game -> filterOnPlayerCount(event, game))
+            .filter(game -> filterOnVictoryPointGoal(event, game))
+            .filter(game -> filterOnGameType(event, game))
+            .filter(game -> filterOnFogType(event, game))
+            .filter(game -> filterOnHomebrew(event, game))
+            .filter(game -> filterOnHasWinner(event, game))
+            .toList();
+    }
+
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            for (Player player : game.getPlayers().values()) {
-                String color = player.getColor();
+            for (Player player : game.getRealPlayers()) {
                 String faction = player.getFaction();
-                if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                    factionCount.putIfAbsent(faction, 1);
-                    factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
-                }
+                factionCount.put(faction,
+                    1 + factionCount.getOrDefault(faction, 0));
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -214,42 +210,21 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
 
-    private static void showMostWinningFactions(GenericInteractionCreateEvent event) {
+    private static void showGameCount(SlashCommandInteractionEvent event) {
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            "Game count: " + getFilteredGames(event).size());
+    }
+
+    private static void showMostWinningFactions(SlashCommandInteractionEvent event) {
         Map<String, Integer> winnerFactionCount = new HashMap<>();
-
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            int vp = game.getVp();
-            boolean findWinner = true;
-            for (Player player : game.getPlayers().values()) {
-                int vpScore = player.getTotalVictoryPoints();
-                if (vp <= vpScore) {
-                    String faction = player.getFaction();
-                    winnerFactionCount.put(faction, 1 + winnerFactionCount.getOrDefault(faction, 0));
-
-                    findWinner = false;
-                }
+        List<Game> filteredGames = getFilteredGames(event);
+        for (Game game : filteredGames) {
+            Player winner = getWinner(game);
+            if (winner == null) {
+                continue;
             }
-            if (findWinner) {
-                Date date = new Date(game.getLastModifiedDate());
-                Date currentDate = new Date();
-                long time_difference = currentDate.getTime() - date.getTime();
-                // Calculate time difference in days
-                long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
-                if (days_difference > 30) {
-                    int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
-                    if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
-                        game.getPlayers().values().stream()
-                            .filter(player -> player.getTotalVictoryPoints() == maxVP)
-                            .findFirst()
-                            .ifPresent(player -> {
-                                String faction = player.getFaction();
-                                winnerFactionCount.put(faction,
-                                    1 + winnerFactionCount.getOrDefault(faction, 0));
-                            });
-                    }
-                }
-            }
+            winnerFactionCount.put(winner.getFaction(),
+                1 + winnerFactionCount.getOrDefault(winner.getFaction(), 0));
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Faction:").append("\n");
@@ -269,12 +244,7 @@ public class OtherStats extends StatisticsSubcommandData {
     }
 
     private static void showFactionWinPercent(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameManager.getInstance().getGameNameToGame().values().stream()
-            .filter(game -> filterOnPlayerCount(event, game))
-            .filter(game -> filterOnVictoryPointGoal(event, game))
-            .filter(game -> filterOnGameType(event, game))
-            .filter(game -> filterOnFogType(event, game))
-            .toList();
+        List<Game> filteredGames = getFilteredGames(event);
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         for (Game game : filteredGames) {
@@ -286,7 +256,7 @@ public class OtherStats extends StatisticsSubcommandData {
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
 
-            game.getPlayers().values().forEach(player -> {
+            game.getRealPlayers().forEach(player -> {
                 String faction = player.getFaction();
                 factionGameCount.put(faction,
                     1 + factionGameCount.getOrDefault(faction, 0));
@@ -296,12 +266,12 @@ public class OtherStats extends StatisticsSubcommandData {
         sb.append("Faction Win Percent:").append("\n");
 
         Mapper.getFactions().stream()
-            .filter(factionModel -> factionModel.getSource().isPok())
             .map(faction -> {
                 double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);
                 return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
             })
+            .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
             .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
             .forEach(entry ->
                 sb.append("`")
@@ -339,13 +309,30 @@ public class OtherStats extends StatisticsSubcommandData {
                 return isDiscordantStarsGame(game);
             }
             case "pok" -> {
-                return !game.isBaseGameMode() && !game.isAbsolMode() && !isDiscordantStarsGame(game)
-                    && !game.isMiltyModMode();
+                return !game.isBaseGameMode();
+            }
+            case "action_deck_2" -> {
+                return "action_deck_2".equals(game.getAcDeckID());
+            }
+            case "little_omega" -> {
+                return "public_stage_1_objectives_little_omega".equals(game.getStage1PublicDeckID())
+                    || "public_stage_2_objectives_little_omega".equals(game.getStage2PublicDeckID())
+                    || "agendas_little_omega".equals(game.getAgendaDeckID());
             }
             default -> {
                 return false;
             }
         }
+    }
+
+    private static boolean filterOnHasWinner(SlashCommandInteractionEvent event, Game game) {
+        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
+        return hasWinnerFilter == null || (hasWinnerFilter && getWinner(game) != null) || (!hasWinnerFilter && getWinner(game) == null);
+    }
+
+    private static boolean filterOnHomebrew(SlashCommandInteractionEvent event, Game game) {
+        Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
+        return homebrewFilter == null || game.hasHomebrew() == homebrewFilter;
     }
 
     private static boolean isDiscordantStarsGame(Game game) {
@@ -367,7 +354,7 @@ public class OtherStats extends StatisticsSubcommandData {
 
     private static Player getWinner(Game game) {
         Player winner = null;
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getRealPlayers()) {
             if (game.getVp() <= player.getTotalVictoryPoints()) {
                 if (winner == null) {
                     winner = player;
@@ -388,18 +375,14 @@ public class OtherStats extends StatisticsSubcommandData {
         return player2;
     }
 
-    private static void showMostPlayedColour(GenericInteractionCreateEvent event) {
+    private static void showMostPlayedColour(SlashCommandInteractionEvent event) {
         Map<String, Integer> colorCount = new HashMap<>();
-
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            for (Player player : game.getPlayers().values()) {
+        List<Game> filteredGames = getFilteredGames(event);
+        for (Game game : filteredGames) {
+            for (Player player : game.getRealPlayers()) {
                 String color = player.getColor();
-                String faction = player.getFaction();
-                if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
-                    colorCount.put(color,
-                        1 + colorCount.getOrDefault(color, 0));
-                }
+                colorCount.put(color,
+                    1 + colorCount.getOrDefault(color, 0));
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -419,40 +402,14 @@ public class OtherStats extends StatisticsSubcommandData {
 
     private static void showMostWinningColour(GenericInteractionCreateEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
-
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            int vp = game.getVp();
-            boolean findWinner = true;
-            for (Player player : game.getPlayers().values()) {
-                int vpScore = player.getTotalVictoryPoints();
-                if (vp <= vpScore) {
-                    String color = player.getColor();
-
-                    winnerColorCount.put(color, 1 + winnerColorCount.getOrDefault(color, 0));
-
-                    findWinner = false;
-                }
+            Player winner = getWinner(game);
+            if (winner == null) {
+                continue;
             }
-            if (findWinner) {
-                Date date = new Date(game.getLastModifiedDate());
-                Date currentDate = new Date();
-                long time_difference = currentDate.getTime() - date.getTime();
-                // Calculate time difference in days
-                long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
-                if (days_difference > 30) {
-                    int maxVP = game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).max(Integer::compareTo).orElse(0);
-                    if (game.getPlayers().values().stream().map(Player::getTotalVictoryPoints).filter(value -> value.equals(maxVP)).count() == 1) {
-                        game.getPlayers().values().stream()
-                            .filter(player -> player.getTotalVictoryPoints() == maxVP)
-                            .findFirst()
-                            .ifPresent(player -> {
-                                String color = player.getColor();
-                                winnerColorCount.put(color, 1 + winnerColorCount.getOrDefault(color, 0));
-                            });
-                    }
-                }
-            }
+            winnerColorCount.put(winner.getColor(),
+                1 + winnerColorCount.getOrDefault(winner.getColor(), 0));
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Colour:").append("\n");

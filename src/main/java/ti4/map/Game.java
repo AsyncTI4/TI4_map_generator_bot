@@ -700,8 +700,7 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame()
-            || isMiltyModMode());
+        return !hasHomebrew();
     }
 
     public boolean isFrankenGame() {
@@ -3663,4 +3662,31 @@ public class Game {
         return scText;
     }
 
+    @JsonIgnore
+    public boolean hasHomebrew() {
+        return isExtraSecretMode()
+            || isFoWMode()
+            || isLightFogMode()
+            || isDiscordantStarsMode()
+            || isFrankenGame()
+            || isMiltyModMode()
+            || isAbsolMode()
+            || isAllianceMode()
+            || isSpinMode()
+            || isHomeBrewSCMode()
+            || isCommunityMode()
+            || acDeckID != null && !List.of("action_cards_pok", "action_cards_basegame", "action_cards_basegame_and_codex1").contains(acDeckID)
+            || soDeckID != null && !List.of("secret_objectives_pok", "secret_objectives_base").contains(soDeckID)
+            || stage1PublicDeckID != null && !List.of("public_stage_1_objectives_pok", "public_stage_1_objectives_base").contains(stage1PublicDeckID)
+            || stage2PublicDeckID != null && !List.of("public_stage_2_objectives_pok", "public_stage_2_objectives_base").contains(stage2PublicDeckID)
+            || relicDeckID != null && !List.of("relics_pok", "relics_base").contains(relicDeckID)
+            || agendaDeckID != null && !List.of("agendas_pok", "agendas_base_game").contains(agendaDeckID)
+            || explorationDeckID != null && !List.of("explores_pok", "explores_base").contains(explorationDeckID)
+            || technologyDeckID != null && !List.of("techs_pok", "techs_base").contains(technologyDeckID)
+            || scSetID != null && !List.of("pok", "base_game").contains(scSetID)
+            || eventDeckID != null && !"null".equals(eventDeckID)
+            || Mapper.getFactions().stream()
+                .filter(faction -> !faction.getSource().isPok())
+                .anyMatch(faction -> getFactions().contains(faction.getAlias()));
+    }
 }
