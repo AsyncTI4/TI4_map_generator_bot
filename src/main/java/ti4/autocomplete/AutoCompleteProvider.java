@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
+import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
 import ti4.commands.statistics.OtherStats;
 import ti4.commands.statistics.OtherStats.SimpleStatistics;
@@ -486,6 +488,22 @@ public class AutoCompleteProvider {
                     latestCommand = StringUtils.left(activeGame.getLatestCommand(), 100);
                 }
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
+            }
+            case Constants.UNDO_TO_BEFORE_COMMAND -> {
+                if (activeGame == null) {
+                    event.replyChoiceStrings("No Active Map for this Channel").queue();
+                    return;
+                }
+                if (activeGame.isFoWMode()) {
+                    event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
+                }
+                long datetime = new Date().getTime();
+                List<Command.Choice> options = Undo.getAllUndoSavedGames(activeGame).entrySet().stream()
+                    .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
+                    .limit(25)
+                    .map(entry -> new Command.Choice(StringUtils.left(entry.getKey() + " (" + Helper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) +  " ago):  " + entry.getValue().getLatestCommand(), 100), entry.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
