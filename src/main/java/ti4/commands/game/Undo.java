@@ -42,13 +42,22 @@ public class Undo extends GameSubcommandData{
 
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Undo failed - Must confirm with YES");
             return;
         }
 
         String gameToUndoBackTo = event.getOption(Constants.UNDO_TO_BEFORE_COMMAND, null, OptionMapping::getAsString);
         if (gameToUndoBackTo == null || gameToUndoBackTo.isEmpty()) {
             MessageHelper.replyToMessage(event, "Must specify command to undo back to");
+            return;
+        }
+        if (gameToUndoBackTo.toLowerCase().contains("fog of war")) {
+            MessageHelper.replyToMessage(event, "Game is Fog of War - limited to a single undo at a time.");
+            GameSaveLoadManager.undo(activeGame, event);
+            return;
+        }
+        if (!gameToUndoBackTo.contains(activeGame.getName())) {
+            MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
 
