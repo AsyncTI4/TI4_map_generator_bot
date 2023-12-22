@@ -1350,7 +1350,7 @@ public class ButtonHelperActionCards {
     public static List<Button> getGhostShipButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player)) {
+            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition())) {
                 boolean hasOtherShip = false;
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player) {

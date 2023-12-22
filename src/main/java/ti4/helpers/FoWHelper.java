@@ -380,7 +380,7 @@ public class FoWHelper {
 
 	}
 
-	public static boolean doesTileHaveWHs(Game activeGame, String position, Player player) {
+	public static boolean doesTileHaveWHs(Game activeGame, String position) {
 		Tile tile = activeGame.getTileByPosition(position);
 
 		String ghostFlagshipColor = null;
@@ -390,9 +390,6 @@ public class FoWHelper {
 				break;
 			}
 		}
-
-		boolean wh_recon = activeGame.getLaws().containsKey("wormhole_recon");
-		boolean absol_recon = activeGame.getLaws().containsKey("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
 		if (wormholeIDs == null) {
@@ -418,14 +415,6 @@ public class FoWHelper {
 			}
 			if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
 				wormholeIDs.add(Constants.DELTA);
-			}
-		}
-
-		if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
-			if (wormholeIDs.contains(Constants.ALPHA)) {
-				wormholeIDs.add(Constants.BETA);
-			} else if (wormholeIDs.contains(Constants.BETA)) {
-				wormholeIDs.add(Constants.ALPHA);
 			}
 		}
 
