@@ -5195,8 +5195,8 @@ public class ButtonHelper {
         Integer poIndex = activeGame.addCustomPO("Crown of Emphidia", 1);
         activeGame.scorePublicObjective(player.getUserID(), poIndex);
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " scored Crown of Emphidia");
-        Helper.checkEndGame(activeGame, player);
         event.getMessage().delete().queue();
+        Helper.checkEndGame(activeGame, player);
     }
 
     public static List<Button> getPlayersToTransact(Game activeGame, Player p) {

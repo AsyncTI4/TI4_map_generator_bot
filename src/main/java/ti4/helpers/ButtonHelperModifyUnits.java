@@ -323,7 +323,7 @@ public class ButtonHelperModifyUnits {
                 Button replace = Button.success("FFCC_" + player.getFaction()+"_rohdhnaIndustrious_" 
                     + activeGame.getTile(AliasHandler.resolveTile(planetName)).getPosition() + "_" + unit + " " + planetName, "Replace SD with Warsun");
                     
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), playerRep + "Industrious: You may spend 6 resources to replace SD with a Warsun.", replace);
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), playerRep + "Industrious: You may spend 6 resources to replace SD with a Warsun.", replace);
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             new AddUnits().unitParsing(event, player.getColor(),
