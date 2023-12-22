@@ -50,7 +50,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
       String sb = "Game: " + activeGame.getName() + "\n" +
           "Player: " + player.getUserName() + "\n" +
           "Showed Promissory Note:" + "\n" +
-          Mapper.getPromissoryNote(acID) + "\n";
+          Mapper.getPromissoryNoteLongText(acID) + "\n";
         if (!scored) {
             player.setPromissoryNote(acID);
         }

@@ -167,7 +167,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
+                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                 }
             }
@@ -175,7 +175,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isAbsolMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
+                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNote(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                     player.addOwnedPromissoryNoteByID("absol_" + pnID);
                 }

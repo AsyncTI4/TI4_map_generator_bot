@@ -26,7 +26,7 @@ public class ListPromissoryNotes extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
         if (Mapper.isValidPromissoryNote(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getPromissoryNoteByID(searchString).getRepresentationEmbed(false, true, true)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getPromissoryNote(searchString).getRepresentationEmbed(false, true, true)).queue();
             return;
         }
 

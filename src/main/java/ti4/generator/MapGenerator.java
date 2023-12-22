@@ -846,7 +846,7 @@ public class MapGenerator {
                 BotLogger.log(error);
                 continue;
             }
-            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pn);
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
             for (Player player_ : players) {
                 if (player_ != player) {
                     String playerColor = player_.getColor();

@@ -204,7 +204,7 @@ public class Mapper {
         return promissoryNotes;
     }
 
-    public static PromissoryNoteModel getPromissoryNoteByID(String id) {
+    public static PromissoryNoteModel getPromissoryNote(String id) {
         return promissoryNotes.get(id);
     }
 
@@ -455,7 +455,10 @@ public class Mapper {
         return actionCards.containsKey(id);
     }
 
-    @Nullable
+    /**
+     * @deprecated use {@link #getActionCard(String id)}.getName() instead
+     */
+    @Nullable @Deprecated
     public static String getActionCardName(String id) {
         ActionCardModel info = getActionCard(id);
         // if we would break trying to split the note, just return whatever is there
@@ -465,28 +468,42 @@ public class Mapper {
         return info.getName();
     }
 
-    public static String getPromissoryNote(String id, boolean longDisplay) {
+    /**
+     * @deprecated start with {@link #getPromissoryNote(String id)} instead
+     *
+     */
+    @Deprecated
+    public static String getPromissoryNoteText(String id, boolean longDisplay) {
         if (longDisplay) {
-            return getPromissoryNote(id);
+            return getPromissoryNoteLongText(id);
         } else {
-            return getShortPromissoryNote(id);
+            return getPromissoryNoteShortText(id);
         }
     }
 
-    public static String getPromissoryNote(String id) {
+    /**
+     * @deprecated use {@link #getPromissoryNote(String id)}.getText() instead
+     *
+     */
+    @Deprecated
+    public static String getPromissoryNoteLongText(String id) {
         return promissoryNotes.get(id).getText();
     }
 
-    public static String getShortPromissoryNote(String id) {
-        String promStr = promissoryNotes.get(id).getText();
-        // if we would break trying to split the note, just return whatever is there
-        if ((promStr == null) || !promStr.contains(";")) {
-            return promStr;
-        }
-        return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction()
-            + promissoryNotes.get(id).getColor();
+    /**
+     * @deprecated use {@link #getPromissoryNote(String id)}.getShortText() instead
+     *
+     */
+    @Deprecated
+    public static String getPromissoryNoteShortText(String id) {
+        return promissoryNotes.get(id).getShortText();
     }
 
+    /**
+     * @deprecated use {@link #getPromissoryNote(String id)}.getOwner() instead
+     *
+     */
+    @Deprecated
     public static String getPromissoryNoteOwner(String id) {
         if (promissoryNotes.get(id) == null) {
             return "finNullDodger";
@@ -851,7 +868,7 @@ public class Mapper {
                 displayName = actionCard.getRepresentation();
             }
             case Constants.PROMISSORY_NOTES -> {
-                PromissoryNoteModel pn = getPromissoryNoteByID(relatedID);
+                PromissoryNoteModel pn = getPromissoryNote(relatedID);
                 displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
             }
             case Constants.TECH -> displayName = getTech(relatedID).getRepresentation(true);
