@@ -70,7 +70,10 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         guild = event.getGuild();
         //CHECK IF CATEGORY EXISTS
        
-
+        if (guild == null) {
+            sendMessage("Guild was null");
+            return;
+        }
      
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
