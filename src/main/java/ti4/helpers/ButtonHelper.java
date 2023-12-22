@@ -2447,6 +2447,15 @@ public class ButtonHelper {
         }
         return hasAbility;
     }
+    public static boolean isPlanetTechSkip(String planetName, Game activeGame){
+        UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, activeGame);
+        Planet planetHolder = (Planet) unitHolder;
+        if (planetHolder == null) return false;
+        if ((Mapper.getPlanet(planetName).getTechSpecialties() != null && Mapper.getPlanet(planetName).getTechSpecialties().size() > 0) || checkForTechSkipAttachments(activeGame, planetName)) {
+            return true;
+        }
+        return false;
+    }
 
     public static boolean isPlanetLegendaryOrHome(String planetName, Game activeGame, boolean onlyIncludeYourHome, Player p1) {
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, activeGame);
@@ -3410,7 +3419,7 @@ public class ButtonHelper {
             buttons.add(domButton);
         }
 
-        if (player.hasUnexhaustedLeader("ghostagent") && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem(), player)) {
+        if (player.hasUnexhaustedLeader("ghostagent") && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem())) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
@@ -4089,6 +4098,16 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static List<Tile> getAllWormholeTiles(Game activeGame){
+        List<Tile> wormholes = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition())){
+                wormholes.add(tile);
+            }
+        }
+        return wormholes;
+    }
+
     public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Game activeGame, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -4170,7 +4189,7 @@ public class ButtonHelper {
                     }
 
                     if ((("mech".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("articles_war") && player.getUnitsOwned().contains("nomad_mech"))
-                        || "dreadnought".equalsIgnoreCase(unitName) || "warsun".equalsIgnoreCase(unitName) || "lady".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName)
+                        || "dreadnought".equalsIgnoreCase(unitName) || ("warsun".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("schematics")) || "lady".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName)
                         || ("mech".equalsIgnoreCase(unitName) && doesPlayerHaveFSHere("nekro_flagship", player, tile))
                         || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2")) || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
                         Button validTile2 = Button
@@ -5031,8 +5050,8 @@ public class ButtonHelper {
                 PlayAC.playAC(event, activeGame, p2, "investments", activeGame.getMainGameChannel(), event.getGuild());
             }
         }
-        if (activeGame.getNaaluAgent()) {
-            activeGame.setNaaluAgent(false);
+        if (!activeGame.getFactionsThatReactedToThis("agendaConstitution").isEmpty()) {
+            activeGame.setCurrentReacts("agendaConstitution", "");
             for (Player p2 : activeGame.getRealPlayers()) {
                 for (String planet : p2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
@@ -5044,6 +5063,37 @@ public class ButtonHelper {
                 }
             }
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Exhausted all home systems due to that one agenda");
+        }
+        if (!activeGame.getFactionsThatReactedToThis("agendaArmsReduction").isEmpty()) {
+            activeGame.setCurrentReacts("agendaArmsReduction", "");
+            for (Player p2 : activeGame.getRealPlayers()) {
+                for (String planet : p2.getPlanets()) {
+                    if (planet.contains("custodia") || planet.contains("ghoti")) {
+                        continue;
+                    }
+                    if (isPlanetTechSkip(planet, activeGame)) {
+                        p2.exhaustPlanet(planet);
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Exhausted all tech skip planets due to that one agenda");
+        }
+        if (!activeGame.getFactionsThatReactedToThis("agendaRepGov").isEmpty()) {
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if(activeGame.getFactionsThatReactedToThis("agendaRepGov").contains(p2.getFaction())){
+                    for (String planet : p2.getPlanets()) {
+                        if (planet.contains("custodia") || planet.contains("ghoti")) {
+                            continue;
+                        }
+                        Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+                        if (p != null && ("cultural".equalsIgnoreCase(p.getOriginalPlanetType()) || p.getTokenList().contains("attachment_titanspn.png"))) {
+                            p2.exhaustPlanet(planet);
+                        }
+                    }
+                }
+            }
+            activeGame.setCurrentReacts("agendaRepGov", "");
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Exhausted all cultural planets of those who voted against on that one agenda");
         }
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick SC.");

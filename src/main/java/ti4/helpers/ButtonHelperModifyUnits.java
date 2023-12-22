@@ -879,8 +879,8 @@ public class ButtonHelperModifyUnits {
 
                             String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                             int amount = unitEntry.getValue();
-
-                            boolean cabalMech = cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech")
+                            Player cabalMechOwner = Helper.getPlayerFromUnit(activeGame, "cabal_mech");
+                            boolean cabalMech = cabalMechOwner != null && unitHolder.getUnitCount(UnitType.Mech, cabalMechOwner.getColor()) > 0 
                                 && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war");
 
                             new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
