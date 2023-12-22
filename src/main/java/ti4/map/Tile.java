@@ -228,7 +228,7 @@ public class Tile {
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
         List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(tileID);
-        if (fullHyperlaneData.size() == 0) {
+        if (fullHyperlaneData.isEmpty()) {
             return null;
         } else if (sourceDirection < 0 || sourceDirection > 5) {
             return Collections.emptyList();

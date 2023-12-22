@@ -999,7 +999,7 @@ public class Helper {
             for(UnitHolder uH : tile.getUnitHolders().values()){
                 for(UnitKey unit : uH.getUnits().keySet()){
                     if(unit.getColor().equalsIgnoreCase(player.getColor())){
-                        if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                        if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()){
                             player.addOwnedUnitByID("tyrantslament");
                         }
                         UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);

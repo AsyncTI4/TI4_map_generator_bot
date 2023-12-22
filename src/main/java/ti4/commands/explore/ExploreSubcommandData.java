@@ -486,7 +486,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ancientshipyard" -> {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 List<String> colors = tile.getUnitHolders().get("space").getUnitColorsOnHolder();
-                if (colors.size() == 0 || colors.contains(player.getColorID())) {
+                if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
                     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Cruiser added to the system automatically.");
                 } else {

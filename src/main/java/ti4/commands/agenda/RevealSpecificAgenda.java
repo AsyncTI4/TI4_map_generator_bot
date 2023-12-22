@@ -80,7 +80,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         }
 
         //ELECT LAW BUT NO LAWS IN PLAY
-        if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().size() == 0)) {
+        if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().isEmpty())) {
             MessageHelper.sendMessageToChannel(channel,
                 activeGame.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
             agendaID = activeGame.revealAgenda(false);

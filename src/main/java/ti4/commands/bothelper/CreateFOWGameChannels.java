@@ -191,7 +191,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
     
     private static String getNextFOWGameName() {
         ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
-        if (existingNums.size() == 0) {
+        if (existingNums.isEmpty()) {
             return "fow1";
         }
         int nextPBDNumber = Collections.max(getAllExistingFOWNumbers()) + 1;

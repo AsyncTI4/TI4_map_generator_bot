@@ -881,7 +881,7 @@ public class AgendaHelper {
 
         List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestWhenMsg(), activeGame);
         List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestAfterMsg(), activeGame);
-        if (missingPlayersAfters.size() == 0 && missingPlayersWhens.size() == 0) {
+        if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
             return;
         }
 
@@ -2322,7 +2322,7 @@ public class AgendaHelper {
     }
 
     public static void eraseVotesOfFaction(Game activeGame, String faction) {
-        if (activeGame.getCurrentAgendaVotes().keySet().size() == 0) {
+        if (activeGame.getCurrentAgendaVotes().keySet().isEmpty()) {
             return;
         }
         Map<String, String> outcomes = new HashMap<>(activeGame.getCurrentAgendaVotes());
@@ -2396,7 +2396,7 @@ public class AgendaHelper {
             agendaName = "Not Currently Tracked";
         }
 
-        if (outcomes.keySet().size() == 0) {
+        if (outcomes.keySet().isEmpty()) {
             summary = "# Agenda Name: " + agendaName + "\nNo current riders or votes have been cast yet.";
         } else {
             StringBuilder summaryBuilder = new StringBuilder("# Agenda Name: " + agendaName + "\nCurrent status of votes and outcomes is: \n");

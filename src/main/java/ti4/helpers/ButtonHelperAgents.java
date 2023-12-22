@@ -883,7 +883,7 @@ public class ButtonHelperAgents {
         if (unitHolder2.getTokenList().contains("attachment_titanspn.png")) {
             return planets;
         }
-        if(types.size() == 0){
+        if(types.isEmpty()){
             return planets;
         }
         for (String planet : player.getExhaustedPlanets()) {

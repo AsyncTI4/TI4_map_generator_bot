@@ -4474,7 +4474,7 @@ public class ButtonHelper {
             }
         }
 
-        if (issues.size() == 0) return;
+        if (issues.isEmpty()) return;
 
         StringBuilder sb = new StringBuilder("### The following pairs of players have colors with a low contrast value:\n");
         for (Collision issue : issues) {
