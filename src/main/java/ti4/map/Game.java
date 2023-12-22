@@ -796,6 +796,7 @@ public class Game {
         } catch (Exception e) {
             ThreadChannel threadChannel; //exists and is not locked
             List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+            if (getActionsChannel() == null) return null;
             if (botChannels.size() != 1) { //can't find it, might be archived
                 for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
                     if (threadChannel_.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
