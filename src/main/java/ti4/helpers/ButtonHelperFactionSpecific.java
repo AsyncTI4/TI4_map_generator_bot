@@ -500,7 +500,7 @@ public class ButtonHelperFactionSpecific {
         String newPlanet = buttonID.split("_")[2];
         Player saar = activeGame.getPNOwner("ragh");
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, activeGame);
-        HashMap<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
+        Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
             int amount = unitEntry.getValue();
@@ -532,7 +532,7 @@ public class ButtonHelperFactionSpecific {
         }
 
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, activeGame);
-        HashMap<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
+        Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
             int amount = unitEntry.getValue();
@@ -1466,7 +1466,7 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getRohDhnaRecycleButtons(Game activeGame, Player player) {
         List<UnitKey> availableUnits = new ArrayList<>();
-        HashMap<UnitKey, Integer> units = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space").getUnits();
+        Map<UnitKey, Integer> units = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
             if(unit.getColor() == player.getColor() && (unit.getUnitType() == UnitType.Cruiser || unit.getUnitType() == UnitType.Carrier || unit.getUnitType() == UnitType.Dreadnought)) {
                 //if unit is not in the list, add it

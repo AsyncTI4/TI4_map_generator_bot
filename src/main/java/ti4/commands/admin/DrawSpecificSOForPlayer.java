@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DrawSpecificSOForPlayer extends AdminSubcommandData {
 
@@ -35,7 +35,7 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         }
 
         User user = playerOption.getAsUser();
-        LinkedHashMap<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
+        Map<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
         if (secrets == null){
             sendMessage("SO not retrieved");
             return;

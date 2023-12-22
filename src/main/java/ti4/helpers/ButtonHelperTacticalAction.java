@@ -28,8 +28,8 @@ public class ButtonHelperTacticalAction {
 
     public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
         String remove = "Move";
-        HashMap<String, Integer> currentSystem = activeGame.getCurrentMovedUnitsFrom1System();
-        HashMap<String, Integer> currentActivation = activeGame.getMovedUnitsFromCurrentActivation();
+        Map<String, Integer> currentSystem = activeGame.getCurrentMovedUnitsFrom1System();
+        Map<String, Integer> currentActivation = activeGame.getMovedUnitsFromCurrentActivation();
         String rest;
         if (buttonID.contains("Remove")) {
             remove = "Remove";
@@ -82,7 +82,7 @@ public class ButtonHelperTacticalAction {
                     String name = entry.getKey();
                     String representation = planetRepresentations.get(name);
                     UnitHolder unitHolder = entry.getValue();
-                    HashMap<UnitKey, Integer> units1 = unitHolder.getUnits();
+                    Map<UnitKey, Integer> units1 = unitHolder.getUnits();
                     Map<UnitKey, Integer> units = new HashMap<>(units1);
 
                     if (unitHolder instanceof Planet) {

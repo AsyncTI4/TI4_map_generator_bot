@@ -634,7 +634,7 @@ public class Mapper {
             .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
-    public static HashMap<String, LeaderModel> getLeaders() {
+    public static Map<String, LeaderModel> getLeaders() {
         return new HashMap<>(leaders);
     }
 
@@ -651,32 +651,32 @@ public class Mapper {
             .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getSecretObjectivesJustNames() {
-        HashMap<String, String> soList = new HashMap<>();
+    public static Map<String, String> getSecretObjectivesJustNames() {
+        Map<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
             soList.put(entry.getKey(), entry.getValue().getName());
         }
         return soList;
     }
 
-    public static HashMap<String, String> getSecretObjectivesJustNamesAndSource() {
-        HashMap<String, String> soList = new HashMap<>();
+    public static Map<String, String> getSecretObjectivesJustNamesAndSource() {
+        Map<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
             soList.put(entry.getKey(), entry.getValue().getName() + " (" + entry.getValue().getSource() + ")");
         }
         return soList;
     }
 
-    public static HashMap<String, String> getAgendaJustNames() {
-        HashMap<String, String> agendaList = new HashMap<>();
+    public static Map<String, String> getAgendaJustNames() {
+        Map<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
             agendaList.put(agenda.getAlias(), agenda.getName());
         }
         return agendaList;
     }
 
-    public static HashMap<String, String> getAgendaJustNames(Game activeGame) {
-        HashMap<String, String> agendaList = new HashMap<>();
+    public static Map<String, String> getAgendaJustNames(Game activeGame) {
+        Map<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
             if (activeGame.isAbsolMode() && agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
@@ -707,11 +707,11 @@ public class Mapper {
         return tokenPath;
     }
 
-    public static HashMap<String, ActionCardModel> getActionCards() {
+    public static Map<String, ActionCardModel> getActionCards() {
         return new HashMap<>(actionCards);
     }
 
-    public static HashMap<String, ActionCardModel> getActionCards(String extra) {
+    public static Map<String, ActionCardModel> getActionCards(String extra) {
         HashMap<String, ActionCardModel> acList = new HashMap<>();
         for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
             acList.put(entry.getKey() + extra, entry.getValue());
@@ -719,8 +719,8 @@ public class Mapper {
         return acList;
     }
 
-    public static HashMap<String, String> getACJustNames() {
-        HashMap<String, String> acNameList = new HashMap<>();
+    public static Map<String, String> getACJustNames() {
+        Map<String, String> acNameList = new HashMap<>();
         for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
             acNameList.put(entry.getKey(), entry.getValue().getName());
         }
@@ -747,21 +747,21 @@ public class Mapper {
         return AliasHandler.getPlanetKeyList().contains(id);
     }
 
-    public static HashMap<String, PublicObjectiveModel> getPublicObjectives() {
+    public static Map<String, PublicObjectiveModel> getPublicObjectives() {
         return new HashMap<>(publicObjectives);
     }
 
-    public static HashMap<String, String> getPublicObjectivesStage1() {
+    public static Map<String, String> getPublicObjectivesStage1() {
         return getPublicObjectives(1);
     }
 
-    public static HashMap<String, String> getPublicObjectivesStage2() {
+    public static Map<String, String> getPublicObjectivesStage2() {
         return getPublicObjectives(2);
     }
 
     @NotNull
-    private static HashMap<String, String> getPublicObjectives(int requiredStage) {
-        HashMap<String, String> poList = new HashMap<>();
+    private static Map<String, String> getPublicObjectives(int requiredStage) {
+        Map<String, String> poList = new HashMap<>();
         for (Map.Entry<String, PublicObjectiveModel> entry : publicObjectives.entrySet()) {
             PublicObjectiveModel po = entry.getValue();
             if (requiredStage == po.getPoints()) {
@@ -771,7 +771,7 @@ public class Mapper {
         return poList;
     }
 
-    public static HashMap<String, ExploreModel> getExplores() {
+    public static Map<String, ExploreModel> getExplores() {
         return new HashMap<>(explore);
     }
 
@@ -787,7 +787,7 @@ public class Mapper {
         return relics.containsKey(relicID);
     }
 
-    public static HashMap<String, AgendaModel> getAgendas() {
+    public static Map<String, AgendaModel> getAgendas() {
         return new HashMap<>(agendas);
     }
 
@@ -795,7 +795,7 @@ public class Mapper {
         return getAgendas().containsKey(agendaID);
     }
 
-    public static HashMap<String, EventModel> getEvents() {
+    public static Map<String, EventModel> getEvents() {
         return new HashMap<>(events);
     }
 
@@ -803,7 +803,7 @@ public class Mapper {
         return getEvents().containsKey(eventID);
     }
 
-    public static HashMap<String, DeckModel> getDecks() {
+    public static Map<String, DeckModel> getDecks() {
         return new HashMap<>(decks);
     }
 
@@ -815,11 +815,11 @@ public class Mapper {
         return getDecks().containsKey(deckID);
     }
 
-    public static HashMap<String, CombatModifierModel> getCombatModifiers() {
+    public static Map<String, CombatModifierModel> getCombatModifiers() {
         return new HashMap<>(combatModifiers);
     }
 
-    public static HashMap<String, AbilityModel> getAbilities() {
+    public static Map<String, AbilityModel> getAbilities() {
         return new HashMap<>(abilities);
     }
 

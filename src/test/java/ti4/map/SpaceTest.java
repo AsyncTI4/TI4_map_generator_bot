@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -77,19 +77,19 @@ public class SpaceTest extends BaseTi4Test {
         // Then
         assertEquals(expectedName, restoredSpace.getName());
         assertEquals(expectedHolderCenterPosition, restoredSpace.getHolderCenterPosition());
-        HashMap<UnitKey, Integer> restoredUnits = restoredSpace.getUnits();
+        Map<UnitKey, Integer> restoredUnits = restoredSpace.getUnits();
         assertEquals(1, restoredUnits.size());
         assertEquals(expectedUnitCount, restoredUnits.get(expectedUnitKey));
-        HashMap<UnitKey, Integer> restoredUnitsDamaged = restoredSpace.getUnitDamage();
+        Map<UnitKey, Integer> restoredUnitsDamaged = restoredSpace.getUnitDamage();
         assertEquals(1, restoredUnitsDamaged.size());
         assertEquals(expectedUnitDamage, restoredUnitsDamaged.get(expectedUnitKey));
-        HashSet<String> restoredCCList = restoredSpace.getCCList();
+        Set<String> restoredCCList = restoredSpace.getCCList();
         assertEquals(1, restoredCCList.size());
         assertTrue(restoredCCList.contains(expectedCommandCounter));
-        HashSet<String> restoredControlList = restoredSpace.getControlList();
+        Set<String> restoredControlList = restoredSpace.getControlList();
         assertEquals(1, restoredControlList.size());
         assertTrue(restoredControlList.contains(expectedControl));
-        HashSet<String> restoredTokenList = restoredSpace.getTokenList();
+        Set<String> restoredTokenList = restoredSpace.getTokenList();
         assertEquals(1, restoredTokenList.size());
         assertTrue(restoredTokenList.contains(expectedToken));
     }

@@ -2,6 +2,7 @@ package ti4;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
@@ -10,17 +11,17 @@ import ti4.helpers.Units.UnitKey;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper;
-    private final HashMap<String, String> unitCache = new HashMap<>();
-    private final HashMap<String, String> decalCache = new HashMap<>();
-    private final HashMap<String, String> spoopyCache = new HashMap<>();
-    private final HashMap<String, String> tileCache = new HashMap<>();
-    private final HashMap<String, String> ccCache = new HashMap<>();
-    private final HashMap<String, String> attachmentCache = new HashMap<>();
-    private final HashMap<String, String> tokenCache = new HashMap<>();
-    private final HashMap<String, String> factionCache = new HashMap<>();
-    private final HashMap<String, String> generalCache = new HashMap<>();
-    private final HashMap<String, String> planetCache = new HashMap<>();
-    private final HashMap<String, String> paCache = new HashMap<>();
+    private final Map<String, String> unitCache = new HashMap<>();
+    private final Map<String, String> decalCache = new HashMap<>();
+    private final Map<String, String> spoopyCache = new HashMap<>();
+    private final Map<String, String> tileCache = new HashMap<>();
+    private final Map<String, String> ccCache = new HashMap<>();
+    private final Map<String, String> attachmentCache = new HashMap<>();
+    private final Map<String, String> tokenCache = new HashMap<>();
+    private final Map<String, String> factionCache = new HashMap<>();
+    private final Map<String, String> generalCache = new HashMap<>();
+    private final Map<String, String> planetCache = new HashMap<>();
+    private final Map<String, String> paCache = new HashMap<>();
 
     private ResourceHelper() {
     }

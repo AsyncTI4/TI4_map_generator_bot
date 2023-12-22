@@ -1,7 +1,6 @@
 package ti4.commands.map;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
@@ -59,7 +58,7 @@ public class AddTileList extends MapSubcommandData {
     }
 
     public static void addTileListToMap(Game activeGame, String tileList, GenericInteractionCreateEvent event) {
-        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, activeGame);
+        Map<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, activeGame);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
             return;

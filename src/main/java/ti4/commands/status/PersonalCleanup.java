@@ -32,7 +32,7 @@ public class PersonalCleanup extends StatusSubcommandData {
 
     public void runStatusCleanup(Game activeGame) {
 
-        HashMap<String, Tile> tileMap = activeGame.getTileMap();
+        Map<String, Tile> tileMap = activeGame.getTileMap();
         Player player = activeGame.getPlayer(getUser().getId());
         String color = player.getColor();
         String ccID = Mapper.getCCID(color);
@@ -41,13 +41,13 @@ public class PersonalCleanup extends StatusSubcommandData {
             tile.removeCC(ccID);
             String ccPath = tile.getCCPath(ccID);
 
-            HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeToken(ccPath);
                 unitHolder.removeAllUnitDamage();
             }
         }
-        HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+        Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             if (player.getSCs().contains(sc.getKey()))
                 sc.setValue(false);

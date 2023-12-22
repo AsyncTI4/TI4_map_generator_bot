@@ -1,8 +1,9 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
@@ -53,7 +54,7 @@ public class CommanderDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
-        HashMap<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));

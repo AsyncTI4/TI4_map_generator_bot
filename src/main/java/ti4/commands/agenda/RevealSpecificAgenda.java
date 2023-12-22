@@ -2,7 +2,6 @@ package ti4.commands.agenda;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
      */
     @Deprecated
     public void revealAgenda(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel, String agendaID) {
-        LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
         if (uniqueID == null) {
             MessageHelper.sendMessageToChannel(channel, "Agenda `" + agendaID + "` not found in discard, please retry");

@@ -1,7 +1,6 @@
 package ti4.commands.cardspn;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -207,7 +206,7 @@ public class PNInfo extends PNCardsSubcommandData {
         //PROMISSORY NOTES
         sb.append("__**Promissory Notes:**__").append("\n");
         int index = 1;
-        LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
+        Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         if (promissoryNotes != null) {
             if (promissoryNotes.isEmpty()) {

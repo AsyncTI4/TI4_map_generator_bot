@@ -276,7 +276,7 @@ public class ButtonHelperHeroes {
     public static void resolveNivynHeroSustainEverything(Game activeGame, Player nivyn) {
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+                Map<UnitKey, Integer> units = unitHolder.getUnits();
                 for (Player player : activeGame.getRealPlayers()) {
                     for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                         if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;

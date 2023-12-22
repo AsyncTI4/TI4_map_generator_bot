@@ -164,7 +164,7 @@ public class DataMigrationManager {
     /// This will fix 6 player 3 ring maps anchors
     public static Boolean migratePlayerStatsBlockPositions_300823(Game activeGame) {
         Boolean mapNeededMigrating = false;
-        ArrayList<String> setup6p = new ArrayList<>() {
+        List<String> setup6p = new ArrayList<>() {
             {
                 add("301");
                 add("304");
@@ -174,7 +174,7 @@ public class DataMigrationManager {
                 add("316");
             }
         };
-        ArrayList<String> setup8p = new ArrayList<>() {
+        List<String> setup8p = new ArrayList<>() {
             {
                 add("401");
                 add("404");
@@ -190,7 +190,7 @@ public class DataMigrationManager {
         List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
         int playerCount = activeGame.getRealPlayers().size() + activeGame.getDummies().size();
 
-        ArrayList<String> setup;
+        List<String> setup;
         if (playerCount == 6 && activeGame.getRingCount() == 3) {
             setup = setup6p;
         } else if (playerCount == 8 && activeGame.getRingCount() == 4) {
@@ -330,7 +330,7 @@ public class DataMigrationManager {
                         }
                     }
                 }
-                HashSet<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
+                Set<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
                 if (!player.getUnitsOwned().equals(updatedUnitIDs)) {
                     mapNeededMigrating = true;
                     player.setUnitsOwned(updatedUnitIDs);
@@ -435,7 +435,7 @@ public class DataMigrationManager {
                         }
                     }
                 }
-                HashSet<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
+                Set<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
                 if (!player.getUnitsOwned().equals(updatedUnitIDs)) {
                     mapNeededMigrating = true;
                     player.setUnitsOwned(updatedUnitIDs);

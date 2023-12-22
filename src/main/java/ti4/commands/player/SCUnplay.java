@@ -1,7 +1,7 @@
 package ti4.commands.player;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.Set;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -32,7 +32,7 @@ public class SCUnplay extends PlayerSubcommandData {
             return;
         }
 
-        LinkedHashSet<Integer> playersSCs = player.getSCs();
+        Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
             sendMessage("No SC has been selected");
             return;
