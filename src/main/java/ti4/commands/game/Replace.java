@@ -126,7 +126,6 @@ public class Replace extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message);
-            MessageHelper.sendMessageToChannel(activeGame.getBotMapUpdatesThread(), player.getRepresentation(true, true) + " pinging you here for visibility");
         }
     }
 }
