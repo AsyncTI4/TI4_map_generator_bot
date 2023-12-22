@@ -1500,6 +1500,10 @@ public class AgendaHelper {
             } catch (Exception e) {
                 BotLogger.log(event, "Could not find next in line", e);
             }
+            if (nextInLine == null) {
+                BotLogger.log(event, "`AgendaHelper.startTheVoting` " + nextInLine + " is **null**");
+                return;
+            }
             String realIdentity = nextInLine.getRepresentation(true, true);
             int[] voteInfo = getVoteTotal(nextInLine, activeGame);
             int counter = 0;
@@ -2050,13 +2054,17 @@ public class AgendaHelper {
             for (int x = 0; x < 6; x++) {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
-                    if (player != null && player.isRealPlayer()) {
+                    if (player == null) {
+                        BotLogger.log("`AgendaHelper.getNextInLine` Hit a null player in game " + activeGame.getName());
+                        return null;
+                    }
+
+                    if (player.isRealPlayer()) {
                         return player;
-                    }else{
-                        BotLogger.log("Hit a null or nontreal player in game "+activeGame.getName()+" on player "+player.getUserName());
+                    } else {
+                        BotLogger.log("`AgendaHelper.getNextInLine` Hit a notRealPlayer player in game " + activeGame.getName() + " on player " + player.getUserName());
                     }
                 }
-
             }
             return null;
 

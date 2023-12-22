@@ -408,6 +408,7 @@ public class ButtonHelper {
                 continue;
             }
             UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            if (unitHolder == null) return types;
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                 || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
@@ -585,7 +586,8 @@ public class ButtonHelper {
             if (planet.contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            if (getUnitHolderFromPlanetName(planet, activeGame).getUnitColorsOnHolder().contains(receiver.getColorID())) {
+            UnitHolder unitHolder = getUnitHolderFromPlanetName(planet, activeGame);
+            if (unitHolder != null && unitHolder.getUnitColorsOnHolder().contains(receiver.getColorID())) {
                 String refreshed = "refreshed";
                 if (p1.getExhaustedPlanets().contains(planet)) {
                     refreshed = "exhausted";
@@ -669,10 +671,10 @@ public class ButtonHelper {
             }
 
             for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
-
                 if (unitEntry.getValue() > 0 && player.unitBelongsToPlayer(unitEntry.getKey())) {
                     UnitModel model = player.getUnitFromUnitKey(unitEntry.getKey());
-                    if (model != null && model.getProductionValue() > 0) return true;
+                    if (model == null) continue;
+                    if (model.getProductionValue() > 0) return true;
                     if (player.hasUnit("ghoti_flagship") && "flagship".equalsIgnoreCase(model.getBaseType())) {
                         return true;
                     }
@@ -1024,12 +1026,11 @@ public class ButtonHelper {
     public static int getNumberOfMechsOnPlanet(String planetName, Game activeGame, Player player) {
         String colorID = Mapper.getColorID(player.getColor());
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, activeGame);
+        if (unitHolder == null) return 0;
         UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
         int numMechs = 0;
-        if (unitHolder.getUnits() != null) {
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                numMechs = unitHolder.getUnits().get(mechKey);
-            }
+        if (unitHolder.getUnits() != null && unitHolder.getUnits().get(mechKey) != null) {
+            numMechs = unitHolder.getUnits().get(mechKey);
         }
         return numMechs;
     }
@@ -3215,6 +3216,10 @@ public class ButtonHelper {
                 break;
             }
         }
+        if (tradeHolder == null) {
+            BotLogger.log(event, "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
+            return;
+        }
         String msg = player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation();
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
             checkTransactionLegality(activeGame, player, tradeHolder);
@@ -4742,7 +4747,6 @@ public class ButtonHelper {
         //INFORM FIRST PLAYER IS UP FOR ACTION
         if (player != null) {
             msgExtra += "# " + player.getRepresentation() + " is up for an action";
-            privatePlayer = player;
             activeGame.updateActivePlayer(player);
             if (activeGame.isFoWMode()) {
                 FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "started turn");
@@ -4756,6 +4760,10 @@ public class ButtonHelper {
         msg = "";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         if (isFowPrivateGame) {
+            if (privatePlayer == null) {
+                BotLogger.log(event, "`ButtonHelper.startMyTurn` privatePlayer is null");
+                return;
+            }  
             msgExtra = "# " + privatePlayer.getRepresentation(true, true) + " UP NEXT";
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -4773,6 +4781,10 @@ public class ButtonHelper {
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msgExtra);
                 MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "\n Use Buttons to do turn.", getStartOfTurnButtons(privatePlayer, activeGame, false, event));
+                if (privatePlayer == null) {
+                    BotLogger.log(event, "`ButtonHelper.startMyTurn` privatePlayer is null");
+                    return;
+                }
                 if (privatePlayer.getStasisInfantry() > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, activeGame),
                         "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.", getPlaceStatusInfButtons(activeGame, privatePlayer));
@@ -6538,6 +6550,7 @@ public class ButtonHelper {
         }
     }
 
+    //TODO: Combine with PlayPN.playPN()
     public static void resolvePNPlay(String id, Player player, Game activeGame, GenericInteractionCreateEvent event) {
         boolean longPNDisplay = false;
         boolean fromHand = true;
