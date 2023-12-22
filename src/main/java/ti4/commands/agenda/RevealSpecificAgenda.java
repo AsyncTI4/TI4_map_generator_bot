@@ -50,6 +50,11 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         revealAgenda(event, activeGame, event.getChannel(), agendaID);
     }
 
+    
+    /**
+     * @deprecated This needs to be refactored to use RevealAgenda.java's version
+     */
+    @Deprecated
     public void revealAgenda(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel, String agendaID) {
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
