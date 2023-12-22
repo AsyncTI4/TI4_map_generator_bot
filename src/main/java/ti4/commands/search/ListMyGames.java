@@ -25,6 +25,7 @@ public class ListMyGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_AVERAGE_TURN_TIME, "True to show average turn time as well (default = false)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_SECONDARIES, "True to show secondaries you need to follow in each game (default = false)"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to Show"));
     }
 
     @Override
@@ -34,7 +35,8 @@ public class ListMyGames extends SearchSubcommandData {
         boolean showAverageTurnTime = event.getOption(Constants.SHOW_AVERAGE_TURN_TIME, false, OptionMapping::getAsBoolean);
         boolean showSecondaries = event.getOption(Constants.SHOW_SECONDARIES, false, OptionMapping::getAsBoolean);
 
-        User user = event.getUser();
+        User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
+
         String userID = user.getId();
 
         Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer() != null && m.getActivePlayer().equals(userID) : m -> true;
