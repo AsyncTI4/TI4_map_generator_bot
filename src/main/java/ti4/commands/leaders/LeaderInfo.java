@@ -93,7 +93,7 @@ public class LeaderInfo extends LeaderSubcommandData {
             //PLAY AREA PROMISSORY NOTES
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    String pnData = Mapper.getPromissoryNote(pn.getKey(), false);
+                    String pnData = Mapper.getPromissoryNoteText(pn.getKey(), false);
                     if (pnData.contains("Alliance")) {
                         String[] split = pnData.split(";");
                         if (split.length < 2) continue;

@@ -58,7 +58,7 @@ public class PNInfo extends PNCardsSubcommandData {
             if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
                 continue;
             }
-            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
             if (owner != player) {
                 Button transact;

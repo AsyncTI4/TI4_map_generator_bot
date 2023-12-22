@@ -162,7 +162,7 @@ public class ButtonHelper {
             if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
                 continue;
             }
-            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
             Button transact;
             if (activeGame.isFoWMode()) {
@@ -5133,7 +5133,7 @@ public class ButtonHelper {
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("scepter") && "scepter".equalsIgnoreCase(pn)) {
-                    PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pn);
+                    PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
                     Player owner = activeGame.getPNOwner(pn);
                     Button transact = Button.success("resolvePNPlay_" + pn, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                     List<Button> buttons = new ArrayList<>();
@@ -5400,7 +5400,7 @@ public class ButtonHelper {
                     if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
                         continue;
                     }
-                    PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+                    PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                     Player owner = activeGame.getPNOwner(pnShortHand);
                     Button transact;
                     if (activeGame.isFoWMode()) {
@@ -5781,8 +5781,8 @@ public class ButtonHelper {
         //PNs
         for (String pn : p1.getPromissoryNotes().keySet()) {
             if (pn != null && Mapper.getPromissoryNoteOwner(pn) != null && !Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn)
-                && Mapper.getPromissoryNote(pn, true) != null) {
-                String pnText = Mapper.getPromissoryNote(pn, true);
+                && Mapper.getPromissoryNoteText(pn, true) != null) {
+                String pnText = Mapper.getPromissoryNoteText(pn, true);
                 if (pnText.contains("Action:") && !"bmf".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
@@ -5790,7 +5790,7 @@ public class ButtonHelper {
                     compButtons.add(pnButton);
                 }
             }
-            if (Mapper.getPromissoryNote(pn, true) == null) {
+            if (Mapper.getPromissoryNoteText(pn, true) == null) {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(p1, activeGame),
                     p1.getRepresentation(true, true) + " you have a null PN. Please use /pn purge after reporting it " + pn);
                 PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
@@ -6555,7 +6555,7 @@ public class ButtonHelper {
                 return;
             }
         }
-        PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(id);
+        PromissoryNoteModel pn = Mapper.getPromissoryNote(id);
         String pnName = pn.getName();
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = activeGame.getPNOwner(id);
@@ -6577,7 +6577,7 @@ public class ButtonHelper {
             pnText = "Political Secret" + Emojis.Absol
                 + ":  *When you cast votes:* You may exhaust up to 3 of the {color} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {color} player.";
         } else {
-            pnText = Mapper.getPromissoryNote(id, longPNDisplay);
+            pnText = Mapper.getPromissoryNoteText(id, longPNDisplay);
         }
         sb.append(pnText).append("\n");
 

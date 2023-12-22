@@ -731,7 +731,7 @@ public class DataMigrationManager {
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.HERO, agents.get(0)));
                 }
             } else if (item.ItemCategory == DraftItem.Category.PN) {
-                if (Mapper.getPromissoryNoteByID(item.ItemId) == null) {
+                if (Mapper.getPromissoryNote(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> pns = faction.getPromissoryNotes();
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.PN, pns.get(0)));
