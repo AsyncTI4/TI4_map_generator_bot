@@ -470,6 +470,12 @@ public class Helper {
         return simpleDateFormat.format(date);
     }
 
+    public static String getDateTimeRepresentation(long dateInfo) {
+        Date date = new Date(dateInfo);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return simpleDateFormat.format(date);
+    }
+
     public static int getDateDifference(String date1, String date2) {
         if (date1 == null || date1.length() == 0) {
             return 1000;
