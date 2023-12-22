@@ -939,8 +939,10 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             HashMap<UnitKey, Integer> units = unitHolder.getUnits();
             for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
-                writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
-                writer.write(System.lineSeparator());
+                if(entry.getKey() != null){
+                    writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
+                    writer.write(System.lineSeparator());
+                }
             }
             writer.write(ENDUNITS);
             writer.write(System.lineSeparator());

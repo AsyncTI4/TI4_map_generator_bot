@@ -39,6 +39,7 @@ import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
+import ti4.commands.tokens.AddCC;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
@@ -144,6 +145,78 @@ public class AgendaHelper {
                         resolveAbsolAgainstChecksNBalances(activeGame);
                     }
                 }
+                if ("schematics".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        for(Player player : activeGame.getRealPlayers()){
+                            if(player.getTechs().contains("ws") || player.getTechs().contains("pws2") || player.getTechs().contains("dsrohdws")){
+                                new DiscardACRandom().discardRandomAC(event, activeGame, player, player.getAc());
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Discarded the ACs of those with warsun tech");
+                    }
+                }
+                if ("defense_act".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        for(Player player : activeGame.getRealPlayers()){
+                            if(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Pds).size() > 0){
+                                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" remove a PDS", ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, activeGame, "pds"));
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Sent buttons for each person to remove a PDS");
+                    }
+                }
+                if ("wormhole_recon".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        for(Tile tile : ButtonHelper.getAllWormholeTiles(activeGame)){
+                            for(Player player : activeGame.getRealPlayers()){
+                                if(FoWHelper.playerHasShipsInSystem(player, tile)){
+                                    AddCC.addCC(event, player.getColor(), tile);
+                                }
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Added CCs to all tiles with wormholes and players ships");
+                    }
+                }
+                if ("travel_ban".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        for(Tile tile : ButtonHelper.getAllWormholeTiles(activeGame)){
+                            for(Player player : activeGame.getRealPlayers()){
+                                for(String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false)){
+                                    Tile tile2 = activeGame.getTileByPosition(adjPos);
+                                    for(UnitHolder uH : tile2.getUnitHolders().values()){
+                                        if(uH.getUnitCount(UnitType.Pds, player.getColor()) > 0){
+                                            uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColorID()), uH.getUnitCount(UnitType.Pds, player.getColor()));
+                                        }
+                                    }
+                                }
+                                for(UnitHolder uH : tile.getUnitHolders().values()){
+                                    if(uH.getUnitCount(UnitType.Pds, player.getColor()) > 0){
+                                        uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColorID()), uH.getUnitCount(UnitType.Pds, player.getColor()));
+                                    }
+                                }
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Removed all PDS in or adjacent to a wormhole");
+                    }
+                }
+                if ("shared_research".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        for(Player player : activeGame.getRealPlayers()){
+                            Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+                            if (player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0) {
+                                tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).get(0);
+                            }
+                            if (tile == null) {
+                                tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
+                            }
+                            if (tile == null) {
+                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find a HS, sorry bro");
+                            }
+                            AddCC.addCC(event, player.getColor(), tile);
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Added player's ccs to their HS");
+                    }
+                }
                 if ("conventions".equalsIgnoreCase(agID)) {
                     List<Player> winOrLose;
                     if (!"for".equalsIgnoreCase(winner)) {
@@ -152,6 +225,16 @@ public class AgendaHelper {
                             new DiscardACRandom().discardRandomAC(event, activeGame, playerWL, playerWL.getAc());
                         }
                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Discarded the ACs of those who voted against");
+                   }
+                }
+                if ("rep_govt".equalsIgnoreCase(agID)) {
+                    List<Player> winOrLose;
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        winOrLose = getWinningVoters(winner, activeGame);
+                        for (Player playerWL : winOrLose) {
+                            activeGame.setCurrentReacts("agendaRepGov", activeGame.getFactionsThatReactedToThis("agendaRepGov")+playerWL.getFaction());
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Will exhaust cultural planets of all players who voted against at start of next strat phase");
                     }
                 }
                 if ("articles_war".equalsIgnoreCase(agID)) {
@@ -304,6 +387,62 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Abolished the " + Mapper.getAgendaTitleNoCap(winner) + " law");
                 activeGame.removeLaw(winner);
             }
+            if("disarmamament".equalsIgnoreCase(agID)){
+                for(Player player : activeGame.getRealPlayers()){
+                    if(player.getPlanets().contains(winner.toLowerCase())){
+                        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(winner, activeGame);
+                        int count = 0;
+                        Player cabalMechOwner = Helper.getPlayerFromUnit(activeGame, "cabal_mech");
+                        boolean cabalMech = cabalMechOwner != null && uH.getUnitCount(UnitType.Mech, cabalMechOwner.getColor()) > 0 
+                                 && !activeGame.getLaws().containsKey("articles_war");
+                        Player cabalFSOwner = Helper.getPlayerFromUnit(activeGame, "cabal_flagship");
+                        boolean cabalFS = cabalFSOwner != null && ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabalFSOwner, activeGame.getTileFromPlanet(winner));
+
+                        if(uH.getUnitCount(UnitType.Mech, player.getColor()) > 0){
+                            if(player.hasTech("sar")){
+                                for (int x = 0; x < uH.getUnitCount(UnitType.Mech, player.getColor()); x++) {
+                                    player.setTg(player.getTg() + 1);
+                                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                        + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                                }
+                                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                            }
+                            if(cabalFS){
+                                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabalFSOwner, uH.getUnitCount(UnitType.Mech, player.getColor()), "mech", event);
+                            }
+                            count = count + uH.getUnitCount(UnitType.Mech, player.getColor());
+                            uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitCount(UnitType.Mech, player.getColor()));
+                        }
+                        if(uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0){
+                            if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))) {
+                                ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);
+                            }
+                            if (player.hasInf2Tech()) {
+                                ButtonHelper.resolveInfantryDeath(activeGame, player, uH.getUnitCount(UnitType.Infantry, player.getColor()));
+                            }
+                            if(cabalFS || cabalMech){
+                                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabalFSOwner, uH.getUnitCount(UnitType.Infantry, player.getColor()), "infantry", event);
+                            }
+                            count = count + uH.getUnitCount(UnitType.Infantry, player.getColor());
+                            uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColorID()), uH.getUnitCount(UnitType.Infantry, player.getColor()));
+                        }
+                        if(player.ownsUnit("titans_pds") || player.ownsUnit("titans_pds2")){
+                            if(uH.getUnitCount(UnitType.Pds, player.getColor()) > 0){
+                                count = count + uH.getUnitCount(UnitType.Pds, player.getColor());
+                                uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColorID()), uH.getUnitCount(UnitType.Pds, player.getColor()));
+                            }
+                        }
+                        if(count > 0){
+                            player.setTg(player.getTg()+count);
+                            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+                            ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        }
+                        MessageHelper.sendMessageToChannel(actionsChannel, "Removed all units and gave player appropriate amount of tg");
+
+                    }
+                }
+            }
             if ("miscount".equalsIgnoreCase(agID) || "absol_miscount".equalsIgnoreCase(agID)) {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                     "# Repealed the " + Mapper.getAgendaTitleNoCap(winner) + " law and will now reveal it for the purposes of revoting. It is technically still in effect");
@@ -331,6 +470,23 @@ public class AgendaHelper {
                     }
                 }
             }
+            if ("arms_reduction".equalsIgnoreCase(agID)) {
+                if ("for".equalsIgnoreCase(winner)) {
+                    for(Player player : activeGame.getRealPlayers()){
+                        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 4){
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" remove excess cruisers", ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, activeGame, "cruiser"));
+                        }
+                        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 2){
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" remove excess dreads", ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, activeGame, "dreadnought"));      
+                        }
+                    }
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Sent buttons for each person to remove excess dreads/cruisers");
+                }else{
+                    activeGame.setCurrentReacts("agendaArmsReduction", "true");
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Will exhaust all tech skip planets at the start of next Strategy phase");
+
+                }
+            }
             if ("rearmament".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     for(Player player : activeGame.getRealPlayers()){
@@ -344,8 +500,8 @@ public class AgendaHelper {
                                 int count = capChecker.getUnitCount(UnitType.Mech, player.getColor());
                                 if (count > 0) {
                                     String colorID = Mapper.getColorID(player.getColor());
-                                    UnitKey mechKey = Mapper.getUnitKey("mech", colorID);
-                                    UnitKey infKey = Mapper.getUnitKey("inf", colorID);
+                                    UnitKey mechKey = Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), colorID);
+                                    UnitKey infKey = Mapper.getUnitKey(AliasHandler.resolveUnit("inf"), colorID);
                                     capChecker.removeUnit(mechKey, count);
                                     capChecker.addUnit(infKey, count);
                                 }
@@ -400,7 +556,7 @@ public class AgendaHelper {
                     for (String law : laws) {
                         activeGame.removeLaw(law);
                     }
-                    activeGame.setNaaluAgent(true);
+                    activeGame.setCurrentReacts("agendaConstitution", "true");
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
                 }
             }
@@ -511,6 +667,41 @@ public class AgendaHelper {
                     }
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing() + " Set everyone's tgs to " + tg);
+            }
+            if ("crisis".equalsIgnoreCase(agID)) {
+                if(!activeGame.isHomeBrewSCMode()){
+                    List<Button> scButtons = new ArrayList<>();
+                    switch(winner){
+                        case "1"-> {
+                            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
+                            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+                        }
+                        case "2"-> {
+                            scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
+                        }
+                        case "3"-> {
+                            scButtons.add(Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                        }
+                        case "4"-> {
+                            scButtons.add(Button.success("construction_sd", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+                            scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+                        }
+                        case "5"-> {
+                            scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm)));
+                        }
+                        case "6"-> {
+                            scButtons.add(Button.success("warfareBuild", "Build At Home"));
+                        }
+                        case "7"-> {
+                            activeGame.setComponentAction(true);
+                            scButtons.add(Button.success("acquireATech", "Get a Tech"));
+                        }
+                        case "8"-> {
+                            scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                        }
+                    }
+                    MessageHelper.sendMessageToChannel(actionsChannel, "You can use this button to resolve the secondary", scButtons);
+                }
             }
 
             if (activeGame.getCurrentAgendaInfo().contains("Law")) {
