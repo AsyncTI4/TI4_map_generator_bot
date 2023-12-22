@@ -91,7 +91,7 @@ public class PNInfo extends PNCardsSubcommandData {
             Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
         }
-        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
+        if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(activeGame).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)) {
                 omenDice.append(" ").append(omenDie);
