@@ -44,12 +44,12 @@ public class ExhaustLeader extends LeaderAction {
 	
 	public static void exhaustLeader(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader leader, Integer tgCount) {
 		leader.setExhausted(true);
-		MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " exhausted:");
 		LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
+		String message = player.getRepresentation() + " exhausted: ";
 		if (leaderModel != null) {
-			event.getMessageChannel().sendMessageEmbeds(leaderModel.getRepresentationEmbed()).queue();
+			MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, leaderModel.getRepresentationEmbed());
 		} else {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), leader.getId());
+			MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + leader.getId());
 		}
 
 		if (tgCount != null) {
