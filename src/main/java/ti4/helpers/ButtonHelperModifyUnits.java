@@ -24,6 +24,37 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperModifyUnits {
 
+     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game activeGame, String unit) {
+        List<Button> buttons = new ArrayList<>();
+        UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit),player.getColorID()).getUnitType();
+        for(Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, type)){
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                if(uH.getUnitCount(type, player.getColor()) > 0){
+                        buttons.add(Button.danger("removeThisTypeOfUnit_"+type.humanReadableName()+"_"+tile.getPosition()+"_"+uH.getName(),"Remove 1 "+type.humanReadableName()+" from tile " + 
+                        tile.getPosition()+ " in location: "+uH.getName()));
+                }
+            }
+        }
+        buttons.add(Button.secondary("deleteButtons", "Done Resolving"));
+        return buttons;
+     }
+
+     public static void removeThisTypeOfUnit(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String unit = buttonID.split("_")[1];
+        String tilePos = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(tilePos);
+        String unitH = buttonID.split("_")[3];
+        UnitHolder uH = tile.getUnitHolders().get(unitH);
+
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 "+ unit+ " "+unitH.replace("space",""), activeGame);
+        if(uH.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(unit),player.getColorID()).getUnitType(), player.getColor()) < 1){
+            ButtonHelper.deleteTheOneButton(event);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()+ " removed 1 "+unit+ " from tile "+tile.getRepresentationForButtons(activeGame, player) +" location: "+unitH);
+     }
+
+    
+
     public static void infiltratePlanet(Player player, Game activeGame, UnitHolder uH, ButtonInteractionEvent event) {
         int sdAmount = 0;
         int pdsAmount = 0;
