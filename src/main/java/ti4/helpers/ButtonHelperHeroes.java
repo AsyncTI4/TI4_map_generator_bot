@@ -420,7 +420,7 @@ public class ButtonHelperHeroes {
             if (tile.getPosition().contains("t") || tile.getPosition().contains("b")) {
                 continue;
             }
-            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Button.secondary("creussHeroStep1_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
             }
 
@@ -590,7 +590,7 @@ public class ButtonHelperHeroes {
             if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1) {
                 continue;
             }
-            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Button.secondary("creussHeroStep2_" + pos1 + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
             }
         }
