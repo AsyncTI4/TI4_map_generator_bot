@@ -212,19 +212,21 @@ public class GameSaveLoadManager {
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
+                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `").append(maxNumber).append("` ");
+                    if (loadedGame.getSavedChannel() instanceof ThreadChannel) {
+                        sb.append("[CLASSIFIED]");
+                    } else {
+                        sb.append(loadedGame.getLatestCommand());
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                     try {
-                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
+                        if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
+                            MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
-                    String msg = "Undoing the last saved command:\n> " + loadedGame.getLatestCommand();
-                    if (loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel) {
-                        msg = "Undoing the last saved command:\n> [CLASSIFIED]";
-                    }
-
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
