@@ -575,7 +575,7 @@ public class AgendaHelper {
                 if ("for".equalsIgnoreCase(winner)) {
                     Button ixthianButton = Button.success("rollIxthian", "Roll Ixthian Artifact").withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
                     String msg = activeGame.getPing() + "Click this button to roll ixthian artifact! 🥁";
-                    MessageHelper.sendMessageToChannelWithButtons(actionsChannel, msg, ixthianButton);
+                    MessageHelper.sendMessageToChannelWithButton(actionsChannel, msg, ixthianButton);
                 } else {
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Against on Ixthian? Disgraceful");
                 }
@@ -870,10 +870,10 @@ public class AgendaHelper {
         if (d1.isSuccess() && !activeGame.isFoWMode()) {
             activeGame.setComponentAction(true);
             Button getTech = Button.success("acquireATech", "Get a tech");
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "You can use the button to get your tech", getTech);
+            MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "You can use the button to get your tech", getTech);
         } else if (!d1.isSuccess() && !activeGame.isFoWMode()) {
             Button modify = Button.secondary("getModifyTiles", "Modify Units");
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Remove units on or adjacent to mecatol please", modify);
+            MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "Remove units on or adjacent to mecatol please", modify);
         }
     }
 
