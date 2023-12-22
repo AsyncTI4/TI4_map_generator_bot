@@ -798,7 +798,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveReparationsStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2.getReadiedPlanets().size() == 0) {
+        if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. This is fine and nothing more needs to be done.");
             event.getMessage().delete().queue();
             return;
@@ -859,7 +859,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveUprisingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2.getReadiedPlanets().size() == 0) {
+        if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. Nothing has been done.");
             event.getMessage().delete().queue();
             return;

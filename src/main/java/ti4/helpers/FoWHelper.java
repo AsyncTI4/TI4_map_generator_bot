@@ -328,7 +328,7 @@ public class FoWHelper {
 		}
 
 		List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
-		if (hyperlaneData != null && hyperlaneData.size() == 0) {
+		if (hyperlaneData != null && hyperlaneData.isEmpty()) {
 			// We could not load the hyperlane data correctly, quit
 			return tiles;
 		}

@@ -2180,7 +2180,7 @@ public class MapGenerator {
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
             Collections.rotate(allPlayers, rotationDistance);
             for (Player player : allPlayers) {
-                if (player.isPassed() || player.getSCs().size() == 0) continue;
+                if (player.isPassed() || player.getSCs().isEmpty()) continue;
                 String faction = player.getFaction();
                 if (faction != null) {
                     BufferedImage bufferedImage = getPlayerFactionIconImage(player);
