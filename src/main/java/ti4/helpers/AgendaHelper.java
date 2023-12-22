@@ -36,6 +36,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
+import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.generator.GenerateTile;
@@ -165,6 +166,16 @@ public class AgendaHelper {
                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Added 3tg to those who voted for");
                     }
                 }
+                if ("nexus".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        Tile tile = activeGame.getTileFromPlanet("mr");
+                        if(tile != null){
+                            String tokenFilename = Mapper.getTokenID("gamma");
+                            tile.addToken(tokenFilename, Constants.SPACE);
+                            MessageHelper.sendMessageToChannel(actionsChannel, "Added Gamma to Rex");
+                        }
+                    }
+                }
                 if ("sanctions".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player playerWL : activeGame.getRealPlayers()) {
@@ -234,6 +245,12 @@ public class AgendaHelper {
                     SOInfo.sendSecretObjectiveInfo(activeGame, player2, event);
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
                 }
+                if ("standardization".equalsIgnoreCase(agID)) {
+                    player2.setTacticalCC(3);
+                    player2.setStrategicCC(2);
+                    player2.setStrategicCC(3);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Set "+ButtonHelper.getIdentOrColor(player2, activeGame)+ " ccs to 3/3/2");
+                }
                 if ("execution".equalsIgnoreCase(agID)) {
                     String message = "Discarded elected player's ACs and exhausted all their planets (not technically the way its done but for the most part equivalent)";
                     new DiscardACRandom().discardRandomAC(event, activeGame, player2, player2.getAc());
@@ -279,7 +296,7 @@ public class AgendaHelper {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(getTech);
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player2, activeGame),
-                        player2.getRepresentation() + " Use the button to get a tech", buttons);
+                        player2.getRepresentation() + " Use the button to get a tech. You will need to lose any fleet CC manually", buttons);
                 }
 
             } //"abolishment" || "absol_abolishment", "miscount" || "absol_miscount"
@@ -294,8 +311,28 @@ public class AgendaHelper {
                 activeGame.putAgendaBackIntoDeckOnTop(winner);
                 new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
             }
+            if ("cladenstine".equalsIgnoreCase(agID)) {
+                if ("for".equalsIgnoreCase(winner)) {
+                    for(Player player : activeGame.getRealPlayers()){
+                        String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+                        Button loseTactic = Button.danger(finsFactionCheckerPrefix + "decrease_tactic_cc", "Lose 1 Tactic CC");
+                        Button loseFleet = Button.danger(finsFactionCheckerPrefix + "decrease_fleet_cc", "Lose 1 Fleet CC");
+                        Button loseStrat = Button.danger(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy CC");
+                        Button DoneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons", "Done Losing CCs");
+                        List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
+                        String message2 = player.getRepresentation(true, true) + " use buttons to lose 2 CC";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                    }
+                }else{
+                    for(Player player : activeGame.getRealPlayers()){
+                        String message = player.getRepresentation()+" you lose a fleet CC";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                        player.setFleetCC(player.getFleetCC()-1);
+                    }
+                }
+            }
             if ("rearmament".equalsIgnoreCase(agID)) {
-                 if ("for".equalsIgnoreCase(winner)) {
+                if ("for".equalsIgnoreCase(winner)) {
                     for(Player player : activeGame.getRealPlayers()){
                         String message = player.getRepresentation()+" Use buttons to drop a mech on a Home System Planet";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message, Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
@@ -318,6 +355,23 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Removed all mechs");
                 }
 
+            }
+            if ("wormhole_research".equalsIgnoreCase(agID)) {
+                if ("for".equalsIgnoreCase(winner)) {
+                    new WormholeResearchFor().doResearch(event, activeGame);
+                } else {
+                    List<Player> players = getWinningVoters(winner, activeGame);
+                    for(Player player : players){
+                        String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+                        Button loseTactic = Button.danger(finsFactionCheckerPrefix + "decrease_tactic_cc", "Lose 1 Tactic CC");
+                        Button loseFleet = Button.danger(finsFactionCheckerPrefix + "decrease_fleet_cc", "Lose 1 Fleet CC");
+                        Button loseStrat = Button.danger(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy CC");
+                        Button DoneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons", "Done Losing CCs");
+                        List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
+                        String message2 = player.getRepresentation(true, true) + " use buttons to lose 1 CC";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                    }
+                }
             }
             if ("mutiny".equalsIgnoreCase(agID)) {
                 List<Player> winOrLose;

@@ -301,7 +301,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             //EXISTING ROLE NAMES
             for (Role role : pbdRoles) {
                 String pbdNum = role.getName().replace("pbd", "");
-                if (Helper.isInteger(pbdNum)) {
+                if (Helper.isInteger(pbdNum) && Integer.parseInt(pbdNum) < 2000) {
                     pbdNumbers.add(Integer.parseInt(pbdNum));
                 }
             }
@@ -313,7 +313,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .toList();
         for (String mapName : mapNames) {
             String pbdNum = mapName.replace("pbd", "");
-            if (Helper.isInteger(pbdNum)) {
+            if (Helper.isInteger(pbdNum) && Integer.parseInt(pbdNum) < 2000) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }

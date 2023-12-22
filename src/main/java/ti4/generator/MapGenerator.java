@@ -52,6 +52,7 @@ import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -1222,9 +1223,9 @@ public class MapGenerator {
                     if (remainingReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
                         String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID));
                         if (game.isFoWMode()) {
-                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage);
+                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage, ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
                         } else {
-                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), warningMessage);
+                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), warningMessage,  ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
                         }
                     }
                 }
