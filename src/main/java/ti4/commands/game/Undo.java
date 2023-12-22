@@ -68,7 +68,15 @@ public class Undo extends GameSubcommandData{
         
         String undoFileToRestorePath = activeGame.getName() + "_" + gameToUndoBackToNumber + ".txt";
         File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
+        if (!undoFileToRestore.exists()) {
+            MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
+            return;
+        }
         Game gameToRestore = GameSaveLoadManager.loadMap(undoFileToRestore);
+        if (gameToRestore == null) {
+            MessageHelper.replyToMessage(event, "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
+            return;
+        }
 
         StringBuilder sb = new StringBuilder("Undoing Save #" + maxSaveNumber + " back to Save #" + gameToUndoBackToNumber + ":\n");
         for (int i = maxSaveNumber; i >= gameToUndoBackToNumber; i--) {
