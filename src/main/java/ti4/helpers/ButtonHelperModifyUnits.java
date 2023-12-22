@@ -40,7 +40,7 @@ public class ButtonHelperModifyUnits {
      }
 
      public static void removeThisTypeOfUnit(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
-        String unit = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[1].toLowerCase().replace(" ", "").replace("'","");
         String tilePos = buttonID.split("_")[2];
         Tile tile = activeGame.getTileByPosition(tilePos);
         String unitH = buttonID.split("_")[3];
