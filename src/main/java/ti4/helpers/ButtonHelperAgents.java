@@ -1495,6 +1495,7 @@ public class ButtonHelperAgents {
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
         }
+        AgendaHelper.ministerOfIndustryCheck(player, activeGame, activeGame.getTileFromPlanet(planet), event);
         if (player.hasAbility("necrophage")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }

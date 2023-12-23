@@ -1849,6 +1849,47 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
 
     }
+    public static void resolveMinisterOfPeace(Player minister, Game activeGame, ButtonInteractionEvent event) {
+        Player target = activeGame.getActivePlayerObject();
+
+        if(target == null || target == minister){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Target player not found");
+            return;
+        }
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        if(tile == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Active system not found");
+            return;
+        }
+        boolean success = activeGame.removeLaw(activeGame.getLaws().get("minister_peace"));
+        if (success) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Minister of War Law removed");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
+            return;
+        }
+
+        if(!activeGame.getNaaluAgent()){
+            if(!AddCC.hasCC(target, tile)){
+                target.setTacticalCC(target.getTacticalCC() - 1);
+                AddCC.addCC(event, target.getColor(), tile);
+            }
+        }
+        MessageHelper.sendMessageToChannel(getCorrectChannel(minister, activeGame),
+            minister.getRepresentation(true, true) + " you have used the Minister of Peace agenda");
+        List<Button> conclusionButtons = new ArrayList<>();
+        Button endTurn = Button.danger("turnEnd", "End Turn");
+        conclusionButtons.add(endTurn);
+        if (getEndOfTurnAbilities(target, activeGame).size() > 1) {
+            conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (getEndOfTurnAbilities(target, activeGame).size() - 1) + ")"));
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, activeGame), target.getRepresentation(true, true)
+            + " You've been hit with minister of peace. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+            conclusionButtons);
+        ButtonHelper.deleteTheOneButton(event);
+
+    }
 
     public static int checkNetGain(Player player, String ccs) {
         int netgain;
@@ -5007,6 +5048,12 @@ public class ButtonHelper {
         activeGame.setACDrawStatusInfo("");
         Button draw1AC = Button.success("drawStatusACs", "Draw Status Phase ACs").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
         Button getCCs = Button.success("redistributeCCButtons", "Redistribute, Gain, & Confirm CCs").withEmoji(Emoji.fromFormatted("🔺"));
+        Button yssarilPolicy = null;
+        for(Player player : activeGame.getRealPlayers()){
+            if(ButtonHelper.isPlayerElected(activeGame, player, "minister_policy") && player.hasAbility("scheming")){
+                yssarilPolicy = Button.secondary("FFCC_"+player.getFaction()+"_yssarilMinisterOfPolicy", "Draw Minister of Policy AC").withEmoji(Emoji.fromFormatted(Emojis.Yssaril));
+            }
+        }
         boolean custodiansTaken = activeGame.isCustodiansScored();
         Button passOnAbilities;
         if (custodiansTaken) {
@@ -5037,6 +5084,9 @@ public class ButtonHelper {
             buttons.add(draw1AC);
             buttons.add(getCCs);
             buttons.add(passOnAbilities);
+            if(yssarilPolicy != null){
+                buttons.add(yssarilPolicy);
+            }
         }
         // if (activeGame.getActionCards().size() > 130 && activeGame.getPlayerFromColorOrFaction("hacan") != null
         //     && getButtonsToSwitchWithAllianceMembers(activeGame.getPlayerFromColorOrFaction("hacan"), activeGame, false).size() > 0) {
