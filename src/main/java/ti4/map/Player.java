@@ -336,7 +336,7 @@ public class Player {
         return bagInfoThreadID;
     }
 
-    public String getFinButtonChecker() {
+    public String getFinsFactionCheckerPrefix() {
         return "FFCC_" + getFaction() + "_";
     }
 
@@ -1104,8 +1104,10 @@ public class Player {
                     sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
-            } else {
+            } else if (roleForCommunity != null) {
                 return getFactionEmoji() + roleForCommunity.getAsMention() + Emojis.getColorEmojiWithName(getColor());
+            } else {
+                return getFactionEmoji() + Emojis.getColorEmojiWithName(getColor());
             }
         }
 
