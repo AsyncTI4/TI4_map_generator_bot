@@ -527,6 +527,10 @@ public class Mapper {
         return events.get(id);
     }
 
+    /**
+     * @deprecated Should use representations avaiable in {@link #ExploreModel} instead
+     */
+    @Deprecated
     public static String getExploreRepresentation(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -561,6 +565,10 @@ public class Mapper {
 
     public static boolean isValidAttachment(String id) {
         return attachments.containsKey(id);
+    }
+
+    public static boolean isValidToken(String id) {
+        return getTokens().contains(id);
     }
 
     public static AttachmentModel getAttachmentInfo(String id) {

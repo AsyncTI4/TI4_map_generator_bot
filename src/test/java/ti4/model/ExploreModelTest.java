@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
-import ti4.message.BotLogger;
 import ti4.testUtils.BaseTi4Test;
 
 public class ExploreModelTest extends BaseTi4Test {
@@ -20,6 +19,7 @@ public class ExploreModelTest extends BaseTi4Test {
     private boolean validateAttachmentID(ExploreModel model) {
         if (model.getAttachmentId().isEmpty()) return true;
         if (Mapper.isValidAttachment(model.getAttachmentId().get())) return true;
+        if (Mapper.isValidToken(model.getAttachmentId().get())) return true;
         System.out.println("Explore **" + model.getAlias() + "** failed validation due to invalid AttachmentID: `" + model.getAttachmentId().get() + "`");
         return false;
     }

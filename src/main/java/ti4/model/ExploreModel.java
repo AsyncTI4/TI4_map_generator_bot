@@ -42,6 +42,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(attachmentId);
     }
 
+    /**
+     * @deprecated This only exists to support legacy code reliant on String.split(";")
+     */
+    @Deprecated
     public String getRepresentation() {
         return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
     }
