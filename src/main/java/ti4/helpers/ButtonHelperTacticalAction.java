@@ -341,6 +341,20 @@ public class ButtonHelperTacticalAction {
         if (systemButtons.size() == 2 || activeGame.getL1Hero()) {
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
         }
+        if (player.getLeaderIDs().contains("nivyncommander") && !player.hasLeaderUnlocked("nivyncommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "nivyn", event);
+        }
+        if (player.getLeaderIDs().contains("ghoticommander") && !player.hasLeaderUnlocked("ghoticommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "ghoti", event);
+        }
+        if (player.getLeaderIDs().contains("zeliancommander") && !player.hasLeaderUnlocked("zeliancommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "zelian", event);
+        }
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "gledge", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "morpheus", event);
+        for(Player p2: activeGame.getRealPlayers()){
+            ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "empyrean", event);
+        }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         event.getMessage().delete().queue();
     }

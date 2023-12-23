@@ -1255,6 +1255,13 @@ public class ButtonHelper {
         buttons.add(Button.danger("deleteButtons_spitItOut", "Delete These Buttons"));
         return buttons;
     }
+    public static List<Button> getAllTechsToReady(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (String tech : player.getExhaustedTechs()) {
+            buttons.add(Button.success("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
+        }
+        return buttons;
+    }
 
     public static void sendAllTechsNTechSkipPlanetsToReady(Game activeGame, GenericInteractionCreateEvent event, Player player, boolean absol) {
         List<Button> buttons = new ArrayList<>();
@@ -1298,6 +1305,9 @@ public class ButtonHelper {
         if (buttonID.contains("tech_")) {
             player.refreshTech(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Helper.getTechRepresentation(last));
+            if (player.getLeaderIDs().contains("kolumecommander") && !player.hasLeaderUnlocked("kolumecommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "kolume", event);
+            }
         } else {
             player.refreshPlanet(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied planet: " + Helper.getPlanetRepresentation(last, activeGame));
@@ -1429,11 +1439,266 @@ public class ButtonHelper {
         return count;
     }
 
+    public static int getNumberOfTilesPlayerIsInWithNoPlanets(Game activeGame, Player player){
+        int count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasUnitsInSystem(player, tile) && tile.getUnitHolders().values().size() == 1){
+                count++;
+            }
+        }
+        return count;
+    }
+    public static int getNumberOfUncontrolledNonLegendaryPlanets(Game activeGame){
+        int count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+            for(UnitHolder plan : tile.getPlanetUnitHolders()){
+                if(plan.getName().contains("mallice")){
+                    continue;
+                }
+                Planet planet = (Planet) plan;
+                if(planet.isHasAbility()){
+                    continue;
+                }
+                boolean unowned = true;
+                for(Player player : activeGame.getRealPlayers()){
+                    if(player.getPlanets().contains(plan.getName())){
+                        unowned = false;
+                    }
+                }
+                if(unowned){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    public static int getNumberOfNonHomeAnomaliesPlayerIsIn(Game activeGame, Player player){
+        int count = 0;
+        int asteroids = 0;
+        int grav = 0;
+        int nebula = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly() && !ButtonHelper.isTileHomeSystem(tile)){
+                if(tile.isGravityRift(activeGame)){
+                    grav = 1;
+                }else if(tile.isNebula()){
+                    nebula = 1;
+                }else if(tile.isAsteroidField()){
+                    asteroids = 1;
+                }else{
+                    count = 1;
+                }
+            }
+        }
+        return count+asteroids+grav+nebula;
+    }
+    public static int getNumberOfAsteroidsPlayerIsIn(Game activeGame, Player player){
+        int count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile.isAsteroidField() && FoWHelper.playerHasShipsInSystem(player, tile)){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static int getNumberOfXTypePlanets(Player player, Game activeGame, String type) {
+        int count = 0;
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if (p != null && (type.equalsIgnoreCase(p.getOriginalPlanetType()) || p.getTokenList().contains("attachment_titanspn.png"))) {
+                count++;
+            }
+        }
+        return count;
+    }
+    public static int checkHighestProductionSystem(Player player, Game activeGame) {
+        int count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasUnitsInSystem(player, tile) && Helper.getProductionValue(player, activeGame, tile, false) > count){
+                count = Helper.getProductionValue(player, activeGame, tile, false);
+            }
+        }
+        return count;
+    }
+    public static int checkHighestCostSystem(Player player, Game activeGame) {
+        int count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasShipsInSystem(player, tile) && checkValuesOfShips(player, activeGame, tile) > count){
+                count = checkValuesOfShips(player, activeGame, tile);
+            }
+        }
+        return count;
+    }
+    public static int checkValuesOfShips(Player player, Game activeGame, Tile tile) {
+        int count = 0;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        for(UnitKey unit : space.getUnits().keySet()){
+            if(!unit.getColor().equals(player.getColor())){
+                continue;
+            }
+            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+            if(removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")){
+                count = count + (int)removedUnit.getCost() * space.getUnits().get(unit);
+            }
+        }
+        return count;
+    }
+    public static int howManyDifferentDebtPlayerHas(Player player){
+        int count = 0;
+        for(String color : player.getDebtTokens().keySet()){
+            if(player.getDebtTokens().get(color) > 0){
+                count++;
+            }
+        }
+        return count;
+    }
+    public static int getNumberOfPlanetsWithStructuresNotInHS(Player player, Game activeGame){
+        int count = 0;
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            if(ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet))){
+                continue;
+            }
+            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if (p != null && (p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0  ||  p.getUnitCount(UnitType.Pds, player.getColor()) > 0 || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasAbility("byssus"))   )) {
+                count++;
+            }
+        }
+        return count;
+    }
+    public static int getNumberOfSpacedocksNotInOrAdjacentHS(Player player, Game activeGame){
+        int count = 0;
+        Tile hs = FoWHelper.getPlayerHS(activeGame, player);
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+
+            if(activeGame.getTileFromPlanet(planet) == hs || FoWHelper.getAdjacentTiles(activeGame, hs.getPosition(), player, false).contains(activeGame.getTileFromPlanet(planet).getPosition())){
+                continue;
+            }
+            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if (p != null && p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 ) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static int getNumberOfSystemsWithShipsNotAdjacentToHS(Player player, Game activeGame){
+        int count = 0;
+        Tile hs = FoWHelper.getPlayerHS(activeGame, player);
+        if(hs == null){
+            BotLogger.log("not finding a HS for "+player.getFaction()+ " in "+activeGame.getName());
+            return 0;
+        }
+        String hsPos = hs.getPosition();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile == hs){
+                continue;
+            }
+            if(FoWHelper.playerHasShipsInSystem(player, tile) && !FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false).contains(hsPos)){
+                count++;
+            }
+        }
+        return count;
+    }
+    public static void fullCommanderUnlockCheck(Player player, Game activeGame, String faction, GenericInteractionCreateEvent event){
+        if (player.getLeaderIDs().contains(faction+"commander") && !player.hasLeaderUnlocked(faction+"commander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, faction, event);
+        }
+    }
+
     public static void commanderUnlockCheck(Player player, Game activeGame, String faction, GenericInteractionCreateEvent event) {
         boolean shouldBeUnlocked = false;
         switch (faction) {
+            case "axis" -> {
+                if(ButtonHelperAbilities.getNumberOfDifferentAxisOrdersBought(player, activeGame) > 3){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "rohdhna" -> {
+                if(checkHighestProductionSystem(player, activeGame) > 6){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "freesystems" -> {
+                if(getNumberOfUncontrolledNonLegendaryPlanets(activeGame) < 1){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "mortheus" -> {
+                if(getNumberOfSystemsWithShipsNotAdjacentToHS(player, activeGame) > 2){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "celdauri" -> {
+                if(getNumberOfSpacedocksNotInOrAdjacentHS(player, activeGame) > 0){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "cheiran" -> {
+                if(getNumberOfPlanetsWithStructuresNotInHS(player, activeGame) > 3){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "vaden" -> {
+                if(howManyDifferentDebtPlayerHas(player) > (activeGame.getRealPlayers().size()/2)-1){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "gledge" -> {
+                if(checkHighestCostSystem(player, activeGame) > 9){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "olradin" -> {
+                if(getNumberOfXTypePlanets(player, activeGame, "industrial") > 0 && getNumberOfXTypePlanets(player, activeGame, "cultural") > 0 && getNumberOfXTypePlanets(player, activeGame, "hazardous") > 0){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "vaylerian" -> {
+                if(getNumberOfXTypePlanets(player, activeGame, "industrial") > 2 || getNumberOfXTypePlanets(player, activeGame, "cultural") > 2 || getNumberOfXTypePlanets(player, activeGame, "hazardous") > 2){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "ghoti" -> {
+                if(getNumberOfTilesPlayerIsInWithNoPlanets(activeGame,player) > 2){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "nivyn" -> {
+                if(getNumberOfNonHomeAnomaliesPlayerIsIn(activeGame, player) > 1){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "zelian" -> {
+                if(getNumberOfAsteroidsPlayerIsIn(activeGame, player) > 1){
+                    shouldBeUnlocked = true;
+                }
+            }
             case "yssaril" -> {
                 if (player.getActionCards().size() > 7 || (player.getExhaustedTechs().contains("mi") && player.getActionCards().size() > 6)) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "kjalengard"->{
+                if(ButtonHelperAgents.getGloryTokenTiles(activeGame).size() > 1){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "kolume"->{
+                shouldBeUnlocked = true;
+                
+            }
+            case "veldyr"->{
+                if(ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player) > 1){
                     shouldBeUnlocked = true;
                 }
             }
@@ -2316,6 +2581,14 @@ public class ButtonHelper {
         if (p1.hasAbility("edict") || p1.hasAbility("imperia")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
+        }
+        if ((p2.hasAbility("for_glory")) && !activeGame.isFoWMode() && ButtonHelperAgents.getGloryTokenTiles(activeGame).size() < 3) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory (Upon Win)").withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+        }
+        if (p1.hasAbility("for_glory") && ButtonHelperAgents.getGloryTokenTiles(activeGame).size() < 3) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory (Upon Win)").withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
         }
 
         if (p2.hasAbility("necrophage") && !activeGame.isFoWMode()) {
@@ -5598,6 +5871,7 @@ public class ButtonHelper {
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
+                ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "vaden", event);
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
@@ -5861,6 +6135,10 @@ public class ButtonHelper {
         //Abilities
         if (p1.hasAbility("star_forge") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar")) && getTilesOfPlayersSpecificUnits(activeGame, p1, UnitType.Warsun).size() > 0) {
             Button abilityButton = Button.success(finChecker + prefix + "ability_starForge", "Starforge").withEmoji(Emoji.fromFormatted(Emojis.Muaat));
+            compButtons.add(abilityButton);
+        }
+        if (p1.hasAbility("meditation") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar")) && p1.getExhaustedTechs().size() > 0) {
+            Button abilityButton = Button.success(finChecker + prefix + "ability_meditation", "Meditation").withEmoji(Emoji.fromFormatted(Emojis.kolume));
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("orbital_drop") && p1.getStrategicCC() > 0) {
@@ -6406,6 +6684,19 @@ public class ButtonHelper {
                     //MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(p1)+" Chose to use the mantle cracking ability");
                     String message = "Select the planet you would like to mantle crack";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("meditation".equalsIgnoreCase(buttonID)) {
+                    if(p1.getStrategicCC() > 0){
+                        String successMessage = ButtonHelper.getIdent(p1)+" Reduced strategy pool CCs by 1 (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
+                        p1.setStrategicCC(p1.getStrategicCC() - 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, activeGame, event);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
+                    }else{
+                        String successMessage = ButtonHelper.getIdent(p1)+" Exhausted Scepter";
+                        p1.addExhaustedRelic("emelpar");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
+                    }
+                    String message = "Select the tech you would like to ready";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, getAllTechsToReady(activeGame, p1));
                 }
             }
             case "getRelic" -> {

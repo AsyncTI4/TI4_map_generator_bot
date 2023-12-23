@@ -667,10 +667,11 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static void resolveVadenSCDebt(Player player, int sc, Game activeGame) {
+    public static void resolveVadenSCDebt(Player player, int sc, Game activeGame, GenericInteractionCreateEvent event) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebt.sendDebt(player, p2, 1);
+                ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "vaden", event);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                     player.getRepresentation(true, true) + " you sent 1 debt token to " + ButtonHelper.getIdentOrColor(p2, activeGame) + " due to their fine print ability");
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " you collected 1 debt token from "
@@ -1194,8 +1195,28 @@ public class ButtonHelperFactionSpecific {
             case "dspnveld4" -> planetReal.addToken("attachment_veldyrorbitalshipyard.png");
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Attached branch office to " + Helper.getPlanetRepresentation(planet, activeGame));
+        if(activeGame.getPNOwner(pnID).getLeaderIDs().contains("veldyrcommander") && !activeGame.getPNOwner(pnID).hasLeaderUnlocked("veldyrcommander")) {
+            ButtonHelper.commanderUnlockCheck(activeGame.getPNOwner(pnID), activeGame, "veldyr", event);
+        }
         event.getMessage().delete().queue();
     }
+
+    public static int getPlayersWithBranchOffices(Game activeGame, Player player){
+        int count = 0;
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                continue;
+            }
+            for(String pn : p2.getPromissoryNotes().keySet()){
+                if(pn.contains("dspnveld")){
+                    count++;
+                    break;
+                }
+            }
+        }
+        return count;
+    }
+
 
     public static List<Button> getCreussIFFTypeOptions() {
         List<Button> buttons = new ArrayList<>();

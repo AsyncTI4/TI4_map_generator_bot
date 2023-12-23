@@ -934,7 +934,7 @@ public class ButtonHelperActionCards {
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
             if (uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                if (!ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, p2)) {
+                if (!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet))) {
                     Tile tile = activeGame.getTileFromPlanet(planet);
                     buttons.add(Button.secondary("reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
                 }
