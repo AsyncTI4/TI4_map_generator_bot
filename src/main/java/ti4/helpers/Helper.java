@@ -456,7 +456,7 @@ public class Helper {
     }
 
     public static void addMirageToTile(Tile tile) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         if (unitHolders.get(Constants.MIRAGE) == null) {
             Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x, Constants.MIRAGE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
             Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
@@ -985,7 +985,7 @@ public class Helper {
     }
 
     public static String buildProducedUnitsMessage(Player player, Game activeGame){
-        HashMap<String, Integer> producedUnits = player.getCurrentProducedUnits();
+        Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         String msg = "";
         List<String> uniquePlaces = new ArrayList<>();
         for(String unit : producedUnits.keySet()){
@@ -1030,7 +1030,7 @@ public class Helper {
             for(UnitHolder uH : tile.getUnitHolders().values()){
                 for(UnitKey unit : uH.getUnits().keySet()){
                     if(unit.getColor().equalsIgnoreCase(player.getColor())){
-                        if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                        if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()){
                             player.addOwnedUnitByID("tyrantslament");
                         }
                         UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
@@ -1083,7 +1083,7 @@ public class Helper {
     }
 
     public static int calculateCostOfProducedUnits(Player player, Game activeGame, boolean wantCost){
-        HashMap<String, Integer> producedUnits = player.getCurrentProducedUnits();
+        Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         int cost = 0;
         int numInf = 0;
         int numFF = 0;
@@ -1123,7 +1123,7 @@ public class Helper {
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
         boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
             if (player.hasWarsunTech()) {
@@ -1342,7 +1342,7 @@ public class Helper {
         if (color == null) {
             return 0;
         }
-        HashMap<String, Tile> tileMap = activeGame.getTileMap();
+        Map<String, Tile> tileMap = activeGame.getTileMap();
         for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
             Tile tile = tileEntry.getValue();
             boolean hasCC = AddCC.hasCC(null, color, tile);
@@ -1451,7 +1451,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1472,7 +1472,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1492,7 +1492,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -1508,7 +1508,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -1524,7 +1524,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1545,7 +1545,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1566,7 +1566,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
@@ -1581,7 +1581,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -1597,7 +1597,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
@@ -1612,7 +1612,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
@@ -1629,11 +1629,11 @@ public class Helper {
             + "/" + getPlayerOptimalInfluenceTotal(player, activeGame) + "\n";
     }
 
-    public static HashMap<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
+    public static Map<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
         int count = 1;
         for (Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
             if (count == linkedHashMap.size()) {
-                HashMap<String, Integer> lastEntry = new HashMap<>();
+                Map<String, Integer> lastEntry = new HashMap<>();
                 lastEntry.put(it.getKey(), it.getValue());
                 return lastEntry;
             }
@@ -1976,7 +1976,7 @@ public class Helper {
         if (playerLeader != null && playerLeader.isLocked()) {
             int scoredSOCount = player.getSecretsScored().size();
             int scoredPOCount = 0;
-            HashMap<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
+            Map<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
                 if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
@@ -2022,9 +2022,9 @@ public class Helper {
         for (Integer location : hsLocations) {
             sortedPlayers.add(unsortedPlayers.get(location));
         }
-        LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
-        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
+        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        Map<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+        Map<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
         String msg = activeGame.getPing() + " set order in the following way: \n";
         try {
             for (Player player : sortedPlayers) {
@@ -2076,7 +2076,7 @@ public class Helper {
         boolean removeCodex = "y".equalsIgnoreCase(codex);
 
         //removing Action Cards
-        HashMap<String, ActionCardModel> actionCards = Mapper.getActionCards();
+        Map<String, ActionCardModel> actionCards = Mapper.getActionCards();
         for (ActionCardModel ac : actionCards.values()) {
             if ("pok".equals(ac.getSource().name())) {
                 activeGame.removeACFromGame(ac.getAlias());
@@ -2094,7 +2094,7 @@ public class Helper {
         }
 
         //removing POs
-        HashMap<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
+        Map<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
         for (PublicObjectiveModel po : poList.values()) {
             if ("pok".equals(po.getSource().name())) {
                 if (po.getPoints() == 1) {

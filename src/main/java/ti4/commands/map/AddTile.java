@@ -6,7 +6,7 @@ import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class AddTile extends AddRemoveTile {
     public AddTile() {
@@ -23,7 +23,7 @@ public class AddTile extends AddRemoveTile {
 
     public static void addCustodianToken(Tile tile) {
         if ("18".equals(tile.getTileID())) {
-            HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 if (unitHolder instanceof Planet && "mr".equals(unitHolder.getName())) {
                     unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);

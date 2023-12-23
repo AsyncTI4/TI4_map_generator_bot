@@ -3,11 +3,12 @@ package ti4.map;
 import ti4.helpers.AliasHandler;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class MapStringMapper {
-    public static HashMap<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
-        HashMap<String, String> mappedTiles = new HashMap<>();
+    public static Map<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
+        Map<String, String> mappedTiles = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(tileListAsString, " ");
 
 

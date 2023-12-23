@@ -46,7 +46,7 @@ public class ScoreSO extends SOCardsSubcommandData {
 
     public static void scoreSO(GenericInteractionCreateEvent event, Game activeGame, Player player, int soID, MessageChannel channel) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
-        boolean scored = activeGame.scoreSecretObjective(player.getUserID(), soID, activeGame);
+        boolean scored = activeGame.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return;

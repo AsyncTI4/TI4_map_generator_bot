@@ -164,7 +164,7 @@ public class DataMigrationManager {
     /// This will fix 6 player 3 ring maps anchors
     public static Boolean migratePlayerStatsBlockPositions_300823(Game activeGame) {
         Boolean mapNeededMigrating = false;
-        ArrayList<String> setup6p = new ArrayList<>() {
+        List<String> setup6p = new ArrayList<>() {
             {
                 add("301");
                 add("304");
@@ -174,7 +174,7 @@ public class DataMigrationManager {
                 add("316");
             }
         };
-        ArrayList<String> setup8p = new ArrayList<>() {
+        List<String> setup8p = new ArrayList<>() {
             {
                 add("401");
                 add("404");
@@ -190,7 +190,7 @@ public class DataMigrationManager {
         List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
         int playerCount = activeGame.getRealPlayers().size() + activeGame.getDummies().size();
 
-        ArrayList<String> setup;
+        List<String> setup;
         if (playerCount == 6 && activeGame.getRingCount() == 3) {
             setup = setup6p;
         } else if (playerCount == 8 && activeGame.getRingCount() == 4) {
@@ -330,7 +330,7 @@ public class DataMigrationManager {
                         }
                     }
                 }
-                HashSet<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
+                Set<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
                 if (!player.getUnitsOwned().equals(updatedUnitIDs)) {
                     mapNeededMigrating = true;
                     player.setUnitsOwned(updatedUnitIDs);
@@ -435,7 +435,7 @@ public class DataMigrationManager {
                         }
                     }
                 }
-                HashSet<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
+                Set<String> updatedUnitIDs = new HashSet<>(ownedUnitIDs);
                 if (!player.getUnitsOwned().equals(updatedUnitIDs)) {
                     mapNeededMigrating = true;
                     player.setUnitsOwned(updatedUnitIDs);
@@ -731,7 +731,7 @@ public class DataMigrationManager {
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.HERO, agents.get(0)));
                 }
             } else if (item.ItemCategory == DraftItem.Category.PN) {
-                if (Mapper.getPromissoryNoteByID(item.ItemId) == null) {
+                if (Mapper.getPromissoryNote(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> pns = faction.getPromissoryNotes();
                     swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.PN, pns.get(0)));
@@ -817,7 +817,7 @@ public class DataMigrationManager {
     }
 
     public static boolean migrateInitStratCardsPerPlayer_121823(Game game) {
-        int maxSCsPerPlayer = game.getSCList().size() / game.getRealPlayers().size();
+        int maxSCsPerPlayer = game.getSCList().size() / Math.max(game.getRealPlayers().size(), 1);
         if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
 
         if (game.getRealPlayers().size() == 1) maxSCsPerPlayer = 1;

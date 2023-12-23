@@ -39,7 +39,7 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
-    public static List<Button> getArboHeroButtons(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+    public static List<Button> getArboHeroButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>();
         tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry));
@@ -55,7 +55,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static List<Button> getSaarHeroButtons(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+    public static List<Button> getSaarHeroButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
         for (Tile tile1 : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock)) {
@@ -276,7 +276,7 @@ public class ButtonHelperHeroes {
     public static void resolveNivynHeroSustainEverything(Game activeGame, Player nivyn) {
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+                Map<UnitKey, Integer> units = unitHolder.getUnits();
                 for (Player player : activeGame.getRealPlayers()) {
                     for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                         if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -479,7 +479,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static List<Button> getJolNarHeroSwapOutOptions(Player player, Game activeGame) {
+    public static List<Button> getJolNarHeroSwapOutOptions(Player player) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
@@ -670,7 +670,7 @@ public class ButtonHelperHeroes {
 
     }
 
-    public static List<Button> getWinnuHeroSCButtons(Game activeGame, Player winnu) {
+    public static List<Button> getWinnuHeroSCButtons(Game activeGame) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
@@ -687,7 +687,7 @@ public class ButtonHelperHeroes {
         return scButtons;
     }
 
-    public static List<Button> getNRAHeroButtons(Game activeGame, Player winnu) {
+    public static List<Button> getNRAHeroButtons(Game activeGame) {
         List<Button> scButtons = new ArrayList<>();
         if (activeGame.getScPlayed().get(1) == null || !activeGame.getScPlayed().get(1)) {
             scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));

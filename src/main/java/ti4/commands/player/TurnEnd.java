@@ -2,8 +2,6 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -144,10 +142,10 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame, String prefix) {
-        LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
-        LinkedHashMap<String, Integer> customPublicVP = activeGame.getCustomPublicVP();
+        Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
+        Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+        Map<String, Integer> customPublicVP = activeGame.getCustomPublicVP();
         List<Button> poButtons = new ArrayList<>();
         List<Button> poButtons1 = new ArrayList<>();
         List<Button> poButtons2 = new ArrayList<>();
@@ -254,7 +252,7 @@ public class TurnEnd extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg, buttons);
         }
         // return beginning of status phase PNs
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {

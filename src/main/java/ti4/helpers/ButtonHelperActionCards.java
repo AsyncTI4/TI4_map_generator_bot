@@ -59,7 +59,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet) continue;
 
             Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
@@ -798,7 +798,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveReparationsStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2.getReadiedPlanets().size() == 0) {
+        if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. This is fine and nothing more needs to be done.");
             event.getMessage().delete().queue();
             return;
@@ -838,7 +838,7 @@ public class ButtonHelperActionCards {
     public static void resolveSeizeArtifactStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-        ArrayList<String> playerFragments = p2.getFragments();
+        List<String> playerFragments = p2.getFragments();
         for (String fragid : playerFragments) {
             if (fragid.contains("crf")) {
                 buttons.add(Button.primary("seizeArtifactStep3_" + p2.getFaction() + "_" + fragid, "Seize Cultural (" + fragid + ")"));
@@ -859,7 +859,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveUprisingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2.getReadiedPlanets().size() == 0) {
+        if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. Nothing has been done.");
             event.getMessage().delete().queue();
             return;

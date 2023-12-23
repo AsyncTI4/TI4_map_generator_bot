@@ -1,7 +1,6 @@
 package ti4.commands.cardsac;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -68,8 +67,8 @@ public class ACInfo extends ACCardsSubcommandData {
         sb.append("**Trap Cards:**").append("\n");
         int index = 1;
 
-        LinkedHashMap<String, Integer> trapCards = player.getTrapCards();
-        LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+        Map<String, Integer> trapCards = player.getTrapCards();
+        Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         if (trapCards != null) {
             if (trapCards.isEmpty()) {
                 sb.append("> None");
@@ -86,7 +85,7 @@ public class ACInfo extends ACCardsSubcommandData {
         return sb.toString();
     }
 
-    public static String getTrapCardRepresentation(String trapID, LinkedHashMap<String, String> trapCardsPlanets) {
+    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
         Map<String, String> dsHandcards = Mapper.getDSHandcards();
         String info = dsHandcards.get(trapID);
@@ -148,7 +147,7 @@ public class ACInfo extends ACCardsSubcommandData {
         sb.append("**Action Cards:**").append("\n");
         int index = 1;
 
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null) {
             if (actionCards.isEmpty()) {
                 sb.append("> None");
@@ -174,7 +173,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     private static List<Button> getPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
@@ -236,7 +235,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static List<Button> getActionPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
@@ -254,7 +253,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static List<Button> getDiscardActionCardButtons(Game activeGame, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         String stall = "";
         if (doingAction) {
             stall = "stall";
@@ -274,7 +273,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static List<Button> getYssarilHeroActionCardButtons(Game activeGame, Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
+        Map<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
@@ -290,7 +289,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static List<Button> getToBeStolenActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
