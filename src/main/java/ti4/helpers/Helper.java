@@ -620,7 +620,22 @@ public class Helper {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
             Planet planet = (Planet) unitHolder;
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources()) + Emojis.getInfluenceEmoji(planet.getInfluence());
+            String techType = "";
+            String techEmoji = "";
+            if (Mapper.getPlanet(planetID).getTechSpecialties() != null && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
+                techType = Mapper.getPlanet(planetID).getTechSpecialties().get(0).toString().toLowerCase();
+            } else {
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, planetID);
+            }
+            if (!"".equalsIgnoreCase(techType)) {
+                switch (techType) {
+                    case "propulsion" -> techEmoji = Emojis.PropulsionTech;
+                    case "warfare" -> techEmoji =Emojis.WarfareTech;
+                    case "cybernetic" -> techEmoji = Emojis.CyberneticTech;
+                    case "biotic" -> techEmoji = Emojis.BioticTech;
+                }
+            }
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources()) + Emojis.getInfluenceEmoji(planet.getInfluence()) + techEmoji;
         }
     }
 
@@ -640,7 +655,22 @@ public class Helper {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
             Planet planet = (Planet) unitHolder;
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources());
+            String techType = "";
+            String techEmoji = "";
+            if (Mapper.getPlanet(planetID).getTechSpecialties() != null && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
+                techType = Mapper.getPlanet(planetID).getTechSpecialties().get(0).toString().toLowerCase();
+            } else {
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, planetID);
+            }
+            if (!"".equalsIgnoreCase(techType)) {
+                switch (techType) {
+                    case "propulsion" -> techEmoji = Emojis.PropulsionTech;
+                    case "warfare" -> techEmoji =Emojis.WarfareTech;
+                    case "cybernetic" -> techEmoji = Emojis.CyberneticTech;
+                    case "biotic" -> techEmoji = Emojis.BioticTech;
+                }
+            }
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources()) + techEmoji;
         }
     }
 
@@ -706,12 +736,13 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
-            String techType = "none";
+            
             if (planet.contains("custodia") || planet.contains("ghoti")) {
                 Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
                 continue;
             }
+            String techType = "none";
             if (Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
             } else {
