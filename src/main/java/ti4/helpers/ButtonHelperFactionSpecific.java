@@ -1217,21 +1217,6 @@ public class ButtonHelperFactionSpecific {
         return count;
     }
 
-    public static int getPlayersWithBranchOffices(Game activeGame, Player player){
-        int count = 0;
-        for(Player p2 : activeGame.getRealPlayers()){
-            if(p2 == player){
-                continue;
-            }
-            for(String pn : p2.getPromissoryNotes().keySet()){
-                if(pn.contains("dspnveld")){
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count;
-    }
 
     public static List<Button> getCreussIFFTypeOptions() {
         List<Button> buttons = new ArrayList<>();
