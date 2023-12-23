@@ -230,7 +230,7 @@ public class Game {
     private Date lastActivePlayerChange = new Date(0);
     private Date lastTimeGamesChecked = new Date(0);
     @JsonProperty("autoPingStatus")
-    private boolean auto_ping_enabled;
+    private boolean autoPingEnabled;
     private long autoPingSpacer;
     private List<String> secretObjectives;
     private List<String> actionCards;
@@ -476,13 +476,13 @@ public class Game {
         activeDraft = draft;
     }
 
-    public void addActionCardDuplicates(List<String> ACs) {
-        actionCards.addAll(ACs);
+    public void addActionCardDuplicates(List<String> acIDs) {
+        actionCards.addAll(acIDs);
         Collections.shuffle(actionCards);
     }
 
-    public void addSecretDuplicates(List<String> SOs) {
-        secretObjectives.addAll(SOs);
+    public void addSecretDuplicates(List<String> soIDs) {
+        secretObjectives.addAll(soIDs);
         Collections.shuffle(secretObjectives);
     }
 
@@ -1191,11 +1191,11 @@ public class Game {
     }
 
     public void setAutoPing(boolean status) {
-        auto_ping_enabled = status;
+        autoPingEnabled = status;
     }
 
     public boolean getAutoPingStatus() {
-        return auto_ping_enabled;
+        return autoPingEnabled;
     }
 
     public long getAutoPingSpacer() {
