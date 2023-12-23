@@ -108,6 +108,10 @@ public class PNInfo extends PNCardsSubcommandData {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
+        if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
+            Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace").withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+            buttons.add(hacanButton);
+        }
         if (player.hasUnexhaustedLeader("vadenagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_vadenagent", "Use Vaden Agent").withEmoji(Emoji.fromFormatted(Emojis.vaden));
             buttons.add(hacanButton);
