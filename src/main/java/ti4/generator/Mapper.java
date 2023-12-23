@@ -218,8 +218,8 @@ public class Mapper {
 
     public static Set<String> getDecals() {
         return decals.keySet().stream()
-            .filter(decal -> decal instanceof String)
-            .map(decal -> (String) decal)
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
             .collect(Collectors.toSet());
     }
 
@@ -405,16 +405,16 @@ public class Mapper {
     }
 
     public static List<String> getColors() {
-        return colors.keySet().stream().filter(color -> color instanceof String)
-            .map(color -> (String) color)
+        return colors.keySet().stream().filter(String.class::isInstance)
+            .map(String.class::cast)
             .sorted()
             .collect(Collectors.toList());
     }
 
     public static List<String> getTokens() {
         return Stream.of(attachments.keySet(), tokens.keySet()).flatMap(Collection::stream)
-            .filter(token -> token instanceof String)
-            .map(token -> (String) token)
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
             .sorted()
             .collect(Collectors.toList());
     }
