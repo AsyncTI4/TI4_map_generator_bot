@@ -1497,6 +1497,9 @@ public class ButtonHelperAgents {
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
         }
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "rohdhna", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
         AgendaHelper.ministerOfIndustryCheck(player, activeGame, activeGame.getTileFromPlanet(planet), event);
         if (player.hasAbility("necrophage")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
@@ -1546,7 +1549,6 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
     public static void moveGlory(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
-        
         Tile tileAS = activeGame.getTileByPosition(buttonID.split("_")[2]);
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
@@ -1558,7 +1560,26 @@ public class ButtonHelperAgents {
         String msg = ButtonHelper.getIdent(player) +" moved glory token from "+tile.getRepresentation() + " to "+tileAS.getRepresentation();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         event.getMessage().delete().queue();
-
+    }
+    public static void placeGlory(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        space.addToken("token_ds_glory.png");
+        String msg = ButtonHelper.getIdent(player) +" added glory token to "+tile.getRepresentation();
+        if (player.getLeaderIDs().contains("kjalengardcommander") && !player.hasLeaderUnlocked("kjalengardcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kjalengard", event);
+        }
+        
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if(player == activeGame.getActivePlayerObject()){
+            activeGame.setComponentAction(true);
+            Button getTech = Button.success("acquireATech", "Get a tech");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(getTech);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) +" can spend 4tg to RESEARCH a unit upgrade of one of their units in the system",buttons );
+        }
+        event.getMessage().delete().queue();
     }
 
     public static List<Tile> getGloryTokenTiles(Game activeGame){

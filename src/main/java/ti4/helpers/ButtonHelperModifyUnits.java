@@ -201,6 +201,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         event.getMessage().delete().queue();
     }
 
@@ -489,6 +490,10 @@ public class ButtonHelperModifyUnits {
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
         }
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "rohdhna", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "gledge", event);
         if (player.hasAbility("necrophage")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
@@ -662,6 +667,9 @@ public class ButtonHelperModifyUnits {
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
         }
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "rohdhna", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
         if (player.hasAbility("necrophage")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }

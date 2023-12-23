@@ -128,7 +128,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && !doubleCheck && event != null) {
             String fac = player.getFactionEmoji();
 
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
                 + "). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring.");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, activeGame);
@@ -155,7 +155,7 @@ public class PlanetAdd extends PlanetAddRemove {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("saarMechRes_" + planet, "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
         }
 
@@ -175,7 +175,7 @@ public class PlanetAdd extends PlanetAddRemove {
             if ("minister_exploration".equalsIgnoreCase(law) && !doubleCheck) {
                 if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null) {
                     String fac = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
@@ -214,11 +214,20 @@ public class PlanetAdd extends PlanetAddRemove {
         if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);
         }
+        if (player.getLeaderIDs().contains("vayleriancommander") && !player.hasLeaderUnlocked("vayleriancommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "vaylerian", event);
+        }
+        if (player.getLeaderIDs().contains("olradincommander") && !player.hasLeaderUnlocked("olradincommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "olradin", event);
+        }
         if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "xxcha", event);
         }
         if (player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "sardakk", event);
+        }
+        for(Player p2: activeGame.getRealPlayers()){
+            ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "freesystems", event);
         }
         if ("mr".equalsIgnoreCase(planet) && player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "winnu", event);
