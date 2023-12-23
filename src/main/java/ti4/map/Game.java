@@ -3698,6 +3698,9 @@ public class Game {
             || eventDeckID != null && !"null".equals(eventDeckID)
             || Mapper.getFactions().stream()
                 .filter(faction -> !faction.getSource().isPok())
-                .anyMatch(faction -> getFactions().contains(faction.getAlias()));
+                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || Mapper.getLeaders().values().stream()
+                .filter(leader -> !leader.getSource().isPok())
+                .anyMatch(leader -> isLeaderInGame(leader.getID()));
     }
 }
