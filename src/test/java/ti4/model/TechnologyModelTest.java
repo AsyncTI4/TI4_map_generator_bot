@@ -22,21 +22,21 @@ public class TechnologyModelTest extends BaseTi4Test {
     private boolean validateFaction(TechnologyModel techModel) {
         if (techModel.getFaction().isEmpty()) return true;
         if (Mapper.isValidFaction(techModel.getFaction().get()) || "keleres".equals(techModel.getFaction().get())) return true;
-        BotLogger.log("Tech **" + techModel.getAlias() + "** failed validation due to invalid FactionID: `" + techModel.getFaction().get() + "`");
+        System.out.println("Tech **" + techModel.getAlias() + "** failed validation due to invalid FactionID: `" + techModel.getFaction().get() + "`");
         return false;
     }
 
     private boolean validateBaseUpgrade(TechnologyModel techModel) {
         if (techModel.getBaseUpgrade().isEmpty()) return true;
         if (Mapper.isValidTech(techModel.getBaseUpgrade().get())) return true;
-        BotLogger.log("Tech **" + techModel.getAlias() + "** failed validation due to invalid BaseUpgrade ID: `" + techModel.getBaseUpgrade().get() + "`");
+        System.out.println("Tech **" + techModel.getAlias() + "** failed validation due to invalid BaseUpgrade ID: `" + techModel.getBaseUpgrade().get() + "`");
         return false;
     }
 
     private boolean validateHomebrewReplacesID(TechnologyModel techModel) {
         if (techModel.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidTech(techModel.getHomebrewReplacesID().get())) return true;
-        BotLogger.log("Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `" + techModel.getHomebrewReplacesID().get() + "`");
+        System.out.println("Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `" + techModel.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }
