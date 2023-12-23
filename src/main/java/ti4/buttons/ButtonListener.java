@@ -1450,7 +1450,11 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("autoresolve_")) {
             String result = buttonID.substring(buttonID.indexOf("_") + 1);
-            if ("manual".equalsIgnoreCase(result)) {
+            if (result.contains("manual")) {
+                if(result.contains("committee")){
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdentOrColor(player, activeGame) + " has chosen to discard Committee Formation to choose the winner. Note that afters can be played before this occurs, and that confounding can still be played");
+                    boolean success = activeGame.removeLaw(activeGame.getLaws().get("committee"));
+                }
                 String resMessage3 = "Please select the winner.";
                 List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null, activeGame, "agendaResolution");
                 deadlyActionRow3.add(Button.danger("resolveWithNoEffect", "Resolve with no result"));
@@ -1562,7 +1566,9 @@ public class ButtonListener extends ListenerAdapter {
                 String msg = p2.getRepresentation(true, true) + " Use buttons to decide what structure to build";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), msg, buttons);
                 event.getMessage().delete().queue();
-            }
+            }//"colonialRedTarget_"
+        } else if (buttonID.startsWith("colonialRedTarget_")) {
+            AgendaHelper.resolveColonialRedTarget(activeGame, buttonID, event);
         } else if (buttonID.startsWith("ruins_")) {
             ButtonHelper.resolveWarForgeRuins(activeGame, buttonID, player, event);
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
@@ -3069,6 +3075,33 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     event.getMessage().editMessage(editedMessage).queue();
                 }
+                case "yssarilMinisterOfPolicy" -> {
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " is drawing Minister of Policy AC(s)");
+                    String message;
+                    if (player.hasAbility("scheming")) {
+                        activeGame.drawActionCard(player.getUserID());
+                        activeGame.drawActionCard(player.getUserID());
+                        message = ButtonHelper.getIdent(player) + " Drew 2 AC With Scheming. Please Discard An AC";
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " use buttons to discard",
+                            ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+
+                    } else if (player.hasAbility("autonetic_memory")) {
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    } else {
+                        activeGame.drawActionCard(player.getUserID());
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        message = ButtonHelper.getIdent(player) + " Drew 1 AC";
+                    }
+                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                    }
+
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    ButtonHelper.checkACLimit(activeGame, event, player);
+                    ButtonHelper.deleteTheOneButton(event);
+                }
                 case "exhauste6g0network" -> {
                     player.addExhaustedRelic("e6-g0_network");
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " Chose to exhaust e6-g0_network");
@@ -3424,6 +3457,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
+                case "ministerOfPeace" -> ButtonHelper.resolveMinisterOfPeace(player, activeGame, event);
                 case "ministerOfWar" -> AgendaHelper.resolveMinisterOfWar(activeGame, player, event);
                 case "concludeMove" -> {
                     ButtonHelperTacticalAction.finishMovingForTacticalAction(player, activeGame, event, buttonID);

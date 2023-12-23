@@ -40,6 +40,7 @@ import ti4.commands.special.WormholeResearchFor;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.tokens.AddCC;
+import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
@@ -59,6 +60,16 @@ import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
 
+    public static void resolveColonialRedTarget(Game activeGame, String buttonID, ButtonInteractionEvent event){
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileFromPlanet(planet);
+        if(p2 != null && tile != null){
+            new AddUnits().unitParsing(event, p2.getColor(), tile, "1 inf "+planet, activeGame);
+        }
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "1 "+p2.getColor()+" infantry was added to "+planet);
+        event.getMessage().delete().queue();
+    }
     public static void resolveAgenda(Game activeGame, String buttonID, ButtonInteractionEvent event, MessageChannel actionsChannel) {
         String winner = buttonID.substring(buttonID.indexOf("_") + 1);
         String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
@@ -386,6 +397,63 @@ public class AgendaHelper {
             if ("abolishment".equalsIgnoreCase(agID) || "absol_abolishment".equalsIgnoreCase(agID)) {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Abolished the " + Mapper.getAgendaTitleNoCap(winner) + " law");
                 activeGame.removeLaw(winner);
+            }
+            if("redistribution".equalsIgnoreCase(agID)){
+                    for(Player player : activeGame.getRealPlayers()){
+                        if(player.getPlanets().contains(winner.toLowerCase())){
+                            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(winner, activeGame);
+                            int count = 0;
+                            Player cabalMechOwner = Helper.getPlayerFromUnit(activeGame, "cabal_mech");
+                            boolean cabalMech = cabalMechOwner != null && uH.getUnitCount(UnitType.Mech, cabalMechOwner.getColor()) > 0 
+                                    && !activeGame.getLaws().containsKey("articles_war");
+                            Player cabalFSOwner = Helper.getPlayerFromUnit(activeGame, "cabal_flagship");
+                            boolean cabalFS = cabalFSOwner != null && ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabalFSOwner, activeGame.getTileFromPlanet(winner));
+
+                            if(uH.getUnitCount(UnitType.Mech, player.getColor()) > 0){
+                                if(player.hasTech("sar")){
+                                    for (int x = 0; x < uH.getUnitCount(UnitType.Mech, player.getColor()); x++) {
+                                        player.setTg(player.getTg() + 1);
+                                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                            + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                                    }
+                                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                                }
+                                if(cabalFS){
+                                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabalFSOwner, uH.getUnitCount(UnitType.Mech, player.getColor()), "mech", event);
+                                }
+                                count = count + uH.getUnitCount(UnitType.Mech, player.getColor());
+                                uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitCount(UnitType.Mech, player.getColor()));
+                            }
+                            if(uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0){
+                                if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))) {
+                                    ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);
+                                }
+                                if (player.hasInf2Tech()) {
+                                    ButtonHelper.resolveInfantryDeath(activeGame, player, uH.getUnitCount(UnitType.Infantry, player.getColor()));
+                                }
+                                if(cabalFS || cabalMech){
+                                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabalFSOwner, uH.getUnitCount(UnitType.Infantry, player.getColor()), "infantry", event);
+                                }
+                                count = count + uH.getUnitCount(UnitType.Infantry, player.getColor());
+                                uH.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColorID()), uH.getUnitCount(UnitType.Infantry, player.getColor()));
+                            }
+                            uH.removeAllUnits(player.getColor());
+                            List<Button> buttons = new ArrayList<>();
+                            for(Player player2 : getPlayersWithLeastPoints(activeGame)){
+                                if(activeGame.isFoWMode()){
+                                    buttons.add(Button.success("colonialRedTarget_"+player2.getFaction()+"_"+winner, ""+player2.getColor()));
+                                }else{
+                                    buttons.add(Button.success("colonialRedTarget_"+player2.getFaction()+"_"+winner, ""+player2.getFaction()));
+                                }
+                            }
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " choose who you want to get the planet", buttons);
+                        
+                            MessageHelper.sendMessageToChannel(actionsChannel, "Removed all units and gave player the option of who to give the planet to");
+
+                        }
+                    }
+                
             }
             if("disarmamament".equalsIgnoreCase(agID)){
                 for(Player player : activeGame.getRealPlayers()){
@@ -1413,13 +1481,19 @@ public class AgendaHelper {
         }
 
         for (Player p1 : activeGame.getRealPlayers()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
             if (p1.hasTechReady("dsedyng")) {
-                String finChecker = "FFCC_" + p1.getFaction() + "_";
                 Button playKeleresHero = Button.secondary(finChecker + "play_after_Edyn Unity Algorithm", "Use Edyn Unity Algorithm Tech")
                     .withEmoji(Emoji.fromFormatted(Emojis.edyn));
                 afterButtons.add(playKeleresHero);
             }
+            if(activeGame.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(activeGame, p1, "committee")){
+                Button playKeleresHero = Button.secondary(finChecker + "autoresolve_manualcommittee", "Use Committee Formation")
+                    .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+                afterButtons.add(playKeleresHero);
+            }
         }
+        
 
         Button noAfter = Button.primary("no_after", "No Afters (for now)")
             .withEmoji(Emoji.fromFormatted(Emojis.noafters));
@@ -1430,6 +1504,13 @@ public class AgendaHelper {
         afterButtons.add(noAfterPersistent);
 
         return afterButtons;
+    }
+
+    public static void ministerOfIndustryCheck(Player player, Game activeGame, Tile tile, GenericInteractionCreateEvent event){
+        if(ButtonHelper.isPlayerElected(activeGame,player, "minister_industry")){
+            String msg = player.getRepresentation(true, true )+ "since you have minister of industry, you can build in tile "+tile.getRepresentationForButtons(activeGame, player)+". The bot believes you have "+Helper.getProductionValue(player, activeGame, tile, false) +" PRODUCTION Value in the system.";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, Helper.getPlaceUnitButtons(event, player, activeGame, tile, "ministerBuild", "place"));
+        }
     }
 
     public static List<Button> getVoteButtons(int minVote, int voteTotal) {
