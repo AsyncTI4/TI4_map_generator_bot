@@ -26,8 +26,7 @@ import ti4.model.UnitModel;
 
 public class CombatHelper {
 
-    public static Map<UnitModel, Integer> GetAllUnits(UnitHolder unitHolder, Player player,
-            GenericInteractionCreateEvent event) {
+    public static Map<UnitModel, Integer> GetAllUnits(UnitHolder unitHolder, Player player) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
