@@ -393,9 +393,6 @@ public class FoWHelper {
 		}
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
@@ -426,9 +423,6 @@ public class FoWHelper {
 		Tile tile = activeGame.getTileByPosition(position);
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
@@ -473,9 +467,6 @@ public class FoWHelper {
 		boolean absol_recon = activeGame.getLaws().containsKey("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {

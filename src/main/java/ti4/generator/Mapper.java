@@ -286,7 +286,7 @@ public class Mapper {
 
     public static Set<String> getWormholes(String tileID) {
         if (TileHelper.getAllTiles().get(tileID).getWormholes() == null) {
-            return null;
+            return new HashSet<>();
         }
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
             .filter(Objects::nonNull)
