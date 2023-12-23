@@ -1,7 +1,6 @@
 package ti4.commands.game;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +95,8 @@ public class Replace extends GameSubcommandData {
 
         message = "Game: " + activeGame.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
         Player player = activeGame.getPlayer(removedPlayer.getUserID());
-        LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+        Map<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(removedPlayer.getUserID());

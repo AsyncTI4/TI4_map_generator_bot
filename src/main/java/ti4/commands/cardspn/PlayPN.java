@@ -2,6 +2,8 @@ package ti4.commands.cardspn;
 
 import java.util.Map;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,7 +17,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
@@ -58,7 +62,7 @@ public class PlayPN extends PNCardsSubcommandData {
             boolean foundSimilarName = false;
             String cardName = "";
             for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
-                String pnName = Mapper.getPromissoryNote(pn.getKey(), false);
+                String pnName = Mapper.getPromissoryNoteText(pn.getKey(), false);
                 if (pnName != null) {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
@@ -79,10 +83,14 @@ public class PlayPN extends PNCardsSubcommandData {
             return;
         }
 
-        PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnID);
-        String pnName = promissoryNote.getName();
+        playPN(event, activeGame, player, longPNDisplay, pnID);
+    }
+
+    private void playPN(GenericInteractionCreateEvent event, Game activeGame, Player player, boolean longPNDisplay, String pnID) {
+        PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
+        String pnName = pnModel.getName();
         Player pnOwner = activeGame.getPNOwner(pnID);
-        if (promissoryNote.getPlayArea()) {
+        if (pnModel.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(pnID);
         } else { //return to owner
             player.removePromissoryNote(pnID);
@@ -95,37 +103,29 @@ public class PlayPN extends PNCardsSubcommandData {
         }
         
        
-
-        String emojiToUse = activeGame.isFoWMode() ? "" : pnOwner.getFactionEmoji();
-        StringBuilder sb = new StringBuilder(player.getRepresentation() + " played promissory note: " + pnName + "\n");
-        sb.append(emojiToUse).append(Emojis.PN);
-        String pnText;
-
-        pnText = Mapper.getPromissoryNote(pnID, longPNDisplay);
-        sb.append(pnText).append("\n");
-
-        //TERRAFORM TIP
-        if ("terraform".equalsIgnoreCase(pnID)) {
-            sb.append("`/add_token token:titanspn`\n");
-        }
+        MessageEmbed pnEmbed = pnModel.getRepresentationEmbed();
+        String emojiToUse = activeGame.isFoWMode() || pnOwner == null ? "" : pnOwner.getFactionEmoji();
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getRepresentation()).append(" played promissory note: ");
+        sb.append(emojiToUse).append(Emojis.PN).append("**").append(pnName).append("**\n");
         
         if ("dspnkoll".equalsIgnoreCase(pnID)) {
-            ButtonHelperFactionSpecific.offerKolleccPNButtons(player, activeGame, event);
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame);
         }
+
         //Fog of war ping
         if (activeGame.isFoWMode()) {
             // Add extra message for visibility
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, sb.toString());
         }
         
-        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID,
-                player.getNumberTurns());
+        MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), sb.toString(), pnEmbed);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+
+        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
-            sendMessage("Combat modifier will be applied next time you push the combat roll button.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
         }
-
-        sendMessage(sb.toString());
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
     }
 }

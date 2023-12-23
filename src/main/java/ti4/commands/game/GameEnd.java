@@ -53,7 +53,7 @@ public class GameEnd extends GameSubcommandData {
             return;
         }
         String gameName = activeGame.getName();
-        if (!event.getChannel().getName().startsWith(gameName + "-")) {
+        if (!gameName.equals(StringUtils.substringBefore(event.getChannel().getName(), "-"))) {
             MessageHelper.replyToMessage(event, "`/game end` must be executed in game channel only!");
             return;
         }
@@ -75,7 +75,7 @@ public class GameEnd extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "There are multiple roles that match this game name (" + gameName + "): " + gameRoles);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please call a @Bothelper to fix this before using `/game end`");
             return;
-        } else if (gameRoles.size() == 0) {
+        } else if (gameRoles.isEmpty()) {
             MessageHelper.replyToMessage(event, "No roles match the game name (" + gameName + ") - no role will be deleted.");
             deleteRole = false;
         }
@@ -114,7 +114,7 @@ public class GameEnd extends GameSubcommandData {
 
               Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
               // CREATE POST IN #THE-PBD-CHRONICLES
-              if (publish && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0) {
+              if (publish && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).isEmpty()) {
                 TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
                 String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
                 if (pbdChroniclesChannel == null) {

@@ -17,6 +17,7 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 abstract public class AddRemoveToken implements Command {
@@ -29,7 +30,7 @@ abstract public class AddRemoveToken implements Command {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
             OptionMapping option = event.getOption(Constants.FACTION_COLOR);
-            ArrayList<String> colors = new ArrayList<>();
+            List<String> colors = new ArrayList<>();
             Game activeGame = gameManager.getUserActiveGame(userID);
             if (option != null) {
                 String colorString = option.getAsString().toLowerCase();
@@ -81,7 +82,7 @@ abstract public class AddRemoveToken implements Command {
         }
     }
 
-    abstract void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> color, Tile tile, Game activeGame);
+    abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game activeGame);
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());

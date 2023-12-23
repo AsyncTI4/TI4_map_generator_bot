@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -25,6 +26,7 @@ public class ListMyGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_AVERAGE_TURN_TIME, "True to show average turn time as well (default = false)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_SECONDARIES, "True to show secondaries you need to follow in each game (default = false)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GAME_MODES, "True to the game's set modes (default = false)"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to Show"));
     }
 
@@ -34,6 +36,7 @@ public class ListMyGames extends SearchSubcommandData {
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean showAverageTurnTime = event.getOption(Constants.SHOW_AVERAGE_TURN_TIME, false, OptionMapping::getAsBoolean);
         boolean showSecondaries = event.getOption(Constants.SHOW_SECONDARIES, false, OptionMapping::getAsBoolean);
+        boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, false, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
 
@@ -41,33 +44,39 @@ public class ListMyGames extends SearchSubcommandData {
 
         Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer() != null && m.getActivePlayer().equals(userID) : m -> true;
         Predicate<Game> endedGamesFilter = includeEndedGames ? m -> m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
+        Predicate<Game> onlyEndedFoWGames = game -> !game.isFoWMode() || game.isHasEnded();
 
-        Comparator<Game> mapSort = Comparator.comparing(Game::getName);
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream().filter(onlyMyTurnFilter).filter(endedGamesFilter).sorted(mapSort).toList();
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+                .filter(onlyMyTurnFilter)
+                .filter(endedGamesFilter)
+                .filter(onlyEndedFoWGames)
+                .sorted(mapSort).toList();
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (Game playerGame : games) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
-            sb.append(getPlayerMapListRepresentation(playerGame, userID, showAverageTurnTime, showSecondaries));
+            sb.append(getPlayerMapListRepresentation(playerGame, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Game List", sb.toString());
     }
 
-    private String getPlayerMapListRepresentation(Game playerGame, String userID, boolean showAverageTurnTime, boolean showSecondaries) {
+    private String getPlayerMapListRepresentation(Game playerGame, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = playerGame.getPlayer(userID);
         if (player == null) return "";
-        String gameNameAndChannelLink = playerGame.getActionsChannel() == null ? playerGame.getName() : playerGame.getActionsChannel().getAsMention();
+        String gameChannelLink = playerGame.getActionsChannel() == null ? "" : playerGame.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getFactionEmoji());
+        if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
         if (player.getColor() != null && !"null".equals(player.getColor())) sb.append(Emojis.getColorEmoji(player.getColor()));
-        sb.append("**").append(gameNameAndChannelLink).append("**");
-        if (playerGame.getActivePlayer() != null && playerGame.getActivePlayer().equals(userID)) sb.append("  **[__IT IS YOUR TURN__]**");
+        sb.append("**").append(playerGame.getName()).append("**");
+        sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
-        if (playerGame.isHasEnded()) sb.append("  [GAME HAS ENDED]");
+        if (playerGame.getGameWinner().isPresent() && player == playerGame.getGameWinner().get()) sb.append(" **👑WINNER👑**");
+        if (playerGame.getActivePlayer() != null && playerGame.getActivePlayer().equals(userID) && !playerGame.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (showSecondaries) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : playerGame.getPlayedSCs()) {
@@ -79,6 +88,8 @@ public class ListMyGames extends SearchSubcommandData {
                 sb.append("\n> Please follow: ").append(String.join(" ", secondaries));
             }
         }
+        if (showGameModes) sb.append(" | Game Modes: ").append(playerGame.getGameModesText());
+        if (playerGame.isHasEnded()) sb.append(" [GAME IS OVER]");
         return sb.toString();
     }
 

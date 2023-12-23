@@ -132,7 +132,7 @@ public class CombatRoll extends CombatSubcommandData {
                         "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
             }
         }
-        if (playerUnitsByQuantity.size() == 0) {
+        if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
             if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
@@ -187,10 +187,5 @@ public class CombatRoll extends CombatSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        super.reply(event);
     }
 }

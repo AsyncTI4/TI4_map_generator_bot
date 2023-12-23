@@ -1,7 +1,6 @@
 package ti4.commands.cardspn;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -58,7 +57,7 @@ public class PNInfo extends PNCardsSubcommandData {
             if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
                 continue;
             }
-            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
             if (owner != player) {
                 Button transact;
@@ -91,7 +90,7 @@ public class PNInfo extends PNCardsSubcommandData {
             Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
         }
-        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
+        if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(activeGame).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)) {
                 omenDice.append(" ").append(omenDie);
@@ -211,7 +210,7 @@ public class PNInfo extends PNCardsSubcommandData {
         //PROMISSORY NOTES
         sb.append("__**Promissory Notes:**__").append("\n");
         int index = 1;
-        LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
+        Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         if (promissoryNotes != null) {
             if (promissoryNotes.isEmpty()) {

@@ -21,11 +21,11 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import org.jetbrains.annotations.Nullable;
-import java.util.ArrayList;
+import java.util.List;
 
 public class AddCC extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
         boolean usedTactics = false;
         for (String color : colors) {
             OptionMapping option = event.getOption(Constants.CC_USE);

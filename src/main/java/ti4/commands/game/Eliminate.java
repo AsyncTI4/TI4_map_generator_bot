@@ -69,13 +69,13 @@ public class Eliminate extends AddRemovePlayer {
             // Player player = Helper.getPlayer(activeGame, null, event);
             User extraUser = option.getAsUser();
             Player player = activeGame.getPlayer(extraUser.getId());
-            Map<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
+            Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null  && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction())&& player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
                 //send back all the PNs of others that the player was holding
                 Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
                 for (String pnID : pns) {
 
-                    PromissoryNoteModel pn = PNss.get(pnID);
+                    PromissoryNoteModel pn = promissoryNotes.get(pnID);
                     if (pn != null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
                         Player p2 = activeGame.getPlayerFromColorOrFaction(pn.getOwner());
                         player.removePromissoryNote(pnID);
@@ -88,7 +88,7 @@ public class Eliminate extends AddRemovePlayer {
                 for (Player p2 : activeGame.getPlayers().values()) {
                     pns = new HashSet<>(p2.getPromissoryNotes().keySet());
                     for (String pnID : pns) {
-                        PromissoryNoteModel pn = PNss.get(pnID);
+                        PromissoryNoteModel pn = promissoryNotes.get(pnID);
                         if (pn != null && (pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
                             p2.removePromissoryNote(pnID);
                             PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
@@ -103,7 +103,7 @@ public class Eliminate extends AddRemovePlayer {
                     }
                 }
                 //discard all of a players ACs
-                LinkedHashMap<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
+                Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
                 for (Map.Entry<String, Integer> ac : acs.entrySet()) {
                     boolean removed = activeGame.discardActionCard(player.getUserID(), ac.getValue());
                     String sb = "Player: " + player.getUserName() + " - " +

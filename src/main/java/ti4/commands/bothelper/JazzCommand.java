@@ -4,14 +4,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.AsyncTI4DiscordBot;
 //import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class JazzCommand extends BothelperSubcommandData {
     public JazzCommand() {

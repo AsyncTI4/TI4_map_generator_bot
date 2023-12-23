@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.draft.DraftItem;
-import ti4.helpers.Constants;
 
 public class FrankenViewCard extends FrankenSubcommandData {
     public FrankenViewCard() {

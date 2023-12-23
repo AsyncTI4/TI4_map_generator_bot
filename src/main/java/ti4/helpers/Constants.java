@@ -1027,4 +1027,5 @@ public class Constants {
     public static final String OTHER = "other";
     public static final String STATISTIC = "statistic";
     public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
+    public static final String SHOW_GAME_MODES = "show_game_modes";
 }

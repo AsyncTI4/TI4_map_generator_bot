@@ -70,7 +70,10 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         guild = event.getGuild();
         //CHECK IF CATEGORY EXISTS
        
-
+        if (guild == null) {
+            sendMessage("Guild was null");
+            return;
+        }
      
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
@@ -191,7 +194,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
     
     private static String getNextFOWGameName() {
         ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
-        if (existingNums.size() == 0) {
+        if (existingNums.isEmpty()) {
             return "fow1";
         }
         int nextPBDNumber = Collections.max(getAllExistingFOWNumbers()) + 1;
