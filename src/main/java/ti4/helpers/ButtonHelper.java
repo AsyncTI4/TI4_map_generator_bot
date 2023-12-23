@@ -790,8 +790,8 @@ public class ButtonHelper {
             Button pT2 = Button.secondary("yinCommanderStep1_", "Remove Inf Via Yin Commander").withEmoji(Emoji.fromFormatted(Emojis.Yin));
             buttons.add(pT2);
         }
-        Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
-        buttons.add(DoneExhausting);
+        Button doneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
+        buttons.add(doneExhausting);
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
@@ -1083,8 +1083,8 @@ public class ButtonHelper {
                     numberOfAbilities++;
                 } else {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player,  "inf");
-                    Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
-                    buttons.add(DoneExhausting);
+                    Button doneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+                    buttons.add(doneExhausting);
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " you must pay 2 influence due to Keleres FS");
                     MessageHelper.sendMessageToChannelWithButtons(channel, "Click the names of the planets you wish to exhaust", buttons);
                 }
@@ -1132,8 +1132,8 @@ public class ButtonHelper {
                     numberOfAbilities++;
                 } else {
                     Button gainTG = Button.success(fincheckerForNonActive + "freelancersBuild_" + activeSystem.getPosition(), "Build 1 Unit");
-                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
-                    List<Button> buttons = List.of(gainTG, Decline2);
+                    Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
+                    List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Arborec commander ", buttons);
                 }
             }
@@ -1147,8 +1147,8 @@ public class ButtonHelper {
                 } else {
                     Button gainTG = Button.success(fincheckerForNonActive + "mahactMechHit_" + activeSystem.getPosition() + "_" + player.getColor(),
                         "Return " + player.getColor() + " CC and end their turn");
-                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
-                    List<Button> buttons = List.of(gainTG, Decline2);
+                    Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
+                    List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Mahact mech ability ", buttons);
                 }
             }
@@ -1161,8 +1161,8 @@ public class ButtonHelper {
                 } else {
                     Button gainTG = Button.success(fincheckerForNonActive + "nullificationField_" + activeSystem.getPosition() + "_" + player.getColor(),
                         "Spend Strat CC and end their turn");
-                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Nullification Field");
-                    List<Button> buttons = List.of(gainTG, Decline2);
+                    Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Nullification Field");
+                    List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Nullfication field ", buttons);
                 }
             }
@@ -1176,8 +1176,8 @@ public class ButtonHelper {
                     Button lookAtACs = Button.success(fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(), "Look at ACs (" + player.getAc() + ")");
                     Button lookAtPNs = Button.success(fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(), "Look at PNs (" + player.getPnCount() + ")");
                     Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs (" + (player.getSo()) + ")");
-                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
-                    List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, Decline2);
+                    Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
+                    List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, decline);
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Yssaril commander ", buttons);
                 }
             }
@@ -1814,8 +1814,8 @@ public class ButtonHelper {
         Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
         Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
         Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
-        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+        Button doneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+        List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC);
         String trueIdentity = target.getRepresentation(true, true);
         String message2 = trueIdentity + "! Your current CCs are " + target.getCCRepresentation() + ". Use buttons to gain CCs";
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, activeGame), message2, buttons);
@@ -1975,8 +1975,8 @@ public class ButtonHelper {
             context = 1;
         }
         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
-        channel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+        channel.sendMessage(baseMessageObject.build()).queue(message -> {
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message.getId());
             if (activeGame.isFoWMode()) {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             } else {
@@ -5984,7 +5984,7 @@ public class ButtonHelper {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
-        HashMap<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
+        Map<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
         List<RichCustomEmoji> emojis = guild.getEmojis();
         if (emojiMap != null && emojiMap.size() != emojis.size()) {
             emojiMap.clear();
@@ -6046,7 +6046,7 @@ public class ButtonHelper {
         Guild guild = activeGame.getGuild();
         if (guild == null) return;
 
-        HashMap<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
+        Map<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
         List<RichCustomEmoji> emojis = guild.getEmojis();
         if (emojiMap != null && emojiMap.size() != emojis.size()) {
             emojiMap.clear();

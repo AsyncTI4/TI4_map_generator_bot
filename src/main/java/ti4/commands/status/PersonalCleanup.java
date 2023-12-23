@@ -54,8 +54,8 @@ public class PersonalCleanup extends StatusSubcommandData {
         }
 
         player.setPassed(false);
-        Set<Integer> SCs = player.getSCs();
-        for (int sc : SCs) {
+        Set<Integer> strategyCards = player.getSCs();
+        for (int sc : strategyCards) {
             activeGame.setScTradeGood(sc, 0);
         }
         player.clearSCs();
