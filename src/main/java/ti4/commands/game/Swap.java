@@ -20,7 +20,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -83,7 +82,7 @@ public class Swap extends GameSubcommandData {
         if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
             message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
             Player player = activeGame.getPlayer(removedPlayer.getUserID());
-            LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+            Map<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
             for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
                 List<String> value = poEntry.getValue();
                 boolean removed = value.remove(removedPlayer.getUserID());
@@ -100,7 +99,7 @@ public class Swap extends GameSubcommandData {
                 swapperPlayer.setDummy(true);
             }
             LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
-            player.setSCs(swapperPlayer.getSCs());
+            player.setSCs(new LinkedHashSet<>(swapperPlayer.getSCs()));
             swapperPlayer.setSCs(holder);
             swapperPlayer.setUserName(removedPlayer.getUserName());
             swapperPlayer.setUserID(removedPlayer.getUserID());

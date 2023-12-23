@@ -2,7 +2,6 @@ package ti4.commands.agenda;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeGame.setCurrentReacts("AssassinatedReps", "");
         activeGame.setCurrentReacts("riskedPredictive","");
         String agendaID = activeGame.revealAgenda(revealFromBottom);
-        LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
         //Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
         boolean action = false;
@@ -75,7 +74,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
         }
-        if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().size() == 0)) {
+        if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().isEmpty())) {
             MessageHelper.sendMessageToChannel(channel,
                 activeGame.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
             revealAgenda(event, revealFromBottom, activeGame, channel);

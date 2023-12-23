@@ -32,28 +32,26 @@ public class ShowPNToAll extends PNCardsSubcommandData {
             return;
         }
 
-        int soIndex = option.getAsInt();
-        String acID = null;
-        boolean scored = false;
-        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-            if (so.getValue().equals(soIndex)) {
-                acID = so.getKey();
+        int pnIndex = option.getAsInt();
+        String pnID = null;
+        for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+            if (pn.getValue().equals(pnIndex)) {
+                pnID = pn.getKey();
                 break;
             }
         }
 
-        if (acID == null) {
+        if (pnID == null) {
             sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
-      String sb = "Game: " + activeGame.getName() + "\n" +
-          "Player: " + player.getUserName() + "\n" +
-          "Showed Promissory Note:" + "\n" +
-          Mapper.getPromissoryNote(acID) + "\n";
-        if (!scored) {
-            player.setPromissoryNote(acID);
-        }
-        sendMessage(sb);
+        StringBuilder sb = new StringBuilder("Game: ").append(activeGame.getName())
+            .append("\nPlayer: ").append(player.getUserName())
+            .append("\nShowed Promissory Note:\n").append(Mapper.getPromissoryNoteLongText(pnID))
+            .append("\n");
+        player.setPromissoryNote(pnID);
+        
+        sendMessage(sb.toString());
     }
 }

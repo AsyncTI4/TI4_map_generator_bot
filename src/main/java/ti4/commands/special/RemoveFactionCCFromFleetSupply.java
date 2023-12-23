@@ -6,7 +6,7 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
     public RemoveFactionCCFromFleetSupply() {
@@ -14,7 +14,7 @@ public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFlee
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, ArrayList<String> colors, Game activeGame, Player player) {
+    void action(SlashCommandInteractionEvent event, List<String> colors, Game activeGame, Player player) {
         for (String color : colors) {
             player.removeMahactCC(color);
         }

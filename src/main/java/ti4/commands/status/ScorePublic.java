@@ -1,7 +1,5 @@
 package ti4.commands.status;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,15 +82,15 @@ public class ScorePublic extends StatusSubcommandData {
 
 	public static String getNameNEMoji(Game activeGame, int poID) {
 		String id = "";
-		LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
+		Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
 		for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
 			if (po.getValue().equals(poID)) {
 				id = po.getKey();
 				break;
 			}
 		}
-		HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-		HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+		Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+		Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
 		String poName1 = publicObjectivesState1.get(id);
 		String poName2 = publicObjectivesState2.get(id);
 		String poName = id;

@@ -1,6 +1,5 @@
 package ti4.commands.leaders;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import java.util.Map;
@@ -87,13 +86,13 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
 
         //PROMISSORY NOTES
-        LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
+        Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         if (promissoryNotes != null) {
             //PLAY AREA PROMISSORY NOTES
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    String pnData = Mapper.getPromissoryNote(pn.getKey(), false);
+                    String pnData = Mapper.getPromissoryNoteText(pn.getKey(), false);
                     if (pnData.contains("Alliance")) {
                         String[] split = pnData.split(";");
                         if (split.length < 2) continue;

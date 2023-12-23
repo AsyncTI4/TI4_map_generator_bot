@@ -11,6 +11,7 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandData {
@@ -33,7 +34,7 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
         }
 
         OptionMapping option = event.getOption(Constants.COLOR);
-        ArrayList<String> colors = new ArrayList<>();
+        List<String> colors = new ArrayList<>();
         if (option != null) {
             String colorString = option.getAsString().toLowerCase();
             colorString = colorString.replace(" ", "");
@@ -54,5 +55,5 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
         }
     }
 
-    abstract void action(SlashCommandInteractionEvent event, ArrayList<String> color, Game activeGame, Player player);
+    abstract void action(SlashCommandInteractionEvent event, List<String> color, Game activeGame, Player player);
 }

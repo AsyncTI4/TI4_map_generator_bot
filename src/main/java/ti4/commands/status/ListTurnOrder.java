@@ -2,6 +2,7 @@ package ti4.commands.status;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -47,7 +48,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             boolean passed = player.isPassed();
 
             Set<Integer> SCs = player.getSCs();
-            HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+            Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
             StringBuilder textBuilder = new StringBuilder();
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);

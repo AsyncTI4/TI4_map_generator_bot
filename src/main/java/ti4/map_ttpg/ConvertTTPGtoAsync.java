@@ -197,7 +197,7 @@ public class ConvertTTPGtoAsync {
         // }
 
         //EMPTY MAP FOR <AgendaName, Faction> to add Laws later
-        HashMap<String, String> electedPlayers = new HashMap<>();
+        Map<String, String> electedPlayers = new HashMap<>();
 
         //PLAYER ORDER MAPPING
         // TTPG player array starts in bottom right and goes clockwise
@@ -468,7 +468,7 @@ public class ConvertTTPGtoAsync {
         List<String> ttpgExploreHazardousDiscards = ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
         List<String> ttpgExploreIndustrialDiscards = ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
         List<String> ttpgExploreFrontierDiscards = ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
-        ArrayList<String> exploreDiscards = new ArrayList<>() {
+        List<String> exploreDiscards = new ArrayList<>() {
             {
                 if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
                 if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
@@ -789,7 +789,7 @@ public class ConvertTTPGtoAsync {
         return generateString(node, false);
     }
 
-    public static String generatePrettyString(JsonNode node, Boolean prettyPrint) throws JsonProcessingException {
+    public static String generatePrettyString(JsonNode node) throws JsonProcessingException {
         return generateString(node, true);
     }
 

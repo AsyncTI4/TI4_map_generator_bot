@@ -60,14 +60,15 @@ import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
 
-    public static void resolveColonialRedTarget(Game activeGame, String buttonID, ButtonInteractionEvent event){
+    public static void resolveColonialRedTarget(Game activeGame, String buttonID, ButtonInteractionEvent event) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) return;
         String planet = buttonID.split("_")[2];
         Tile tile = activeGame.getTileFromPlanet(planet);
-        if(p2 != null && tile != null){
-            new AddUnits().unitParsing(event, p2.getColor(), tile, "1 inf "+planet, activeGame);
+        if (tile != null) {
+            new AddUnits().unitParsing(event, p2.getColor(), tile, "1 inf " + planet, activeGame);
         }
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "1 "+p2.getColor()+" infantry was added to "+planet);
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "1 " + p2.getColor() + " infantry was added to " + planet);
         event.getMessage().delete().queue();
     }
     public static void resolveAgenda(Game activeGame, String buttonID, ButtonInteractionEvent event, MessageChannel actionsChannel) {
@@ -76,7 +77,7 @@ public class AgendaHelper {
         int aID;
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = activeGame.revealAgenda(false);
-            LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+            Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# The hidden agenda was " + agendaName
@@ -85,7 +86,7 @@ public class AgendaHelper {
         } else {
             aID = Integer.parseInt(agendaid);
         }
-        LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         String agID = "";
         List<Player> predictiveCheck = getLosingVoters(winner, activeGame);
         for (Player playerWL : predictiveCheck) {
@@ -695,7 +696,7 @@ public class AgendaHelper {
                 } else {
                     winOrLose = getWinningVoters(winner, activeGame);
                     for (Player playerWL : winOrLose) {
-                        String message = "";
+                        String message;
                         if (playerWL.hasAbility("autonetic_memory")) {
                             ButtonHelperAbilities.autoneticMemoryStep1(activeGame, playerWL, 2);
                             message = ButtonHelper.getIdent(playerWL) + " Triggered Autonetic Memory Option";
@@ -949,7 +950,7 @@ public class AgendaHelper {
 
         List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestWhenMsg(), activeGame);
         List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestAfterMsg(), activeGame);
-        if (missingPlayersAfters.size() == 0 && missingPlayersWhens.size() == 0) {
+        if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
             return;
         }
 
@@ -1134,7 +1135,7 @@ public class AgendaHelper {
                 } else {
                     identifier = player.getFaction();
                 }
-                HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+                Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
                 String existingData = outcomes.getOrDefault(outcome, "empty");
                 int numV = Integer.parseInt(votes);
                 int numVOrig = Integer.parseInt(Helper.buildSpentThingsMessageForVoting(player, activeGame, true));
@@ -1333,7 +1334,7 @@ public class AgendaHelper {
         } else {
             voteMessage = ident + voteMessage;
         }
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
             if (existingData == null || "empty".equalsIgnoreCase(existingData) || "".equalsIgnoreCase(existingData)) {
@@ -1360,7 +1361,7 @@ public class AgendaHelper {
 
     public static void reverseAllRiders(ButtonInteractionEvent event, Game activeGame, Player player) {
 
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
             if (existingData == null || "empty".equalsIgnoreCase(existingData) || "".equalsIgnoreCase(existingData)) {
@@ -1406,7 +1407,7 @@ public class AgendaHelper {
         } else {
             identifier = player.getFaction();
         }
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
         String existingData = outcomes.getOrDefault(choice, "empty");
         if ("empty".equalsIgnoreCase(existingData)) {
             existingData = identifier + "_" + rider;
@@ -1580,6 +1581,10 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(null, getVotingOrder(activeGame), activeGame);
             } catch (Exception e) {
                 BotLogger.log(event, "Could not find next in line", e);
+            }
+            if (nextInLine == null) {
+                BotLogger.log(event, "`AgendaHelper.startTheVoting` " + nextInLine + " is **null**");
+                return;
             }
             String realIdentity = nextInLine.getRepresentation(true, true);
             int[] voteInfo = getVoteTotal(nextInLine, activeGame);
@@ -1783,7 +1788,7 @@ public class AgendaHelper {
 
     public static List<Player> getWinningRiders(String winner, Game activeGame, GenericInteractionCreateEvent event) {
         List<Player> winningRs = new ArrayList<>();
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
             if (outcome.equalsIgnoreCase(winner)) {
@@ -1924,7 +1929,7 @@ public class AgendaHelper {
     public static List<Player> getRiders(Game activeGame) {
         List<Player> riders = new ArrayList<>();
 
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
             StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
@@ -1948,7 +1953,7 @@ public class AgendaHelper {
 
     public static List<Player> getLosers(String winner, Game activeGame) {
         List<Player> losers = new ArrayList<>();
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
             if (!outcome.equalsIgnoreCase(winner)) {
@@ -1972,7 +1977,7 @@ public class AgendaHelper {
 
     public static List<Player> getWinningVoters(String winner, Game activeGame) {
         List<Player> losers = new ArrayList<>();
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
             if (outcome.equalsIgnoreCase(winner)) {
@@ -1996,7 +2001,7 @@ public class AgendaHelper {
 
     public static List<Player> getLosingVoters(String winner, Game activeGame) {
         List<Player> losers = new ArrayList<>();
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
             if (!outcome.equalsIgnoreCase(winner)) {
@@ -2131,13 +2136,17 @@ public class AgendaHelper {
             for (int x = 0; x < 6; x++) {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
-                    if (player != null && player.isRealPlayer()) {
+                    if (player == null) {
+                        BotLogger.log("`AgendaHelper.getNextInLine` Hit a null player in game " + activeGame.getName());
+                        return null;
+                    }
+
+                    if (player.isRealPlayer()) {
                         return player;
-                    }else{
-                        BotLogger.log("Hit a null or nontreal player in game "+activeGame.getName()+" on player "+player.getUserName());
+                    } else {
+                        BotLogger.log("`AgendaHelper.getNextInLine` Hit a notRealPlayer player in game " + activeGame.getName() + " on player " + player.getUserName());
                     }
                 }
-
             }
             return null;
 
@@ -2161,7 +2170,7 @@ public class AgendaHelper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         int[] voteInfo = getVoteTotal(player, activeGame);
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
         for (String planet : planets) {
             PlanetModel planetModel = Mapper.getPlanet(planet);
             int voteAmount = 0;
@@ -2250,7 +2259,7 @@ public class AgendaHelper {
     }
     public static int getSpecificPlanetsVoteWorth(Player player, Game activeGame, String planet){
             int voteAmount = 0;
-            HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+            Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
              int[] voteInfo = getVoteTotal(player, activeGame);
             Planet p = (Planet) planetsInfo.get(planet);
             if (p == null) {
@@ -2370,7 +2379,7 @@ public class AgendaHelper {
             message.append("Custom PO '")
                 .append(StringUtils.capitalize(player.getColor() + " VP Scored Prior to Agenda Wipe' has been added and scored by that color, worth " + currentPoints + " points. \n"));
             activeGame.scorePublicObjective(player.getUserID(), poIndex);
-            HashMap<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
+            Map<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
                 if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
@@ -2403,7 +2412,7 @@ public class AgendaHelper {
     }
 
     public static void eraseVotesOfFaction(Game activeGame, String faction) {
-        if (activeGame.getCurrentAgendaVotes().keySet().size() == 0) {
+        if (activeGame.getCurrentAgendaVotes().keySet().isEmpty()) {
             return;
         }
         Map<String, String> outcomes = new HashMap<>(activeGame.getCurrentAgendaVotes());
@@ -2437,7 +2446,7 @@ public class AgendaHelper {
 
     public static String getWinner(Game activeGame) {
         StringBuilder winner = new StringBuilder();
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
         int currentHighest = -1;
         for (String outcome : outcomes.keySet()) {
             int totalVotes = 0;
@@ -2464,7 +2473,7 @@ public class AgendaHelper {
 
     public static String getSummaryOfVotes(Game activeGame, boolean capitalize) {
         String summary;
-        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
         String agendaDetails = activeGame.getCurrentAgendaInfo();
         String agendaName;
         if (StringUtils.countMatches(agendaDetails, "_") > 2)
@@ -2477,7 +2486,7 @@ public class AgendaHelper {
             agendaName = "Not Currently Tracked";
         }
 
-        if (outcomes.keySet().size() == 0) {
+        if (outcomes.keySet().isEmpty()) {
             summary = "# Agenda Name: " + agendaName + "\nNo current riders or votes have been cast yet.";
         } else {
             StringBuilder summaryBuilder = new StringBuilder("# Agenda Name: " + agendaName + "\nCurrent status of votes and outcomes is: \n");
@@ -2612,9 +2621,9 @@ public class AgendaHelper {
 
     public static int getVoteCountFromPlanets(Game activeGame, Player player) {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-        HashMap<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
-        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast).mapToInt(Planet::getResources).sum();
+        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast).mapToInt(Planet::getInfluence).sum();
         int voteCount = baseInfluenceCount; //default
 
         //NEKRO unless XXCHA ALLIANCE
