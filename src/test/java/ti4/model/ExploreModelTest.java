@@ -13,14 +13,14 @@ public class ExploreModelTest extends BaseTi4Test {
     public void testExplores() {
         for (ExploreModel model : Mapper.getExplores().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
-            // assertTrue(validateAttachmentID(model), model.getAlias() + ": invalid AttachmentID: " + model.getAttachmentId().orElse(""));
+            assertTrue(validateAttachmentID(model), model.getAlias() + ": invalid AttachmentID: " + model.getAttachmentId().orElse(""));
         }
     }
 
     private boolean validateAttachmentID(ExploreModel model) {
         if (model.getAttachmentId().isEmpty()) return true;
         if (Mapper.isValidAttachment(model.getAttachmentId().get())) return true;
-        BotLogger.log("Explore **" + model.getAlias() + "** failed validation due to invalid AttachmentID: `" + model.getAttachmentId().get() + "`");
+        System.out.println("Explore **" + model.getAlias() + "** failed validation due to invalid AttachmentID: `" + model.getAttachmentId().get() + "`");
         return false;
     }
 }
