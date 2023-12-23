@@ -817,7 +817,7 @@ public class DataMigrationManager {
     }
 
     public static boolean migrateInitStratCardsPerPlayer_121823(Game game) {
-        int maxSCsPerPlayer = game.getSCList().size() / game.getRealPlayers().size();
+        int maxSCsPerPlayer = game.getSCList().size() / Math.max(game.getRealPlayers().size(), 1);
         if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
 
         if (game.getRealPlayers().size() == 1) maxSCsPerPlayer = 1;
