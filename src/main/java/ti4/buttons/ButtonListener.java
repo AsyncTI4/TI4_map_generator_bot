@@ -947,21 +947,6 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
             }
-
-            //("autoneticMemoryStep2
-        } else if (buttonID.startsWith("pickFromDiscard_")) {
-            ButtonHelper.pickACardFromDiscardStep2(activeGame, player, event, buttonID);
-        } else if (buttonID.startsWith("autoneticMemoryStep2_")) {
-            ButtonHelperAbilities.autoneticMemoryStep2(activeGame, player, event, buttonID);
-        } else if (buttonID.startsWith("autoneticMemoryDecline_")) {
-            ButtonHelperAbilities.autoneticMemoryDecline(activeGame, player, event, buttonID);
-        } else if (buttonID.startsWith("autoneticMemoryStep3")) {
-            if (buttonID.contains("autoneticMemoryStep3a")) {
-                ButtonHelperAbilities.autoneticMemoryStep3a(activeGame, player, event);
-            } else {
-                ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
-            }
-
         } else if (buttonID.startsWith("assignHits_")) {
 
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
@@ -1468,14 +1453,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.moveGlory(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("rider_")) {
             AgendaHelper.placeRider(buttonID, event, activeGame, player, ident);
-        } else if (buttonID.startsWith("startToScuttleAUnit_")) {
-            ButtonHelperActionCards.resolveScuttleStart(player, activeGame, event, buttonID);
-        } else if (buttonID.startsWith("endScuttle_")) {
-            ButtonHelperActionCards.resolveScuttleEnd(player, activeGame, event, buttonID);
-        } else if (buttonID.startsWith("scuttleOn_")) {
-            ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
-        } else if (buttonID.startsWith("scuttleIn_")) {
-            ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("startToScuttleAUnit_")) {
             ButtonHelperActionCards.resolveScuttleStart(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("endScuttle_")) {
