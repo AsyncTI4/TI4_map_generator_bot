@@ -198,7 +198,7 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setCurrentPhase("status");
         for (Player player : activeGame.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(activeGame, player);
-          List<String> relics = new ArrayList<>(player.getRelics());
+            List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {
                     player.removeRelic(relic);
@@ -230,6 +230,20 @@ public class TurnEnd extends PlayerSubcommandData {
         for(Player player : activeGame.getRealPlayers()){
             if(player.getTotalVictoryPoints() > maxVP){
                 maxVP = player.getTotalVictoryPoints();
+            }
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")){
+                int numScoredSOs = player.getSoScored();
+                int numScoredPos = player.getPublicVictoryPoints(false);
+                if(numScoredPos +player.getCommodities()> player.getCommoditiesTotal()){
+                    numScoredPos = player.getCommoditiesTotal() - player.getCommodities();
+                }
+                player.setTg(player.getTg()+numScoredSOs);
+                if(numScoredSOs > 0){
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, numScoredSOs);
+                }
+                player.setCommodities(player.getCommodities()+numScoredPos);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you gained "+numScoredSOs+" tg and "+numScoredPos+" commodities due to Vaden Commander");
             }
         }
         if(maxVP+4 > activeGame.getVp()){
