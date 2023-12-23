@@ -205,10 +205,6 @@ public class GenerateTile {
     }
 
     private void addTile(Tile tile, Game activeGame, TileStep step) {
-        addTile(tile, activeGame, step, false);
-    }
-
-    private void addTile(Tile tile, Game activeGame, TileStep step, boolean setupCheck) {
         if (tile == null || tile.getTileID() == null) {
             return;
         }

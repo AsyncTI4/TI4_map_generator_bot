@@ -142,18 +142,18 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
             }
             case "winnuhero" -> {
-                List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(activeGame, player);
+                List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
                     buttons);
             }
             case "arborechero" -> {
-                List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player, event);
+                List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the buttons to build in a system", buttons);
             }
             case "saarhero" -> {
-                List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(activeGame, player, event);
+                List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the buttons to select the system to remove all opposing ff and inf from",
                     buttons);
@@ -173,7 +173,7 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " sustained all units except their mechs");
             }
             case "jolnarhero" -> {
-                List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(player, activeGame);
+                List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the buttons to pick what tech you would like to swap out. Reminder that since all swap are simultenous, you cannot swap out a tech and then swap it back in.",
                     buttons);
@@ -187,7 +187,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "naazhero" -> {
                 DrawRelic.drawRelicAndNotify(player, event, activeGame);
-                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(activeGame, player);
+                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the button to do TWO of the available secondaries. (note, all are presented for conveinence, but two is the limit)", buttons);
             }

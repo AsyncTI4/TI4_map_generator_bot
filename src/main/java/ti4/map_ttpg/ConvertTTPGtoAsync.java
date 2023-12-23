@@ -789,7 +789,7 @@ public class ConvertTTPGtoAsync {
         return generateString(node, false);
     }
 
-    public static String generatePrettyString(JsonNode node, Boolean prettyPrint) throws JsonProcessingException {
+    public static String generatePrettyString(JsonNode node) throws JsonProcessingException {
         return generateString(node, true);
     }
 

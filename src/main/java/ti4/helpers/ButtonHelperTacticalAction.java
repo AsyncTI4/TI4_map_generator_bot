@@ -26,7 +26,7 @@ import ti4.model.UnitModel;
 public class ButtonHelperTacticalAction {
 
 
-    public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
+    public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String buttonLabel) {
         String remove = "Move";
         Map<String, Integer> currentSystem = activeGame.getCurrentMovedUnitsFrom1System();
         Map<String, Integer> currentActivation = activeGame.getMovedUnitsFromCurrentActivation();
@@ -228,7 +228,7 @@ public class ButtonHelperTacticalAction {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
-    public static void concludeTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+    public static void concludeTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (!activeGame.getL1Hero()) {
             ButtonHelper.exploreDET(player, activeGame, event);
             if (player.hasAbility("cunning")) {
@@ -287,7 +287,7 @@ public class ButtonHelperTacticalAction {
         event.getMessage().delete().queue();
     }
 
-    public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+    public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
         String message = "Moved all units to the space area.";
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         List<Button> systemButtons;
@@ -368,7 +368,7 @@ public class ButtonHelperTacticalAction {
             + ". Use buttons to select the units you want to move.", systemButtons);
         event.getMessage().delete().queue();
     }
-    public static void selectRingThatActiveSystemIsIn(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+    public static void selectRingThatActiveSystemIsIn(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (player.getTacticalCC() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " does not have any tactical cc.");
             return;

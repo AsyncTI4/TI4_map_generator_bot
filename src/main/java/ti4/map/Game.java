@@ -2591,7 +2591,7 @@ public class Game {
         return false;
     }
 
-    public boolean scoreSecretObjective(String userID, Integer soIDNumber, Game activeGame) {
+    public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
             Map<String, Integer> secrets = player.getSecrets();
