@@ -189,7 +189,7 @@ public class ButtonListener extends ListenerAdapter {
                 return;
             }
         }
-        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix(); 
+        String finsFactionCheckerPrefix = player == null ? "FFCC_nullPlayer_" : player.getFinsFactionCheckerPrefix(); 
         String trueIdentity = player.getRepresentation(true, true);
         String fowIdentity = player.getRepresentation(false, true);
         String ident = player.getFactionEmoji();
