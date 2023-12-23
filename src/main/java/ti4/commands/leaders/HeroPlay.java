@@ -29,6 +29,7 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class HeroPlay extends LeaderAction {
     public HeroPlay() {
@@ -180,7 +181,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinButtonChecker() + "yinHeroStart", "Invade a planet with Yin Hero"));
+                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart", "Invade a planet with Yin Hero"));
                 buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
@@ -203,8 +204,8 @@ public class HeroPlay extends LeaderAction {
             }
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinButtonChecker() + "augersHeroStart_" + 1, "Resolve Augers Hero on Stage 1 Deck"));
-                buttons.add(Button.primary(player.getFinButtonChecker() + "augersHeroStart_" + 2, "Resolve Augers Hero on Stage 2 Deck"));
+                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1, "Resolve Augers Hero on Stage 1 Deck"));
+                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2, "Resolve Augers Hero on Stage 2 Deck"));
                 buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText) + " use the button to choose which objective type you wanna hero on", buttons);
@@ -233,7 +234,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
         }
-        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, leaderModel.getID(), player.getNumberTurns());
+        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, playerLeader.getId(), player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");

@@ -990,7 +990,7 @@ public class GameSaveLoadManager {
 
     private static File[] readAllMapFiles() {
         File folder = Storage.getMapImageDirectory();
-        if (folder == null) {
+        if (!folder.exists()) {
             try {
                 if (folder.createNewFile()) {
                     folder = Storage.getMapImageDirectory();
@@ -1005,7 +1005,7 @@ public class GameSaveLoadManager {
 
     private static File[] readAllMapJSONFiles() {
         File folder = Storage.getMapsJSONDirectory();
-        if (folder == null) {
+        if (!folder.exists()) {
             try {
                 if (folder.createNewFile()) {
                     folder = Storage.getMapImageDirectory();

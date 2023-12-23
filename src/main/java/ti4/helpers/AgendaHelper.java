@@ -60,14 +60,15 @@ import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
 
-    public static void resolveColonialRedTarget(Game activeGame, String buttonID, ButtonInteractionEvent event){
+    public static void resolveColonialRedTarget(Game activeGame, String buttonID, ButtonInteractionEvent event) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 == null) return;
         String planet = buttonID.split("_")[2];
         Tile tile = activeGame.getTileFromPlanet(planet);
-        if(p2 != null && tile != null){
-            new AddUnits().unitParsing(event, p2.getColor(), tile, "1 inf "+planet, activeGame);
+        if (tile != null) {
+            new AddUnits().unitParsing(event, p2.getColor(), tile, "1 inf " + planet, activeGame);
         }
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "1 "+p2.getColor()+" infantry was added to "+planet);
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "1 " + p2.getColor() + " infantry was added to " + planet);
         event.getMessage().delete().queue();
     }
     public static void resolveAgenda(Game activeGame, String buttonID, ButtonInteractionEvent event, MessageChannel actionsChannel) {
@@ -695,7 +696,7 @@ public class AgendaHelper {
                 } else {
                     winOrLose = getWinningVoters(winner, activeGame);
                     for (Player playerWL : winOrLose) {
-                        String message = "";
+                        String message;
                         if (playerWL.hasAbility("autonetic_memory")) {
                             ButtonHelperAbilities.autoneticMemoryStep1(activeGame, playerWL, 2);
                             message = ButtonHelper.getIdent(playerWL) + " Triggered Autonetic Memory Option";

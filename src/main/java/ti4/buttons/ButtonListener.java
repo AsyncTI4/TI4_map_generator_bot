@@ -156,10 +156,10 @@ public class ButtonListener extends ListenerAdapter {
 
         MessageChannel privateChannel = event.getChannel();
         if (activeGame.isFoWMode()) {
-            if (player.getPrivateChannel() == null) {
+            if (player != null && player.getPrivateChannel() == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
                 privateChannel = null;
-            } else {
+            } else if (player != null) {
                 privateChannel = player.getPrivateChannel();
             }
         }
@@ -181,16 +181,15 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace("FFCC_", "");
             String factionWhoGeneratedButton = buttonID.substring(0, buttonID.indexOf("_"));
             buttonID = buttonID.replaceFirst(factionWhoGeneratedButton + "_", "");
-            String factionWhoIsUp = player.getFaction();
-            if (!player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton)
+            String factionWhoIsUp = player == null ? "nullPlayer" : player.getFaction();
+            if (player != null && !player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton)
                 && !buttonLabel.toLowerCase().contains(factionWhoIsUp)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "To " + player.getFactionEmoji()
                     + ": you are not the faction who these buttons are meant for.");
                 return;
             }
         }
-
-        String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix(); 
         String trueIdentity = player.getRepresentation(true, true);
         String fowIdentity = player.getRepresentation(false, true);
         String ident = player.getFactionEmoji();
@@ -1272,7 +1271,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                     player.exhaustTech(tech);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
-                    Button gainCC = Button.success(player.getFinButtonChecker() + "gain_CC", "Gain CC");
+                    Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
                 }
                 case "aida", "sar", "htp" -> {
