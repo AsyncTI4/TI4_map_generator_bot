@@ -190,6 +190,10 @@ public class ACInfo extends ACCardsSubcommandData {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             acButtons.add(nekroButton);
         }
+        if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
+            Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace").withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+            acButtons.add(hacanButton);
+        }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent", "Use Vaylerian Agent").withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
             acButtons.add(nekroButton);

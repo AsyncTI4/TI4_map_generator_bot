@@ -477,7 +477,12 @@ public class ButtonHelperModifyUnits {
             }
 
         }
-
+        if ("sd".equalsIgnoreCase(unit)){
+            Tile tile = activeGame.getTileFromPlanet(planetName);
+            if(tile != null){
+                AgendaHelper.ministerOfIndustryCheck(player, activeGame, tile, event);
+            }
+        }
         if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "titans", event);
         }
@@ -647,6 +652,12 @@ public class ButtonHelperModifyUnits {
 
         if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "titans", event);
+        }
+        if ("sd".equalsIgnoreCase(unit)){
+            Tile tile = activeGame.getTileFromPlanet(planetName);
+            if(tile != null){
+                AgendaHelper.ministerOfIndustryCheck(player, activeGame, tile, event);
+            }
         }
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
