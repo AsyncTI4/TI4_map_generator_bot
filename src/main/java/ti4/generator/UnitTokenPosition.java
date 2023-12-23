@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UnitTokenPosition implements Serializable {
     private final String unitHolderName;
@@ -33,10 +34,10 @@ public class UnitTokenPosition implements Serializable {
     }
 
     public String getUnitHolderName() { return unitHolderName; }
-    public LinkedHashMap<String, List<Point>> getCoordinateMap() { return coordinateMap; }
+    public Map<String, List<Point>> getCoordinateMap() { return coordinateMap; }
 
-    /*public ArrayList<String> getUnitOrder() {
-        ArrayList<String> unitOrder = new ArrayList<>();
+    /*public List<String> getUnitOrder() {
+        List<String> unitOrder = new ArrayList<>();
         for (Map.Entry<String, List<Point>> entry : coordinateMap.entrySet()) {
             unitOrder.add(entry.getKey());
         }

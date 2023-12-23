@@ -60,6 +60,10 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         return faction;
     }
 
+    public boolean getPlayArea() {
+        return Optional.ofNullable(playArea).orElse(false);
+    }
+
     public boolean isPlayedDirectlyToPlayArea() {
         if (playArea == null) {
             return false;
@@ -115,6 +119,19 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
 
         eb.setColor(Color.blue);
         return eb.build();
+    }
+
+    /**
+     * @deprecated This only exists to simulate the old text based promissory note .property files
+     */
+    @Deprecated
+    public String getShortText() {
+        String promStr = getText();
+        // if we would break trying to split the note, just return whatever is there
+        if (promStr == null || !promStr.contains(";")) {
+            return promStr;
+        }
+        return getName() + ";" + getFaction() + getColor();
     }
 
     public boolean search(String searchString) {

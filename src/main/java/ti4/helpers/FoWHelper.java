@@ -23,6 +23,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.WormholeModel;
 
@@ -328,7 +329,7 @@ public class FoWHelper {
 		}
 
 		List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
-		if (hyperlaneData != null && hyperlaneData.size() == 0) {
+		if (hyperlaneData != null && hyperlaneData.isEmpty()) {
 			// We could not load the hyperlane data correctly, quit
 			return tiles;
 		}
@@ -392,11 +393,8 @@ public class FoWHelper {
 		}
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -425,11 +423,8 @@ public class FoWHelper {
 		Tile tile = activeGame.getTileByPosition(position);
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -472,11 +467,8 @@ public class FoWHelper {
 		boolean absol_recon = activeGame.getLaws().containsKey("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -522,7 +514,7 @@ public class FoWHelper {
 				continue;
 			}
 			for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-				HashSet<String> tokenList = unitHolder.getTokenList();
+				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
 						if (token.contains(wormholeID)) {
@@ -784,7 +776,10 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-			if (receiverVisible) {
+			if (receivingPlayer == null) {
+				BotLogger.log(event, "`FoWHelper.pingPlayersTransaction` Warning, receivingPlayer is null");
+			}
+			if (receiverVisible && receivingPlayer != null) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");

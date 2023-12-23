@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -150,7 +148,7 @@ public class ButtonHelperAgents {
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet) continue;
 
             Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
@@ -885,7 +883,7 @@ public class ButtonHelperAgents {
         if (unitHolder2.getTokenList().contains("attachment_titanspn.png")) {
             return planets;
         }
-        if(types.size() == 0){
+        if(types.isEmpty()){
             return planets;
         }
         for (String planet : player.getExhaustedPlanets()) {

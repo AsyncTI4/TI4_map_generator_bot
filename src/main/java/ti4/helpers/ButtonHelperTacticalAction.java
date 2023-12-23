@@ -10,9 +10,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.special.CheckDistance;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
@@ -28,10 +26,10 @@ import ti4.model.UnitModel;
 public class ButtonHelperTacticalAction {
 
 
-    public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
+    public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String buttonLabel) {
         String remove = "Move";
-        HashMap<String, Integer> currentSystem = activeGame.getCurrentMovedUnitsFrom1System();
-        HashMap<String, Integer> currentActivation = activeGame.getMovedUnitsFromCurrentActivation();
+        Map<String, Integer> currentSystem = activeGame.getCurrentMovedUnitsFrom1System();
+        Map<String, Integer> currentActivation = activeGame.getMovedUnitsFromCurrentActivation();
         String rest;
         if (buttonID.contains("Remove")) {
             remove = "Remove";
@@ -84,7 +82,7 @@ public class ButtonHelperTacticalAction {
                     String name = entry.getKey();
                     String representation = planetRepresentations.get(name);
                     UnitHolder unitHolder = entry.getValue();
-                    HashMap<UnitKey, Integer> units1 = unitHolder.getUnits();
+                    Map<UnitKey, Integer> units1 = unitHolder.getUnits();
                     Map<UnitKey, Integer> units = new HashMap<>(units1);
 
                     if (unitHolder instanceof Planet) {
@@ -230,7 +228,7 @@ public class ButtonHelperTacticalAction {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
-    public static void concludeTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+    public static void concludeTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (!activeGame.getL1Hero()) {
             ButtonHelper.exploreDET(player, activeGame, event);
             if (player.hasAbility("cunning")) {
@@ -289,7 +287,7 @@ public class ButtonHelperTacticalAction {
         event.getMessage().delete().queue();
     }
 
-    public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+    public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
         String message = "Moved all units to the space area.";
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         List<Button> systemButtons;
@@ -370,7 +368,7 @@ public class ButtonHelperTacticalAction {
             + ". Use buttons to select the units you want to move.", systemButtons);
         event.getMessage().delete().queue();
     }
-    public static void selectRingThatActiveSystemIsIn(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+    public static void selectRingThatActiveSystemIsIn(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (player.getTacticalCC() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " does not have any tactical cc.");
             return;

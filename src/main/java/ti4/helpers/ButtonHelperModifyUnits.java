@@ -879,7 +879,7 @@ public class ButtonHelperModifyUnits {
             String cID = Mapper.getColorID(player.getColor());
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 UnitHolder unitHolder = entry.getValue();
-                HashMap<UnitKey, Integer> units1 = unitHolder.getUnits();
+                Map<UnitKey, Integer> units1 = unitHolder.getUnits();
                 Map<UnitKey, Integer> units = new HashMap<>(units1);
                 if (unitHolder instanceof Planet) {
                     if (!rest.contains("AllShips")) {

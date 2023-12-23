@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -110,6 +109,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
+        if (guild == null) {
+            sendMessage("Error: Guild is null");
+            return;
+        }
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {

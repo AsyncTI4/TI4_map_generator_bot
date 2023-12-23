@@ -25,7 +25,7 @@ public class AbilityModelTest extends BaseTi4Test {
 
     private boolean validateFaction(AbilityModel model) {
         if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction())) return true;
-        BotLogger.log("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
+        System.out.println("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
         return false;
     }
 

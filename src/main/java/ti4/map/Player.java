@@ -94,22 +94,22 @@ public class Player {
 
     private Set<Integer> followedSCs = new HashSet<>();
 
-    private final LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
-    private final LinkedHashMap<String, Integer> events = new LinkedHashMap<>();
-    private final LinkedHashMap<String, Integer> trapCards = new LinkedHashMap<>();
-    private final LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>();
-    private final LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
-    private final LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
-    private HashSet<String> abilities = new HashSet<>();
-    private HashSet<String> exhaustedAbilities = new HashSet<>();
-    private HashSet<String> promissoryNotesOwned = new HashSet<>();
-    private HashSet<String> unitsOwned = new HashSet<>();
+    private final Map<String, Integer> actionCards = new LinkedHashMap<>();
+    private final Map<String, Integer> events = new LinkedHashMap<>();
+    private final Map<String, Integer> trapCards = new LinkedHashMap<>();
+    private final Map<String, String> trapCardsPlanets = new LinkedHashMap<>();
+    private final Map<String, Integer> secrets = new LinkedHashMap<>();
+    private final Map<String, Integer> secretsScored = new LinkedHashMap<>();
+    private Map<String, Integer> promissoryNotes = new LinkedHashMap<>();
+    private Set<String> abilities = new HashSet<>();
+    private Set<String> exhaustedAbilities = new HashSet<>();
+    private Set<String> promissoryNotesOwned = new HashSet<>();
+    private Set<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> spentThingsThisWindow = new ArrayList<>();
     private List<String> teamMateIDs = new ArrayList<>();
-    private HashMap<String, Integer> producedUnits = new HashMap<>();
+    private Map<String, Integer> producedUnits = new HashMap<>();
     @Getter
     @Setter
     private List<String> factionTechs = new ArrayList<>();
@@ -126,9 +126,9 @@ public class Player {
     private List<Leader> leaders = new ArrayList<>();
 
     private Map<String, Integer> debt_tokens = new LinkedHashMap<>(); // color, count
-    private final HashMap<String, String> fow_seenTiles = new HashMap<>();
-    private final HashMap<String, Integer> unitCaps = new HashMap<>();
-    private final HashMap<String, String> fow_customLabels = new HashMap<>();
+    private final Map<String, String> fow_seenTiles = new HashMap<>();
+    private final Map<String, Integer> unitCaps = new HashMap<>();
+    private final Map<String, String> fow_customLabels = new HashMap<>();
     private String fowFogFilter;
     private boolean fogInitialized;
 
@@ -145,7 +145,7 @@ public class Player {
     private int hrf;
     private int irf;
     private int vrf;
-    private ArrayList<String> fragments = new ArrayList<>();
+    private List<String> fragments = new ArrayList<>();
     private List<String> relics = new ArrayList<>();
     private List<String> exhaustedRelics = new ArrayList<>();
     private LinkedHashSet<Integer> SCs = new LinkedHashSet<>();
@@ -220,7 +220,7 @@ public class Player {
         spentThingsThisWindow = new ArrayList<>();
     }
 
-    public HashMap<String, Integer> getCurrentProducedUnits() {
+    public Map<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
     }
 
@@ -275,7 +275,7 @@ public class Player {
         producedUnits.put(unit, amount);
     }
 
-    public void setProducedUnits(HashMap<String, Integer> displacedUnits) {
+    public void setProducedUnits(Map<String, Integer> displacedUnits) {
         producedUnits = displacedUnits;
     }
 
@@ -336,7 +336,7 @@ public class Player {
         return bagInfoThreadID;
     }
 
-    public String getFinButtonChecker() {
+    public String getFinsFactionCheckerPrefix() {
         return "FFCC_" + getFaction() + "_";
     }
 
@@ -520,11 +520,11 @@ public class Player {
         tenMinReminderPing = status;
     }
 
-    public HashSet<String> getAbilities() {
+    public Set<String> getAbilities() {
         return abilities;
     }
 
-    public void setAbilities(HashSet<String> abilities) {
+    public void setAbilities(Set<String> abilities) {
         this.abilities = abilities;
     }
 
@@ -543,11 +543,11 @@ public class Player {
         return getAbilities().contains(ability);
     }
 
-    public HashSet<String> getExhaustedAbilities() {
+    public Set<String> getExhaustedAbilities() {
         return exhaustedAbilities;
     }
 
-    public void setExhaustedAbilities(HashSet<String> exhaustedAbilities) {
+    public void setExhaustedAbilities(Set<String> exhaustedAbilities) {
         this.exhaustedAbilities = exhaustedAbilities;
     }
 
@@ -570,7 +570,7 @@ public class Player {
         return unitCaps.get(unit);
     }
 
-    public HashMap<String, Integer> getUnitCaps() {
+    public Map<String, Integer> getUnitCaps() {
         return unitCaps;
     }
 
@@ -578,27 +578,27 @@ public class Player {
         unitCaps.put(unit, cap);
     }
 
-    public LinkedHashMap<String, Integer> getActionCards() {
+    public Map<String, Integer> getActionCards() {
         return actionCards;
     }
 
-    public LinkedHashMap<String, Integer> getEvents() {
+    public Map<String, Integer> getEvents() {
         return events;
     }
 
-    public LinkedHashMap<String, Integer> getTrapCards() {
+    public Map<String, Integer> getTrapCards() {
         return trapCards;
     }
 
-    public LinkedHashMap<String, String> getTrapCardsPlanets() {
+    public Map<String, String> getTrapCardsPlanets() {
         return trapCardsPlanets;
     }
 
-    public HashSet<String> getPromissoryNotesOwned() {
+    public Set<String> getPromissoryNotesOwned() {
         return promissoryNotesOwned;
     }
 
-    public void setPromissoryNotesOwned(HashSet<String> promissoryNotesOwned) {
+    public void setPromissoryNotesOwned(Set<String> promissoryNotesOwned) {
         this.promissoryNotesOwned = promissoryNotesOwned;
     }
 
@@ -614,7 +614,7 @@ public class Player {
         return promissoryNotesOwned.add(promissoryNoteID);
     }
 
-    public LinkedHashMap<String, Integer> getPromissoryNotes() {
+    public Map<String, Integer> getPromissoryNotes() {
         return promissoryNotes;
     }
 
@@ -622,7 +622,7 @@ public class Player {
         return promissoryNotesInPlayArea;
     }
 
-    public HashSet<String> getUnitsOwned() {
+    public Set<String> getUnitsOwned() {
         return unitsOwned;
     }
 
@@ -630,7 +630,7 @@ public class Player {
         return unitsOwned.contains(unit);
     }
 
-    public void setUnitsOwned(HashSet<String> unitsOwned) {
+    public void setUnitsOwned(Set<String> unitsOwned) {
         this.unitsOwned = unitsOwned;
     }
 
@@ -790,7 +790,7 @@ public class Player {
         this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
     }
 
-    public void setPromissoryNotes(LinkedHashMap<String, Integer> promissoryNotes) {
+    public void setPromissoryNotes(Map<String, Integer> promissoryNotes) {
         this.promissoryNotes = promissoryNotes;
     }
 
@@ -845,7 +845,7 @@ public class Player {
         removePromissoryNotesInPlayArea(id);
     }
 
-    public LinkedHashMap<String, Integer> getSecrets() {
+    public Map<String, Integer> getSecrets() {
         return secrets;
     }
 
@@ -874,7 +874,7 @@ public class Player {
         secrets.remove(idToRemove);
     }
 
-    public LinkedHashMap<String, Integer> getSecretsScored() {
+    public Map<String, Integer> getSecretsScored() {
         return secretsScored;
     }
 
@@ -920,7 +920,7 @@ public class Player {
         return vrf;
     }
 
-    public ArrayList<String> getFragments() {
+    public List<String> getFragments() {
         return fragments;
     }
 
@@ -972,7 +972,7 @@ public class Player {
         return count;
     }
 
-    public void setFragments(ArrayList<String> fragmentList) {
+    public void setFragments(List<String> fragmentList) {
         fragments = fragmentList;
         updateFragments();
     }
@@ -1104,8 +1104,10 @@ public class Player {
                     sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
-            } else {
+            } else if (roleForCommunity != null) {
                 return getFactionEmoji() + roleForCommunity.getAsMention() + Emojis.getColorEmojiWithName(getColor());
+            } else {
+                return getFactionEmoji() + Emojis.getColorEmojiWithName(getColor());
             }
         }
 
@@ -1162,7 +1164,7 @@ public class Player {
     }
 
     private void initAbilities() {
-        HashSet<String> abilities = new HashSet<>();
+        Set<String> abilities = new HashSet<>();
         for (String ability : getFactionStartingAbilities()) {
             if (!ability.isEmpty() && !ability.isBlank()) {
                 abilities.add(ability);
@@ -1479,7 +1481,7 @@ public class Player {
 
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
-        LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
+        Map<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
             if (scoredPOEntry.getValue().contains(getUserID())) {
@@ -1600,12 +1602,12 @@ public class Player {
         return secretsScored.size();
     }
 
-    public LinkedHashSet<Integer> getSCs() {
+    public Set<Integer> getSCs() {
         return SCs;
     }
 
-    public void setSCs(LinkedHashSet<Integer> SCs) {
-        this.SCs = SCs;
+    public void setSCs(Set<Integer> SCs) {
+        this.SCs = new LinkedHashSet<>(SCs);
         this.SCs.remove(0); // TEMPORARY MIGRATION TO REMOVE 0 IF PLAYER HAS IT FROM OLD SAVES
     }
 
@@ -2063,11 +2065,11 @@ public class Player {
         return new Tile(tileID, position, player, true, label);
     }
 
-    public HashMap<String, String> getFogTiles() {
+    public Map<String, String> getFogTiles() {
         return fow_seenTiles;
     }
 
-    public HashMap<String, String> getFogLabels() {
+    public Map<String, String> getFogLabels() {
         return fow_customLabels;
     }
 
@@ -2284,7 +2286,7 @@ public class Player {
     }
 
     public boolean hasMechInSystem(Tile tile) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String colorID = Mapper.getColorID(getColor());
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty())
@@ -2297,7 +2299,7 @@ public class Player {
     }
 
     public boolean hasProductionUnitInSystem(Tile tile) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String colorID = Mapper.getColorID(getColor());
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty())

@@ -659,8 +659,7 @@
         "name": "Star Chart",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
-        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
         "source": "ds"
     },
     {
@@ -668,8 +667,7 @@
         "name": "Star Chart",
         "type": "Hazardous",
         "resolution": "Instant",
-        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
-        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
         "source": "ds"
     },
     {
@@ -677,8 +675,7 @@
         "name": "Star Chart",
         "type": "Industrial",
         "resolution": "Instant",
-        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
-        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
         "source": "ds"
     },
     {
@@ -686,8 +683,7 @@
         "name": "Star Chart",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
-        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
         "source": "ds"
     },
     {
@@ -804,7 +800,7 @@
         "type": "Cultural",
         "resolution": "Attach",
         "text": "ATTACH: Whenever you exhaust this planet, gain 1 commodity.",
-        "attachmentId": "traderoute",
+        "attachmentId": "lloyd_traderoute",
         "source": "asteroid"
     },
     {
@@ -813,7 +809,7 @@
         "type": "Cultural",
         "resolution": "Attach",
         "text": "ATTACH: Whenever you ready this planet, draw 1 action card, or 2 if you have the Neural Motivators technology.",
-        "attachmentId": "interplanetaryhub",
+        "attachmentId": "lloyd_interplanetaryhub",
         "source": "asteroid"
     },
     {

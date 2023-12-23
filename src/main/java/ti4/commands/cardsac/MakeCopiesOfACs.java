@@ -1,8 +1,8 @@
 package ti4.commands.cardsac;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -32,7 +32,7 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
             }
         }
         if (count == 2) {
-            HashMap<String, ActionCardModel> actionCards = Mapper.getActionCards("extra1");
+            Map<String, ActionCardModel> actionCards = Mapper.getActionCards("extra1");
             List<String> ACs = new ArrayList<>(actionCards.keySet());
             activeGame.addActionCardDuplicates(ACs);
         }

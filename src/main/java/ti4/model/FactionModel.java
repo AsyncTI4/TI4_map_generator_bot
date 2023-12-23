@@ -7,8 +7,6 @@ import java.util.Optional;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;

@@ -9,8 +9,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
 public class ShowDiscardedAgendas extends AgendaSubcommandData {
     public ShowDiscardedAgendas() {
         super(Constants.SHOW_DISCARDED, "Show discarded Agendas");
@@ -24,7 +22,7 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
     public void showDiscards(Game activeGame, GenericInteractionCreateEvent event){
         StringBuilder sb = new StringBuilder();
         sb.append("__**Discarded Agendas:**__\n");
-        LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         int index = 1;
         for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
             sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));

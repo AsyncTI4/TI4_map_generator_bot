@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -106,7 +105,7 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     private static String getSecretObjectiveCardInfo(Game activeGame, Player player) {
-        LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
+        Map<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeGame.getScoredSecretObjective(player.getUserID()));
         for (String id : activeGame.getSoToPoList()) {
             scoredSecretObjective.remove(id);
@@ -145,7 +144,7 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Game activeGame, Player player) {
-        LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
+        Map<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null && !secretObjective.isEmpty()) {
             for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
@@ -161,7 +160,7 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game activeGame, Player player) {
-        LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
+        Map<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null && !secretObjective.isEmpty()) {
             for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
