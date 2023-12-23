@@ -53,7 +53,7 @@ public class GameEnd extends GameSubcommandData {
             return;
         }
         String gameName = activeGame.getName();
-        if (!event.getChannel().getName().startsWith(gameName + "-")) {
+        if (!gameName.equals(StringUtils.substringBefore(event.getChannel().getName(), "-"))) {
             MessageHelper.replyToMessage(event, "`/game end` must be executed in game channel only!");
             return;
         }

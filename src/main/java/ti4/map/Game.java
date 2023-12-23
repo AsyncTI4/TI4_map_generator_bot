@@ -2916,6 +2916,16 @@ public class Game {
         return name;
     }
 
+    public String getGameNameForSorting() {
+        if (getName().startsWith("pbd")) {
+            return StringUtils.leftPad(getName(), 10, "0");
+        }
+        if (getName().startsWith("fow")) {
+            return StringUtils.leftPad(getName(), 10, "1");
+        }
+        return getName();
+    }
+
     @JsonIgnore
     public String getPing() {
         Guild guild = getGuild();
