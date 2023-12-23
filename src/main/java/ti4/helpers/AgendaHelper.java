@@ -2621,8 +2621,8 @@ public class AgendaHelper {
     public static int getVoteCountFromPlanets(Game activeGame, Player player) {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
-        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast).mapToInt(Planet::getResources).sum();
+        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast).mapToInt(Planet::getInfluence).sum();
         int voteCount = baseInfluenceCount; //default
 
         //NEKRO unless XXCHA ALLIANCE
