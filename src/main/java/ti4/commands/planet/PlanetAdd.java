@@ -12,11 +12,13 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
@@ -146,6 +148,14 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Button.success("scourPlanet_"+planet, "Use Scour").withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " if you have not already used Scour this tactical action, you can discard an AC to ready the planet "+Helper.getPlanetRepresentation(planet, activeGame);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
+        }
+        Tile tile = activeGame.getTileFromPlanet(planet);
+        if(tile != null && activeGame.getActivePlayerObject() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !ButtonHelper.isTileHomeSystem(tile) && FoWHelper.playerHasShipsInSystem(player, tile)){
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship").withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            String msg2 = player.getRepresentation(true, true) + " you can produce 1 ship in the system due to Free Systems Commander";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
         if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")

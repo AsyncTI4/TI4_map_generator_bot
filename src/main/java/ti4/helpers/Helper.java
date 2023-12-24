@@ -622,7 +622,7 @@ public class Helper {
             Planet planet = (Planet) unitHolder;
             String techType = "";
             String techEmoji = "";
-            if (Mapper.getPlanet(planetID).getTechSpecialties() != null && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
+            if (Mapper.getPlanet(planetID) != null && Mapper.getPlanet(planetID).getTechSpecialties() != null && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planetID).getTechSpecialties().get(0).toString().toLowerCase();
             } else {
                 techType = ButtonHelper.getTechSkipAttachments(activeGame, planetID);
@@ -835,6 +835,9 @@ public class Helper {
                 case "absolsyncretone" ->{
                     msg = msg +  "Used Absol Syncretone for "+count+" votes "+"\n";
                 }
+                case "augerscommander" ->{
+                    msg = msg +  "Used Augurs Commander for "+count+" votes "+"\n";
+                }
                 case "zeal" ->{
                     msg = msg +  "Used Zeal Ability for "+count+" votes "+"\n";
                 }
@@ -930,6 +933,10 @@ public class Helper {
                     msg = msg + "> Used Sarween Tools "+Emojis.CyberneticTech +"\n";
                     res = res+1;
                 }
+                if(thing.contains("warmachine")){
+                    msg = msg + "> Used War Machine "+Emojis.ActionCard +"\n";
+                    res = res+1;
+                }
                 if(thing.contains("aida")){
                     msg = msg + "> Exhausted AIDEV ";
                     if(thing.contains("_")){
@@ -954,7 +961,7 @@ public class Helper {
                     msg = msg +"> "+ "Custiodia Vigilia (2/3)" + "\n";
                     res = res + 2;
                     inf = inf + 3;
-                } else if(thing.contains("custodia")){
+                } else if(thing.contains("ghoti")){
                     msg = msg +"> "+ "Ghoti (3/3)" + "\n";
                     res = res + 3;
                     inf = inf + 3;
@@ -1079,6 +1086,9 @@ public class Helper {
             }
             productionValueTotal = highestProd;
         }
+        if(productionValueTotal > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")){
+            productionValueTotal = productionValueTotal+ ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd");
+        }
         return productionValueTotal;
     }
 
@@ -1105,7 +1115,11 @@ public class Helper {
         if(regulated){
             cost = cost + numInf + numFF;
         }else{
-            cost = cost + ((numInf+1)/2);
+            if(player.ownsUnit("cymiae_infantry") || player.ownsUnit("cymiae_infantry2")){
+                cost = cost + numInf;
+            }else{
+                cost = cost + ((numInf+1)/2);
+            }
             cost = cost + ((numFF+1)/2);
         }
         totalUnits = totalUnits + numInf+numFF;

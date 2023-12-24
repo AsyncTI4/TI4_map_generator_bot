@@ -2263,7 +2263,9 @@ public class AgendaHelper {
              int[] voteInfo = getVoteTotal(player, activeGame);
             Planet p = (Planet) planetsInfo.get(planet);
             if (p == null) {
-                return 0;
+                if(planet.contains("custodia") || planet.contains("ghoti")){
+                    return 3;
+                }
             }
             voteAmount += p.getInfluence();
             if (voteInfo[1] != 0) {
@@ -2326,6 +2328,11 @@ public class AgendaHelper {
         }
         if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")){
             Button button = Button.secondary("exhaustForVotes_hacanCommanderTg", "Spend a tg for 2 votes").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
+            planetButtons.add(button);
+        }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")){
+            int count = player.getTechs().size()/2;
+            Button button = Button.secondary("exhaustForVotes_augerscommander_"+count, "Use Augurs Commander Votes ("+count+")").withEmoji(Emoji.fromFormatted(Emojis.augers));
             planetButtons.add(button);
         }
         if (CollectionUtils.containsAny(player.getRelics(), List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
@@ -2719,6 +2726,10 @@ public class AgendaHelper {
         if (player.hasRelicReady("absol_syncretone")) {
             int count = player.getNeighbourCount();
             additionalVotesAndSources.put(Emojis.Relic + "Syncretone", count);
+        }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")){
+            int count = player.getTechs().size()/2;
+            additionalVotesAndSources.put(Emojis.augers + "Augers Commander", count);
         }
 
         //Ghoti Wayfarer Tech
