@@ -58,7 +58,7 @@ public class ButtonHelperFactionSpecific {
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf "+planet, activeGame);
         String msg = player.getRepresentation(true, true) + " deployed a mech and infantry on "+Helper.getPlanetRepresentation(planet, activeGame);
         ButtonHelper.sendMessageToRightStratThread(player, activeGame, msg, "construction");
-        if (!player.getSCs().contains(Integer.parseInt("4"))) {
+        if (!player.getSCs().contains(Integer.parseInt("4")) && !activeGame.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
             String color = player.getColor();
             if (Mapper.isValidColor(color)) {
                 AddCC.addCC(event, color, tile);

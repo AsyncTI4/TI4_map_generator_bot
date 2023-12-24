@@ -207,6 +207,10 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("miningInitiative", "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
+            codedName = "War Machine";
+            if (actionCardTitle.contains(codedName)) {
+                player.addSpentThing("warmachine");
+            }
 
             codedName = "Economic Initiative";
             if (actionCardTitle.contains(codedName)) {
