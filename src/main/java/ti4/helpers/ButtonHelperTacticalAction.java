@@ -474,6 +474,13 @@ public class ButtonHelperTacticalAction {
             }
             ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
         }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")&&ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock).contains(activeGame.getTileByPosition(pos))){
+            List<Button> buttons = new ArrayList<>();
+            Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+            buttons.add(getCommButton);
+            String msg = player.getRepresentation()+" you have Celdauri Commander and activated a system with your SD. Please hit button to get a commodity";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        }
         if (!activeGame.isFoWMode() && playersWithPds2.size() > 0 && !activeGame.getL1Hero()) {
             StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true) + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
             List<Button> buttons2 = new ArrayList<>();
@@ -492,7 +499,7 @@ public class ButtonHelperTacticalAction {
         }
         if (player.getTechs().contains("sdn") && !button2.isEmpty() && !activeGame.getL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink", button2);
-            if (player.hasAbility("awaken")) {
+            if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos), event);
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "\n\nUse buttons to select the first system you want to move from", systemButtons);
