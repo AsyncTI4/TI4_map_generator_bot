@@ -443,17 +443,20 @@ public class ButtonHelperModifyUnits {
                     if (tile == null) {
                         tile = activeGame.getTileByPosition(tileID);
                     }
-                    if (Mapper.isValidColor(color)) {
-                        AddCC.addCC(event, color, tile);
+                    String msg = playerRep + " Placed A CC From Reinforcements In The "
+                                + Helper.getPlanetRepresentation(planetName, activeGame) + " system";
+                    if(!activeGame.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")){
+                        if (Mapper.isValidColor(color)) {
+                            AddCC.addCC(event, color, tile);
+                        }
+                    }else{
+                        msg = playerRep +" has Rohdhna Commander and is thus doing the Primary which does not place a CC";
                     }
 
                     if (activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(),
-                            playerRep + " Placed A CC From Reinforcements In The "
-                                + Helper.getPlanetRepresentation(planetName, activeGame) + " system");
+                        MessageHelper.sendMessageToChannel(event.getChannel(),msg);
                     } else {
-                        ButtonHelper.sendMessageToRightStratThread(player, activeGame, playerRep + " Placed A CC From Reinforcements In The "
-                            + Helper.getPlanetRepresentation(planetName, activeGame) + " system", "construction");
+                        ButtonHelper.sendMessageToRightStratThread(player, activeGame, msg, "construction");
                     }
                 }
             }

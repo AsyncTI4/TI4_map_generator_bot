@@ -100,6 +100,16 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             ButtonHelper.getIdent(player) + " placed 1 fighter in " + tile.getRepresentation() + " using Ghost Commander");
     }
+    public static void resolveKhraskCommanderPlacement(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "inf", activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        ButtonHelper.getIdent(player) + " placed 1 infantry in " + tile.getRepresentation() + " using Khrask Commander");
+        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
+        event.getMessage().editMessage(event.getMessage().getContentRaw())
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
 
     public static List<Button> resolveFlorzenCommander(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();

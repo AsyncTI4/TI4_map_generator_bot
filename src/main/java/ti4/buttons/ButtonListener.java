@@ -426,6 +426,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperCommanders.resolveYinCommanderRemoval(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("placeGhostCommanderFF_")) {
             ButtonHelperCommanders.resolveGhostCommanderPlacement(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("placeKhraskCommanderInf_")) {
+            ButtonHelperCommanders.resolveKhraskCommanderPlacement(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
             String planet = buttonID.replace("yinHeroPlanet_", "");
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " Chose to invade " + Helper.getPlanetRepresentation(planet, activeGame));
