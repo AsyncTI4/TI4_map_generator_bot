@@ -2203,7 +2203,7 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.resolveAgenda(activeGame, buttonID, event, actionsChannel);
         } else if (buttonID.startsWith("rollIxthian")) {
             if (activeGame.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
-                AgendaHelper.rollIxthian(activeGame);
+                AgendaHelper.rollIxthian(activeGame, true);
             } else {
                 Button ixthianButton = Button.success("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mecatol));

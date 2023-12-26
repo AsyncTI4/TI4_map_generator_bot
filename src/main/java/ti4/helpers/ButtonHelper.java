@@ -1224,6 +1224,10 @@ public class ButtonHelper {
 
     public static String getTechSkipAttachments(Game activeGame, String planetName) {
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
+        if(tile == null){
+            BotLogger.log("Couldnt find tile for "+planetName +" in game "+activeGame.getName());
+            return "none";
+        }
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         if(unitHolder == null){
             BotLogger.log("Couldnt find unitholder for "+planetName +" in game "+activeGame.getName());
@@ -2886,6 +2890,9 @@ public class ButtonHelper {
                     }
                 }
             }
+            if(capChecker.getUnitCount(UnitType.PlenaryOrbital, player.getColor()) > 0){
+                fightersIgnored += 10;
+            }
         }
         //System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
@@ -4246,6 +4253,7 @@ public class ButtonHelper {
             case "cv" -> "carrier";
             case "dn" -> "dreadnought";
             case "lady" -> "lady";
+            case "plenaryorbital" -> "plenaryorbital";
             default -> "";
         };
     }
