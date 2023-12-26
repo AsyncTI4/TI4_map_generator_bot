@@ -1225,6 +1225,10 @@ public class ButtonHelper {
     public static String getTechSkipAttachments(Game activeGame, String planetName) {
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        if(unitHolder == null){
+            BotLogger.log("Couldnt find unitholder for "+planetName +" in game "+activeGame.getName());
+            return "none";
+        }
         Set<String> tokenList = unitHolder.getTokenList();
         if (CollectionUtils.containsAny(tokenList, "attachment_warfare.png", "attachment_cybernetic.png", "attachment_biotic.png", "attachment_propulsion.png")) {
             String type = "warfare";

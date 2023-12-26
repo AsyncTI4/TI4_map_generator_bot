@@ -394,10 +394,7 @@ public class ButtonHelperActionCards {
     public static void resolveFrontlineDeployment(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to drop 3 infantry on";
         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "3gf", "placeOneNDone_skipbuild"));
-        Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
-        buttons.add(DoneRefreshing);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
-
         event.getMessage().delete().queue();
     }
 
