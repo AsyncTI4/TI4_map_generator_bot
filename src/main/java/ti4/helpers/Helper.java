@@ -625,7 +625,7 @@ public class Helper {
             if (Mapper.getPlanet(planetID) != null && Mapper.getPlanet(planetID).getTechSpecialties() != null && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planetID).getTechSpecialties().get(0).toString().toLowerCase();
             } else {
-                techType = ButtonHelper.getTechSkipAttachments(activeGame, planetID);
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, AliasHandler.resolvePlanet(planetID));
             }
             if (!"".equalsIgnoreCase(techType)) {
                 switch (techType) {
@@ -1043,6 +1043,9 @@ public class Helper {
                     if(unit.getColor().equalsIgnoreCase(player.getColor())){
                         if(unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()){
                             player.addOwnedUnitByID("tyrantslament");
+                        }
+                        if(unit.getUnitType() == UnitType.PlenaryOrbital && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()){
+                            player.addOwnedUnitByID("plenaryorbital");
                         }
                         UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                         int productionValue = unitModel.getProductionValue();

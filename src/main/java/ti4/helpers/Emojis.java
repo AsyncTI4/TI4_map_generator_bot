@@ -1135,6 +1135,7 @@ public class Emojis {
             case "destroyer" -> destroyer;
             case "carrier" -> carrier;
             case "cruiser" -> cruiser;
+            case "plenaryorbital"-> spacedock;
 
             // LEADERS - AGENTS
             case "arborecagent" -> ArborecAgent;

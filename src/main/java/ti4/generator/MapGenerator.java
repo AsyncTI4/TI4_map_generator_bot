@@ -3452,6 +3452,9 @@ public class MapGenerator {
                     if (unitKey.getUnitType() == UnitType.Lady) {
                         unitPath = unitPath.replace("lady", "fs");
                     }
+                    if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
+                        unitPath = unitPath.replace("plenaryorbital", "csd");
+                    }
                 }
 
                 unitImage = ImageHelper.read(unitPath);
