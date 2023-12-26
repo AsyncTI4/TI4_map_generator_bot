@@ -528,7 +528,7 @@ public class AgendaHelper {
                         Button loseStrat = Button.danger(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy CC");
                         Button DoneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons", "Done Losing CCs");
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
-                        String message2 = player.getRepresentation(true, true) + " use buttons to lose 2 CC";
+                        String message2 = player.getRepresentation(true, true) + " use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
                     }
                 }else{
@@ -593,7 +593,7 @@ public class AgendaHelper {
                         Button loseStrat = Button.danger(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy CC");
                         Button DoneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons", "Done Losing CCs");
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
-                        String message2 = player.getRepresentation(true, true) + " use buttons to lose 1 CC";
+                        String message2 = player.getRepresentation(true, true) + " use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
                     }
                 }

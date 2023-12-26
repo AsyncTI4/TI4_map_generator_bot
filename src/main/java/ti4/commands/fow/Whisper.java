@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 public class Whisper extends FOWSubcommandData {
 
     public Whisper() {
-        super(Constants.WHISPER, "Send a private message to a player");
+        super(Constants.WHISPER, "Send a private message to a player in fog mode");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
@@ -35,6 +35,10 @@ public class Whisper extends FOWSubcommandData {
         Player player_ = Helper.getPlayer(activeGame, player, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
+            return;
+        }
+        if(!activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
             return;
         }
         OptionMapping whisperms = event.getOption(Constants.MSG);
