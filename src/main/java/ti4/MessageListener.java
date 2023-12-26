@@ -34,6 +34,7 @@ import ti4.commands.fow.Whisper;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -428,11 +429,15 @@ public class MessageListener extends ListenerAdapter {
         colors.addAll(Mapper.getFactionIDs());
         String message = msg.getContentRaw().toLowerCase();
         boolean messageToColor = false;
+        boolean messageToMyself = false;
         for (String color : colors) {
             if (message.startsWith("to" + color)) {
                 messageToColor = true;
                 break;
             }
+        }
+        if(message.startsWith("tofutureme")){
+            messageToMyself = true;
         }
 
         if (event.getChannel() instanceof ThreadChannel && event.getChannel().getName().contains("vs") && event.getChannel().getName().contains("private")) {
@@ -498,7 +503,7 @@ public class MessageListener extends ListenerAdapter {
 
         }
 
-        if (messageToColor) {
+        if (messageToColor || messageToMyself) {
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -517,17 +522,23 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
                 Player player_ = activeGame.getPlayer(event.getAuthor().getId());
-                String factionColor = msg3.substring(2, msg3.indexOf(" ")).toLowerCase();
-                factionColor = AliasHandler.resolveFaction(factionColor);
-                for (Player player3 : activeGame.getPlayers().values()) {
-                    if (Objects.equals(factionColor, player3.getFaction()) ||
-                        Objects.equals(factionColor, player3.getColor())) {
-                        player_ = player3;
-                        break;
-                    }
-                }
 
-                Whisper.sendWhisper(activeGame, player, player_, msg2, "n", event.getChannel(), event.getGuild());
+                if(messageToColor){
+                    String factionColor = msg3.substring(2, msg3.indexOf(" ")).toLowerCase();
+                    factionColor = AliasHandler.resolveFaction(factionColor);
+                    for (Player player3 : activeGame.getPlayers().values()) {
+                        if (Objects.equals(factionColor, player3.getFaction()) ||
+                            Objects.equals(factionColor, player3.getColor())) {
+                            player_ = player3;
+                            break;
+                        }
+                    }
+
+                    Whisper.sendWhisper(activeGame, player, player_, msg2, "n", event.getChannel(), event.getGuild());
+                }else{
+                    activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction())+" "+msg2.replace(":","666fin"));
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " sent themselves a future message");
+                }
                 msg.delete().queue();
             }
         }

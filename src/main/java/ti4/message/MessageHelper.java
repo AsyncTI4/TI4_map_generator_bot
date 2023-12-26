@@ -164,7 +164,10 @@ public class MessageHelper {
 	}
 
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
-		if (fileUpload == null) return;
+		if (fileUpload == null) {
+			BotLogger.log("Fileupload null");
+			return;
+		}
 		if (channel.getName().contains("-actions")) {
 			String threadName = channel.getName().replace("-actions", "") + "-bot-map-updates";
 			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
