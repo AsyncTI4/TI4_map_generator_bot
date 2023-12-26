@@ -896,33 +896,54 @@ public class AgendaHelper {
         }
     }
 
-    public static void rollIxthian(Game activeGame) {
-        TextChannel watchParty = watchPartyChannel(activeGame);
-        String watchPartyPing = watchPartyPing(activeGame);
-        String activeGamePing = activeGame.getPing();
-        Message watchPartyMsg = watchParty == null ? null : watchParty.sendMessage(drumroll(watchPartyPing, 0)).complete();
-
-        MessageHelper.MessageFunction resolveIxthian = (msg) -> {
-            int rand = 10 + ThreadLocalRandom.current().nextInt(5);
-            if (ThreadLocalRandom.current().nextInt(10) == 0) {
-                //random chance for a super long wait
-                rand += ThreadLocalRandom.current().nextInt(45);
-            }
-            sleep();
-            for (int i = 1; i <= rand; i++) {
-                msg.editMessage(drumroll(activeGamePing, i)).queue();
-                if (watchPartyMsg != null) {
-                    watchPartyMsg.editMessage(drumroll(watchPartyPing, i)).queue();
+    public static void rollIxthian(Game activeGame, boolean publish) {
+         String activeGamePing = activeGame.getPing();
+        if(publish){
+                TextChannel watchParty = watchPartyChannel(activeGame);
+                String watchPartyPing = watchPartyPing(activeGame);
+                Message watchPartyMsg = watchParty == null ? null : watchParty.sendMessage(drumroll(watchPartyPing, 0)).complete();
+                MessageHelper.MessageFunction resolveIxthian = (msg) -> {
+                int rand = 10 + ThreadLocalRandom.current().nextInt(5);
+                if (ThreadLocalRandom.current().nextInt(10) == 0) {
+                    //random chance for a super long wait
+                    rand += ThreadLocalRandom.current().nextInt(45);
                 }
                 sleep();
-            }
-            msg.delete().queue();
-            if (watchPartyMsg != null) {
-                watchPartyMsg.delete().queue();
-            }
-            resolveIxthianRoll(activeGame);
-        };
-        MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), activeGame.getMainGameChannel(), resolveIxthian);
+                for (int i = 1; i <= rand; i++) {
+                    msg.editMessage(drumroll(activeGamePing, i)).queue();
+                    if (watchPartyMsg != null) {
+                        watchPartyMsg.editMessage(drumroll(watchPartyPing, i)).queue();
+                    }
+                    sleep();
+                }
+                msg.delete().queue();
+                if (watchPartyMsg != null) {
+                    watchPartyMsg.delete().queue();
+                }
+                resolveIxthianRoll(activeGame);
+            };
+            MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), activeGame.getMainGameChannel(), resolveIxthian);
+        }else{
+            MessageHelper.MessageFunction resolveIxthian = (msg) -> {
+                int rand = 10 + ThreadLocalRandom.current().nextInt(5);
+                if (ThreadLocalRandom.current().nextInt(10) == 0) {
+                    //random chance for a super long wait
+                    rand += ThreadLocalRandom.current().nextInt(45);
+                }
+                sleep();
+                for (int i = 1; i <= rand; i++) {
+                    msg.editMessage(drumroll(activeGamePing, i)).queue();
+                    sleep();
+                }
+                msg.delete().queue();
+                resolveIxthianRoll(activeGame);
+            };
+            MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), activeGame.getMainGameChannel(), resolveIxthian);
+        }
+        
+
+        
+        
     }
 
     private static void resolveIxthianRoll(Game activeGame) {
@@ -2274,6 +2295,7 @@ public class AgendaHelper {
             if(player.hasAbility("lithoids")){
                 voteAmount = p.getResources();
             }
+            
 
             if(player.hasAbility("biophobic")){
                 voteAmount = 1;
@@ -2286,6 +2308,11 @@ public class AgendaHelper {
                 PlanetModel planetModel = Mapper.getPlanet(planet);
                 if (planetModel != null && planetModel.getPlanetType().toString().equals(Constants.CULTURAL)) {
                     voteAmount += 2;
+                }
+            }
+            for(String attachment :p.getTokenList()){
+                if(attachment.contains("council_preserve")){
+                    voteAmount+=4;
                 }
             }
 
