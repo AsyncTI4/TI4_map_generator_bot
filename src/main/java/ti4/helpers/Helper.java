@@ -806,6 +806,10 @@ public class Helper {
         int tg = player.getSpentTgsThisWindow();
         for(String thing : spentThings){
             int count = 0;
+            if(!thing.contains("_")){
+                BotLogger.log("Caught the following thing in the voting "+thing+" in game "+activeGame.getName());
+                continue;
+            }
             String secondHalf = thing.split("_")[1];
             String flavor = thing.split("_")[0];
             if(flavor.contains("planet")){
