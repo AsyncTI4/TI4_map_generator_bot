@@ -217,7 +217,7 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> scButtons = new ArrayList<>();
                 scButtons.add(Button.success("resolveReverse_" + actionCardTitle, "Pick up " + actionCardTitle + " from the discard"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    fowIdentity + " After checking for sabos, use buttons to resolve reverse engineer", scButtons);
+                    fowIdentity + " After checking for sabos, use buttons to resolve reverse engineer.", scButtons);
             }
 
             if (channel != null) {
@@ -3149,7 +3149,11 @@ public class ButtonListener extends ListenerAdapter {
                         editedMessage = editedMessage.replace(
                             "Your current CCs are " + originalCCs + ". Use buttons to gain CCs", "CCs have gone from " + originalCCs + " -> " + player.getCCRepresentation()
                                 + ". Net gain of: -1");
-                    } else {
+                    } else  if (editedMessage.contains("Use buttons to lose CCs")) {
+                        editedMessage = editedMessage.replace(
+                            "Your current CCs are " + originalCCs + ". Use buttons to lose CCs", "CCs have gone from " + originalCCs + " -> " + player.getCCRepresentation()
+                                + ". Net gain of: -1");
+                    }else {
                         String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "));
                         shortCCs = shortCCs.replace("CCs have gone from ", "");
                         shortCCs = shortCCs.substring(0, shortCCs.indexOf(" "));
@@ -3166,6 +3170,10 @@ public class ButtonListener extends ListenerAdapter {
                     if (editedMessage.contains("Use buttons to gain CCs")) {
                         editedMessage = editedMessage.replace(
                             "Your current CCs are " + originalCCs + ". Use buttons to gain CCs", "CCs have gone from " + originalCCs + " -> " + player.getCCRepresentation()
+                                + ". Net gain of: -1");
+                    } else  if (editedMessage.contains("Use buttons to lose CCs")) {
+                        editedMessage = editedMessage.replace(
+                            "Your current CCs are " + originalCCs + ". Use buttons to lose CCs", "CCs have gone from " + originalCCs + " -> " + player.getCCRepresentation()
                                 + ". Net gain of: -1");
                     } else {
                         String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "));
@@ -3185,7 +3193,11 @@ public class ButtonListener extends ListenerAdapter {
                         editedMessage = editedMessage.replace(
                             "Your current CCs are " + originalCCs + ". Use buttons to gain CCs", "CCs have gone from " + originalCCs + " -> " + player.getCCRepresentation()
                                 + ". Net gain of: -1");
-                    } else {
+                    } else  if (editedMessage.contains("Use buttons to lose CCs")) {
+                        editedMessage = editedMessage.replace(
+                            "Your current CCs are " + originalCCs + ". Use buttons to lose CCs", "CCs have gone from " + originalCCs + " -> " + player.getCCRepresentation()
+                                + ". Net gain of: -1");
+                    } else{
                         String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "));
                         shortCCs = shortCCs.replace("CCs have gone from ", "");
                         shortCCs = shortCCs.substring(0, shortCCs.indexOf(" "));
