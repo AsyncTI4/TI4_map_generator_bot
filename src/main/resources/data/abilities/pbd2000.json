@@ -1,0 +1,86 @@
+[
+    {
+        "id": "enable",
+        "name": "enable",
+        "faction": "syndicate",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "disrupt",
+        "name": "disrupt",
+        "faction": "syndicate",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "echo1",
+        "name": "echo1",
+        "faction": "echoes",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "echo2",
+        "name": "echo2",
+        "faction": "echoes",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "voidmaker",
+        "name": "voidmaker",
+        "faction": "raven",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "impairment",
+        "name": "impairment",
+        "faction": "raven",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "tachyonpulse",
+        "name": "tachyonpulse",
+        "faction": "raven",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "durable",
+        "name": "durable",
+        "faction": "terminator",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "saturation",
+        "name": "saturation",
+        "faction": "enclave",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "restricted",
+        "name": "restricted",
+        "faction": "enclave",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "architect",
+        "name": "architect",
+        "faction": "enclave",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    },
+    {
+        "id": "constrained",
+        "name": "constrained",
+        "faction": "enclave",
+        "permanentEffect": "Secret Ability Text",
+        "source": "pbd2000"
+    }
+]

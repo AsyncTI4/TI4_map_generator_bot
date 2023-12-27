@@ -1,0 +1,47 @@
+[
+    {
+        "alias": "windfall",
+        "name": "Windfall",
+        "faction": "syndicate",
+        "playArea": "false",
+        "attachment": "",
+        "source": "pbd2000",
+        "text": "At the start of the Syndicate player's turn, gain 1 TG. Then return this card to the Syndicate player."
+    },
+    {
+        "alias": "echopn",
+        "name": "Echo PN",
+        "faction": "echoes",
+        "playArea": "false",
+        "attachment": "",
+        "source": "pbd2000",
+        "text": "Variable."
+    },
+    {
+        "alias": "strotemarket",
+        "name": "Strotemarket",
+        "faction": "raven",
+        "playArea": "false",
+        "attachment": "",
+        "source": "pbd2000",
+        "text": "At the start of your turn, you may spend 2 resources to place 1 destroyer or 2 fighters in a system that does not contain another player's ships. Then, return this card to the Raven player."
+    },
+    {
+        "alias": "deathstrike",
+        "name": "Deathstrike",
+        "faction": "terminator",
+        "playArea": "false",
+        "attachment": "",
+        "source": "pbd2000",
+        "text": "At the start of a combat against the non-Terminator player, you may choose 1 enemy ship and destroy that unit."
+    },
+    {
+        "alias": "starwars",
+        "name": "Star Wars",
+        "faction": "enclave",
+        "playArea": "false",
+        "attachment": "",
+        "source": "pbd2000",
+        "text": "After an opponent moves ships into a system that contains your units, you may fire SPACE CANNON 5 (x3), then return this card."
+    }
+]

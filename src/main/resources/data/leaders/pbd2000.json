@@ -1,0 +1,167 @@
+[
+    {
+        "id": "syndicateagent",
+        "faction": "syndicate",
+        "type": "agent",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "pbd2000"
+    },
+    {
+        "id": "syndicatecommander",
+        "faction": "syndicate",
+        "type": "commander",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Secret Unlock Condition",
+        "source": "pbd2000"
+    },
+    {
+        "id": "syndicatehero",
+        "faction": "syndicate",
+        "type": "hero",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "pbd2000"
+    },
+    {
+        "id": "echoesagent",
+        "faction": "echoes",
+        "type": "agent",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "pbd2000"
+    },
+    {
+        "id": "echoescommander",
+        "faction": "echoes",
+        "type": "commander",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Secret Unlock Condition",
+        "source": "pbd2000"
+    },
+    {
+        "id": "echoeshero",
+        "faction": "echoes",
+        "type": "hero",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "pbd2000"
+    },
+    {
+        "id": "ravenagent",
+        "faction": "raven",
+        "type": "agent",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "pbd2000"
+    },
+    {
+        "id": "ravencommander",
+        "faction": "raven",
+        "type": "commander",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Secret Unlock Condition",
+        "source": "pbd2000"
+    },
+    {
+        "id": "ravenhero",
+        "faction": "raven",
+        "type": "hero",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "pbd2000"
+    },
+    {
+        "id": "terminatoragent",
+        "faction": "terminator",
+        "type": "agent",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "pbd2000"
+    },
+    {
+        "id": "terminatorcommander",
+        "faction": "terminator",
+        "type": "commander",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Secret Unlock Condition",
+        "source": "pbd2000"
+    },
+    {
+        "id": "terminatorhero",
+        "faction": "terminator",
+        "type": "hero",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "pbd2000"
+    },
+    {
+        "id": "enclaveagent",
+        "faction": "enclave",
+        "type": "agent",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "pbd2000"
+    },
+    {
+        "id": "enclavecommander",
+        "faction": "enclave",
+        "type": "commander",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Secret Unlock Condition",
+        "source": "pbd2000"
+    },
+    {
+        "id": "enclavehero",
+        "faction": "enclave",
+        "type": "hero",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "pbd2000"
+    }
+]

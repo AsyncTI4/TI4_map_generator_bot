@@ -7,12 +7,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
-import ti4.message.BotLogger;
 import ti4.testUtils.BaseTi4Test;
 
-public class FactionModelTest extends BaseTi4Test {
+class FactionModelTest extends BaseTi4Test {
     @Test
-    public void testFactions() {
+    void testFactions() {
         for (FactionModel faction : Mapper.getFactions()) {
             assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
             assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
