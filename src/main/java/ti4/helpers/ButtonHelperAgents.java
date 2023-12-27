@@ -205,7 +205,7 @@ public class ButtonHelperAgents {
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
-        List<String> allowedUnits = Stream.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun).map(UnitType::getValue).toList();
+        List<String> allowedUnits = Stream.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun, UnitType.Fighter).map(UnitType::getValue).toList();
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);

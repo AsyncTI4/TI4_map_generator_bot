@@ -429,10 +429,15 @@ public class MessageListener extends ListenerAdapter {
         colors.addAll(Mapper.getFactionIDs());
         String message = msg.getContentRaw().toLowerCase();
         boolean messageToColor = false;
+        boolean messageToFutureColor = false;
         boolean messageToMyself = false;
         for (String color : colors) {
             if (message.startsWith("to" + color)) {
                 messageToColor = true;
+                break;
+            }
+            if (message.startsWith("tofuture" + color)) {
+                messageToFutureColor = true;
                 break;
             }
         }
@@ -503,7 +508,7 @@ public class MessageListener extends ListenerAdapter {
 
         }
 
-        if (messageToColor || messageToMyself) {
+        if (messageToColor || messageToMyself || messageToFutureColor) {
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -535,9 +540,21 @@ public class MessageListener extends ListenerAdapter {
                     }
 
                     Whisper.sendWhisper(activeGame, player, player_, msg2, "n", event.getChannel(), event.getGuild());
-                }else{
+                }else if(messageToMyself){
                     activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction())+" "+msg2.replace(":","666fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " sent themselves a future message");
+                }else{
+                    String factionColor = msg3.substring(8, msg3.indexOf(" ")).toLowerCase();
+                    factionColor = AliasHandler.resolveFaction(factionColor);
+                    for (Player player3 : activeGame.getPlayers().values()) {
+                        if (Objects.equals(factionColor, player3.getFaction()) ||
+                            Objects.equals(factionColor, player3.getColor())) {
+                            player_ = player3;
+                            break;
+                        }
+                    }
+                    activeGame.setCurrentReacts("futureMessageFor_"+player_.getFaction()+"_"+player.getFaction(),activeGame.getFactionsThatReactedToThis("futureMessageFor_"+player_.getFaction()+"_"+player.getFaction())+" "+msg2.replace(":","666fin"));
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " sent someone else a future message");
                 }
                 msg.delete().queue();
             }
