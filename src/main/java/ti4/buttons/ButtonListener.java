@@ -835,8 +835,10 @@ public class ButtonListener extends ListenerAdapter {
                 + " Cards info thread.");
             ButtonHelper.addReaction(event, true, false, "Looked at top of Hazardous, Cultural and Industrial decks.", "");
             event.getMessage().delete().queue();
-        } else if (buttonID.startsWith("distant_suns_")) {
+        } else if (buttonID.startsWith("distant_suns_")) {//"autoAssignGroundHits_"
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("autoAssignGroundHits_")) {//"autoAssignGroundHits_"
+            ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
             activeGame.setComponentAction(true);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
@@ -1388,6 +1390,18 @@ public class ButtonListener extends ListenerAdapter {
             int median = Integer.parseInt(hours);
             player.setAutoSaboPassMedian(median);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
+            if(median > 0){
+                if(player.hasAbility("quash") || player.ownsPromissoryNote("rider") || player.getPromissoryNotes().keySet().contains("riderm") 
+                || player.hasAbility("radiance") || player.hasAbility("galactic_threat") ||player.ownsPromissoryNote("riderx") 
+                || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")){
+                }else{
+                    List<Button> buttons = new ArrayList<>();
+                    String msg = player.getRepresentation() +" The bot can also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                    buttons.add(Button.success("playerPrefDecision_true_agenda","Turn on"));
+                    buttons.add(Button.success("playerPrefDecision_false_agenda","Turn off"));
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+                }
+            }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("arboAgentOn_")) {
             String pos = buttonID.split("_")[1];
@@ -1519,6 +1533,24 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.yinAgent(buttonID, event, activeGame, player, ident, trueIdentity);
         } else if (buttonID.startsWith("resolveMaw")) {
             ButtonHelper.resolveMaw(activeGame, player, event);
+        } else if (buttonID.startsWith("playerPref_")) {
+            ButtonHelper.resolvePlayerPref(player, event, buttonID, activeGame);
+        } else if (buttonID.startsWith("setPersonalAutoPingInterval_")) {
+            int interval = Integer.parseInt(buttonID.split("_")[1]);
+            player.setPersonalPingInterval(interval);
+            Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+            for (Game activeGame2 : mapList.values()) {
+                for (Player player2 : activeGame2.getRealPlayers()) {
+                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                        player2.setPersonalPingInterval(interval);
+                        GameSaveLoadManager.saveMap(activeGame2);
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set interval as "+interval +" hours");
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("playerPrefDecision_")) {
+            ButtonHelper.resolvePlayerPrefDecision(player, event, buttonID, activeGame);
         } else if (buttonID.startsWith("resolveCrownOfE")) {
             ButtonHelper.resolveCrownOfE(activeGame, player, event);
         } else if (buttonID.startsWith("sarMechStep1_")) {
@@ -2324,7 +2356,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Decided to skip waiting for afters and proceed to voting.");
                     try {
-                        AgendaHelper.startTheVoting(activeGame, event);
+                        AgendaHelper.startTheVoting(activeGame);
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not start the voting", e);
                     }
@@ -2799,6 +2831,9 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
+                case "offerPlayerPref" -> {
+                    ButtonHelper.offerPlayerPreferences(player, event);
+                }
                 case "no_after" -> {
                     String message = activeGame.isFoWMode() ? "No afters" : null;
                     if (activeGame.getFactionsThatReactedToThis("noAfterThisAgenda") == null) {
@@ -2855,7 +2890,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     RevealStage1.revealTwoStage1(event, activeGame.getMainGameChannel());
                     ButtonHelper.startStrategyPhase(event, activeGame);
-                    ButtonHelper.offerSetAutoPassOnSaboButtons(activeGame);
+                    ButtonHelper.offerSetAutoPassOnSaboButtons(activeGame, null);
                     event.getMessage().delete().queue();
                 }
                 case "gain_2_comms" -> {
@@ -4041,8 +4076,18 @@ public class ButtonListener extends ListenerAdapter {
         }
         int numberOfPlayers = activeGame.getRealPlayers().size();
         if (matchingFactionReactions >= numberOfPlayers) {
-            Message mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageId).completeAfter(100, TimeUnit.MILLISECONDS);
-            mainMessage.reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+            activeGame.getMainGameChannel().retrieveMessageById(messageId).queue(msg ->{
+                if(activeGame.getLatestAfterMsg().equalsIgnoreCase(messageId)){
+                    msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
+                    AgendaHelper.startTheVoting(activeGame);
+                    msg.delete().queue();
+                }else if(activeGame.getLatestWhenMsg().equalsIgnoreCase(messageId)){
+                    msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);;
+                }else{
+                    msg.reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+                }
+            });
+            
             if (activeGame.getMessageIDsForSabo().contains(messageId)) {
                 activeGame.removeMessageIDForSabo(messageId);
             }
@@ -4108,7 +4153,7 @@ public class ButtonListener extends ListenerAdapter {
             case "no_when", "no_when_persistent" -> event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1, TimeUnit.SECONDS);
             case "no_after", "no_after_persistent" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Afters'").queue();
-                AgendaHelper.startTheVoting(activeGame, event);
+                AgendaHelper.startTheVoting(activeGame);
                 event.getMessage().delete().queue();
 
             }

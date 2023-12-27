@@ -289,9 +289,6 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getRaghsCallButtons(Player player, Game activeGame, Tile tile) {
         List<Button> buttons = new ArrayList<>();
-        if (!player.getPromissoryNotes().containsKey("ragh")) {
-            return buttons;
-        }
         Player saar = activeGame.getPNOwner("ragh");
         if (saar == player) {
             return buttons;
