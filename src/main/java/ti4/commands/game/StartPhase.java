@@ -29,7 +29,7 @@ public class StartPhase extends GameSubcommandData {
     public static void startPhase(GenericInteractionCreateEvent event, Game activeGame, String phase) {
         switch (phase) {
             case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
-            case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
+            case "voting" -> AgendaHelper.startTheVoting(activeGame);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
             //case "unleashTheNames" -> OtherStats.sendAllNames(event);
             //case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
