@@ -690,7 +690,7 @@ public class DataMigrationManager {
     private static void replaceFrankenItemsInBag_111223(DraftBag bag) {
         for (int i = 0; i < bag.Contents.size(); i++) {
             DraftItem item = bag.Contents.get(i);
-            if (item.ItemId.equals("keleres")) {
+            if ("keleres".equals(item.ItemId)) {
                 var newItem = DraftItem.Generate(item.ItemCategory, "keleresa");
                 swapBagItem(bag, i, newItem);
                 item = newItem;
@@ -814,17 +814,6 @@ public class DataMigrationManager {
             return true;
         }
         return false;
-    }
-
-    public static boolean migrateInitStratCardsPerPlayer_121823(Game game) {
-        int maxSCsPerPlayer = game.getSCList().size() / game.getRealPlayers().size();
-        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
-
-        if (game.getRealPlayers().size() == 1) maxSCsPerPlayer = 1;
-
-        game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
-
-        return true;
     }
 
 }
