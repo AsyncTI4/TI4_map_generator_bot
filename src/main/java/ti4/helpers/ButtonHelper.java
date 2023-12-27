@@ -6943,7 +6943,7 @@ public class ButtonHelper {
         buttons.add(Button.secondary("playerPref_tacticalAction","Change Distance-Based Tactical Action Preference"));
         buttons.add(Button.secondary("playerPref_autoNoWhensAfters","Change Auto No Whens/Afters React").withEmoji(Emoji.fromFormatted(Emojis.Agenda)));
         buttons.add(Button.secondary("playerPref_personalPingInterval","Change Personal Ping Interval"));
-        deleteTheOneButton(event);
+        //deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }
 

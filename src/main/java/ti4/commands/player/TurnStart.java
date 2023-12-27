@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.fow.Whisper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -109,6 +110,14 @@ public class TurnStart extends PlayerSubcommandData {
         if(!activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).isEmpty()){
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true)+ " you left yourself the following message: \n"+activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).replace("666fin", ":"));
             activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),"");
+        }
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(!activeGame.getFactionsThatReactedToThis("futureMessageFor_"+player.getFaction()+"_"+p2.getFaction()).isEmpty()){
+                String msg2 = "This is a message sent from the past:\n"+activeGame.getFactionsThatReactedToThis("futureMessageFor_"+player.getFaction()+"_"+p2.getFaction()).replace("666fin", ":");
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + " your future message got delivered");
+                Whisper.sendWhisper(activeGame, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
+                activeGame.setCurrentReacts("futureMessageFor_"+player.getFaction()+"_"+p2.getFaction(),"");
+            }
         }
         
         if (goingToPass) {
