@@ -1,0 +1,31 @@
+[
+    {
+        "id": "pbd2000_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Secret Mech",
+        "source": "pbd2000",
+        "capacityUsed": 0,
+        "cost": 0,
+        "combatHitsOn": 0,
+        "combatDieCount": 0,
+        "sustainDamage": true,
+        "isGroundForce": true
+    },
+    {
+        "id": "pbd2000_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Secret Flagship",
+        "source": "pbd2000",
+        "moveValue": 0,
+        "capacityValue": 0,
+        "capacityUsed": 0,
+        "cost": 0,
+        "combatHitsOn": 0,
+        "combatDieCount": 0,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true
+    }
+]

@@ -619,6 +619,36 @@ public class Emojis {
     public static final String Franken7 = "<:Franken7:1180167520821452931>";
     public static final String Franken8 = "<:Franken8:1180167522176213062>";
 
+    // PBD2000 FACTIONS
+    public static final String echoes = "<:echoes:1189668215413026968>";
+    public static final String enclave = "<:enclave:1189668216478367744>";
+    public static final String raven = "<:raven:1189668203580887121>";
+    public static final String syndicate = "<:syndicate:1189668205355073667>";
+    public static final String terminator = "<:terminator:1189668214125363231>";
+
+    // DICE
+    public static final String d10green_0 = "<:d10green_0:1180170565819039916>";
+    public static final String d10green_1 = "<:d10green_1:1180170567337386026>";
+    public static final String d10green_2 = "<:d10green_2:1180170568381763605>";
+    public static final String d10green_3 = "<:d10green_3:1180170569526825092>";
+    public static final String d10green_4 = "<:d10green_4:1180170570533441576>";
+    public static final String d10green_5 = "<:d10green_5:1180170571896606770>";
+    public static final String d10green_6 = "<:d10green_6:1189667939222290434>";
+    public static final String d10green_7 = "<:d10green_7:1189667941407543378>";
+    public static final String d10green_8 = "<:d10green_8:1189667942326079618>";
+    public static final String d10green_9 = "<:d10green_9:1189667944125435924>";
+    public static final String d10red_0 = "<:d10red_0:1189667965600280676>";
+    public static final String d10red_1 = "<:d10red_1:1189667967349301358>";
+    public static final String d10red_2 = "<:d10red_2:1189667968427249754>";
+    public static final String d10red_3 = "<:d10red_3:1189667969597452369>";
+    public static final String d10red_4 = "<:d10red_4:1189667971270979796>";
+    public static final String d10red_5 = "<:d10red_5:1189667992557076661>";
+    public static final String d10red_6 = "<:d10red_6:1189667994025066686>";
+    public static final String d10red_7 = "<:d10red_7:1189667994977181796>";
+    public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
+    public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
+
+
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
@@ -768,6 +798,12 @@ public class Emojis {
             case "franken6" -> Franken6;
             case "franken7" -> Franken7;
             case "franken8" -> Franken8;
+
+            case "echoes" -> echoes;
+            case "enclave" -> enclave;
+            case "raven" -> raven;
+            case "syndicate" -> syndicate;
+            case "terminator" -> terminator;
 
             default -> getRandomizedEmoji(0, null);
         };

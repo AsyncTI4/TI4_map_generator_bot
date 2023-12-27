@@ -16,7 +16,7 @@ public class Source {
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, projectpi,
 
         // async homebrew
-        admins, pbd100, testsource,
+        admins, pbd100, testsource, pbd2000,
 
         // personal projs
         ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod;
@@ -46,7 +46,7 @@ public class Source {
                 case ds -> Emojis.DiscordantStars;
                 case eronous -> Emojis.Eronous;
                 case admins -> Emojis.AdminsFaction;
-                case ignis_aurora -> Emojis.IgnisAurora;
+                case ignis_aurora, pbd2000 -> Emojis.IgnisAurora;
                 case keleresplus -> Emojis.KeleresPlus;
                 case projectpi -> Emojis.ProjectPi;
                 case miltymod -> Emojis.MiltyMod;
