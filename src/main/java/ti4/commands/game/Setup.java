@@ -61,7 +61,15 @@ public class Setup extends GameSubcommandData {
         OptionMapping scOption = event.getOption(Constants.SC_COUNT_FOR_MAP);
         if (scOption != null) {
             int count = scOption.getAsInt();
-            int maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getRealPlayers().size();
+
+            int maxSCsPerPlayer = 1;
+            if( activeGame.getRealPlayers().size() != 0){
+                maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getRealPlayers().size();
+            }else{
+                maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getPlayers().size();
+            }
+
+            
             if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
 
             if (count < 1) {

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
+import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -159,6 +160,17 @@ public class CombatMessageHelper {
             if (holderPlanet != null) {
                 combatTypeName += " on " + StringUtils.capitalize(holderName);
             }
+        }else{
+            int round = 0;
+            Game activeGame = player.getGame();
+            String combatName = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
+            if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
+                round = 1;
+            }else{
+                round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+            }
+            activeGame.setCurrentReacts(combatName, ""+round);
+            combatTypeName=combatTypeName+" (Combat Round #"+round+")";
         }
         return String.format("**%s** rolls for %s on %s %s:  \n",
                 combatTypeName, player.getFactionEmoji(),

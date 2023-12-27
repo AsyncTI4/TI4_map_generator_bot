@@ -195,7 +195,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     player.getRepresentation() + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
             }
             String codedName = "Plagiarize";
-            String codedMessage = player.getRepresentation() + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos.  ";
+            String codedMessage = player.getRepresentation() + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
             List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));

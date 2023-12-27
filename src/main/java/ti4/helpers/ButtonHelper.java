@@ -324,7 +324,7 @@ public class ButtonHelper {
     }
 
     public static boolean shouldKeleresRiderExist(Game activeGame) {
-        return activeGame.getPNOwner("ridera") != null || activeGame.getPNOwner("riderm") != null || activeGame.getPNOwner("riderx") != null || activeGame.getPNOwner("ridera") != null;
+        return activeGame.getPNOwner("ridera") != null || activeGame.getPNOwner("riderm") != null || activeGame.getPNOwner("riderx") != null || activeGame.getPNOwner("rider") != null;
     }
 
     public static String rollInfantryRevival(Player player) {
@@ -4129,7 +4129,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void offerSetAutoPassOnSaboButtons(Game activeGame) {
+    public static void offerSetAutoPassOnSaboButtons(Game activeGame, Player player2) {
         List<Button> buttons = new ArrayList<>();
         int x = 1;
         buttons.add(Button.secondary("setAutoPassMedian_" + x, "" + x));
@@ -4149,11 +4149,18 @@ public class ButtonHelper {
         buttons.add(Button.secondary("setAutoPassMedian_" + x, "" + x));
         buttons.add(Button.danger("deleteButtons", "Decline"));
         x = 0;
-        buttons.add(Button.danger("setAutoPassMedian_" + x, "Turn off"));
-        for (Player player : activeGame.getRealPlayers()) {
+        buttons.add(Button.danger("setAutoPassMedian_" + x, "Turn off (if already on)"));
+        if(player2 == null){
+            for (Player player : activeGame.getRealPlayers()) {
+                String message = player.getRepresentation(true, true)
+                    + " you can choose to automatically pass on sabo's after a random amount of time if you don't have a sabo/instinct training/watcher mechs. How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below. It's random so people cant derive much information from it. You are free to decline, noone will ever know either way, but if necessary you can change your time later with /player stats";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+            }
+        }else{
+            Player player = player2;
             String message = player.getRepresentation(true, true)
-                + " you can choose to automatically pass on sabo's after a random amount of time if you don't have a sabo/instinct training/watcher mechs. How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below. It's random so people cant derive much information from it. You are free to decline, noone will ever know either way, but if necessary you can change your time later with /player stats";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                    + " you can choose to automatically pass on sabo's after a random amount of time if you don't have a sabo/instinct training/watcher mechs. How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below. It's random so people cant derive much information from it. You are free to decline, noone will ever know either way, but if necessary you can change your time later with /player stats";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         }
     }
 
@@ -5671,6 +5678,13 @@ public class ButtonHelper {
             + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
             buttons);
     }
+     public static void offerPersonalPingOptions(Game activeGame, Player player) {
+        List<Button> buttons = getPersonalAutoPingButtons(activeGame);
+        player.setHoursThatPlayerIsAFK("");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
+            + " select the number of hours you would like the bot to wait before it pings you that it is your turn. This will apply to all your games. 0 is off. Your current interval is "+player.getPersonalPingInterval(),
+            buttons);
+    }
 
     public static void resolveSpecificTransButtons(Game activeGame, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
@@ -6006,6 +6020,15 @@ public class ButtonHelper {
             buttons.add(Button.secondary("setHourAsAFK_" + x, "" + x));
         }
         buttons.add(Button.danger("deleteButtons", "Done"));
+        return buttons;
+    }
+    public static List<Button> getPersonalAutoPingButtons(Game activeGame) {
+        List<Button> buttons = new ArrayList<>();
+        for (int x = 0; x < 13; x++) {
+            buttons.add(Button.secondary("setPersonalAutoPingInterval_" + x, "" + x));
+        }
+        buttons.add(Button.secondary("setPersonalAutoPingInterval_" + 24, "" + 24));
+        buttons.add(Button.secondary("setPersonalAutoPingInterval_" + 48, "" + 48));
         return buttons;
     }
 
@@ -6913,6 +6936,85 @@ public class ButtonHelper {
         }
     }
 
+    public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.secondary("playerPref_autoSaboReact","Change Auto No-Sabo React Time").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+        buttons.add(Button.secondary("playerPref_afkTimes","Change AFK Times"));
+        buttons.add(Button.secondary("playerPref_tacticalAction","Change Distance-Based Tactical Action Preference"));
+        buttons.add(Button.secondary("playerPref_autoNoWhensAfters","Change Auto No Whens/Afters React").withEmoji(Emoji.fromFormatted(Emojis.Agenda)));
+        buttons.add(Button.secondary("playerPref_personalPingInterval","Change Personal Ping Interval"));
+        deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
+    }
+
+    public static void resolvePlayerPref(Player player, ButtonInteractionEvent event, String buttonID, Game activeGame){
+        String thing = buttonID.split("_")[1];
+        switch(thing) {
+            case "autoSaboReact"->{
+                ButtonHelper.offerSetAutoPassOnSaboButtons(activeGame, player);
+            }
+            case "afkTimes"->{
+                ButtonHelper.offerAFKTimeOptions(activeGame, player);
+            }
+            case "tacticalAction"->{
+                List<Button> buttons = new ArrayList<>();
+                String msg = player.getRepresentation() +" Choose whether you want your tactical action buttons to be distance based (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses) or ring based (choose what ring the active system is in). Default is ring based. This will apply to all your games";
+                buttons.add(Button.success("playerPrefDecision_true_distance","Make it distance based"));
+                buttons.add(Button.success("playerPrefDecision_false_distance","Make it ring based"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            }
+            case "autoNoWhensAfters"->{
+                List<Button> buttons = new ArrayList<>();
+                String msg = player.getRepresentation() +" Choose whether you want the game to auto react no whens/afters after a random amount of time for you when you have no whens/afters. Default is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                buttons.add(Button.success("playerPrefDecision_true_agenda","Turn on"));
+                buttons.add(Button.success("playerPrefDecision_false_agenda","Turn off"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            }
+            case "personalPingInterval"->{
+                offerPersonalPingOptions(activeGame, player);
+            }
+        }
+        event.getMessage().delete().queue();
+    }
+    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID, Game activeGame){
+        String trueOrFalse = buttonID.split("_")[1];
+        String distanceOrAgenda = buttonID.split("_")[2];
+        if(trueOrFalse.equals("true")){
+            if(distanceOrAgenda.equals("distance")){
+                player.setPreferenceForDistanceBasedTacticalActions(true);
+                Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+                for (Game activeGame2 : mapList.values()) {
+                    for (Player player2 : activeGame2.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            player2.setPreferenceForDistanceBasedTacticalActions(true);
+                            GameSaveLoadManager.saveMap(activeGame2);
+                        }
+                    }
+                }
+            }else{
+                player.setAutoPassWhensAfters(true);
+            }
+        }else{
+             if(distanceOrAgenda.equals("distance")){
+                player.setPreferenceForDistanceBasedTacticalActions(false);
+                Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+                for (Game activeGame2 : mapList.values()) {
+                    for (Player player2 : activeGame2.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            player2.setPreferenceForDistanceBasedTacticalActions(false);
+                            GameSaveLoadManager.saveMap(activeGame2);
+                        }
+                    }
+                }
+            }else{
+                player.setAutoPassWhensAfters(false);
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
+            
+        event.getMessage().delete().queue();
+    }
+
     //TODO: Combine with PlayPN.playPN()
     public static void resolvePNPlay(String id, Player player, Game activeGame, GenericInteractionCreateEvent event) {
         boolean longPNDisplay = false;
@@ -6979,6 +7081,10 @@ public class ButtonHelper {
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), "2 ff", activeGame);
             String message = player.getRepresentation(true, true) + " added 2 ff to the active system";
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message);
+        }
+        if("ragh".equalsIgnoreCase(id)){
+              String message = player.getRepresentation(true, true) + " select planet to raghs call on";
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message, ButtonHelperFactionSpecific.getRaghsCallButtons(player, activeGame, activeGame.getTileByPosition(activeGame.getActiveSystem())));
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));

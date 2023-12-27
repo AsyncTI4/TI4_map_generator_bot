@@ -54,6 +54,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
@@ -880,6 +881,25 @@ public class AgendaHelper {
         }
     }
 
+    public static boolean doesPlayerHaveAnyWhensOrAfters(Player player){
+        if(!player.doesPlayerAutoPassOnWhensAfters()){
+            return true;
+        }
+        if(player.hasAbility("quash") || player.ownsPromissoryNote("rider") || player.getPromissoryNotes().keySet().contains("riderm") 
+        || player.hasAbility("radiance") || player.hasAbility("galactic_threat") ||player.ownsPromissoryNote("riderx") 
+        || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")){
+            return true;
+        }
+        for(String acID : player.getActionCards().keySet()){
+             ActionCardModel actionCard = Mapper.getActionCard(acID);
+             String actionCardWindow = actionCard.getWindow();
+             if (actionCardWindow.contains("When an agenda is revealed") || actionCardWindow.contains("After an agenda is revealed")){
+                return true;
+             }
+        }
+        return false;
+    }
+
     public static void offerEveryonePreAbstain(Game activeGame) {
         for (Player player : activeGame.getRealPlayers()) {
             int[] voteInfo = getVoteTotal(player, activeGame);
@@ -920,7 +940,7 @@ public class AgendaHelper {
                 if (watchPartyMsg != null) {
                     watchPartyMsg.delete().queue();
                 }
-                resolveIxthianRoll(activeGame);
+                resolveIxthianRoll(activeGame, true);
             };
             MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), activeGame.getMainGameChannel(), resolveIxthian);
         }else{
@@ -936,7 +956,7 @@ public class AgendaHelper {
                     sleep();
                 }
                 msg.delete().queue();
-                resolveIxthianRoll(activeGame);
+                resolveIxthianRoll(activeGame, false);
             };
             MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), activeGame.getMainGameChannel(), resolveIxthian);
         }
@@ -946,14 +966,14 @@ public class AgendaHelper {
         
     }
 
-    private static void resolveIxthianRoll(Game activeGame) {
+    private static void resolveIxthianRoll(Game activeGame, boolean publish) {
         TextChannel watchParty = watchPartyChannel(activeGame);
         String watchPartyPing = watchPartyPing(activeGame);
 
         Die d1 = new Die(6);
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian!";
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
-        if (watchParty != null) {
+        if (watchParty != null && publish) {
             String watchMsg = watchPartyPing + " " + activeGame.getName() + " has finished rolling:\n" + msg;
             MessageHelper.sendMessageToChannel(watchParty, watchMsg);
         }
@@ -1592,7 +1612,7 @@ public class AgendaHelper {
         return voteButtons;
     }
 
-    public static void startTheVoting(Game activeGame, GenericInteractionCreateEvent event) {
+    public static void startTheVoting(Game activeGame) {
         activeGame.setCurrentPhase("agendaVoting");
         if (activeGame.getCurrentAgendaInfo() != null) {
             String message = " up to vote! Resolve using buttons. \n \n" + getSummaryOfVotes(activeGame, true);
@@ -1601,10 +1621,10 @@ public class AgendaHelper {
             try {
                 nextInLine = getNextInLine(null, getVotingOrder(activeGame), activeGame);
             } catch (Exception e) {
-                BotLogger.log(event, "Could not find next in line", e);
+                BotLogger.log( "Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.log(event, "`AgendaHelper.startTheVoting` " + nextInLine + " is **null**");
+                BotLogger.log( "`AgendaHelper.startTheVoting` " + nextInLine + " is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentation(true, true);
@@ -1620,7 +1640,7 @@ public class AgendaHelper {
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
                 } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), skippedMessage);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(nextInLine, activeGame), skippedMessage);
                 }
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(activeGame), activeGame);
                 realIdentity = nextInLine.getRepresentation(true, true);
@@ -1637,21 +1657,21 @@ public class AgendaHelper {
             try {
                 activeGame.updateActivePlayer(nextInLine);
             } catch (Exception e) {
-                BotLogger.log(event, "Could not update active player", e);
+                BotLogger.log("Could not update active player", e);
             }
 
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (activeGame.isFoWMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
-                    event.getMessageChannel().sendMessage("Voting started. Notified first in line").queue();
+                    activeGame.getMainGameChannel().sendMessage("Voting started. Notified first in line").queue();
                 }
             } else {
-                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) ButtonHelper.getCorrectChannel(nextInLine, activeGame), message, buttons);
             }
             ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, activeGame);
         } else {
-            event.getMessageChannel().sendMessage("Cannot find voting info, sorry. Please resolve automatically").queue();
+            activeGame.getMainGameChannel().sendMessage("Cannot find voting info, sorry. Please resolve automatically").queue();
         }
     }
 

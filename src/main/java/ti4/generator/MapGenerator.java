@@ -3445,7 +3445,7 @@ public class MapGenerator {
                     }
                     if (unitKey.getUnitType() == UnitType.TyrantsLament) {
                         unitPath = unitPath.replace("tyrantslament", "fs");
-                        String name = "tyrant.png";
+                        String name = "TyrantNew.png";
                         unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
                         //spoopy = ImageHelper.read(spoopyPath);
                     }
@@ -3453,7 +3453,9 @@ public class MapGenerator {
                         unitPath = unitPath.replace("lady", "fs");
                     }
                     if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
-                        unitPath = unitPath.replace("plenaryorbital", "csd");
+                        unitPath = unitPath.replace("plenaryorbital", "sd");
+                        String name = "PlenaryNew.png";
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name); 
                     }
                 }
 
