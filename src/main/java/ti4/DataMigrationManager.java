@@ -72,7 +72,6 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
-            runMigration("migrateInitStratCardsPerPlayer_121823", DataMigrationManager::migrateInitStratCardsPerPlayer_121823);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
