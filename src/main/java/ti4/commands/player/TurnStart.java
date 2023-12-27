@@ -1,6 +1,9 @@
 package ti4.commands.player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -39,6 +42,13 @@ public class TurnStart extends PlayerSubcommandData {
     public static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
+        Map<String,String> maps = new HashMap<>();
+        maps.putAll(activeGame.getMessagesThatICheckedForAllReacts());
+        for(String id : maps.keySet()){
+            if(id.contains("combatRoundTracker")){
+                activeGame.removeMessageIDFromCurrentReacts(id);
+            }
+        }
         boolean goingToPass = false;
         if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
             && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {

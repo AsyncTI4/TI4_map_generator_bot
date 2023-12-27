@@ -199,6 +199,8 @@ public class PNInfo extends PNCardsSubcommandData {
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             buttons.add(psycho);
         }
+        Button playerPref = Button.secondary("offerPlayerPref", "Change Player Settings");
+        buttons.add(playerPref);
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nYou can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }

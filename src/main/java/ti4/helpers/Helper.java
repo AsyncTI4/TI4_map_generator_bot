@@ -370,6 +370,24 @@ public class Helper {
                     }
                 }
             }
+            if(activeGame.getCurrentPhase().equals("agendawaiting")){
+                int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
+                int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
+                boolean shouldDoIt2 = result2 == highNum2;
+                if(shouldDoIt2){
+                    String whensID = activeGame.getLatestWhenMsg();
+                    if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player) && !ButtonListener.checkForASpecificPlayerReact(whensID, player, activeGame)) {
+                        String message = activeGame.isFoWMode() ? "No whens" : null;
+                        ButtonHelper.addReaction(player, false, false, message, null, whensID, activeGame);
+                    }
+                    String aftersID = activeGame.getLatestAfterMsg();
+                    if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player) && !ButtonListener.checkForASpecificPlayerReact(aftersID, player, activeGame)) {
+                        String message = activeGame.isFoWMode() ? "No afters" : null;
+                        ButtonHelper.addReaction(player, false, false, message, null, aftersID, activeGame);
+                    }
+                }
+            }
+
         }
     }
 

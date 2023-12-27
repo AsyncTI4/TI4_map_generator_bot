@@ -41,10 +41,10 @@ public class Stats extends PlayerSubcommandData {
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral system for your turn specifically"))
+			//.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
+			//.addOptions(new OptionData(OptionType.INTEGER, Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral system for your turn specifically"))
 			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
-			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE, "Prefers distance based tile selection"))
+			//.addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE, "Prefers distance based tile selection"))
 			.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 	}
