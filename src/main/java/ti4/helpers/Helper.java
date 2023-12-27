@@ -1084,6 +1084,11 @@ public class Helper {
                 if(player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)){
                     productionValueTotal = productionValueTotal +1;
                 }
+                for(String token : uH.getTokenList()){
+                    if(token.contains("orbital_foundries")){
+                        productionValueTotal = productionValueTotal +2;
+                    }
+                }
             }
             if(tile.isSupernova() && player.hasTech("mr")){
                 productionValueTotal = productionValueTotal +5;
