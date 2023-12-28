@@ -16,13 +16,14 @@ import ti4.message.MessageHelper;
 public class Setup extends GameSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Game Setup");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game VP count. Default is 10").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets. Default 1").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game VP count. Default is 10"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets. Default 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of SO's per player. Default 3"));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode").setRequired(false));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to base game mode."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with Base Game Mode)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
@@ -58,26 +59,28 @@ public class Setup extends GameSubcommandData {
             activeGame.setVp(count);
         }
 
-        OptionMapping scOption = event.getOption(Constants.SC_COUNT_FOR_MAP);
-        if (scOption != null) {
-            int count = scOption.getAsInt();
+        Integer maxSOCount = event.getOption(Constants.MAX_SO_COUNT, null, OptionMapping::getAsInt);
+        if (maxSOCount != null && maxSOCount >= 0) {
+            activeGame.setMaxSOCountPerPlayer(maxSOCount);
+        }
 
-            int maxSCsPerPlayer = 1;
-            if( activeGame.getRealPlayers().size() != 0){
-                maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getRealPlayers().size();
-            }else{
-                maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getPlayers().size();
+        Integer scCountPerPlayer = event.getOption(Constants.SC_COUNT_FOR_MAP, null, OptionMapping::getAsInt);
+        if (scCountPerPlayer != null) {
+            int maxSCsPerPlayer;
+            if (activeGame.getRealPlayers().isEmpty()) {
+                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
+            } else {
+                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
             }
 
-            
             if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
 
-            if (count < 1) {
-                count = 1;
-            } else if (count > maxSCsPerPlayer) {
-                count = maxSCsPerPlayer;
+            if (scCountPerPlayer < 1) {
+                scCountPerPlayer = 1;
+            } else if (scCountPerPlayer > maxSCsPerPlayer) {
+                scCountPerPlayer = maxSCsPerPlayer;
             }
-            activeGame.setStrategyCardsPerPlayer(count);
+            activeGame.setStrategyCardsPerPlayer(scCountPerPlayer);
         }
 
         Boolean communityMode = event.getOption(Constants.COMMUNITY_MODE, null, OptionMapping::getAsBoolean);
@@ -112,8 +115,8 @@ public class Setup extends GameSubcommandData {
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
 
-        Boolean extraSecretMode = event.getOption("extra_secret_mode", false, OptionMapping::getAsBoolean);
-        activeGame.setExtraSecretMode(extraSecretMode);
+        Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
+        if (extraSecretMode != null) activeGame.setExtraSecretMode(extraSecretMode);
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {

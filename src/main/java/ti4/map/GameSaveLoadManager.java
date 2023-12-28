@@ -468,6 +468,8 @@ public class GameSaveLoadManager {
 
         writer.write(Constants.VP_COUNT + " " + activeGame.getVp());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MAX_SO_COUNT + " " + activeGame.getMaxSOCountPerPlayer());
+        writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
         for (Map.Entry<String, List<String>> entry : activeGame.getScoredPublicObjectives().entrySet()) {
@@ -1455,6 +1457,14 @@ public class GameSaveLoadManager {
                         activeGame.setVp(vpCount);
                     } catch (Exception e) {
                         activeGame.setVp(10);
+                    }
+                }
+                case Constants.MAX_SO_COUNT -> {
+                    try {
+                        int soCount = Integer.parseInt(info);
+                        activeGame.setMaxSOCountPerPlayer(soCount);
+                    } catch (Exception e) {
+                        activeGame.setVp(3);
                     }
                 }
                 case Constants.DISPLAY_TYPE -> {

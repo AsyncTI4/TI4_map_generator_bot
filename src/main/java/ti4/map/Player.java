@@ -852,6 +852,13 @@ public class Player {
         removePromissoryNotesInPlayArea(id);
     }
 
+    public int getMaxSOCount() {
+        int maxSOCount = getGame().getMaxSOCountPerPlayer();
+        if (hasRelic("obsidian")) maxSOCount++;
+        if (hasRelic("absol_obsidian")) maxSOCount++;
+        return maxSOCount;
+    }
+
     public Map<String, Integer> getSecrets() {
         return secrets;
     }
