@@ -98,6 +98,8 @@ public class Game {
     private int activationCount;
     @ExportableField
     private int vp = 10;
+    @ExportableField @Getter @Setter
+    private int maxSOCountPerPlayer = 3;
     @ExportableField
     private boolean competitiveTIGLGame;
     @ExportableField
