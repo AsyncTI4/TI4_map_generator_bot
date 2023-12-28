@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
+import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -24,6 +25,34 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperCommanders {
+
+    public static void olradinCommanderStep1(Player player, Game activeGame){
+        List<Button> buttons = new ArrayList<>();
+        for(String planet : player.getReadiedPlanets()){
+            Tile tile = activeGame.getTileFromPlanet(planet);
+            if(planet.equalsIgnoreCase("mr") || tile == null || ButtonHelper.isTileHomeSystem(tile)){
+                continue;
+            }
+            buttons.add(Button.success("olradinCommanderStep2_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        buttons.add(Button.danger("deleteButtons","Decline"));
+        String msg = player.getRepresentation(true, true)+ " you can exhaust 1 planet to gain tgs equal to its influence or resources";
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+    }
+    public static void olradinCommanderStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        int oldTg = player.getTg();
+        int count = 0;
+        Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        count = Math.max(p.getInfluence(), p.getResources());
+        player.setTg(oldTg + count);
+        new PlanetExhaust().doAction(player, planet, activeGame);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+        String msg = player.getRepresentation(true, true)+ " used Olradin Commander to exhaust "+Helper.getPlanetRepresentation(planet, activeGame) +" and gain " + count + " tgs (" + oldTg + "->" + player.getTg() + ")";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
 
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();

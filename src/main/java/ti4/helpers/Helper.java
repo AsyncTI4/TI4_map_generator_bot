@@ -47,6 +47,7 @@ import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
+import ti4.commands.capture.RemoveUnits;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.milty.MiltyDraftManager;
@@ -1052,6 +1053,35 @@ public class Helper {
         }
         return msg;
     }
+    public static void resetProducedUnits(Player player, Game activeGame, GenericInteractionCreateEvent event){
+        Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
+        List<String> uniquePlaces = new ArrayList<>();
+        for(String unit : producedUnits.keySet()){
+            String tilePos = unit.split("_")[1];
+            String planetOrSpace = unit.split("_")[2];
+            if(!uniquePlaces.contains(tilePos+"_"+planetOrSpace)){
+                uniquePlaces.add(tilePos+"_"+planetOrSpace);
+            }
+        }
+        for(String uniquePlace : uniquePlaces){
+            String tilePos2 = uniquePlace.split("_")[0];
+            Tile tile = activeGame.getTileByPosition(tilePos2);
+            for(String unit : producedUnits.keySet()){
+                String tilePos = unit.split("_")[1];
+                String planetOrSpace = unit.split("_")[2];
+                if("space".equalsIgnoreCase(planetOrSpace)){
+                    planetOrSpace = "";
+                }else{
+                    planetOrSpace = " "+planetOrSpace;
+                }
+                String un = unit.split("_")[0];
+                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
+                new ti4.commands.units.RemoveUnits().unitParsing(event, player.getColor(), tile, producedUnits.get(unit)+" "+un +planetOrSpace, activeGame);
+            }
+        }
+        
+        player.resetProducedUnits();
+    }
 
     public static int getProductionValue(Player player, Game activeGame, Tile tile, boolean warfare){
         int productionValueTotal = 0;
@@ -1266,6 +1296,7 @@ public class Helper {
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff, "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
+            unitButtons.add(Button.secondary("resetProducedThings", "Reset Build"));
         }
         if (player.hasTech("yso")) {
             if ("sling".equalsIgnoreCase(warfareNOtherstuff)) {
@@ -1275,7 +1306,6 @@ public class Helper {
             } else {
                 unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
             }
-
         }
 
         return unitButtons;
@@ -1434,7 +1464,7 @@ public class Helper {
                 }
             }
 
-            msg += "(" + color + ") is over CC limit. CC used: " + ccCount;
+            msg += "(" + color + ") is over the CC limit of 16. CC used: " + ccCount;
             MessageHelper.replyToMessage(event, msg);
         }
     }

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import software.amazon.awssdk.utils.StringUtils;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -58,6 +59,9 @@ public class Whisper extends FOWSubcommandData {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
+        if(!activeGame.isFoWMode()){
+            player1 = player.getFactionEmoji() + "("+StringUtils.capitalize(player.getFaction())+") "+player1;
+        }
 
         if (anonY.compareToIgnoreCase("y") == 0) {
             message = "[REDACTED] says: " + msg;
