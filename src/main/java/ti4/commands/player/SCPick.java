@@ -217,6 +217,7 @@ public class SCPick extends PlayerSubcommandData {
                 privatePlayer = activeGame.getRealPlayers().get(0);
             }
             activeGame.setCurrentPhase("strategy");
+            activeGame.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
                 privatePlayer.getRepresentation(true, true) + "Use Buttons to Pick Which SC you want to give someone", Helper.getRemainingSCButtons(event, activeGame, privatePlayer));
         }

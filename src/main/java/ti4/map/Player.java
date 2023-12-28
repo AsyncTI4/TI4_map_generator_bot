@@ -35,6 +35,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -495,6 +496,7 @@ public class Player {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+        
     }
 
     public boolean isReadyToPassBag() {

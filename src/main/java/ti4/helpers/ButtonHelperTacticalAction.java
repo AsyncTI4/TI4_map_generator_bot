@@ -364,7 +364,7 @@ public class ButtonHelperTacticalAction {
         String pos = buttonID.replace("doneWithOneSystem_", "");
         Tile tile = activeGame.getTileByPosition(pos);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "
-            + tile.getRepresentationForButtons(activeGame, player) + " (" +CheckDistance.getDistanceBetweenTwoTiles(activeGame, player, pos, activeGame.getActiveSystem())+" tiles away)\n" + event.getMessage().getContentRaw());
+            + tile.getRepresentationForButtons(activeGame, player) + " (**" +CheckDistance.getDistanceBetweenTwoTiles(activeGame, player, pos, activeGame.getActiveSystem())+" tiles away**)\n" + event.getMessage().getContentRaw());
         String message = "Choose a different system to move from, or finalize movement.";
         activeGame.resetCurrentMovedUnitsFrom1System();
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeGame, event);
