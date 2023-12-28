@@ -64,26 +64,23 @@ public class Setup extends GameSubcommandData {
             activeGame.setMaxSOCountPerPlayer(maxSOCount);
         }
 
-        OptionMapping scOption = event.getOption(Constants.SC_COUNT_FOR_MAP);
-        if (scOption != null) {
-            int count = scOption.getAsInt();
-
-            int maxSCsPerPlayer = 1;
-            if( activeGame.getRealPlayers().size() != 0){
-                maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getRealPlayers().size();
-            }else{
-                maxSCsPerPlayer = activeGame.getSCList().size() / activeGame.getPlayers().size();
+        Integer scCountPerPlayer = event.getOption(Constants.SC_COUNT_FOR_MAP, null, OptionMapping::getAsInt);
+        if (scCountPerPlayer != null) {
+            int maxSCsPerPlayer;
+            if (activeGame.getRealPlayers().isEmpty()) {
+                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
+            } else {
+                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
             }
 
-            
             if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
 
-            if (count < 1) {
-                count = 1;
-            } else if (count > maxSCsPerPlayer) {
-                count = maxSCsPerPlayer;
+            if (scCountPerPlayer < 1) {
+                scCountPerPlayer = 1;
+            } else if (scCountPerPlayer > maxSCsPerPlayer) {
+                scCountPerPlayer = maxSCsPerPlayer;
             }
-            activeGame.setStrategyCardsPerPlayer(count);
+            activeGame.setStrategyCardsPerPlayer(scCountPerPlayer);
         }
 
         Boolean communityMode = event.getOption(Constants.COMMUNITY_MODE, null, OptionMapping::getAsBoolean);
