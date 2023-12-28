@@ -1,8 +1,10 @@
 package ti4.commands.explore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -44,10 +46,9 @@ public class RelicInfo extends ExploreSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getRelicInfoText(player));
 
         //BUTTONS
-        String purgeRelicMessage = "_ _\nClick a button below to exhaust or purge a Relic";
         List<Button> relicButtons = getRelicButtons(activeGame, player);
-        if (relicButtons != null && !relicButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(purgeRelicMessage, relicButtons);
+        if (!relicButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(null, relicButtons);
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
@@ -70,6 +71,8 @@ public class RelicInfo extends ExploreSubcommandData {
     }
 
     private static List<Button> getRelicButtons(Game activeGame, Player player) {
-        return null;
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.primary("refreshRelics", "Refresh Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+        return buttons;
     }
 }
