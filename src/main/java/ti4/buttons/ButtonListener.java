@@ -566,6 +566,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveSelectedBeforeSwapSC(player, activeGame, buttonID);
         } else if (buttonID.startsWith("sardakkcommander_")) {
             ButtonHelperCommanders.resolveSardakkCommander(activeGame, player, buttonID, event, ident);
+        } else if (buttonID.startsWith("olradinCommanderStep2_")) {
+            ButtonHelperCommanders.olradinCommanderStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("useOmenDie_")) {
             ButtonHelperAbilities.useOmenDie(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("peaceAccords_")) {
@@ -2347,6 +2349,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "ghotiAProd" -> ButtonHelperAgents.ghotiAgentForProduction(buttonID, event, activeGame, player);
                 case "passForRound" -> {
                     player.setPassed(true);
+                    if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+                        ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+                    }
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
                     TurnEnd.pingNextPlayer(event, activeGame, player, true);
@@ -3110,6 +3115,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.checkACLimit(activeGame, event, player);
                     ButtonHelper.deleteTheOneButton(event);
                 }
+                case "resetProducedThings"->{
+                    Helper.resetProducedUnits(player, activeGame, event);
+                    event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, activeGame)).queue();
+                }
                 case "exhauste6g0network" -> {
                     player.addExhaustedRelic("e6-g0_network");
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " Chose to exhaust e6-g0_network");
@@ -3625,6 +3634,14 @@ public class ButtonListener extends ListenerAdapter {
                     player.setStrategicCC(stratCC - 1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Quashed agenda. Strategic CCs went from " + stratCC + " -> " + (stratCC - 1));
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                    String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
+                    int aCount = 0;
+                    if(agendaCount.isEmpty()){
+                        aCount = 0;
+                    }else{
+                        aCount = Integer.parseInt(agendaCount) - 1;
+                    }
+                    activeGame.setCurrentReacts("agendaCount", aCount + "");
                     new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
                     event.getMessage().delete().queue();
                 }

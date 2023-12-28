@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -26,6 +27,9 @@ public class Pass extends PlayerSubcommandData {
             return;
         }
         player.setPassed(true);
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+            ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+        }
         String text = player.getRepresentation() + " PASSED";
         sendMessage(text);
         TurnEnd.pingNextPlayer(event, activeGame, player, true);

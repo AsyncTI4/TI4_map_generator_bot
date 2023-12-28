@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -224,6 +225,9 @@ public class Stats extends PlayerSubcommandData {
 			if ("y".equals(value) || "yes".equals(value)) {
 				player.setPassed(true);
 				// Turn.pingNextPlayer(event, activeMap, player);
+				if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+					ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+				}
 			} else if ("n".equals(value) || "no".equals(value)) {
 				player.setPassed(false);
 			} else {

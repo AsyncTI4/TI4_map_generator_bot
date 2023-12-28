@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.fow.Whisper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -122,6 +123,9 @@ public class TurnStart extends PlayerSubcommandData {
         
         if (goingToPass) {
             player.setPassed(true);
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+                ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+            }
             String text2 = player.getRepresentation() + " PASSED";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text2);
             TurnEnd.pingNextPlayer(event, activeGame, player, true);
