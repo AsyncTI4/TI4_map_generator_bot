@@ -115,8 +115,8 @@ public class Setup extends GameSubcommandData {
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
 
-        Boolean extraSecretMode = event.getOption("extra_secret_mode", false, OptionMapping::getAsBoolean);
-        activeGame.setExtraSecretMode(extraSecretMode);
+        Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
+        if (extraSecretMode != null) activeGame.setExtraSecretMode(extraSecretMode);
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
