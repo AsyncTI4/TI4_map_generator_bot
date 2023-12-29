@@ -1030,4 +1030,8 @@ public class Constants {
     public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
+    public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";
+    public static final String REFRESH_LEADER_INFO = "refreshLeaderInfo";
+    public static final String REFRESH_UNIT_INFO = "refreshUnitInfo";
+    public static final String REFRESH_TECH_INFO = "refreshTechInfo";
 }

@@ -50,7 +50,7 @@ public class UnitInfo extends PlayerSubcommandData {
 
     private static List<Button> getUnitInfoButtons() {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.primary("refreshUnits", "Refresh Unit Info"));
+        buttons.add(Button.primary(Constants.REFRESH_UNIT_INFO, "Refresh Unit Info"));
         return buttons;
     }
 

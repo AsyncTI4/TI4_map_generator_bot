@@ -2272,10 +2272,10 @@ public class ButtonListener extends ListenerAdapter {
                     String reply = activeGame.isFoWMode() ? "No public objective scored" : null;
                     ButtonHelper.addReaction(event, false, false, reply, "");
                 }
-                case "refreshRelics" -> RelicInfo.sendRelicInfo(activeGame, player, event);
-                case "refreshTechs" -> TechInfo.sendTechInfo(activeGame, player, event);
-                case "refreshUnits" -> UnitInfo.sendUnitInfo(activeGame, player, event);
-                case "refreshLeaders" -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
+                case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(activeGame, player, event);
+                case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
+                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
+                case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
                 case "warfareBuild" -> {
                     List<Button> buttons;
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
