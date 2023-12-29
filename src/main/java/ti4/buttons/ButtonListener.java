@@ -424,6 +424,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperCommanders.yinCommanderStep1(player, activeGame, event);
         } else if (buttonID.startsWith("yinCommanderRemoval_")) {
             ButtonHelperCommanders.resolveYinCommanderRemoval(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("cheiranCommanderBlock_")) {
+            ButtonHelperCommanders.cheiranCommanderBlock(player, activeGame, event);
         } else if (buttonID.startsWith("placeGhostCommanderFF_")) {
             ButtonHelperCommanders.resolveGhostCommanderPlacement(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("placeKhraskCommanderInf_")) {
@@ -1385,6 +1387,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("saarMechRes_")) {
             ButtonHelperFactionSpecific.placeSaarMech(player, activeGame, event, buttonID);
+        } else if(buttonID.startsWith("cymiaeCommanderRes_")){
+            ButtonHelperCommanders.cymiaeCommanderRes(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("arboAgentPutShip_")) {
             ButtonHelperAgents.arboAgentPutShip(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("setAutoPassMedian_")) {
@@ -1468,6 +1472,8 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.reverseRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("moveGlory_")) {
             ButtonHelperAgents.moveGlory(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("placeGlory_")) {
+            ButtonHelperAgents.placeGlory(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("rider_")) {
             AgendaHelper.placeRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("startToScuttleAUnit_")) {
@@ -1951,7 +1957,24 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("reactorMeltdownStep2_")) {
             ButtonHelperActionCards.resolveReactorMeltdownStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("declareUse_")) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel( player, activeGame), ident + " is using "+ buttonID.split("_")[1]);
+            String msg = ident + " is using "+ buttonID.split("_")[1];
+            if(msg.contains("Vaylerian")){
+                msg = msg + " to add +2 capacity to a ship with capacity";
+            }
+            if(msg.contains("Tnelis")){
+                msg = msg + " to apply 1 hit against their **non-fighter** ships in the system and give **1** of their ships a +1 boost. This ability can only be used once per activation.";
+                String pos =  buttonID.split("_")[2];
+                List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame, activeGame.getTileByPosition(pos));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to assign 1 hit", buttons);
+                activeGame.setCurrentReacts("tnelisCommanderTracker", player.getFaction());
+            }
+            if(msg.contains("Ghemina")){
+                msg = msg + " to gain 1tg after winning the space combat";
+                player.setTg(player.getTg()+1);
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                ButtonHelperAbilities.pillageCheck(player, activeGame);
+            }
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel( player, activeGame), msg);
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("spyStep2_")) {
             ButtonHelperActionCards.resolveSpyStep2(player, activeGame, event, buttonID);
@@ -2447,6 +2470,13 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     event.getMessage().delete().queue();
                 }
+                case "deployTyrant"->{
+                    String message = "Use buttons to put a tyrant with your ships";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message, Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "tyrantslament", "placeOneNDone_skipbuild"));
+                    ButtonHelper.deleteTheOneButton(event);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+ " is deploying the Tyrants Lament");
+                    player.addOwnedUnitByID("tyrantslament");
+                }
                 case "endOfTurnAbilities" -> {
                     String msg = "Use buttons to do an end of turn ability";
                     List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, activeGame);
@@ -2470,7 +2500,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
 
-                    if (!activeGame.isFoWMode() && activeGame.isCustodiansScored() && !player.getRelics().contains("mawofworlds") && !player.getActionCards().containsKey("stability")) {
+                    if (!activeGame.isFoWMode() && "statusHomework".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                         ButtonHelper.addReaction(event, false, false, "", "");
                     }
 
@@ -2585,6 +2615,19 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 8, activeGame, event);
                     }
                   //  player.addFollowedSC(8);
+                    SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                    ButtonHelper.addReaction(event, false, false, message, "");
+                }
+                case "edynCommanderSODraw" -> {
+                    if(!activeGame.playerHasLeaderUnlockedOrAlliance(player, "edyncommander")){
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " you dont have Edyn Commander silly");
+                    }
+                    String message = "Drew Secret Objective instead of scoring PO, using Edyn Commander";
+                    activeGame.drawSecretObjective(player.getUserID());
+                    if (player.hasAbility("plausible_deniability")) {
+                        activeGame.drawSecretObjective(player.getUserID());
+                        message = message + ". Drew a second SO due to plausible deniability";
+                    }
                     SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
@@ -3461,7 +3504,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "startArbiter" -> ButtonHelper.resolveImperialArbiter(event, activeGame, player);
                 case "pay1tgforKeleres" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, activeGame, event);
-                case "announceARetreat" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " announces a retreat");
+                case "announceARetreat" -> {
+                    String msg = ident + " announces a retreat";
+                    if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")){
+                        msg = msg + ". Since they have nokar commander, this means they can cancel 2 hits in this coming combat round";
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                }
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " officially declines to fire PDS");
                 case "startQDN" -> ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event);
                 case "finishComponentAction" -> {
@@ -3503,6 +3552,10 @@ public class ButtonListener extends ListenerAdapter {
                     SOInfo.sendSecretObjectiveInfo(activeGame, player);
                     ACInfo.sendActionCardInfo(activeGame, player);
                     PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "As a reminder, you can whisper to people from this channel by starting a message with to[color] or to[faction]."+
+                    "\nYou can send a message to yourself, that will be delivered at the start of your next turn, by starting a message with tofutureme"+
+                    "\nYou can send a message to others, that will be delivered at the start of their next turn, by starting a message with tofuture[color] or tofuture[faction]");
+
                 }
                 case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, activeGame, player, ident);
@@ -3964,6 +4017,7 @@ public class ButtonListener extends ListenerAdapter {
                     player = activeGame.getPlayer(activeGame.getActivePlayer());
                     activeGame.setNaaluAgent(false);
                 }
+                activeGame.setCurrentReacts("tnelisCommanderTracker", "");
 
                 String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
                 List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
@@ -4209,6 +4263,8 @@ public class ButtonListener extends ListenerAdapter {
                     Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
+                }else{
+
                 }
             }
         }
