@@ -1,7 +1,11 @@
 package ti4.commands.cardsso;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ListAllScored extends SOCardsSubcommandData{
@@ -11,21 +15,16 @@ public class ListAllScored extends SOCardsSubcommandData{
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        var stringBuilder = new StringBuilder();
-        stringBuilder.append("__**Scored Secret Objectives**__\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Scored Secret Objectives**__\n");
 
-        var game = getActiveGame();
-        var players = game.getPlayers().entrySet();
-        for (var player : players) {
-            var objectiveIDs = getActiveGame().getScoredSecretObjective(player.getKey());
-            for (var objective : objectiveIDs.keySet()) {
-                stringBuilder.append(player.getValue().getFactionEmoji()).append(SOInfo.getSecretObjectiveRepresentation(objective));
+        Game game = getActiveGame();
+        List<Player> players = game.getPlayers().values().stream().toList();
+        for (Player player : players) {
+            for (var objective : player.getSecretsScored().keySet()) {
+                sb.append(player.getFactionEmoji()).append(SOInfo.getSecretObjectiveRepresentation(objective));
             }
         }
-
-        MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            stringBuilder.toString()
-        );
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 }

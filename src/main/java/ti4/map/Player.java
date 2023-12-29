@@ -894,6 +894,17 @@ public class Player {
         return secretsScored;
     }
 
+    @JsonIgnore
+    public Map<String, Integer> getSecretsUnscored() {
+        Map<String, Integer> secretsUnscored = new HashMap<>();
+        for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
+            if (!secretsScored.containsKey(secret.getKey())) {
+                secretsUnscored.put(secret.getKey(), secret.getValue());
+            }
+        }
+        return secretsUnscored;
+    }
+
     public void setSecretScored(String id) {
         Collection<Integer> values = secretsScored.values();
         List<Integer> allIDs = getGame().getPlayers().values().stream()
