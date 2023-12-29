@@ -66,6 +66,7 @@ import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
@@ -3499,13 +3500,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.updateMap(activeGame, event);
                 }
                 case "mitosisMech" -> ButtonHelperAbilities.resolveMitosisMech(buttonID, event, activeGame, player, ident, finsFactionCheckerPrefix);
-                case "cardsInfo" -> {
-                    String headerText = player.getRepresentation(true, true) + " here is your cards info";
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-                    SOInfo.sendSecretObjectiveInfo(activeGame, player);
-                    ACInfo.sendActionCardInfo(activeGame, player);
-                    PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                }
+                case "cardsInfo" -> CardsInfo.sendCardsInfo(activeGame, player);
                 case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, activeGame, player, ident);
                 case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, activeGame, player);
