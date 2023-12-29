@@ -50,6 +50,7 @@ import ti4.commands.explore.RelicInfo;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
+import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
@@ -57,6 +58,7 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
+import ti4.commands.player.UnitInfo;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
@@ -2270,8 +2272,10 @@ public class ButtonListener extends ListenerAdapter {
                     String reply = activeGame.isFoWMode() ? "No public objective scored" : null;
                     ButtonHelper.addReaction(event, false, false, reply, "");
                 }
-                case "refreshRelics" -> RelicInfo.sendRelicInfo(activeGame, player);
-                case "refreshTechs" -> TechInfo.sendTechInfo(activeGame, player);
+                case "refreshRelics" -> RelicInfo.sendRelicInfo(activeGame, player, event);
+                case "refreshTechs" -> TechInfo.sendTechInfo(activeGame, player, event);
+                case "refreshUnits" -> UnitInfo.sendUnitInfo(activeGame, player, event);
+                case "refreshLeaders" -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
                 case "warfareBuild" -> {
                     List<Button> buttons;
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
