@@ -103,7 +103,7 @@ public class GameSaveLoadManager {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent) {
                 if (event.getMessageChannel() instanceof ThreadChannel || activeGame.isFoWMode()) {
-                    activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId());
+                    activeGame.setLatestCommand(username + " pressed button: [CLASSIFIED]");
                 } else {
                     activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- " + ((ButtonInteraction) event).getButton().getLabel());
                 }

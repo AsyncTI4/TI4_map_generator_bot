@@ -197,7 +197,7 @@ public class CombatRoll extends CombatSubcommandData {
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
             buttons.add(Button.success(finChecker+"autoAssignGroundHits_"+combatOnHolder.getName()+"_"+h,"Auto-assign Hits"));
-            buttons.add(Button.success("deleteButtons","Decline"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         }
 

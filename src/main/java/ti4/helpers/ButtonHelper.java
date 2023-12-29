@@ -1200,6 +1200,9 @@ public class ButtonHelper {
                         PNInfo.sendPromissoryNoteInfo(activeGame, nonActivePlayer, false);
                         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
                         MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                        if(pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")){
+                            player.setCommoditiesTotal(player.getCommodities()-1);
+                        }
                     }
 
                 }
@@ -2652,6 +2655,25 @@ public class ButtonHelper {
         if ("space".equalsIgnoreCase(groundOrSpace) && p1.hasAbility("foresight") && p1.getStrategicCC() > 0) {
             buttons.add(Button.danger("retreat_" + pos + "_foresight", "Foresight").withEmoji(Emoji.fromFormatted(Emojis.Naalu)));
         }
+        boolean gheminaCommanderApplicable = false;
+        if(tile.getPlanetUnitHolders().isEmpty()){
+            gheminaCommanderApplicable = true;
+        }else{
+            for(Player p3 : activeGame.getRealPlayers()){
+                if(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p3, UnitType.Pds, UnitType.Spacedock).contains(tile)){
+                    gheminaCommanderApplicable = true;
+                    break;
+                }
+            }
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "gheminacommander") && gheminaCommanderApplicable && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.danger(finChecker+"declareUse_Ghemina Commander", "Use Ghemina Commander").withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "gheminacommander")  && gheminaCommanderApplicable) {
+             String finChecker = "FFCC_" + p1.getFaction() + "_";
+             buttons.add(Button.danger(finChecker+"declareUse_Ghemina Commander", "Use Ghemina Commander").withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
+        }
         if (p1.hasLeaderUnlocked("keleresherokuuasi") && "space".equalsIgnoreCase(groundOrSpace) && doesPlayerOwnAPlanetInThisSystem(tile, p1, activeGame)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "purgeKeleresAHero", "Keleres Argent Hero")
@@ -2689,6 +2711,16 @@ public class ButtonHelper {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+                }
+                if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayerObject()) {
+                    String finChecker = "FFCC_" + p1.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_" + unitH.getName(), "Cheiran Commander on " + nameOfHolder)
+                        .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+                }
+                if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p2 != activeGame.getActivePlayerObject()) {
+                    String finChecker = "FFCC_" + p2.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_" + unitH.getName(), "Cheiran Commander on " + nameOfHolder)
+                        .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
                 }
                 if (p1.hasAbility("assimilate") && "ground".equalsIgnoreCase(groundOrSpace) && (unitH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0
                     || unitH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || unitH.getUnitCount(UnitType.Pds, p2.getColor()) > 0)) {
@@ -2891,7 +2923,8 @@ public class ButtonHelper {
                 }
             }
             if(capChecker.getUnitCount(UnitType.PlenaryOrbital, player.getColor()) > 0){
-                fightersIgnored += 10;
+                fightersIgnored += 8;
+                fleetCap = fleetCap + 4;
             }
         }
         //System.out.println(fightersIgnored);
@@ -2929,6 +2962,9 @@ public class ButtonHelper {
         }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;
+        }
+        if(capacity > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "vayleriancommander") && tile.getPosition().equals(activeGame.getActiveSystem()) && player == activeGame.getActivePlayerObject()){
+            capacity = capacity+2;
         }
         if (numInfNFightersNMechs > capacity) {
             if (numInfNFightersNMechs - numFighter2s > capacity) {
@@ -3151,6 +3187,10 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("freesystemsagent") && player.getReadiedPlanets().size() > 0 && ButtonHelperAgents.getAvailableLegendaryAbilities(activeGame).size() > 0) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_freesystemsagent_" + player.getFaction(), "Use Free Systems Agent").withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
         }
+        if(player.hasRelic("absol_tyrantslament") && !player.hasUnit("tyrantslament")){
+            endButtons.add(Button.success("deployTyrant", "Deploy The Tyrant's Lament").withEmoji(Emoji.fromFormatted(Emojis.Absol)));
+        }
+        
 
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_lizhoagent", "Use Lizho Agent on Yourself").withEmoji(Emoji.fromFormatted(Emojis.lizho)));
@@ -3760,6 +3800,11 @@ public class ButtonHelper {
         }
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(activeGame, activeGame.getActiveSystem(), player)) {
             Button ghostButton = Button.secondary("declareUse_Aetherstream", "Declare Aetherstream").withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
+            buttons.add(ghostButton);
+        }
+
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "vayleriancommander")) {
+            Button ghostButton = Button.secondary("declareUse_Vaylerian Commander", "Use Vaylerian Commander").withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
             buttons.add(ghostButton);
         }
         if (player.ownsUnit("ghost_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0) {
@@ -4406,6 +4451,9 @@ public class ButtonHelper {
         } else {
             doAll = Button.secondary(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_moveAll", "Move all units");
             concludeMove = Button.primary(finChecker + "doneWithOneSystem_" + tile.getPosition(), "Done moving units from this system");
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "tneliscommander") && activeGame.getFactionsThatReactedToThis("tnelisCommanderTracker").isEmpty()){
+                buttons.add(Button.primary("declareUse_Tnelis Commander_" + tile.getPosition(),"Use Tnelis Commander").withEmoji(Emoji.fromFormatted(Emojis.tnelis)));
+            }
         }
         buttons.add(doAll);
         buttons.add(concludeMove);
@@ -5166,7 +5214,7 @@ public class ButtonHelper {
                 }
             }
         }
-        msgExtra += activeGame.getPing() + "\nAll players picked SC";
+        msgExtra +=  "\nAll players picked SC";
         for (Player player_ : activePlayers) {
             int playersLowestSC = player_.getLowestSC();
             String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
@@ -5974,6 +6022,9 @@ public class ButtonHelper {
                         sendSftT = true;
                     } else {
                         sendAlliance = true;
+                        if(activeGame.getPNOwner(id).hasLeaderUnlocked("bentorcommander")){
+                            p2.setCommoditiesTotal(p2.getCommodities()+1);
+                        }
                     }
                 }
                 PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);

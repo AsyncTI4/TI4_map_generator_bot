@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -104,9 +105,9 @@ public class CardsInfo implements Command {
         sendCardsInfo(activeGame, player, event);
     }
 
-    public static void sendCardsInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+    public static void sendCardsInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         if (player == null) return;
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation(true, true) + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendCardsInfo(activeGame, player);
     }
@@ -116,6 +117,10 @@ public class CardsInfo implements Command {
         ACInfo.sendActionCardInfo(activeGame, player);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         sendVariousAdditionalButtons(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "As a reminder, you can whisper to people from this channel by starting a message with to[color] or to[faction]."+
+        "\nYou can send a message to yourself, that will be delivered at the start of your next turn, by starting a message with tofutureme"+
+        "\nYou can send a message to others, that will be delivered at the start of their next turn, by starting a message with tofuture[color] or tofuture[faction]");
+
     }
 
     private static void sendVariousAdditionalButtons(Game activeGame, Player player) {
