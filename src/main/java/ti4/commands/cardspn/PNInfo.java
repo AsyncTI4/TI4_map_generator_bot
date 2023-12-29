@@ -46,6 +46,13 @@ public class PNInfo extends PNCardsSubcommandData {
     }
 
     public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat) {
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                getPromissoryNoteCardInfo(activeGame, player, longFormat),
+                getPNButtons(activeGame, player));
+    }
+
+    private static List<Button> getPNButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
             if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
@@ -66,8 +73,7 @@ public class PNInfo extends PNCardsSubcommandData {
             }
             buttons.add(transact);
         }
-
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), getPromissoryNoteCardInfo(activeGame, player, longFormat), buttons);
+        return buttons;
     }
 
     public static String getPromissoryNoteCardInfo(Game activeGame, Player player, boolean longFormat) {

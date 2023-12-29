@@ -42,18 +42,10 @@ public class RelicInfo extends ExploreSubcommandData {
     }
 
     public static void sendRelicInfo(Game activeGame, Player player) {
-        //RELIC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getRelicInfoText(player));
-
-        //BUTTONS
-        List<Button> relicButtons = getRelicButtons(activeGame, player);
-        if (!relicButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(null, relicButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                getRelicInfoText(player),
+                getRelicButtons(activeGame, player));
     }
 
     private static String getRelicInfoText(Player player) {
