@@ -45,7 +45,7 @@ public class RelicInfo extends ExploreSubcommandData {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 getRelicInfoText(player),
-                getRelicButtons(activeGame, player));
+                getRelicButtons(player));
     }
 
     private static String getRelicInfoText(Player player) {
@@ -62,7 +62,7 @@ public class RelicInfo extends ExploreSubcommandData {
         return sb.toString();
     }
 
-    private static List<Button> getRelicButtons(Game activeGame, Player player) {
+    private static List<Button> getRelicButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.primary("refreshRelics", "Refresh Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         return buttons;

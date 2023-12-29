@@ -65,6 +65,7 @@ import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
+import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
@@ -2270,6 +2271,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, reply, "");
                 }
                 case "refreshRelics" -> RelicInfo.sendRelicInfo(activeGame, player);
+                case "refreshTechs" -> TechInfo.sendTechInfo(activeGame, player);
                 case "warfareBuild" -> {
                     List<Button> buttons;
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
