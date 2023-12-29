@@ -246,6 +246,14 @@ public class Player {
         }
         return 0;
     }
+    public int getSpentInfantryThisWindow() {
+        for (String thing : spentThingsThisWindow) {
+            if (thing.contains("infantry_")) {
+                return Integer.parseInt(thing.split("_")[1]);
+            }
+        }
+        return 0;
+    }
 
     public void increaseTgsSpentThisWindow(int amount) {
         int oldTgSpent = getSpentTgsThisWindow();
@@ -254,6 +262,14 @@ public class Player {
             removeSpentThing("tg_" + oldTgSpent);
         }
         addSpentThing("tg_" + newTgSpent);
+    }
+    public void increaseInfantrySpentThisWindow(int amount) {
+        int oldTgSpent = getSpentInfantryThisWindow();
+        int newTgSpent = oldTgSpent + amount;
+        if (oldTgSpent != 0) {
+            removeSpentThing("infantry_" + oldTgSpent);
+        }
+        addSpentThing("infantry_" + newTgSpent);
     }
 
     public void setSpentThings(List<String> things) {

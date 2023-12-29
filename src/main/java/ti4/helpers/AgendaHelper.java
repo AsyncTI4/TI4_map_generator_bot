@@ -2261,7 +2261,7 @@ public class AgendaHelper {
 
     public static void exhaustForVotes(ButtonInteractionEvent event, Player player, Game activeGame, String buttonID){
         String thing = buttonID.replace("exhaustForVotes_","");
-        if(!thing.contains("hacan") && !thing.contains("allPlanets")){
+        if(!thing.contains("hacan") && !thing.contains("kyro") && !thing.contains("allPlanets")){
             player.addSpentThing(thing);
             if(thing.contains("planet_")){
                 String planet = thing.replace("planet_","");
@@ -2281,6 +2281,10 @@ public class AgendaHelper {
                 if(player.getTg() < 1){
                     ButtonHelper.deleteTheOneButton(event);
                 }
+            }
+            if(thing.contains("kyro")){
+                player.increaseInfantrySpentThisWindow(1);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" please remove 1 infantry to pay for commander",  ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, activeGame, "infantry"));
             }
             if(thing.contains("allPlanets")){
                 List<String> unexhaustedPs = new ArrayList<>();
@@ -2378,6 +2382,10 @@ public class AgendaHelper {
         }
         if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")){
             Button button = Button.secondary("exhaustForVotes_hacanCommanderTg", "Spend a tg for 2 votes").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
+            planetButtons.add(button);
+        }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")){
+            Button button = Button.secondary("exhaustForVotes_kyrocommanderInf", "Kill infantry for 1 vote per kill").withEmoji(Emoji.fromFormatted(Emojis.blex));
             planetButtons.add(button);
         }
         if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")){
@@ -2763,6 +2771,15 @@ public class AgendaHelper {
         //Xxcha Alliance
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             additionalVotesAndSources.put(Emojis.Xxcha + "Alliance has been counted for", 0);
+        }
+
+        //Hacan Alliance
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
+            additionalVotesAndSources.put(Emojis.Hacan + " Alliance not calculated", 0);
+        }
+        //Kyro Alliance
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")) {
+            additionalVotesAndSources.put(Emojis.blex + " Alliance not calculated", 0);
         }
 
         //Absol Shard of the Throne

@@ -166,6 +166,13 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
         }
+        if (activeGame.getActivePlayerObject() == player && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
+            List<Button> saarButton = new ArrayList<>();
+            saarButton.add(Button.success("cymiaeCommanderRes_" + planet, "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
+            saarButton.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation(true, true) + " due to Cymiae Commander, you can discard an AC here to place or move a mech on "+Helper.getPlanetRepresentation(planet, activeGame)+". Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
+        }
 
         if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2"))
             && !doubleCheck && event != null) {

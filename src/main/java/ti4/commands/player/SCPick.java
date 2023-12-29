@@ -278,7 +278,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
 
-            msgExtra += activeGame.getPing() + "\nAll players picked SC";
+            msgExtra +=  "\nAll players picked SC";
 
             Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();

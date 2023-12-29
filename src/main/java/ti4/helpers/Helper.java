@@ -846,6 +846,9 @@ public class Helper {
                 case "tg" ->{
                     msg = msg +  "Spent "+player.getSpentTgsThisWindow()+" tgs for "+tg*2+" votes "+"\n";
                 }
+                case "infantry" ->{
+                    msg = msg +  "Spent "+player.getSpentInfantryThisWindow()+" infantry for "+player.getSpentInfantryThisWindow()+" votes "+"\n";
+                }
                 case "planet" ->{
                     msg = msg + getPlanetRepresentation(secondHalf, activeGame) + " for "+count+" votes "+"\n";
                 }
