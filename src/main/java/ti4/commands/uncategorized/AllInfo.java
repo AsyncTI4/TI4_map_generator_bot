@@ -98,7 +98,7 @@ public class AllInfo implements Command {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event) + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         AbilityInfo.sendAbilityInfo(activeGame, player);
         UnitInfo.sendUnitInfo(activeGame, player);

@@ -7,6 +7,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -33,21 +34,13 @@ public class AbilityInfo extends PlayerSubcommandData {
         sendAbilityInfo(activeGame, player, event);
     }
 
-    
-    public static void sendAbilityInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendAbilityInfo(activeGame, player);
-    }
-
     public static void sendAbilityInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " used a command or button";
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendAbilityInfo(activeGame, player);
     }
 
     public static void sendAbilityInfo(Game activeGame, Player player) {
-        //ABILITY INFO
         MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
     }
 

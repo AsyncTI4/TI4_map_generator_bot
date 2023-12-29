@@ -46,9 +46,11 @@ import ti4.commands.ds.ZelianHero;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.RelicInfo;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
+import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
@@ -56,6 +58,7 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
+import ti4.commands.player.UnitInfo;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
@@ -64,7 +67,9 @@ import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
+import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddCC;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
@@ -2290,6 +2295,10 @@ public class ButtonListener extends ListenerAdapter {
                     String reply = activeGame.isFoWMode() ? "No public objective scored" : null;
                     ButtonHelper.addReaction(event, false, false, reply, "");
                 }
+                case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(activeGame, player, event);
+                case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
+                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
+                case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
                 case "warfareBuild" -> {
                     List<Button> buttons;
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
@@ -3546,17 +3555,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.updateMap(activeGame, event);
                 }
                 case "mitosisMech" -> ButtonHelperAbilities.resolveMitosisMech(buttonID, event, activeGame, player, ident, finsFactionCheckerPrefix);
-                case "cardsInfo" -> {
-                    String headerText = player.getRepresentation(true, true) + " here is your cards info";
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-                    SOInfo.sendSecretObjectiveInfo(activeGame, player);
-                    ACInfo.sendActionCardInfo(activeGame, player);
-                    PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "As a reminder, you can whisper to people from this channel by starting a message with to[color] or to[faction]."+
-                    "\nYou can send a message to yourself, that will be delivered at the start of your next turn, by starting a message with tofutureme"+
-                    "\nYou can send a message to others, that will be delivered at the start of their next turn, by starting a message with tofuture[color] or tofuture[faction]");
-
-                }
+                case "cardsInfo" -> CardsInfo.sendCardsInfo(activeGame, player, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, activeGame, player, ident);
                 case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, activeGame, player);
