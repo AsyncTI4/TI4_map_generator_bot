@@ -264,6 +264,7 @@ public class ButtonHelperTacticalAction {
             player = activeGame.getPlayer(activeGame.getActivePlayer());
             activeGame.setNaaluAgent(false);
         }
+        activeGame.setCurrentReacts("tnelisCommanderTracker", "");
         activeGame.setL1Hero(false);
 
         String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
@@ -389,6 +390,7 @@ public class ButtonHelperTacticalAction {
         }
         activeGame.setNaaluAgent(false);
         activeGame.setL1Hero(false);
+        activeGame.setCurrentReacts("tnelisCommanderTracker", "");
         activeGame.setCurrentReacts("planetsTakenThisRound","");
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         activeGame.resetCurrentMovedUnitsFrom1TacticalAction();

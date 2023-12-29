@@ -258,6 +258,9 @@ public class ButtonHelperHeroes {
                 sendSftT = true;
             } else {
                 sendAlliance = true;
+                if(activeGame.getPNOwner(id).hasLeaderUnlocked("bentorcommander")){
+                    p2.setCommoditiesTotal(p2.getCommodities()+1);
+                }
             }
         }
         PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);

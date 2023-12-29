@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -253,10 +254,23 @@ public class ButtonHelperModifyUnits {
         if (skilled) {
             skilledS = "_skilled";
         }
+        HashSet<String> adjTiles = new HashSet();
+        adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos1, player, false));
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")){
+            Tile hs = FoWHelper.getPlayerHS(activeGame, player);
+            if(hs != null){
+                adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, hs.getPosition(), player, false));
+            }
+        }
+        List<String> checked = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)) {
             if (pos1.equalsIgnoreCase(pos2)) {
                 continue;
             }
+            if(checked.contains(pos2)){
+                continue;
+            }
+            checked.add(pos2);
             Tile tile2 = activeGame.getTileByPosition(pos2);
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)) {
                 if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, activeGame) || skilled) {
