@@ -2675,24 +2675,6 @@ public class Game {
         return false;
     }
 
-    @Nullable
-    public Map<String, Integer> getSecretObjective(String userID) {
-        Player player = getPlayer(userID);
-        if (player != null) {
-            return player.getSecrets();
-        }
-        return null;
-    }
-
-    @Nullable
-    public Map<String, Integer> getScoredSecretObjective(String userID) {
-        Player player = getPlayer(userID);
-        if (player != null) {
-            return player.getSecretsScored();
-        }
-        return null;
-    }
-
     public void addSecretObjective(String id) {
         if (!secretObjectives.contains(id)) {
             secretObjectives.add(id);
