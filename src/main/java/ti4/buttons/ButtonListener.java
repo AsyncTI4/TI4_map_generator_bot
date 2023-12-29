@@ -3555,7 +3555,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.updateMap(activeGame, event);
                 }
                 case "mitosisMech" -> ButtonHelperAbilities.resolveMitosisMech(buttonID, event, activeGame, player, ident, finsFactionCheckerPrefix);
-                case "cardsInfo" -> CardsInfo.sendCardsInfo(activeGame, player);
+                case "cardsInfo" -> CardsInfo.sendCardsInfo(activeGame, player, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, activeGame, player, ident);
                 case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, activeGame, player);
