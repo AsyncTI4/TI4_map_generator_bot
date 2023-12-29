@@ -10,7 +10,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class PNReset extends PNCardsSubcommandData {
     public PNReset() {
@@ -35,9 +34,7 @@ public class PNReset extends PNCardsSubcommandData {
             }
         }
         PNInfo.checkAndAddPNs(activeGame, player);
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, true);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
         sendMessage("PN Info Sent");
     }
 }

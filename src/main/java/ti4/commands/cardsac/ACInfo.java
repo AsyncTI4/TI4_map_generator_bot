@@ -3,13 +3,11 @@ package ti4.commands.cardsac;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -37,20 +35,6 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         sendActionCardInfo(activeGame, player, event);
         sendMessage("AC Info Sent");
-    }
-
-    public static void sendActionCardInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
-    }
-
-    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
     }
 
     private static void sendTrapCardInfo(Game activeGame, Player player) {
@@ -109,8 +93,8 @@ public class ACInfo extends ACCardsSubcommandData {
         return sb.toString();
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentation() + " pressed button: " + event.getButton().getLabel();
+    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendActionCardInfo(activeGame, player);
     }
