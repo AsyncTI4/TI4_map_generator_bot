@@ -62,11 +62,8 @@ public class ACInfo extends ACCardsSubcommandData {
     private static String getTrapCardInfo(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
-
-        //ACTION CARDS
         sb.append("**Trap Cards:**").append("\n");
         int index = 1;
-
         Map<String, Integer> trapCards = player.getTrapCards();
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         if (trapCards != null) {
@@ -81,7 +78,6 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
         }
-
         return sb.toString();
     }
 
@@ -117,24 +113,15 @@ public class ACInfo extends ACCardsSubcommandData {
         String headerText = player.getRepresentation() + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
     }
 
     public static void sendActionCardInfo(Game activeGame, Player player) {
         //AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
-
-        //BUTTONS
-        String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-        List<Button> acButtons = getPlayActionCardButtons(activeGame, player);
-        if (!acButtons.isEmpty()) {
-
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                "_ _\nClick a button below to play an Action Card",
+                getPlayActionCardButtons(activeGame, player));
 
         sendTrapCardInfo(activeGame, player);
     }
