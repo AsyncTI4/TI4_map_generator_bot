@@ -56,7 +56,7 @@ public class LeaderInfo extends LeaderSubcommandData {
 
     private static List<Button> getLeaderButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.primary(Constants.REFRESH_LEADER_INFO, "Refresh Leaders"));
+        buttons.add(Button.primary(Constants.REFRESH_LEADER_INFO, "Refresh Leader Info"));
         return buttons;
     }
 

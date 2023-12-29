@@ -64,7 +64,7 @@ public class RelicInfo extends ExploreSubcommandData {
 
     private static List<Button> getRelicButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.primary(Constants.REFRESH_RELIC_INFO, "Refresh Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+        buttons.add(Button.primary(Constants.REFRESH_RELIC_INFO, "Refresh Relic Info"));
         return buttons;
     }
 }

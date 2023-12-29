@@ -50,7 +50,7 @@ public class TechInfo extends TechSubcommandData {
 
     private static List<Button> getTechButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.primary(Constants.REFRESH_TECH_INFO, "Refresh Techs").withEmoji(Emoji.fromFormatted(Emojis.NonUnitTechSkip)));
+        buttons.add(Button.primary(Constants.REFRESH_TECH_INFO, "Refresh Tech Info"));
         return buttons;
     }
 
