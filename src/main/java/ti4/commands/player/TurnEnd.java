@@ -186,6 +186,12 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtons1);
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
+        for(Player player : activeGame.getRealPlayers()){
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !activeGame.isFoWMode()){
+                poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
+                break;
+            }
+        }
         poButtons.removeIf(Objects::isNull);
         return poButtons;
     }

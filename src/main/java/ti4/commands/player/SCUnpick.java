@@ -81,7 +81,7 @@ public class SCUnpick extends PlayerSubcommandData {
 
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
-            msgExtra += activeGame.getPing() + "\nAll players picked SC";
+            msgExtra += "\nAll players picked SC";
 
             Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
