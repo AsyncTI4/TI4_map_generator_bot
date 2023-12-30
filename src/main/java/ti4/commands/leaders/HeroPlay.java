@@ -11,6 +11,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.special.KeleresHeroMentak;
+import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
@@ -91,7 +92,7 @@ public class HeroPlay extends LeaderAction {
             BotLogger.log(event, "Missing LeaderModel: " + playerLeader.getId());
         }
 
-        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
+        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId()) || "nokarhero".equals(playerLeader.getId()) || "kolumehero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be PURGED after status cleanup");
@@ -134,6 +135,10 @@ public class HeroPlay extends LeaderAction {
                     }
                 }
             }
+            case "olradinhero" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " added 1 infantry to each planet");
+                new RiseOfMessiah().doRise(player, event, activeGame);
+            }   
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
                     + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical cc from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
