@@ -487,7 +487,7 @@ public class ButtonHelperModifyUnits {
             } else if (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), "sd " + planetName, activeGame);
-                successMessage = "Placed a cabal space dock on "
+                successMessage = "Placed a space dock on "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                 if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "cabal", event);
@@ -735,7 +735,7 @@ public class ButtonHelperModifyUnits {
             } else if (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), "sd " + planetName, activeGame);
-                successMessage = "Placed a cabal space dock on "
+                successMessage = "Placed a space dock on "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             } else {
                 new AddUnits().unitParsing(event, player.getColor(),
