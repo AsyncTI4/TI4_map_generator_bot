@@ -1117,6 +1117,9 @@ public class Helper {
                 if(player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)){
                     productionValueTotal = productionValueTotal +1;
                 }
+                if(player.getPlanets().contains(uH.getName()) && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)){
+                    productionValueTotal = productionValueTotal +3;
+                }
                 for(String token : uH.getTokenList()){
                     if(token.contains("orbital_foundries")){
                         productionValueTotal = productionValueTotal +2;

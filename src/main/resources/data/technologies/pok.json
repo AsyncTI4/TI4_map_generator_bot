@@ -370,7 +370,7 @@
     },
     {
         "alias": "scc",
-        "name": "Spacial Conduit Cylinders",
+        "name": "Spatial Conduit Cylinders",
         "type": "PROPULSION",
         "requirements": "BB",
         "faction": "jolnar",

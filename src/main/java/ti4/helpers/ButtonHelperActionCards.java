@@ -883,7 +883,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                buttons.add(Button.secondary("signalJammingStep3_" + p2.getFaction() + "_" + tile.getPosition(), tile.getRepresentation()));
+                buttons.add(Button.secondary("signalJammingStep3_" + p2.getFaction() + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
             }
         }
         event.getMessage().delete().queue();

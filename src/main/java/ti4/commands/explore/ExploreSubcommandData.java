@@ -319,7 +319,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
-                        + "). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring.");
+                        + "). Reminder you do not legally have this tg prior to exploring, and you could potentially deploy a mech before doing it to dodge pillage.");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);

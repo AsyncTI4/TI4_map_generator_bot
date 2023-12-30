@@ -2038,8 +2038,8 @@ public class ButtonListener extends ListenerAdapter {
             if (Mapper.isValidColor(color)) {
                 AddCC.addCC(event, color, tile);
             }
-            //String message = playerRep + " Placed A CC From Reinforcements In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system";
-            ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
+            String message = ident+ " Placed A CC From Reinforcements In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system";
+            ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "construction");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("placeHolderOfConInSystem_")) {
             //String playerRep = player.getRepresentation();
@@ -2476,6 +2476,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteTheOneButton(event);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+ " is deploying the Tyrants Lament");
                     player.addOwnedUnitByID("tyrantslament");
+                }
+                case "startStrategyPhase" -> {
+                    StartPhase.startPhase(event, activeGame, "strategy");
+                    event.getMessage().delete().queue();
                 }
                 case "endOfTurnAbilities" -> {
                     String msg = "Use buttons to do an end of turn ability";
@@ -4264,7 +4268,9 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
                 }else{
-
+                    Button flipAgenda = Button.primary("startStrategyPhase", "Press this to start Strategy Phase");
+                    List<Button> buttons = List.of(flipAgenda);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Start Strategy Phase", buttons);
                 }
             }
         }
