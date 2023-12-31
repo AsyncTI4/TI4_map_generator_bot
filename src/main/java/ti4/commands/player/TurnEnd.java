@@ -63,6 +63,9 @@ public class TurnEnd extends PlayerSubcommandData {
         //in a normal game, 8 is the maximum number, so we modulo on 9
         List<Player> unpassedPlayers = activeGame.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
         int maxSC = Collections.max(activeGame.getSCList()) + 1;
+        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
+            maxSC = maxSC+1;
+        }
         for (int i = 1; i <= maxSC; i++) {
             int scCheck = (startingInitiative + i) % maxSC;
             for (Player p : unpassedPlayers) {
