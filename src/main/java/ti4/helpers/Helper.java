@@ -274,6 +274,9 @@ public class Helper {
         }
         List<Player> initiativeOrder = new ArrayList<>();
         Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
+            max = max+1;
+        }
         if (naaluSC != 0) {
             Player p3 = order.get(naaluSC);
             initiativeOrder.add(p3);
@@ -735,6 +738,9 @@ public class Helper {
             String label = " ";
             if (activeGame.getScTradeGoods().get(sc) > 0 && !activeGame.isFoWMode()) {
                 label = "[has " + activeGame.getScTradeGoods().get(sc) + " tg]";
+            }
+            if(sc == ButtonHelper.getKyroHeroSC(activeGame)){
+                label = label + " Kyro Hero Cursed";
             }
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
 

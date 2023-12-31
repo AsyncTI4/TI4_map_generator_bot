@@ -550,7 +550,11 @@ public class MapGenerator {
                         graphics.setColor(Color.WHITE);
                         graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
                     } else {
-                        graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                        if(sc == ButtonHelper.getKyroHeroSC(game)){
+                           graphics.drawString(""+(game.getSCList().size()+1), x + 90, y + 70 + yDelta);
+                        }else{
+                            graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                        }
                     }
                 } else { // if (playerSCs.size() <= 4) {
                     int count = 1;
@@ -583,8 +587,13 @@ public class MapGenerator {
                             graphics.setColor(Color.WHITE);
                             graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
                         } else {
-                            drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                            if(sc == ButtonHelper.getKyroHeroSC(game)){
+                                drawCenteredString(graphics, (game.getSCList().size()+1)+"", new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                            }else{
+                                drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                            }
                         }
+                        
                         count++;
                     }
                 }

@@ -199,6 +199,10 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), assignSpeakerMessage, assignSpeakerActionRow);
         }
+        if(scToPlay == ButtonHelper.getKyroHeroSC(activeGame) && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))){
+             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
+
+        }
 
         if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {
             String assignSpeakerMessage2 = player.getRepresentation() + " after assigning speaker, Use this button to draw agendas into your cards info thread.";
