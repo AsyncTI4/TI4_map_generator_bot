@@ -3363,6 +3363,15 @@ public class ButtonHelper {
         }
     }
 
+    public static int getKyroHeroSC(Game activeGame){
+        
+        if(activeGame.getFactionsThatReactedToThis("kyroHeroSC").isEmpty()){
+            return 1000;
+        }else{
+            return Integer.parseInt(activeGame.getFactionsThatReactedToThis("kyroHeroSC"));
+        }
+    }
+
     public static List<Button> getPossibleRings(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();

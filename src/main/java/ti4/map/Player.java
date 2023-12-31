@@ -35,6 +35,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -1657,7 +1658,16 @@ public class Player {
 
     public int getLowestSC() {
         try {
-            return Collections.min(getSCs());
+            int min = 100;
+            Game activeGame = getGame();
+            for(int SC : getSCs()){
+                if(SC == ButtonHelper.getKyroHeroSC(activeGame)){
+                    min = Math.min(activeGame.getSCList().size()+1, min);
+                }else{
+                    min = Math.min(SC, min);
+                }
+            }
+            return min;
         } catch (NoSuchElementException e) {
             return 100;
         }

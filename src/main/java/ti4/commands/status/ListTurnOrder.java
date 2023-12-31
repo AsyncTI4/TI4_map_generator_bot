@@ -90,6 +90,9 @@ public class ListTurnOrder extends StatusSubcommandData {
             msg.append("`").append(0).append(".`").append(text).append("\n");
         }
         Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
+            max = max+1;
+        }
         for (int i = 1; i <= max; i++) {
             if (naaluSC != 0 && i == naaluSC) {
                 continue;
