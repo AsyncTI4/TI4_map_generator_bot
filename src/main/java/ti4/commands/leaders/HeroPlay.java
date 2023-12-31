@@ -12,6 +12,7 @@ import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.RiseOfMessiah;
+import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
@@ -126,6 +127,13 @@ public class HeroPlay extends LeaderAction {
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "`Use the following command to add the attachment: /add_token token:titanshero`");
                 }
+            }
+            case "kyrohero"->{
+                int dieResult = player.getLowestSC();
+                activeGame.setCurrentReacts("kyroHeroSC", dieResult+"");
+                activeGame.setCurrentReacts("kyroHeroPlayer", player.getFaction());
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Marked the Blex Hero Target as SC #"+dieResult + " and the faction that played the hero as "+player.getFaction());
+                ListTurnOrder.turnOrder(event, activeGame);
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " removed all of your ccs from the board");

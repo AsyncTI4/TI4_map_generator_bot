@@ -47,6 +47,9 @@ import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -1284,6 +1287,16 @@ public class Game {
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
         if (Objects.isNull(tradeGoodCount)) tradeGoodCount = 0;
+        if(tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)){
+            Player player = getPlayerFromColorOrFaction(getFactionsThatReactedToThis("kyroHeroPlayer"));
+            if(player != null){
+                player.setTg(player.getTg()+tradeGoodCount);
+                ButtonHelperAbilities.pillageCheck(player, this);
+                ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
+                tradeGoodCount = 0;
+                MessageHelper.sendMessageToChannel(getActionsChannel(), "The tgs that would be placed on the SC "+sc+" have instead been given to the Kyro Hero player, as per Kyro Hero text");
+            }
+        }
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
@@ -3654,6 +3667,7 @@ public class Game {
         } else if (player.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             scText = "0/" + scText;
         }
+        
         return scText;
     }
 

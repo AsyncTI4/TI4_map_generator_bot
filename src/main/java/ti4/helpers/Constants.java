@@ -979,6 +979,7 @@ public class Constants {
     public static final String TECH_DECK_ID = "tech_deck_id";
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
     public static final String ADD_OMEN_DIE = "add_omen_die";
+    public static final String KYRO_HERO = "kyro_hero";
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
     public static final String COMBAT_ROLL_TYPE = "rolltype";
