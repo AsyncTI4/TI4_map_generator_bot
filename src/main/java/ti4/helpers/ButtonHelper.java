@@ -1709,7 +1709,7 @@ public class ButtonHelper {
                 
             }
             case "veldyr"->{
-                if(ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player) > 1){
+                if(ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player).size() > 1){
                     shouldBeUnlocked = true;
                 }
             }
@@ -2188,7 +2188,13 @@ public class ButtonHelper {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";
         for (Tile tile : getTilesWithYourCC(player, activeGame, event)) {
-            buttonsToRemoveCC.add(Button.success(finChecker + "removeCCFromBoard_" + whatIsItFor + "_" + tile.getPosition(), "Remove CC from " + tile.getRepresentationForButtons(activeGame, player)));
+            if(whatIsItFor.contains("kjal")){
+                String pos = whatIsItFor.split("_")[1];
+                if(!pos.equalsIgnoreCase(tile.getPosition()) && !FoWHelper.getAdjacentTiles(activeGame, pos, player, false).contains(tile.getPosition())){
+                    continue;
+                }
+            }
+            buttonsToRemoveCC.add(Button.success(finChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition(), "Remove CC from " + tile.getRepresentationForButtons(activeGame, player)));
         }
         return buttonsToRemoveCC;
     }
@@ -3364,7 +3370,7 @@ public class ButtonHelper {
     }
 
     public static int getKyroHeroSC(Game activeGame){
-        
+
         if(activeGame.getFactionsThatReactedToThis("kyroHeroSC").isEmpty()){
             return 1000;
         }else{
@@ -4021,9 +4027,14 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.zelian));
             buttons.add(zelianH);
         }
-        if (player.hasLeaderUnlocked("sardakkhero")) {
+        if (player.hasLeaderUnlocked("sardakkhero") && tile.getPlanetUnitHolders().size() > 0) {
             Button sardakkH = Button.primary(finChecker + "purgeSardakkHero", "Use Sardakk Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.Sardakk));
+            buttons.add(sardakkH);
+        }
+        if (player.hasLeaderUnlocked("rohdhnahero")) {
+            Button sardakkH = Button.primary(finChecker + "purgeRohdhnaHero", "Use Rohdhna Hero")
+                .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
             buttons.add(sardakkH);
         }
         if (tile.getUnitHolders().size() > 1 && getTilesOfUnitsWithBombard(player, activeGame).contains(tile)) {

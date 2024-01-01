@@ -44,6 +44,7 @@ public class Emojis {
     public static final String axis = "<:axis:1082705549092737044>";
     public static final String bentor = "<:bentor:1082705559897264199>";
     public static final String blex = "<:blex:1082705569351204995>";
+    public static final String kyro = "<:blex:1082705569351204995>";
     public static final String celdauri = "<:celdauri:1082705576691253288>";
     public static final String cheiran = "<:cheiran:1082705584886915204>";
     public static final String cymiae = "<:cymiae:1082705596836487238>";
