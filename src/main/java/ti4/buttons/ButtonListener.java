@@ -367,6 +367,8 @@ public class ButtonListener extends ListenerAdapter {
             new Swap().secondHalfOfSwap(activeGame, player, activeGame.getPlayerFromColorOrFaction(faction), event.getUser(), event);
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
             ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("olradinHeroFlip_")) {
+            ButtonHelperHeroes.olradinHeroFlipPolicy(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("arcExp_")) {
             ButtonHelperActionCards.resolveArcExpButtons(activeGame, player, buttonID, event, trueIdentity);
         } else if (buttonID.startsWith("augerHeroSwap_")) {
@@ -1670,6 +1672,7 @@ public class ButtonListener extends ListenerAdapter {
             String faction = buttonID.replace("nekroStealTech_", "");
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             List<String> potentialTech = new ArrayList<>();
+            activeGame.setComponentAction(true);
             potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, activeGame);
             List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, activeGame);
             if (buttons.size() > 0 && p2 != null && !p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
@@ -1726,8 +1729,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("genericBuild_")) {
             String pos = buttonID.replace("genericBuild_", "");
-            List<Button> buttons;
-            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "genericBuild", "place");
+            List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "genericBuild", "place");
             String message = player.getRepresentation() + " Use the buttons to produce units. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
@@ -1757,8 +1759,10 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 event.getMessage().delete().queue();
             }
-        } else if (buttonID.startsWith("checksNBalancesPt2_")) {
+        } else if (buttonID.startsWith("checksNBalancesPt2_")) {//"freeSystemsHeroPlanet_"
             new SCPick().resolvePt2ChecksNBalances(event, player, activeGame, buttonID);
+        } else if (buttonID.startsWith("freeSystemsHeroPlanet_")) {//"freeSystemsHeroPlanet_"
+            ButtonHelperHeroes.freeSystemsHeroPlanet(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("scPick_")) {
             Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
@@ -3671,6 +3675,21 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperHeroes.killShipsSardakkHero(player, activeGame, event);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         player.getRepresentation(true, true) + " All ships have been removed, continue to land troops.");
+                    ButtonHelper.deleteTheOneButton(event);
+                }
+                case "purgeRohdhnaHero" -> {
+                    Leader playerLeader = player.unsafeGetLeader("rohdhnahero");
+                    StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                    boolean purged = player.removeLeader(playerLeader);
+                    if (purged) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message + " - Leader " + "rohdhnahero" + " has been purged");
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                    }
+                    List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(activeGame.getActiveSystem()), "rohdhnaBuild", "place");
+                    String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                    event.getMessage().delete().queue();
                     ButtonHelper.deleteTheOneButton(event);
                 }
                 case "purgeKeleresAHero" -> {
