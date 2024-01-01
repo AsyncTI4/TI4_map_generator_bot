@@ -789,6 +789,7 @@ public class ButtonHelperAbilities {
         }
         return techToGain;
     }
+    
 
     public static List<String> getPossibleTechForNekroToGainFromPlayer(Player nekro, Player victim, List<String> currentList, Game activeGame) {
         List<String> techToGain = new ArrayList<>(currentList);

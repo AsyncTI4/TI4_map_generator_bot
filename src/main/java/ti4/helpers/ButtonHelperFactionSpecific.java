@@ -1198,20 +1198,20 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static int getPlayersWithBranchOffices(Game activeGame, Player player){
-        int count = 0;
+    public static List<Player> getPlayersWithBranchOffices(Game activeGame, Player player){
+        List<Player> players = new ArrayList<>();
         for(Player p2 : activeGame.getRealPlayers()){
             if(p2 == player){
                 continue;
             }
             for(String pn : p2.getPromissoryNotes().keySet()){
                 if(pn.contains("dspnveld")){
-                    count++;
+                    players.add(p2);
                     break;
                 }
             }
         }
-        return count;
+        return players;
     }
 
 
