@@ -19,6 +19,7 @@ import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.franken.LeaderAdd;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.UnlockLeader;
+import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SCPlay;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -39,6 +40,43 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
+    public static void offerFreeSystemsButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
+            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
+                buttons.add(Button.success("freeSystemsHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = "Use buttons to select which planet to use free systems hero on";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+    public static void freeSystemsHeroPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String planet = buttonID.split("_")[1];
+        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        planetReal.addToken("token_dmz.png");
+        unitHolder.removeAllUnits(player.getColor());
+        if(player.getExhaustedPlanets().contains(planet)){
+            new PlanetRefresh().doAction(player, planet, activeGame);
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached Free Systems Hero to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getPossibleTechForVeldyrToGainFromPlayer(Player veldyr, Player victim, Game activeGame) {
+        List<Button> techToGain = new ArrayList<>();
+        for (String tech : victim.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (!veldyr.getTechs().contains(tech) && !techToGain.contains(tech) && "unitupgrade".equalsIgnoreCase(techM.getType().toString()) && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
+                techToGain.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        return techToGain;
+    }
     public static List<Button> getArboHeroButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>();
@@ -168,7 +206,7 @@ public class ButtonHelperHeroes {
 
         List<Tile> tiles = new ArrayList<>();
         for (Player p : activeGame.getRealPlayers()) {
-            if (p.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock") || player.getUnitsOwned().contains("cabal_spacedock2")) {
+            if (p.hasTech("dt2") || p.getUnitsOwned().contains("cabal_spacedock") || p.getUnitsOwned().contains("cabal_spacedock2")) {
                 tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.CabalSpacedock, UnitType.Spacedock));
             }
         }
@@ -355,6 +393,92 @@ public class ButtonHelperHeroes {
                 + " The Naalu Hero has been played and you must send a PN. Please select the PN you would like to send";
             MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
         }
+        event.getMessage().delete().queue();
+    }
+
+    public static void offerOlradinHeroFlips(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList();
+        buttons.add(Button.success("olradinHeroFlip_people","People Policy"));
+        buttons.add(Button.success("olradinHeroFlip_environment","Environment Policy"));
+        buttons.add(Button.success("olradinHeroFlip_economy","Economy Policy"));
+        buttons.add(Button.danger("deleteButtons","Decline"));
+        String msg = player.getRepresentation() + " you can flip one policy";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+
+    public static void olradinHeroFlipPolicy(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        int negativePolicies = 0;
+        int positivePolicies = 0;
+        String policy = buttonID.split("_")[1];
+        // go through each option and set the policy accordingly
+        String msg = player.getRepresentation()+" ";
+        if (policy.equalsIgnoreCase("people")) {
+            if (player.hasAbility("policy_the_people_connect")) {
+                player.removeAbility("policy_the_people_connect");
+                msg = msg+"removed Policy - The People: Connect (+) and added Policy - The People: Control (-).";
+                player.addAbility("policy_the_people_control");
+            } else if (player.hasAbility("policy_the_people_control")) {
+                player.removeAbility("policy_the_people_control");
+                msg = msg+"removed Policy - The People: Control (-) and added Policy - The People: Connect (+).";
+                player.addAbility("policy_the_people_connect");
+            }
+        }
+        if (policy.equalsIgnoreCase("environment")) {
+            if (player.hasAbility("policy_the_environment_preserve")) {
+                player.removeAbility("policy_the_environment_preserve");
+                msg = msg+"removed Policy - The Environment: Preserve (+) and added Policy - The Environment: Plunder (-).";
+                player.addAbility("policy_the_environment_plunder");
+            }
+            if (player.hasAbility("policy_the_environment_plunder")) {
+                player.removeAbility("policy_the_environment_plunder");
+                msg = msg+"removed Policy - The Environment: Plunder (-) and added Policy - The Environment: Preserve (+).";
+                player.addAbility("policy_the_environment_preserve");
+            }
+        }
+        if (policy.equalsIgnoreCase("economy")) {
+            if (player.hasAbility("policy_the_economy_empower")) {
+                player.removeAbility("policy_the_economy_empower");
+                msg = msg+"removed Policy - The Economy: Empower (+)";
+                player.addAbility("policy_the_economy_exploit");
+                player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
+                msg = msg+" and added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!";
+            } else if (player.hasAbility("policy_the_economy_exploit")) {
+                player.removeAbility("policy_the_economy_exploit");
+                player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
+                msg = msg+"removed Policy - The Economy: Exploit (-)";
+                player.addAbility("policy_the_economy_empower");
+                msg = msg+" and added Policy - The Economy: Empower (+).";
+            }
+        }
+        player.removeOwnedUnitByID("olradin_mech");
+        player.removeOwnedUnitByID("olradin_mech_positive");
+        player.removeOwnedUnitByID("olradin_mech_negative");
+        String unitModelID;
+        if (player.hasAbility("policy_the_economy_exploit")) {
+            negativePolicies++;
+        }else{
+            positivePolicies++;
+        }
+        if (player.hasAbility("policy_the_environment_plunder")) {
+            negativePolicies++;
+        }else{
+            positivePolicies++;
+        }
+        if (player.hasAbility("policy_the_people_connect")) {
+            positivePolicies++;
+        }else{
+            negativePolicies++;
+        }
+        if (positivePolicies >= 2) {
+            unitModelID = "olradin_mech_positive";
+        } else if (negativePolicies > 2) {
+            unitModelID = "olradin_mech_negative";
+        } else {
+            unitModelID = "olradin_mech";
+        }
+        player.addOwnedUnitByID(unitModelID);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        DiscordantStarsHelper.checkOlradinMech(activeGame);
         event.getMessage().delete().queue();
     }
 

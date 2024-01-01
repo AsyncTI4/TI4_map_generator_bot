@@ -2,11 +2,14 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetRefresh;
@@ -19,11 +22,14 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -146,6 +152,7 @@ public class HeroPlay extends LeaderAction {
             case "olradinhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " added 1 infantry to each planet");
                 new RiseOfMessiah().doRise(player, event, activeGame);
+                ButtonHelperHeroes.offerOlradinHeroFlips(activeGame, player);
             }   
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
@@ -171,6 +178,45 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
                     + " use the buttons to select the system to remove all opposing ff and inf from",
                     buttons);
+            }
+            case "edynhero"-> {
+                int size = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size();
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can resolve "+size +" agendas cause thats how many sigils they got. After putting the agendas on top in the order you want (dont bottom any), please press the button to reveal an agenda");
+                new DrawAgenda().drawAgenda(event, size, activeGame, player);
+                Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
+                List<Button> buttons = List.of(flipAgenda);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
+            }
+            case "kjalengardhero" ->{
+                int size = ButtonHelperAgents.getGloryTokenTiles(activeGame).size();
+                for(Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)){
+                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "kjalHero_"+tile.getPosition());
+                    if(buttons.size() > 0){
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to remove token from "+tile.getRepresentationForButtons(activeGame, player)+" or an adjacent tile", buttons);
+                    }
+                }
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain "+size +" CCs");
+                Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                String trueIdentity = player.getRepresentation(true, true);
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+
+            }
+            case "freesystemshero"->{
+                ButtonHelperHeroes.offerFreeSystemsButtons(player, activeGame, event);
+            }
+            case "veldyrhero"->{
+                activeGame.setComponentAction(true);
+                for(Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player)){
+                    if(ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame).size() > 0){
+                        String msg = player.getRepresentation(true, true)+ " you can retrieve a unit upgrade tech from players with branch offices. Here is the possible techs from "+ButtonHelper.getIdentOrColor(p2, activeGame);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame));
+                    }
+                }
             }
             case "nekrohero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, activeGame);
