@@ -154,7 +154,7 @@
         "type": "mods",
         "value": "-1",
         "persistenceType": "ALWAYS",
-        "scope": "pd",
+        "scope": "",
         "forCombatAbility": "SpaceCannonOffence",
         "related": [
             {
@@ -233,6 +233,22 @@
                 "type": "custom",
                 "alias": "custom",
                 "message": ":shield: Defenders get +1 to ship rolls in a nebula."
+            }
+        ]
+    },
+    {
+        "alias": "plus1_vaylerian_hero",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "vaylerianhero",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Vaylerian Ships get +1 to combat rolls due to Hero"
             }
         ]
     },

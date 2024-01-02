@@ -86,6 +86,8 @@ public class HeroPlay extends LeaderAction {
         playHero(event, activeGame, player, playerLeader);
     }
 
+    
+
     public static void playHero(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader playerLeader) {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
@@ -168,6 +170,18 @@ public class HeroPlay extends LeaderAction {
                     + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
                     buttons);
             }
+            case "gheminaherolady" -> {
+                List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, activeGame);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true)
+                    + " use the button to pick which planet you want to resolve the hero on",
+                    buttons);
+            }
+            case "gheminaherolord" -> {
+                List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLordHero(player, activeGame);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true)
+                    + " use the button to pick which planet you want to resolve the hero on",
+                    buttons);
+            }
             case "arborechero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
@@ -196,6 +210,29 @@ public class HeroPlay extends LeaderAction {
                     }
                 }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain "+size +" CCs");
+                Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                String trueIdentity = player.getRepresentation(true, true);
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+
+            }
+            case "vaylerianhero" ->{
+                if(!activeGame.getNaaluAgent()){
+                    player.setTacticalCC(player.getTacticalCC() - 1);
+                    AddCC.addCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()));
+                    activeGame.setCurrentReacts("vaylerianHeroActive", "true");
+                }
+                for(Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)){
+                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "vaylerianhero");
+                    if(buttons.size() > 0){
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to remove a token from the board", buttons);
+                    }
+                }
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain 1 CC");
                 Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                 Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                 Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
