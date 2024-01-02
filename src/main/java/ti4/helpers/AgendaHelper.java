@@ -344,7 +344,7 @@ public class AgendaHelper {
                 if ("standardization".equalsIgnoreCase(agID)) {
                     player2.setTacticalCC(3);
                     player2.setStrategicCC(2);
-                    player2.setStrategicCC(3);
+                    player2.setFleetCC(3);
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Set "+ButtonHelper.getIdentOrColor(player2, activeGame)+ " ccs to 3/3/2");
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
@@ -529,7 +529,7 @@ public class AgendaHelper {
                         Button loseStrat = Button.danger(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy CC");
                         Button DoneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons", "Done Losing CCs");
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
-                        String message2 = player.getRepresentation(true, true) + " use buttons to lose CCs";
+                        String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation()+". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
                     }
                 }else{
@@ -594,7 +594,7 @@ public class AgendaHelper {
                         Button loseStrat = Button.danger(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy CC");
                         Button DoneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons", "Done Losing CCs");
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
-                        String message2 = player.getRepresentation(true, true) + " use buttons to lose CCs";
+                        String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation()+". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
                     }
                 }
