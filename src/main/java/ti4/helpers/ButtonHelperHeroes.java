@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -19,9 +21,12 @@ import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.franken.LeaderAdd;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.UnlockLeader;
+import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SCPlay;
+import ti4.commands.special.StellarConverter;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -66,6 +71,78 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Attached Free Systems Hero to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
+
+    public static List<Button> getButtonsForGheminaLadyHero(Player player, Game activeGame) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tilesWithBombard = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Lady, UnitType.Flagship);
+        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tilesWithBombard.get(0).getPosition(), player, false);
+        for (Tile tile : tilesWithBombard) {
+            adjacentTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
+        }
+        for (String pos : adjacentTiles) {
+            Tile tile = activeGame.getTileByPosition(pos);
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet planet) {
+                    if (!player.getPlanetsAllianceMode().contains(planet.getName()) && !ButtonHelper.isTileHomeSystem(tile)
+                        && !planet.getName().toLowerCase().contains("rex")) {
+                        buttons.add(Button.success(finChecker + "gheminaLadyHero_" + planet.getName(), Helper.getPlanetRepresentation(planet.getName(), activeGame)));
+                    }
+                }
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> getButtonsForGheminaLordHero(Player player, Game activeGame) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tilesWithBombard = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Lady, UnitType.Flagship);
+        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tilesWithBombard.get(0).getPosition(), player, false);
+        for (Tile tile : tilesWithBombard) {
+            adjacentTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
+        }
+        for (String pos : adjacentTiles) {
+            Tile tile = activeGame.getTileByPosition(pos);
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet planet) {
+                    if (!player.getPlanetsAllianceMode().contains(planet.getName()) && !ButtonHelper.isTileHomeSystem(tile)
+                        && !planet.getName().toLowerCase().contains("rex") && (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty())) {
+                        buttons.add(Button.success(finChecker + "gheminaLordHero_" + planet.getName(), Helper.getPlanetRepresentation(planet.getName(), activeGame)));
+                    }
+                }
+            }
+        }
+        return buttons;
+    }
+
+     public static void resolveGheminaLadyHero(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planetName = buttonID.split("_")[1];
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+        for(Player p2 : activeGame.getRealPlayers()){
+            unitHolder.removeAllUnits(p2.getColor());
+        }
+         String planetRepresentation2 = Helper.getPlanetRepresentation(planetName, activeGame);
+        String msg = player.getFactionEmoji() + " destroyed all units on the planet " + planetRepresentation2 + " using the Ghemina Lady Hero. ";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveGheminaLordHero(String buttonID, String ident, Player player, Game activeGame, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        if ("lockedmallice".equalsIgnoreCase(planet)) {
+            planet = "mallice";
+            Tile tile = activeGame.getTileFromPlanet("lockedmallice");
+            tile = MoveUnits.flipMallice(event, tile, activeGame);
+        }
+        new PlanetAdd().doAction(player, planet, activeGame, event);
+        new PlanetRefresh().doAction(player, planet, activeGame);
+        String planetRepresentation2 = Helper.getPlanetRepresentation(planet, activeGame);
+        String msg = ident + " claimed the planet " + planetRepresentation2 + " using the Ghemina Lord Hero. ";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
+
 
     public static List<Button> getPossibleTechForVeldyrToGainFromPlayer(Player veldyr, Player victim, Game activeGame) {
         List<Button> techToGain = new ArrayList<>();

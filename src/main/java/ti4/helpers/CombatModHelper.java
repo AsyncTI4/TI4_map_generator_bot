@@ -253,6 +253,11 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "vaylerianhero" -> {
+                if (player == game.getActivePlayerObject() && !game.getFactionsThatReactedToThis("vaylerianHeroActive").isEmpty()) {
+                    meetsCondition = true;
+                }
+            }
             default -> meetsCondition = true;
         }
         return meetsCondition;

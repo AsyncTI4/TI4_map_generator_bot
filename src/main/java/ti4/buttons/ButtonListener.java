@@ -576,6 +576,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.useOmenDie(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("peaceAccords_")) {
             ButtonHelperAbilities.resolvePeaceAccords(buttonID, ident, player, activeGame, event);
+        } else if (buttonID.startsWith("gheminaLordHero_")) {
+            ButtonHelperHeroes.resolveGheminaLordHero(buttonID, ident, player, activeGame, event);
+        } else if (buttonID.startsWith("gheminaLadyHero_")) {
+            ButtonHelperHeroes.resolveGheminaLadyHero(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("get_so_discard_buttons")) {
             String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
             List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(activeGame, player);
@@ -3689,7 +3693,36 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(activeGame.getActiveSystem()), "rohdhnaBuild", "place");
                     String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                    event.getMessage().delete().queue();
+                    ButtonHelper.deleteTheOneButton(event);
+                }
+                case "purgeVaylerianHero" -> {
+                    Leader playerLeader = player.unsafeGetLeader("vaylerianhero");
+                    StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                    boolean purged = player.removeLeader(playerLeader);
+                    if (purged) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message + " - Leader " + "vaylerianhero" + " has been purged");
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                    }
+                    if(!activeGame.getNaaluAgent()){
+                        player.setTacticalCC(player.getTacticalCC() - 1);
+                        AddCC.addCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()));
+                        activeGame.setCurrentReacts("vaylerianHeroActive", "true");
+                    }
+                    for(Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)){
+                        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "vaylerianhero");
+                        if(buttons.size() > 0){
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to remove a token from the board", buttons);
+                        }
+                    }
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain 1 CC");
+                    Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                    Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                    Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                    Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                    String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
                     ButtonHelper.deleteTheOneButton(event);
                 }
                 case "purgeKeleresAHero" -> {
