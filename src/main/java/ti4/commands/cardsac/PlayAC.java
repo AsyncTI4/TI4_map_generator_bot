@@ -1,10 +1,12 @@
 package ti4.commands.cardsac;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -118,13 +120,12 @@ public class PlayAC extends ACCardsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append(activeGame.getPing()).append(" ").append(activeGame.getName()).append("\n");
-
         if (activeGame.isFoWMode()) {
             sb.append("Someone played an Action Card:\n");
         } else {
             sb.append(player.getRepresentation()).append(" played an Action Card:\n");
         }
-        sb.append(actionCard.getRepresentation());
+
         List<Button> buttons = new ArrayList<>();
         Button sabotageButton = Button.danger("sabotage_ac_" + actionCardTitle, "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
@@ -155,18 +156,21 @@ public class PlayAC extends ACCardsSubcommandData {
             }
 
         }
-
+        MessageEmbed acEmbed = actionCard.getRepresentationEmbed();
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
         buttons.add(noSabotageButton);
         if (acID.contains("sabo")) {
-            MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
+            MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
         } else {
             if (Helper.isSaboAllowed(activeGame, player)) {
-                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeGame, player, buttons, true);
+                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, sb.toString(), activeGame, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
-                MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
-                MessageHelper.sendMessageToChannel(mainGameChannel,
-                    "Either all sabos were in the discard or active player had Transparasteel Plating and everyone was passed. Instinct training and watcher mechs may still be viable, who knows. ");
+                MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
+
+                StringBuilder noSabosMessage = new StringBuilder("> Either all **Sabotage** are in the discard or the active player has ");
+                noSabosMessage.append(Emojis.Yssaril).append("**Transparasteel Plating** and everyone else has passed.\n");
+                noSabosMessage.append("> ").append(Emojis.Xxcha).append("**Instinct Training** and ").append(Emojis.Empyrean).append(Emojis.mech).append("**Watcher** may still be viable, who knows.");
+                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
             }
             MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
             if (actionCardTitle.contains("Manipulate Investments")) {
@@ -191,7 +195,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     player.getRepresentation() + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
             }
             String codedName = "Plagiarize";
-            String codedMessage = player.getRepresentation() + " After checking for sabos, use buttons to resolve ";
+            String codedMessage = player.getRepresentation() + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
             List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
@@ -202,6 +206,10 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("miningInitiative", "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "War Machine";
+            if (actionCardTitle.contains(codedName)) {
+                player.addSpentThing("warmachine");
             }
 
             codedName = "Economic Initiative";

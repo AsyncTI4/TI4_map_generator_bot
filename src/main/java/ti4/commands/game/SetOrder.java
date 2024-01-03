@@ -30,9 +30,9 @@ public class SetOrder extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
-        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
+        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        Map<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+        Map<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
         try {
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER1));
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER2));
@@ -53,7 +53,7 @@ public class SetOrder extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 
-    public void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
+    public void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, OptionMapping option1) {
         if (option1 != null) {
             String id = option1.getAsUser().getId();
             Player player = players.get(id);
@@ -63,7 +63,7 @@ public class SetOrder extends GameSubcommandData {
             }
         }
     }
-    public void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, Player player) {
+    public void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, Player player) {
         if (player != null){
             newPlayerOrder.put(player.getUserID(), player);
             players.remove(player.getUserID());

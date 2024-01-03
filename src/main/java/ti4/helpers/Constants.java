@@ -8,6 +8,7 @@ public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
+    public static final String AUTO_PASS_WHENS_N_AFTERS = "auto_pass_whens_n_afters";
     public static final String DRAFT_HAND = "franken_personal_bag";
     public static final String DRAFT_BAG = "franken_bag_to_pass";
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
@@ -25,6 +26,7 @@ public class Constants {
     public static final String AFK_HOURS = "afk_hours";
     public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
+    public static final String WORMHOLE_RESEARCH_FOR = "wormhole_research_for";
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
     public static final String REVISE_LAW = "revise_law";
@@ -977,6 +979,7 @@ public class Constants {
     public static final String TECH_DECK_ID = "tech_deck_id";
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
     public static final String ADD_OMEN_DIE = "add_omen_die";
+    public static final String KYRO_HERO = "kyro_hero";
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
     public static final String COMBAT_ROLL_TYPE = "rolltype";
@@ -1025,4 +1028,11 @@ public class Constants {
     public static final String SAVE_FILE = "save_file";
     public static final String OTHER = "other";
     public static final String STATISTIC = "statistic";
+    public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
+    public static final String SHOW_GAME_MODES = "show_game_modes";
+    public static final String MAX_SO_COUNT = "max_so_count";
+    public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";
+    public static final String REFRESH_LEADER_INFO = "refreshLeaderInfo";
+    public static final String REFRESH_UNIT_INFO = "refreshUnitInfo";
+    public static final String REFRESH_TECH_INFO = "refreshTechInfo";
 }

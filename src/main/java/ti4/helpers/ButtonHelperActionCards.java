@@ -59,7 +59,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet) continue;
 
             Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
@@ -394,10 +394,7 @@ public class ButtonHelperActionCards {
     public static void resolveFrontlineDeployment(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to drop 3 infantry on";
         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "3gf", "placeOneNDone_skipbuild"));
-        Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
-        buttons.add(DoneRefreshing);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
-
         event.getMessage().delete().queue();
     }
 
@@ -798,7 +795,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveReparationsStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2.getReadiedPlanets().size() == 0) {
+        if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. This is fine and nothing more needs to be done.");
             event.getMessage().delete().queue();
             return;
@@ -838,7 +835,7 @@ public class ButtonHelperActionCards {
     public static void resolveSeizeArtifactStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-        ArrayList<String> playerFragments = p2.getFragments();
+        List<String> playerFragments = p2.getFragments();
         for (String fragid : playerFragments) {
             if (fragid.contains("crf")) {
                 buttons.add(Button.primary("seizeArtifactStep3_" + p2.getFaction() + "_" + fragid, "Seize Cultural (" + fragid + ")"));
@@ -859,7 +856,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveUprisingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2.getReadiedPlanets().size() == 0) {
+        if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. Nothing has been done.");
             event.getMessage().delete().queue();
             return;
@@ -886,7 +883,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                buttons.add(Button.secondary("signalJammingStep3_" + p2.getFaction() + "_" + tile.getPosition(), tile.getRepresentation()));
+                buttons.add(Button.secondary("signalJammingStep3_" + p2.getFaction() + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
             }
         }
         event.getMessage().delete().queue();
@@ -934,7 +931,7 @@ public class ButtonHelperActionCards {
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
             if (uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                if (!ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, p2)) {
+                if (!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet))) {
                     Tile tile = activeGame.getTileFromPlanet(planet);
                     buttons.add(Button.secondary("reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
                 }
@@ -1350,7 +1347,7 @@ public class ButtonHelperActionCards {
     public static List<Button> getGhostShipButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player)) {
+            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition())) {
                 boolean hasOtherShip = false;
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player) {

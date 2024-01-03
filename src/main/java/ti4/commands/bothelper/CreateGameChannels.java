@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -60,12 +59,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
         String gameName;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
-            if (gameOrRoleAlreadyExists(gameName)) {
-                sendMessage("Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
-                return;
-            }
         } else {
             gameName = getNextGameName();
+            if ("pbd2000".equals(gameName)) {
+                sendMessage("No more games can be created. Please contact @Developer to resolve."); // See comments in getAllExistingPBDNumbers
+                return;
+            }
+        }
+        if (gameOrRoleAlreadyExists(gameName)) {
+            sendMessage("Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
+            return;
         }
 
         //CHECK IF GIVEN CATEGORY IS VALID
@@ -110,6 +113,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
+        if (guild == null) {
+            sendMessage("Error: Guild is null");
+            return;
+        }
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
@@ -228,11 +235,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
         String botGetStartedMessage = role.getAsMention() + " - bot/map channel\n" +
             "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n" +
             "### __Use the following commands to get started:__\n" +
-            "> `/game setup` to set player count and additional options\n" +
             "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
-            "> `/game set_order` to set the starting speaker order\n" +
             "> `/player setup` to set player faction and color\n" +
-            "> `/tech add` for factions who need to add tech\n" +
+            "> `/game setup` to set player count and additional options\n" +
+            "> `/game set_order` to set the starting speaker order\n" +
             "\n" +
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
@@ -301,7 +307,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             //EXISTING ROLE NAMES
             for (Role role : pbdRoles) {
                 String pbdNum = role.getName().replace("pbd", "");
-                if (Helper.isInteger(pbdNum)) {
+                if (Helper.isInteger(pbdNum)
+                && Integer.parseInt(pbdNum) < 2000) // REMOVE AFTER pbd1999 GETS CREATED
+                {
                     pbdNumbers.add(Integer.parseInt(pbdNum));
                 }
             }
@@ -313,7 +321,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .toList();
         for (String mapName : mapNames) {
             String pbdNum = mapName.replace("pbd", "");
-            if (Helper.isInteger(pbdNum)) {
+            if (Helper.isInteger(pbdNum)
+                 && Integer.parseInt(pbdNum) < 2000) // REMOVE AFTER pbd1999 GETS CREATED
+            {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }

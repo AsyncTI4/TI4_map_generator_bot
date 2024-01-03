@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -61,22 +60,17 @@ public class SOInfo extends SOCardsSubcommandData {
         //SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getSecretObjectiveCardInfo(activeGame, player));
 
-        //BUTTONS
+        if (player.getSecretsUnscored().isEmpty()) return;
+        
+        // SCORE/DISCARD BUTTONS
         String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
-        List<Button> soButtons = getUnscoredSecretObjectiveButtons(activeGame, player);
-        if (!soButtons.isEmpty()) {
-            List<Button> buttons = new ArrayList<>();
-            Button scoreB = Button.primary("get_so_score_buttons", "Score an SO");
-            Button discardB = Button.danger("get_so_discard_buttons", "Discard an SO");
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            buttons.add(scoreB);
-            buttons.add(discardB);
-            // if (activeGame.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
-            //     buttons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false));
-            // }
-            MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
-
-        }
+        List<Button> buttons = new ArrayList<>();
+        Button scoreB = Button.primary("get_so_score_buttons", "Score an SO");
+        Button discardB = Button.danger("get_so_discard_buttons", "Discard an SO");
+        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
+        buttons.add(scoreB);
+        buttons.add(discardB);
+        MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
     }
 
     public static String getSecretObjectiveRepresentationShort(String soID) {
@@ -106,8 +100,8 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     private static String getSecretObjectiveCardInfo(Game activeGame, Player player) {
-        LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
-        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeGame.getScoredSecretObjective(player.getUserID()));
+        Map<String, Integer> secretObjective = player.getSecrets();
+        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : activeGame.getSoToPoList()) {
             scoredSecretObjective.remove(id);
         }
@@ -145,10 +139,10 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Game activeGame, Player player) {
-        LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
+        Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
-        if (secretObjective != null && !secretObjective.isEmpty()) {
-            for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
+        if (secretObjectives != null && !secretObjectives.isEmpty()) {
+            for (Map.Entry<String, Integer> so : secretObjectives.entrySet()) {
                 SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
@@ -161,10 +155,10 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game activeGame, Player player) {
-        LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
+        Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
-        if (secretObjective != null && !secretObjective.isEmpty()) {
-            for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
+        if (secretObjectives != null && !secretObjectives.isEmpty()) {
+            for (Map.Entry<String, Integer> so : secretObjectives.entrySet()) {
                 SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
                 String soName = so_.getName();
                 Integer idValue = so.getValue();

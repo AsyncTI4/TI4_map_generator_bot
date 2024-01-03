@@ -195,6 +195,7 @@ public class ButtonHelperAbilities {
         }
         return trappedPlanets;
     }
+    
 
     public static List<String> getUnusedTraps(Game activeGame, Player player) {
         List<String> unusedTraps = new ArrayList<>();
@@ -646,6 +647,27 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
+    public static int getNumberOfDifferentAxisOrdersBought(Player player, Game activeGame) {
+        int num = 0;
+        String relicName = "axisorderdd";
+        String extra = "duplicate";
+        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName) || ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName+extra)) {
+            num++;
+        }
+        relicName = "axisordercr";
+        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName) || ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName+extra)) {
+            num++;
+        }
+        relicName = "axisordercv";
+        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName) || ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName+extra)) {
+            num++;
+        }
+        relicName = "axisorderdn";
+        if (ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName) || ButtonHelperFactionSpecific.somebodyHasThisRelic(activeGame, relicName+extra)) {
+            num++;
+        }
+        return num;
+    }
     public static List<Button> getBuyableAxisOrders(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
         int maxCost = player.getCommodities();
@@ -713,6 +735,9 @@ public class ButtonHelperAbilities {
         player.setCommodities(oldComms - lostComms);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " acquired " + Mapper.getRelic(relicName).getName()
             + " and paid " + lostComms + " commodities (" + oldComms + "->" + player.getCommodities() + ")");
+        if(player.getLeaderIDs().contains("axiscommander") && !player.hasLeaderUnlocked("axiscommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "axis", event);
+        }
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -764,6 +789,7 @@ public class ButtonHelperAbilities {
         }
         return techToGain;
     }
+    
 
     public static List<String> getPossibleTechForNekroToGainFromPlayer(Player nekro, Player victim, List<String> currentList, Game activeGame) {
         List<String> techToGain = new ArrayList<>(currentList);

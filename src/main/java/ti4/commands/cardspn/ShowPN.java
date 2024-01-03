@@ -62,7 +62,7 @@ public class ShowPN extends PNCardsSubcommandData {
             "Game: " + activeGame.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
             "Showed Promissory Note:" + "\n" +
-            Mapper.getPromissoryNote(acID, longPNDisplay) + "\n" +
+            Mapper.getPromissoryNoteText(acID, longPNDisplay) + "\n" +
             "---------\n";
         player.setPromissoryNote(acID);
         

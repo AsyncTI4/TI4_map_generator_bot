@@ -2,8 +2,9 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -54,7 +55,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
 
-        LinkedHashSet<Integer> playersSCs = player.getSCs();
+        Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
             sendMessage("No SC has been selected");
             return;
@@ -197,6 +198,10 @@ public class SCPlay extends PlayerSubcommandData {
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), assignSpeakerMessage, assignSpeakerActionRow);
+        }
+        if(scToPlay == ButtonHelper.getKyroHeroSC(activeGame) && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))){
+             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
+
         }
 
         if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {

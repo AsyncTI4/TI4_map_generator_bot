@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,7 +75,7 @@ public class SCPick extends PlayerSubcommandData {
 
         Stats stats = new Stats();
         boolean pickSuccessful = stats.pickSC(event, activeGame, player, option);
-        LinkedHashSet<Integer> playerSCs = player.getSCs();
+        Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
             if (activeGame.isFoWMode()) {
                 String[] scs = { Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6 };
@@ -138,7 +137,7 @@ public class SCPick extends PlayerSubcommandData {
 
     public void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, activeGame, scPicked);
-        LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+        Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 
         for (Player playerStats : activeGame.getRealPlayers()) {
             if (playerStats.getSCs().contains(scPicked)) {
@@ -180,6 +179,24 @@ public class SCPick extends PlayerSubcommandData {
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, activeGame, scpick);
         if (buttons.size() == 0) {
+            Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+            Set<Integer> scPickedList = new HashSet<>();
+            for (Player player_ : activeGame.getRealPlayers()) {
+                scPickedList.addAll(player_.getSCs());
+            }
+
+            //ADD A TG TO UNPICKED SC
+            for (Integer scNumber : scTradeGoods.keySet()) {
+                if (!scPickedList.contains(scNumber) && scNumber != 0) {
+                    Integer tgCount = scTradeGoods.get(scNumber);
+                    tgCount = tgCount == null ? 1 : tgCount + 1;
+                    activeGame.setScTradeGood(scNumber, tgCount);
+                }
+            }
+
+            for (int sc : scPickedList) {
+                activeGame.setScTradeGood(sc, 0);
+            }
             ButtonHelper.startActionPhase(event, activeGame);
         } else {
             boolean foundPlayer = false;
@@ -200,6 +217,7 @@ public class SCPick extends PlayerSubcommandData {
                 privatePlayer = activeGame.getRealPlayers().get(0);
             }
             activeGame.setCurrentPhase("strategy");
+            activeGame.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
                 privatePlayer.getRepresentation(true, true) + "Use Buttons to Pick Which SC you want to give someone", Helper.getRemainingSCButtons(event, activeGame, privatePlayer));
         }
@@ -260,9 +278,9 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
 
-            msgExtra += activeGame.getPing() + "\nAll players picked SC";
+            msgExtra +=  "\nAll players picked SC";
 
-            LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+            Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());

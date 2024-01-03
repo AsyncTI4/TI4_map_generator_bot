@@ -99,7 +99,6 @@ public class DrawRelic extends GenericRelicAction {
             case "shard" -> {
                 Integer poIndex = activeGame.addCustomPO("Shard of the Throne", 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
-                Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
                     .append(player.getRepresentation()).append(" scored 'Shard of the Throne'");
             }
@@ -108,9 +107,8 @@ public class DrawRelic extends GenericRelicAction {
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";
                 Integer poIndex = activeGame.addCustomPO(customPOName, 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
-                Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO '").append(customPOName).append("' has been added.\n")
-                    .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
+                .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
             }
         }
         if (activeGame.isFoWMode()) {
@@ -120,5 +118,6 @@ public class DrawRelic extends GenericRelicAction {
         if (checked) {
             activeGame.shuffleRelics();
         }
+        Helper.checkEndGame(activeGame, player);
     }
 }

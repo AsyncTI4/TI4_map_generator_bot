@@ -173,7 +173,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (token.equals(Constants.DMZ)) {
                     String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                     tile.addToken(dmzLargeFilename, planetName);
-                    HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                    Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                     UnitHolder planetUnitHolder = unitHolders.get(planetName);
                     UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                     if (planetUnitHolder != null && spaceUnitHolder != null) {
@@ -182,7 +182,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             String color = player_.getColor();
                             planetUnitHolder.removeAllUnits(color);
                         }
-                        HashMap<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                        Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
                         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                             UnitKey key = unitEntry.getKey();
                             if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
@@ -319,7 +319,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
-                        + "). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring.");
+                        + "). Reminder you do not legally have this tg prior to exploring, and you could potentially deploy a mech before doing it to dodge pillage.");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
@@ -330,7 +330,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Button.success("saarMechRes_" + "mirage", "Pay 1tg for mech on " + Helper.getPlanetRepresentation("mirage", activeGame)));
                     saarButton.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                         player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
                 }
 
@@ -486,7 +486,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ancientshipyard" -> {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 List<String> colors = tile.getUnitHolders().get("space").getUnitColorsOnHolder();
-                if (colors.size() == 0 || colors.contains(player.getColorID())) {
+                if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
                     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Cruiser added to the system automatically.");
                 } else {

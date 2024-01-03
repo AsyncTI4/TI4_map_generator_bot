@@ -23,7 +23,7 @@ import java.util.*;
 
 public class AddToken extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
 
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
@@ -91,7 +91,7 @@ public class AddToken extends AddRemoveToken {
                 continue;
             }
             if (tokenID.contains("dmz")) {
-                HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                 UnitHolder planetUnitHolder = unitHolders.get(planet);
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                 if (planetUnitHolder != null && spaceUnitHolder != null) {
@@ -100,7 +100,7 @@ public class AddToken extends AddRemoveToken {
                         String color = player_.getColor();
                         planetUnitHolder.removeAllUnits(color);
                     }
-                    HashMap<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                    Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
                     for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                         UnitKey key = unitEntry.getKey();
                         if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {

@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -444,7 +443,7 @@ public class StartMilty extends MiltySubcommandData {
                 continue;
             }
             draftTile.setTile(tile);
-            HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 if (unitHolder instanceof Planet planet) {
                     int resources = planet.getResources();

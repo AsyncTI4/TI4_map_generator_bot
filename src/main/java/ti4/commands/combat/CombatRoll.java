@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.TileHelper;
@@ -132,7 +134,7 @@ public class CombatRoll extends CombatSubcommandData {
                         "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
             }
         }
-        if (playerUnitsByQuantity.size() == 0) {
+        if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
             if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
@@ -183,14 +185,21 @@ public class CombatRoll extends CombatSubcommandData {
         message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player,
                 opponent,
                 activeGame, rollType);
+        String hits = StringUtils.substringAfter(message, "Total hits ");
+        hits = hits.split(" ")[0].replace("*","");
+        int h = Integer.parseInt(hits);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-    }
+        if(!activeGame.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && h > 0 && opponent != null && opponent != player){
+            String msg = opponent.getRepresentation(true, true) + " you can autoassign "+h+" hit(s)";
+            List<Button> buttons = new ArrayList<>();
+            String finChecker = "FFCC_" + opponent.getFaction() + "_";
+            buttons.add(Button.success(finChecker+"autoAssignGroundHits_"+combatOnHolder.getName()+"_"+h,"Auto-assign Hits"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        }
 
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        super.reply(event);
     }
 }

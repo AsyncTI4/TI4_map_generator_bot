@@ -1,11 +1,13 @@
 package ti4.commands.explore;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -33,26 +35,17 @@ public class RelicInfo extends ExploreSubcommandData {
         sendRelicInfo(activeGame, player, event);
     }
 
-    public static void sendRelicInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+    public static void sendRelicInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendRelicInfo(activeGame, player);
     }
 
     public static void sendRelicInfo(Game activeGame, Player player) {
-        //RELIC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getRelicInfoText(player));
-
-        //BUTTONS
-        String purgeRelicMessage = "_ _\nClick a button below to exhaust or purge a Relic";
-        List<Button> relicButtons = getRelicButtons(activeGame, player);
-        if (relicButtons != null && !relicButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(purgeRelicMessage, relicButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                getRelicInfoText(player),
+                getRelicButtons(player));
     }
 
     private static String getRelicInfoText(Player player) {
@@ -69,7 +62,9 @@ public class RelicInfo extends ExploreSubcommandData {
         return sb.toString();
     }
 
-    private static List<Button> getRelicButtons(Game activeGame, Player player) {
-        return null;
+    private static List<Button> getRelicButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.primary(Constants.REFRESH_RELIC_INFO, "Refresh Relic Info"));
+        return buttons;
     }
 }

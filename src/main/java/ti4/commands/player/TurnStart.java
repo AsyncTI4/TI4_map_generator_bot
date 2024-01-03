@@ -1,13 +1,18 @@
 package ti4.commands.player;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.fow.Whisper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -39,6 +44,13 @@ public class TurnStart extends PlayerSubcommandData {
     public static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
+        Map<String,String> maps = new HashMap<>();
+        maps.putAll(activeGame.getMessagesThatICheckedForAllReacts());
+        for(String id : maps.keySet()){
+            if(id.contains("combatRoundTracker")){
+                activeGame.removeMessageIDFromCurrentReacts(id);
+            }
+        }
         boolean goingToPass = false;
         if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
             && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
@@ -96,8 +108,24 @@ public class TurnStart extends PlayerSubcommandData {
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
         }
+        if(!activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).isEmpty()){
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true)+ " you left yourself the following message: \n"+activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).replace("666fin", ":"));
+            activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),"");
+        }
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(!activeGame.getFactionsThatReactedToThis("futureMessageFor_"+player.getFaction()+"_"+p2.getFaction()).isEmpty()){
+                String msg2 = "This is a message sent from the past:\n"+activeGame.getFactionsThatReactedToThis("futureMessageFor_"+player.getFaction()+"_"+p2.getFaction()).replace("666fin", ":");
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + " your future message got delivered");
+                Whisper.sendWhisper(activeGame, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
+                activeGame.setCurrentReacts("futureMessageFor_"+player.getFaction()+"_"+p2.getFaction(),"");
+            }
+        }
+        
         if (goingToPass) {
             player.setPassed(true);
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+                ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+            }
             String text2 = player.getRepresentation() + " PASSED";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text2);
             TurnEnd.pingNextPlayer(event, activeGame, player, true);

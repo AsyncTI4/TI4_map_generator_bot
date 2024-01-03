@@ -2,8 +2,6 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,6 +63,9 @@ public class TurnEnd extends PlayerSubcommandData {
         //in a normal game, 8 is the maximum number, so we modulo on 9
         List<Player> unpassedPlayers = activeGame.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
         int maxSC = Collections.max(activeGame.getSCList()) + 1;
+        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
+            maxSC = maxSC+1;
+        }
         for (int i = 1; i <= maxSC; i++) {
             int scCheck = (startingInitiative + i) % maxSC;
             for (Player p : unpassedPlayers) {
@@ -144,10 +145,10 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame, String prefix) {
-        LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
-        LinkedHashMap<String, Integer> customPublicVP = activeGame.getCustomPublicVP();
+        Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
+        Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+        Map<String, Integer> customPublicVP = activeGame.getCustomPublicVP();
         List<Button> poButtons = new ArrayList<>();
         List<Button> poButtons1 = new ArrayList<>();
         List<Button> poButtons2 = new ArrayList<>();
@@ -188,6 +189,12 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtons1);
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
+        for(Player player : activeGame.getRealPlayers()){
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !activeGame.isFoWMode()){
+                poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
+                break;
+            }
+        }
         poButtons.removeIf(Objects::isNull);
         return poButtons;
     }
@@ -198,7 +205,7 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setCurrentPhase("status");
         for (Player player : activeGame.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(activeGame, player);
-          List<String> relics = new ArrayList<>(player.getRelics());
+            List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {
                     player.removeRelic(relic);
@@ -231,6 +238,20 @@ public class TurnEnd extends PlayerSubcommandData {
             if(player.getTotalVictoryPoints() > maxVP){
                 maxVP = player.getTotalVictoryPoints();
             }
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")){
+                int numScoredSOs = player.getSoScored();
+                int numScoredPos = player.getPublicVictoryPoints(false);
+                if(numScoredPos +player.getCommodities()> player.getCommoditiesTotal()){
+                    numScoredPos = player.getCommoditiesTotal() - player.getCommodities();
+                }
+                player.setTg(player.getTg()+numScoredSOs);
+                if(numScoredSOs > 0){
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, numScoredSOs);
+                }
+                player.setCommodities(player.getCommodities()+numScoredPos);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you gained "+numScoredSOs+" tg and "+numScoredPos+" commodities due to Vaden Commander");
+            }
         }
         if(maxVP+4 > activeGame.getVp()){
             String msg = "You can use these buttons to force scoring to go in iniative order";
@@ -240,7 +261,7 @@ public class TurnEnd extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg, buttons);
         }
         // return beginning of status phase PNs
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {

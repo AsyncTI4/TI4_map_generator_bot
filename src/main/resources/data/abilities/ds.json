@@ -83,7 +83,7 @@
         "id": "byssus",
         "name": "Byssus",
         "faction": "cheiran",
-        "permanentEffect": "You may treat your mechs as structuresfor any purpose other than scoring objectives.",
+        "permanentEffect": "You may treat your mechs as structures for any purpose other than scoring objectives.",
         "source": "ds"
     },
     {

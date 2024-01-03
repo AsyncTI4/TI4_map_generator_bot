@@ -23,6 +23,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.WormholeModel;
 
@@ -172,6 +173,38 @@ public class FoWHelper {
 				player.updateFogTile(tileToUpdate, "Round " + activeGame.getRound());
 			}
 		}
+	}
+
+	public static Tile getPlayerHS(Game activeGame, Player player){
+		String faction = player.getFaction();
+		for (Tile tile : activeGame.getTileMap().values()) {
+			if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
+				if(ButtonHelper.isTileHomeSystem(tile)){
+					return tile;
+				}
+			}
+			if(player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null && (faction.contains("ghost") || faction.contains("franken"))){
+				return tile;
+			}
+		}
+		if(!player.getFaction().contains("franken")){
+			Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+			if(player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0){
+				tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).get(0);
+			}
+			if (tile == null) {
+				tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
+			}
+			if(tile != null){
+				if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
+					if(ButtonHelper.isTileHomeSystem(tile)){
+						return tile;
+					}
+				}
+			}
+			return tile;
+		}
+		return null;
 	}
 
 	private static boolean hasHomeSystemInView(@NotNull Game activeGame, @NotNull Player player, @NotNull Player viewingPlayer) {
@@ -328,7 +361,7 @@ public class FoWHelper {
 		}
 
 		List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
-		if (hyperlaneData != null && hyperlaneData.size() == 0) {
+		if (hyperlaneData != null && hyperlaneData.isEmpty()) {
 			// We could not load the hyperlane data correctly, quit
 			return tiles;
 		}
@@ -380,7 +413,7 @@ public class FoWHelper {
 
 	}
 
-	public static boolean doesTileHaveWHs(Game activeGame, String position, Player player) {
+	public static boolean doesTileHaveWHs(Game activeGame, String position) {
 		Tile tile = activeGame.getTileByPosition(position);
 
 		String ghostFlagshipColor = null;
@@ -391,15 +424,9 @@ public class FoWHelper {
 			}
 		}
 
-		boolean wh_recon = activeGame.getLaws().containsKey("wormhole_recon");
-		boolean absol_recon = activeGame.getLaws().containsKey("absol_recon");
-
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -421,26 +448,15 @@ public class FoWHelper {
 			}
 		}
 
-		if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
-			if (wormholeIDs.contains(Constants.ALPHA)) {
-				wormholeIDs.add(Constants.BETA);
-			} else if (wormholeIDs.contains(Constants.BETA)) {
-				wormholeIDs.add(Constants.ALPHA);
-			}
-		}
-
 		return !wormholeIDs.isEmpty();
 	}
 
-	public static boolean doesTileHaveAlphaOrBeta(Game activeGame, String position, Player player) {
+	public static boolean doesTileHaveAlphaOrBeta(Game activeGame, String position) {
 		Tile tile = activeGame.getTileByPosition(position);
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -483,11 +499,8 @@ public class FoWHelper {
 		boolean absol_recon = activeGame.getLaws().containsKey("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-		if (wormholeIDs == null) {
-			wormholeIDs = new HashSet<>();
-		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			HashSet<String> tokenList = unitHolder.getTokenList();
+			Set<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if (!tokenName.contains("champion")) {
@@ -533,7 +546,7 @@ public class FoWHelper {
 				continue;
 			}
 			for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-				HashSet<String> tokenList = unitHolder.getTokenList();
+				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
 						if (token.contains(wormholeID)) {
@@ -795,7 +808,10 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-			if (receiverVisible) {
+			if (receivingPlayer == null) {
+				BotLogger.log(event, "`FoWHelper.pingPlayersTransaction` Warning, receivingPlayer is null");
+			}
+			if (receiverVisible && receivingPlayer != null) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");

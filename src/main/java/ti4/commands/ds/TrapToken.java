@@ -1,7 +1,8 @@
 package ti4.commands.ds;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -68,7 +69,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
 
     public void setTrapForPlanet(GenericInteractionCreateEvent event, Game activeGame, String planetName, String trap, Player player) {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
-        LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+        Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         String planetUnitHolderName = trapCardsPlanets.get(trap);
         if (planetUnitHolderName != null) {
             MessageHelper.replyToMessage(event, "Trap used on other planet, please use trap swap or remove first");
