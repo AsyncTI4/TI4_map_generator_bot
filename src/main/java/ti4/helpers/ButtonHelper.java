@@ -647,6 +647,7 @@ public class ButtonHelper {
         String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, activeGame) + " to " + getIdentOrColor(p2, activeGame);
         goAgainButtons.add(button);
         goAgainButtons.add(done);
+        
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
@@ -655,6 +656,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
         }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " you got traded the DMZ");
         event.getMessage().delete().queue();
     }
 
@@ -2325,11 +2327,15 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageWithFile(tc, systemWithContext, "Picture of system", false);
         List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
+        Button graviton = null;
         MessageHelper.sendMessageToChannelWithButtons(tc, "Combat", buttons);
         if (playersWithPds2.size() > 0 && !activeGame.isFoWMode() && "space".equalsIgnoreCase(spaceOrGround)) {
             StringBuilder pdsMessage = new StringBuilder("The following players have space cannon offense cover in the region, and can use the button to fire it:");
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append(" ").append(playerWithPds.getRepresentation());
+                if(playerWithPds.hasTechReady("gls") && graviton == null){
+                    graviton = Button.secondary("exhaustTech_gls", "Exhaust Graviton Laser Systems");
+                }
             }
             MessageHelper.sendMessageToChannel(tc, pdsMessage.toString());
         } else {
@@ -2343,6 +2349,9 @@ public class ButtonHelper {
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
             if (!activeGame.isFoWMode()) {
                 buttons2.add(Button.danger("declinePDS", "Decline PDS"));
+            }
+            if(graviton != null){
+                 buttons2.add(graviton);
             }
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
         }
@@ -5475,6 +5484,9 @@ public class ButtonHelper {
             int round = activeGame.getRound();
             round++;
             activeGame.setRound(round);
+        }
+        if(activeGame.getRealPlayers().size()==6){
+            activeGame.setStrategyCardsPerPlayer(1);
         }
         ButtonHelperFactionSpecific.checkForNaaluPN(activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + activeGame.getRound());

@@ -1,6 +1,7 @@
 package ti4.commands.units;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -11,6 +12,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import java.util.Objects;
 
@@ -76,8 +78,14 @@ public class RemoveUnits extends AddRemoveUnits {
             countToRemove = count;
         }
 
-        tile.removeUnit(unitHolder.getName(), unitID, count);
-        tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
+        if(unitHolder != null){
+            tile.removeUnit(unitHolder.getName(), unitID, count);
+            tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
+        }else{
+            if(event instanceof ButtonInteractionEvent eventB){
+                BotLogger.log(event.getId() + " found a null unitholder with the following info: "+tile.getRepresentation() + " "+planetName);
+            }
+        }
 
         // Check to see if we should remove from other unitHolders
         if ((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
