@@ -1312,6 +1312,10 @@ public class ButtonListener extends ListenerAdapter {
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(redistribute, deleButton));
                 }
+                case "gls"->{
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+                }
             }
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);

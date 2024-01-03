@@ -487,11 +487,18 @@ public class ButtonHelperTacticalAction {
         if (!activeGame.isFoWMode() && playersWithPds2.size() > 0 && !activeGame.getL1Hero()) {
             StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true) + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
             List<Button> buttons2 = new ArrayList<>();
+            Button graviton = null;
             buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
             buttons2.add(Button.danger("declinePDS", "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append(" ").append(playerWithPds.getRepresentation());
+                if(playerWithPds.hasTechReady("gls") && graviton == null){
+                    graviton = Button.secondary("exhaustTech_gls", "Exhaust Graviton Laser Systems");
+                }
             }
+            if(graviton != null){
+                buttons2.add(graviton);
+           }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), pdsMessage.toString(), buttons2);
         }
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
