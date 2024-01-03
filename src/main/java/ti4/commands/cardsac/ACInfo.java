@@ -3,13 +3,11 @@ package ti4.commands.cardsac;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -39,20 +37,6 @@ public class ACInfo extends ACCardsSubcommandData {
         sendMessage("AC Info Sent");
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
-    }
-
-    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
-    }
-
     private static void sendTrapCardInfo(Game activeGame, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { //Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getTrapCardInfo(activeGame, player));
@@ -62,11 +46,8 @@ public class ACInfo extends ACCardsSubcommandData {
     private static String getTrapCardInfo(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
-
-        //ACTION CARDS
         sb.append("**Trap Cards:**").append("\n");
         int index = 1;
-
         Map<String, Integer> trapCards = player.getTrapCards();
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         if (trapCards != null) {
@@ -81,7 +62,6 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
         }
-
         return sb.toString();
     }
 
@@ -113,28 +93,19 @@ public class ACInfo extends ACCardsSubcommandData {
         return sb.toString();
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentation() + " pressed button: " + event.getButton().getLabel();
+    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
     }
 
     public static void sendActionCardInfo(Game activeGame, Player player) {
         //AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
-
-        //BUTTONS
-        String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-        List<Button> acButtons = getPlayActionCardButtons(activeGame, player);
-        if (!acButtons.isEmpty()) {
-
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                "_ _\nClick a button below to play an Action Card",
+                getPlayActionCardButtons(activeGame, player));
 
         sendTrapCardInfo(activeGame, player);
     }

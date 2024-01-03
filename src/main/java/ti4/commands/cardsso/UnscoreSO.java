@@ -36,7 +36,7 @@ public class UnscoreSO extends SOCardsSubcommandData {
 
         boolean scored = activeGame.unscoreSecretObjective(getUser().getId(), option.getAsInt());
         if (!scored) {
-            List<String> scoredSOs = activeGame.getScoredSecretObjective(getUser().getId()).entrySet().stream()
+            List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
                 .map(e -> "> (" + e.getValue() + ") " + SOInfo.getSecretObjectiveRepresentationShort(e.getKey()))
                 .toList();
             StringBuilder sb = new StringBuilder("Secret Objective ID found - please retry.\nYour current scored SOs are:\n");

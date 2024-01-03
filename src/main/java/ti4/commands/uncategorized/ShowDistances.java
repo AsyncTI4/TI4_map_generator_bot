@@ -45,7 +45,6 @@ public class ShowDistances implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Game activeGame;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         GameManager gameManager = GameManager.getInstance();
@@ -79,10 +78,8 @@ public class ShowDistances implements Command {
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
         activeGame.setTileDistances(CheckDistance.getTileDistances(activeGame, player, tile.getPosition(), maxDistance));
 
-        MapGenerator.saveImage(activeGame, DisplayType.map, event, false)
+        MapGenerator.saveImage(activeGame, DisplayType.map, event, true)
                 .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
-
-        activeGame.setTileDistances(new HashMap<>());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
