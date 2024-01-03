@@ -295,7 +295,7 @@ public class ButtonHelperFactionSpecific {
         }
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH instanceof Planet && FoWHelper.playerHasUnitsOnPlanet(saar, tile, uH.getName())) {
-                buttons.add(Button.secondary("raghsCallStep1_" + uH.getName(), "Ragh's Call on " + Helper.getPlanetRepresentation(uH.getName(), activeGame)));
+                buttons.add(Button.secondary("raghsCallStepOne_" + uH.getName(), "Ragh's Call on " + Helper.getPlanetRepresentation(uH.getName(), activeGame)));
             }
         }
         return buttons;

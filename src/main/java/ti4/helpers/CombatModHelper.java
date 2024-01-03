@@ -78,7 +78,7 @@ public class CombatModHelper {
             }
         }
 
-        if (opponent != null) {
+        if (opponent != null && opponent != player) {
             for (String tech : opponent.getTechs()) {
                 Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                         .filter(modifier -> modifier.isRelevantTo("opponent_tech", tech))

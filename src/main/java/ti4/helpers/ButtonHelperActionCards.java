@@ -828,7 +828,7 @@ public class ButtonHelperActionCards {
             sb.append("Could not find agenda");
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " " + sb);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to players cards info");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to "+ButtonHelper.getIdentOrColor(player, activeGame)+" cards info");
         event.getMessage().delete().queue();
     }
 
