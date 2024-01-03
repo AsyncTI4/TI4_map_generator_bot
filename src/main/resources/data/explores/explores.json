@@ -707,7 +707,7 @@
         "name": "Council Preserve",
         "type": "Cultural",
         "resolution": "Attach",
-        "text": "ATTACH: When you exhaust this planet to cast votes, cast 3 additional votes.",
+        "text": "ATTACH: When you exhaust this planet to cast votes, cast 4 additional votes.",
         "attachmentId": "council_preserve",
         "source": "ds"
     },

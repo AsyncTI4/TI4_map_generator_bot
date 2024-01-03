@@ -33,9 +33,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.SOInfo;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
@@ -203,11 +201,7 @@ public class GameSaveLoadManager {
                     for (Player p1 : loadedGame.getRealPlayers()) {
                         Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
                         if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            String headerText = p1.getRepresentation(true, true) + " here is your cards info";
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(p1, loadedGame, headerText);
-                            SOInfo.sendSecretObjectiveInfo(loadedGame, p1);
-                            ACInfo.sendActionCardInfo(loadedGame, p1);
-                            PNInfo.sendPromissoryNoteInfo(loadedGame, p1, false);
+                            CardsInfo.sendCardsInfo(loadedGame, p1);
                         }
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());

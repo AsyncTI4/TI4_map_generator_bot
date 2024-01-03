@@ -1,15 +1,14 @@
 package ti4.commands.leaders;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -43,29 +42,22 @@ public class LeaderInfo extends LeaderSubcommandData {
     }
 
     public static void sendLeadersInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " used something, idk, this silly";
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendLeadersInfo(activeGame, player);
     }
 
     public static void sendLeadersInfo(Game activeGame, Player player) {
-        //LEADERS INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getLeaderInfo(activeGame, player));
-
-        //BUTTONS
-        String leaderPlayMsg = "_ _\nClick a button below to exhaust or purge a Leader";
-        List<Button> leaderButtons = getLeaderButtons(activeGame, player);
-        if (leaderButtons != null && !leaderButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(leaderPlayMsg, leaderButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), 
+                getLeaderInfo(activeGame, player),
+                getLeaderButtons(player));
     }
 
-    private static List<Button> getLeaderButtons(Game activeGame, Player player) {
-        return null;
+    private static List<Button> getLeaderButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.primary(Constants.REFRESH_LEADER_INFO, "Refresh Leader Info"));
+        return buttons;
     }
 
     public static String getLeaderInfo(Game activeGame, Player player) {

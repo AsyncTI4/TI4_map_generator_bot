@@ -283,7 +283,10 @@ public class MapGenerator {
         tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
         tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Units));
-        if (!game.getTileDistances().isEmpty()) tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
+        if (!game.getTileDistances().isEmpty()) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
+            game.setTileDistances(new HashMap<>()); //clear distances after consuming them
+        }
         if (debug) debugTileTime = System.nanoTime() - debugStartTime;
     }
 
@@ -321,7 +324,7 @@ public class MapGenerator {
             "\n" +
             "    Info time: " + Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime) + String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0) +
             "\n" +
-            "     Discord time: " + Helper.getTimeRepresentationNanoSeconds(debugDiscordTime) + String.format(" (%2.2f%%)", (double) debugDiscordTime / (double) total * 100.0) +
+            " Discord time: " + Helper.getTimeRepresentationNanoSeconds(debugDiscordTime) + String.format(" (%2.2f%%)", (double) debugDiscordTime / (double) total * 100.0) +
             "\n";
         MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
@@ -343,6 +346,7 @@ public class MapGenerator {
             return null;
         }
         if (debug) debugStartTime = System.nanoTime();
+        FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             // CONVERT PNG TO JPG
             BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -358,12 +362,12 @@ public class MapGenerator {
             imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
 
             String fileName = game.getName() + "_" + getTimeStamp() + ".jpg";
-            return FileUpload.fromData(out.toByteArray(), fileName);
+            fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload", e);
         }
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
-        return null;
+        return fileUpload;
     }
 
     private Player getFowPlayer(@Nullable GenericInteractionCreateEvent event) {
