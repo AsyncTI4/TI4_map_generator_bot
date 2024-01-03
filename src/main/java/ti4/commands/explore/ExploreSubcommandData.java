@@ -243,8 +243,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "lc1", "lc2" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
                 message = hasSchemingAbility
-                    ? "Drew 3 Actions Card (Scheming) - please discard an Action Card from your hand"
-                    : "Drew 2 Action cards";
+                    ? "Drew 3 action cards (Scheming) - please discard an action card from your hand"
+                    : "Drew 2 action cards";
                 int count = hasSchemingAbility ? 3 : 2;
                 if (player.hasAbility("autonetic_memory")) {
                     ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count);
