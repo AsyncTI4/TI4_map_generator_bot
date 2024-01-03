@@ -19,6 +19,7 @@ import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
+import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -28,12 +29,14 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
@@ -135,6 +138,17 @@ public class HeroPlay extends LeaderAction {
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "`Use the following command to add the attachment: /add_token token:titanshero`");
                 }
+            }
+            case "florzenhero"->{
+                for(Tile tile : activeGame.getTileMap().values()){
+                    for(UnitHolder uH : tile.getPlanetUnitHolders()){
+                        if(player.getPlanets().contains(uH.getName()) && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)){
+                            new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", activeGame);
+                            break;
+                        }
+                    }
+                }
+                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)+"Added 2 fighters to every system with an owned planet and no opponent ships. Please steal the token yourself with /remove_token and /add_token");
             }
             case "kyrohero"->{
                 int dieResult = player.getLowestSC();
