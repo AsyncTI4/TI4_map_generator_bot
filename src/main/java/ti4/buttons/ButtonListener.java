@@ -2596,8 +2596,8 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     boolean hasSchemingAbility = player.hasAbility("scheming");
                     String message = hasSchemingAbility
-                        ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand"
-                        : "Drew 2 Actions cards";
+                        ? "Drew 3 Action Cards (Scheming) - please discard an Action Card from your hand"
+                        : "Drew 2 Action cards";
                     int count = hasSchemingAbility ? 3 : 2;
                     if (player.hasAbility("autonetic_memory")) {
                         ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count);

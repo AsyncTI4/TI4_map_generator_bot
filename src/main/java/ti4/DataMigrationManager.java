@@ -72,7 +72,6 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
-            runMigration("migrateInitStratCardsPerPlayer_121823", DataMigrationManager::migrateInitStratCardsPerPlayer_121823);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -690,7 +689,7 @@ public class DataMigrationManager {
     private static void replaceFrankenItemsInBag_111223(DraftBag bag) {
         for (int i = 0; i < bag.Contents.size(); i++) {
             DraftItem item = bag.Contents.get(i);
-            if (item.ItemId.equals("keleres")) {
+            if ("keleres".equals(item.ItemId)) {
                 var newItem = DraftItem.Generate(item.ItemCategory, "keleresa");
                 swapBagItem(bag, i, newItem);
                 item = newItem;
@@ -814,17 +813,6 @@ public class DataMigrationManager {
             return true;
         }
         return false;
-    }
-
-    public static boolean migrateInitStratCardsPerPlayer_121823(Game game) {
-        int maxSCsPerPlayer = game.getSCList().size() / Math.max(game.getRealPlayers().size(), 1);
-        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
-
-        if (game.getRealPlayers().size() == 1) maxSCsPerPlayer = 1;
-
-        game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
-
-        return true;
     }
 
 }

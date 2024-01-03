@@ -2,9 +2,9 @@
   {
     "alias": "ancient_data_archive",
     "name": "Ancient Data Archive",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Look at the top 3 cards of an exploration deck or the relic deck, shuffle 2 of those cards back into it, and place the remaining card on top of it.",
+    "phase": "Agenda",
+    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "text": "Exhaust up to 2 planets you control. Then, explore each of those planets.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -246,9 +246,18 @@
     "alias": "double_agents",
     "name": "Double Agents",
     "phase": "Any",
-    "window": "When another player plays an action card that does not have a component action",
+    "window": "When another player plays an action card that does not have a component action, other than \"Sabotage\"",
     "text": "Cancel and take that action card.",
-    "flavorText": "\"Sorry, love, it's just business,\" Mot Nesretep said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
+    "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "drop_pods",
+    "name": "Drop Pods",
+    "phase": "Action",
+    "window": "After your units use BOMBARDMENT against a planet",
+    "text": "Place 1 infantry from your reinforcements on that planet for each die result that did not produce a hit.",
+    "flavorText": "The brood swarmed around the planet, a tendril-like formation made entirely of ships. It whipped furiously as it released thousands of kin towards the surface, seeding the planet. It would be the home of a new generation of warriors.",
     "source": "action_deck_2"
   },
   {
@@ -297,15 +306,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "fire_for_effect",
-    "name": "Fire for Effect",
-    "phase": "Action",
-    "window": "At the end of a round of space combat",
-    "text": "Your units in the active system use their SPACE CANNON abilities against your opponent's ships.",
-    "flavorText": "Trrakan had stockpiled munitions for this moment. If the reports were correct, and their forces were able to stave off the invasion for long enough, the enemy would find themselves under near continuous fire.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "firing_solution_",
     "name": "Firing Solution ",
     "phase": "Action",
@@ -328,7 +328,7 @@
     "name": "Foreign Policy",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Give 1 of those actions card to each other player and take the remaining card.",
+    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Then, give 1 of those action cards to each other player and take the remaining card.",
     "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
     "source": "action_deck_2"
   },
@@ -365,7 +365,7 @@
     "phase": "Action",
     "window": "After you gain control of a planet that was controlled by another player",
     "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
-    "flavorText": "As her hostages hurled insults, Suffi began to laugh. \"This artifact was the property of countless different civilizations. You thought its journey would end with yours?\"",
+    "flavorText": "Mot awoke in a pool of his own blood. He was no longer bound – S'Ula had granted him that courtesy at least – but he was too weak to stand. So, he laid in front of the empty vault and wept.",
     "source": "action_deck_2"
   },
   {
@@ -375,6 +375,15 @@
     "window": "After you activate a system",
     "text": "Move any number of your ships from the active system into an adjacent system that does not contain another player's units. [Note: You can transport ground forces during this movement.]",
     "flavorText": "This was the last mission of the Admiral's long, decorated career. When he was asked to oversee the feat, he refused, breaking into such a rage that he threw the papers, along with the man who brought them, out of his office. Five sleepless days later, planning was complete.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "hidden_initiatives",
+    "name": "Hidden Initiatives",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Discard 1 or more of your action cards to draw an equal number of action cards. Then, draw 1 action card.",
+    "flavorText": "M'aban sighed at her assistant's pleas. How many others in the galaxy could hide their intentions so well? Hunting this prey had filled her with exhilaration, but seeing him now, bathed in the stench of fear and his composure completely broken, disgusted her.",
     "source": "action_deck_2"
   },
   {
@@ -429,15 +438,6 @@
     "window": "Before the \"Ready Planets\" step of the agenda phase",
     "text": "Each player readies up to 2 planets they control. Then, reveal and vote on the top card of the agenda deck.",
     "flavorText": "The rules for such an occasion were dubious. However, dubious is where Elder Junn thrived.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "mechanized_workforce",
-    "name": "Mechanized Workforce",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Place 1 destroyer in each system that contains 1 of your mechs and does not contain another player's ships.",
-    "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
   },
   {
@@ -540,6 +540,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "recusal",
+    "name": "Recusal",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "During this agenda, voting begins with the player to your left and continues clockwise.",
+    "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "rehashed_debates",
     "name": "Rehashed Debates",
     "phase": "Agenda",
@@ -598,8 +607,8 @@
     "name": "Seized Facility",
     "phase": "Action",
     "window": "When you gain control of a planet that contains another player's structure",
-    "text": "Research a non-faction technology owned by that player; ignore 1 of that technology's prerequisites.",
-    "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL YOUR DATA ARE << BELONGS TO US",
+    "text": "Gain a non-faction technology owned by that player.",
+    "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL DATA << BELONGS TO US",
     "source": "action_deck_2"
   },
   {
@@ -657,15 +666,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "smuggler_routes",
-    "name": "Smuggler Routes",
-    "phase": "Status",
-    "window": "At the start of the status phase",
-    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's ships to gain 1 trade good.",
-    "flavorText": "Greg looked to the skies longingly, \"I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "spatial_collapse",
     "name": "Spatial Collapse",
     "phase": "Action",
@@ -698,7 +698,7 @@
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
     "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
-    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only as they cleared the blast radius did he loosen his grasp on the stolen plans.",
+    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only as they cleared the blast radius did he loosen his grasp on the stolen schematics.",
     "source": "action_deck_2"
   },
   {
