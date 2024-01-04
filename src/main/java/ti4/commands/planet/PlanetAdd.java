@@ -129,7 +129,7 @@ public class PlanetAdd extends PlanetAddRemove {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
-                + "). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring.");
+                + "). Reminder that you do not legally have this tg prior to exploring, and that this was mandatory.");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
