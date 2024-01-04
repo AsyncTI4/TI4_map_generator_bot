@@ -114,7 +114,8 @@ public class GameCommand implements Command {
         subcommands.add(new SetUnitCap());
         subcommands.add(new StartPhase());
         subcommands.add(new SetDeck());
-        subcommands.add(new GameCreate());
+        //subcommands.add(new GameCreate());
+        subcommands.add(new CreateGameButton());
         subcommands.add(new Swap());
         //subcommands.add(new ReverseSpeakerOrder());
         return subcommands;

@@ -403,6 +403,13 @@ public class CombatHelper {
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
 
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            if(unit.getId().equalsIgnoreCase("jolnar_flagship")){
+                for(Die die : resultRolls){
+                    if(die.getResult() > 8){
+                        hitRolls = hitRolls + 2;
+                    }
+                }
+            }
             totalHits += hitRolls;
 
             String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
