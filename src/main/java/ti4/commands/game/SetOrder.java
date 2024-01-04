@@ -17,14 +17,14 @@ public class SetOrder extends GameSubcommandData {
 
     public SetOrder() {
         super(Constants.SET_ORDER, "Set player order in game");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8"));
     }
 
     @Override

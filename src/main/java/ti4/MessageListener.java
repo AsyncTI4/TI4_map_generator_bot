@@ -60,7 +60,7 @@ public class MessageListener extends ListenerAdapter {
         String userID = event.getUser().getId();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
-        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS) && !event.getInteraction().getName().equals(Constants.SEARCH)
+        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS) && (event.getInteraction().getSubcommandName() == null || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON)) && !event.getInteraction().getName().equals(Constants.SEARCH)
             && event.getOption(Constants.GAME_NAME) == null) { //SKIP /help COMMANDS
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {

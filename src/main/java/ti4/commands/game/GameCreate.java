@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -49,7 +50,7 @@ public class GameCreate extends GameSubcommandData {
         }
     }
 
-    public static Game createNewGame(SlashCommandInteractionEvent event, String gameName, Member gameOwner) {
+    public static Game createNewGame(GenericInteractionCreateEvent event, String gameName, Member gameOwner) {
         Game newGame = new Game();
         newGame.newGameSetup();
         String ownerID = gameOwner.getId();
