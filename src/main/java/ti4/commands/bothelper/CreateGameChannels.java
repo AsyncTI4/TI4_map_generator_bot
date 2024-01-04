@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -144,6 +145,33 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
+       createGameChannelsPart2(members, event, categoryChannelName, gameName, gameOwner, categoryChannel);
+    }
+
+
+    public void createGameChannelsPart2(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel){
+        //SET GUILD BASED ON CATEGORY SELECTED
+        Guild guild = categoryChannel.getGuild();
+        if (guild == null) {
+            sendMessage("Error: Guild is null");
+            return;
+        }
+
+        //CHECK IF SERVER CAN SUPPORT A NEW GAME
+        if (!serverCanHostNewGame(guild)) {
+            sendMessage("Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            return;
+        }
+
+        //CHECK IF CATEGORY HAS ROOM
+        Category category = categoryChannel;
+        if (category.getChannels().size() > 48) {
+            sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
+            return;
+        }
+
+        
+
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
         List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
@@ -189,7 +217,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / members.size());
 
         //CREATE CHANNELS
-        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
+       
         newGame.setCustomName(gameFunName);
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
@@ -249,7 +277,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> " + chatChannel.getAsMention() + "\n" +
             "> " + actionsChannel.getAsMention() + "\n" +
             "> " + botThread.getAsMention() + "\n";
-        sendMessage(message);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         GameSaveLoadManager.saveMap(newGame, event);
 
@@ -263,7 +291,50 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         GameCreate.reportNewGameCreated(newGame);
+
+
+
+
+
+
+
+
+
+
+
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private static String getNextGameName() {
         List<Integer> existingNums = getAllExistingPBDNumbers();

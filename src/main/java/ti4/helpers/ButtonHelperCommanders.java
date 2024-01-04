@@ -330,7 +330,7 @@ public class ButtonHelperCommanders {
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
-                if (AddCC.hasCC(event, player.getColor(), tile2)) {
+                if (AddCC.hasCC(event, player.getColor(), tile2) && !activeGame.getDominusOrbStatus()) {
                     continue;
                 }
                 for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {

@@ -19,12 +19,15 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -37,38 +40,29 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateGameChannels extends GameSubcommandData {
-    public CreateGameChannels() {
-        super(Constants.CREATE_GAME_CHANNELS, "Create Button For Bothelper to Approve");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
+public class CreateGameButton extends GameSubcommandData {
+    public CreateGameButton() {
+        super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player5"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         //GAME NAME
-        OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
-        String gameName;
-        if (gameNameOption != null) {
-            gameName = gameNameOption.getAsString();
-        } else {
-            gameName = getNextGameName();
+        String gameName = getNextGameName();
             if ("pbd2000".equals(gameName)) {
                  MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No more games can be created. Please contact @Developer to resolve."); // See comments in getAllExistingPBDNumbers
                 return;
             }
-        }
-        if (gameOrRoleAlreadyExists(gameName)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
-            return;
-        }
+        
 
         //CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName =  getCategoryNameForGame(gameName);
@@ -116,24 +110,112 @@ public class CreateGameChannels extends GameSubcommandData {
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
-            sb.append("You will be automatically added to the game channels when you join the server.");
-            
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         }
-
-        //CREATE ROLE
-        Role role = guild.createRole()
-            .setName(gameName)
-            .setMentionable(true)
-            .complete();
-
-        //ADD PLAYERS TO ROLE
-        for (Member member : members) {
-            if (missingMembers.contains(member)) continue; //skip members who aren't on the new server yet
-            guild.addRoleToMember(member, role).complete();
+        String buttonMsg = "";
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("createGameChannels", "Create Game"));
+        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
+        gameFunName = gameFunName.replace(".","");
+        gameFunName = gameFunName.replace(":","");
+        
+        if(members.size() > 0){
+            buttonMsg = "Game Fun Name:"+gameFunName+".\nPlayers:\n";
+            int counter = 1;
+            for(Member member : members){
+                buttonMsg = buttonMsg + counter+":"+member.getId()+".("+member.getAsMention()+")\n";
+                counter++;
+            }
+            Role bothelperRole = getRole("Bothelper", event.getGuild());
+            buttonMsg = buttonMsg+"\n\n"+bothelperRole.getAsMention() +" this game is ready for you to create";
+            MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
         }
-
-     
     }
+
+    public static void decodeButtonMsg(ButtonInteractionEvent event){
+
+        Member member = event.getMember();
+        boolean isAdmin = false;
+        if (member != null) {
+            List<Role> roles = member.getRoles();
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                if (roles.contains(role)) {
+                    isAdmin = true;
+                    break;
+                }
+            }
+        }
+        if(!isAdmin){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only authorized users can press this button successfully.");
+            return;
+        }
+
+
+
+        String buttonMsg = event.getMessage().getContentRaw();
+
+        String gameSillyName = buttonMsg.split(":")[1];
+        gameSillyName = StringUtils.substringBefore(gameSillyName, ".");
+        List<Member> members = new ArrayList<>();
+        Member gameOwner = null;
+        for (int i = 3; i <= 8; i++) {
+            if (StringUtils.countMatches(buttonMsg, ":") >= (i)) {
+                String user = buttonMsg.split(":")[i];
+                user = StringUtils.substringBefore(user, ".");
+                Member member2 = event.getGuild().getMemberById(user);
+                if (member2 != null) members.add(member2);
+                if (gameOwner == null) gameOwner = member2;
+            } else {
+                break;
+            }
+        }
+
+
+         String gameName = getNextGameName();
+            if ("pbd2000".equals(gameName)) {
+                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No more games can be created. Please contact @Developer to resolve."); // See comments in getAllExistingPBDNumbers
+                return;
+            }
+        
+
+        //CHECK IF GIVEN CATEGORY IS VALID
+        String categoryChannelName =  getCategoryNameForGame(gameName);
+        Category categoryChannel = null;
+        List<Category> categories = getAllAvailablePBDCategories();
+        for (Category category : categories) {
+            if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
+                categoryChannel = category;
+                break;
+            }
+        }
+        if (categoryChannel == null) categoryChannel = createNewCategory(categoryChannelName);
+
+        //SET GUILD BASED ON CATEGORY SELECTED
+        Guild guild = categoryChannel.getGuild();
+
+        //CHECK IF GUILD HAS ALL PLAYERS LISTED
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
+        List<Member> missingMembers = new ArrayList<>();
+        for (Member member4 : members) {
+            if (!guildMemberIDs.contains(member4.getId())) {
+                missingMembers.add(member4);
+            }
+        }
+        if (missingMembers.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(
+                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
+            sb.append(guild.getName()).append("** server.\n");
+            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
+            sb.append("The following players need to join the server:\n");
+            for (Member member3 : missingMembers) {
+                sb.append("> ").append(member3.getAsMention()).append("\n");
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        }
+        new CreateGameChannels().createGameChannelsPart2(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        event.getMessage().delete().queue();
+    } 
 
     private static String getNextGameName() {
         List<Integer> existingNums = getAllExistingPBDNumbers();

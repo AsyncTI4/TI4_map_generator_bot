@@ -47,6 +47,7 @@ import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.explore.RelicInfo;
+import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
@@ -150,27 +151,32 @@ public class ButtonListener extends ListenerAdapter {
         gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
         gameName = StringUtils.substringBefore(gameName, "-");
         Game activeGame = GameManager.getInstance().getGame(gameName);
-        Player player = activeGame.getPlayer(id);
-        player = Helper.getGamePlayer(activeGame, player, event.getMember(), id);
-        if (player == null && !"showGameAgain".equalsIgnoreCase(buttonID)) {
-            event.getChannel().sendMessage("You're not a player of the game").queue();
-            return;
-        }
-        buttonID = buttonID.replace("delete_buttons_", "resolveAgendaVote_");
-        activeGame.increaseButtonPressCount();
-
+        Player player = null;
         MessageChannel privateChannel = event.getChannel();
-        if (activeGame.isFoWMode()) {
-            if (player != null && player.getPrivateChannel() == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
-                privateChannel = null;
-            } else if (player != null) {
-                privateChannel = player.getPrivateChannel();
+        MessageChannel mainGameChannel = event.getChannel();
+        if(activeGame != null){
+            player = activeGame.getPlayer(id);
+            player = Helper.getGamePlayer(activeGame, player, event.getMember(), id);
+            if (player == null && !"showGameAgain".equalsIgnoreCase(buttonID)) {
+                event.getChannel().sendMessage("You're not a player of the game").queue();
+                return;
+            }
+            buttonID = buttonID.replace("delete_buttons_", "resolveAgendaVote_");
+            activeGame.increaseButtonPressCount();
+
+            
+            if (activeGame.isFoWMode()) {
+                if (player != null && player.getPrivateChannel() == null) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
+                    privateChannel = null;
+                } else if (player != null) {
+                    privateChannel = player.getPrivateChannel();
+                }
             }
         }
 
-        MessageChannel mainGameChannel = event.getChannel();
-        if (activeGame.getMainGameChannel() != null) {
+       
+        if (activeGame != null && activeGame.getMainGameChannel() != null) {
             mainGameChannel = activeGame.getMainGameChannel();
         }
 
@@ -195,16 +201,22 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         String finsFactionCheckerPrefix = player == null ? "FFCC_nullPlayer_" : player.getFinsFactionCheckerPrefix(); 
-        String trueIdentity = player.getRepresentation(true, true);
-        String fowIdentity = player.getRepresentation(false, true);
-        String ident = player.getFactionEmoji();
+        String trueIdentity = null;
+        String fowIdentity = null;
+        String ident = null;
 
-        if (!"ultimateundo".equalsIgnoreCase(buttonID) && !"showGameAgain".equalsIgnoreCase(buttonID)) {
+        if(player != null){
+                trueIdentity = player.getRepresentation(true, true);
+            fowIdentity = player.getRepresentation(false, true);
+            ident = player.getFactionEmoji();
+        }
+
+        if (activeGame != null && !"ultimateundo".equalsIgnoreCase(buttonID) && !"showGameAgain".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
 
-        if (activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
+        if (activeGame != null &&activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
 
@@ -1603,6 +1615,8 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.resolveColonialRedTarget(activeGame, buttonID, event);
         } else if (buttonID.startsWith("ruins_")) {
             ButtonHelper.resolveWarForgeRuins(activeGame, buttonID, player, event);
+        } else if (buttonID.startsWith("createGameChannels")) {
+            CreateGameButton.decodeButtonMsg(event);
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
             String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
             Player notYssaril = activeGame.getPlayerFromColorOrFaction(playerFaction);
