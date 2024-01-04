@@ -144,8 +144,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 break;
             }
         }
+        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
+        gameFunName = gameFunName.replace(".","");
+        gameFunName = gameFunName.replace(":","");
 
-       createGameChannelsPart2(members, event, categoryChannelName, gameName, gameOwner, categoryChannel);
+       createGameChannelsPart2(members, event, gameFunName, gameName, gameOwner, categoryChannel);
     }
 
 
