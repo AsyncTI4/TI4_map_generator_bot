@@ -153,20 +153,20 @@ public class CreateGameChannels extends BothelperSubcommandData {
         //SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
         if (guild == null) {
-            sendMessage("Error: Guild is null");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Error: Guild is null");
             return;
         }
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            sendMessage("Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
         //CHECK IF CATEGORY HAS ROOM
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
-            sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         }
 
@@ -191,7 +191,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
             sb.append("You will be automatically added to the game channels when you join the server.");
-            sendMessage(sb.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
         }
 
         //CREATE ROLE
