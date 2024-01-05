@@ -1552,15 +1552,14 @@ public class ButtonHelper {
 
     public static int checkHighestCostSystem(Player player, Game activeGame) {
         int count = 0;
-        for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tile) && checkValuesOfShips(player, activeGame, tile) > count) {
-                count = checkValuesOfShips(player, activeGame, tile);
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasShipsInSystem(player, tile) && checkValuesOfNonFighterShips(player, activeGame, tile) > count){
+                count = checkValuesOfNonFighterShips(player, activeGame, tile);
             }
         }
         return count;
     }
-
-    public static int checkValuesOfShips(Player player, Game activeGame, Tile tile) {
+    public static int checkValuesOfNonFighterShips(Player player, Game activeGame, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -1574,8 +1573,147 @@ public class ButtonHelper {
         }
         return count;
     }
+    public static float getTotalResourceValueOfUnits(Player player, Game activeGame) {
+        float count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+                count = count + checkValuesOfUnits(player, activeGame, tile);
+        }
+        return count;
+    }
+    public static float checkValuesOfUnits(Player player, Game activeGame, Tile tile) {
+        float count = 0;
+        for(UnitHolder uh : tile.getUnitHolders().values()){
+            for(UnitKey unit : uh.getUnits().keySet()){
+                if(!unit.getColor().equals(player.getColor())){
+                    continue;
+                }
+                if(player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                    continue;
+                }
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                if(removedUnit.getIsShip() || removedUnit.getIsGroundForce()){
+                    count = count + removedUnit.getCost() * uh.getUnits().get(unit);
+                }
+            }
+        }
+        return Math.round(count*10)/(float)10.0;
+    }
+    public static float getTotalUnitAbilityValueOfUnits(Player player, Game activeGame) {
+        float count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+                count = count + checkUnitAbilityValuesOfUnits(player, activeGame, tile);
+        }
+        return Math.round(count*10)/(float)10.0;
+    }
+    public static float checkUnitAbilityValuesOfUnits(Player player, Game activeGame, Tile tile) {
+        float count = 0;
+        for(UnitHolder uh : tile.getUnitHolders().values()){
+            for(UnitKey unit : uh.getUnits().keySet()){
+                if(!unit.getColor().equals(player.getColor())){
+                    continue;
+                }
+                if(player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                    continue;
+                }
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                float hitChance = 0;
+                if(removedUnit.getAfbDieCount() > 0){
+                    hitChance = (((float)11.0-removedUnit.getAfbHitsOn())/10);
+                    if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")){
+                        hitChance = 1- ((1-hitChance) * (1-hitChance));
+                    }
+                    count = count + removedUnit.getAfbDieCount() * hitChance * uh.getUnits().get(unit);
+                }
+                if(removedUnit.getSpaceCannonDieCount() > 0){
+                    hitChance =  (((float)11.0-removedUnit.getSpaceCannonHitsOn())/10);
+                    if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")){
+                        hitChance = 1- ((1-hitChance) * (1-hitChance));
+                    }
+                    count = count + removedUnit.getSpaceCannonDieCount() * hitChance * uh.getUnits().get(unit);
+                }
+                if(removedUnit.getBombardDieCount() > 0){
+                    hitChance = (((float)11.0-removedUnit.getBombardHitsOn())/10);
+                    if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")){
+                        hitChance = 1- ((1-hitChance) * (1-hitChance));
+                    }
+                    count = count + removedUnit.getBombardDieCount() * hitChance * uh.getUnits().get(unit);
+                }
+            }
+        }
+        return Math.round(count*10)/(float)10.0;
+    }
+    public static float getTotalCombatValueOfUnits(Player player, Game activeGame) {
+        float count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+                count = count + checkCombatValuesOfUnits(player, activeGame, tile);
+        }
+        return count;
+    }
+    public static float checkCombatValuesOfUnits(Player player, Game activeGame, Tile tile) {
+        float count = 0;
+        for(UnitHolder uh : tile.getUnitHolders().values()){
+            for(UnitKey unit : uh.getUnits().keySet()){
+                if(!unit.getColor().equals(player.getColor())){
+                    continue;
+                }
+                if(player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                    continue;
+                }
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                float unrelententing = 0;
+                if(player.hasAbility("unrelenting")){
+                    unrelententing = (float)0.1;
+                }else if(player.hasAbility("fragile")){
+                    unrelententing = (float)-0.1;
+                }
+                if(removedUnit.getIsShip() || removedUnit.getIsGroundForce()){
+                    count = count + removedUnit.getCombatDieCount() * (((float)11.0-removedUnit.getCombatHitsOn())/10+unrelententing) * uh.getUnits().get(unit);
+                }
+            }
+        }
+        return count;
+    }
 
-    public static int howManyDifferentDebtPlayerHas(Player player) {
+    public static int getTotalHPValueOfUnits(Player player, Game activeGame) {
+        int count = 0;
+        for(Tile tile : activeGame.getTileMap().values()){
+                count = count + checkHPOfUnits(player, activeGame, tile);
+        }
+        return count;
+    }
+    public static int checkHPOfUnits(Player player, Game activeGame, Tile tile) {
+        int count = 0;
+        for(UnitHolder uh : tile.getUnitHolders().values()){
+            for(UnitKey unit : uh.getUnits().keySet()){
+                if(!unit.getColor().equals(player.getColor())){
+                    continue;
+                }
+                if(player.getUnitsByAsyncID(unit.asyncID()).size() == 0){
+                    continue;
+                }
+                UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                if(removedUnit.getIsShip() || removedUnit.getIsGroundForce()){
+                    int sustain = 0;
+                    if(removedUnit.getSustainDamage()){
+                        sustain = 1;
+                        if(player.hasTech("nes")){
+                            sustain =2;
+                        }
+                    }
+                    int damagedUnits = 0;
+                    if (uh.getUnitDamage() != null && uh.getUnitDamage().get(unit) != null) {
+                        damagedUnits = uh.getUnitDamage().get(unit);
+                    }
+                    int totalUnits = uh.getUnits().get(unit);
+                    totalUnits = totalUnits - damagedUnits;
+                    count = count + uh.getUnits().get(unit);
+                    count = count + sustain * totalUnits;
+                }
+            }
+        }
+        return count;
+    }
+    public static int howManyDifferentDebtPlayerHas(Player player){
         int count = 0;
         for (String color : player.getDebtTokens().keySet()) {
             if (player.getDebtTokens().get(color) > 0) {
@@ -4185,7 +4323,7 @@ public class ButtonHelper {
             buttons.add(Button.success("transitDiodes_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
         }
         buttons.add(Button.danger("deleteButtons", "Done resolving transit diodes"));
-        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), player.getRepresentation() + " use buttons to choose the planet you want to move troops too", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), player.getRepresentation() + " use buttons to choose the planet you want to move troops to", buttons);
     }
 
     public static void resolveTransitDiodesStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {

@@ -226,7 +226,7 @@
         "type": "agent",
         "name": "Captain Mendosa",
         "title": "Captain of the Fifth Fleet",
-        "abilityWindow": "After a player activates a system:",
+        "abilityWindow": "When a player activates a system:",
         "abilityText": "You may exhaust this card to increase the move value of 1 of that player's ships to match the move value of the ship on the game board that has the highest move value.",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
@@ -248,7 +248,7 @@
         "type": "agent",
         "name": "Tellurian",
         "title": "The Protector",
-        "abilityWindow": "When a hit is produced against a unit:",
+        "abilityWindow": "Before a hit would be assigned:",
         "abilityText": "You may exhaust this card to cancel that hit.",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
@@ -503,7 +503,7 @@
         "name": "G'hom Sek'kus",
         "title": "Valkyrie Elite",
         "abilityWindow": "During the \"Commit Ground Forces\" step:",
-        "abilityText": "You can commit up to 1 ground force from each planet in the active system and each planet in adjacent systems that do not contain 1 of your command tokens.",
+        "abilityText": "You can commit (move) up to 1 ground force from each planet in the active system and each planet in adjacent systems that do not contain 1 of your command tokens.",
         "unlockCondition": "Control 5 planets in non-home systems.",
         "source": "pok"
     },
@@ -882,7 +882,7 @@
         "title": "High Priest of Yin",
         "abilityName": "Quantum Dissemination: Blessing of the Yin",
         "abilityWindow": "ACTION:",
-        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home planets and resolve invasions on those planets. Players cannot use Space Cannon against these units. Then, purge this card.",
+        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home planets and resolve ground combats on those planets. Players cannot use Space Cannon against these units. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },

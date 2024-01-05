@@ -567,7 +567,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.setStrategicCC(player.getStrategicCC() - 1);
                 skilled = true;
             }
-            String message = trueIdentity + " Use buttons to select a system to move too. Warning: bot does not always know what the valid retreat tiles are, you will need to verify these.";
+            String message = trueIdentity + " Use buttons to select a system to move to. Warning: bot does not always know what the valid retreat tiles are, you will need to verify these.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeGame, pos, skilled));
         } else if (buttonID.startsWith("exhaustAgent_")) {
             ButtonHelperAgents.exhaustAgent(buttonID, event, activeGame, player, ident);
