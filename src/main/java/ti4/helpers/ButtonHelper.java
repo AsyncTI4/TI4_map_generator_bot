@@ -1647,7 +1647,7 @@ public class ButtonHelper {
         for(Tile tile : activeGame.getTileMap().values()){
                 count = count + checkCombatValuesOfUnits(player, activeGame, tile);
         }
-        return count;
+        return  Math.round(count*10)/(float)10.0;
     }
     public static float checkCombatValuesOfUnits(Player player, Game activeGame, Tile tile) {
         float count = 0;
@@ -1671,7 +1671,7 @@ public class ButtonHelper {
                 }
             }
         }
-        return count;
+        return  Math.round(count*10)/(float)10.0;
     }
 
     public static int getTotalHPValueOfUnits(Player player, Game activeGame) {
