@@ -157,7 +157,7 @@
         "id": "miltymod_muaat_warsun",
         "baseType": "warsun",
         "asyncId": "ws",
-        "name": "Prototype War Sun II",
+        "name": "Prototype War Sun I",
         "upgradesToUnitId": "miltymod_muaat_warsun2",
         "source": "miltymod",
         "faction": "Muaat",
