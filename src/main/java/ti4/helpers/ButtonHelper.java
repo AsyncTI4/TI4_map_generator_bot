@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,9 +13,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -51,6 +56,8 @@ import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.explore.ShowRemainingRelics;
+import ti4.commands.game.GameCreate;
+import ti4.commands.game.GameEnd;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.RefreshLeader;
@@ -4724,6 +4731,141 @@ public class ButtonHelper {
             factionsComplete.add(factionId);
         }
         return buttons;
+    }
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            int d = Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    public static void rematch(Game activeGame, GenericInteractionCreateEvent event){
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + activeGame.getName() + "` has ended!**");
+        activeGame.setHasEnded(true);
+        activeGame.setEndedDate(new Date().getTime());
+        GameSaveLoadManager.saveMap(activeGame, event);
+        String gameEndText = GameEnd.getGameEndText(activeGame, event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
+        activeGame.setAutoPing(false);
+        activeGame.setAutoPingSpacer(0);
+
+        String name = activeGame.getName();
+        int charValue = name.charAt(name.length()-1);
+        String next = String.valueOf( (char) (charValue + 1));
+        String newName= "";
+        if(isNumeric(next)){
+            newName = name + "b";
+        }else{
+            newName = name.substring(0, name.length()-1)+next;
+        }
+
+        Guild guild = activeGame.getGuild();
+        Role gameRole = null;
+        if (guild != null) {
+            for (Role role : guild.getRoles()) {
+                if (activeGame.getName().equals(role.getName().toLowerCase())) {
+                    gameRole = role;
+                }
+            }
+        }
+        if(gameRole != null){
+            gameRole.getManager().setName(newName).queue();
+        }else{
+            gameRole = guild.createRole()
+            .setName(newName)
+            .setMentionable(true)
+            .complete();
+            for (Player player : activeGame.getRealPlayers()) {
+                Member member = guild.getMemberById(player.getUserID());
+                if(member != null){
+                    guild.addRoleToMember(member, gameRole).complete();
+                }
+            }
+        }
+        TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
+        TextChannel actionsChannel = activeGame.getMainGameChannel();
+        
+        // CLOSE THREADS IN CHANNELS
+        if (tableTalkChannel != null) {
+            for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
+                threadChannel.getManager().setArchived(true).queue();
+            }
+            String newTableName = tableTalkChannel.getName().replace(name, newName);
+            activeGame.getTableTalkChannel().getManager().setName(newTableName).queue();
+        }
+        if (actionsChannel != null) {
+            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+                threadChannel.getManager().setArchived(true).queue();
+            }
+            activeGame.getActionsChannel().getManager().setName(newName+"-actions").queue();
+        }
+        Member gameOwner = guild.getMemberById(activeGame.getOwnerID());
+        Game newGame = GameCreate.createNewGame(event, newName, gameOwner);
+
+        //ADD PLAYERS
+        for (Player player : activeGame.getPlayers().values()) {
+            newGame.addPlayer(player.getUserID(), player.getUserName());
+        }
+        newGame.setPlayerCountForMap(newGame.getPlayers().values().size());
+        newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / newGame.getPlayers().values().size());
+
+        //CREATE CHANNELS
+       
+        newGame.setCustomName(activeGame.getCustomName()+" Rematch");
+        
+
+       
+        newGame.setTableTalkChannelID(tableTalkChannel.getId());
+
+        // CREATE ACTIONS CHANNEL
+        String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
+        newGame.setMainGameChannelID(actionsChannel.getId());
+
+        // CREATE BOT/MAP THREAD
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
+        newGame.setBotMapUpdatesThreadID(botThread.getId());
+
+        // INTRODUCTION TO TABLETALK CHANNEL
+        String tabletalkGetStartedMessage = gameRole.getAsMention() + " - table talk channel\n" +
+            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n" +
+            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n" +
+            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
+        MessageHelper.sendMessageToChannelAndPin(tableTalkChannel, tabletalkGetStartedMessage);
+
+        // INTRODUCTION TO ACTIONS CHANNEL
+        String actionsGetStartedMessage = gameRole.getAsMention() + " - actions channel\n" +
+            "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
+            "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
+        MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel);
+
+        // INTRODUCTION TO BOT-MAP THREAD
+        String botGetStartedMessage = gameRole.getAsMention() + " - bot/map channel\n" +
+            "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n" +
+            "### __Use the following commands to get started:__\n" +
+            "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
+            "> `/player setup` to set player faction and color\n" +
+            "> `/game setup` to set player count and additional options\n" +
+            "> `/game set_order` to set the starting speaker order\n" +
+            "\n" +
+            "### __Other helpful commands:__\n" +
+            "> `/game replace` to replace a player in the game with a new one\n";
+        MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
+        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
+
+
+        GameSaveLoadManager.saveMap(newGame, event);
+        if(event instanceof ButtonInteractionEvent event2){
+            event2.getMessage().delete().queue();
+        }
     }
 
     public static List<Button> getColorSetupButtons(Game activeGame, String buttonID) {

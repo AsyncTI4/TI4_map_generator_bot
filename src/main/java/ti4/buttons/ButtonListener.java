@@ -3673,6 +3673,7 @@ public class ButtonListener extends ListenerAdapter {
                     GameEnd.secondHalfOfGameEnd(event, activeGame, true, true);
                     event.getMessage().delete().queue();
                 }
+                case "rematch"->{ ButtonHelper.rematch(activeGame, event);}
                 case "purgeHacanHero" -> {
                     Leader playerLeader = player.unsafeGetLeader("hacanhero");
                     StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));

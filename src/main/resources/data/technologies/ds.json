@@ -329,7 +329,7 @@
         "requirements": "Y",
         "faction": "kyro",
         "source": "ds",
-        "text": "At the start of the strategy phase, choose 1 strategy card. During this strategy phase, other players must give you 1 of their promissory notes to choose that strategy card."
+        "text": "At the start of the strategy phase, you may place any number of your trade goods on any combination of strategy cards. Then, place 2 trade goods from the supply on 1 strategy card"
     },
     {
         "alias": "dslaneb",
