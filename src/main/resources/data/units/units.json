@@ -1582,7 +1582,8 @@
         "sustainDamage": true,
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "ability": "Other player's units in this system lose PLANETARY SHIELD."
     },
     {
         "id": "mech",
