@@ -4,7 +4,7 @@
         "name": "Anti-Intellectual Revolution ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Technologies with prerequisites require 1 additional prerequisite, matching any they already have. When a player would research a technology, they may gain 2 command tokens instead.",
+        "text1": "For: Technologies with prerequisites require 1 additional prerequisite, matching any they already have. When a player would research a technology, they may gain 3 command tokens instead.",
         "text2": "Against: Players return 1 of their non-unit upgrade, non-faction technologies that has the most prerequisites to their technology deck.",
         "mapText": "Technologies require 1 additional prerequisite, matching any they already have.",
         "source": "little_omega"

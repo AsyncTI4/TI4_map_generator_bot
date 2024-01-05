@@ -275,7 +275,8 @@
         "sustainDamage": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "homebrewReplacesID": "dreadnought2"
+        "homebrewReplacesID": "dreadnought2",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "absol_warsun",
@@ -295,7 +296,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "warsun"
+        "homebrewReplacesID": "warsun",
+        "ability": "Other players' units in this system lose PLANETARY SHIELD."
     },
     {
         "id": "absol_sol_carrier2",
@@ -353,7 +355,7 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
         "homebrewReplacesID": "sardakk_dreadnought2"
     },
     {
@@ -375,7 +377,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "homebrewReplacesID": "l1z1x_dreadnought2"
+        "homebrewReplacesID": "l1z1x_dreadnought2",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "absol_naalu_fighter2",
@@ -386,11 +389,14 @@
         "requiredTechId": "absol_hcf2",
         "source": "absol",
         "faction": "naalu",
+        "moveValue": 2,
         "capacityUsed": 1,
+        "cost": 0.5,
         "isShip": true,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "homebrewReplacesID": "naalu_fighter2"
+        "homebrewReplacesID": "naalu_fighter2",
+        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "id": "absol_muaat_warsun2",
