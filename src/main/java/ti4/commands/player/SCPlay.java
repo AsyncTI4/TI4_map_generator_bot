@@ -226,7 +226,7 @@ public class SCPlay extends PlayerSubcommandData {
 
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
             Button mahactA = Button.danger("mahactA_follow_" + scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
-            for (Player player3 : activeGame.getPlayers().values()) {
+            for (Player player3 : activeGame.getRealPlayers()) {
                 if (player3 == player) {
                     continue;
                 }
