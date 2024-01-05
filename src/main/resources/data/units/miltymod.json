@@ -209,6 +209,7 @@
         "source": "miltymod",
         "faction": "Naalu",
         "capacityUsed": 1,
+        "cost": 0.5,
         "isShip": true,
         "combatHitsOn": 8,
         "combatDieCount": 1,
