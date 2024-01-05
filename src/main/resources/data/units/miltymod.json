@@ -608,7 +608,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "warsun"
+        "homebrewReplacesID": "warsun",
+        "ability": "Other players' units in this system lose PLANETARY SHIELD."
     },
     {
         "id": "miltymod_carrier",
