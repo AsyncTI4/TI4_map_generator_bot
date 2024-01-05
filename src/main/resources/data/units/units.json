@@ -624,6 +624,7 @@
         "source": "base",
         "faction": "Naalu",
         "capacityUsed": 1,
+        "cost": 0.5,
         "isShip": true,
         "combatHitsOn": 8,
         "combatDieCount": 1
@@ -637,7 +638,9 @@
         "requiredTechId": "hcf2",
         "source": "base",
         "faction": "Naalu",
+        "moveValue": 2,
         "capacityUsed": 1,
+        "cost": 0.5,
         "isShip": true,
         "combatHitsOn": 7,
         "combatDieCount": 1,
