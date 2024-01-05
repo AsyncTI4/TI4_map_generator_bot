@@ -367,7 +367,8 @@
         "bombardHitsOn": 4,
         "bombardDieCount": 1,
         "sustainDamage": true,
-        "isShip": true
+        "isShip": true,
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "l1z1x_flagship",
@@ -929,7 +930,7 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
     },
     {
         "id": "sardakk_flagship",
@@ -1438,7 +1439,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": false,
-        "isShip": true
+        "isShip": true,
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "fighter",
