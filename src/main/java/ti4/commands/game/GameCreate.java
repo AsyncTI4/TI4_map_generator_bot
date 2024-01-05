@@ -72,7 +72,8 @@ public class GameCreate extends GameSubcommandData {
 
     public static void reportNewGameCreated(Game game) {
         if (game == null) return;
-        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).stream().findFirst().orElse(null);
+        
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
         if (bothelperLoungeChannel == null) return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
         if (threadChannels.isEmpty()) return;

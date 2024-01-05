@@ -138,9 +138,9 @@ public class GameEnd extends GameSubcommandData {
               }
 
               // GET BOTHELPER LOUNGE
-              TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+              TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).get(0);
               if (bothelperLoungeChannel == null) {
-                BotLogger.log(event, "`#bothelper-lounge` channel not found - `/game end` cannot continue");
+                BotLogger.log(event, "`#staff-lounge` channel not found - `/game end` cannot continue");
                 return;
               }
 

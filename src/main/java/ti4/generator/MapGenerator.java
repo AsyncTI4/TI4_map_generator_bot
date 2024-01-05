@@ -1264,8 +1264,27 @@ public class MapGenerator {
                     }
                 }
             }
-            if (-5 <= remainingReinforcements)
+            if (-5 <= remainingReinforcements){
                 paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
+            }
+            
+            UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+            if (unitHolder != null && unitHolder.getUnits().isEmpty()) {
+                drawPAImage(x-00, y-150, "pa_resources.png");
+                drawPAImage(x+100, y-150, "pa_health.png");
+                drawPAImage(x+200, y-150, "pa_hit.png");
+                drawPAImage(x+300, y-150, "pa_hit.png");
+                drawPAImage(x+300, y-150, "pa_unitimage.png");
+                graphics.setColor(Color.WHITE);
+                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalResourceValueOfUnits(player, game)), new Rectangle(x -20, y -60, 120, 35), Storage.getFont35());
+                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalHPValueOfUnits(player, game)), new Rectangle(x +80, y -60, 120, 35), Storage.getFont35());
+                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalCombatValueOfUnits(player, game)), new Rectangle(x +180, y -60, 120, 35), Storage.getFont35());
+                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalUnitAbilityValueOfUnits(player,game)), new Rectangle(x +280, y -60, 120, 35), Storage.getFont35());
+            }
+            
+ 
+            
+
         }
         return xDeltaFromRightSide + 450;
     }
