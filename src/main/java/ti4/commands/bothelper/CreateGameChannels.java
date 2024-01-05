@@ -208,7 +208,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             if (missingMembers.contains(member)) continue; //skip members who aren't on the new server yet
             guild.addRoleToMember(member, role).complete();
         }
-
+        
         //CREATE GAME
         Game newGame = GameCreate.createNewGame(event, gameName, gameOwner);
 

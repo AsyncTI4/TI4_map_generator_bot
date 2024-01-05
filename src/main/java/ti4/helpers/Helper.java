@@ -1181,7 +1181,11 @@ public class Helper {
             }else {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
-                cost = cost + (int)removedUnit.getCost() * producedUnits.get(unit);
+                if(removedUnit.getBaseType().equalsIgnoreCase("flagship") && activeGame.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")){
+                    cost = cost; //nomad alliance
+                }else{
+                    cost = cost + (int)removedUnit.getCost() * producedUnits.get(unit);
+                }
                 totalUnits = totalUnits + producedUnits.get(unit);
             }
         }
@@ -2133,6 +2137,7 @@ public class Helper {
         if (player.getTotalVictoryPoints() >= activeGame.getVp()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("gameEnd", "End Game"));
+            buttons.add(Button.primary("rematch", "Rematch (make new game with same players/channels)"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
                 activeGame.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, activeGame)
