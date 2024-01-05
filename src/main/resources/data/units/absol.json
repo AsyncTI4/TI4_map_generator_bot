@@ -275,7 +275,8 @@
         "sustainDamage": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "homebrewReplacesID": "dreadnought2"
+        "homebrewReplacesID": "dreadnought2",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "absol_warsun",
@@ -353,7 +354,7 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
         "homebrewReplacesID": "sardakk_dreadnought2"
     },
     {
@@ -375,7 +376,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "homebrewReplacesID": "l1z1x_dreadnought2"
+        "homebrewReplacesID": "l1z1x_dreadnought2",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "absol_naalu_fighter2",
