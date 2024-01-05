@@ -189,30 +189,6 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
         if (categoryChannel == null) categoryChannel = createNewCategory(categoryChannelName);
-
-        //SET GUILD BASED ON CATEGORY SELECTED
-        Guild guild = categoryChannel.getGuild();
-
-        //CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        List<Member> missingMembers = new ArrayList<>();
-        for (Member member4 : members) {
-            if (!guildMemberIDs.contains(member4.getId())) {
-                missingMembers.add(member4);
-            }
-        }
-        if (missingMembers.size() > 0) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(
-                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
-            sb.append(guild.getName()).append("** server.\n");
-            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
-            sb.append("The following players need to join the server:\n");
-            for (Member member3 : missingMembers) {
-                sb.append("> ").append(member3.getAsMention()).append("\n");
-            }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-        }
         new CreateGameChannels().createGameChannelsPart2(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         event.getMessage().delete().queue();
     } 
@@ -226,25 +202,7 @@ public class CreateGameButton extends GameSubcommandData {
         return "pbd" + nextPBDNumber;
     }
 
-    private static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
-        List<String> gameAndRoleNames = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            //EXISTING ROLE NAMES
-            for (Role role : guild.getRoles()) {
-                gameAndRoleNames.add(role.getName());
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
-        gameAndRoleNames.addAll(mapNames);
-
-        //CHECK
-        return mapNames.contains(name);
-    }
+   
 
     private static List<Integer> getAllExistingPBDNumbers() {
         List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
@@ -317,19 +275,7 @@ public class CreateGameButton extends GameSubcommandData {
         return null;
     }
 
-    private static boolean serverCanHostNewGame(Guild guild) {
-        return guild != null && serverHasRoomForNewRole(guild)
-            && serverHasRoomForNewChannels(guild);
-    }
 
-    private static boolean serverHasRoomForNewRole(Guild guild) {
-        int roleCount = guild.getRoles().size();
-        if (roleCount >= 250) {
-            BotLogger.log("`CreateGameChannels.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
-            return false;
-        }
-        return true;
-    }
 
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
@@ -353,16 +299,6 @@ public class CreateGameButton extends GameSubcommandData {
         return true;
     }
 
-    private static boolean serverHasRoomForNewChannels(Guild guild) {
-        int channelCount = guild.getChannels().size();
-        int channelMax = 500;
-        int channelsCountRequiredForNewGame = 2;
-        if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.log("`CreateGameChannels.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
-            return false;
-        }
-        return true;
-    }
 
     public static String getCategoryNameForGame(String gameName) {
         if (!gameName.startsWith("pbd")) return null;
@@ -408,4 +344,6 @@ public class CreateGameButton extends GameSubcommandData {
             .findFirst()
             .orElse(null);
     }
+
+    
 }

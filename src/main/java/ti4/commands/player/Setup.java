@@ -214,30 +214,30 @@ public class Setup extends PlayerSubcommandData {
 
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up free people ability markers. " + player.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set up free people ability markers. " + player.getRepresentation(true, true)
                 + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
             player.setUnitCap(unitID, 7);
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
         }
         if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
                 + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
             GameSaveLoadManager.saveMap(activeGame, event);
         }
