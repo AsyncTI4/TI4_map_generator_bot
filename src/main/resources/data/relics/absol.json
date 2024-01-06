@@ -32,7 +32,7 @@
         "name": "Maw of Worlds",
         "text": "When you would exhaust a technology or legendary planet card, you may exhaust this card instead.\nAt the start of the agenda phase, you may purge this card and exhaust any number of your planets to gain a technology with the same number of prerequisites.",
         "source": "absol",
-        "flavourText": "No larger than a carrier, the spherical lattice held a captive singularity at its heart. As they dumped the planet's entire energy grid into its core, the black hole began to spin, the complex logic-circuitry along the lattic slowly coming to life."
+        "flavourText": "No larger than a carrier, the spherical lattice held a captive singularity at its heart. As they dumped the planet's entire energy grid into its core, the black hole began to spin, the complex logic-circuitry along the lattice slowly coming to life."
     },
     {
         "alias": "absol_nanoforge",
@@ -57,7 +57,7 @@
     },
     {
         "alias": "absol_emelpar",
-        "name": "Sceptar of Emelpar",
+        "name": "Scepter of Emelpar",
         "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.\nACTION: Purge this card to ready your strategy card.",
         "source": "absol",
         "flavourText": "As the hilt began to fuse with the flesh of her hand, she worried that she should set the scepter aside. But the whispered suggestions in her mind were too valuable and insightful to seriously consider such a rash and illogical act."
