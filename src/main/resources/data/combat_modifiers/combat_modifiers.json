@@ -197,7 +197,7 @@
         "type": "mods",
         "value": "-1",
         "persistenceType": "ALWAYS",
-        "scope": "pd",
+        "scope": "",
         "forCombatAbility": "SpaceCannonDefence",
         "related": [
             {

@@ -38,6 +38,29 @@ import ti4.model.UnitModel;
 public class ButtonHelperFactionSpecific {
 
 
+    public static boolean doesAnyoneElseHaveJr(Game activeGame, Player player){
+        for(Player p1 : activeGame.getRealPlayers()){
+            if(p1 == player){
+                continue;
+            }
+            if (p1.hasRelic("titanprototype") || p1.hasRelic("absol_jr")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void yssarilAgentAsJr(Game activeGame, Player player, ButtonInteractionEvent event){
+        List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "jrResolution", null);
+        player.getLeader("yssarilagent").get().setExhausted(true);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()+" is using yssaril agent as JR");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
+        event.getMessage().delete().queue();
+        String message = "Use buttons to end turn or do another action.";
+        List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+    }
+
     public static void handleTitansConstructionMechDeployStep1(Game activeGame, Player player){
         List<Button> buttons = new ArrayList<>();
         if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 3){
@@ -1397,6 +1420,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveTCSExhaust(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        buttonID = buttonID.replace("absol_jr", "absoljr");
         String agent = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
@@ -1404,6 +1428,24 @@ public class ButtonHelperFactionSpecific {
         player.exhaustTech("tcs");
         Leader playerLeader = p2.getLeader(agent).orElse(null);
         if (playerLeader == null) {
+            if(agent.contains("titanprototype")){
+                p2.removeExhaustedRelic("titanprototype");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " exhausted TCS tech to ready " + agent + ", owned by " + p2.getColor());
+                if (p2 != player) {
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                        p2.getRepresentation(true, true) + " the TCS tech was exhausted by " + player.getColor() + " to ready your " + agent);
+                }
+                event.getMessage().delete().queue();
+            }
+            if(agent.contains("absol")){
+                p2.removeExhaustedRelic("absol_jr");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " exhausted TCS tech to ready " + agent + ", owned by " + p2.getColor());
+                if (p2 != player) {
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                        p2.getRepresentation(true, true) + " the TCS tech was exhausted by " + player.getColor() + " to ready your " + agent);
+                }
+                event.getMessage().delete().queue();
+            }
             return;
         }
         RefreshLeader.refreshLeader(p2, playerLeader, activeGame);

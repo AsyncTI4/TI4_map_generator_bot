@@ -157,6 +157,12 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Marked the Blex Hero Target as SC #"+dieResult + " and the faction that played the hero as "+player.getFaction());
                 ListTurnOrder.turnOrder(event, activeGame);
             }
+             case "ghotihero"->{
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGhotiHeroIn(player, activeGame, event));
+            }
+             case "mortheushero"->{
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, activeGame, event));
+            }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " removed all of your ccs from the board");
                 for (Tile t : activeGame.getTileMap().values()) {

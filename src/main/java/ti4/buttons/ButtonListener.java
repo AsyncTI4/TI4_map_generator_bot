@@ -386,6 +386,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("olradinHeroFlip_")) {
             ButtonHelperHeroes.olradinHeroFlipPolicy(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("tnelisHeroAttach_")) {
+            ButtonHelperHeroes.resolveTnelisHeroAttach(player, activeGame, buttonID.split("_")[1], event);
         } else if (buttonID.startsWith("arcExp_")) {
             ButtonHelperActionCards.resolveArcExpButtons(activeGame, player, buttonID, event, trueIdentity);
         } else if (buttonID.startsWith("augerHeroSwap_")) {
@@ -1407,6 +1409,16 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("getReleaseButtons")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " you can release units one at a time with the buttons",
                 ButtonHelperFactionSpecific.getReleaseButtons(player, activeGame));
+        } else if (buttonID.startsWith("ghotiHeroIn_")) {
+            String pos = buttonID.substring(buttonID.indexOf("_") + 1);
+            List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, activeGame, event, activeGame.getTileByPosition(pos));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " select which unit you'd like to replace", buttons);
+            ButtonHelper.deleteTheOneButton(event);
+         } else if (buttonID.startsWith("glimmersHeroIn_")) {
+            String pos = buttonID.substring(buttonID.indexOf("_") + 1);
+            List<Button> buttons = ButtonHelperHeroes.getUnitsToGlimmersHero(player, activeGame, event, activeGame.getTileByPosition(pos));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " select which unit you'd like to duplicate", buttons);
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("arboAgentIn_")) {
             String pos = buttonID.substring(buttonID.indexOf("_") + 1);
             List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, activeGame, event, activeGame.getTileByPosition(pos));
@@ -1441,6 +1453,12 @@ public class ButtonListener extends ListenerAdapter {
             String unit = buttonID.split("_")[2];
             List<Button> buttons = ButtonHelperAgents.getArboAgentReplacementOptions(player, activeGame, event, activeGame.getTileByPosition(pos), unit);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " select which unit you'd like to place down", buttons);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("glimmersHeroOn_")) {
+            String pos = buttonID.split("_")[1];
+            String unit = buttonID.split("_")[2];
+            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), unit, activeGame);
+            MessageHelper.sendMessageToChannel(event.getChannel(), ident + " chose to duplicate a "+unit);
             event.getMessage().delete().queue();
 
         } else if (buttonID.startsWith("resolveWithNoEffect")) {
@@ -1584,10 +1602,12 @@ public class ButtonListener extends ListenerAdapter {
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set interval as "+interval +" hours");
             event.getMessage().delete().queue();
-         } else if (buttonID.startsWith("playerPrefDecision_")) {
+        } else if (buttonID.startsWith("playerPrefDecision_")) {
             ButtonHelper.resolvePlayerPrefDecision(player, event, buttonID, activeGame);
         } else if (buttonID.startsWith("resolveCrownOfE")) {
             ButtonHelper.resolveCrownOfE(activeGame, player, event);
+        } else if (buttonID.startsWith("yssarilAgentAsJr")) {
+            ButtonHelperFactionSpecific.yssarilAgentAsJr(activeGame, player, event);
         } else if (buttonID.startsWith("sarMechStep1_")) {
             ButtonHelper.resolveSARMechStep1(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("sarMechStep2_")) {
