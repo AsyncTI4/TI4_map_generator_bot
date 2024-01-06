@@ -9,6 +9,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -45,6 +46,84 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
+
+    public static void resolveTnelisHeroAttach(Player tnelis, Game activeGame, String soID, ButtonInteractionEvent event){
+        Map<String,Integer> customPOs = new HashMap<String, Integer>();
+        customPOs.putAll(activeGame.getCustomPublicVP());
+        for(String customPO : customPOs.keySet()){
+            if(customPO.contains("Tnelis Hero")){
+                activeGame.removeCustomPO(customPOs.get(customPO));
+                 String sb = "Removed Tnelis Hero from an SO.";
+                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(tnelis, activeGame), sb);
+            }
+        }
+        Integer poIndex = activeGame.addCustomPO("Tnelis Hero ("+Mapper.getSecretObjectivesJustNames().get(soID)+")", 1);
+        String sb = "Attached Tnelis Hero to an SO. This PO" + "\n" +
+            "(" + poIndex + ") should only be scored by them " + "\n" +
+            Mapper.getSecretObjectivesJustNames().get(soID) + "\n";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(tnelis, activeGame), sb);
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getTilesToGhotiHeroIn(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                Button validTile = Button.success(finChecker + "ghotiHeroIn_" + tileEntry.getKey(), tile.getRepresentationForButtons(activeGame, player));
+                buttons.add(validTile);
+            }
+        }
+        Button validTile2 = Button.danger(finChecker + "deleteButtons", "Done");
+        buttons.add(validTile2);
+        return buttons;
+    }
+    public static List<Button> getUnitsToGlimmersHero(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun, UnitType.Fighter);
+
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            UnitHolder unitHolder = entry.getValue();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet) continue;
+
+            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
+            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (!player.unitBelongsToPlayer(unitKey)) continue;
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                    continue;
+                }
+                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String unitName = unitKey.unitName();
+                Button validTile2 = Button.danger(finChecker + "glimmersHeroOn_" + tile.getPosition() + "_" + unitName, "Duplicate " + prettyName);
+                validTile2 = validTile2.withEmoji(emoji);
+                buttons.add(validTile2);
+                
+            }
+        }
+        Button validTile2 = Button.danger(finChecker + "deleteButtons", "Decline");
+        buttons.add(validTile2);
+        return buttons;
+    }
+    public static List<Button> getTilesToGlimmersHeroIn(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                Button validTile = Button.success(finChecker + "glimmersHeroIn_" + tileEntry.getKey(), tile.getRepresentationForButtons(activeGame, player));
+                buttons.add(validTile);
+            }
+        }
+        Button validTile2 = Button.danger(finChecker + "deleteButtons", "Done");
+        buttons.add(validTile2);
+        return buttons;
+    }
     public static void offerFreeSystemsButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {

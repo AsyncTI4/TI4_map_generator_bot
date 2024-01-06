@@ -6507,6 +6507,11 @@ public class ButtonHelper {
                         Button lButton = Button.secondary(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Unimplemented Component Agent")
                             .withEmoji(Emoji.fromFormatted(factionEmoji));
                         compButtons.add(lButton);
+                        if(ButtonHelperFactionSpecific.doesAnyoneElseHaveJr(activeGame, p1)){
+                            Button jrButton = Button.secondary(finChecker + "yssarilAgentAsJr", "Use " + leaderName + " The Relic/Agent JR")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(jrButton);
+                        }
 
                     } else {
                         Button lButton = Button.secondary(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
@@ -7000,11 +7005,16 @@ public class ButtonHelper {
                         List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "jrResolution", null);
                         p1.addExhaustedRelic(buttonID);
                         purgeOrExhaust = "Exhausted ";
-                        Button sdButton = Button.success("jrStructure_sd", "Place A SD");
-                        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-                        Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
-                        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
+                        for (Player p2 : activeGame.getRealPlayers()) {
+                            if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
+                                List<Button> buttons3 = new ArrayList<>();
+                                buttons2.add(Button.success("exhaustTCS_" + buttonID + "_" + p1.getFaction(), "Exhaust TCS to Ready " + buttonID));
+                                buttons2.add(Button.danger("deleteButtons", "Decline"));
+                                String msg = p2.getRepresentation(true, true) + " you have the opportunity to exhaust your TCS tech to ready " + buttonID + " and potentially resolve a transaction.";
+                                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), msg, buttons2);
+                            }
+                        }
                     } else {
                         p1.removeRelic(buttonID);
                         p1.removeExhaustedRelic(buttonID);
