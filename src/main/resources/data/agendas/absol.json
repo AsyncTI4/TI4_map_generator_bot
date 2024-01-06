@@ -414,7 +414,7 @@
         "name": "Political Censure",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card and 1 victory point. If they are the speaker, the other player that cast the most votes for them takes the speaker token. The electd player cannot play action cards or take or be given the speaker token. If the elected player loses this card, they lose 1 victory point.",
+        "text1": "The elected player gains this card and 1 victory point. If they are the speaker, the other player that cast the most votes for them takes the speaker token. The elected player cannot play action cards or take or be given the speaker token. If the elected player loses this card, they lose 1 victory point.",
         "text2": "",
         "mapText": "Player gains 1 VP. Cannot play action cards or take or be given the speaker token. If the elected player loses this card, they lose 1 VP.",
         "source": "absol"
