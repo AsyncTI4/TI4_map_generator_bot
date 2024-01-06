@@ -1064,31 +1064,21 @@ public class Helper {
     }
     public static void resetProducedUnits(Player player, Game activeGame, GenericInteractionCreateEvent event){
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
-        List<String> uniquePlaces = new ArrayList<>();
+        
         for(String unit : producedUnits.keySet()){
             String tilePos = unit.split("_")[1];
             String planetOrSpace = unit.split("_")[2];
-            if(!uniquePlaces.contains(tilePos+"_"+planetOrSpace)){
-                uniquePlaces.add(tilePos+"_"+planetOrSpace);
+            if("space".equalsIgnoreCase(planetOrSpace)){
+                planetOrSpace = "";
+            }else{
+                planetOrSpace = " "+planetOrSpace;
             }
+            Tile tile = activeGame.getTileByPosition(tilePos);
+            String un = unit.split("_")[0];
+            //UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
+            new ti4.commands.units.RemoveUnits().unitParsing(event, player.getColor(), tile, producedUnits.get(unit)+" "+AliasHandler.resolveUnit(un) +planetOrSpace, activeGame);
         }
-        for(String uniquePlace : uniquePlaces){
-            String tilePos2 = uniquePlace.split("_")[0];
-           // Tile tile = activeGame.getTileByPosition(tilePos2);
-            for(String unit : producedUnits.keySet()){
-                String tilePos = unit.split("_")[1];
-                String planetOrSpace = unit.split("_")[2];
-                if("space".equalsIgnoreCase(planetOrSpace)){
-                    planetOrSpace = "";
-                }else{
-                    planetOrSpace = " "+planetOrSpace;
-                }
-                Tile tile = activeGame.getTileByPosition(tilePos);
-                String un = unit.split("_")[0];
-                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
-                new ti4.commands.units.RemoveUnits().unitParsing(event, player.getColor(), tile, producedUnits.get(unit)+" "+un +planetOrSpace, activeGame);
-            }
-        }
+        
         
         player.resetProducedUnits();
     }
