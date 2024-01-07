@@ -178,6 +178,9 @@ public class SCPlay extends PlayerSubcommandData {
                     // SEARCH FOR EXISTING OPEN THREAD
                     for (ThreadChannel threadChannel_ : threadChannels) {
                         if (threadChannel_.getName().equals(threadName)) {
+                            if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
+                                MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, activeGame), true);
+                            }
                             if (scToPlay == 5) {
                                 Button transaction = Button.primary("transaction", "Transaction");
                                 scButtons.add(transaction);
@@ -185,6 +188,7 @@ public class SCPlay extends PlayerSubcommandData {
                                 scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
+                            
                         }
                     }
                 });

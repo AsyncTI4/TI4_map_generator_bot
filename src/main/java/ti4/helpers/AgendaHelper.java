@@ -1223,6 +1223,9 @@ public class AgendaHelper {
             }
 
             String message = " up to vote! Resolve using buttons.";
+            Button eraseandReVote = Button.danger("eraseMyVote", "Erase my vote & have me vote again");
+            String revoteMsg = "You can press this button to revote if you made a mistake, ignore it otherwise";
+            MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseandReVote);
             Player nextInLine = getNextInLine(player, getVotingOrder(activeGame), activeGame);
             String realIdentity2 = nextInLine.getRepresentation(true, true);
 
