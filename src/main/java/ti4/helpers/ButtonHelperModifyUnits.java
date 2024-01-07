@@ -226,11 +226,18 @@ public class ButtonHelperModifyUnits {
         int sdAmount = 0;
         int pdsAmount = 0;
         for (Player p2 : activeGame.getRealPlayers()) {
+            if(p2 == player){
+                continue;
+            }
             sdAmount = uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) + sdAmount + uH.getUnitCount(UnitType.Spacedock, p2.getColor());
-            new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd " + uH.getName(), activeGame);
-            new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " csd " + uH.getName(), activeGame);
+            if(uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0){
+                new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd " + uH.getName(), activeGame);
+                new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " csd " + uH.getName(), activeGame);
+            }
             pdsAmount = uH.getUnitCount(UnitType.Pds, p2.getColor()) + pdsAmount;
-            new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds " + uH.getName(), activeGame);
+            if(uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0){
+                new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds " + uH.getName(), activeGame);
+            }
         }
         if (pdsAmount > 0) {
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds " + uH.getName(), activeGame);
@@ -904,14 +911,20 @@ public class ButtonHelperModifyUnits {
         } else {
             unitName = rest;
         }
-
+         if (buttonLabel.toLowerCase().contains("damaged")) {
+            unitName = unitName.replace("damaged", "");
+        }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), amount + " " + unitName, activeGame);
         if (buttonLabel.toLowerCase().contains("damaged")) {
             activeGame.getTileByPosition(pos).addUnitDamage("space", unitKey, amount);
+            activeGame.getTileByPosition(pos).removeUnitDamage(planet, unitKey, amount);
         }
-
+        
         activeGame.getTileByPosition(pos).removeUnit(planet, unitKey, amount);
+         if (buttonLabel.toLowerCase().contains("damaged")) {
+            unitName = "damaged "+unitName;
+        }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + "Undid landing of " + amount + " " + unitName + " on " + planet);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
@@ -932,11 +945,18 @@ public class ButtonHelperModifyUnits {
         } else {
             unitName = rest;
         }
+         if (buttonLabel.toLowerCase().contains("damaged")) {
+            unitName = unitName.replace("damaged", "");
+        }
 
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), amount + " " + unitName + " " + planet, activeGame);
         if (buttonLabel.toLowerCase().contains("damaged")) {
             activeGame.getTileByPosition(pos).addUnitDamage(planet, unitKey, amount);
+            activeGame.getTileByPosition(pos).removeUnitDamage("space", unitKey, amount);
+        }
+         if (buttonLabel.toLowerCase().contains("damaged")) {
+            unitName = "damaged "+unitName;
         }
 
         activeGame.getTileByPosition(pos).removeUnit("space", unitKey, amount);

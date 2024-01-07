@@ -541,7 +541,11 @@ public class MessageListener extends ListenerAdapter {
 
                     Whisper.sendWhisper(activeGame, player, player_, msg2, "n", event.getChannel(), event.getGuild());
                 }else if(messageToMyself){
-                    activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction())+" "+msg2.replace(":","666fin"));
+                    String previousThoughts = "";
+                    if(!activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).isEmpty()){
+                        previousThoughts = activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction())+". ";
+                    }
+                    activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),previousThoughts+msg2.replace(":","666fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " sent themselves a future message");
                 }else{
                     String factionColor = msg3.substring(8, msg3.indexOf(" ")).toLowerCase();
