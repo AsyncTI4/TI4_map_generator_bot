@@ -13,6 +13,7 @@ import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.player.ClearDebt;
 import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -36,6 +37,22 @@ public class ButtonHelperAbilities {
         buttons.add(Button.danger("autoneticMemoryDecline_" + count, "Decline"));
         String msg = player.getRepresentation(true, true) + " you have the ability to draw 1 less action card and utilize your autonetic memory ability. Please use or decline to use.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void bindingDebtRes(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
+        event.getMessage().delete().queue();
+        Player vaden = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+
+        vaden.setTg(vaden.getTg()+1);
+        pillageCheck(vaden, activeGame);
+        player.setTg(player.getTg()-1);
+         int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor()));
+        ClearDebt.clearDebt(vaden, player, amount);
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame)+ " paid 1tg to "+ButtonHelper.getIdentOrColor(vaden, activeGame)+"to get 2 debt tokens cleared via the binding debts ability";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, activeGame), msg);
+        }
     }
 
     public static void autoneticMemoryDecline(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
