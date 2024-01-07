@@ -91,18 +91,41 @@ public class ButtonHelperTacticalAction {
                             if ((unitKey.getUnitType() == UnitType.Infantry || unitKey.getUnitType() == UnitType.Mech)) {
                                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                                 int amount = unitEntry.getValue();
-
-                                rest = unitName.toLowerCase() + "_" + unitHolder.getName().toLowerCase();
-                                if (currentSystem.containsKey(rest)) {
-                                    activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
-                                } else {
-                                    activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                int totalUnits = amount;
+                                int damagedUnits = 0;
+                                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                                 }
-                                if (currentActivation.containsKey(unitName)) {
-                                    activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName,
-                                        currentActivation.get(unitName) + amount);
-                                } else {
-                                    activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
+                                if (damagedUnits > 0) {
+                                    amount = damagedUnits;
+                                    rest = unitName.toLowerCase() + "damaged_" + unitHolder.getName().toLowerCase();
+                                    if (currentSystem.containsKey(rest)) {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                    } else {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                    }
+                                    if (currentActivation.containsKey(unitName)) {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName,
+                                            currentActivation.get(unitName) + amount);
+                                    } else {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
+                                    }
+                                }
+                                rest = unitName;
+                                amount = totalUnits - damagedUnits;
+                                if (amount > 0) {
+                                    rest = unitName.toLowerCase() + "_" + unitHolder.getName().toLowerCase();
+                                    if (currentSystem.containsKey(rest)) {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                    } else {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                    }
+                                    if (currentActivation.containsKey(unitName)) {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName,
+                                            currentActivation.get(unitName) + amount);
+                                    } else {
+                                        activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
+                                    }
                                 }
 
                                 new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
