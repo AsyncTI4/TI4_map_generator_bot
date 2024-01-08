@@ -394,11 +394,12 @@ public class ButtonHelperHeroes {
                 ButtonHelper.riftAllUnitsInASystem(pos, event, activeGame, p2, p2.getFactionEmoji(), player);
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile) && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeGame, player)) {
-                String msg = player.getRepresentation(true, true) + " has failed to eat units owned by " + player.getRepresentation()
+                String msg = player.getRepresentation(true, true) + " has failed to eat units owned by " + p2.getRepresentation()
                     + " because they were blockaded. Wah-wah.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
             }
         }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getEmpyHeroButtons(Player player, Game activeGame) {
