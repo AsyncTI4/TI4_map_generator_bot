@@ -754,7 +754,17 @@ public class ButtonHelper {
             } else {
                 sendMessageToRightStratThread(player, activeGame, message.toString(), "technology");
             }
-            if (paymentRequired) payForTech(activeGame, player, event, buttonID);
+            if (paymentRequired) {
+                payForTech(activeGame, player, event, buttonID);
+            }else{
+                if(player.hasLeader("zealotshero") && player.getLeader("zealotshero").get().isActive()){
+                    if(activeGame.getFactionsThatReactedToThis("zealotsHeroTechs").isEmpty()){
+                        activeGame.setCurrentReacts("zealotsHeroTechs", techID);
+                    }else{
+                        activeGame.setCurrentReacts("zealotsHeroTechs", activeGame.getFactionsThatReactedToThis("zealotsHeroTechs")+"-"+techID);
+                    }
+                }
+            }
             if (player.hasUnit("augers_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
                     player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
@@ -1145,6 +1155,19 @@ public class ButtonHelper {
                     Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Arborec commander ", buttons);
+                }
+            }
+            if (nonActivePlayer.hasLeaderUnlocked("celdaurihero") && FoWHelper.playerHasPlanetsInSystem(nonActivePlayer, activeSystem) && !activeSystem.getTileID().equalsIgnoreCase("18")) {
+                if (justChecking) {
+                    if (!activeGame.isFoWMode()) {
+                        MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger a chance to play celdauri Hero");
+                    }
+                    numberOfAbilities++;
+                } else {
+                    Button gainTG = Button.success(fincheckerForNonActive + "purgeCeldauriHero_" + activeSystem.getPosition(), "Use Celdauri Hero");
+                    Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Hero");
+                    List<Button> buttons = List.of(gainTG, decline);
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to decide if you want to use Celdauri Hero", buttons);
                 }
             }
             if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem) && nonActivePlayer.getMahactCC().contains(player.getColor())
@@ -2542,7 +2565,7 @@ public class ButtonHelper {
                 if((p1.hasTech("ac") && checkNumberNonFighterShips(p1, activeGame, tile) >2) || (p2.hasTech("ac") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
                     buttons2.add(Button.primary("assCannonNDihmohn_ac_" + tile.getPosition(), "Use Assault Cannon").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
                 }
-                if((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
+                if((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
                     buttons2.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dihmohn Commander").withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
                 }
             }
@@ -2896,6 +2919,28 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Keleres)));
         }
 
+        if (p1.hasLeaderUnlocked("dihmohnhero") && "space".equalsIgnoreCase(groundOrSpace)) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "purgeDihmohnHero", "Dihmohn Hero")
+                .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
+        }
+        if (p2.hasLeaderUnlocked("dihmohnhero") && !activeGame.isFoWMode() && "space".equalsIgnoreCase(groundOrSpace)) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "purgeDihmohnHero", "Dihmohn Hero")
+                .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
+        }
+
+        if (p1.hasLeaderUnlocked("kortalihero")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "purgeKortaliHero_"+p2.getFaction(), "Kortali Hero")
+                .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
+        }
+        if (p2.hasLeaderUnlocked("kortalihero") && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "purgeKortaliHero_"+p1.getFaction(), "Kortali Hero")
+                .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
+
         if (getTilesOfUnitsWithBombard(p1, activeGame).contains(tile) || getTilesOfUnitsWithBombard(p2, activeGame).contains(tile)) {
             if (tile.getUnitHolders().size() > 2) {
                 buttons.add(Button.secondary("bombardConfirm_combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment, "Roll Bombardment"));
@@ -3093,6 +3138,9 @@ public class ButtonHelper {
         }
         if (player.hasAbility("armada")) {
             armadaValue = 2;
+        }
+        if(player.hasTech("dsghotg") && tile == FoWHelper.getPlayerHS(activeGame, player)){
+            armadaValue = armadaValue+3;
         }
         int fleetCap = (player.getFleetCC() + armadaValue + player.getMahactCC().size()) * 2;
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
@@ -5880,6 +5928,20 @@ public class ButtonHelper {
                 && p2.getActionCards().containsKey("investments")) {
                 PlayAC.playAC(event, activeGame, p2, "investments", activeGame.getMainGameChannel(), event.getGuild());
             }
+            if(p2.hasLeader("zealotshero") && p2.getLeader("zealotshero").get().isActive()){
+                if(!activeGame.getFactionsThatReactedToThis("zealotsHeroTechs").isEmpty()){
+                    String list = activeGame.getFactionsThatReactedToThis("zealotsHeroTechs");
+                    List<Button> buttons = new ArrayList<>();
+                    for(String techID : list.split("-")){
+                        buttons.add(Button.success("purgeTech_"+techID,"Purge "+Mapper.getTech(techID).getName()));
+                    }
+                    String msg = p2.getRepresentation(true, true) +" due to zealots hero, you have to purge 2 techs. Use buttons to purge ";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg+ "the first tech", buttons);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg+"the second tech", buttons);
+                    p2.removeLeader("zealotshero");
+                    activeGame.setCurrentReacts("zealotsHeroTechs", "");
+                }
+            }
         }
         if (!activeGame.getFactionsThatReactedToThis("agendaConstitution").isEmpty()) {
             activeGame.setCurrentReacts("agendaConstitution", "");
@@ -6005,12 +6067,10 @@ public class ButtonHelper {
             player.exhaustPlanet(planet);
         }
         activeGame.setComponentAction(true);
-        Button getTech = Button.success("acquireAFreeTech", "Get a tech");
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(getTech);
-        buttons.add(Button.danger("deleteButtons", "Delete These"));
+        
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " purged Maw Of Worlds.");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech", buttons);
+        Button getTech = Button.success("acquireAFreeTech", "Get a tech");
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech", getTech);
         event.getMessage().delete().queue();
     }
 
@@ -6234,7 +6294,7 @@ public class ButtonHelper {
             }
             case "PNs" -> {
                 PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
-                String message = p1.getRepresentation(true, true) + " Click the PN you would like to send";
+                String message = p1.getRepresentation(true, true) + " Click the PN you would like to send.";
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                     if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
@@ -6252,6 +6312,7 @@ public class ButtonHelper {
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "Reminder that, unlike other things, you can only send a person 1 PN in a transaction.");
             }
             case "Frags" -> {
                 String message = "Click the amount of fragments you would like to send";
@@ -7528,8 +7589,10 @@ public class ButtonHelper {
             player.setPromissoryNotesInPlayArea(id);
         } else {
             player.removePromissoryNote(id);
-            owner.setPromissoryNote(id);
-            PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
+            if(!id.equalsIgnoreCase("dspncymi")){
+                owner.setPromissoryNote(id);
+                PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
+            }
             PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         }
         String emojiToUse = activeGame.isFoWMode() ? "" : owner.getFactionEmoji();
@@ -7568,6 +7631,14 @@ public class ButtonHelper {
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), "2 ff", activeGame);
             String message = player.getRepresentation(true, true) + " added 2 ff to the active system";
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message);
+        }
+        if("dspncymi".equalsIgnoreCase(id)){
+            ButtonHelper.pickACardFromDiscardStep1(activeGame,player);
+        }
+        if("dspnkort".equalsIgnoreCase(id)){
+            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "kortalipn");
+            MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
+            MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
         }
         if ("ragh".equalsIgnoreCase(id)) {
             String message = player.getRepresentation(true, true) + " select planet to raghs call on";

@@ -8,7 +8,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cardsac.ACInfo;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -83,6 +85,8 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");
+        ACInfo.sendActionCardInfo(activeGame, player);
+        ButtonHelper.checkACLimit(activeGame, event, player);
         if (noMoreComponentActionCards) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }

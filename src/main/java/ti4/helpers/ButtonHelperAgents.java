@@ -1059,7 +1059,7 @@ public class ButtonHelperAgents {
         adjTiles.addAll(FoWHelper.getAdjacentTiles(activeGame, origTile.getPosition(), player, false));
         for(String posTile : adjTiles){
             Tile adjTile = activeGame.getTileByPosition(posTile);
-            if(adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, origTile)){
+            if(adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, adjTile)){
                 tiles.add(adjTile);
             }
         }
