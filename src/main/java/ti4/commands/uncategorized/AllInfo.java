@@ -19,6 +19,7 @@ import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.UnitInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -108,6 +109,7 @@ public class AllInfo implements Command {
         SOInfo.sendSecretObjectiveInfo(activeGame, player);
         ACInfo.sendActionCardInfo(activeGame, player);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
     }
 
     protected String getActionDescription() {
