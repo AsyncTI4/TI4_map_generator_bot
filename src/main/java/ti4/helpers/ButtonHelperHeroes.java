@@ -320,6 +320,45 @@ public class ButtonHelperHeroes {
         return techPlanets;
     }
 
+    public static void purgeCeldauriHero(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        Leader playerLeader = player.unsafeGetLeader("celdaurihero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader " + "celdaurihero" + " has been purged");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+        }
+        player.setCommodities(player.getCommoditiesTotal());
+        ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<>();
+        Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
+        for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+            if (player.getPlanets().contains(uH.getName())) {
+                String planet = uH.getName();
+                Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
+                buttons.add(sdButton);
+            }
+        }
+        buttons.add(tgButton);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            player.getRepresentation(true, true) + " Use buttons to place a SD on a planet you control", buttons);
+        List<Button> buttons2 = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "celdauriHero", "place");
+        String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannel(event.getChannel(), "The bot believes you have " + Helper.getProductionValue(player, activeGame, tile, false)
+            + " PRODUCTION value in this system\n" + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons2);
+        event.getMessage().delete().queue();
+    }
+    public static void purgeTech(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String techID = buttonID.replace("purgeTech_","");
+        player.removeTech(techID);
+        String msg = player.getRepresentation(true, true) +" purged "+Mapper.getTech(techID).getName();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+
+    }
     public static void resolveNekroHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
@@ -355,6 +394,8 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
+
+
 
     public static List<Button> getCabalHeroButtons(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -494,6 +535,64 @@ public class ButtonHelperHeroes {
             }
         }
     }
+
+    public static void offerStealRelicButtons(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        ButtonHelper.deleteTheOneButton(event);
+        String faction = buttonID.split("_")[1];
+        Player victim = activeGame.getPlayerFromColorOrFaction(faction);
+        List<Button> buttons = new ArrayList<>();
+        for(String relic : victim.getRelics()){
+            buttons.add(Button.success("stealRelic_"+victim.getFaction()+"_"+relic, "Steal "+Mapper.getRelic(relic).getName()));
+        }
+        String msg = player.getRepresentation(true, true)+" choose the relic you want to steal";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+
+    }
+    public static void stealRelic(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+        String faction = buttonID.split("_")[1];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        String relic = buttonID.split("_")[2];
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame)+" stole "+Mapper.getRelic(relic).getName()+" from "+ButtonHelper.getIdentOrColor(p2, activeGame);
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg);
+        }
+        boolean exhausted = p2.getExhaustedRelics().contains(relic);
+        p2.removeRelic(relic);
+        player.addRelic(relic);
+        if(exhausted){
+            p2.removeExhaustedRelic(relic);
+            player.addExhaustedRelic(relic);
+        }
+        
+        
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+    }
+
+    public static void resolvDihmohnHero(Game activeGame) {
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        for (Player player : activeGame.getRealPlayers()) {
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                int totalUnits = unitEntry.getValue() - damagedUnits;
+                if (totalUnits > 0 && unitModel.getIsShip()) {
+                    tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
+                }
+            }
+        }
+        
+    }
+
+
 
     public static void augersHeroSwap(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         int num = Integer.parseInt(buttonID.split("_")[2]);

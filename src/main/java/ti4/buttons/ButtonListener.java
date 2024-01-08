@@ -2074,6 +2074,18 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReactorMeltdownStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep3_")) {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
+        } else if(buttonID.startsWith("purgeKortaliHero_")){
+            Leader playerLeader = player.unsafeGetLeader("kortalihero");
+            StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            boolean purged = player.removeLeader(playerLeader);
+            if (purged) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader " + "kortalihero" + " has been purged");
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+            }
+            ButtonHelperHeroes.offerStealRelicButtons(activeGame, player, buttonID, event);
+        } else if(buttonID.startsWith("purgeCeldauriHero_")){
+            ButtonHelperHeroes.purgeCeldauriHero(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("unstableStep2_")) {//"titansConstructionMechDeployStep2_"
@@ -2393,7 +2405,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "combatDrones" -> ButtonHelperModifyUnits.offerCombatDroneButtons(event, activeGame, player);
                 case "offerMirvedaCommander" -> ButtonHelperModifyUnits.offerMirvedaCommanderButtons(event, activeGame, player);
-                 case "acquireAFreeTech" -> {
+                case "acquireAFreeTech" -> {
                     List<Button> buttons = new ArrayList<>();
 
                     Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech");
@@ -2417,7 +2429,8 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(unitupgradesTech);
 
                     String message = player.getRepresentation() + " What type of tech would you want?";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    event.getMessage().delete().queue();
                  }
                 case "acquireATech" -> {
 
@@ -3810,6 +3823,19 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), "2 cruiser, 1 flagship", activeGame);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " 2 cruisers and a flagship added.");
+                    ButtonHelper.deleteTheOneButton(event);
+                }
+                case "purgeDihmohnHero" -> {
+                    Leader playerLeader = player.unsafeGetLeader("dihmohnhero");
+                    StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                    boolean purged = player.removeLeader(playerLeader);
+                    if (purged) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader " + "dihmohnhero" + " has been purged");
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                    }
+                    ButtonHelperHeroes.resolvDihmohnHero(activeGame);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " sustained everything. Reminder you do not take hits this round.");
                     ButtonHelper.deleteTheOneButton(event);
                 }
                 case "quash" -> {
