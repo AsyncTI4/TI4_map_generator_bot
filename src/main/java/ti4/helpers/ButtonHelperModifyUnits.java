@@ -931,6 +931,34 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    public static void resolveAssaultCannonNDihmohnCommander(String buttonID, ButtonInteractionEvent event, Player player, Game activeGame){
+        String cause = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        Player opponent = null;
+         String msg;
+        Tile tile = activeGame.getTileByPosition(pos);
+        for(Player p2: activeGame.getRealPlayers()){
+            if(p2 == player){
+                continue;
+            }
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && !player.getAllianceMembers().contains(p2.getFaction())){
+                opponent = p2;
+            }
+        }
+        if(opponent == null){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No opponent found");
+            return;
+        }
+        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, activeGame, tile);
+        if(cause.contains("dihmohn")){
+            msg = opponent.getRepresentation(true, true)+ " "+player.getFactionEmoji() +" used Dihmohn COmmander to generate a hit against you. Please assign it with buttons";
+        }else{
+            msg = opponent.getRepresentation(true, true)+ " "+player.getFactionEmoji() +" used assault cannon to force you to destroy a non fighter ship. Please assign it with buttons";
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+
+    }
+
     public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
         String rest = buttonID.replace("landUnits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));

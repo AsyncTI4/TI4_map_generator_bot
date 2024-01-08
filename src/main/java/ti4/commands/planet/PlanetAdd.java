@@ -191,7 +191,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                        fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
+                        fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + ").");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);

@@ -948,6 +948,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.removeThisTypeOfUnit(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("repairDamage_")) {
             ButtonHelperModifyUnits.repairDamage(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("assCannonNDihmohn_")) {
+            ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander(buttonID, event, player, activeGame);
         } else if (buttonID.startsWith("refreshViewOfSystem_")) {
             String rest = buttonID.replace("refreshViewOfSystem_", "");
             String pos = rest.split("_")[0];
@@ -1054,8 +1056,17 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("getAllTechOfType_")) {
             String techType = buttonID.replace("getAllTechOfType_", "");
+            boolean noPay = false;
+            if(techType.contains("_")){
+                techType = techType.split("_")[0];
+                noPay = true;
+            }
             List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player);
             List<Button> buttons = Helper.getTechButtons(techs, techType, player);
+            if(noPay){
+                buttons = Helper.getTechButtons(techs, techType, player, "nekro");
+            }
+            
             buttons.add(Button.secondary("acquireATech", "Get Tech of a Different Type"));
             String message = player.getRepresentation() + " Use the buttons to get the tech you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -2382,6 +2393,32 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "combatDrones" -> ButtonHelperModifyUnits.offerCombatDroneButtons(event, activeGame, player);
                 case "offerMirvedaCommander" -> ButtonHelperModifyUnits.offerMirvedaCommanderButtons(event, activeGame, player);
+                 case "acquireAFreeTech" -> {
+                    List<Button> buttons = new ArrayList<>();
+
+                    Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech");
+                    propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
+                    buttons.add(propulsionTech);
+
+                    Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllTechOfType_biotic_noPay", "Get a Green Tech");
+                    bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+                    buttons.add(bioticTech);
+
+                    Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_noPay", "Get a Yellow Tech");
+                    cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
+                    buttons.add(cyberneticTech);
+
+                    Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllTechOfType_warfare_noPay", "Get a Red Tech");
+                    warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
+                    buttons.add(warfareTech);
+
+                    Button unitupgradesTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech");
+                    unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
+                    buttons.add(unitupgradesTech);
+
+                    String message = player.getRepresentation() + " What type of tech would you want?";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                 }
                 case "acquireATech" -> {
 
                     List<Button> buttons = new ArrayList<>();
@@ -2407,11 +2444,8 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(unitupgradesTech);
 
                     String message = player.getRepresentation() + " What type of tech would you want?";
-                    if (!activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-                    } else {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-                    }
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                    
                 }
                 case Constants.SO_NO_SCORING -> {
                     String message = player.getRepresentation()

@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -76,6 +78,15 @@ public class ScorePublic extends StatusSubcommandData {
 			MessageHelper.sendMessageToChannel(channel, "No such Public Objective ID found or already scored, please retry");
 		} else {
 			informAboutScoring(event, channel, activeGame, player, poID);
+			for(Player p2 : player.getNeighbouringPlayers()){
+				if(p2.hasLeaderUnlocked("syndicatecommander")){
+					p2.setTg(p2.getTg()+1);
+					String msg = p2.getRepresentation(true, true) + " you gained 1tg due to your neighbor scoring a PO while you have syndicate commander. Your tgs went from "+(p2.getTg()-1)+" -> "+p2.getTg();
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),msg);
+					ButtonHelperAbilities.pillageCheck(p2, activeGame);
+					ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+				}
+			}
 		}
 		Helper.checkEndGame(activeGame, player);
 	}
