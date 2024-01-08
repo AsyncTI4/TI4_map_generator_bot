@@ -749,7 +749,7 @@ public class ButtonHelper {
             commanderUnlockCheck(player, activeGame, "dihmohn", event);
         }
         if (StringUtils.countMatches(buttonID, "_") < 2) { //TODO: Better explain what this is doing and why this way
-            if (activeGame.getComponentAction()) {
+            if (activeGame.getComponentAction()|| !activeGame.getCurrentPhase().equalsIgnoreCase("action")) {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
             } else {
                 sendMessageToRightStratThread(player, activeGame, message.toString(), "technology");
@@ -1556,6 +1556,34 @@ public class ButtonHelper {
         for(Tile tile : activeGame.getTileMap().values()){
             if(FoWHelper.playerHasShipsInSystem(player, tile) && checkValuesOfNonFighterShips(player, activeGame, tile) > count){
                 count = checkValuesOfNonFighterShips(player, activeGame, tile);
+            }
+        }
+        return count;
+    }
+    public static int checkNumberNonFighterShips(Player player, Game activeGame, Tile tile) {
+        int count = 0;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        for (UnitKey unit : space.getUnits().keySet()) {
+            if (!unit.getColor().equals(player.getColor())) {
+                continue;
+            }
+            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+            if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                count = count + (int) space.getUnits().get(unit);
+            }
+        }
+        return count;
+    }
+     public static int checkTypesOfNonFighterShips(Player player, Game activeGame, Tile tile) {
+        int count = 0;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        for (UnitKey unit : space.getUnits().keySet()) {
+            if (!unit.getColor().equals(player.getColor())) {
+                continue;
+            }
+            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+            if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                count = count + 1;
             }
         }
         return count;
@@ -2511,6 +2539,12 @@ public class ButtonHelper {
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
             if (!activeGame.isFoWMode()) {
                 buttons2.add(Button.danger("declinePDS", "Decline PDS"));
+                if((p1.hasTech("ac") && checkNumberNonFighterShips(p1, activeGame, tile) >2) || (p2.hasTech("ac") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
+                    buttons2.add(Button.primary("assCannonNDihmohn_ac_" + tile.getPosition(), "Use Assault Cannon").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
+                }
+                if((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
+                    buttons2.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dihmohn Commander").withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
+                }
             }
             if (graviton != null) {
                 buttons2.add(graviton);
@@ -5971,7 +6005,7 @@ public class ButtonHelper {
             player.exhaustPlanet(planet);
         }
         activeGame.setComponentAction(true);
-        Button getTech = Button.success("acquireATech", "Get a tech");
+        Button getTech = Button.success("acquireAFreeTech", "Get a tech");
         List<Button> buttons = new ArrayList<>();
         buttons.add(getTech);
         buttons.add(Button.danger("deleteButtons", "Delete These"));
