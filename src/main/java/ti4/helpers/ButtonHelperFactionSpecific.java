@@ -355,7 +355,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + "Choose which planet to relocate saar ground forces to", buttons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {

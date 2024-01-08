@@ -104,11 +104,17 @@ public class HeroPlay extends LeaderAction {
             BotLogger.log(event, "Missing LeaderModel: " + playerLeader.getId());
         }
 
-        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId()) || "nokarhero".equals(playerLeader.getId()) || "kolumehero".equals(playerLeader.getId())) {
+        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId()) || "zealotshero".equals(playerLeader.getId()) || "nokarhero".equals(playerLeader.getId()) || "kolumehero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be PURGED after status cleanup");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
+            if("zealotshero".equals(playerLeader.getId())){
+                Button getTech = Button.success("acquireAFreeTech", "Get a tech");
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your first non-faction tech", getTech);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your second non-faction tech", getTech);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your third non-faction tech", getTech);
+            }
         } else {
             boolean purged = true;
             if(!"mykomentorihero".equals(playerLeader.getId())){

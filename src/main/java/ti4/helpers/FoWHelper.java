@@ -195,13 +195,13 @@ public class FoWHelper {
 			if (tile == null) {
 				tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
 			}
-			if(tile != null){
-				if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
-					if(ButtonHelper.isTileHomeSystem(tile)){
-						return tile;
-					}
-				}
-			}
+			// if(tile != null){
+			// 	if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
+			// 		if(ButtonHelper.isTileHomeSystem(tile)){
+			// 			return tile;
+			// 		}
+			// 	}
+			// }
 			return tile;
 		}
 		return null;
@@ -620,6 +620,15 @@ public class FoWHelper {
 	/** Check if the player has units in the system */
 	public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
 		return tile.containsPlayersUnits(player);
+	}
+	public static boolean playerHasPlanetsInSystem(Player player, Tile tile) {
+		for(UnitHolder uH : tile.getPlanetUnitHolders()){
+			if(player.getPlanets().contains(uH.getName())){
+				return true;
+			}
+		}
+		return false;
+
 	}
 
 	public static boolean playerHasShipsInSystem(Player player, Tile tile) {

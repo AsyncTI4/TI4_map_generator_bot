@@ -17,6 +17,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -191,6 +192,7 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
+        
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
                 Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
@@ -241,6 +243,7 @@ public class Setup extends PlayerSubcommandData {
                 + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
             GameSaveLoadManager.saveMap(activeGame, event);
         }
+        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
 
         if (!activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Player: " + player.getRepresentation() + " has been set up");
