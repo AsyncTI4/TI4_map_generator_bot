@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -22,9 +23,13 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
-public class ACInfo extends ACCardsSubcommandData {
+public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public ACInfo() {
         super(Constants.INFO, "Send Action Cards to your Cards Info thread");
+    }
+
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return acceptEvent(event, getActionID());
     }
 
     @Override

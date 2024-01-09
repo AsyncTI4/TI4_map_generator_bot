@@ -684,6 +684,7 @@ public class Constants {
     public static final String PLANET_EXHAUST_ALL = "exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
+    public static final String PLANET_INFO = "info";
 
     public static final String EXPLORE = "explore";
     public static final String CULTURAL = "cultural";
@@ -783,7 +784,6 @@ public class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
-    public static final String PLANETS_INFO = "planets_info";
 
     public static final String BAG_DRAFT = "bag_draft";
     public static final String ABILITY = "ability";

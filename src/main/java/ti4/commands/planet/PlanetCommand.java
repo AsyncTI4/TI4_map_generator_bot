@@ -83,6 +83,7 @@ public class PlanetCommand implements Command {
         subcommands.add(new PlanetRefreshAbility());
         subcommands.add(new PlanetRefreshAll());
         subcommands.add(new PlanetExhaustAll());
+        subcommands.add(new PlanetInfo());
 
         return subcommands;
     }
