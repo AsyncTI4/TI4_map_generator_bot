@@ -510,7 +510,7 @@ public class MessageListener extends ListenerAdapter {
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Game activeGame = GameManager.getInstance().getGame(gameName);
             if (activeGame != null) {
-                String messageContent = messageText.substring(messageText.indexOf(" ") + 1);
+                final String messageContent = StringUtils.substringAfter(messageText, " ");
                 Player player = activeGame.getPlayer(event.getAuthor().getId());
                 if (activeGame.isCommunityMode()) {
                     Collection<Player> players = activeGame.getPlayers().values();
@@ -537,7 +537,7 @@ public class MessageListener extends ListenerAdapter {
                 }
 
                 if (messageToColor) {
-                    String factionColor = messageText.substring(2, messageText.indexOf(" ")).toLowerCase();
+                    String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(2);
                     factionColor = AliasHandler.resolveFaction(factionColor);
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (Objects.equals(factionColor, player3.getFaction()) ||
@@ -560,7 +560,7 @@ public class MessageListener extends ListenerAdapter {
                     activeGame.setCurrentReacts("futureMessageFor" + player.getFaction(), previousThoughts + messageContent.replace(":", "666fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " sent themselves a future message");
                 } else {
-                    String factionColor = messageText.substring(8, messageText.indexOf(" ")).toLowerCase();
+                    String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);
                     for (Player player3 : activeGame.getPlayers().values()) {
                         if (Objects.equals(factionColor, player3.getFaction()) ||
