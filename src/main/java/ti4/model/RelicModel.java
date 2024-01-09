@@ -18,6 +18,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String shortName;
     private String text;
     private String flavourText;
+    private String flavourTextFormatted;
     private ComponentSource source;
     private Boolean isFakeRelic;
     private List<String> searchTags = new ArrayList<>();
@@ -54,7 +55,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(Emojis.Relic + "__" + name + "__" + getSource().emoji(), null);
         eb.setColor(Color.yellow);
         eb.setDescription(getText());
-        if (includeFlavourText && getFlavourText() != null) eb.addField("", "*" + getFlavourText() + "*", false);
+        if (includeFlavourText && getFlavourText() != null) eb.addField("", getFlavourText(), false);
         if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
         return eb.build();
     }
