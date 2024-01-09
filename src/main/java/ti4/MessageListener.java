@@ -419,31 +419,31 @@ public class MessageListener extends ListenerAdapter {
 
         List<String> colors = Mapper.getColors();
         colors.addAll(Mapper.getFactionIDs());
-        String message = msg.getContentRaw().toLowerCase();
+        final String messageText = msg.getContentRaw();
+        final String messageLowerCase = messageText.toLowerCase();
         boolean messageToColor = false;
         boolean messageToFutureColor = false;
         boolean messageToMyself = false;
         boolean messageToJazz = false;
         for (String color : colors) {
-            if (message.startsWith("to" + color)) {
+            if (messageLowerCase.startsWith("to" + color)) {
                 messageToColor = true;
                 break;
             }
-            if (message.startsWith("tofuture" + color)) {
+            if (messageLowerCase.startsWith("tofuture" + color)) {
                 messageToFutureColor = true;
                 break;
             }
         }
-        if (message.startsWith("tofutureme")) {
+        if (messageLowerCase.startsWith("tofutureme")) {
             messageToMyself = true;
         }
-        if (message.startsWith("tojazz") || message.startsWith("tofuturejazz")) {
+        if (messageLowerCase.startsWith("tojazz") || messageLowerCase.startsWith("tofuturejazz")) {
             messageToJazz = true;
         }
 
         if (event.getChannel() instanceof ThreadChannel && event.getChannel().getName().contains("vs") && event.getChannel().getName().contains("private")) {
             String gameName2 = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
-            String message2 = msg.getContentRaw();
 
             Game activeGame = GameManager.getInstance().getGame(gameName2);
             Player player3 = activeGame.getPlayer(event.getAuthor().getId());
@@ -459,7 +459,7 @@ public class MessageListener extends ListenerAdapter {
 
             if (activeGame.isFoWMode() &&
                 ((player3 != null && player3.isRealPlayer() && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot())
-                    || (event.getAuthor().isBot() && message2.contains("Total hits ")))) {
+                    || (event.getAuthor().isBot() && messageText.contains("Total hits ")))) {
 
                 String systemPos;
                 if (StringUtils.countMatches(event.getChannel().getName(), "-") > 4) {
@@ -478,14 +478,14 @@ public class MessageListener extends ListenerAdapter {
                     MessageChannel pChannel = player.getPrivateChannel();
                     TextChannel pChan = (TextChannel) pChannel;
                     if (pChan != null) {
-                        String newMessage = player.getRepresentation(true, true) + " Someone said: " + message2;
-                        if (event.getAuthor().isBot() && message2.contains("Total hits ")) {
-                            String hits = StringUtils.substringAfter(message2, "Total hits ");
-                            String location = StringUtils.substringBefore(message2, "rolls for");
+                        String newMessage = player.getRepresentation(true, true) + " Someone said: " + messageText;
+                        if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
+                            String hits = StringUtils.substringAfter(messageText, "Total hits ");
+                            String location = StringUtils.substringBefore(messageText, "rolls for");
                             newMessage = player.getRepresentation(true, true) + " Someone rolled dice for " + location + " and got a total of **" + hits + " hits";
                         }
                         if (!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()) {
-                            newMessage = player.getRepresentation(true, true) + " " + StringUtils.capitalize(player3.getColor()) + " said: " + message2;
+                            newMessage = player.getRepresentation(true, true) + " " + StringUtils.capitalize(player3.getColor()) + " said: " + messageText;
                         }
 
                         newMessage = newMessage.replace("Total hits", "");
@@ -510,8 +510,7 @@ public class MessageListener extends ListenerAdapter {
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Game activeGame = GameManager.getInstance().getGame(gameName);
             if (activeGame != null) {
-                String msg3 = msg.getContentRaw();
-                String msg2 = msg3.substring(msg3.indexOf(" ") + 1);
+                String messageContent = messageText.substring(messageText.indexOf(" ") + 1);
                 Player player = activeGame.getPlayer(event.getAuthor().getId());
                 if (activeGame.isCommunityMode()) {
                     Collection<Player> players = activeGame.getPlayers().values();
@@ -529,7 +528,7 @@ public class MessageListener extends ListenerAdapter {
                     if (player_.getUserID().equals(jazzId)) {
                         messageToMyself = true;
                     } else {
-                        if (message.startsWith("tofuture")) {
+                        if (messageLowerCase.startsWith("tofuture")) {
                             messageToFutureColor = true;
                         } else {
                             messageToColor = true;
@@ -538,7 +537,7 @@ public class MessageListener extends ListenerAdapter {
                 }
 
                 if (messageToColor) {
-                    String factionColor = msg3.substring(2, msg3.indexOf(" ")).toLowerCase();
+                    String factionColor = messageText.substring(2, messageText.indexOf(" ")).toLowerCase();
                     factionColor = AliasHandler.resolveFaction(factionColor);
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (Objects.equals(factionColor, player3.getFaction()) ||
@@ -552,16 +551,16 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
 
-                    Whisper.sendWhisper(activeGame, player, player_, msg2, "n", event.getChannel(), event.getGuild());
+                    Whisper.sendWhisper(activeGame, player, player_, messageContent, "n", event.getChannel(), event.getGuild());
                 } else if (messageToMyself) {
                     String previousThoughts = "";
                     if (!activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()).isEmpty()) {
                         previousThoughts = activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()) + ". ";
                     }
-                    activeGame.setCurrentReacts("futureMessageFor" + player.getFaction(), previousThoughts + msg2.replace(":", "666fin"));
+                    activeGame.setCurrentReacts("futureMessageFor" + player.getFaction(), previousThoughts + messageContent.replace(":", "666fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " sent themselves a future message");
                 } else {
-                    String factionColor = msg3.substring(8, msg3.indexOf(" ")).toLowerCase();
+                    String factionColor = messageText.substring(8, messageText.indexOf(" ")).toLowerCase();
                     factionColor = AliasHandler.resolveFaction(factionColor);
                     for (Player player3 : activeGame.getPlayers().values()) {
                         if (Objects.equals(factionColor, player3.getFaction()) ||
@@ -575,7 +574,7 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                     activeGame.setCurrentReacts("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction(),
-                        activeGame.getFactionsThatReactedToThis("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " " + msg2.replace(":", "666fin"));
+                        activeGame.getFactionsThatReactedToThis("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " " + messageContent.replace(":", "666fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " sent someone else a future message");
                 }
                 msg.delete().queue();
