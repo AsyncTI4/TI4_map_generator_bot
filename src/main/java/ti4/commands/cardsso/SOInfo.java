@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -21,9 +21,13 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 
-public class SOInfo extends SOCardsSubcommandData {
+public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     public SOInfo() {
         super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread");
+    }
+
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return acceptEvent(event, getActionID());
     }
 
     @Override

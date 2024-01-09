@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -22,9 +23,13 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source.ComponentSource;
 
-public class PNInfo extends PNCardsSubcommandData {
+public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
     public PNInfo() {
         super(Constants.INFO, "Send your Promissory Notes to your Cards Info thread");
+    }
+
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return acceptEvent(event, getActionID());
     }
 
     @Override
