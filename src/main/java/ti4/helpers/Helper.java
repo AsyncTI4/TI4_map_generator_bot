@@ -917,8 +917,8 @@ public class Helper {
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
-                    if(msg.contains("reduced comms")){
-                        String comms = StringUtils.substringAfter(msg,"by ");
+                    if(thing.contains("reduced comms")){
+                        String comms = StringUtils.substringAfter(thing,"by ");
                         comms = StringUtils.substringBefore(comms, " (");
                         keleresAgent = Integer.parseInt(comms);
                     }
