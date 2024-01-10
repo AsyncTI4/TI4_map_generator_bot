@@ -32,7 +32,7 @@
         "type": "public_stage_2_objective",
         "description": "A facelift to various objectives based on online stats. Expected to be played with Little Omega Secret Objectives.\nSee: [google doc - public objectives tab](<https://docs.google.com/spreadsheets/d/1zcr-lKfsSIxpzlGPy33rCx4PcmPrZDCDz2tqExqQD9g/edit#gid=991205782>) | [card sheet](<https://raw.githubusercontent.com/TI4-Online/TI4-Homebrew/main/assets/Textures/little-omega/card/objective/public_2/face.jpg>) | [news and feedback discord channel](https://discord.com/channels/743629929484386395/1124309831206051900)",
         "cardIDs": [
-            "become_legend","form_a_galactic_brain_trust_little_omega","centralize_trade","command_armada","conquer","control_borderlands","distant_lands","golden_age","manipulate_law","massive_cities","protect_the_border_little_omega","subdue_the_galaxy_little_omega","supremacy","unify_the_colonies_little_omega","vast_reserves","patrol_vast_territories_little_omega","establish_an_imperial_navy_little_omega","dominate_cities_little_omega","declare_victory_little_omega","learn_the_secrets_of_the_cosmos_little_omega"
+            "become_legend","form_a_galactic_brain_trust_little_omega","centralize_trade","command_armada","conquer","control_borderlands","distant_lands","golden_age","manipulate_law","massive_cities_little_omega","protect_the_border_little_omega","subdue_the_galaxy_little_omega","supremacy","unify_the_colonies_little_omega","vast_reserves","patrol_vast_territories_little_omega","establish_an_imperial_navy_little_omega","dominate_cities_little_omega","declare_victory_little_omega","learn_the_secrets_of_the_cosmos_little_omega"
         ]
     },
     {
