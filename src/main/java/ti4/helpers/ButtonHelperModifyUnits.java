@@ -51,6 +51,58 @@ public class ButtonHelperModifyUnits {
         return sustains;
     }
 
+    public static void autoAssignAntiFighterBarrageHits(Player player, Game activeGame, String pos, int hits, ButtonInteractionEvent event){
+        Tile tile = activeGame.getTileByPosition(pos);
+        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        String msg = ButtonHelper.getIdent(player)+" assigned hits in the following way:\n";
+        Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+        int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
+        Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
+        if(hits > 0 && unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0){
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int totalUnits = unitEntry.getValue();
+                int min = Math.min(totalUnits, hits);
+                if (unitName.equalsIgnoreCase("fighter") && min > 0) {
+                    msg = msg + "> Destroyed "+min+" "+Emojis.fighter+"\n";
+                    hits = hits - min;
+                    new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
+
+                    if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
+                    && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
+                        ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
+                    }
+                }
+            }
+        }
+        Player argent = Helper.getPlayerFromAbility(activeGame, "raid_formation");
+        if(hits > 0 && argent != null && FoWHelper.playerHasShipsInSystem(argent, tile) && argent != player && numSustains > 0){
+           for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                int totalUnits = unitEntry.getValue() - damagedUnits;
+                int min = Math.min(totalUnits, hits);
+                if (unitModel.getSustainDamage() && min > 0) {
+                    msg = msg + "> Made "+min+" "+unitModel.getUnitEmoji()+" sustained\n";
+                    hits = hits - min;
+                    tile.addUnitDamage("space", unitKey, min);
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        event.getMessage().delete().queue();
+    }
     public static void autoAssignGroundCombatHits(Player player, Game activeGame, String planet, int hits, ButtonInteractionEvent event){
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
         String msg = ButtonHelper.getIdent(player)+" assigned hits in the following way:\n";
@@ -78,7 +130,7 @@ public class ButtonHelperModifyUnits {
                     min = Math.min(totalUnits, (hits+1)/2);
                 }
                 if (unitModel.getSustainDamage() && min > 0) {
-                    msg = msg + "> Sustained "+min+" "+Emojis.mech+"\n";
+                    msg = msg + "> Sustained "+min+" "+unitModel.getUnitEmoji()+"\n";
                     hits = hits - min;
                     if(player.hasTech("nes")){
                         hits = hits - min;
