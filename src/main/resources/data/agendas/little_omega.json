@@ -159,7 +159,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may use the Production ability of 1 of their space docks. When the owner of this card resolves 1 of their Production abilities, they may discard this card to resolve an additional 1 of their Production abilities.",
         "text2": "",
-        "mapText": "After you resolve Construction, you may use the Production ability of 1 of your space docks. When you resolve 1 of your Production abilities, you may discard this card to resolve an additional 1 of your Production abilities.",
+        "mapText": "After resolving Construction, use the Production ability of 1 of your space docks. When you resolve 1 of your Production abilities, you may discard this card to resolve an additional 1 of your Production abilities.",
         "source": "little_omega"
     },
     {
@@ -169,7 +169,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Diplomacy\" strategy card, they ready 1 planet they control. After a player activates a system that contains a different player's units, the owner of this card may discard this card to end the active player's turn.",
         "text2": "",
-        "mapText": "After you resolve Diplomacy, you ready 1 planet you control. After a player activates a system that contains a different player's units, you may discard this card to end that player's turn.",
+        "mapText": "After resolving Diplomacy, ready 1 planet you control. After a player activates another player's units, discard this card to end their turn.",
         "source": "little_omega"
     },
     {
@@ -235,7 +235,7 @@
         "name": "Public Execution ω",
         "type": "Directive",
         "target": "Elect Player",
-        "text1": "The elected player discards half of their action cards, rounded up. If they have the speaker token, they give it to the player on their right. They cannot vote or resolve abilities during this agenda phase.",
+        "text1": "The elected player discards 4 action cards. If they have the speaker token, they give it to the player on their right. They cannot vote or resolve abilities during this agenda phase.",
         "text2": "",
         "source": "little_omega"
     },
