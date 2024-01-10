@@ -123,7 +123,7 @@ public class CardsInfo implements Command {
 
     }
 
-    private static void sendVariousAdditionalButtons(Game activeGame, Player player) {
+    public static void sendVariousAdditionalButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         Button transaction = Button.primary("transaction", "Transaction");
         buttons.add(transaction);

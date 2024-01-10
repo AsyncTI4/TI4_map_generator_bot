@@ -212,6 +212,18 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
             }
         }
+        Player vaden = Helper.getPlayerFromAbility(activeGame, "binding_debts");
+        if(vaden != null){
+            for(Player p2 : vaden.getNeighbouringPlayers()){
+                if(p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0){
+                    String msg = p2.getRepresentation(true, true) +" you have the opportunity to pay off binding debts here. You can pay 1tg to get 2 debt tokens forgiven. ";
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Button.success("bindingDebtsRes_"+vaden.getFaction(),"Pay 1 tg"));
+                    buttons.add(Button.danger("deleteButtons","Decline"));
+                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
+                }
+            }
+        }
         List<Button> poButtons = getScoreObjectiveButtons(event, activeGame);
         Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
         Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");

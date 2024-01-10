@@ -1,6 +1,7 @@
 package ti4.commands.special;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +102,7 @@ public class CheckDistance extends SpecialSubcommandData {
                 tiles.add(pos);
             }
         }
+        Collections.sort(tiles);
         return tiles;
     }
 

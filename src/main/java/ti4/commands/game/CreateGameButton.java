@@ -158,7 +158,7 @@ public class CreateGameButton extends GameSubcommandData {
         gameSillyName = StringUtils.substringBefore(gameSillyName, ".");
         List<Member> members = new ArrayList<>();
         Member gameOwner = null;
-        for (int i = 3; i <= 8; i++) {
+        for (int i = 3; i <= 10; i++) {
             if (StringUtils.countMatches(buttonMsg, ":") >= (i)) {
                 String user = buttonMsg.split(":")[i];
                 user = StringUtils.substringBefore(user, ".");

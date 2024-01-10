@@ -982,7 +982,17 @@ public class AgendaHelper {
         }
         if (d1.isSuccess() && !activeGame.isFoWMode()) {
             activeGame.setComponentAction(true);
-            Button getTech = Button.success("acquireATech", "Get a tech");
+           Button getTech = Button.success("acquireATech", "Get a tech");
+            if(Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
+                Player player = Helper.getPlayerFromAbility(activeGame, "propagation");
+                Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+            }
             MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "You can use the button to get your tech", getTech);
         } else if (!d1.isSuccess() && !activeGame.isFoWMode()) {
             Button modify = Button.secondary("getModifyTiles", "Modify Units");
@@ -1213,6 +1223,9 @@ public class AgendaHelper {
             }
 
             String message = " up to vote! Resolve using buttons.";
+            Button eraseandReVote = Button.danger("eraseMyVote", "Erase my vote & have me vote again");
+            String revoteMsg = "You can press this button to revote if you made a mistake, ignore it otherwise";
+            MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseandReVote);
             Player nextInLine = getNextInLine(player, getVotingOrder(activeGame), activeGame);
             String realIdentity2 = nextInLine.getRepresentation(true, true);
 

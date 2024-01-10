@@ -82,7 +82,7 @@ public class Cleanup extends StatusSubcommandData {
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()){
-                    if (leader.isActive()){
+                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")){
                         player.removeLeader(leader.getId());
                     } else {
                         RefreshLeader.refreshLeader(player, leader, activeGame);
