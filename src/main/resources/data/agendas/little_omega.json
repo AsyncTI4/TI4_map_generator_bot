@@ -235,7 +235,7 @@
         "name": "Public Execution ω",
         "type": "Directive",
         "target": "Elect Player",
-        "text1": "The elected player discards 4 action cards. If they have the speaker token, they give it to the player on their right. They cannot vote or resolve abilities during this agenda phase.",
+        "text1": "The elected player discards 4 of their action cards. If they have the speaker token, they give it to the player on their right. They cannot vote or resolve abilities during this agenda phase.",
         "text2": "",
         "source": "little_omega"
     },
