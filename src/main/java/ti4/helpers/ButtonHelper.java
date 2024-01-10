@@ -1063,8 +1063,8 @@ public class ButtonHelper {
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = activeGame.getActionsChannel();
         if (justChecking) {
-            Player ghostPlayer = activeGame.getPlayerFromColorOrFaction("ghost");
-            if (ghostPlayer != null && ghostPlayer != player && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech") > 0) {
+            Player ghostPlayer = Helper.getPlayerFromUnit(activeGame, "ghost_mech");
+            if (ghostPlayer != null && ghostPlayer != player && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech") > 0  && !activeGame.getLaws().containsKey("articles_war")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
             }
@@ -2562,8 +2562,8 @@ public class ButtonHelper {
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
             if (!activeGame.isFoWMode()) {
                 buttons2.add(Button.danger("declinePDS", "Decline PDS"));
-                if((p1.hasTech("ac") && checkNumberNonFighterShips(p1, activeGame, tile) >2) || (p2.hasTech("ac") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
-                    buttons2.add(Button.primary("assCannonNDihmohn_ac_" + tile.getPosition(), "Use Assault Cannon").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
+                if((p1.hasTech("asc") && checkNumberNonFighterShips(p1, activeGame, tile) >2) || (p2.hasTech("asc") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
+                    buttons2.add(Button.primary("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
                 }
                 if((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
                     buttons2.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dihmohn Commander").withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));

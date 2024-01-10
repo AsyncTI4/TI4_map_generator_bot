@@ -346,8 +346,11 @@ public class ButtonHelperHeroes {
             player.getRepresentation(true, true) + " Use buttons to place a SD on a planet you control", buttons);
         List<Button> buttons2 = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "celdauriHero", "place");
         String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannel(event.getChannel(), "The bot believes you have " + Helper.getProductionValue(player, activeGame, tile, false)
-            + " PRODUCTION value in this system\n" + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
+        String message3 = "The bot believes you have " + Helper.getProductionValue(player, activeGame, tile, false) + " PRODUCTION value in this system\n";
+        if(Helper.getProductionValue(player, activeGame, tile, false) > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")){
+            message3 = message3 + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons2);
         event.getMessage().delete().queue();
     }
