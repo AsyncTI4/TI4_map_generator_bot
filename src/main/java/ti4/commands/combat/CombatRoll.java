@@ -200,6 +200,14 @@ public class CombatRoll extends CombatSubcommandData {
             buttons.add(Button.danger("deleteButtons","Decline"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         }
+        if(!activeGame.isFoWMode() && rollType == CombatRollType.AFB && h > 0 && opponent != null && opponent != player){
+            String msg = opponent.getRepresentation(true, true) + " you can autoassign "+h+" hit(s)";
+            List<Button> buttons = new ArrayList<>();
+            String finChecker = "FFCC_" + opponent.getFaction() + "_";
+            buttons.add(Button.success(finChecker+"autoAssignAFBHits_"+tile.getPosition()+"_"+h,"Auto-assign Hits"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        }
 
     }
 }

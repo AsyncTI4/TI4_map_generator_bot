@@ -58,6 +58,24 @@
         ]
     },
     {
+        "alias": "plus1_roll_mechs_naaz_flagship",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "CONDITIONAL",
+        "scope": "mf",
+        "forCombatAbility": "combatround",
+        "condition": "naazFS",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Naaz Mechs get +1 die due to Flagship"
+            }
+        ]
+
+    },
+    {
         "alias": "plus1_1round_all",
         "type": "DIE_MOD",
         "value": "+1",
@@ -279,21 +297,6 @@
             }
         ],
         "forCombatAbility": "bombardment"
-    },
-    {
-        "alias": "plus1_roll_mechs_naaz_flagship",
-        "type": "extrarolls",
-        "value": "+1",
-        "applyEachForQuantity": true,
-        "persistenceType": "ALWAYS",
-        "scope": "mf",
-        "related": [
-            {
-                "type": "unit",
-                "alias": "naaz_flagship"
-            }
-        ],
-        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_roll_argent_commander_spacecannonoffence",

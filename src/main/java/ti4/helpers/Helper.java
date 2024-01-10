@@ -911,11 +911,17 @@ public class Helper {
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
         int bestRes = 0;
+        int keleresAgent = 0;
         for(String thing : spentThings){
             if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
+                    if(thing.contains("reduced comms")){
+                        String comms = StringUtils.substringAfter(thing,"by ");
+                        comms = StringUtils.substringBefore(comms, " (");
+                        keleresAgent = Integer.parseInt(comms);
+                    }
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
@@ -1000,13 +1006,13 @@ public class Helper {
                 }
             }
         }
-        res = res + tg;
-        inf = inf + tg;
+        res = res + tg+keleresAgent;
+        inf = inf + tg+keleresAgent;
         if(tg > 0){
             msg = msg + "> Spent "+tg+" tgs "+Emojis.getTGorNomadCoinEmoji(activeGame) +" ("+(player.getTg()+tg)+"->"+player.getTg()+") \n";
             if(player.hasTech("mc")){
-                res = res + tg;
-                inf = inf + tg;
+                res = res + tg+keleresAgent;
+                inf = inf + tg+keleresAgent;
                 msg = msg + "> Counted the trade goods twice due to Mirror Computing \n";
             }
         }
