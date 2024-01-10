@@ -189,8 +189,9 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
         if (categoryChannel == null) categoryChannel = createNewCategory(categoryChannelName);
-        new CreateGameChannels().createGameChannelsPart2(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         event.getMessage().delete().queue();
+        new CreateGameChannels().createGameChannelsPart2(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        
     } 
 
     private static String getNextGameName() {

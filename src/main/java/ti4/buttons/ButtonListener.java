@@ -870,6 +870,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {//"autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
+        } else if (buttonID.startsWith("autoAssignAFBHits_")) {//"autoAssignGroundHits_"
+            ButtonHelperModifyUnits.autoAssignAntiFighterBarrageHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
             activeGame.setComponentAction(true);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
@@ -2383,9 +2385,13 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find a HS, sorry bro");
                     }
                     buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "warfare", "place");
+                    int val = Helper.getProductionValue(player, activeGame, tile, true);
                     String message = player.getRepresentation()
                         + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system. "
-                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame) + "\n"+ "The bot believes you have "+Helper.getProductionValue(player, activeGame, tile, true)+" PRODUCTION value in this system";
+                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame) + "\n"+ "The bot believes you have "+val+" PRODUCTION value in this system";
+                    if(val > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")){
+                        message = message + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit";
+                    }
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);

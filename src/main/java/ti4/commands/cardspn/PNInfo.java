@@ -60,7 +60,7 @@ public class PNInfo extends PNCardsSubcommandData {
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
-            if (owner == player)
+            if (owner == player || pnShortHand.endsWith("_ta"))
                 continue;
 
             Button transact;

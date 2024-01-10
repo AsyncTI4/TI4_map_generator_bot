@@ -419,6 +419,9 @@ public class CombatHelper {
 
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
+        if(player.hasRelic("thalnos") && rollType == CombatRollType.combatround){
+            result = result + "\n"+player.getFactionEmoji()+" You have crown of thalnos and can reroll misses (Not yet automated)";
+        }
         return result;
     }
 }

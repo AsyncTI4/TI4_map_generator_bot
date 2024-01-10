@@ -258,6 +258,11 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "naazFS"->{
+                if( ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player, game.getTileByPosition(game.getActiveSystem()))){
+                    meetsCondition = true;
+                }
+            }
             default -> meetsCondition = true;
         }
         return meetsCondition;
