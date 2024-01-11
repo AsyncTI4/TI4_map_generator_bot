@@ -255,6 +255,23 @@
         ]
     },
     {
+        "alias": "nivyn_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "damaged_units_same_type",
+        "persistenceType": "CONDITIONAL",
+        "condition": "nivyn_commander_damaged",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "> Nivyn Commander Grants an Extra Die To Sustained Ships\n"
+            }
+        ]
+    },
+    {
         "alias": "plus1_vaylerian_hero",
         "type": "mods",
         "value": "+1",

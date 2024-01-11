@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -165,6 +166,10 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeGame);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+        }
+        if(ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord",player, tile)){
+            new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf "+planetName, activeGame);
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord FS. Technically happens after exploring");
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
             new PlanetRefresh().doAction(player, planetName, activeGame);
