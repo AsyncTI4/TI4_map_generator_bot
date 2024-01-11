@@ -199,6 +199,11 @@ public class CombatRoll extends CombatSubcommandData {
             buttons.add(Button.success(finChecker+"autoAssignGroundHits_"+combatOnHolder.getName()+"_"+h,"Auto-assign Hits"));
             buttons.add(Button.danger("deleteButtons","Decline"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        }else{
+            if(!activeGame.isFoWMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player){
+                String msg = "\n"+opponent.getRepresentation(true, true) + " your opponent rolled and got "+h+" hit(s)";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            }
         }
         if(!activeGame.isFoWMode() && rollType == CombatRollType.AFB && h > 0 && opponent != null && opponent != player){
             String msg = opponent.getRepresentation(true, true) + " you can autoassign "+h+" hit(s)";

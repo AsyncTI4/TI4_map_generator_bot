@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.commands.capture.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -385,6 +387,7 @@ public class CombatHelper {
         StringBuilder resultBuilder = new StringBuilder(result);
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
         List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
+        UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space");
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
@@ -410,17 +413,51 @@ public class CombatHelper {
                     }
                 }
             }
+            
             totalHits += hitRolls;
 
+            
             String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
             resultBuilder.append(unitRoll);
+            List<Die> resultRolls2 = new ArrayList<>();
+            int numMisses = numRolls - hitRolls;
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player,"jolnarcommander") && rollType != CombatRollType.combatround && numMisses > 0){
+                int numRolls2 = numMisses;
+                resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numRolls2);
+                player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls2 * (11 - toHit + modifierToHit)));
+                int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                totalHits += hitRolls2;
+                String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
+                resultBuilder.append("\nRerolling "+numMisses+" misses due to Jol-Nar Commander:\n "+unitRoll2);
+            }
+
+           int argentInfKills = 0;
+            if(player != opponent && unit.getId().equalsIgnoreCase("argent_destroyer2") && rollType == CombatRollType.AFB && space.getUnitCount(UnitType.Infantry, opponent.getColor()) > 0 ){
+                for(Die die : resultRolls){
+                    if(die.getResult() > 8){
+                        argentInfKills++;
+                    }
+                }
+                for(Die die : resultRolls2){
+                    if(die.getResult() > 8){
+                        argentInfKills++;
+                    }
+                }
+                argentInfKills = Math.min(argentInfKills, space.getUnitCount(UnitType.Infantry, opponent.getColor()));
+            }
+            if(argentInfKills > 0){
+                String kills = "\nDue to SWA II destroyer ability, "+argentInfKills +" of "+opponent.getRepresentation(false, true)+" infantry were destroyed\n";
+                resultBuilder.append(kills);
+                space.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), opponent.getColorID()), argentInfKills);
+                ButtonHelper.resolveInfantryDeath(activeGame, opponent, argentInfKills);
+            }
         }
         result = resultBuilder.toString();
 
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if(player.hasRelic("thalnos") && rollType == CombatRollType.combatround){
-            result = result + "\n"+player.getFactionEmoji()+" You have crown of thalnos and can reroll misses (Not yet automated)";
+            result = result + "\n"+player.getFactionEmoji()+" You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives. (Not yet automated)";
         }
         return result;
     }

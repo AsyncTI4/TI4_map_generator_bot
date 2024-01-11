@@ -394,6 +394,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.augersHeroSwap(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("hacanMechTradeStepOne_")) {
             ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("rollForAmbush_")) {
+            ButtonHelperFactionSpecific.rollAmbush(player, activeGame, activeGame.getTileByPosition(buttonID.split("_")[1]), event);
         } else if (buttonID.startsWith("raghsCallStepOne_")) {
             ButtonHelperFactionSpecific.resolveRaghsCallStepOne(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("raghsCallStepTwo_")) {
@@ -1140,6 +1142,7 @@ public class ButtonListener extends ListenerAdapter {
             boolean sendReact = true;
             if ("empy".equalsIgnoreCase(type)) {
                 message = message + "a Watcher mech! The Watcher should be removed now by the owner.";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Remove the watcher", ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, activeGame, "mech"));
                 event.getMessage().delete().queue();
             } else if ("xxcha".equalsIgnoreCase(type)) {
                 message = message
@@ -2164,7 +2167,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
-            if ("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName)) {
+            if ("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName) || "Kyro Rider".equalsIgnoreCase(riderName)) {
                 if ("Keleres Rider".equalsIgnoreCase(riderName)) {
                     String pnKey = "fin";
                     for (String pn : player.getPromissoryNotes().keySet()) {
@@ -2187,6 +2190,19 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if ("fin".equalsIgnoreCase(pnKey)) {
                         MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
+                        return;
+                    }
+                    ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
+                }
+                if ("Kyro Rider".equalsIgnoreCase(riderName)) {
+                    String pnKey = "fin";
+                    for (String pn : player.getPromissoryNotes().keySet()) {
+                        if (pn.contains("dspnkyro")) {
+                            pnKey = pn;
+                        }
+                    }
+                    if ("fin".equalsIgnoreCase(pnKey)) {
+                        MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Kyro Rider");
                         return;
                     }
                     ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
@@ -2346,6 +2362,17 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
             }
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("applytempcombatmod__" + "tech" + "__")) {
+            String acAlias = "sc";
+            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier("tech", acAlias,
+                player.getNumberTurns());
+            if (combatModAC != null) {
+                player.addNewTempCombatMod(combatModAC);
+                MessageHelper.sendMessageToChannel(event.getChannel(),
+                    player.getFactionEmoji()+" +1 Modifier will be applied the next time you push the combat roll button due to supercharge.");
+            }
+            player.exhaustTech("sc");
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("applytempcombatmod__" + Constants.AC + "__")) {
             String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier(Constants.AC, acAlias,
