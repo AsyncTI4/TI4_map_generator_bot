@@ -331,6 +331,10 @@ public class ButtonHelperTacticalAction {
                 empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + " use button to exhaust Empy agent", empyButtons);
             }
+            if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty() && (tile.getUnitHolders().values().size() == 1) && player.getPlanets().contains("ghoti")){
+                player.setCommodities(player.getCommodities()+1);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" gained 1 commodity due to ghoti planet card. Your commodities are now "+player.getCommodities());
+            }
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             ButtonHelperFactionSpecific.checkForStymie(activeGame, player, tile);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

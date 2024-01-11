@@ -1111,6 +1111,9 @@ public class Helper {
                                 productionValue = planet.getResources()+ productionValue;
                             }
                         }
+                        if(productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")){
+                            productionValue++;
+                        }
                         productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
                     }
                 }
@@ -1147,6 +1150,9 @@ public class Helper {
                                 productionValue = planet.getResources()+ productionValue;
                             }
                         }
+                        if(productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")){
+                            productionValue++;
+                        }
                         if( productionValue > highestProd){
                             highestProd = productionValue;
                         }
@@ -1157,6 +1163,9 @@ public class Helper {
         }
         if(productionValueTotal > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")){
             productionValueTotal = productionValueTotal+ ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd");
+        }
+        if(productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")){
+            productionValueTotal = productionValueTotal-2;
         }
         return productionValueTotal;
     }

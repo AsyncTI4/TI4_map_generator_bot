@@ -1199,7 +1199,7 @@ public class AgendaHelper {
                 if (activeGame.getLaws() != null && (activeGame.getLaws().containsKey("rep_govt") || activeGame.getLaws().containsKey("absol_government"))) {
                 }else{
                     if(player.ownsPromissoryNote("blood_pact") || player.getPromissoryNotesInPlayArea().contains("blood_pact")){
-                        for(Player p2 : getLosingVoters(outcome, activeGame)){
+                        for(Player p2 : getWinningVoters(outcome, activeGame)){
                             if(p2 == player){
                                 continue;
                             }
@@ -1513,8 +1513,12 @@ public class AgendaHelper {
             Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresAfter);
         }
-        if (activeGame.getPlayerFromColorOrFaction("edyn") != null && !activeGame.isFoWMode()) {
+        if (activeGame.getPNOwner("dspnedyn") != null && !activeGame.isFoWMode()) {
             Button playKeleresAfter = Button.secondary("play_after_Edyn Rider", "Play Edyn PN Rider").withEmoji(Emoji.fromFormatted(Emojis.edyn));
+            afterButtons.add(playKeleresAfter);
+        }
+        if (activeGame.getPNOwner("dspnkyro") != null && !activeGame.isFoWMode()) {
+            Button playKeleresAfter = Button.secondary("play_after_Kyro Rider", "Play Kyro PN Rider").withEmoji(Emoji.fromFormatted(Emojis.kyro));
             afterButtons.add(playKeleresAfter);
         }
         if (Helper.getPlayerFromAbility(activeGame, "galactic_threat") != null && !activeGame.isFoWMode()) {
