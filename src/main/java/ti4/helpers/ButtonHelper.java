@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
+import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.agenda.ShowDiscardedAgendas;
@@ -99,6 +100,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 
@@ -2565,9 +2567,18 @@ public class ButtonHelper {
                 if((p1.hasTech("asc") && checkNumberNonFighterShips(p1, activeGame, tile) >2) || (p2.hasTech("asc") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
                     buttons2.add(Button.primary("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
                 }
+                if( FoWHelper.doesTileHaveWHs(activeGame,tile.getPosition()) && (p1.hasTech("ds") || p2.hasTech("ds"))){
+                    buttons2.add(Button.primary("assCannonNDihmohn_ds_" + tile.getPosition(), "Use Dimensional Splicer").withEmoji(Emoji.fromFormatted(Emojis.Ghost)));
+                }
                 if((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
                     buttons2.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dihmohn Commander").withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
                 }
+                if(p1.hasAbility("ambush") || (!activeGame.isFoWMode() && p2.hasAbility("ambush"))){
+                    buttons2.add(Button.secondary("rollForAmbush_"+tile.getPosition(), "Ambush" ).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+                }
+                
+                buttons2.add(Button.secondary("announceARetreat", "Announce A Retreat"));
+                
             }
             if (graviton != null) {
                 buttons2.add(graviton);
@@ -2753,9 +2764,9 @@ public class ButtonHelper {
             return buttons;
         }
         buttons.add(Button.danger("getDamageButtons_" + pos, "Assign Hits"));
-        if (getButtonsForRepairingUnitsInASystem(p1, activeGame, tile).size() > 1 || getButtonsForRepairingUnitsInASystem(p2, activeGame, tile).size() > 1) {
-            buttons.add(Button.success("getRepairButtons_" + pos, "Repair Damage"));
-        }
+        //if (getButtonsForRepairingUnitsInASystem(p1, activeGame, tile).size() > 1 || getButtonsForRepairingUnitsInASystem(p2, activeGame, tile).size() > 1) {
+        buttons.add(Button.success("getRepairButtons_" + pos, "Repair Damage"));
+       // }
         buttons.add(Button.primary("refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace, "Refresh Picture"));
 
         Player titans = Helper.getPlayerFromUnlockedLeader(activeGame, "titansagent");
@@ -2763,6 +2774,11 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + titans.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent", "Titans Agent").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
+        if(p1.hasTechReady("sc") || (!activeGame.isFoWMode() && p2.hasTechReady("sc"))){
+           // TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier("tech", "sc", p1.getNumberTurns());
+            buttons.add(Button.success("applytempcombatmod__" + "tech" + "__" + "sc", "Use Super Charge" ).withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
+        }
+        
 
         Player ghemina = Helper.getPlayerFromUnlockedLeader(activeGame, "gheminaagent");
         if (!activeGame.isFoWMode() && ghemina != null && ghemina.hasUnexhaustedLeader("gheminaagent")) {
@@ -2877,9 +2893,7 @@ public class ButtonHelper {
             buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
-        if ("space".equalsIgnoreCase(groundOrSpace) && !activeGame.isFoWMode()) {
-            buttons.add(Button.secondary("announceARetreat", "Announce A Retreat"));
-        }
+        
         if ("space".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Button.danger("retreat_" + pos, "Retreat"));
         }
@@ -5020,8 +5034,34 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         activeGame.setAutoPing(false);
         activeGame.setAutoPingSpacer(0);
-
-        String name = activeGame.getName();
+         String name = activeGame.getName();
+         MapGenerator.saveImage(activeGame, DisplayType.all, event)
+         .thenAccept(fileUpload -> {
+           StringBuilder message = new StringBuilder();
+           for (String playerID : activeGame.getRealPlayerIDs()) { //GET ALL PLAYER PINGS
+             Member member = event.getGuild().getMemberById(playerID);
+             if (member != null) message.append(member.getAsMention());
+           }
+           message.append("\nPlease provide a summary of the game below:");
+        if (!activeGame.isFoWMode() && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).isEmpty()) {
+                TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
+                String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
+                if (pbdChroniclesChannel == null) {
+                  BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+                  return;
+                }
+                if (!activeGame.isFoWMode()) {
+                  // INFORM PLAYERS
+                  pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
+                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                    m.createThreadChannel(name).queueAfter(2, TimeUnit.SECONDS, t -> t.sendMessage(message.toString()).queue(null,
+                        (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
+                  });
+                }
+              }
+         });
+       
         int charValue = name.charAt(name.length()-1);
         String next = String.valueOf( (char) (charValue + 1));
         String newName= "";
@@ -7724,6 +7764,15 @@ public class ButtonHelper {
         }
         if ("dspnedyn".equalsIgnoreCase(id)) {
             String riderName = "Edyn Rider";
+            String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
+
+            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);
+            List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
+            MessageHelper.sendMessageToChannelWithFactionReact(activeGame.getMainGameChannel(), "Please select your rider target", activeGame, player, riderButtons);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), "Please indicate no afters again.", activeGame, afterButtons, "after");
+        }
+        if ("dspnkyro".equalsIgnoreCase(id)) {
+            String riderName = "Kyro Rider";
             String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);

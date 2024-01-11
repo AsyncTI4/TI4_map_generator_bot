@@ -24,6 +24,7 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -33,6 +34,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
@@ -322,6 +324,52 @@ public class ButtonHelperFactionSpecific {
             }
         }
         return buttons;
+    }
+
+    public static void rollAmbush(Player player, Game activeGame, Tile tile,  ButtonInteractionEvent event){
+        UnitHolder space = tile.getUnitHolders().get("space");
+        int numCruisers = Math.min(2, space.getUnitCount(UnitType.Cruiser, player.getColor()));
+        int remaining = 2-numCruisers;
+        int numDestroyers = Math.min(remaining, space.getUnitCount(UnitType.Destroyer, player.getColor()));
+
+        String result = ButtonHelper.getIdentOrColor(player, activeGame)+" rolling for ambush:\n";
+
+        // Actually roll for each unit
+        int totalHits = 0;
+        StringBuilder resultBuilder = new StringBuilder(result);
+        Map<UnitModel, Integer> playerUnits = CombatHelper.GetUnitsInCombat(tile, space, player, event,
+        CombatRollType.combatround, activeGame);
+        for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
+            UnitModel unit = entry.getKey();
+            int numOfUnit = entry.getValue();
+            if(unit.getBaseType().equalsIgnoreCase("cruiser") || unit.getBaseType().equalsIgnoreCase("destroyer")){
+                if(unit.getBaseType().equalsIgnoreCase("cruiser")){
+                    numOfUnit = numCruisers;
+                }else{
+                    numOfUnit = numDestroyers;
+                }
+                if(numOfUnit < 1){
+                    continue;
+                }
+                int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround);
+                int modifierToHit = 0;
+                int extraRollsForUnit = 0;
+                int numRollsPerUnit = 1;
+                int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+                int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                totalHits += hitRolls;
+                String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+                resultBuilder.append(unitRoll);
+            }
+            
+        }
+        result = resultBuilder.toString();
+        result += CombatMessageHelper.displayHitResults(totalHits);
+        player.setActualHits(player.getActualHits() + totalHits);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void checkForNaaluPN(Game activeGame) {

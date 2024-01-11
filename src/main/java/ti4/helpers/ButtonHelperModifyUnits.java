@@ -1004,6 +1004,8 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, activeGame, tile);
         if(cause.contains("dihmohn")){
             msg = opponent.getRepresentation(true, true)+ " "+player.getFactionEmoji() +" used Dihmohn COmmander to generate a hit against you. Please assign it with buttons";
+        }else if(cause.contains("ds")){
+            msg = opponent.getRepresentation(true, true)+ " "+player.getFactionEmoji() +" used Dimensional Splicer to assign a hit of their choice. They should declare the target now, and if you dont cancel it somehow, you should assign it with buttons";
         }else{
             msg = opponent.getRepresentation(true, true)+ " "+player.getFactionEmoji() +" used assault cannon to force you to destroy a non fighter ship. Please assign it with buttons";
         }

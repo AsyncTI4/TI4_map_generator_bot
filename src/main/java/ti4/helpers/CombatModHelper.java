@@ -176,7 +176,7 @@ public class CombatModHelper {
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits);
+                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits, unit);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -258,6 +258,11 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+             case "nivyn_commander_damaged"->{
+                if(game.playerHasLeaderUnlockedOrAlliance(player, "nivyncommander")){
+                    meetsCondition = true;
+                }
+             }
             case "naazFS"->{
                 if( ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player, game.getTileByPosition(game.getActiveSystem()))){
                     meetsCondition = true;
@@ -275,7 +280,7 @@ public class CombatModHelper {
     /// or how many POs the opponent has scored that you havent etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-            Game activeGame, List<UnitModel> opponentUnitsInCombat) {
+            Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         Long scalingCount = (long) 0;
@@ -337,6 +342,15 @@ public class CombatModHelper {
                     scalingCount += opponentUnitsInCombat.stream()
                             .filter(unit -> unit.getBaseType() != UnitType.Fighter.value)
                             .count();
+                }
+                case "damaged_units_same_type" -> {
+                    UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space");
+                    int count = 0;
+                    if(space.getUnitDamage().get(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID())) != null){
+                        count = space.getUnitDamage().get(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()));
+                    }
+                    scalingCount +=count;
+                    
                 }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {

@@ -30,7 +30,7 @@ public class CombatModHelperTest extends BaseTi4Test {
         opponentUnits.add(nonFighter);
         opponentUnits.add(nonFighter);
 
-        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
+        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits, nonFighter));
     }
 
     @Test
@@ -53,6 +53,6 @@ public class CombatModHelperTest extends BaseTi4Test {
         opponentUnits.add(nonFighter);
         opponentUnits.add(fighter);
 
-        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
+        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits, fighter));
     }
 }
