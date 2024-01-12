@@ -1,7 +1,11 @@
 package ti4.message;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -120,6 +124,79 @@ public class BotLogger {
                     t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                 }));
             }
+        }
+    }
+
+    public static void logButton(ButtonInteractionEvent event) {
+        TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
+        if (primaryBotLogChannel == null) return;
+        try {
+            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
+            String threadName = "button-log";
+            ThreadChannel buttonLogThread = null;
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getName().equals(threadName)) {
+                    buttonLogThread = threadChannel;
+                }
+            }
+
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (buttonLogThread == null) {
+                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel : hiddenThreadChannels) {
+                    if (threadChannel.getName().equals(threadName)) {
+                        buttonLogThread = threadChannel;
+                    }
+                }
+            }
+            if (buttonLogThread == null) return;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(event.getUser().getEffectiveName()).append(" ");
+            sb.append("[");
+            if (event.getButton().getEmoji() != null) sb.append(event.getButton().getEmoji().getFormatted());
+            sb.append(event.getButton().getLabel()).append("]");
+            sb.append(" `").append(event.getButton().getId()).append("` ");
+            sb.append(event.getMessage().getJumpUrl());
+            MessageHelper.sendMessageToChannel(buttonLogThread, sb.toString());
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
+    public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
+        TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
+        if (primaryBotLogChannel == null) return;
+        try {
+            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
+            String threadName = "slash-command-log";
+            ThreadChannel slashCommandLogThread = null;
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getName().equals(threadName)) {
+                    slashCommandLogThread = threadChannel;
+                }
+            }
+
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (slashCommandLogThread == null) {
+                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel : hiddenThreadChannels) {
+                    if (threadChannel.getName().equals(threadName)) {
+                        slashCommandLogThread = threadChannel;
+                    }
+                }
+            }
+            if (slashCommandLogThread == null) return;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(event.getUser().getEffectiveName()).append(" ");
+            sb.append("`").append(event.getCommandString()).append("` ");
+            sb.append(commandResponseMessage.getJumpUrl());
+            MessageHelper.sendMessageToChannel(slashCommandLogThread, sb.toString());
+        } catch (Exception e) {
+            // Do nothing
         }
     }
 

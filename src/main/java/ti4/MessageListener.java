@@ -55,7 +55,7 @@ public class MessageListener extends ListenerAdapter {
             event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
-        long timeNow = new Date().getTime();
+        long startTime = new Date().getTime();
 
         String userID = event.getUser().getId();
 
@@ -70,30 +70,19 @@ public class MessageListener extends ListenerAdapter {
                     .setEphemeral(true).queue();
                 return;
             } else {
-                GameManager gameManager = GameManager.getInstance();
-                Game userActiveGame = gameManager.getUserActiveGame(userID);
+                Game userActiveGame = GameManager.getInstance().getUserActiveGame(userID);
                 if (userActiveGame != null) {
-                    userActiveGame.increaseSlashCommandsRun();
-                    String command = event.getName() + " " + event.getSubcommandName();
-                    Integer count = userActiveGame.getAllSlashCommandsUsed().get(command);
-                    if (count == null) {
-                        userActiveGame.setSpecificSlashCommandCount(command, 1);
-                    } else {
-                        userActiveGame.setSpecificSlashCommandCount(command, 1 + count);
-                    }
+                    userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
-
             }
         }
 
         event.getInteraction().deferReply().queue();
 
         Member member = event.getMember();
-
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue();
-            // BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
+            event.getChannel().sendMessage(commandText).queue(m -> BotLogger.logSlashCommand(event, m));
         }
 
         CommandManager commandManager = CommandManager.getInstance();
@@ -110,8 +99,9 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
         }
-        if (new Date().getTime() - timeNow > 3000) {
-            BotLogger.log(event, "This slash command took longer than 3000 ms (" + (new Date().getTime() - timeNow) + ")");
+        long endTime = new Date().getTime();
+        if (endTime - startTime > 3000) {
+            BotLogger.log(event, "This slash command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }
     }
 
