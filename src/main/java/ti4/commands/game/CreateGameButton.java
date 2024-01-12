@@ -23,8 +23,7 @@ import ti4.message.MessageHelper;
 public class CreateGameButton extends GameSubcommandData {
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel")
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -73,31 +72,15 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        List<Member> missingMembers = new ArrayList<>();
-        for (Member member : members) {
-            if (!guildMemberIDs.contains(member.getId())) {
-                missingMembers.add(member);
-            }
-        }
-        if (missingMembers.size() > 0) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
-            sb.append(guild.getName()).append("** server.\n");
-            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
-            sb.append("The following players need to join the server:\n");
-            for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
-            }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-        }
+        CreateGameChannels.inviteUsersToServer(guild, members, event.getMessageChannel());
+
         String buttonMsg = "";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
         if (members.size() > 0) {
-            buttonMsg = "Game Fun Name:" + gameFunName + ".\nPlayers:\n";
+            buttonMsg = "Game Fun Name: " + gameFunName + "\nPlayers:\n";
             int counter = 1;
             for (Member member : members) {
                 buttonMsg = buttonMsg + counter + ":" + member.getId() + ".(" + member.getAsMention() + ")\n";
@@ -110,6 +93,8 @@ public class CreateGameButton extends GameSubcommandData {
     }
 
     public static void decodeButtonMsg(ButtonInteractionEvent event) {
+        event.editButton(null).queue();
+        event.getChannel().sendMessage(event.getUser().getEffectiveName() + " pressed the [Create Game] button").queue();
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
@@ -128,8 +113,7 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = buttonMsg.split(":")[1];
-        gameSillyName = StringUtils.substringBefore(gameSillyName, ".");
+        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         List<Member> members = new ArrayList<>();
         Member gameOwner = null;
         for (int i = 3; i <= 10; i++) {
@@ -161,6 +145,6 @@ public class CreateGameButton extends GameSubcommandData {
         }
         if (categoryChannel == null) categoryChannel = CreateGameChannels.createNewCategory(categoryChannelName);
         event.getMessage().delete().queue();
-        CreateGameChannels.createGameChannelsPart2(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        CreateGameChannels.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
     }
 }
