@@ -36,6 +36,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -102,6 +103,11 @@ public class Setup extends PlayerSubcommandData {
         }
 
         FactionModel setupInfo = player.getFactionSetupInfo();
+
+        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !activeGame.isMiltyModMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
+            return;
+        }
 
         // HOME SYSTEM
         if (!PositionMapper.isTilePositionValid(positionHS)) {

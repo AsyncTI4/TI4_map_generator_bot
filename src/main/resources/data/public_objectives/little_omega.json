@@ -126,5 +126,13 @@
     "text": "Have units in 7 systems that contain or are adjacent to an anomaly.",
     "points": 2,
     "source": "little_omega"
+  },
+  {
+    "alias": "massive_cities_little_omega",
+    "name": "Construct Massive Cities",
+    "phase": "Status",
+    "text": "Have 6 structures.",
+    "points": 2,
+    "source": "little_omega"
   }
 ]

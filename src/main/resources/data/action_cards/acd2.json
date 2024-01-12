@@ -4,7 +4,7 @@
     "name": "Ancient Data Archive",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Exhaust up to 2 planets you control. Then, explore each of those planets.",
+    "text": "Exhaust each of your readied planets. Then, explore up to 2 of those planets.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -177,6 +177,15 @@
     "window": "Action",
     "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first to pass; otherwise, gain 1 command token.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "decisive_victory",
+    "name": "Decisive Victory",
+    "phase": "Action",
+    "window": "After you win a combat that ended during its first round",
+    "text": "Remove your command token from the active system.",
+    "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
     "source": "action_deck_2"
   },
   {
@@ -603,24 +612,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "seized_facility",
-    "name": "Seized Facility",
-    "phase": "Action",
-    "window": "When you gain control of a planet that contains another player's structure",
-    "text": "Gain a non-faction technology owned by that player.",
-    "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL DATA << BELONGS TO US",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "shock_troops",
-    "name": "Shock Troops",
-    "phase": "Action",
-    "window": "After you win a combat that ended during its first round",
-    "text": "Remove your command token from the active system.",
-    "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "short-lived_clone",
     "name": "Short-lived Clone",
     "phase": "Any",
@@ -735,6 +726,15 @@
     "window": "At the start of the second round of a space combat",
     "text": "Place 2 fighters from your reinforcements into the active system.",
     "flavorText": "Most researchers question how the Naalu's prescience had not led them down a path of debilitating caution. The answer seems to lie in their excessive confidence.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "tomb_raiders",
+    "name": "Tomb Raiders",
+    "phase": "Action",
+    "window": "Action",
+    "text": "For each exploration deck, look at the top card of that deck; you may either gain that card, if it is a relic fragment, or gain 1 commodity.",
+    "flavorText": "As her hostages hurled insults, S'Ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
     "source": "action_deck_2"
   },
   {
