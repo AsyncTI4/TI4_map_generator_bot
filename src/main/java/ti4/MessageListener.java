@@ -73,16 +73,8 @@ public class MessageListener extends ListenerAdapter {
                 GameManager gameManager = GameManager.getInstance();
                 Game userActiveGame = gameManager.getUserActiveGame(userID);
                 if (userActiveGame != null) {
-                    userActiveGame.increaseSlashCommandsRun();
-                    String command = event.getName() + " " + event.getSubcommandName();
-                    Integer count = userActiveGame.getAllSlashCommandsUsed().get(command);
-                    if (count == null) {
-                        userActiveGame.setSpecificSlashCommandCount(command, 1);
-                    } else {
-                        userActiveGame.setSpecificSlashCommandCount(command, 1 + count);
-                    }
+                    userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
-
             }
         }
 
@@ -92,8 +84,7 @@ public class MessageListener extends ListenerAdapter {
 
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue();
-            // BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
+            event.getChannel().sendMessage(commandText).queue(m -> BotLogger.logSlashCommand(event, m));
         }
 
         CommandManager commandManager = CommandManager.getInstance();

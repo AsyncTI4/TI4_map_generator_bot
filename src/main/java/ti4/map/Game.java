@@ -534,16 +534,8 @@ public class Game {
         buttonPress = count;
     }
 
-    public void setSlashCommandsRun(int count) {
-        slashCommandsRun = count;
-    }
-
-    public void increaseSlashCommandsRun() {
-        slashCommandsRun++;
-    }
-
     public int getSlashCommandsRunCount() {
-        return slashCommandsRun;
+        return getAllSlashCommandsUsed().values().stream().mapToInt(Integer::intValue).sum();
     }
 
     public void setRound(int round) {
@@ -1105,6 +1097,10 @@ public class Game {
 
     public void setSpecificCurrentMovedUnitsFrom1System(String unit, int count) {
         displacedUnitsFrom1System.put(unit, count);
+    }
+
+    public void incrementSpecificSlashCommandCount(String fullCommandName) {
+        slashCommandsUsed.merge(fullCommandName, 1, (oldValue, newValue) -> oldValue + 1);
     }
 
     public void setSpecificSlashCommandCount(String command, int count) {
