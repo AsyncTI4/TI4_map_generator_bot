@@ -144,15 +144,12 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 break;
             }
         }
-        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
-        gameFunName = gameFunName.replace(".","");
-        gameFunName = gameFunName.replace(":","");
+        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
-       createGameChannelsPart2(members, event, gameFunName, gameName, gameOwner, categoryChannel);
+        createGameChannelsPart2(members, event, gameFunName, gameName, gameOwner, categoryChannel);
     }
 
-
-    public void createGameChannelsPart2(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel){
+    public static void createGameChannelsPart2(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel){
         //SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
         if (guild == null) {
@@ -220,8 +217,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / members.size());
 
         //CREATE CHANNELS
-       
         newGame.setCustomName(gameFunName);
+        gameFunName = gameFunName.replace(" ", "-");
+        gameFunName = gameFunName.replace(".","");
+        gameFunName = gameFunName.replace(":","");
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
@@ -289,57 +288,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
             thread.getManager()
                 .setName(newGame.getName() + "-launched - " + thread.getName())
                 .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                .setArchived(true)
                 .queue();
         }
 
         GameCreate.reportNewGameCreated(newGame);
-
-
-
-
-
-
-
-
-
-
-
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private static String getNextGameName() {
+    public static String getNextGameName() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.size() == 0) {
             return "pbd1";
