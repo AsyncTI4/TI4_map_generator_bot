@@ -92,7 +92,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                     }
                     String message = "Please decide whether or not to use your distant suns (explore twice) ability.";
                     Button resolveExplore1 = Button.success("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
-                    Button resolveExplore2 = Button.success("distant_suns_decline_" + planetName + "_" + drawColor, "Decline Distant Suns");
+                    Button resolveExplore2 = Button.danger("distant_suns_decline_" + planetName + "_" + drawColor, "Decline Distant Suns");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;

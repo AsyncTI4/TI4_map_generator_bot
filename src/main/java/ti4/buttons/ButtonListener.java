@@ -712,7 +712,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             } else {
-                MessageHelper.sendMessageToChannel(channel, trueIdentity + " exhausted Scepter of Empelar to follow SC#" + scnum);
+                MessageHelper.sendMessageToChannel(channel, trueIdentity + " exhausted Scepter of Silly Spelling to follow SC#" + scnum);
                 player.addExhaustedRelic("emelpar");
             }
             Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
