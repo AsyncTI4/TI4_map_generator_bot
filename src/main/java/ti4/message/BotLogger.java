@@ -127,6 +127,44 @@ public class BotLogger {
         }
     }
 
+    public static void logButton(ButtonInteractionEvent event) {
+        TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
+        if (primaryBotLogChannel == null) return;
+        try {
+            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
+            String threadName = "button-log";
+            ThreadChannel buttonLogThread = null;
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getName().equals(threadName)) {
+                    buttonLogThread = threadChannel;
+                }
+            }
+
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (buttonLogThread == null) {
+                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel : hiddenThreadChannels) {
+                    if (threadChannel.getName().equals(threadName)) {
+                        buttonLogThread = threadChannel;
+                    }
+                }
+            }
+            if (buttonLogThread == null) return;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(event.getUser().getEffectiveName()).append(" ");
+            sb.append("[");
+            if (event.getButton().getEmoji() != null) sb.append(event.getButton().getEmoji().getFormatted());
+            sb.append(event.getButton().getLabel()).append("]");
+            sb.append(" `").append(event.getButton().getId()).append("` ");
+            sb.append(event.getMessage().getJumpUrl());
+            MessageHelper.sendMessageToChannel(buttonLogThread, sb.toString());
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
     public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
@@ -153,7 +191,8 @@ public class BotLogger {
             if (slashCommandLogThread == null) return;
 
             StringBuilder sb = new StringBuilder();
-            sb.append("`").append(event.getCommandString()).append("`");
+            sb.append(event.getUser().getEffectiveName()).append(" ");
+            sb.append("`").append(event.getCommandString()).append("` ");
             sb.append(commandResponseMessage.getJumpUrl());
             MessageHelper.sendMessageToChannel(slashCommandLogThread, sb.toString());
         } catch (Exception e) {
