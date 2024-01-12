@@ -132,6 +132,7 @@ public class Info extends GameSubcommandData {
         sb.append("Events: `").append(activeGame.getEventsInEffect()).append("`").append(NEW_LINE);
         sb.append("Migrations Run: `").append(activeGame.getRunMigrations()).append("`").append(NEW_LINE);
         sb.append("Buttons pressed: `").append(activeGame.getButtonPressCount()).append("`").append(NEW_LINE);
+        sb.append("SlashCommands used: `").append(activeGame.getSlashCommandsRunCount()).append("`").append(NEW_LINE);
 
         return sb;
     }

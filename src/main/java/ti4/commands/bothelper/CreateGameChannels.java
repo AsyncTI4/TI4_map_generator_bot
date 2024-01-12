@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -144,15 +145,12 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 break;
             }
         }
-        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
-        gameFunName = gameFunName.replace(".","");
-        gameFunName = gameFunName.replace(":","");
+        String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
-       createGameChannelsPart2(members, event, gameFunName, gameName, gameOwner, categoryChannel);
+        createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
     }
 
-
-    public void createGameChannelsPart2(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel){
+    public static void createGameChannels(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel){
         //SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
         if (guild == null) {
@@ -173,29 +171,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return;
         }
 
-        
-
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        List<Member> missingMembers = new ArrayList<>();
-        for (Member member : members) {
-            if (!guildMemberIDs.contains(member.getId())) {
-                missingMembers.add(member);
-            }
-        }
-        if (missingMembers.size() > 0) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(
-                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
-            sb.append(guild.getName()).append("** server.\n");
-            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
-            sb.append("The following players need to join the server:\n");
-            for (Member member : missingMembers) {
-                sb.append("> ").append(member.getAsMention()).append("\n");
-            }
-            sb.append("You will be automatically added to the game channels when you join the server.");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
-        }
+        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel());
 
         //CREATE ROLE
         Role role = guild.createRole()
@@ -220,8 +197,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setStrategyCardsPerPlayer(newGame.getSCList().size() / members.size());
 
         //CREATE CHANNELS
-       
         newGame.setCustomName(gameFunName);
+        gameFunName = gameFunName.replace(" ", "-");
+        gameFunName = gameFunName.replace(".","");
+        gameFunName = gameFunName.replace(":","");
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
@@ -289,57 +268,43 @@ public class CreateGameChannels extends BothelperSubcommandData {
             thread.getManager()
                 .setName(newGame.getName() + "-launched - " + thread.getName())
                 .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                .setArchived(true)
                 .queue();
         }
 
         GameCreate.reportNewGameCreated(newGame);
-
-
-
-
-
-
-
-
-
-
-
     }
 
+    /**
+     * @param guild guild to invite users to
+     * @param members list of users
+     * @param channel channel to post message to
+     * @return the list of missing members
+     */
+    public static List<Member> inviteUsersToServer(Guild guild, List<Member> members, MessageChannel channel) {
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
+        List<Member> missingMembers = new ArrayList<>();
+        for (Member member : members) {
+            if (!guildMemberIDs.contains(member.getId())) {
+                missingMembers.add(member);
+            }
+        }
+        if (missingMembers.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(
+                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
+            sb.append(guild.getName()).append("** server.\n");
+            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
+            sb.append("The following players need to join the server:\n");
+            for (Member member : missingMembers) {
+                sb.append("> ").append(member.getAsMention()).append("\n");
+            }
+            sb.append("You will be automatically added to the game channels when you join the server.");
+            MessageHelper.sendMessageToChannel(channel, sb.toString());
+        }
+        return missingMembers;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private static String getNextGameName() {
+    public static String getNextGameName() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.size() == 0) {
             return "pbd1";

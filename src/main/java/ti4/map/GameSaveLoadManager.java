@@ -1525,17 +1525,17 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.SLASH_COMMAND_STRING -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
-                        String outcome = null;
-                        String voteInfo;
+                    StringTokenizer commandCounts = new StringTokenizer(info, ":");
+                    while (commandCounts.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(commandCounts.nextToken(), ",");
+                        String commandName = null;
+                        String commandCount;
                         if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
+                            commandName = dataInfo.nextToken();
                         }
                         if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            activeGame.setSpecificSlashCommandCount(outcome, Integer.parseInt(voteInfo));
+                            commandCount = dataInfo.nextToken();
+                            activeGame.setSpecificSlashCommandCount(commandName, Integer.parseInt(commandCount));
                         }
                     }
                 }
@@ -1830,13 +1830,6 @@ public class GameSaveLoadManager {
                         activeGame.setButtonPressCount(Integer.parseInt(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse button press count", exception);
-                    }
-                }
-                case Constants.SLASH_COMMAND_COUNT -> {
-                    try {
-                        activeGame.setSlashCommandsRun(Integer.parseInt(info));
-                    } catch (Exception exception) {
-                        BotLogger.log("Could not parse slash command count", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {

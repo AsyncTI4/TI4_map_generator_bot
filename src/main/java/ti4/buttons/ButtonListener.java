@@ -118,16 +118,17 @@ public class ButtonListener extends ListenerAdapter {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
             return;
         }
-
         event.deferEdit().queue();
-        long timeNow = new Date().getTime();
+        BotLogger.logButton(event);
+        long startTime = new Date().getTime();
         try {
             resolveButtonInteractionEvent(event);
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        if (new Date().getTime() - timeNow > 3000) {
-            BotLogger.log(event, "This button command took longer than 3000 ms (" + (new Date().getTime() - timeNow) + ")");
+        long endTime = new Date().getTime();
+        if (endTime - startTime > 3000) {
+            BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }
     }
 
