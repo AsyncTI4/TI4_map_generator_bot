@@ -11,6 +11,7 @@ tibot.jar
 .vscode/launch.json
 .settings/org.eclipse.jdt.core.prefs
 org.eclipse.jdt.core.prefs
+eclipse-java-google-style.xml
 TI4_map_generator_bot.code-workspace
 docker_run.ps1
 TI4_map_generator_discord_bot.iml
