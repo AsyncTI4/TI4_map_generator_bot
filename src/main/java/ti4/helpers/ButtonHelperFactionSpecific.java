@@ -1540,6 +1540,24 @@ public class ButtonHelperFactionSpecific {
 
         return ats;
     }
+    public static void resolveSalvageOps(Player player, ButtonInteractionEvent event, String buttonID, Game activeGame) {
+        ButtonHelper.deleteTheOneButton(event);
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        player.setTg(player.getTg()+1);
+        if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)){
+            String type = "sling";
+            List<Button> buttons;
+            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type, "placeOneNDone_dontskip");
+            String message = player.getRepresentation() + " Use the buttons to produce 1 ship that was destroyed in the combat. "
+                + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        }
+        String msg = player.getRepresentation()+" used Salvage Ops to get 1tg (current tg is now "+player.getTg()+")";
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+    }
 
     public static void resolveLanefirATS(Player player, ButtonInteractionEvent event, String buttonID) {
         String count = buttonID.split("_")[1];
