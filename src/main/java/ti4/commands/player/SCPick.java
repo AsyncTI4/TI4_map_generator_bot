@@ -171,7 +171,7 @@ public class SCPick extends PlayerSubcommandData {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(factionPicked);
         boolean pickSuccessful = new Stats().secondHalfOfPickSC(event, activeGame, p2, scpick);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick +" by "+player.getFactionEmoji());
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), p2.getColor() + " was given SC #" + scpick);
 

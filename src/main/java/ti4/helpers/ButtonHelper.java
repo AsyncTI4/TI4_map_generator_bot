@@ -1248,7 +1248,7 @@ public class ButtonHelper {
 
     public static boolean checkForTechSkipAttachments(Game activeGame, String planetName) {
         boolean techPresent = false;
-        if ("custodiavigilia".equalsIgnoreCase(planetName)) {
+        if ("custodiavigilia".equalsIgnoreCase(planetName)|| planetName.contains("ghoti")) {
             return false;
         }
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
@@ -2967,6 +2967,27 @@ public class ButtonHelper {
                 buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment, "Roll Bombardment"));
             }
         }
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayerObject()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm" , "Cheiran Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+        if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace)
+            && p2 != activeGame.getActivePlayerObject()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Cheiran Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "kortalicommander")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm" , "Kortali Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
+        if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "kortalicommander")) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm", "Kortali Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
         for (UnitHolder unitH : tile.getUnitHolders().values()) {
             String nameOfHolder = "Space";
             if (unitH instanceof Planet) {
@@ -2987,17 +3008,7 @@ public class ButtonHelper {
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 }
-                if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayerObject()) {
-                    String finChecker = "FFCC_" + p1.getFaction() + "_";
-                    buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_" + unitH.getName(), "Cheiran Commander on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
-                }
-                if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace)
-                    && p2 != activeGame.getActivePlayerObject()) {
-                    String finChecker = "FFCC_" + p2.getFaction() + "_";
-                    buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_" + unitH.getName(), "Cheiran Commander on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
-                }
+                
                 if (p1.hasAbility("assimilate") && "ground".equalsIgnoreCase(groundOrSpace) && (unitH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0
                     || unitH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || unitH.getUnitCount(UnitType.Pds, p2.getColor()) > 0)) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";

@@ -20,6 +20,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -194,6 +195,14 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     player.getRepresentation() + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
             }
+            if (actionCardTitle.contains("Planetary Rigs")) {
+                List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(activeGame, player);
+                String msg = player.getRepresentation()+" After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg,acbuttons);
+            }
+
+
+            
             String codedName = "Plagiarize";
             String codedMessage = player.getRepresentation() + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
             List<Button> codedButtons = new ArrayList<>();
