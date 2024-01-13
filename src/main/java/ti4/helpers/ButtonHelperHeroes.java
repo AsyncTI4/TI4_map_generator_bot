@@ -8,6 +8,7 @@ import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
+import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.franken.LeaderAdd;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.UnlockLeader;
@@ -40,12 +42,228 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
+
+    public static List<String> getAttachmentsForFlorzenHero(Game activeGame, Player player){
+        List<String> legendaries = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(!FoWHelper.playerHasShipsInSystem(player, tile)){
+                continue;
+            }
+            for(UnitHolder uh : tile.getPlanetUnitHolders()){
+                for(String token : uh.getTokenList()){
+                    if(!token.contains("attachment")){
+                        continue;
+                    }
+                    token = token.replace(".png","").replace("attachment_", "");
+                    
+                    String s = uh.getName()+"_"+token;
+                    if(!token.contains("sleeper") && !token.contains("control") && !legendaries.contains(s)){
+                        legendaries.add(s);
+                    }
+                }
+            }
+        }
+        return legendaries;
+    }
+
+    public static void resolveGledgeHero(Player player, Game activeGame){
+        List<Button> buttons = getAttachmentSearchButtons(activeGame, player);
+        String msg = player.getRepresentation()+" use these buttons to find attachments. Explore #";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg+"1",buttons);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg+"2",buttons);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg+"3",buttons);
+
+    }
+
+    public static void resolveKhraskHero(Player player, Game activeGame) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("khraskHeroStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("khraskHeroStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " tell the bot who's planet you want to exhaust or ready",
+            buttons);
+    }
+
+    public static void resolveKhraskHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        String faction = buttonID.split("_")[1];
+        buttons.add(Button.success("khraskHeroStep3Ready_"+faction,"Ready a Planet"));
+        buttons.add(Button.danger("khraskHeroStep3Exhaust_"+faction,"Exhaust a Planet"));
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " tell the bot if you want to exhaust or ready a planet",
+            buttons);
+    }
+    public static void resolveKhraskHeroStep3Exhaust(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2.getReadiedPlanets().isEmpty()) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. Nothing has been done.");
+            event.getMessage().delete().queue();
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getReadiedPlanets()) {
+            buttons.add(Button.secondary("khraskHeroStep4Exhaust_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " select the planet you want to exhaust", buttons);
+    }
+    public static void resolveKhraskHeroStep4Exhaust(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        p2.exhaustPlanet(planet);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you exhausted " + planetRep);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your planet " + planetRep + " was exhausted.");
+    }
+    public static void resolveKhraskHeroStep3Ready(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2.getExhaustedPlanets().isEmpty()) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no exhausted planets. Nothing has been done.");
+            event.getMessage().delete().queue();
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getExhaustedPlanets()) {
+            buttons.add(Button.secondary("khraskHeroStep4Ready_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " select the planet you want to ready", buttons);
+    }
+    public static void resolveKhraskHeroStep4Ready(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        p2.refreshPlanet(planet);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you refreshed " + planetRep);
+        if(p2 != player){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your planet " + planetRep + " was refreshed.");
+        }
+    }
+
+
+    public static List<Button> getAttachmentSearchButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(activeGame, player);
+        for (String type : types) {
+            if ("industrial".equals(type) && doesExploreDeckHaveAnAttachmentLeft(type, activeGame)) {
+                buttons.add(Button.success("findAttachmentInDeck_industrial", "Explore Industrials"));
+            }
+            if ("cultural".equals(type)&& doesExploreDeckHaveAnAttachmentLeft(type, activeGame)) {
+                buttons.add(Button.primary("findAttachmentInDeck_cultural", "Explore Culturals"));
+            }
+            if ("hazardous".equals(type)&& doesExploreDeckHaveAnAttachmentLeft(type, activeGame)) {
+                buttons.add(Button.danger("findAttachmentInDeck_hazardous", "Explore Hazardous"));
+            }
+        }
+        return buttons;
+    }
+    public static void resolveAttachAttachment(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+        String planet = buttonID.split("_")[1];
+        String attachment = buttonID.replace("attachAttachment_"+planet+"_","");
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        uH.addToken("attachment_"+attachment+".png");
+        String msg = player.getRepresentation(true, true)+ " put "+attachment+" on "+Helper.getPlanetRepresentation(planet, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+    }
+
+    public static List<Button> getAttachmentAttach(Game activeGame, Player player, String type, String attachment) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if (p != null && (type.equalsIgnoreCase(p.getOriginalPlanetType()) || p.getTokenList().contains("attachment_titanspn.png"))) {
+                buttons.add(Button.success("attachAttachment_"+planet+"_"+attachment, Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        return buttons;
+    }
+    public static void findAttachmentInDeck(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String type = buttonID.split("_")[1];
+        int counter = 0;
+        boolean foundOne = false;
+        StringBuilder sb = new StringBuilder();
+        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
+        if(!doesExploreDeckHaveAnAttachmentLeft(type, activeGame)){
+            MessageHelper.sendMessageToChannel(channel, "The "+type+ " deck doesnt have any attachments left in it");
+            return;
+        }else{
+            event.getMessage().delete().queue();
+        }
+        while (!foundOne && counter < 40){
+            counter++;
+            String cardID = activeGame.drawExplore(type);
+            sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
+            ExploreModel explore = Mapper.getExplore(cardID);
+            if(explore.getResolution().equalsIgnoreCase("attach")){
+                foundOne = true;
+                sb.append(player.getRepresentation()).append(" Found attachment "+explore.getName());
+                activeGame.purgeExplore(cardID);
+                MessageHelper.sendMessageToChannel(channel, sb.toString());
+                String msg = player.getRepresentation()+" tell the bot what planet this should be attached too";
+                MessageHelper.sendMessageToChannel(channel, msg, getAttachmentAttach(activeGame, player, type, explore.getAttachmentId().get()));
+                return;
+            }
+        }
+        
+    }
+
+    public static boolean doesExploreDeckHaveAnAttachmentLeft(String type, Game activeGame){
+
+        List<String> deck = activeGame.getExploreDeck(type);
+        deck.addAll(activeGame.getExploreDiscard(type));
+        for(String cardID : deck){
+            ExploreModel explore = Mapper.getExplore(cardID);
+            if(explore.getResolution().equalsIgnoreCase("attach")){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static void resolveFlorzenHeroStep1(Player player, Game activeGame) {
+        List<Button> buttons = new ArrayList<>();
+        for(String attachment : getAttachmentsForFlorzenHero(activeGame, player)){
+            String planet = attachment.split("_")[0];
+            String attach = attachment.split("_")[1];
+            buttons.add(Button.success("florzeHeroStep2_"+attachment, attach + " on "+Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        String msg = player.getRepresentation(true, true)+ " choose the attachment you wish to steal";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+    public static void resolveFlorzenHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String attachment = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<>();
+        Tile hs = FoWHelper.getPlayerHS(activeGame, player);
+        for(UnitHolder uh : hs.getPlanetUnitHolders()){
+            String planet2 = uh.getName();
+            buttons.add(Button.success("florzenAgentStep3_"+planet+"_"+planet2+"_"+attachment, Helper.getPlanetRepresentation(planet2, activeGame)));
+        }
+        
+        String msg = player.getRepresentation(true, true)+ " choose the HS planet you wish to put the attachment on";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveTnelisHeroAttach(Player tnelis, Game activeGame, String soID, ButtonInteractionEvent event){
         Map<String,Integer> customPOs = new HashMap<String, Integer>();

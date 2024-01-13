@@ -305,9 +305,12 @@ public class ButtonHelperTacticalAction {
         String pos = buttonID.replace("tacticalActionBuild_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "tacticalAction", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), "The bot believes you have " + Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false)
-            + " PRODUCTION value in this system\n" + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
+        String message3 = "The bot believes you have " + Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false)
+            + " PRODUCTION value in this system\n";
+        if(Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false) > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")){
+            message3 = message3 + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }

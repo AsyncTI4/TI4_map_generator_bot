@@ -48,6 +48,11 @@ public class ButtonHelperCommanders {
         String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " used Cheiran Commander to spend 1 "+msg2+" to cancel 1 hit. They can do this once per round of combat";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
+    public static void kortaliCommanderBlock(Player player, Game activeGame, ButtonInteractionEvent event){
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " used Kortali Commander to cancel 1 hit in the first round of combat.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        ButtonHelper.deleteTheOneButton(event);
+    }
     public static void olradinCommanderStep1(Player player, Game activeGame){
         List<Button> buttons = new ArrayList<>();
         for(String planet : player.getReadiedPlanets()){

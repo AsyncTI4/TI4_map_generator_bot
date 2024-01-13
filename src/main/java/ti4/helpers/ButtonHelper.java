@@ -1248,7 +1248,7 @@ public class ButtonHelper {
 
     public static boolean checkForTechSkipAttachments(Game activeGame, String planetName) {
         boolean techPresent = false;
-        if ("custodiavigilia".equalsIgnoreCase(planetName)) {
+        if ("custodiavigilia".equalsIgnoreCase(planetName)|| planetName.contains("ghoti")) {
             return false;
         }
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
@@ -2573,7 +2573,8 @@ public class ButtonHelper {
                 if((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2) ){
                     buttons2.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dihmohn Commander").withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
                 }
-                if(p1.hasAbility("ambush") || (!activeGame.isFoWMode() && p2.hasAbility("ambush"))){
+                if((p1.hasAbility("ambush")) || (!activeGame.isFoWMode() && p2.hasAbility("ambush"))){
+
                     buttons2.add(Button.secondary("rollForAmbush_"+tile.getPosition(), "Ambush" ).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
                 }
                 
@@ -2870,6 +2871,10 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mentakCommander_" + p1.getColor(), "Mentak Commander on " + p1.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
+        if("space".equalsIgnoreCase(groundOrSpace) && ((p1.hasTech("so")) || (!activeGame.isFoWMode() && p2.hasTech("so")))){
+
+            buttons.add(Button.secondary("salvageOps_"+tile.getPosition(), "Salvage Ops" ).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+        }
         if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mentakcommander")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mentakCommander_" + p2.getColor(), "Mentak Commander on " + p2.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
@@ -2918,7 +2923,7 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.danger(finChecker + "declareUse_Ghemina Commander", "Use Ghemina Commander").withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
-        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "gheminacommander") && gheminaCommanderApplicable) {
+        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "gheminacommander") && gheminaCommanderApplicable) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.danger(finChecker + "declareUse_Ghemina Commander", "Use Ghemina Commander").withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
@@ -2962,6 +2967,27 @@ public class ButtonHelper {
                 buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment, "Roll Bombardment"));
             }
         }
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayerObject()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm" , "Cheiran Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+        if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace)
+            && p2 != activeGame.getActivePlayerObject()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Cheiran Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "kortalicommander")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm" , "Kortali Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
+        if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "kortalicommander")) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm", "Kortali Commander Block")
+                .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
         for (UnitHolder unitH : tile.getUnitHolders().values()) {
             String nameOfHolder = "Space";
             if (unitH instanceof Planet) {
@@ -2982,17 +3008,7 @@ public class ButtonHelper {
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 }
-                if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayerObject()) {
-                    String finChecker = "FFCC_" + p1.getFaction() + "_";
-                    buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_" + unitH.getName(), "Cheiran Commander on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
-                }
-                if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace)
-                    && p2 != activeGame.getActivePlayerObject()) {
-                    String finChecker = "FFCC_" + p2.getFaction() + "_";
-                    buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_" + unitH.getName(), "Cheiran Commander on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
-                }
+                
                 if (p1.hasAbility("assimilate") && "ground".equalsIgnoreCase(groundOrSpace) && (unitH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0
                     || unitH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || unitH.getUnitCount(UnitType.Pds, p2.getColor()) > 0)) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
@@ -4195,16 +4211,18 @@ public class ButtonHelper {
                         buttons.add(validTile2);
                     }
                 }
-                if (planet.getUnitCount(inf, colorID) > 0) {
-                    limit = planet.getUnitCount(inf, colorID);
-                    for (int x = 1; x < limit + 1; x++) {
-                        if (x == 1 && player.hasUnexhaustedLeader("dihmohnagent")) {
+                if (planet.getUnitCount(inf, colorID) > 0 || planet.getUnitCount(mech, colorID) > 0) {
+                    if (player.hasUnexhaustedLeader("dihmohnagent")) {
                             Button dihmohn = Button
                                 .success("exhaustAgent_dihmohnagent_" + unitHolder.getName(),
                                     "Use Dihmohn Agent to land an extra Infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), activeGame))
                                 .withEmoji(Emoji.fromFormatted(Emojis.dihmohn));
                             buttons.add(dihmohn);
                         }
+                }
+                if (planet.getUnitCount(inf, colorID) > 0) {
+                    limit = planet.getUnitCount(inf, colorID);
+                    for (int x = 1; x < limit + 1; x++) {
                         if (x > 2) {
                             break;
                         }

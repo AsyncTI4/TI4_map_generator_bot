@@ -554,9 +554,12 @@ public class ButtonHelperAgents {
         if ("xxchaagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
-            String message = "Use buttons to ready a planet. Removing the infantry is not automated but is an option for you to do.";
-            List<Button> ringButtons = ButtonHelper.getXxchaAgentReadyButtons(activeGame, p2);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + message, ringButtons);
+            String message =  " Use buttons to ready a planet. Removing the infantry is not automated but is an option for you to do.";
+            List<Button> buttons = new ArrayList<>();
+            for (String planet : p2.getExhaustedPlanets()) {
+                buttons.add(Button.secondary("khraskHeroStep4Ready_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + message, buttons);
         }
 
         if ("yinagent".equalsIgnoreCase(agent)) {
@@ -1208,7 +1211,7 @@ public class ButtonHelperAgents {
         UnitHolder uH2 = ButtonHelper.getUnitHolderFromPlanetName(planet2, activeGame);
         uH.removeToken("attachment_"+attachment+".png");
         uH2.addToken("attachment_"+attachment+".png");
-        String msg = player.getRepresentation(true, true)+ " removed "+attachment+" from "+Helper.getPlanetRepresentation(planet, activeGame) + " and put it on "+Helper.getPlanetRepresentation(planet2, activeGame) + " using Florzen agent";
+        String msg = player.getRepresentation(true, true)+ " removed "+attachment+" from "+Helper.getPlanetRepresentation(planet, activeGame) + " and put it on "+Helper.getPlanetRepresentation(planet2, activeGame) + " using Florzen powers";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         event.getMessage().delete().queue();
     }
