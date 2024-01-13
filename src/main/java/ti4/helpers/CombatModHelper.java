@@ -263,6 +263,28 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
              }
+            case "lizho_commander_particular"->{
+                if(game.playerHasLeaderUnlockedOrAlliance(player, "lizhocommander")){
+                    int nonFighter = 0;
+                    int infantry = 0;
+                    for(UnitModel unitM : unitsByQuantity.keySet()){
+                        if(unitM.getIsShip()){
+                            if(!unitM.getBaseType().equalsIgnoreCase("fighter")){
+                                nonFighter = nonFighter + unitsByQuantity.get(unitM);
+                            }
+                        }else{
+                            if(unitM.getBaseType().equalsIgnoreCase("infantry")){
+                                infantry = infantry + unitsByQuantity.get(unitM);
+                            }
+                        }
+                    }
+                    if(nonFighter < 1 && infantry < 2){
+                        meetsCondition = true;
+                    }else if(nonFighter < 2){
+                        meetsCondition = true;
+                    }
+                }
+             }
             case "naazFS"->{
                 if( ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player, game.getTileByPosition(game.getActiveSystem()))){
                     meetsCondition = true;

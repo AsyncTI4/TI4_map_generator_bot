@@ -272,6 +272,22 @@
         ]
     },
     {
+        "alias": "lizho_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "lizho_commander_particular",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "> Lizho Commander Grants an Extra Die\n"
+            }
+        ]
+    },
+    {
         "alias": "plus1_vaylerian_hero",
         "type": "mods",
         "value": "+1",

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
@@ -72,7 +73,7 @@ public class Eliminate extends AddRemovePlayer {
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null  && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction())&& player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
                 if(player.getPlanets().size() > 0){
-                    Role bothelperRole = CreateGameButton.getRole("Bothelper", event.getGuild());
+                    Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
                     if(bothelperRole != null){
                         msg = msg +  " Pinging bothelper for assistance: "+ bothelperRole.getAsMention();

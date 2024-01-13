@@ -450,6 +450,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperCommanders.resolveYinCommanderRemoval(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("cheiranCommanderBlock_")) {
             ButtonHelperCommanders.cheiranCommanderBlock(player, activeGame, event);
+        } else if (buttonID.startsWith("kortaliCommanderBlock_")) {
+            ButtonHelperCommanders.kortaliCommanderBlock(player, activeGame, event);
         } else if (buttonID.startsWith("placeGhostCommanderFF_")) {
             ButtonHelperCommanders.resolveGhostCommanderPlacement(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("placeKhraskCommanderInf_")) {
@@ -504,8 +506,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.resolveFreeSystemsAgentStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("florzenAgentStep2_")) {
             ButtonHelperAgents.resolveFlorzenAgentStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("florzenHeroStep2_")) {
+            ButtonHelperHeroes.resolveFlorzenHeroStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("florzenAgentStep3_")) {
             ButtonHelperAgents.resolveFlorzenAgentStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("attachAttachment_")) {
+            ButtonHelperHeroes.resolveAttachAttachment(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("findAttachmentInDeck_")) {
+            ButtonHelperHeroes.findAttachmentInDeck(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("cheiranAgentStep3_")) {
             ButtonHelperAgents.resolveCheiranAgentStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("celdauriAgentStep3_")) {
@@ -1976,6 +1984,16 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("khraskHeroStep2_")) {
+            ButtonHelperHeroes.resolveKhraskHeroStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("khraskHeroStep3Exhaust_")) {
+            ButtonHelperHeroes.resolveKhraskHeroStep3Exhaust(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("khraskHeroStep4Exhaust_")) {
+            ButtonHelperHeroes.resolveKhraskHeroStep4Exhaust(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("khraskHeroStep3Ready_")) {
+            ButtonHelperHeroes.resolveKhraskHeroStep3Ready(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("khraskHeroStep4Ready_")) {
+            ButtonHelperHeroes.resolveKhraskHeroStep4Ready(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("drawRelicAtPosition_")) {
             DrawRelic.resolveDrawRelicAtPosition(player, event, activeGame, buttonID);
         } else if (buttonID.startsWith("setTrapStep2_")) {
@@ -2059,7 +2077,9 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("probeStep2_")) {
             ButtonHelperActionCards.resolveProbeStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("salvageStep2_")) {
-            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);
+            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);//"salvageOps_"
+        } else if (buttonID.startsWith("salvageOps_")) {
+            ButtonHelperFactionSpecific.resolveSalvageOps(player, event, buttonID, activeGame);
         } else if (buttonID.startsWith("psStep2_")) {
             ButtonHelperActionCards.resolvePSStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep2_")) {
