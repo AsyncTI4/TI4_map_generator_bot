@@ -411,7 +411,7 @@
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition": "units_two_matching_not_ff",
-        "scope": "",
+        "scope": "_ship_",
         "related": [
             {
                 "type": "ability",

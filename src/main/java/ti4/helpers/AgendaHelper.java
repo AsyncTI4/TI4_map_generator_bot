@@ -33,6 +33,7 @@ import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
@@ -346,6 +347,10 @@ public class AgendaHelper {
                     player2.setStrategicCC(2);
                     player2.setFleetCC(3);
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Set "+ButtonHelper.getIdentOrColor(player2, activeGame)+ " ccs to 3/3/2");
+                }
+                if ("minister_antiquities".equalsIgnoreCase(agID)) {
+                    DrawRelic.drawRelicAndNotify(player2, event, activeGame);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Drew relic for "+ButtonHelper.getIdentOrColor(player2, activeGame));
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
                     String message = "Discarded elected player's ACs and exhausted all their planets (not technically the way its done but for the most part equivalent)";
@@ -2746,6 +2751,16 @@ public class AgendaHelper {
                 }
             }
             voteCount += (cultPlanets.size() * 2);
+        }
+        UnitHolder p;
+        for (String cplanet : planets) {
+            p = ButtonHelper.getUnitHolderFromPlanetName(cplanet, activeGame);
+            if (p == null) continue;
+            for(String attachment :p.getTokenList()){
+                if(attachment.contains("council_preserve")){
+                    voteCount+=4;
+                }
+            }
         }
 
         return voteCount;
