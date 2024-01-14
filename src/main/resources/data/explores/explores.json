@@ -5,6 +5,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "flavorText": "*The Vexis Howelers were well-equipped with transports, powered armor, and even logistical support—everything a fledgling outpost needed to survive.*",
         "source": "pok"
     },
     {
@@ -13,6 +14,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "flavorText": "*As part of the annexation agreement, local artisans would be well paid to lay the groundwork for military installations in the newly acquired territories.*",
         "source": "pok"
     },
     {
@@ -21,6 +23,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "flavorText": "*Overseer Flix was known for hiring hundreds of freelancers and then \"forgetting\" to pay them once the bulk of the work was complete.*",
         "source": "pok"
     },
     {
@@ -29,6 +32,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may place 1 infantry from your reinforcements on this planet.",
+        "flavorText": "*\"My mates and I used to be 4th Air Legion, but we figured we could make more money working freelance.\"*",
         "source": "pok"
     },
     {
@@ -37,6 +41,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may place 1 infantry from your reinforcements on this planet.",
+        "flavorText": "*The bar was full of scarred and dirty individuals from a dozen different species. But each one had a weapon, and looked completely comfortable with it.*",
         "source": "pok"
     },
     {
@@ -45,6 +50,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "You may place 1 infantry from your reinforcements on this planet.",
+        "flavorText": "*\"Morse's Marauders are the most affordable soldiers of fortune on-planet. And trust me, you get exactly what you pay for.\"*",
         "source": "pok"
     },
     {
@@ -53,6 +59,7 @@
         "type": "Cultural",
         "resolution": "Token",
         "text": "Place a gamma wormhole token in this system. Then, purge this card.",
+        "flavorText": "*The gravic sensors howled a warning. Ahead of the ship was a ring of twisted starlight, surrounding a sphere of utter darkness.*",
         "attachmentId": "gamma",
         "source": "pok"
     },
@@ -170,6 +177,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 command token.",
+        "flavorText": "*It turned out that the continuous lightning storms were an unlimited source of power, which was little consolation to those assigned to build the collection towers.*",
         "source": "pok"
     },
     {
@@ -178,6 +186,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 command token.",
+        "flavorText": "*Only by using retrofitted Scavenger walkers could they mine the radioactive Nyx crystals safely.*",
         "source": "pok"
     },
     {
@@ -186,6 +195,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 command token.",
+        "flavorText": "*\"With the extra fuel refined from the plasma clouds, our fleet can continue operations for months.\"*",
         "source": "pok"
     },
     {
@@ -194,6 +204,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready this planet.",
+        "flavorText": "*\"These cave networks stretch for hundreds of kilometers. It may take months to properly map them.\"*",
         "source": "pok"
     },
     {
@@ -202,6 +213,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready this planet.",
+        "flavorText": "*\"We've lost two companies of scouts to whatever is in those canyons.\"*",
         "source": "pok"
     },
     {
@@ -210,6 +222,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready this planet.",
+        "flavorText": "*The Eidolon screamed through the atmosphere, corrosive rain streaming harmlessly off the hull as it began its survey sweep.*",
         "source": "pok"
     },
     {
@@ -218,6 +231,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
+        "flavorText": "*\"If we don't seal it now, this mine is going to erupt and spew those metals you want so badly across the entire continent!\"*",
         "source": "pok"
     },
     {
@@ -226,6 +240,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
+        "flavorText": "*The borehole was over a kilometer across. It seemed to stretch down forever, but Ilan could see a faint orange glow in its depths.*",
         "source": "pok"
     },
     {
@@ -234,6 +249,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
+        "flavorText": "*The borehole was over a kilometer across. It seemed to stretch down forever, but Ilan could see a faint orange glow in its depths.*",
         "source": "pok"
     },
     {
@@ -334,6 +350,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "flavorText": "*\"Looks like some smuggler hid their shipment of gerr root here and forgot to pick it up.\"*",
         "source": "pok"
     },
     {
@@ -342,6 +359,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "flavorText": "*Suffi An drifted into the derelict orbital and brushed her suited hand across the inner hatch controls. A light glowed, and she smiled. The statis seals were still operational.*",
         "source": "pok"
     },
     {
@@ -350,6 +368,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "flavorText": "*The storage silos had been half buried in sand dunes, sealed enviro-doors hiding the stockpiles within.*",
         "source": "pok"
     },
     {
@@ -358,6 +377,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "flavorText": "*Far beneath the storm-wracked seas, vast storage tanks drifted in the lightless depths.*",
         "source": "pok"
     },
     {
@@ -366,6 +386,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "flavorText": "*The Imperial Survey Corp outpost had been adandoned since the Twilight Wars, but the facilities had been built to last for millennia.*",
         "source": "pok"
     },
     {
@@ -374,6 +395,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "flavorText": "*The orbital distribution station proved easy to integrate into the fleet's growing logistical operation.*",
         "source": "pok"
     },
     {
@@ -382,6 +404,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "flavorText": "*The local defense forces abandoned their fortress as the first troop transports made planetfall, leaving it open to occupation.*",
         "source": "pok"
     },
     {
@@ -390,6 +413,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "flavorText": "*\"Yes commander, the base appears completely abandoned. No sign of what happened to the garrison.\"*",
         "source": "pok"
     },
     {
@@ -398,6 +422,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "flavorText": "*Edict 281: All indigenous production facilities are placed under control of the occupational authorities until further notice.*",
         "source": "pok"
     },
     {
@@ -406,6 +431,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "flavorText": "*\"These people's autofactories can turn out a new starfighter in less time than it takes me to order it!\"*",
         "source": "pok"
     },
     {
@@ -414,6 +440,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "flavorText": "*Though sub-standard, the locally produced munitions were enough to turn the tide of the war.*",
         "source": "pok"
     },
     {
@@ -422,6 +449,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "flavorText": "*Within months, bulk transports were arriving from the homeworld, reviving the local economy.*",
         "source": "pok"
     },
     {
@@ -497,6 +525,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Draw 1 secret objective.",
+        "flavorText": "The flickering ion storm illuminated the hulk, its hull rent and torn apart by some monstrous force.",
         "source": "pok"
     },
     {
@@ -505,6 +534,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Draw 1 secret objective.",
+        "flavorText": "*Missing for fifty years, the* Errasthua *was found drifting off the Celder Nebula with her drive dead and every crewmember vanished.*",
         "source": "pok"
     },
     {
@@ -513,6 +543,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Place this card faceup in your play area. Action: You may spend 6 resource and purge this card to research 1 technology.",
+        "flavorText": "*A needle longer than a dreadnought but no wider than a landcar flew through the void, its surface glowing with a pale violet light.*",
         "source": "pok"
     },
     {
@@ -521,6 +552,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Place this card faceup in your play area. Action: You may spend 6 resource and purge this card to research 1 technology.",
+        "flavorText": "*The silver pinwheel spun slowly in the midst of the nebula, each kilometer-long blade glittering faintly with reflected starlight.*",
         "source": "pok"
     },
     {
@@ -530,6 +562,7 @@
         "resolution": "Token",
         "text": "Place a gamma wormhole token in this system. Then, purge this card.",
         "attachmentId": "gamma",
+        "flavorText": "*Old spacers would tell stories of a black gateway in the deep space beyond the outer Oort Cloud.*",
         "source": "pok"
     },
     {
@@ -547,6 +580,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Draw 2 action cards.",
+        "flavorText": "*\"Mayday, mayday...this is the free trader* Hrothgar*...losing pressure fast...abandoning ship... Mayday...\"*",
         "source": "pok"
     },
     {
@@ -555,6 +589,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Draw 2 action cards.",
+        "flavorText": "*Only two survivors were found aboard the derelict, and they had a harrowing tale to tell their saviors.*",
         "source": "pok"
     },
     {
@@ -563,6 +598,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "You may replenish your commodities, or you may convert your commodities to trade goods.",
+        "flavorText": "*The deep space freeports tend to be infamous dens of criminals, but also valuable nodes in the interplanetary trade networks.*",
         "source": "pok"
     },
     {
@@ -571,6 +607,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "You may replenish your commodities, or you may convert your commodities to trade goods.",
+        "flavorText": "*\"Unidentified vessel, this is Freeport Canopus. State your intentions before approaching.\"*",
         "source": "pok"
     },
     {
@@ -579,6 +616,7 @@
         "type": "Frontier",
         "resolution": "Token",
         "text": "Place the Mirage planet token in this system. Gain the Mirage planet card and ready it. Then, purge this card.",
+        "flavorText": "*The star wasn't supposed to have a habitable planet, but one lay directly in the cruiser's path. And a cloud of starfighters was rising from the world's surface to greet it.*",
         "attachmentId": "mirage",
         "source": "pok"
     },
