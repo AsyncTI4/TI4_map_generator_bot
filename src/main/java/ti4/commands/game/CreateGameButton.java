@@ -111,7 +111,7 @@ public class CreateGameButton extends GameSubcommandData {
             return;
         }
         event.editButton(null).queue();
-
+        
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         List<Member> members = new ArrayList<>();

@@ -937,14 +937,14 @@ public class ButtonHelperFactionSpecific {
             buttons1.add(transact2);
             buttons1.add(transact3);
             buttons1.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg, buttons1);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons1);
 
             Button transact = Button.success("relic_look_top", "Look at top of Relic Deck");
             String msg2 = "Kollecc may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);
             buttons2.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg2, buttons2);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
         }
         {
 
