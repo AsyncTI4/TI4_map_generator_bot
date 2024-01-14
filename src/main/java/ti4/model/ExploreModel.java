@@ -24,11 +24,6 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
     public boolean isValid() {
         return id != null
             && name != null
