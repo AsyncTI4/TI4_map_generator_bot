@@ -652,7 +652,7 @@
     "name": "Smuggler Routes",
     "phase": "Action",
     "window": "Action",
-    "text": "Move 1 of your ships to an adjacent system that does not contain another player's units. [Note: You can transport ground forces during this movement.]",
+    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport ground forces during this movement.]",
     "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. He slowly looked to the skies and imagined the space beyond - a place he had never been - before quietly speaking to himself, \"I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
