@@ -496,12 +496,34 @@ public class ButtonHelperModifyUnits {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
             if (unitHolder instanceof Planet) continue;
-
+            //retreat non-capacity units first to avoid false cap flags
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
+                if(unitModel.getCapacityUsed() > 0){
+                    continue;
+                }
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int totalUnits = unitEntry.getValue();
+                int damagedUnits = 0;
 
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+
+                new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false, activeGame);
+                new AddUnits().unitParsing(event, player.getColor(), tile2, totalUnits + " " + unitName, activeGame);
+                if (damagedUnits > 0) {
+                    activeGame.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
+                }
+            }
+            //this will catch all the capacity units left behind in the previous iteration
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int totalUnits = unitEntry.getValue();

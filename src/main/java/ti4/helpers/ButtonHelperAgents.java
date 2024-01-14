@@ -201,7 +201,7 @@ public class ButtonHelperAgents {
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, activeGame);
-        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " was removed via Arborec agent by " + ButtonHelper.getIdent(player);
+        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " was removed by " + ButtonHelper.getIdent(player)+". A ship costing up to 2 more than it can now be placed";
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
@@ -1666,23 +1666,33 @@ public class ButtonHelperAgents {
         switch (unit) {
             case "destroyer" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", activeGame);
-                successMessage = ident + " Placed 1 " + Emojis.destroyer + " in tile "
-                    + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
+                successMessage = ident + " Replaced a ship with 1 " + Emojis.destroyer + " in tile "
+                    + tile.getRepresentationForButtons(activeGame, player) ;
             }
             case "cruiser" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
-                successMessage = ident + " Placed 1 " + Emojis.cruiser + " in tile "
-                    + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
+                successMessage = ident + " Replaced a ship with 1 " + Emojis.cruiser + " in tile "
+                    + tile.getRepresentationForButtons(activeGame, player) ;
             }
             case "carrier" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "carrier", activeGame);
-                successMessage = ident + " Placed 1 " + Emojis.carrier + " in tile "
-                    + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
+                successMessage = ident + " Replaced a ship with 1 " + Emojis.carrier + " in tile "
+                    + tile.getRepresentationForButtons(activeGame, player) ;
             }
             case "dreadnought" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "dreadnought", activeGame);
-                successMessage = ident + " Placed 1 " + Emojis.dreadnought + " in tile "
-                    + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
+                successMessage = ident + " Replaced a ship with 1 " + Emojis.dreadnought + " in tile "
+                    + tile.getRepresentationForButtons(activeGame, player);
+            }
+            case "fighter" -> {
+                new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", activeGame);
+                successMessage = ident + " Replaced a ship with 1 " + Emojis.fighter + " in tile "
+                    + tile.getRepresentationForButtons(activeGame, player) ;
+            }
+            case "warsun" -> {
+                new AddUnits().unitParsing(event, player.getColor(), tile, "warsun", activeGame);
+                successMessage = ident + " Replaced a ship with 1 " + Emojis.warsun + " in tile "
+                    + tile.getRepresentationForButtons(activeGame, player) ;
             }
         }
 
