@@ -40,6 +40,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 
@@ -281,9 +282,8 @@ public class ButtonHelperAgents {
         for (int i = 0; i < 2; i++) {
             String cardID = activeGame.drawExplore(type);
             sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
-            String card = Mapper.getExploreRepresentation(cardID);
-            String[] cardInfo = card.split(";");
-            String cardType = cardInfo[3];
+            ExploreModel card = Mapper.getExplore(cardID);
+            String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
                 sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
@@ -1025,10 +1025,9 @@ public class ButtonHelperAgents {
             if (buttonID.contains("frontier")) {
                 String cardChosen = activeGame.drawExplore(Constants.FRONTIER);
                 String pos = buttonID.split("_")[3];
-                String card = Mapper.getExploreRepresentation(cardChosen);
-                String[] cardInfo1 = card.split(";");
-                String name1 = cardInfo1[0];
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " in " + activeGame.getTileByPosition(pos).getRepresentation());
+                ExploreModel card = Mapper.getExplore(cardChosen);
+                String name = card.getName();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name + " in " + activeGame.getTileByPosition(pos).getRepresentation());
                 new ExpFrontier().expFrontAlreadyDone(event, activeGame.getTileByPosition(pos), activeGame, player, cardChosen);
             } else {
                 String drawColor = buttonID.split("_")[2];
@@ -1335,8 +1334,8 @@ public class ButtonHelperAgents {
         String frag = player.getFragments().get(rand);
         player.removeFragment(frag);
         bentor.addFragment(frag);
-        String[] cardInfo = Mapper.getExploreRepresentation(frag).split(";");
-        String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " lost a " + cardInfo[1] + " frag to " + ButtonHelper.getIdentOrColor(bentor, activeGame) + " due to Kortali agent";
+        ExploreModel cardInfo = Mapper.getExplore(frag);
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " lost a " + cardInfo.getName() + " to " + ButtonHelper.getIdentOrColor(bentor, activeGame) + " due to Kortali agent";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         if (activeGame.isFoWMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), msg);

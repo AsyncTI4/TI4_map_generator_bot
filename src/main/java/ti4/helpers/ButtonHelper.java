@@ -93,6 +93,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
@@ -100,7 +101,6 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 
@@ -1351,7 +1351,7 @@ public class ButtonHelper {
         String last = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         if (buttonID.contains("tech_")) {
             player.refreshTech(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Helper.getTechRepresentation(last));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
             if (player.getLeaderIDs().contains("kolumecommander") && !player.hasLeaderUnlocked("kolumecommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "kolume", event);
             }
@@ -3835,16 +3835,14 @@ public class ButtonHelper {
         }
         if (player.hasTech("det") && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
             if (player.hasAbility("voidsailors")) {
-                String cardID = activeGame.drawExplore(Constants.FRONTIER);
+                String cardID1 = activeGame.drawExplore(Constants.FRONTIER);
                 String cardID2 = activeGame.drawExplore(Constants.FRONTIER);
-                String card = Mapper.getExploreRepresentation(cardID);
-                String[] cardInfo1 = card.split(";");
-                String name1 = cardInfo1[0];
-                String card2 = Mapper.getExploreRepresentation(cardID2);
-                String[] cardInfo2 = card2.split(";");
-                String name2 = cardInfo2[0];
-                Button resolveExplore1 = Button.success("resFrontier_" + cardID + "_" + tile.getPosition() + "_" + cardID2, "Choose " + name1);
-                Button resolveExplore2 = Button.success("resFrontier_" + cardID2 + "_" + tile.getPosition() + "_" + cardID, "Choose " + name2);
+                ExploreModel card1 = Mapper.getExplore(cardID1);
+                ExploreModel card2 = Mapper.getExplore(cardID2);
+                String name1 = card1.getName();
+                String name2 = card2.getName();
+                Button resolveExplore1 = Button.success("resFrontier_" + cardID1 + "_" + tile.getPosition() + "_" + cardID2, "Choose " + name1);
+                Button resolveExplore2 = Button.success("resFrontier_" + cardID2 + "_" + tile.getPosition() + "_" + cardID1, "Choose " + name2);
                 List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                 //code to draw 2 explores and get their names
                 //Send Buttons to decide which one to explore
@@ -3861,14 +3859,13 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
                 String msg2 = "As a reminder of their text, the card abilities read as: \n";
-                msg2 = msg2 + name1 + ": " + cardInfo1[4] + "\n";
-                msg2 = msg2 + name2 + ": " + cardInfo2[4] + "\n";
+                msg2 = msg2 + name1 + ": " + card1.getText() + "\n";
+                msg2 = msg2 + name2 + ": " + card2.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else if (player.hasUnexhaustedLeader("lanefiragent")) {
                 String cardID = activeGame.drawExplore(Constants.FRONTIER);
-                String card = Mapper.getExploreRepresentation(cardID);
-                String[] cardInfo1 = card.split(";");
-                String name1 = cardInfo1[0];
+                ExploreModel card = Mapper.getExplore(cardID);
+                String name1 = card.getName();
                 Button resolveExplore1 = Button.success("lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
                 Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_frontier_" + tile.getPosition(), "Use Lanefir Agent");
                 List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
@@ -3881,7 +3878,7 @@ public class ButtonHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 String msg2 = "As a reminder of the text, the card reads as: \n";
-                msg2 = msg2 + name1 + ": " + cardInfo1[4] + "\n";
+                msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
                 new ExpFrontier().expFront(event, tile, activeGame, player);
@@ -6569,7 +6566,7 @@ public class ButtonHelper {
                 }
                 boolean sendSftT = false;
                 boolean sendAlliance = false;
-                String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
+                String promissoryNoteOwner = Mapper.getPromissoryNote(id).getOwner();
                 if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
                     && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(activeGame.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
                     p2.setPromissoryNotesInPlayArea(id);
@@ -6773,9 +6770,9 @@ public class ButtonHelper {
         }
         //PNs
         for (String pn : p1.getPromissoryNotes().keySet()) {
-            if (pn != null && Mapper.getPromissoryNoteOwner(pn) != null && !Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn)
-                && Mapper.getPromissoryNoteText(pn, true) != null) {
-                String pnText = Mapper.getPromissoryNoteText(pn, true);
+            PromissoryNoteModel prom = Mapper.getPromissoryNote(pn);
+            if (pn != null && prom.getOwner() != null && !prom.getOwner().equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
+                String pnText = prom.getText();
                 if (pnText.contains("Action:") && !"bmf".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
@@ -6783,9 +6780,8 @@ public class ButtonHelper {
                     compButtons.add(pnButton);
                 }
             }
-            if (Mapper.getPromissoryNoteText(pn, true) == null) {
-                MessageHelper.sendMessageToChannel(getCorrectChannel(p1, activeGame),
-                    p1.getRepresentation(true, true) + " you have a null PN. Please use /pn purge after reporting it " + pn);
+            if (prom.getText() == null) {
+                MessageHelper.sendMessageToChannel(getCorrectChannel(p1, activeGame), p1.getRepresentation(true, true) + " you have a null PN. Please use /pn purge after reporting it " + pn);
                 PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
             }
         }
@@ -7152,7 +7148,7 @@ public class ButtonHelper {
             case "tech" -> {
                 p1.exhaustTech(buttonID);
 
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (p1.getRepresentation() + " exhausted tech: " + Helper.getTechRepresentation(buttonID)));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getRepresentation() + " exhausted tech: " + Mapper.getTech(buttonID).getRepresentation(false));
                 if ("mi".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), p1.getRepresentation(true, true) + " Select who you would like to mageon.", buttons);
@@ -7673,7 +7669,7 @@ public class ButtonHelper {
             pnText = "Political Secret" + Emojis.Absol
                 + ":  *When you cast votes:* You may exhaust up to 3 of the {color} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {color} player.";
         } else {
-            pnText = Mapper.getPromissoryNoteText(id, longPNDisplay);
+            pnText = longPNDisplay ? Mapper.getPromissoryNote(id).getText() : Mapper.getPromissoryNote(id).getName();
         }
         sb.append(pnText).append("\n");
 
