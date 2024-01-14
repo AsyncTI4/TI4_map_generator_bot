@@ -54,7 +54,7 @@ public class SendPN extends PNCardsSubcommandData {
 			boolean foundSimilarName = false;
 			String cardName = "";
 			for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
-				String pnName = Mapper.getPromissoryNoteText(pn.getKey(), false);
+				String pnName = Mapper.getPromissoryNote(pn.getKey()).getName();
 				if (pnName != null) {
 					pnName = pnName.toLowerCase();
 					if (pnName.contains(value) || pn.getKey().contains(value)) {
@@ -98,7 +98,7 @@ public class SendPN extends PNCardsSubcommandData {
 		ButtonHelperAbilities.pillageCheck(targetPlayer, activeGame);
 		targetPlayer.setPromissoryNote(id);
 
-		if(id.contains("dspnveld")){
+		if (id.contains("dspnveld")) {
 			ButtonHelper.resolvePNPlay(id, targetPlayer, activeGame, event);
 		}
 

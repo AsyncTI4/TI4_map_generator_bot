@@ -109,7 +109,7 @@ public class ButtonHelper {
     public static void pickACardFromDiscardStep1(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : activeGame.getDiscardActionCards().keySet()) {
-            buttons.add(Button.success("pickFromDiscard_" + acStringID, Mapper.getActionCardName(acStringID)));
+            buttons.add(Button.success("pickFromDiscard_" + acStringID, Mapper.getActionCard(acStringID).getName()));
         }
         buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
         if (buttons.size() > 25) {
@@ -133,7 +133,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        String msg2 = player.getRepresentation(true, true) + " grabbed " + Mapper.getActionCardName(acID) + " from the discard";
+        String msg2 = player.getRepresentation(true, true) + " grabbed " + Mapper.getActionCard(acID).getName() + " from the discard";
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), msg2);
 
         ACInfo.sendActionCardInfo(activeGame, player, event);
@@ -6355,7 +6355,7 @@ public class ButtonHelper {
             case "ACs" -> {
                 String message = p1.getRepresentation() + " Click the GREEN button that indicates the AC you would like to send";
                 for (String acShortHand : p1.getActionCards().keySet()) {
-                    Button transact = Button.success(finChecker + "send_ACs_" + p2.getFaction() + "_" + p1.getActionCards().get(acShortHand), Mapper.getActionCardName(acShortHand));
+                    Button transact = Button.success(finChecker + "send_ACs_" + p2.getFaction() + "_" + p1.getActionCards().get(acShortHand), Mapper.getActionCard(acShortHand).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);

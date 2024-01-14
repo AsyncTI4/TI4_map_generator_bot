@@ -1,6 +1,8 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -10,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShowPNToAll extends PNCardsSubcommandData {
     public ShowPNToAll() {
@@ -46,12 +49,11 @@ public class ShowPNToAll extends PNCardsSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder("Game: ").append(activeGame.getName())
-            .append("\nPlayer: ").append(player.getUserName())
-            .append("\nShowed Promissory Note:\n").append(Mapper.getPromissoryNoteLongText(pnID))
-            .append("\n");
+        MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(false, false, false);
         player.setPromissoryNote(pnID);
-        
-        sendMessage(sb.toString());
+
+        String message = player.getRepresentation(false, false) + " showed a promissory note:";
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+        MessageHelper.sendMessageToChannelWithEmbed(event.getChannel(), message, pnEmbed);
     }
 }
