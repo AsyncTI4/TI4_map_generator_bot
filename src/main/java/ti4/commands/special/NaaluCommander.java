@@ -44,36 +44,13 @@ public class NaaluCommander extends SpecialSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
 
         // Top Agenda
-        sb.setLength(0);
-        sb.append("__**Top Agenda:**__");
-        String agendaID = activeGame.lookAtTopAgenda(0);
-        MessageEmbed embed = null;
-        if (activeGame.getSentAgendas().get(agendaID) != null) {
-            if (activeGame.getCurrentAgendaInfo().contains("_CL_")) {
-                sb.append("You are currently voting on covert legislation and the top agenda is in the speaker's hand.");
-                sb.append(" Showing the next agenda because thats how it should be by the RULEZ\n");
-                agendaID = activeGame.lookAtTopAgenda(1);
-
-                if (activeGame.getSentAgendas().get(agendaID) != null) {
-                    embed = AgendaModel.agendaIsInSomeonesHandEmbed();
-                } else if (agendaID != null) {
-                    embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-                }
-            } else {
-                sb.append("The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard");
-            }
-        } else if (agendaID != null) {
-            embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-        } else {
-            sb.append("Could not find agenda");
-        }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        sendTopAgendaToCardsInfoSkipCovert(activeGame, player);
 
         // Bottom Agenda
-        embed = null;
+        MessageEmbed embed = null;
         sb.setLength(0);
         sb.append("__**Bottom Agenda:**__\n");
-        agendaID = activeGame.lookAtBottomAgenda(0);
+        String agendaID = activeGame.lookAtBottomAgenda(0);
         if (activeGame.getSentAgendas().get(agendaID) != null) {
             embed = AgendaModel.agendaIsInSomeonesHandEmbed();
         } else if (agendaID != null) {
@@ -95,5 +72,32 @@ public class NaaluCommander extends SpecialSubcommandData {
         if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
             player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+    }
+
+    public static void sendTopAgendaToCardsInfoSkipCovert(Game activeGame, Player player) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Top Agenda:**__");
+        String agendaID = activeGame.lookAtTopAgenda(0);
+        MessageEmbed embed = null;
+        if (activeGame.getSentAgendas().get(agendaID) != null) {
+            if (activeGame.getCurrentAgendaInfo().contains("_CL_") && activeGame.getCurrentPhase().startsWith("agenda")) {
+                sb.append("You are currently voting on covert legislation and the top agenda is in the speaker's hand.");
+                sb.append(" Showing the next agenda because thats how it should be by the RULEZ\n");
+                agendaID = activeGame.lookAtTopAgenda(1);
+
+                if (activeGame.getSentAgendas().get(agendaID) != null) {
+                    embed = AgendaModel.agendaIsInSomeonesHandEmbed();
+                } else if (agendaID != null) {
+                    embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+                }
+            } else {
+                sb.append("The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard");
+            }
+        } else if (agendaID != null) {
+            embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+        } else {
+            sb.append("Could not find agenda");
+        }
+        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
     }
 }
