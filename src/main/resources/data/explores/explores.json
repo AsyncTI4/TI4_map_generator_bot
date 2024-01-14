@@ -736,6 +736,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "For each planet in this system, gain 1 trade good.",
+        "flavorText": "*\"Oh, thank the stars!\" the merchant gushed over comms. \"We haven't had fresh food in weeks!\"*",
         "source": "ds"
     },
     {
@@ -744,6 +745,7 @@
         "type": "Cultural",
         "resolution": "Instant",
         "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "flavorText": "*\"Very well,\" said the old Celdauri officer. \"Let's take a look at these plans.\"*",
         "source": "ds"
     },
     {
@@ -761,6 +763,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready your agent or draw 1 action card.",
+        "flavorText": "*There are safer places to find a merc, but that sort of place doesn't attract the sort of operation the Emoress had tasked Za-trè with recruiting.*",
         "source": "ds"
     },
     {
@@ -769,6 +772,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, place 1 mech or 2 infantry from your reinforcements on this planet.",
+        "flavorText": "*Magma spurted through cracks in the surface, but the exploratory team knew the risk was worth the reward.*",
         "source": "ds"
     },
     {
@@ -786,6 +790,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "Explore the frontier deck in this system.",
+        "flavorText": "*Hadd Halftail hadn't been searching for a laboratorym but was happy to claim the secrets she had stumbled upon.*",
         "source": "ds"
     },
     {
@@ -794,6 +799,7 @@
         "type": "Industrial",
         "resolution": "Instant",
         "text": "Place up to 1 cruiser from your reinforcements in this system if it contains no other players' ships.",
+        "flavorText": "*Alva was pleased to discover the cruiser's systems were still operational. \"A grand welcome awaits us,\" she said to her twin.*",
         "source": "ds"
     },
     {
@@ -811,6 +817,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Place 1 command token from your reinforcements in your fleet pool and move any number of your units in this system to the space area of another system that contains no other players' ships.",
+        "flavorText": "*Captain Kask ordered the fleet through the scintilating gate. There was no path back, but at least they'd be with allies.*",
         "source": "ds"
     },
     {
@@ -819,6 +826,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Choose 2 other players, each of those players must give you 1 promissory note from their hand.",
+        "flavorText": "*The abandoned ships provided a trove of compromising diplomatic communications.*",
         "source": "ds"
     },
     {
@@ -827,6 +835,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Look at the top card of each exploration deck, discard any number of those cards and explore up to 1 planet you control. Then, shuffle each exploration deck.",
+        "flavorText": "*If you stare too long into the voids between the stars, you may find that the voids begin to whisper.*",
         "source": "ds"
     },
     {
