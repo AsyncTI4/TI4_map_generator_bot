@@ -3411,7 +3411,7 @@ public class Game {
         int count = 0;
         for (String exploreCardID : exploreDeckModel.getNewDeck()) {
             ExploreModel exploreCard = Mapper.getExplore(exploreCardID);
-            if (exploreCard.getType().equals(exploreDeckID)) {
+            if (exploreCard.getType().equalsIgnoreCase(exploreDeckID)) {
                 count++;
             }
         }

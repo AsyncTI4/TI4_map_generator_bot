@@ -40,6 +40,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
@@ -84,12 +85,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     }
 
     public String displayExplore(String cardID) {
-        String card = Mapper.getExploreRepresentation(cardID);
+        ExploreModel card = Mapper.getExplore(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
-            String[] cardInfo = card.split(";");
-            String name = cardInfo[0];
-            String description = cardInfo[4];
+            String name = card.getName();
+            String description = card.getText();
             sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
         } else {
             sb.append("Invalid ID ").append(cardID);
@@ -122,14 +122,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             message = "Card has been added to play area.";
             activeGame.purgeExplore(cardID);
         }
-        String card = Mapper.getExploreRepresentation(cardID);
-        String[] cardInfo = card.split(";");
+        ExploreModel card = Mapper.getExplore(cardID);
         if (tile == null) {
             tile = activeGame.getTileFromPlanet(planetName);
-            // if (tile == null) {
-            //     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Tile could not be found");
-            //     return;
-            // }
         }
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Player could not be found");
@@ -139,19 +134,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
             String factionIcon = player.getFactionEmoji();
             if (planetName != null) {
-                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), factionIcon + " found a " + cardInfo[0] + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
+                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), factionIcon + " found a " + card.getName() + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
             } else {
-                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), factionIcon + " found a " + cardInfo[0]);
+                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), factionIcon + " found a " + card.getName());
             }
         }
 
-        String cardType = cardInfo[3];
+        String cardType = card.getType();
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
             message = "Gained relic fragment";
             player.addFragment(cardID);
             activeGame.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
-            String token = cardInfo[5];
+            String token = card.getAttachmentId().orElse(null);
             String tokenFilename = Mapper.getAttachmentImagePath(token);
             if (tokenFilename != null && tile != null && planetName != null) {
                 PlanetModel planetInfo = Mapper.getPlanet(planetName);
@@ -210,7 +205,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token, tile, or planet";
             }
         } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
-            String token = cardInfo[5];
+            String token = card.getAttachmentId().orElse(null);
             String tokenFilename = Mapper.getTokenID(token);
             if (tokenFilename != null && tile != null) {
                 if ("ionalpha".equalsIgnoreCase(token)) {

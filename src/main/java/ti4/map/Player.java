@@ -979,7 +979,7 @@ public class Player {
         int cult = 0;
         int frontier = 0;
         for (String id : fragments) {
-            switch (Mapper.getExplore(id).getType()) {
+            switch (Mapper.getExplore(id).getType().toLowerCase()) {
                 case "cultural" -> cult++;
                 case "industrial" -> ind++;
                 case "hazardous" -> haz++;
@@ -1033,7 +1033,7 @@ public class Player {
     private void updateFragments() {
         crf = irf = hrf = vrf = 0;
         for (String cardID : fragments) {
-            String color = Mapper.getExplore(cardID).getType();
+            String color = Mapper.getExplore(cardID).getType().toLowerCase();
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;

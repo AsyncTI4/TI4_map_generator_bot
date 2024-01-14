@@ -53,7 +53,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Collections.shuffle(promissoryNotes);
         int index = 1;
         for (String id : promissoryNotes) {
-            sb.append(index).append(". ").append(Mapper.getPromissoryNoteText(id, longPNDisplay)).append("\n");
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName()).append("\n");
             index++;
         }
 

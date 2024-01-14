@@ -24,6 +24,11 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
     public boolean isValid() {
         return id != null
             && name != null
@@ -48,7 +53,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
      */
     @Deprecated
     public String getRepresentation() {
-        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
+        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType().toLowerCase(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
     }
 
     public boolean search(String searchString) {
