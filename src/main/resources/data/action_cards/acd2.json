@@ -81,15 +81,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "border_skirmish",
-    "name": "Border Skirmish",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to or greater than that ship's combat value, they produce 1 hit against the other player's ships in those systems.",
-    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand, \"Our dominion knows no border.\" The man hesitated, then agreed.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "brilliant_tactician",
     "name": "Brilliant Tactician",
     "phase": "Action",
@@ -150,6 +141,15 @@
     "window": "When an agenda is revealed",
     "text": "Players cannot resolve abilities other than those of this agenda until after this agenda has been resolved.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "continuous_barrage",
+    "name": "Continuous Barrage",
+    "phase": "Action",
+    "window": "At the end of a round of space combat",
+    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units. [Note: This AFB still only targets fighters.]",
+    "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
     "source": "action_deck_2"
   },
   {
@@ -315,15 +315,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "firing_solution_",
-    "name": "Firing Solution ",
-    "phase": "Action",
-    "window": "At the end of a round of space combat",
-    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's ships. [Note: This AFB still only targets fighters.]",
-    "flavorText": "Mirik pounded his fist on his command chair. \"We've locked on to the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "flawless_strategy",
     "name": "Flawless Strategy",
     "phase": "Action",
@@ -361,7 +352,7 @@
   },
   {
     "alias": "garner_tribute",
-    "name": "Garner Tribute",
+    "name": "Garnered Tribute",
     "phase": "Action",
     "window": "Action",
     "text": "Gain trade goods equal to the influence value of 1 planet you control.",
@@ -375,15 +366,6 @@
     "window": "After you gain control of a planet that was controlled by another player",
     "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
     "flavorText": "Mot awoke in a pool of his own blood. He was no longer bound – S'Ula had granted him that courtesy at least – but he was too weak to stand. So, he laid in front of the empty vault and wept.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "grand_operation",
-    "name": "Grand Operation",
-    "phase": "Action",
-    "window": "After you activate a system",
-    "text": "Move any number of your ships from the active system into an adjacent system that does not contain another player's units. [Note: You can transport ground forces during this movement.]",
-    "flavorText": "This was the last mission of the Admiral's long, decorated career. When he was asked to oversee the feat, he refused, breaking into such a rage that he threw the papers, along with the man who brought them, out of his office. Five sleepless days later, planning was complete.",
     "source": "action_deck_2"
   },
   {
@@ -409,7 +391,7 @@
     "name": "Illusory Duplication",
     "phase": "Action",
     "window": "At the start of a space combat",
-    "text": "Up to 3 of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of the combat.",
+    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
     "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy ship's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
@@ -585,6 +567,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "rendezvous_point",
+    "name": "Rendezvous Point",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport ground forces during this movement.]",
+    "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished for her, \"A logistical nightmare? I recommend you get to it then.\"",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "risky_jump",
     "name": "Risky Jump",
     "phase": "Action",
@@ -624,7 +615,7 @@
     "alias": "shrapnel_turrets",
     "name": "Shrapnel Turrets",
     "phase": "Action",
-    "window": "At the start of the first round of a space combat",
+    "window": "At the start of a space combat",
     "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x2) until the end of the combat.",
     "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
     "source": "action_deck_2"
@@ -654,6 +645,15 @@
     "window": "After 1 of your ships is destroyed",
     "text": "Produce a matching unit in your home system; reduce the cost of that unit by half, rounded up.",
     "flavorText": "The production of the Van Hauge XVIII had finished in record time. As it left the docking bay, Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "smuggler_routes_acd2",
+    "name": "Smuggler Routes",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport ground forces during this movement.]",
+    "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. He slowly looked to the skies and imagined the space beyond - a place he had never been - before quietly speaking to himself, \"I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
   {

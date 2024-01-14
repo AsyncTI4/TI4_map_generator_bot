@@ -64,16 +64,9 @@ public class DataMigrationManager {
             runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
             runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
-            runMigration("migrateInitializeACD2_271023", DataMigrationManager::migrateInitializeACD2_271023);
-            runMigration("migrateInitializeLO_271023", DataMigrationManager::migrateInitializeLO_271023);
-            runMigration("migrateInitializeLO_021123", DataMigrationManager::migrateInitializeLO_021123);
-            runMigration("migrateInitializeLO_061123", DataMigrationManager::migrateInitializeLO_061123);
-            runMigration("migrateInitializeLO_081123", DataMigrationManager::migrateInitializeLO_081123);
-            runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
-            // runMigration("migrateExampleMigration_241223", (map) ->
-            // migrateExampleMigration_241223(map));
+            runMigration("migrateInitializeACD2_1", DataMigrationManager::migrateInitializeACD2_1);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -565,7 +558,6 @@ public class DataMigrationManager {
     }
 
     private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
-
         String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
         DateFormat format = new SimpleDateFormat("ddMMyy");
         Date migrationForGamesBeforeDate = null;
@@ -607,69 +599,6 @@ public class DataMigrationManager {
             String mapNames = String.join(", ", migrationsAppliedThisTime);
             BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
         }
-    }
-
-    // MIGRATION: ACD2 id change
-    public static boolean migrateInitializeACD2_271023(Game game) {
-        Map<String, String> replacements = Map.of("deep_space_station", "derelict_space_station",
-            "deep_space_station2", "derelict_space_station2",
-            "deep_space_station3", "derelict_space_station3",
-            "deep_space_station4", "derelict_space_station4");
-        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
-        return replaceActionCards(game, decksToCheck, replacements);
-    }
-
-    // MIGRATION: LO id change
-    public static boolean migrateInitializeLO_271023(Game game) {
-        Map<String, String> replacements = Map.of("little_omega_minister_commrece", "little_omega_minister_commerce");
-        List<String> decksToCheck = List.of("agendas_little_omega");
-        return replaceAgendaCards(game, decksToCheck, replacements);
-    }
-
-    // LO id change
-    public static boolean migrateInitializeLO_021123(Game game) {
-        Map<String, String> replacements = Map.of("parade_marvels_little_omega", "engineer_marvel");
-        List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
-        return replaceStage1s(game, decksToCheck, replacements);
-    }
-
-    // LO id change
-    public static boolean migrateInitializeLO_061123(Game game) {
-        Map<String, String> replacements = Map.of("raise_fleets_little_omega", "raise_fleet");
-        List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
-        return replaceStage1s(game, decksToCheck, replacements);
-    }
-
-    // ACD2
-    public static boolean migrateInitializeLO_081123(Game game) {
-        Map<String, String> replacements = Map.of("fulfillment_protocols", "mercenary_contract",
-            "magen_engineers", "ancient_defenses");
-        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
-        return replaceActionCards(game, decksToCheck, replacements);
-    }
-
-    public static boolean migrateInitializeLO_171123(Game game) {
-        Map<String, String> replacements = new HashMap<>();
-        replacements.put("adrenaline_shots", "armistice");
-        replacements.put("assassination_attempt", "armistice");
-        replacements.put("counter-intelligence", "crisis_management");
-        replacements.put("deep_cover_operatives", "espionage");
-        replacements.put("disrupt_logistics", "disrupted_logistics");
-        replacements.put("emergency_conscription", "pivoted_plan");
-        replacements.put("efficient_protocols", "commercial_applications");
-        replacements.put("fulfillment_protocols", "mercenary_contract");
-        replacements.put("graviton_shielding", "commercial_applications");
-        replacements.put("magen_engineers", "double_agents");
-        replacements.put("production_rider", "foreign_policy");
-        replacements.put("rigged_explosives", "mechanized_workforce");
-        replacements.put("shock_and_awe", "classified_weapons_acd2");
-        replacements.put("space_mines", "dangerous_conditions");
-        replacements.put("transference_protocol", "masterclass_logistics");
-        replacements.put("virulent_gas_canisters", "virulent_gas");
-        replacements.put("cyberwarfare", "seized_facility");
-        replacements.put("rehash_debates", "rehashed_debates");
-        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
-        return replaceActionCards(game, decksToCheck, replacements);
     }
 
     public static boolean migrateFrankenItems_111223(Game game) {
@@ -743,6 +672,18 @@ public class DataMigrationManager {
         BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    public static boolean migrateInitializeACD2_1(Game game) {
+        if (game.getName() == null || !game.getName().contains("pbd1913")) {
+            return false;
+        }
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("border_skirmish", "smuggler_routes_acd2");
+        replacements.put("firing_solution_", "continuous_barrage");
+        replacements.put("grand_operation", "rendezvous_point");
+        List<String> decksToCheck = List.of("action_deck_2");
+        return replaceActionCards(game, decksToCheck, replacements);
     }
 
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
