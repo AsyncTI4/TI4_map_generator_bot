@@ -909,7 +909,7 @@ public class ButtonHelperAbilities {
 
     public static void resolveMitosisMechPlacement(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
-        String uH = buttonID.split("_")[1];
+        String uH = buttonID.split("_")[2];
         String successMessage = "";
         if(uH.equalsIgnoreCase("space")){
             successMessage= ident + " Replaced an infantry with a mech in the space area of " + tile.getRepresentationForButtons(activeGame,player) + ".";

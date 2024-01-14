@@ -1485,7 +1485,7 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.split("_")[1];
             String unit = buttonID.split("_")[2];
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), unit, activeGame);
-            MessageHelper.sendMessageToChannel(event.getChannel(), ident + " chose to duplicate a "+unit);
+            MessageHelper.sendMessageToChannel(event.getChannel(), ident + " chose to duplicate a "+unit+" in "+activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player));
             event.getMessage().delete().queue();
 
         } else if (buttonID.startsWith("resolveWithNoEffect")) {
@@ -2924,6 +2924,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setTg(tg + commoditiesTotal);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     player.setCommodities(0);
+                   
                     for (Player p2 : activeGame.getRealPlayers()) {
                         if (p2.getSCs().contains(5) && p2.getCommodities() > 0) {
                             if(p2.getCommodities() > washedCommsPower){
@@ -2931,13 +2932,17 @@ public class ButtonListener extends ListenerAdapter {
                                 p2.setCommodities(p2.getCommodities()-washedCommsPower);
                                 ButtonHelperAbilities.pillageCheck(p2, activeGame);
                                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
-                                    p2.getRepresentation(true, true) + " "+washedCommsPower+" of your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                                p2.getRepresentation(true, true) + " "+washedCommsPower+" of your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                                ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, p2, player.getCommoditiesTotal());
+                                ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2,  player, p2.getCommoditiesTotal());
                             }else{
                                 p2.setTg(p2.getTg() + p2.getCommodities());
                                 p2.setCommodities(0);
                                 ButtonHelperAbilities.pillageCheck(p2, activeGame);
                                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
-                                    p2.getRepresentation(true, true) + " your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                                p2.getRepresentation(true, true) + " your commodities got washed in the process of washing " + ButtonHelper.getIdentOrColor(player, activeGame));
+                                ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, p2, player.getCommoditiesTotal());
+                                ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2,  player, p2.getCommoditiesTotal());
                             }
                         }
                     }
