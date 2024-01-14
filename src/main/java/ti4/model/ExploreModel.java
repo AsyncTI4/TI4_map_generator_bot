@@ -19,6 +19,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String resolution;
     private String text;
     private String attachmentId;
+    private String flavorText;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
