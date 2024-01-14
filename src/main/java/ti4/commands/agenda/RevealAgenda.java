@@ -17,7 +17,6 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -50,7 +49,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeGame.setCurrentReacts("noWhenThisAgenda", "");
         activeGame.setCurrentReacts("noAfterThisAgenda", "");
         activeGame.setCurrentReacts("AssassinatedReps", "");
-        activeGame.setCurrentReacts("riskedPredictive","");
+        activeGame.setCurrentReacts("riskedPredictive", "");
         String agendaID = activeGame.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
@@ -61,7 +60,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         } else {
             action = true;
         }
-        
+
         AgendaModel agendaModel = Mapper.getAgenda(agendaID);
         String agendaTarget = agendaModel.getTarget();
         String agendaType = agendaModel.getType();
@@ -112,32 +111,30 @@ public class RevealAgenda extends AgendaSubcommandData {
                         speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
                     }
                     if (speaker != null) {
-                        StringBuilder sb = new StringBuilder();
                         Map.Entry<String, Integer> entry = activeGame.drawAgenda();
-                        sb.append("-----------\n");
-                        sb.append("Game: ").append(activeGame.getName()).append("\n");
-                        sb.append(speaker.getRepresentation(true, true)).append("\n");
-                        sb.append("Drawn Agendas:\n");
-                        sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
-                        sb.append("\n");
-                        MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(), sb.toString());
+                        if (entry == null) {
+                            sendMessage("It appears there are no cards left in the agenda deck. Ping Fin or Jazz.");
+                        } else {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append(speaker.getRepresentation(true, true)).append(" this is the top agenda for Covert Legislation:");
+                            List<MessageEmbed> embeds = List.of(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
+                            MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, speaker, sb.toString(), embeds);
+                        }
                     }
                 }
-
             }
-
         }
         activeGame.setCurrentReacts("Pass On Shenanigans", "");
         activeGame.setCurrentReacts("Abstain On Agenda", "");
-        if(!action){
+        if (!action) {
             AgendaHelper.offerEveryonePrepassOnShenanigans(activeGame);
             AgendaHelper.offerEveryonePreAbstain(activeGame);
         }
         String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
         int aCount = 0;
-        if(agendaCount.isEmpty()){
+        if (agendaCount.isEmpty()) {
             aCount = 1;
-        }else{
+        } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         activeGame.setCurrentReacts("agendaCount", aCount + "");
@@ -153,7 +150,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
 
         StringBuilder whensAftersMessage = new StringBuilder(
-                "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you can simply play it.");
+            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you can simply play it.");
         if (action) {
             whensAftersMessage.append("\nYou can play afters during this agenda");
         }
@@ -186,21 +183,21 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
-                    "# " + activeGame.getPing() + " the agenda target is " + agendaTarget
-                            + ". Sent the agenda to the speakers cards info");
+                "# " + activeGame.getPing() + " the agenda target is " + agendaTarget
+                    + ". Sent the agenda to the speakers cards info");
         }
         MessageHelper.sendMessageToChannel(channel, "The game believes this is agenda #" + aCount + " of this agenda phase");
         for (Player player : activeGame.getRealPlayers()) {
             if (!action && activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0 && aCount == 2) {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true)
-                                + " you have Florzen commander and can thus explore and ready a planet",
-                        ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
+                    player.getRepresentation(true, true)
+                        + " you have Florzen commander and can thus explore and ready a planet",
+                    ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
             }
         }
         if (!activeGame.isFoWMode() && !action) {
             ButtonHelper.updateMap(activeGame, event,
-                    "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+                "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
         }
     }
 }
