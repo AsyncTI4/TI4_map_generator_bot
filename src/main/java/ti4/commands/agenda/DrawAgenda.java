@@ -1,20 +1,28 @@
 package ti4.commands.agenda;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.entities.User;
+
+import org.jetbrains.annotations.NotNull;
+
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 public class DrawAgenda extends AgendaSubcommandData {
 
@@ -24,83 +32,51 @@ public class DrawAgenda extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, "from_bottom", "Whether to draw from bottom, default false"));
     }
 
-    public void drawAgenda(GenericInteractionCreateEvent event, int count, Game activeGame, Player player) {
+    public static void drawAgenda(GenericInteractionCreateEvent event, int count, Game activeGame, @NotNull Player player) {
         drawAgenda(event, count, false, activeGame, player);
     }
-    public void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game activeGame, Player player) {
-        drawAgenda(event, count, fromBottom, activeGame, player, false);
+
+    public static void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game activeGame, @NotNull Player player) {
+        drawAgenda(count, fromBottom, activeGame, player, false);
     }
 
-    public void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game activeGame, Player player, boolean discard) {
+    public static void drawAgenda(int count, Game activeGame, @NotNull Player player) {
+        drawAgenda(count, false, activeGame, player, false);
+    }
+
+    public static void drawAgenda(int count, boolean fromBottom, Game activeGame, @NotNull Player player, boolean discard) {
         StringBuilder sb = new StringBuilder();
-        sb.append("-----------\n");
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("Drawn Agendas:\n");
-        int index = 1;
-        List<Button> buttons = new ArrayList<>();
+        sb.append(player.getRepresentation(true, true)).append(" here are the agenda(s) you have drawn:");
+        Player realPlayer = Helper.getGamePlayer(activeGame, player, (Member) null, null);
+        if (realPlayer == null || activeGame == null) return;
+
+        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, activeGame, sb.toString());
         for (int i = 0; i < count; i++) {
             Map.Entry<String, Integer> entry = fromBottom ? activeGame.drawBottomAgenda() : activeGame.drawAgenda();
             if (entry != null) {
-                sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
-                index++;
-                sb.append("\n");
-                buttons.add(Button.primary("topAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the top of the agenda deck."));
-                if(!discard){
-                buttons.add(Button.danger("bottomAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the bottom of the agenda deck."));
-                }else{
-                    buttons.add(Button.danger("discardAgenda_" + entry.getValue(), "Discard agenda " + entry.getValue() ));
+                AgendaModel agenda = Mapper.getAgenda(entry.getKey());
+                List<MessageEmbed> agendaEmbed = Collections.singletonList(agenda.getRepresentationEmbed());
 
-                }
+                List<Button> buttons = agendaButtons(agenda, entry.getValue(), discard);
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(realPlayer.getCardsInfoThread(), null, agendaEmbed, buttons);
             }
         }
-        sb.append("-----------\n");
-
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToUser(sb.toString(), event);
-        } else {
-            User userById = event.getJDA().getUserById(player.getUserID());
-            if (userById != null) {
-                if (activeGame.isCommunityMode() && player.getPrivateChannel() != null) {
-                    // MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
-                } else {
-                    //MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
-                }
-            } else {
-                MessageHelper.sendMessageToUser(sb.toString(), event);
-            }
-        }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, activeGame, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
     }
 
-    public void drawAgenda(int count, Game activeGame, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("-----------\n");
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append(player.getRepresentation(true, true)).append("\n");
-        sb.append("Drawn Agendas:\n");
-        int index = 1;
+    private static List<Button> agendaButtons(AgendaModel agenda, Integer id, boolean discard) {
         List<Button> buttons = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            Map.Entry<String, Integer> entry = activeGame.drawAgenda();
-            if (entry != null) {
-                sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
-                index++;
-                sb.append("\n");
-                Button top = Button.primary("topAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the top of the agenda deck.");
-                Button bottom = Button.danger("bottomAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the bottom of the agenda deck.");
-                buttons.add(top);
-                buttons.add(bottom);
-            }
-        }
-        sb.append("-----------\n");
-        if (activeGame.isCommunityMode() && player.getPrivateChannel() != null) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
+        Button topButton = Button.success("topAgenda_" + id, "Put " + agenda.getName() + " on the top of the agenda deck.").withEmoji(Emoji.fromUnicode("🔼"));
+        Button bottomButton = Button.danger("bottomAgenda_" + id, "Put " + agenda.getName() + " on the bottom of the agenda deck.").withEmoji(Emoji.fromUnicode("🔽"));
+        Button discardButton = Button.danger("discardAgenda_" + id, "Discard " + agenda.getName()).withEmoji(Emoji.fromUnicode("🗑️"));
+
+        buttons.add(topButton);
+        if (!discard) {
+            buttons.add(bottomButton);
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
+            buttons.add(discardButton);
         }
+        return buttons;
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -114,6 +90,10 @@ public class DrawAgenda extends AgendaSubcommandData {
         boolean fromBottom = fromBottomOption != null && fromBottomOption.getAsBoolean();
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
+        if (player == null) {
+            sendMessage("You are not a player of this game");
+            return;
+        }
         drawAgenda(event, count, fromBottom, activeGame, player);
     }
 }

@@ -56,7 +56,6 @@ public class MessageHelper {
 	public static void sendMessageToBotLogChannel(String messageText) {
 		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
-	
 
 	public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
 		splitAndSent(messageText, channel, null, Collections.singletonList(button));
@@ -64,6 +63,10 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithEmbed(MessageChannel channel, String messageText, MessageEmbed embed) {
 		splitAndSent(messageText, channel, Collections.singletonList(embed), null);
+	}
+
+	public static void sendMessageToChannelWithEmbeds(MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
+		splitAndSent(messageText, channel, embeds, null);
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
@@ -104,7 +107,8 @@ public class MessageHelper {
 		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, activeGame, player, null, buttons, saboable);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game activeGame, Player player, List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
+	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game activeGame, Player player, List<MessageEmbed> embeds, List<Button> buttons,
+		boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(activeGame, player, msg);
 			if (saboable) activeGame.addMessageIDForSabo(msg.getId());
@@ -269,7 +273,7 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
 			} else { //last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (messageText.contains("Use buttons to do your turn") || messageText.contains("Use buttons to end turn")) {
+					if (messageText != null && (messageText.contains("Use buttons to do your turn") || messageText.contains("Use buttons to end turn"))) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -279,7 +283,7 @@ public class MessageHelper {
 						}
 					}
 
-					if (messageText.toLowerCase().contains("up next") && messageText.contains("#")) {
+					if (messageText != null && messageText.toLowerCase().contains("up next") && messageText.contains("#")) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -460,6 +464,9 @@ public class MessageHelper {
 		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
 		Iterator<List<ActionRow>> buttonIterator = partitionedButtons.iterator();
 
+		List<List<MessageEmbed>> partitionedEmbeds = getPartitionedEmbedLists(embeds);
+		Iterator<List<MessageEmbed>> embedsIterator = partitionedEmbeds.iterator();
+
 		List<String> messageList = splitLargeText(message, 2000);
 		Iterator<String> messageIterator = messageList.iterator();
 
@@ -470,24 +477,35 @@ public class MessageHelper {
 			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.trim().isEmpty()) {
 				messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());
 
-			//We are at the last message, so try and add the first row of buttons
+				//We are at the last message, so try and add the first row of buttons
 			} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.trim().isEmpty()) {
 				MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
 				messageCreateBuilder.addContent(smallMessage);
 
-				//add a limited amount of embeds if they exist (max 10 per message) TODO: handle additional embeds with iterator
-				if (embeds != null && !embeds.isEmpty()) {
-					messageCreateBuilder.addEmbeds(embeds.stream().limit(10).toList());
+				//add first set of embeds if it exists
+				if (embedsIterator.hasNext()) {
+					List<MessageEmbed> messageEmbeds = embedsIterator.next();
+					if (messageEmbeds != null && !messageEmbeds.isEmpty()) {
+						messageCreateBuilder.addEmbeds(messageEmbeds);
+					}
 				}
 
-				//add first row of buttons if it exists
-				if (buttonIterator.hasNext()) {
+				//add first row of buttons if it exists AND there are no more embeds
+				if (buttonIterator.hasNext() && !embedsIterator.hasNext()) {
 					List<ActionRow> actionRows = buttonIterator.next();
 					if (actionRows != null && !actionRows.isEmpty()) {
 						messageCreateBuilder.addComponents(actionRows);
 					}
 				}
 				messageCreateDataList.add(messageCreateBuilder.build());
+			}
+		}
+
+		//ADD REMAINING EMBEDS IF THEY EXIST
+		while (embedsIterator.hasNext()) {
+			List<MessageEmbed> messageEmbeds = embedsIterator.next();
+			if (messageEmbeds != null && !messageEmbeds.isEmpty()) {
+				messageCreateDataList.add(new MessageCreateBuilder().addEmbeds(messageEmbeds).build());
 			}
 		}
 
@@ -537,6 +555,18 @@ public class MessageHelper {
 		}
 		partitionedButtonRows = ListUtils.partition(buttonRows, 5);
 		return partitionedButtonRows;
+	}
+
+	private static List<List<MessageEmbed>> getPartitionedEmbedLists(List<MessageEmbed> embeds) {
+		try {
+			embeds.removeIf(Objects::isNull);
+		} catch (Exception e) {
+			//Do nothing
+		}
+		if (embeds == null || embeds.isEmpty()) return new ArrayList<>();
+
+		List<List<MessageEmbed>> partitions = ListUtils.partition(embeds, 10);
+		return partitions;
 	}
 
 	public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
