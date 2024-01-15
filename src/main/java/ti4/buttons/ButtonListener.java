@@ -59,6 +59,7 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
+import ti4.commands.player.TurnStart;
 import ti4.commands.player.UnitInfo;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
@@ -296,7 +297,7 @@ public class ButtonListener extends ListenerAdapter {
                         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
                         buttons.add(Button.danger("deleteButtons", "Decline to drop Mech"));
                         MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
-                        List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                         MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                     }
                     ButtonHelper.checkACLimit(activeGame, event, player);
@@ -1246,7 +1247,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("finishComponentAction_")) {
             String message = "Use buttons to end turn or do another action.";
-            List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+            List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
             event.getMessage().delete().queue();
@@ -3658,7 +3659,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
                     DrawRelic.drawRelicAndNotify(player, event, activeGame);
                     String message = "Use buttons to end turn or do another action.";
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
@@ -3675,7 +3676,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "startQDN" -> ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event);
                 case "finishComponentAction" -> {
                     String message = "Use buttons to end turn or do another action.";
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
@@ -3691,7 +3692,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "doAnotherAction" -> {
                     String message = "Use buttons to end turn or do another action.";
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
@@ -4232,7 +4233,7 @@ public class ButtonListener extends ListenerAdapter {
                 activeGame.setCurrentReacts("tnelisCommanderTracker", "");
 
                 String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
-                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, systemButtons);
                 player.resetOlradinPolicyFlags();
             }

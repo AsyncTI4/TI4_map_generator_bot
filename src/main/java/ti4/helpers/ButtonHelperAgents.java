@@ -26,6 +26,7 @@ import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.player.TurnStart;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -946,7 +947,7 @@ public class ButtonHelperAgents {
                     exhaustAgent("exhaustAgent_edynagent", event, activeGame, edyn2, ButtonHelper.getIdent(edyn2));
                     activeGame.setCurrentReacts("edynAgentPreset", "");
                     activeGame.setCurrentReacts("edynAgentInAction", newActivePlayer.getFaction()+"_"+edyn2.getFaction()+"_"+upNextPlayer.getFaction());
-                    List<Button> buttons = ButtonHelper.getStartOfTurnButtons(newActivePlayer, activeGame, true, event);
+                    List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, activeGame, true, event);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(newActivePlayer, activeGame), newActivePlayer.getRepresentation(true, true)+ " you can take 1 action now due to Edyn Agent", buttons);
                     return true;
                 }
