@@ -1368,6 +1368,57 @@ public class ButtonListener extends ListenerAdapter {
                 case "gls" -> { // Graviton Laser System
                     // Do Nothing
                 }
+                case "mi" -> { // Mageon
+                    List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + " Select who you would like to Mageon.", buttons);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                }
+                case "vtx", "absol_vtx" -> { // Vortex
+                    List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, activeGame, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + " Select what unit you would like to capture", buttons);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                }
+                case "wg" -> { // Wormhole Generator
+                    List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
+                    String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                }
+                case "absol_wg" -> { // Absol's Wormhole Generator
+                    List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
+                    String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                }
+                case "pm" -> { // Production Biomes
+                    ButtonHelperFactionSpecific.resolveProductionBiomesStep1(player, activeGame, event);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                }
+                case "lgf" -> { // Lazax Gate Folding
+                    if (player.getPlanets().contains("mr")) {
+                        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet("mr"), "inf mr", activeGame);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
+                        ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                    }
+                }
+                case "sr" -> { // Sling Relay
+                    List<Button> buttons = new ArrayList<>();
+                    List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
+                    if (player.hasUnit("ghoti_flagship")) {
+                        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship));
+                    }
+                    List<String> pos2 = new ArrayList<>();
+                    for (Tile tile : tiles) {
+                        if (!pos2.contains(tile.getPosition())) {
+                            Button tileButton = Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling", tile.getRepresentationForButtons(activeGame, player));
+                            buttons.add(tileButton);
+                            pos2.add(tile.getPosition());
+                        }
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to sling in.", buttons);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                }
             }
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
@@ -2756,7 +2807,7 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
                     }
                 }
-                 case "resolveDistinguished" -> ButtonHelperActionCards.resolveDistinguished(player, activeGame, event);
+                case "resolveDistinguished" -> ButtonHelperActionCards.resolveDistinguished(player, activeGame, event);
                 case "resolveMykoMech" -> ButtonHelperFactionSpecific.resolveMykoMech(player, activeGame);
                 case "offerNecrophage" -> ButtonHelperFactionSpecific.offerNekrophageButtons(player, event);
                 case "resolveMykoCommander" -> ButtonHelperCommanders.mykoCommanderUsage(player, activeGame, event);

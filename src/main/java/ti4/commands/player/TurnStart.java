@@ -279,7 +279,7 @@ public class TurnStart extends PlayerSubcommandData {
             startButtons.add(nekroButton);
         }
         if (activeGame.getLatestTransactionMsg() != null && !"".equalsIgnoreCase(activeGame.getLatestTransactionMsg())) {
-            activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
+            activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue(null, error -> {});
             activeGame.setLatestTransactionMsg("");
         }
         // if (activeGame.getActionCards().size() > 130 && getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
