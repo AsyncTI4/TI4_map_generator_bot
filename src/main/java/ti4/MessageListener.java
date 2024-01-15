@@ -60,7 +60,9 @@ public class MessageListener extends ListenerAdapter {
         String userID = event.getUser().getId();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
-        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS) && (event.getInteraction().getSubcommandName() == null || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON)) && !event.getInteraction().getName().equals(Constants.SEARCH)
+        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS)
+            && (event.getInteraction().getSubcommandName() == null || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+            && !event.getInteraction().getName().equals(Constants.SEARCH)
             && event.getOption(Constants.GAME_NAME) == null) { //SKIP /help COMMANDS
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
@@ -202,7 +204,7 @@ public class MessageListener extends ListenerAdapter {
                 }
                 if (activeGame.getAutoPingStatus() && spacer != 0 && !activeGame.getTemporaryPingDisable()) {
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
-                        
+
                         if (player != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                             long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (60 * 60 * multiplier * spacer)
@@ -218,7 +220,7 @@ public class MessageListener extends ListenerAdapter {
                                 } else {
                                     long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
                                     int autoPingSpacer = (int) spacer;
-                                    int pingNumber = (int) (milliSinceLastTurnChange)/(60 * 60 * multiplier * (int) autoPingSpacer);
+                                    int pingNumber = (int) (milliSinceLastTurnChange) / (60 * 60 * multiplier * (int) autoPingSpacer);
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 2)) {
                                         ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
@@ -421,6 +423,7 @@ public class MessageListener extends ListenerAdapter {
         boolean messageToColor = false;
         boolean messageToFutureColor = false;
         boolean messageToMyself = false;
+        boolean messageToJazz = false;
         for (String color : colors) {
             if (message.startsWith("to" + color)) {
                 messageToColor = true;
@@ -431,8 +434,11 @@ public class MessageListener extends ListenerAdapter {
                 break;
             }
         }
-        if(message.startsWith("tofutureme")){
+        if (message.startsWith("tofutureme")) {
             messageToMyself = true;
+        }
+        if (message.startsWith("tojazz") || message.startsWith("tofuturejazz")) {
+            messageToJazz = true;
         }
 
         if (event.getChannel() instanceof ThreadChannel && event.getChannel().getName().contains("vs") && event.getChannel().getName().contains("private")) {
@@ -498,7 +504,7 @@ public class MessageListener extends ListenerAdapter {
 
         }
 
-        if (messageToColor || messageToMyself || messageToFutureColor) {
+        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz) {
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -518,26 +524,43 @@ public class MessageListener extends ListenerAdapter {
                 }
                 Player player_ = activeGame.getPlayer(event.getAuthor().getId());
 
-                if(messageToColor){
+                String jazzId = "228999251328368640";
+                if (messageToJazz && activeGame.getRealPlayerIDs().contains(jazzId)) {
+                    if (player_.getUserID().equals(jazzId)) {
+                        messageToMyself = true;
+                    } else {
+                        if (message.startsWith("tofuture")) {
+                            messageToFutureColor = true;
+                        } else {
+                            messageToColor = true;
+                        }
+                    }
+                }
+
+                if (messageToColor) {
                     String factionColor = msg3.substring(2, msg3.indexOf(" ")).toLowerCase();
                     factionColor = AliasHandler.resolveFaction(factionColor);
-                    for (Player player3 : activeGame.getPlayers().values()) {
+                    for (Player player3 : activeGame.getRealPlayers()) {
                         if (Objects.equals(factionColor, player3.getFaction()) ||
                             Objects.equals(factionColor, player3.getColor())) {
+                            player_ = player3;
+                            break;
+                        }
+                        if (player3.getUserID().equals("228999251328368640") && messageToJazz) {
                             player_ = player3;
                             break;
                         }
                     }
 
                     Whisper.sendWhisper(activeGame, player, player_, msg2, "n", event.getChannel(), event.getGuild());
-                }else if(messageToMyself){
+                } else if (messageToMyself) {
                     String previousThoughts = "";
-                    if(!activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).isEmpty()){
-                        previousThoughts = activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction())+". ";
+                    if (!activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()).isEmpty()) {
+                        previousThoughts = activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()) + ". ";
                     }
-                    activeGame.setCurrentReacts("futureMessageFor"+player.getFaction(),previousThoughts+msg2.replace(":","666fin"));
-                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " sent themselves a future message");
-                }else{
+                    activeGame.setCurrentReacts("futureMessageFor" + player.getFaction(), previousThoughts + msg2.replace(":", "666fin"));
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " sent themselves a future message");
+                } else {
                     String factionColor = msg3.substring(8, msg3.indexOf(" ")).toLowerCase();
                     factionColor = AliasHandler.resolveFaction(factionColor);
                     for (Player player3 : activeGame.getPlayers().values()) {
@@ -546,9 +569,14 @@ public class MessageListener extends ListenerAdapter {
                             player_ = player3;
                             break;
                         }
+                        if (player3.getUserID().equals("228999251328368640") && messageToJazz) {
+                            player_ = player3;
+                            break;
+                        }
                     }
-                    activeGame.setCurrentReacts("futureMessageFor_"+player_.getFaction()+"_"+player.getFaction(),activeGame.getFactionsThatReactedToThis("futureMessageFor_"+player_.getFaction()+"_"+player.getFaction())+" "+msg2.replace(":","666fin"));
-                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " sent someone else a future message");
+                    activeGame.setCurrentReacts("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction(),
+                        activeGame.getFactionsThatReactedToThis("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " " + msg2.replace(":", "666fin"));
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " sent someone else a future message");
                 }
                 msg.delete().queue();
             }

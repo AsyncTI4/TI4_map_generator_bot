@@ -1185,7 +1185,7 @@ public class Player {
         if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
             emoji = factionEmoji;
         }
-        if (getFactionModel() != null) {
+        if (emoji != null && getFactionModel() != null) {
             emoji = getFactionModel().getFactionEmoji();
         }
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);

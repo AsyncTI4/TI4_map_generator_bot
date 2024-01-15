@@ -132,7 +132,7 @@ public class ResourceHelper {
     @Nullable
     public String getNonSpoopyFinFile(String name) {
         // overlay_jackolantern_1
-       
+
         String spoopyPath = spoopyCache.get(name);
         if (spoopyPath != null) {
             return spoopyPath;
