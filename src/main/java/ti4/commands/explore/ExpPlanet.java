@@ -110,15 +110,16 @@ public class ExpPlanet extends ExploreSubcommandData {
                         ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
 
                         // Report to common channel
+                        String reportMessage = player.getFactionEmoji() + " used their " + Emojis.Naaz + "**Distant Suns** ability and found a **" + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentationPlusEmoji(planetName);
                         if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
-                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Using Distant Suns, " + player.getFactionEmoji() + " found a **" + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentation(planetName, activeGame));
+                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), reportMessage);
                             
                         } else {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Found a **" + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentation(planetName, activeGame));
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
                         }
                         
-                        Button resolveExplore1 = Button.success("resolve_explore_" + cardID1 + "_" + planetName, exploreModel1.getName());
-                        Button resolveExplore2 = Button.success("resolve_explore_" + cardID2 + "_" + planetName, exploreModel2.getName());
+                        Button resolveExplore1 = Button.success("resolve_explore_" + cardID1 + "_" + planetName + "_distantSuns", exploreModel1.getName());
+                        Button resolveExplore2 = Button.success("resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
                         List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                         List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed(), exploreModel2.getRepresentationEmbed());
                         String message = player.getRepresentation() + " please choose 1 Explore card to resolve.";

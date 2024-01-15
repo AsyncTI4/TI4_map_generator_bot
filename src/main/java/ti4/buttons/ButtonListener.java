@@ -912,6 +912,9 @@ public class ButtonListener extends ListenerAdapter {
             String planetName = info[1];
             Tile tile = activeGame.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " + "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+            if (buttonID.contains("_distantSuns")) {
+                messageText = player.getFactionEmoji() + " chose to resolve: ";
+            }
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, activeGame);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("refresh_")) {

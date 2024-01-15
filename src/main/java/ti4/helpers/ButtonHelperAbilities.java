@@ -1008,13 +1008,11 @@ public class ButtonHelperAbilities {
         String[] info = bID.split("_");
         String message;
         if ("decline".equalsIgnoreCase(info[0])) {
-            message = "Declined Distant Suns Ability";
+            message = player.getFactionEmoji() + " declined to use their Distant Suns ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 1, false);
         } else {
-            message = "Drawing two Explore Cards";
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 2, false);
         }
