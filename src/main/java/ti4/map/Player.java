@@ -1202,6 +1202,10 @@ public class Player {
         this.factionEmoji = factionEmoji;
     }
 
+    public String getFactionEmojiRaw() {
+        return factionEmoji;
+    }
+
     public boolean hasCustomFactionEmoji() {
         return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)
             && getFactionModel() != null && !factionEmoji.equalsIgnoreCase(getFactionModel().getFactionEmoji());

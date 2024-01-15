@@ -571,9 +571,10 @@ public class ButtonHelperFactionSpecific {
         Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
-            int amount = unitEntry.getValue();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
-            if (!unitName.contains("pds")) {
+            UnitModel unit = player.getUnitFromUnitKey(unitKey);
+            if (player.unitBelongsToPlayer(unitKey) && unit.getIsGroundForce()) {
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int amount = unitEntry.getValue();
                 new RemoveUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(origPlanet), amount + " " + unitName + " " + origPlanet, activeGame);
                 new AddUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(newPlanet), amount + " " + unitName + " " + newPlanet, activeGame);
             }

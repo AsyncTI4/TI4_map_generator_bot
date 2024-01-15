@@ -871,8 +871,8 @@ public class Mapper {
             case Constants.ABILITY -> displayName = getAbility(relatedID).getRepresentation();
             case Constants.UNIT -> {
                 UnitModel unit = getUnit(relatedID);
-                displayName = unit.getUnitEmoji() + " "
-                    + unit.getName() + " " + unit.getAbility();
+                displayName = unit.getUnitEmoji() + " " + unit.getName();
+                if (unit.getAbility().isPresent()) displayName += " - *" + unit.getAbility() + "*";
             }
             case Constants.LEADER -> displayName = getLeader(relatedID).getRepresentation(true, true, false);
             default -> {
