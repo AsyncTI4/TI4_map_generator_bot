@@ -12,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.model.ExploreModel;
 import ti4.generator.Mapper;
 
 public class PurgeFragments extends ExploreSubcommandData {
@@ -19,7 +20,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 	public PurgeFragments() {
 		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic. Can use unknown fragments)");
 		addOptions(typeOption.setRequired(true),
-				new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
+			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
 	}
@@ -30,7 +31,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		Player activePlayer = activeGame.getPlayer(getUser().getId());
 		activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
 		activePlayer = Helper.getPlayer(activeGame, activePlayer, event);
-		if (activePlayer == null){
+		if (activePlayer == null) {
 			sendMessage("Player not found in game.");
 			return;
 		}
@@ -44,10 +45,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 		List<String> unknowns = new ArrayList<>();
 		List<String> playerFragments = activePlayer.getFragments();
 		for (String id : playerFragments) {
-			String[] cardInfo = Mapper.getExploreRepresentation(id).split(";");
-			if (cardInfo[1].equalsIgnoreCase(color)) {
+			ExploreModel explore = Mapper.getExplore(id);
+			if (explore.getType().equalsIgnoreCase(color)) {
 				fragmentsToPurge.add(id);
-			} else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
+			} else if (explore.getType().equalsIgnoreCase(Constants.FRONTIER)) {
 				unknowns.add(id);
 			}
 		}
@@ -70,17 +71,16 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 
 		Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
-				p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")
-			).findFirst().orElse(null);
+			p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
 
-		if (lanefirPlayer != null){
+		if (lanefirPlayer != null) {
 			ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, "lanefir", event);
 		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		sendMessage(message);
-		
-		if(activePlayer.hasTech("dslaner")){
-			activePlayer.setAtsCount(activePlayer.getAtsCount()+1);
+
+		if (activePlayer.hasTech("dslaner")) {
+			activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);
 			sendMessage(activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
 		}
 

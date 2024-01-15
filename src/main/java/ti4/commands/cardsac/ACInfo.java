@@ -103,9 +103,9 @@ public class ACInfo extends ACCardsSubcommandData {
         //AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                "_ _\nClick a button below to play an Action Card",
-                getPlayActionCardButtons(activeGame, player));
+            player.getCardsInfoThread(),
+            "_ _\nClick a button below to play an Action Card",
+            getPlayActionCardButtons(activeGame, player));
 
         sendTrapCardInfo(activeGame, player);
     }
@@ -150,7 +150,7 @@ public class ACInfo extends ACCardsSubcommandData {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
@@ -211,7 +211,7 @@ public class ACInfo extends ACCardsSubcommandData {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
@@ -233,7 +233,7 @@ public class ACInfo extends ACCardsSubcommandData {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
@@ -249,7 +249,7 @@ public class ACInfo extends ACCardsSubcommandData {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.secondary("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
@@ -265,7 +265,7 @@ public class ACInfo extends ACCardsSubcommandData {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.danger("takeAC_" + value + "_" + player.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }

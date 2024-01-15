@@ -19,6 +19,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String resolution;
     private String text;
     private String attachmentId;
+    private String flavorText;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
@@ -47,7 +48,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
      */
     @Deprecated
     public String getRepresentation() {
-        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
+        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType().toLowerCase(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
     }
 
     public boolean search(String searchString) {

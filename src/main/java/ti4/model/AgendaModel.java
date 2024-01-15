@@ -133,7 +133,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         String name = getName() == null ? "" : getName();
         eb.setTitle(Emojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
         eb.setColor(Color.blue);
-        
+
         // DESCRIPTION
         StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
         if (getText1().length() > 0) {
@@ -147,6 +147,18 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         eb.setDescription(text.toString());
 
         if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        return eb.build();
+    }
+
+    public static MessageEmbed agendaIsInSomeonesHandEmbed() {
+        EmbedBuilder eb = new EmbedBuilder();
+        String name = "No info available";
+        eb.setTitle(Emojis.Agenda + "__" + name + "__", null);
+        eb.setColor(Color.blue);
+
+        // DESCRIPTION
+        StringBuilder text = new StringBuilder("This agenda is in somebody's hand");
+        eb.setDescription(text.toString());
         return eb.build();
     }
 

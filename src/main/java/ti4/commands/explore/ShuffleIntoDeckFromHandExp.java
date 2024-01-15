@@ -27,8 +27,7 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            String card = Mapper.getExploreRepresentation(id);
-            if (card != null) {
+            if (Mapper.getExplore(id) != null) {
                 activePlayer.removeFragment(id);
                 sb.append("Fragment discarded: ").append(displayExplore(id)).append(System.lineSeparator());
                 activeGame.addExplore(id);

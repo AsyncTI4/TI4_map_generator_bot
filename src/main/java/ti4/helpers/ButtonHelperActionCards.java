@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -16,6 +18,7 @@ import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExploreAndDiscard;
+import ti4.commands.special.NaaluCommander;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -32,6 +35,8 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
@@ -240,9 +245,8 @@ public class ButtonHelperActionCards {
         for (int i = 0; i < 3; i++) {
             String cardID = activeGame.drawExplore(type);
             sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
-            String card = Mapper.getExploreRepresentation(cardID);
-            String[] cardInfo = card.split(";");
-            String cardType = cardInfo[3];
+            ExploreModel card = Mapper.getExplore(cardID);
+            String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
                 sb.append(trueIdentity).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
@@ -405,11 +409,11 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
-     public static void resolveDistinguished(Player player, Game activeGame, ButtonInteractionEvent event) {
+    public static void resolveDistinguished(Player player, Game activeGame, ButtonInteractionEvent event) {
         player.addSpentThing("distinguished_5");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " added 5 votes to your vote total");
         event.getMessage().delete().queue();
-     }
+    }
 
     public static void resolveUprisingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -809,26 +813,8 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveInsiderInformation(Player player, Game activeGame, ButtonInteractionEvent event) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("__**Top Agenda:**__\n");
-        String agendaID = activeGame.lookAtTopAgenda(0);
-        sb.append("1: ");
-        if (activeGame.getSentAgendas().get(agendaID) != null) {
-            sb.append("This agenda is currently in somebody's hand. Showing the next agenda because thats how it should be by the RULEZ");
-            agendaID = activeGame.lookAtTopAgenda(1);
-            if (activeGame.getSentAgendas().get(agendaID) != null) {
-                sb.append("This agenda is currently in somebody's hand.");
-            } else if (agendaID != null) {
-                sb.append(Helper.getAgendaRepresentation(agendaID));
-            }
-        } else if (agendaID != null) {
-            sb.append(Helper.getAgendaRepresentation(agendaID));
-        } else {
-            sb.append("Could not find agenda");
-        }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " " + sb);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to "+ButtonHelper.getIdentOrColor(player, activeGame)+" cards info");
+        NaaluCommander.sendTopAgendaToCardsInfoSkipCovert(activeGame, player);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to " + ButtonHelper.getIdentOrColor(player, activeGame) + " cards info");
         event.getMessage().delete().queue();
     }
 
