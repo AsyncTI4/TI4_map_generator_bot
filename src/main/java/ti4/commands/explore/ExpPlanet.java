@@ -161,7 +161,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             return;
         }
-        resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+        resolveExplore(event, cardID, tile, planetName, messageText, player, activeGame);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeGame);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");

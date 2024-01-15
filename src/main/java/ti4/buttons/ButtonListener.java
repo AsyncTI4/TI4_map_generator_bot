@@ -913,7 +913,7 @@ public class ButtonListener extends ListenerAdapter {
             Tile tile = activeGame.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " +
                 "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
-            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, activeGame);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("refresh_")) {
             String planetName = buttonID.split("_")[1];

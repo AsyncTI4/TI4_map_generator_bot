@@ -53,7 +53,7 @@ public class UseExplore extends ExploreSubcommandData {
             Player player = activeGame.getPlayer(event.getUser().getId());
             player = Helper.getGamePlayer(activeGame, player, event, null);
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
-            resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id), player, activeGame);
+            resolveExplore(event, id, tile, planetName, messageText, player, activeGame);
         } else {
             sendMessage("Invalid card ID");
         }

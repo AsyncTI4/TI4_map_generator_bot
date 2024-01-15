@@ -116,7 +116,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Game activeGame) {
+    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, Player player, Game activeGame) {
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Player could not be found");
             return;
@@ -138,14 +138,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), messageText, exploreEmbed);
 
         String message = "Card has been discarded. Resolve effects manually.";
-        if (enigmatic || cardID.contains("starchart")) {
+        if (cardID.contains("starchart")) {
             message = "Card has been added to play area.";
             activeGame.purgeExplore(cardID);
         }
         if (tile == null) {
             tile = activeGame.getTileFromPlanet(planetName);
         }
-
 
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
             if (planetName != null) {
@@ -155,98 +154,111 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
 
-        String cardType = exploreModel.getType();
-        if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-            message = "Gained relic fragment";
-            player.addFragment(cardID);
-            activeGame.purgeExplore(cardID);
-        } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
-            String token = exploreModel.getAttachmentId().orElse("");
-            String tokenFilename = Mapper.getAttachmentImagePath(token);
-            if (tokenFilename != null && tile != null && planetName != null) {
-                PlanetModel planetInfo = Mapper.getPlanet(planetName);
-                if (Optional.ofNullable(planetInfo).isPresent()) {
-                    if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetName)) {
-                        if ((token.equals(Constants.WARFARE) ||
-                            token.equals(Constants.PROPULSION) ||
-                            token.equals(Constants.CYBERNETIC) ||
-                            token.equals(Constants.BIOTIC) ||
-                            token.equals(Constants.WEAPON))) {
-                            String attachmentID = Mapper.getAttachmentImagePath(token + "stat");
-                            if (attachmentID != null) {
-                                tokenFilename = attachmentID;
-                            }
-                        }
-                    }
-                }
-
-                if (token.equals(Constants.DMZ)) {
-                    String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
-                    tile.addToken(dmzLargeFilename, planetName);
-                    Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-                    UnitHolder planetUnitHolder = unitHolders.get(planetName);
-                    UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                    if (planetUnitHolder != null && spaceUnitHolder != null) {
-                        Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
-                        for (Player player_ : activeGame.getPlayers().values()) {
-                            String color = player_.getColor();
-                            planetUnitHolder.removeAllUnits(color);
-                        }
-                        Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                            UnitKey key = unitEntry.getKey();
-                            if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
-                                Integer count = spaceUnits.get(key);
-                                if (count == null) {
-                                    count = unitEntry.getValue();
-                                } else {
-                                    count += unitEntry.getValue();
-                                }
-                                spaceUnits.put(key, count);
-                            }
-                        }
-                    }
-                }
-                tile.addToken(tokenFilename, planetName);
+        // Card Type Handling
+        String cardType = exploreModel.getType().toLowerCase();
+        switch (cardType) {
+            case Constants.FRAGMENT -> {
+                message = "Gained relic fragment";
+                player.addFragment(cardID);
                 activeGame.purgeExplore(cardID);
-                message = "Token added to planet";
-                if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);
-                }
-                if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, activeGame, "xxcha", event);
-                }
-            } else {
-                message = "Invalid token, tile, or planet";
             }
-        } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
-            String token = exploreModel.getAttachmentId().orElse("");
-            String tokenFilename = Mapper.getTokenID(token);
-            if (tokenFilename != null && tile != null) {
-                if ("ionalpha".equalsIgnoreCase(token)) {
-                    message = "Use buttons to decide to place either an alpha or a beta ionstorm";
-                    List<Button> buttonIon = new ArrayList<>();
-                    buttonIon.add(Button.success("addIonStorm_beta_" + tile.getPosition(), "Put down a beta"));
-                    buttonIon.add(Button.secondary("addIonStorm_alpha_" + tile.getPosition(), "Put down an alpha"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
+            case Constants.ATTACH -> {
+                String token = exploreModel.getAttachmentId().orElse("");
+                String tokenFilename = Mapper.getAttachmentImagePath(token);
+                if (tokenFilename != null && tile != null && planetName != null) {
+                    PlanetModel planetInfo = Mapper.getPlanet(planetName);
+                    if (Optional.ofNullable(planetInfo).isPresent()) {
+                        if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetName)) {
+                            if ((token.equals(Constants.WARFARE) ||
+                                token.equals(Constants.PROPULSION) ||
+                                token.equals(Constants.CYBERNETIC) ||
+                                token.equals(Constants.BIOTIC) ||
+                                token.equals(Constants.WEAPON))) {
+                                String attachmentID = Mapper.getAttachmentImagePath(token + "stat");
+                                if (attachmentID != null) {
+                                    tokenFilename = attachmentID;
+                                }
+                            }
+                        }
+                    }
+    
+                    if (token.equals(Constants.DMZ)) {
+                        String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
+                        tile.addToken(dmzLargeFilename, planetName);
+                        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                        UnitHolder planetUnitHolder = unitHolders.get(planetName);
+                        UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
+                        if (planetUnitHolder != null && spaceUnitHolder != null) {
+                            Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                            for (Player player_ : activeGame.getPlayers().values()) {
+                                String color = player_.getColor();
+                                planetUnitHolder.removeAllUnits(color);
+                            }
+                            Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                                UnitKey key = unitEntry.getKey();
+                                if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                                    Integer count = spaceUnits.get(key);
+                                    if (count == null) {
+                                        count = unitEntry.getValue();
+                                    } else {
+                                        count += unitEntry.getValue();
+                                    }
+                                    spaceUnits.put(key, count);
+                                }
+                            }
+                        }
+                    }
+                    tile.addToken(tokenFilename, planetName);
+                    activeGame.purgeExplore(cardID);
+                    message = "Token added to planet";
+                    if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);
+                    }
+                    if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "xxcha", event);
+                    }
                 } else {
-                    tile.addToken(tokenFilename, Constants.SPACE);
-                    message = "Token added to map";
+                    message = "Invalid token, tile, or planet";
                 }
+            }
+            case Constants.TOKEN -> {
+                String token = exploreModel.getAttachmentId().orElse("");
+                String tokenFilename = Mapper.getTokenID(token);
+                if (tokenFilename != null && tile != null) {
+                    if ("ionalpha".equalsIgnoreCase(token)) {
+                        message = "Use buttons to decide to place either an alpha or a beta ionstorm";
+                        List<Button> buttonIon = new ArrayList<>();
+                        buttonIon.add(Button.success("addIonStorm_beta_" + tile.getPosition(), "Put down a beta"));
+                        buttonIon.add(Button.secondary("addIonStorm_alpha_" + tile.getPosition(), "Put down an alpha"));
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
+                    } else {
+                        tile.addToken(tokenFilename, Constants.SPACE);
+                        message = "Token added to map";
+                    }
 
-                if (Constants.MIRAGE.equalsIgnoreCase(token)) {
-                    Helper.addMirageToTile(tile);
-                    activeGame.clearPlanetsCache();
-                    message = "Mirage added to map, added to your stats, readied, and explored!";
+                    if (Constants.MIRAGE.equalsIgnoreCase(token)) {
+                        Helper.addMirageToTile(tile);
+                        activeGame.clearPlanetsCache();
+                        message = "Mirage added to map, added to your stats, readied, and explored!";
+                    }
+                    activeGame.purgeExplore(cardID);
+                } else {
+                    message = "Invalid token or tile";
                 }
-                activeGame.purgeExplore(cardID);
-            } else {
-                message = "Invalid token or tile";
             }
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        message = "";
 
         // Specific Explore Handling
         switch (cardID) {
+            case "ed1", "ed2" -> {
+                message = "Card has been added to play area.";
+                player.addRelic(Constants.ENIGMATIC_DEVICE);
+                activeGame.purgeExplore(cardID);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            }
             case "lc1", "lc2" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
                 message = hasSchemingAbility
@@ -307,7 +319,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
                 }
             }
-            case "mirage" -> {
+            case Constants.MIRAGE -> {
                 String mirageID = Constants.MIRAGE;
                 PlanetModel planetValue = Mapper.getPlanet(mirageID);
                 if (Optional.ofNullable(planetValue).isEmpty()) {
@@ -316,8 +328,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 new PlanetAdd().doAction(player, mirageID, activeGame);
                 new PlanetRefresh().doAction(player, mirageID, activeGame);
-                String planetTrait = Constants.CULTURAL;
-                String exploreID = activeGame.drawExplore(planetTrait);
+                String exploreID = activeGame.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
@@ -353,11 +364,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                 }
 
-                String exploredMessage = player.getRepresentation() + " explored " +
-                    Emojis.getEmojiFromDiscord(planetTrait) +
+                String exploredMessage = player.getRepresentation() + " explored " + Emojis.Cultural +
                     "Planet " + Helper.getPlanetRepresentationPlusEmoji(mirageID) + " *(tile " + tile.getPosition() + ")*:";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-                resolveExplore(event, exploreID, tile, mirageID, exploredMessage, false, player, activeGame);
+                resolveExplore(event, exploreID, tile, mirageID, exploredMessage, player, activeGame);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
@@ -379,7 +389,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 message = Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)
                     + ". This placement is optional though.";
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
@@ -419,10 +429,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = player.getRepresentation(true, true);
-                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                message += "\n" + trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
 
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";
@@ -502,7 +511,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Added as a relic (not actually a relic) - use /explore relic_purge to use it";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
-            default -> MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
         }
 
         if (player.hasAbility("fortune_seekers")) {

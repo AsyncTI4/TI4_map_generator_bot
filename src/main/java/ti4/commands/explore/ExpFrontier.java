@@ -42,7 +42,7 @@ public class ExpFrontier extends ExploreSubcommandData {
             space.removeToken(frontierFilename);
             String cardID = activeGame.drawExplore(Constants.FRONTIER);
             String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
-            resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
+            resolveExplore(event, cardID, tile, null, messageText, player, activeGame);
             
             if(player.hasTech("dslaner")){
                 player.setAtsCount(player.getAtsCount()+1);
@@ -58,7 +58,7 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
-            resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
+            resolveExplore(event, cardID, tile, null, messageText, player, activeGame);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
@@ -67,13 +67,5 @@ public class ExpFrontier extends ExploreSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
-    }
-
-    public static boolean checkIfEngimaticDevice(@NotNull Player player, String cardID) {
-        if ("ed1".equals(cardID) || "ed2".equals(cardID)) {
-            player.addRelic(Constants.ENIGMATIC_DEVICE);
-            return true;
-        }
-        return false;
     }
 }
