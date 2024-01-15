@@ -16,6 +16,7 @@ import ti4.map.Leader;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.PromissoryNoteModel;
 
 public class LeaderInfo extends LeaderSubcommandData {
     public LeaderInfo() {
@@ -49,9 +50,9 @@ public class LeaderInfo extends LeaderSubcommandData {
 
     public static void sendLeadersInfo(Game activeGame, Player player) {
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(), 
-                getLeaderInfo(activeGame, player),
-                getLeaderButtons(player));
+            player.getCardsInfoThread(),
+            getLeaderInfo(activeGame, player),
+            getLeaderButtons(player));
     }
 
     private static List<Button> getLeaderButtons(Player player) {
@@ -84,11 +85,9 @@ public class LeaderInfo extends LeaderSubcommandData {
             //PLAY AREA PROMISSORY NOTES
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    String pnData = Mapper.getPromissoryNoteText(pn.getKey(), false);
-                    if (pnData.contains("Alliance")) {
-                        String[] split = pnData.split(";");
-                        if (split.length < 2) continue;
-                        String color = split[1];
+                    PromissoryNoteModel pnData = Mapper.getPromissoryNote(pn.getKey());
+                    if (pnData.getName().equals("Alliance")) {
+                        String color = pnData.getColor().orElse(null);
                         for (Player player_ : activeGame.getPlayers().values()) {
                             if (player_.getColor().equalsIgnoreCase(color)) {
                                 Leader playerLeader = player_.unsafeGetLeader(Constants.COMMANDER);

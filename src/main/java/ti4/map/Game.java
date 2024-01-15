@@ -60,6 +60,7 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
+import ti4.model.ExploreModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -101,7 +102,9 @@ public class Game {
     private int activationCount;
     @ExportableField
     private int vp = 10;
-    @ExportableField @Getter @Setter
+    @ExportableField
+    @Getter
+    @Setter
     private int maxSOCountPerPlayer = 3;
     @ExportableField
     private boolean competitiveTIGLGame;
@@ -350,7 +353,7 @@ public class Game {
         return secretObjectives.size();
     }
 
-    public String getEndedDateString(){
+    public String getEndedDateString() {
         return Helper.getDateRepresentation(endedDate);
     }
 
@@ -1283,14 +1286,14 @@ public class Game {
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
         if (Objects.isNull(tradeGoodCount)) tradeGoodCount = 0;
-        if(tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)){
+        if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)) {
             Player player = getPlayerFromColorOrFaction(getFactionsThatReactedToThis("kyroHeroPlayer"));
-            if(player != null){
-                player.setTg(player.getTg()+tradeGoodCount);
+            if (player != null) {
+                player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);
                 ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
                 tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(getActionsChannel(), "The tgs that would be placed on the SC "+sc+" have instead been given to the Kyro Hero player, as per Kyro Hero text");
+                MessageHelper.sendMessageToChannel(getActionsChannel(), "The tgs that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
@@ -2270,10 +2273,9 @@ public class Game {
     private List<String> getExplores(String reqType, List<String> superDeck) {
         List<String> deck = new ArrayList<>();
         for (String id : superDeck) {
-            String card = Mapper.getExploreRepresentation(id);
+            ExploreModel card = Mapper.getExplore(id);
             if (card != null) {
-                String[] split = card.split(";");
-                String type = split[1];
+                String type = card.getType();
                 if (reqType.equalsIgnoreCase(type)) {
                     deck.add(id);
                 }
@@ -2328,7 +2330,7 @@ public class Game {
 
     public void discardExplore(String id) {
         explore.remove(id);
-        if (Mapper.getExploreRepresentation(id) != null) {
+        if (Mapper.getExplore(id) != null) {
             discardExplore.add(id);
         }
     }
@@ -2339,7 +2341,7 @@ public class Game {
     }
 
     public void addExplore(String id) {
-        if (Mapper.getExploreRepresentation(id) != null) {
+        if (Mapper.getExplore(id) != null) {
             int place = ThreadLocalRandom.current().nextInt(explore.size());
             explore.add(place, id);
         }
@@ -3049,6 +3051,7 @@ public class Game {
     }
 
     public Player getPlayer(String userID) {
+        if (userID == null) return null;
         return players.get(userID);
     }
 
@@ -3404,14 +3407,15 @@ public class Game {
     private int getExploreDeckFullSize(String exploreDeckID) {
         DeckModel exploreDeckModel = Mapper.getDeck(getExplorationDeckID());
         if (exploreDeckModel == null) return -1;
-        List<String> exploreDeck = new ArrayList<>();
+
+        int count = 0;
         for (String exploreCardID : exploreDeckModel.getNewDeck()) {
-            String exploreCard = Mapper.getExploreRepresentation(exploreCardID);
-            if (StringUtils.substringAfter(exploreCard, ";").toLowerCase().startsWith(exploreDeckID)) {
-                exploreDeck.add(exploreCard);
+            ExploreModel exploreCard = Mapper.getExplore(exploreCardID);
+            if (exploreCard.getType().equalsIgnoreCase(exploreDeckID)) {
+                count++;
             }
         }
-        return exploreDeck.size();
+        return count;
     }
 
     @JsonIgnore
@@ -3663,7 +3667,7 @@ public class Game {
         } else if (player.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             scText = "0/" + scText;
         }
-        
+
         return scText;
     }
 

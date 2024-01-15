@@ -36,7 +36,6 @@ import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -247,6 +246,7 @@ public class Player {
         }
         return 0;
     }
+
     public int getSpentInfantryThisWindow() {
         for (String thing : spentThingsThisWindow) {
             if (thing.contains("infantry_")) {
@@ -264,6 +264,7 @@ public class Player {
         }
         addSpentThing("tg_" + newTgSpent);
     }
+
     public void increaseInfantrySpentThisWindow(int amount) {
         int oldTgSpent = getSpentInfantryThisWindow();
         int newTgSpent = oldTgSpent + amount;
@@ -513,7 +514,7 @@ public class Player {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
-        
+
     }
 
     public boolean isReadyToPassBag() {
@@ -523,6 +524,7 @@ public class Player {
     public boolean doesPlayerPreferDistanceBasedTacticalActions() {
         return prefersDistanceBasedTacticalActions;
     }
+
     public boolean doesPlayerAutoPassOnWhensAfters() {
         return autoPassOnWhensAfters;
     }
@@ -530,6 +532,7 @@ public class Player {
     public void setPreferenceForDistanceBasedTacticalActions(boolean preference) {
         prefersDistanceBasedTacticalActions = preference;
     }
+
     public void setAutoPassWhensAfters(boolean preference) {
         autoPassOnWhensAfters = preference;
     }
@@ -976,15 +979,11 @@ public class Player {
         int cult = 0;
         int frontier = 0;
         for (String id : fragments) {
-            String[] cardInfo = Mapper.getExploreRepresentation(id).split(";");
-            if ("hazardous".equalsIgnoreCase(cardInfo[1])) {
-                haz = haz + 1;
-            } else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
-                frontier = frontier + 1;
-            } else if ("industrial".equalsIgnoreCase(cardInfo[1])) {
-                ind = ind + 1;
-            } else if ("cultural".equalsIgnoreCase(cardInfo[1])) {
-                cult = cult + 1;
+            switch (Mapper.getExplore(id).getType().toLowerCase()) {
+                case "cultural" -> cult++;
+                case "industrial" -> ind++;
+                case "hazardous" -> haz++;
+                case "frontier" -> frontier++;
             }
         }
         int targetToHit = 3 - frontier;
@@ -1034,7 +1033,7 @@ public class Player {
     private void updateFragments() {
         crf = irf = hrf = vrf = 0;
         for (String cardID : fragments) {
-            String color = Mapper.getExploreRepresentation(cardID).split(";")[1].toLowerCase();
+            String color = Mapper.getExplore(cardID).getType().toLowerCase();
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;
@@ -1149,9 +1148,9 @@ public class Player {
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
-                return getFactionEmoji() + roleForCommunity.getAsMention() + Emojis.getColorEmojiWithName(getColor());
+                return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " " + Emojis.getColorEmojiWithName(getColor());
             } else {
-                return getFactionEmoji() + Emojis.getColorEmojiWithName(getColor());
+                return getFactionEmoji() + " " + Emojis.getColorEmojiWithName(getColor());
             }
         }
 
@@ -1182,13 +1181,14 @@ public class Player {
 
     @NotNull
     public String getFactionEmoji() {
+        String emoji = null;
         if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
-            return factionEmoji;
+            emoji = factionEmoji;
         }
         if (getFactionModel() != null) {
-            return getFactionModel().getFactionEmoji();
+            emoji = getFactionModel().getFactionEmoji();
         }
-        return Emojis.getFactionIconFromDiscord(faction);
+        return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
     }
 
     public String getFactionEmojiOrColor() {
@@ -1671,10 +1671,10 @@ public class Player {
         try {
             int min = 100;
             Game activeGame = getGame();
-            for(int SC : getSCs()){
-                if(SC == ButtonHelper.getKyroHeroSC(activeGame)){
-                    min = Math.min(activeGame.getSCList().size()+1, min);
-                }else{
+            for (int SC : getSCs()) {
+                if (SC == ButtonHelper.getKyroHeroSC(activeGame)) {
+                    min = Math.min(activeGame.getSCList().size() + 1, min);
+                } else {
                     min = Math.min(SC, min);
                 }
             }
@@ -1734,8 +1734,8 @@ public class Player {
     }
 
     public boolean hasTech(String techID) {
-        if(techID.equals("det") || techID.equals("amd")){
-            if(techs.contains("absol_"+techID)){
+        if (techID.equals("det") || techID.equals("amd")) {
+            if (techs.contains("absol_" + techID)) {
                 return true;
             }
         }

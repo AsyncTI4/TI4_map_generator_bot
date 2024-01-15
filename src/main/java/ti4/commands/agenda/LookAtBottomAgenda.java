@@ -1,7 +1,5 @@
 package ti4.commands.agenda;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -9,7 +7,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class LookAtBottomAgenda extends AgendaSubcommandData {
     public LookAtBottomAgenda() {
@@ -28,43 +25,12 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("-----------\n");
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("`").append(event.getCommandString()).append("`").append("\n");
-        if (count > 1) {
-            sb.append("__**Bottom ").append(count).append(" agendas:**__\n");
-        } else {
-            sb.append("__**Bottom agenda:**__\n");
-        }
-        for (int i = 0; i < count; i++) {
-            String agendaID = activeGame.lookAtBottomAgenda(i);
-            sb.append(i + 1).append(": ");
-            if (activeGame.getSentAgendas().get(agendaID) != null) {
-                sb.append("This agenda is currently in somebody's hand.");
-            } else {
-                sb.append(Helper.getAgendaRepresentation(agendaID));
-            }
-            sb.append("\n");
-        }
-        sb.append("-----------\n");
-
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
-        if (player == null){
-            MessageHelper.sendMessageToUser(sb.toString(), event);
-        } else {
-            User userById = event.getJDA().getUserById(player.getUserID());
-            if (userById != null) {
-                if (activeGame.isCommunityMode() &&player.getPrivateChannel() != null && player.getPrivateChannel() instanceof MessageChannel) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
-                } else {
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-                }
-            } else {
-                MessageHelper.sendMessageToUser(sb.toString(), event);
-            }
+        if (player == null) {
+            sendMessage("You are not a player in this game.");
+            return;
         }
+        LookAtTopAgenda.lookAtAgendas(activeGame, player, count, true);
     }
 }

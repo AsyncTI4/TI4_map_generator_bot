@@ -62,7 +62,7 @@ public class PlayPN extends PNCardsSubcommandData {
             boolean foundSimilarName = false;
             String cardName = "";
             for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
-                String pnName = Mapper.getPromissoryNoteText(pn.getKey(), false);
+                String pnName = Mapper.getPromissoryNote(pn.getKey()).getName();
                 if (pnName != null) {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
@@ -101,14 +101,13 @@ public class PlayPN extends PNCardsSubcommandData {
                 }
             }
         }
-        
-       
+
         MessageEmbed pnEmbed = pnModel.getRepresentationEmbed();
         String emojiToUse = activeGame.isFoWMode() || pnOwner == null ? "" : pnOwner.getFactionEmoji();
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentation()).append(" played promissory note: ");
         sb.append(emojiToUse).append(Emojis.PN).append("**").append(pnName).append("**\n");
-        
+
         if ("dspnkoll".equalsIgnoreCase(pnID)) {
             ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame);
         }
@@ -118,7 +117,7 @@ public class PlayPN extends PNCardsSubcommandData {
             // Add extra message for visibility
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, sb.toString());
         }
-        
+
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), sb.toString(), pnEmbed);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
 
