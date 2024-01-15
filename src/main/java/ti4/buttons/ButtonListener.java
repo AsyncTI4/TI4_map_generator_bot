@@ -1307,6 +1307,12 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteTheOneButton(event);
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
+                case "absol_st" -> { // Absol's Sarween Tools
+                    player.addSpentThing("absol_sarween");
+                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                    ButtonHelper.deleteTheOneButton(event);
+                    event.getMessage().editMessage(exhaustedMessage).queue();
+                }
                 case "absol_pa" -> { // Absol's Psychoarcheology
                     List<Button> absolPAButtons = new ArrayList<>();
                     absolPAButtons.add(Button.primary("getDiscardButtonsACs", "Discard").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
@@ -1331,6 +1337,10 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "absol_bs" -> { //Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
+                }
+                case "absol_nm" -> { //Absol's Neural Motivator
+                    Button draw2ACButton = Button.secondary(player.getFinsFactionCheckerPrefix() + "sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                    MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 }
                 case "td" -> { //Transit Diodes
                     ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
@@ -4128,6 +4138,10 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sarweenButton = Button.danger("useTech_st", "Use Sarween");
+                    buttons.add(sarweenButton);
+                }
+                if (player.hasTechReady("absol_st")) {
+                    Button sarweenButton = Button.danger("useTech_absol_st", "Use Sarween Tools");
                     buttons.add(sarweenButton);
                 }
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {

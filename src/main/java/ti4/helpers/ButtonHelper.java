@@ -3500,7 +3500,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String finChecker = player.getFinsFactionCheckerPrefix();
         activeGame.setDominusOrb(false);
 
         List<Button> startButtons = new ArrayList<>();
@@ -7129,7 +7129,7 @@ public class ButtonHelper {
         buttonID = buttonID.replace(firstPart + "_", "");
 
         switch (firstPart) {
-            case "tech" -> {
+            case "tech" -> { // TODO: use the "exhaustTech_" stack of ButtonListener: `else if (buttonID.startsWith("exhaustTech_"))`
                 p1.exhaustTech(buttonID);
 
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), (p1.getRepresentation() + " exhausted tech: " + Helper.getTechRepresentation(buttonID)));
