@@ -64,7 +64,7 @@
         "name": "Psychoarchaeology",
         "type": "BIOTIC",
         "source": "absol",
-        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\n \n At the end of your turn, you may discard an action card to explore a readied planet you control.",
+        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nAt the end of your turn, you may discard an action card to explore a readied planet you control.",
         "homebrewReplacesID": "pa"
     },
     {

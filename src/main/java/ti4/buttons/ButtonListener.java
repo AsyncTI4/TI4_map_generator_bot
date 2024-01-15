@@ -1295,9 +1295,10 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes - 9, votes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
-        } else if (buttonID.startsWith("exhaustTech_")) {
-            String tech = buttonID.replace("exhaustTech_", "");
+        } else if (buttonID.startsWith("useTech_")) {
+            String tech = buttonID.replace("useTech_", "");
             String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " used tech: " + techRepresentation));
             switch (tech) {
                 case "st" -> { // Sarween Tools
                     player.addSpentThing("sarween");
@@ -1305,30 +1306,39 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteTheOneButton(event);
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
+                case "absol_pa" -> { // Absol's Psychoarcheology
+                    List<Button> absolPAButtons = new ArrayList<>();
+                    absolPAButtons.add(Button.primary("getDiscardButtonsACs", "Discard").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    for (String planetID : player.getReadiedPlanets()) {
+                        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, activeGame);
+                        if (planet != null && planet.getOriginalPlanetType() != null) {
+                            List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planet, player);
+                            absolPAButtons.addAll(planetButtons);
+                        }
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " use buttons to discard an AC and explore a readied Planet", absolPAButtons);  
+                }
+            }
+        } else if (buttonID.startsWith("exhaustTech_")) {
+            String tech = buttonID.replace("exhaustTech_", "");
+            String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+            player.exhaustTech(tech);
+            switch (tech) {
                 case "bs" -> { //Bio-stims
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
                 }
                 case "absol_bs" -> { //Bio-stims
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
                 }
                 case "td" -> { //Transit Diodes
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
                 }
                 case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
                 }
                 case "aida", "sar", "htp" -> {
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.deleteTheOneButton(event);
                     if (buttonLabel.contains("(")) {
                         player.addSpentThing(tech + "_");
@@ -1338,16 +1348,13 @@ public class ButtonListener extends ListenerAdapter {
                     String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
-                case "pi" -> {
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+                case "pi" -> { // Predictive Intelligence
                     Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(redistribute, deleButton));
                 }
-                case "gls"->{
-                    player.exhaustTech(tech);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+                case "gls" -> { // Graviton Laser System
+                    // Do Nothing
                 }
             }
         } else if (buttonID.startsWith("planetOutcomes_")) {
@@ -4119,7 +4126,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(aiDEVButton);
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
+                    Button sarweenButton = Button.danger("useTech_st", "Use Sarween");
                     buttons.add(sarweenButton);
                 }
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {

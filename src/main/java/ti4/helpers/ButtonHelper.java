@@ -3454,6 +3454,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("miltymod_hm") && !player.getExhaustedTechs().contains("miltymod_hm")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_miltymod_hm", "Exhaust Hyper Metabolism"));
         }
+        if (player.getTechs().contains("absol_pa") && !player.getReadiedPlanets().isEmpty()) {
+            endButtons.add(Button.success(finChecker + "useTech_absol_pa", "Use Psychoarchaeology"));
+        }
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
         }
