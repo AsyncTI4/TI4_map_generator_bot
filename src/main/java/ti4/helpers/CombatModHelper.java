@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -362,7 +361,7 @@ public class CombatModHelper {
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
                     scalingCount += opponentUnitsInCombat.stream()
-                        .filter(unit -> !unit.getBaseType().equals(UnitType.Fighter.value))
+                        .filter(unit -> !unit.getBaseType().equals("fighter"))
                         .count();
                 }
                 case "damaged_units_same_type" -> {
