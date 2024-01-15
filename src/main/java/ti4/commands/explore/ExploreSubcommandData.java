@@ -138,20 +138,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), messageText, exploreEmbed);
 
         String message = "Card has been discarded. Resolve effects manually.";
-        if (cardID.contains("starchart")) {
-            message = "Card has been added to play area.";
-            activeGame.purgeExplore(cardID);
-        }
-        if (tile == null) {
-            tile = activeGame.getTileFromPlanet(planetName);
-        }
-
+        
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
             if (planetName != null) {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getFactionEmoji() + " found a " + exploreModel.getName() + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
             } else {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getFactionEmoji() + " found a " + exploreModel.getName());
             }
+        }
+        
+        if (tile == null) {
+            tile = activeGame.getTileFromPlanet(planetName);
         }
 
         // Card Type Handling
@@ -507,8 +504,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgGain);
             }
             case "starchartcultural", "starchartindustrial", "starcharthazardous", "starchartfrontier" -> {
+                activeGame.purgeExplore(cardID);
                 player.addRelic(cardID);
-                message = "Added as a relic (not actually a relic) - use /explore relic_purge to use it";
+                message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
         }
