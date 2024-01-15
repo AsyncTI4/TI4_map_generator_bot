@@ -4,7 +4,7 @@
     "name": "Ancient Data Archive",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Exhaust each of your readied planets. Then, explore up to 2 of those planets.",
+    "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -13,7 +13,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "During this turn, you can negotiate transactions with players who are not your neighbor. Choose any number of other players. Those players gain 2 commodities.",
+    "text": "Choose any number of other players. Those players gain 2 commodities. During this turn, treat those players as if you were neighbors.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
     "source": "action_deck_2"
   },
@@ -21,9 +21,9 @@
     "alias": "annexation",
     "name": "Annexation",
     "phase": "Action",
-    "window": "After you commit units to land on a non-legendary, non-home planet other than Mecatol Rex",
-    "text": "The player who controls that planet must remove their ground forces from it and place them on a different planet they control, if able.",
-    "flavorText": "Those who surrendered were spared and compensated with passage to other worlds. The Hacan's reputation for fairness had won them a bloodless victory.",
+    "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
+    "text": "That player must remove all of their ground forces from that planet and place them on a different planet they control, if able.",
+    "flavorText": "Gila's silver tongue had scored the Emirates a victory. She, however, was more pleased with the enumerable lives that were spared.",
     "source": "action_deck_2"
   },
   {
@@ -40,7 +40,7 @@
     "name": "Arms Deal",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 of your neighbors. That player may place 1 cruiser and 1 destroyer from their reinforcements in any system containing their ships.",
+    "text": "Choose 1 of your neighbors. That player places 1 cruiser and 1 destroyer from their reinforcements in any system containing their ships.",
     "flavorText": "Ipswitch smirked when the Commander asked for the ships' documentation, \"Probably burned... with the bodies.\"",
     "source": "action_deck_2"
   },
@@ -57,7 +57,7 @@
     "alias": "artifact_research",
     "name": "Artifact Research",
     "phase": "Action",
-    "window": "When you spend resources to research",
+    "window": "When you spend resources to research a technology",
     "text": "Discard 1 of your relic fragments to reduce the resources spent by 4 and ignore 1 of that technology's prerequisites.",
     "flavorText": "The observation team had protested with one voice, threatening to return with fleets should the Creuss continue to bar them from this discovery.",
     "source": "action_deck_2"
@@ -68,7 +68,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Purge 2 of your relic fragments to gain 1 relic.",
-    "flavorText": "Carth breathed in the familiar air of the Golden Sands - home. If only she never had to leave. If only she were not here for such dark business.",
+    "flavorText": "Carth breathed in the familiar air of the Golden Sands. If only she never had to leave. If only she were not here for such dark business.",
     "source": "action_deck_2"
   },
   {
