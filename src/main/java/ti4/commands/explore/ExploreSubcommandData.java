@@ -116,7 +116,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, Player player, Game activeGame) {
+    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, String messageText, Player player, Game activeGame) {
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Player could not be found");
             return;
@@ -140,33 +140,32 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         String message = null;
         
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
-            if (planetName != null) {
-                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getFactionEmoji() + " found a " + exploreModel.getName() + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
+            if (planetID != null) {
+                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getFactionEmoji() + " found a " + exploreModel.getName() + " on " + Helper.getPlanetRepresentation(planetID, activeGame));
             } else {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getFactionEmoji() + " found a " + exploreModel.getName());
             }
         }
 
         if (tile == null) {
-            tile = activeGame.getTileFromPlanet(planetName);
+            tile = activeGame.getTileFromPlanet(planetID);
         }
 
-        // Special Resolution Handling
+        // Generic Resolution Handling
         switch (exploreModel.getResolution().toLowerCase()) {
             case Constants.FRAGMENT -> {
-                message = player.getFactionEmojiOrColor() + " Gained a Relic Fragment";
                 player.addFragment(cardID);
                 activeGame.purgeExplore(cardID);
             }
             case Constants.ATTACH -> {
                 String attachment = exploreModel.getAttachmentId().orElse("");
                 String attachmentFilename = Mapper.getAttachmentImagePath(attachment);
-                if (attachmentFilename == null || tile == null || planetName == null) {
+                if (attachmentFilename == null || tile == null || planetID == null) {
                     message = "Invalid attachment, tile, or planet";
                 } else {
-                    PlanetModel planetInfo = Mapper.getPlanet(planetName);
+                    PlanetModel planetInfo = Mapper.getPlanet(planetID);
                     if (Optional.ofNullable(planetInfo).isPresent()) {
-                        if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetName)) {
+                        if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
                             if ((attachment.equals(Constants.WARFARE) ||
                                 attachment.equals(Constants.PROPULSION) ||
                                 attachment.equals(Constants.CYBERNETIC) ||
@@ -182,9 +181,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
                     if (attachment.equals(Constants.DMZ)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
-                        tile.addToken(dmzLargeFilename, planetName);
+                        tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-                        UnitHolder planetUnitHolder = unitHolders.get(planetName);
+                        UnitHolder planetUnitHolder = unitHolders.get(planetID);
                         UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                         if (planetUnitHolder != null && spaceUnitHolder != null) {
                             Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
@@ -207,7 +206,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             }
                         }
                     }
-                    tile.addToken(attachmentFilename, planetName);
+                    tile.addToken(attachmentFilename, planetID);
                     activeGame.purgeExplore(cardID);
                     message = "Attachment `" + attachment +  "` added to planet";
                     if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
@@ -249,6 +248,18 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
         // Specific Explore Handling
         switch (cardID) {
+            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " gained " + Emojis.CFrag);
+            }
+            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " gained " + Emojis.HFrag);
+            }
+            case "irf1", "irf2", "irf3", "irf4", "irf5" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " gained " + Emojis.IFrag);  
+            }
+            case "urf1", "urf2", "urf3" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " gained " + Emojis.UFrag);
+            }
             case "ed1", "ed2" -> {
                 message = "Card has been added to play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
@@ -380,16 +391,16 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
-                if (tile != null && planetName != null) {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeGame, planetName);
+                if (tile != null && planetID != null) {
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, activeGame, planetID);
                 }
-                message = Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)
-                    + ". This placement is optional though.";
+                message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
+                    + ", however this placement *is* optional.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
-                Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech)); //TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
+                Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On " + planetID).withEmoji(Emoji.fromFormatted(Emojis.mech)); //TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -431,36 +442,36 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";
-                Button ReadyPlanet = Button.success("planet_ready", "Remove Inf Or Have Mech To Ready " + planetName);
+                Button ReadyPlanet = Button.success("planet_ready", "Remove Inf Or Have Mech To Ready " + planetID);
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ReadyPlanet, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "frln1", "frln2", "frln3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("freelancersBuild_" + planetName, "Build 1 Unit");
+                Button gainTG = Button.success("freelancersBuild_" + planetID, "Build 1 Unit");
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On " + planetName).withEmoji(Emoji.fromFormatted(Emojis.tg));
+                Button gainTG = Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On " + planetID).withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainCC = Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On " + planetName);
+                Button gainCC = Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On " + planetID);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "warforgeruins" -> {
                 message = "Resolve explore using the buttons.";
-                Button ruinsInf = Button.success("ruins_" + planetName + "_2inf", "Remove Inf Or Have Mech To Place 2 Infantry on " + Mapper.getPlanet(planetName).getName());
-                Button ruinsMech = Button.success("ruins_" + planetName + "_mech", "Remove Inf Or Have Mech To Place Mech on " + Mapper.getPlanet(planetName).getName());
+                Button ruinsInf = Button.success("ruins_" + planetID + "_2inf", "Remove Inf Or Have Mech To Place 2 Infantry on " + Mapper.getPlanet(planetID).getName());
+                Button ruinsMech = Button.success("ruins_" + planetID + "_mech", "Remove Inf Or Have Mech To Place Mech on " + Mapper.getPlanet(planetID).getName());
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ruinsInf, ruinsMech, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -470,10 +481,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Resolve explore using the buttons.";
                 for (Leader leader : player.getLeaders()) {
                     if (leader.isExhausted() && leader.getId().contains("agent")) {
-                        buttons.add(Button.success("seedySpace_" + leader.getId() + "_" + planetName, "Remove Inf Or Have Mech To Refresh " + Mapper.getLeader(leader.getId()).getName()));
+                        buttons.add(Button.success("seedySpace_" + leader.getId() + "_" + planetID, "Remove Inf Or Have Mech To Refresh " + Mapper.getLeader(leader.getId()).getName()));
                     }
                 }
-                buttons.add(Button.primary("seedySpace_AC_" + planetName, "Remove Inf Or Have Mech Draw AC "));
+                buttons.add(Button.primary("seedySpace_AC_" + planetID, "Remove Inf Or Have Mech Draw AC "));
                 buttons.add(Button.danger("decline_explore", "Decline Explore"));
 
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -526,8 +537,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "bentor", event);
         }
 
-        if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetName) && player.getPlanets().contains(planetName)) {
-            Button placeSleeper = Button.success("putSleeperOnPlanet_" + planetName, "Put Sleeper on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.Sleeper));
+        if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetID) && player.getPlanets().contains(planetID)) {
+            Button placeSleeper = Button.success("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID).withEmoji(Emoji.fromFormatted(Emojis.Sleeper));
             Button decline = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
             List<Button> buttons = List.of(placeSleeper, decline);
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
