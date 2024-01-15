@@ -39,7 +39,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         revealAgenda(event, revealFromBottom, activeGame, event.getChannel());
     }
 
-    public void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game activeGame, MessageChannel channel) {
+    public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game activeGame, MessageChannel channel) {
         if (!activeGame.getFactionsThatReactedToThis("lastAgendaReactTime").isEmpty()
             && ((new Date().getTime()) - Long.parseLong(activeGame.getFactionsThatReactedToThis("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -113,7 +113,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                     if (speaker != null) {
                         Map.Entry<String, Integer> entry = activeGame.drawAgenda();
                         if (entry == null) {
-                            sendMessage("It appears there are no cards left in the agenda deck. Ping Fin or Jazz.");
+                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "It appears there are no cards left in the agenda deck. Ping Fin or Jazz.");
                         } else {
                             StringBuilder sb = new StringBuilder();
                             sb.append(speaker.getRepresentation(true, true)).append(" this is the top agenda for Covert Legislation:");
