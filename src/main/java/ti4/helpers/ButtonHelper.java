@@ -4553,6 +4553,11 @@ public class ButtonHelper {
         return tile.getUnitHolders().get(planetName);
     }
 
+    
+    /**
+     * @deprecated just use {@link Player#getFactionEmoji()} instead
+     */
+    @Deprecated
     public static String getIdent(Player player) {
         return player.getFactionEmoji();
     }

@@ -159,28 +159,28 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 activeGame.purgeExplore(cardID);
             }
             case Constants.ATTACH -> {
-                String token = exploreModel.getAttachmentId().orElse("");
-                String tokenFilename = Mapper.getAttachmentImagePath(token);
-                if (tokenFilename == null || tile == null || planetName == null) {
-                    message = "Invalid token, tile, or planet";
+                String attachment = exploreModel.getAttachmentId().orElse("");
+                String attachmentFilename = Mapper.getAttachmentImagePath(attachment);
+                if (attachmentFilename == null || tile == null || planetName == null) {
+                    message = "Invalid attachment, tile, or planet";
                 } else {
                     PlanetModel planetInfo = Mapper.getPlanet(planetName);
                     if (Optional.ofNullable(planetInfo).isPresent()) {
                         if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetName)) {
-                            if ((token.equals(Constants.WARFARE) ||
-                                token.equals(Constants.PROPULSION) ||
-                                token.equals(Constants.CYBERNETIC) ||
-                                token.equals(Constants.BIOTIC) ||
-                                token.equals(Constants.WEAPON))) {
-                                String attachmentID = Mapper.getAttachmentImagePath(token + "stat");
+                            if ((attachment.equals(Constants.WARFARE) ||
+                                attachment.equals(Constants.PROPULSION) ||
+                                attachment.equals(Constants.CYBERNETIC) ||
+                                attachment.equals(Constants.BIOTIC) ||
+                                attachment.equals(Constants.WEAPON))) {
+                                String attachmentID = Mapper.getAttachmentImagePath(attachment + "stat");
                                 if (attachmentID != null) {
-                                    tokenFilename = attachmentID;
+                                    attachmentFilename = attachmentID;
                                 }
                             }
                         }
                     }
 
-                    if (token.equals(Constants.DMZ)) {
+                    if (attachment.equals(Constants.DMZ)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetName);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -207,9 +207,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             }
                         }
                     }
-                    tile.addToken(tokenFilename, planetName);
+                    tile.addToken(attachmentFilename, planetName);
                     activeGame.purgeExplore(cardID);
-                    message = "Token " + token +  " added to planet";
+                    message = "Attachment `" + attachment +  "` added to planet";
                     if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);
                     }
@@ -221,7 +221,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case Constants.TOKEN -> {
                 String token = exploreModel.getAttachmentId().orElse("");
                 String tokenFilename = Mapper.getTokenID(token);
-                if (tokenFilename != null && tile != null) {
+                if (tokenFilename == null || tile == null) {
+                    message = "Invalid token or tile";
+                } else {
                     if ("ionalpha".equalsIgnoreCase(token)) {
                         message = "Use buttons to decide to place either an alpha or a beta Ion Storm";
                         List<Button> buttonIon = new ArrayList<>();
@@ -230,7 +232,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
                     } else {
                         tile.addToken(tokenFilename, Constants.SPACE);
-                        message = "Token added to map";
+                        message = "Token `" + token +  "` added to map";
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
@@ -239,8 +241,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         message = "Mirage added to map, added to your stats, readied, and explored!";
                     }
                     activeGame.purgeExplore(cardID);
-                } else {
-                    message = "Invalid token or tile";
                 }
             }
         }

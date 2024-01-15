@@ -870,7 +870,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, true, false, "Looked at top of Hazardous, Cultural and Industrial decks.", "");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {//"autoAssignGroundHits_"
-            ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player, ident);
+            ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {//"autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("autoAssignAFBHits_")) {//"autoAssignGroundHits_"
@@ -911,8 +911,7 @@ public class ButtonListener extends ListenerAdapter {
             String cardID = info[0];
             String planetName = info[1];
             Tile tile = activeGame.getTileFromPlanet(planetName);
-            String messageText = player.getRepresentation() + " explored " +
-                "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+            String messageText = player.getRepresentation() + " explored " + "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, activeGame);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("refresh_")) {

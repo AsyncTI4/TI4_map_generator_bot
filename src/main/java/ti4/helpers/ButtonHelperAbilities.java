@@ -1003,17 +1003,17 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void distantSuns(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
+    public static void distantSuns(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         String bID = buttonID.replace("distant_suns_", "");
         String[] info = bID.split("_");
         String message;
         if ("decline".equalsIgnoreCase(info[0])) {
-            message = "Rejected Distant Suns Ability";
+            message = "Declined Distant Suns Ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 1, false);
         } else {
-            message = "Exploring twice";
+            message = "Drawing two Explore Cards";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 2, false);
