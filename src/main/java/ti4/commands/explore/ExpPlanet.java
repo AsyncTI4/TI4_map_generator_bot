@@ -140,9 +140,8 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         String messageText = player.getRepresentation() + " explored " +
             Emojis.getEmojiFromDiscord(drawColor) +
-            "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
-            "> " + displayExplore(cardID);
-        if(player.hasUnexhaustedLeader("lanefiragent")){
+            "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+        if (player.hasUnexhaustedLeader("lanefiragent")) {
             String card = Mapper.getExploreRepresentation(cardID);
             String[] cardInfo1 = card.split(";");
             String name1 = cardInfo1[0];

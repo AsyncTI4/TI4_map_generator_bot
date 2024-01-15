@@ -34,7 +34,6 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
-import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
@@ -46,6 +45,7 @@ import ti4.commands.ds.ZelianHero;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.RelicInfo;
 import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
@@ -802,7 +802,7 @@ public class ButtonListener extends ListenerAdapter {
             StringBuilder sb = new StringBuilder();
             sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             String topCard = deck.get(0);
-            sb.append(new ExpPlanet().displayExplore(topCard));
+            sb.append(ExploreSubcommandData.displayExplore(topCard));
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
@@ -836,7 +836,7 @@ public class ButtonListener extends ListenerAdapter {
             StringBuilder csb = new StringBuilder();
             csb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             String ctopCard = cdeck.get(0);
-            csb.append(new ExpPlanet().displayExplore(ctopCard));
+            csb.append(ExploreSubcommandData.displayExplore(ctopCard));
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, csb.toString());
             trait = "hazardous";
@@ -849,7 +849,7 @@ public class ButtonListener extends ListenerAdapter {
             StringBuilder hsb = new StringBuilder();
             hsb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             String htopCard = hdeck.get(0);
-            hsb.append(new ExpPlanet().displayExplore(htopCard));
+            hsb.append(ExploreSubcommandData.displayExplore(htopCard));
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, hsb.toString());
             trait = "industrial";
@@ -862,7 +862,7 @@ public class ButtonListener extends ListenerAdapter {
             StringBuilder isb = new StringBuilder();
             isb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             String itopCard = ideck.get(0);
-            isb.append(new ExpPlanet().displayExplore(itopCard));
+            isb.append(ExploreSubcommandData.displayExplore(itopCard));
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, isb.toString());
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "top of Hazardous, Cultural and Industrial explore decks has been set to " + playerFactionNameWithEmoji
@@ -912,9 +912,8 @@ public class ButtonListener extends ListenerAdapter {
             String planetName = info[1];
             Tile tile = activeGame.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " +
-                "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
-                "> " + new ExpPlanet().displayExplore(cardID);
-            new ExpPlanet().resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+                "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("refresh_")) {
             String planetName = buttonID.split("_")[1];

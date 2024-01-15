@@ -22,8 +22,8 @@ import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExpPlanet;
 import ti4.commands.explore.ExploreAndDiscard;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tokens.AddCC;
@@ -996,9 +996,8 @@ public class ButtonHelperAgents {
                 Tile tile = activeGame.getTileFromPlanet(planetName);
                 String messageText = player.getRepresentation() + " explored " +
                     Emojis.getEmojiFromDiscord(drawColor) +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
-                    "> " + new ExpPlanet().displayExplore(cardID);
-                new ExpPlanet().resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+                ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, activeGame);
                     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
@@ -1031,9 +1030,8 @@ public class ButtonHelperAgents {
                 String cardID = activeGame.drawExplore(drawColor);
                 String messageText = player.getRepresentation() + " explored " +
                     Emojis.getEmojiFromDiscord(drawColor) +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
-                    "> " + new ExpPlanet().displayExplore(cardID);
-                new ExpPlanet().resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+                ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, activeGame);
                     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
