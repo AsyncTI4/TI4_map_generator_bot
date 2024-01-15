@@ -137,7 +137,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed();
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), messageText, exploreEmbed);
 
-        String message = "Card has been discarded. Resolve effects manually.";
+        String message = null;
         
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
             if (planetName != null) {
@@ -146,23 +146,24 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getFactionEmoji() + " found a " + exploreModel.getName());
             }
         }
-        
+
         if (tile == null) {
             tile = activeGame.getTileFromPlanet(planetName);
         }
 
-        // Card Type Handling
-        String cardType = exploreModel.getType().toLowerCase();
-        switch (cardType) {
+        // Special Resolution Handling
+        switch (exploreModel.getResolution().toLowerCase()) {
             case Constants.FRAGMENT -> {
-                message = "Gained relic fragment";
+                message = player.getFactionEmojiOrColor() + " Gained a Relic Fragment";
                 player.addFragment(cardID);
                 activeGame.purgeExplore(cardID);
             }
             case Constants.ATTACH -> {
                 String token = exploreModel.getAttachmentId().orElse("");
                 String tokenFilename = Mapper.getAttachmentImagePath(token);
-                if (tokenFilename != null && tile != null && planetName != null) {
+                if (tokenFilename == null || tile == null || planetName == null) {
+                    message = "Invalid token, tile, or planet";
+                } else {
                     PlanetModel planetInfo = Mapper.getPlanet(planetName);
                     if (Optional.ofNullable(planetInfo).isPresent()) {
                         if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetName)) {
@@ -178,7 +179,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             }
                         }
                     }
-    
+
                     if (token.equals(Constants.DMZ)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetName);
@@ -208,15 +209,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     tile.addToken(tokenFilename, planetName);
                     activeGame.purgeExplore(cardID);
-                    message = "Token added to planet";
+                    message = "Token " + token +  " added to planet";
                     if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);
                     }
                     if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "xxcha", event);
                     }
-                } else {
-                    message = "Invalid token, tile, or planet";
                 }
             }
             case Constants.TOKEN -> {
@@ -224,10 +223,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 String tokenFilename = Mapper.getTokenID(token);
                 if (tokenFilename != null && tile != null) {
                     if ("ionalpha".equalsIgnoreCase(token)) {
-                        message = "Use buttons to decide to place either an alpha or a beta ionstorm";
+                        message = "Use buttons to decide to place either an alpha or a beta Ion Storm";
                         List<Button> buttonIon = new ArrayList<>();
-                        buttonIon.add(Button.success("addIonStorm_beta_" + tile.getPosition(), "Put down a beta"));
-                        buttonIon.add(Button.secondary("addIonStorm_alpha_" + tile.getPosition(), "Put down an alpha"));
+                        buttonIon.add(Button.success("addIonStorm_beta_" + tile.getPosition(), "Place a beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
+                        buttonIon.add(Button.secondary("addIonStorm_alpha_" + tile.getPosition(), "Place an alpha").withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
                     } else {
                         tile.addToken(tokenFilename, Constants.SPACE);
@@ -246,7 +245,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        message = "";
+        message = "Card has been discarded. Resolve effects manually.";
 
         // Specific Explore Handling
         switch (cardID) {
