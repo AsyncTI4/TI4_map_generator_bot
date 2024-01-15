@@ -134,6 +134,143 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your planet " + planetRep + " was exhausted.");
     }
 
+    public static void resolveAxisHeroStep1(Player player, Game activeGame){
+        List<Button> buttons = new ArrayList<>();
+        String message = player.getRepresentation()+" Click the axis order you would like to send";
+        for (String shipOrder : ButtonHelper.getPlayersShipOrders(player)) {
+            Button transact = Button.success("axisHeroStep2_" + shipOrder, "" + Mapper.getRelic(shipOrder).getName());
+            buttons.add(transact);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
+    public static List<String> getAllRevealedRelics(Game activeGame){
+        List<String> relicsTotal = new ArrayList<>();
+        for(Player player : activeGame.getRealPlayers()){
+            for(String relic : player.getRelics()){
+                if(relic.contains("axisorder") || relic.contains("enigmatic")){
+                    continue;
+                }
+                System.out.println(relic);
+                relicsTotal.add(player.getFaction()+";"+relic);
+            }
+        }
+
+        String key = "lanefirRelicReveal";
+        for(int x = 1; x < 4; x++){
+            if(!activeGame.getFactionsThatReactedToThis(key+x).isEmpty()){
+                relicsTotal.add(key+";"+activeGame.getFactionsThatReactedToThis(key+x));
+            }
+        }
+        return relicsTotal;
+    }
+    public static void resolveLanefirHeroStep1(Player player, Game activeGame){
+        List<String> revealedRelics = getAllRevealedRelics(activeGame);
+        String key = "lanefirRelicReveal";
+        String revealMsg = player.getRepresentation() +" you revealed the following 3 relics:\n";
+        for(int x = 1; x < 4; x++){
+            String relic = activeGame.drawRelic();
+            activeGame.setCurrentReacts(key+x,relic);
+            revealMsg = revealMsg + x+". "+Mapper.getRelic(relic).getName()+"\n";
+        }
+        int size = revealedRelics.size();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain "+size +" CCs");
+        Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+        Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+        String trueIdentity = player.getRepresentation(true, true);
+        String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+        revealedRelics = getAllRevealedRelics(activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), revealMsg);
+
+        List<Button> relicButtons = new ArrayList<Button>();
+        for(String fanctionNRelic : revealedRelics){
+            String relic = fanctionNRelic.split(";")[1];
+            relicButtons.add(Button.success("relicSwapStep1_"+fanctionNRelic, Mapper.getRelic(relic).getName()));
+        }
+        String revealMsg2 = player.getRepresentation() +" use buttons to swap any revealed relic or relic in play area with another relic. No Automated effects of a relic gain or loss will be applied. All relics can only move places once\n";
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), revealMsg2, relicButtons);
+    }
+
+    public static void resolveRelicSwapStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String fanctionNRelic = buttonID.replace("relicSwapStep1_","");
+        ButtonHelper.deleteTheOneButton(event);
+        String relic = fanctionNRelic.split(";")[1];
+        List<String> revealedRelics = getAllRevealedRelics(activeGame);
+        String revealMsg = player.getRepresentation() +" you chose to swap the relic "+Mapper.getRelic(relic).getName()+". Choose another relic to swap it with";
+        List<Button> relicButtons = new ArrayList<Button>();
+        for(String fanctionNRelic2 : revealedRelics){
+            if(fanctionNRelic.equalsIgnoreCase(fanctionNRelic2)){
+                continue;
+            }
+            String relic2 = fanctionNRelic2.split(";")[1];
+            relicButtons.add(Button.success("relicSwapStep2;"+fanctionNRelic+";"+fanctionNRelic2, Mapper.getRelic(relic2).getName()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), revealMsg, relicButtons);
+    }
+    public static void resolveRelicSwapStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        event.getMessage().delete().queue();
+        String faction = buttonID.split(";")[1];
+        String relic = buttonID.split(";")[2];
+        String faction2 = buttonID.split(";")[3];
+        String relic2 = buttonID.split(";")[4];
+        String revealMsg = player.getRepresentation() +" you chose to swap the relic "+Mapper.getRelic(relic).getName()+" with the relic "+Mapper.getRelic(relic2).getName()+"";
+        MessageHelper.sendMessageToChannel((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), revealMsg);
+        if(faction.contains("lanefirRelicReveal")){
+            activeGame.removeMessageIDFromCurrentReacts(faction);
+        }else{
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+            String msg = p2.getRepresentation()+" your relic "+ Mapper.getRelic(relic).getName()+" was swapped via Lanefir hero with the relic "+Mapper.getRelic(relic2).getName()+". Please resolve any necessary effects of this transition";
+            p2.removeRelic(relic);
+            p2.addRelic(relic2);
+            MessageHelper.sendMessageToChannel( ButtonHelper.getCorrectChannel(p2, activeGame), msg);
+        }
+        if(faction2.contains("lanefirRelicReveal")){
+            activeGame.removeMessageIDFromCurrentReacts(faction2);
+        }else{
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction2);
+            String msg = p2.getRepresentation()+" your relic "+ Mapper.getRelic(relic2).getName()+" was swapped via Lanefir hero with the relic "+Mapper.getRelic(relic).getName()+". Please resolve any necessary effects of this transition";
+            p2.removeRelic(relic2);
+            p2.addRelic(relic);
+            MessageHelper.sendMessageToChannel( ButtonHelper.getCorrectChannel(p2, activeGame), msg);
+        }
+
+    }
+    public static void resolveAxisHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String shipOrder = buttonID.split("_")[1];
+        String message = player.getRepresentation()+" Click the player you would like to give the order to and force them to give you a PN";
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("axisHeroStep3_" + shipOrder+"_"+p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("axisHeroStep3_" +  shipOrder+"_"+p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+    public static void resolveAxisHeroStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String shipOrder = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        String message = player.getRepresentation()+" sent "+Mapper.getRelic(shipOrder).getName() + " to "+ ButtonHelper.getIdentOrColor(p2, activeGame) + " who now owes a PN. Buttons have been sent to the players cards info thread to resolve";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+        List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, player, p2);
+        String message2 = p2.getRepresentation(true, true)
+            + " You have been given an axis order by Axis Hero and now must send a PN. Please select the PN you would like to send";
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message2, stuffToTransButtons);
+        event.getMessage().delete().queue();
+    }
     public static void resolveKhraskHeroStep3Ready(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2.getExhaustedPlanets().isEmpty()) {

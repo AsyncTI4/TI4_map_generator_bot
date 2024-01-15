@@ -2103,7 +2103,11 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReactorMeltdownStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep3_")) {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
-        } else if (buttonID.startsWith("purgeKortaliHero_")) {
+        } else if (buttonID.startsWith("axisHeroStep3_")) {
+            ButtonHelperHeroes.resolveAxisHeroStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("axisHeroStep2_")) {
+            ButtonHelperHeroes.resolveAxisHeroStep2(player, activeGame, event, buttonID);
+        } else if(buttonID.startsWith("purgeKortaliHero_")){
             Leader playerLeader = player.unsafeGetLeader("kortalihero");
             StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
@@ -2337,6 +2341,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.removeSleeper(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("replaceSleeperWith_")) {
             ButtonHelperAbilities.replaceSleeperWith(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("relicSwapStep2")) {
+            ButtonHelperHeroes.resolveRelicSwapStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("relicSwapStep1")) {
+            ButtonHelperHeroes.resolveRelicSwapStep1(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("topAgenda_")) {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), activeGame);
