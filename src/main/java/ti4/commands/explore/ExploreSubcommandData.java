@@ -140,7 +140,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
 
-        String cardType = card.getType();
+        String cardType = card.getResolution();
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
             message = "Gained relic fragment";
             player.addFragment(cardID);
