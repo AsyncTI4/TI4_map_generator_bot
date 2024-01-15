@@ -179,6 +179,12 @@ public class HeroPlay extends LeaderAction {
              case "mortheushero"->{
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, activeGame, event));
             }
+            case "axishero"->{
+                ButtonHelperHeroes.resolveAxisHeroStep1(player, activeGame);
+            }
+            case "lanefirhero"->{
+                ButtonHelperHeroes.resolveLanefirHeroStep1(player, activeGame);
+            }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " removed all of your ccs from the board");
                 for (Tile t : activeGame.getTileMap().values()) {
