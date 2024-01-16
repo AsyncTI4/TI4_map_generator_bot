@@ -1,6 +1,9 @@
 package ti4.commands.explore;
 
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,7 +20,7 @@ public class UseExplore extends ExploreSubcommandData {
 
     public UseExplore() {
         super(Constants.USE, "Draw and activate an explore card from the deck or discard");
-        addOptions(idOption.setRequired(true));
+        addOptions(idOption.setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
@@ -26,6 +29,7 @@ public class UseExplore extends ExploreSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
+        id = StringUtils.substringBefore(id, " ");
         if (activeGame.pickExplore(id) != null) {
             OptionMapping planetOption = event.getOption(Constants.PLANET);
             String planetName = null;

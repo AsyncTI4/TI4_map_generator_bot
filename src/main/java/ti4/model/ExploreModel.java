@@ -53,8 +53,11 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || 
+                getText().toLowerCase().contains(searchString) ||
+                getId().toLowerCase().contains(searchString) ||
+                getType().toLowerCase().contains(searchString) ||
+                getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
