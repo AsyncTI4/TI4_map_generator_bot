@@ -1,18 +1,23 @@
 package ti4.commands.planet;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.model.PlanetTypeModel;
-import ti4.model.TechSpecialtyModel;
-import ti4.model.TileModel;
+import ti4.model.PlanetModel;
 
 public class PlanetInfo extends PlanetSubcommandData implements InfoThreadCommand {
     public PlanetInfo() {
@@ -24,52 +29,59 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
         return Constants.PLANET_INFO;
     }
 
+    protected String getActionDescription() {
+        return "Sends list of owned planets to your Cards-Info thread";
+    }
+
     public boolean accept(SlashCommandInteractionEvent event) {
         return acceptEvent(event, getActionID());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        var user = event.getUser();
-        var activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        User user = event.getUser();
+        Game activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
 
-        var player = activeGame.getPlayer(user.getId());
-        var planets = activeGame.getPlayer(user.getId()).getPlanets()
-            .stream()
-            .map(planetId -> {
-                var planet = (Planet) activeGame.getPlanetsInfo().get(planetId);
-                var planetModel = Mapper.getPlanet(planetId);
-
-                EmbedBuilder eb = new EmbedBuilder();
-
-                StringBuilder sb = new StringBuilder();
-                sb.append(planetModel.getEmoji()).append("__").append(planetModel.getName()).append("__");
-                eb.setTitle(sb.toString());
-
-                TileModel tile = TileHelper.getTile(planetModel.getTileId());
-                sb = new StringBuilder();
-                sb.append(Emojis.getResourceEmoji(planet.getResources())).append(Emojis.getInfluenceEmoji(planet.getInfluence())).append("\n");
-
-                if (tile != null) sb.append("System: ").append(tile.getName());
-                System.err.println(sb.toString());
-                eb.setDescription(sb.toString());
-                if (planetModel.getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + planetModel.getLegendaryAbilityName(), planetModel.getLegendaryAbilityText(), false);
-                if (planetModel.getFlavourText() != null) eb.addField("", planetModel.getFlavourText(), false);
-
-                sb = new StringBuilder();
-                sb.append("ID: ").append(planetId);
-                eb.setFooter(sb.toString());
-
-                if (planetModel.getEmojiURL() != null) eb.setThumbnail(planetModel.getEmojiURL());
-
-                return eb.build();
-            })
-            .toList();
-
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "__**Planets:**__\n", planets);
+        Player player = activeGame.getPlayer(user.getId());
+        sendPlanetInfo(player);
     }
 
-    protected String getActionDescription() {
-        return "Sends list of owned planets to your Cards-Info thread";
+    public static void sendPlanetInfo(Player player) {
+        List<MessageEmbed> planetEmbeds = player.getPlanets()
+            .stream()
+            .map(planetID -> getPlanetEmbed(player, planetID))
+            .toList();
+
+        Button refreshPlanets = Button.secondary(Constants.REFRESH_PLANET_INFO, "Refresh Planets Info");
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), "__**Planets:**__", planetEmbeds, List.of(refreshPlanets));
+    }
+
+    private static MessageEmbed getPlanetEmbed(Player player, String planetID) {
+        Game activeGame = player.getGame();
+        Planet planet = (Planet) activeGame.getPlanetsInfo().get(planetID);
+        PlanetModel planetModel = Mapper.getPlanet(planetID);
+        Tile tile = activeGame.getTileFromPlanet(planetID);
+
+        EmbedBuilder eb = new EmbedBuilder();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(planetModel.getEmoji()).append("__").append(planetModel.getName()).append("__");
+        if (tile != null) sb.append(" (").append(tile.getPosition()).append(")");
+        eb.setTitle(sb.toString());
+
+        sb = new StringBuilder();
+        if (player.getReadiedPlanets().contains(planetID)) {
+            sb.append("Ready: ");
+        } else {
+            sb.append("Exhausted: ");
+        }
+        sb.append(Emojis.getResourceEmoji(planet.getResources())).append(Emojis.getInfluenceEmoji(planet.getInfluence())).append("\n");
+        eb.setDescription(sb.toString());
+        Mapper.getTokensToName();
+        if (!planet.getTokenList().isEmpty()) eb.addField("Attachments", planet.getTokenList().stream().map(Mapper::getTokenIDFromTokenPath).toList().toString(), true);
+
+        if (planetModel.getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + planetModel.getLegendaryAbilityName(), planetModel.getLegendaryAbilityText(), false);
+
+        return eb.build();
     }
 }
