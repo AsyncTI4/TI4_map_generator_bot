@@ -37,6 +37,7 @@ import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
+import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
@@ -1086,9 +1087,10 @@ public class AutoCompleteProvider {
                         List<String> explores = activeGame.getAllExplores();
                         List<Command.Choice> options = explores.stream()
                             .map(Mapper::getExplore)
-                            .filter(entry -> entry.search(enteredValue))
+                            .filter(e -> e.search(enteredValue))
                             .limit(25)
-                            .map(entry -> new Command.Choice(entry.getId() + " " + entry.getName() + " (" + entry.getType() +")", entry.getId()))
+                            .sorted(Comparator.comparing(ExploreModel::getAutoCompleteName))
+                            .map(e -> new Command.Choice(e.getAutoCompleteName(), e.getId()))
                             .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }

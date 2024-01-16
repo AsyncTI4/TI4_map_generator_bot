@@ -65,7 +65,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getType() + ") (" + getSource() + ")";
+        return getName() + " (" + getType() + ") [" + getSource() + "]";
     }
 
     public MessageEmbed getRepresentationEmbed() {
