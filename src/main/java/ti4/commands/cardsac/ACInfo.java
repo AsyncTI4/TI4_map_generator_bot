@@ -1,17 +1,14 @@
 package ti4.commands.cardsac;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.commands.uncategorized.InfoThreadCommand;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -45,20 +42,6 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         sendMessage("AC Info Sent");
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
-    }
-
-    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
-    }
-
     private static void sendTrapCardInfo(Game activeGame, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { //Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getTrapCardInfo(activeGame, player));
@@ -68,13 +51,10 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     private static String getTrapCardInfo(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
-
-        //ACTION CARDS
         sb.append("**Trap Cards:**").append("\n");
         int index = 1;
-
-        LinkedHashMap<String, Integer> trapCards = player.getTrapCards();
-        LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+        Map<String, Integer> trapCards = player.getTrapCards();
+        Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         if (trapCards != null) {
             if (trapCards.isEmpty()) {
                 sb.append("> None");
@@ -87,11 +67,10 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 }
             }
         }
-
         return sb.toString();
     }
 
-    public static String getTrapCardRepresentation(String trapID, LinkedHashMap<String, String> trapCardsPlanets) {
+    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
         Map<String, String> dsHandcards = Mapper.getDSHandcards();
         String info = dsHandcards.get(trapID);
@@ -119,28 +98,19 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentation() + " pressed button: " + event.getButton().getLabel();
+    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendActionCardInfo(activeGame, player);
-        sendTrapCardInfo(activeGame, player);
     }
 
     public static void sendActionCardInfo(Game activeGame, Player player) {
         //AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
-
-        //BUTTONS
-        String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-        List<Button> acButtons = getPlayActionCardButtons(activeGame, player);
-        if (!acButtons.isEmpty()) {
-
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
+        MessageHelper.sendMessageToChannelWithButtons(
+            player.getCardsInfoThread(),
+            "_ _\nClick a button below to play an Action Card",
+            getPlayActionCardButtons(activeGame, player));
 
         sendTrapCardInfo(activeGame, player);
     }
@@ -153,7 +123,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         sb.append("**Action Cards:**").append("\n");
         int index = 1;
 
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null) {
             if (actionCards.isEmpty()) {
                 sb.append("> None");
@@ -179,13 +149,13 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     private static List<Button> getPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
@@ -196,11 +166,15 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             acButtons.add(nekroButton);
         }
+        if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
+            Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace").withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+            acButtons.add(hacanButton);
+        }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent", "Use Vaylerian Agent").withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
             acButtons.add(nekroButton);
         }
-        if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0) {
+        if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0 && !activeGame.getLaws().containsKey("articles_war")) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             acButtons.add(ghostButton);
         }
@@ -237,12 +211,12 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     public static List<Button> getActionPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
@@ -255,7 +229,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     public static List<Button> getDiscardActionCardButtons(Game activeGame, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         String stall = "";
         if (doingAction) {
             stall = "stall";
@@ -264,7 +238,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
@@ -275,12 +249,12 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     public static List<Button> getYssarilHeroActionCardButtons(Game activeGame, Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
+        Map<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.secondary("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
@@ -291,12 +265,12 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     public static List<Button> getToBeStolenActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
+                String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.danger("takeAC_" + value + "_" + player.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }

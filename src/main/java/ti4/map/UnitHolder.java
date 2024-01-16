@@ -2,14 +2,16 @@ package ti4.map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -17,11 +19,10 @@ import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "javaClassType")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Space.class, name = "space"),
-    @JsonSubTypes.Type(value = Planet.class, name = "planet")
+    @JsonSubTypes.Type(value = Space.class, name = "Space"),
+    @JsonSubTypes.Type(value = Planet.class, name = "Planet")
 })
 abstract public class UnitHolder {
     private final String name;
@@ -29,12 +30,12 @@ abstract public class UnitHolder {
     private final Point holderCenterPosition;
 
     // ID, Count
-    private final HashMap<UnitKey, Integer> units = new HashMap<>();
-    private final HashMap<UnitKey, Integer> unitsDamage = new HashMap<>();
+    private final Map<UnitKey, Integer> units = new HashMap<>();
+    private final Map<UnitKey, Integer> unitsDamage = new HashMap<>();
 
-    private final HashSet<String> ccList = new HashSet<>();
-    private final HashSet<String> controlList = new HashSet<>();
-    protected final HashSet<String> tokenList = new HashSet<>();
+    private final Set<String> ccList = new HashSet<>();
+    private final Set<String> controlList = new HashSet<>();
+    protected final Set<String> tokenList = new HashSet<>();
 
     public String getName() {
         return name;
@@ -80,6 +81,10 @@ abstract public class UnitHolder {
         controlList.remove(cc);
     }
 
+    /**
+     * Adds a variety of tokens from faction effects and other game mechanics (sleeper tokens,
+     * frontier tokens, wormhole tokens, etc).
+     */
     public boolean addToken(String cc) {
         return tokenList.add(cc);
     }
@@ -154,7 +159,7 @@ abstract public class UnitHolder {
         units.keySet().removeIf(key -> key.getColorID().equals(colorID));
     }
 
-    public HashMap<UnitKey, Integer> getUnits() {
+    public Map<UnitKey, Integer> getUnits() {
         return units;
     }
 
@@ -176,7 +181,8 @@ abstract public class UnitHolder {
         return !getUnits().isEmpty();
     }
 
-    public HashMap<UnitKey, Integer> getUnitDamage() {
+    @JsonProperty("unitsDamage")
+    public Map<UnitKey, Integer> getUnitDamage() {
         return unitsDamage;
     }
 
@@ -187,15 +193,19 @@ abstract public class UnitHolder {
               .findFirst().map(Entry::getValue).orElse(0);
     }
 
-    public HashSet<String> getCCList() {
+    /**
+     * Get the Command Counter list.
+     */
+    @JsonProperty("commandCounterList")
+    public Set<String> getCCList() {
         return ccList;
     }
 
-    public HashSet<String> getTokenList() {
+    public Set<String> getTokenList() {
         return tokenList;
     }
 
-    public HashSet<String> getControlList() {
+    public Set<String> getControlList() {
         return controlList;
     }
 
@@ -203,12 +213,13 @@ abstract public class UnitHolder {
         return holderCenterPosition;
     }
 
-    public HashMap<String, Integer> getUnitAsyncIdsOnHolder(String color) {
+    public Map<String, Integer> getUnitAsyncIdsOnHolder(String color) {
         return new HashMap<>(units.entrySet().stream()
             .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
             .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
     }
 
+    @JsonIgnore
     public List<String> getUnitColorsOnHolder() {
         return getUnits().keySet().stream()
             .map(this::getUnitColor)
@@ -216,10 +227,12 @@ abstract public class UnitHolder {
             .collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public String getUnitAliasId(UnitKey unitKey) {
         return unitKey.asyncID();
     }
 
+    @JsonIgnore
     public String getUnitColor(UnitKey unitKey) {
         return unitKey.getColorID();
     }

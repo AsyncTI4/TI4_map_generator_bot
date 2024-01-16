@@ -14,7 +14,7 @@ public class OfferAutoPassOptions extends CustomSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        ButtonHelper.offerSetAutoPassOnSaboButtons(activeGame);
+        ButtonHelper.offerSetAutoPassOnSaboButtons(activeGame, null);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Offered options");
     }
 }

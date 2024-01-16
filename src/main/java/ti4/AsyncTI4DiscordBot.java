@@ -348,7 +348,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
-        bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
+        bothelperRoles.addAll(adminRoles); //admins can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
@@ -356,7 +356,6 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
-
         bothelperRoles.removeIf(Objects::isNull);
     }
 

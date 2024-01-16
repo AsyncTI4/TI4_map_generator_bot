@@ -1,5 +1,9 @@
 package ti4.commands.cardspn;
+
+import java.util.List;
 import java.util.Map;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -40,14 +44,14 @@ public class ShowPN extends PNCardsSubcommandData {
         }
 
         int acIndex = option.getAsInt();
-        String acID = null;
+        String pnID = null;
         for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
             if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+                pnID = so.getKey();
             }
         }
 
-        if (acID == null) {
+        if (pnID == null) {
             sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
@@ -58,16 +62,13 @@ public class ShowPN extends PNCardsSubcommandData {
             return;
         }
 
-        String sb = "---------\n" +
-            "Game: " + activeGame.getName() + "\n" +
-            "Player: " + player.getUserName() + "\n" +
-            "Showed Promissory Note:" + "\n" +
-            Mapper.getPromissoryNote(acID, longPNDisplay) + "\n" +
-            "---------\n";
-        player.setPromissoryNote(acID);
-        
+        MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(!longPNDisplay, false, false);
+        player.setPromissoryNote(pnID);
+
+        String message = player.getRepresentation(false, false) + " showed you a promissory note:";
+
         sendMessage("PN shown");
         PNInfo.sendPromissoryNoteInfo(activeGame, player, longPNDisplay);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeGame, sb);
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, targetPlayer, message, List.of(pnEmbed));
     }
 }

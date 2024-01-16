@@ -11,8 +11,6 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
 public class TrapSwap extends DiscordantStarsSubcommandData {
 
     public TrapSwap() {
@@ -64,7 +62,7 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
         if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG) &&
                 unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
 
-            LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+            Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap1 = null;
             String trap2 = null;
             for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {

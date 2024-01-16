@@ -11,14 +11,13 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 public class AddControl extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();

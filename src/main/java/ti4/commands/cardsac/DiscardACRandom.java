@@ -15,7 +15,8 @@ import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DiscardACRandom extends ACCardsSubcommandData {
     public DiscardACRandom() {
@@ -40,7 +41,7 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
+        Map<String, Integer> actionCardsMap = player.getActionCards();
         if (actionCardsMap.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
             return;
@@ -56,8 +57,8 @@ public class DiscardACRandom extends ACCardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append(" - ");
         sb.append("Discarded Action Card:").append("\n");
         while (count > 0 && player.getActionCards().size() > 0) {
-            LinkedHashMap<String, Integer> actionCards_ = player.getActionCards();
-            ArrayList<String> cards_ = new ArrayList<>(actionCards_.keySet());
+            Map<String, Integer> actionCards_ = player.getActionCards();
+            List<String> cards_ = new ArrayList<>(actionCards_.keySet());
             Collections.shuffle(cards_);
             String acID = cards_.get(0);
             boolean removed = activeGame.discardActionCard(player.getUserID(), actionCards_.get(acID));

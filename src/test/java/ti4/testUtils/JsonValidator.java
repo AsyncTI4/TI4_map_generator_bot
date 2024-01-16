@@ -10,13 +10,14 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ti4.json.ObjectMapperFactory;
 
 /**
  * Utility test class that allows us to validate our source files are correctly configured
  * for JSON save/restore.
  */
 public final class JsonValidator<T> {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
     
     private JsonValidator() {}
 

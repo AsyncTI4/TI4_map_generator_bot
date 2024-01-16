@@ -6,7 +6,8 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -34,19 +35,23 @@ public class UnitInfo extends PlayerSubcommandData {
     }
 
     public static void sendUnitInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + " used the force";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendUnitInfo(activeGame, player);
-    }
-
-    public static void sendUnitInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentation() + " pressed `" + event.getButton().getId() + "`";
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendUnitInfo(activeGame, player);
     }
 
     public static void sendUnitInfo(Game activeGame, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "__**Unit Info:**__", getUnitMessageEmbeds(player));
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                player.getCardsInfoThread(),
+                "__**Unit Info:**__",
+                getUnitMessageEmbeds(player),
+                getUnitInfoButtons());
+    }
+
+    private static List<Button> getUnitInfoButtons() {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.primary(Constants.REFRESH_UNIT_INFO, "Refresh Unit Info"));
+        return buttons;
     }
 
     private static List<MessageEmbed> getUnitMessageEmbeds(Player player) {

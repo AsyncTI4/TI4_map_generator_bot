@@ -33,9 +33,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.SOInfo;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
@@ -105,7 +103,7 @@ public class GameSaveLoadManager {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent) {
                 if (event.getMessageChannel() instanceof ThreadChannel || activeGame.isFoWMode()) {
-                    activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId());
+                    activeGame.setLatestCommand(username + " pressed button: [CLASSIFIED]");
                 } else {
                     activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- " + ((ButtonInteraction) event).getButton().getLabel());
                 }
@@ -148,7 +146,7 @@ public class GameSaveLoadManager {
         }
 
         try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
-            HashMap<String, Tile> tileMap = activeGame.getTileMap();
+            Map<String, Tile> tileMap = activeGame.getTileMap();
             writer.write(activeGame.getOwnerID());
             writer.write(System.lineSeparator());
             writer.write(activeGame.getOwnerName());
@@ -203,28 +201,26 @@ public class GameSaveLoadManager {
                     for (Player p1 : loadedGame.getRealPlayers()) {
                         Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
                         if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            String headerText = p1.getRepresentation(true, true) + " here is your cards info";
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(p1, loadedGame, headerText);
-                            SOInfo.sendSecretObjectiveInfo(loadedGame, p1);
-                            ACInfo.sendActionCardInfo(loadedGame, p1);
-                            PNInfo.sendPromissoryNoteInfo(loadedGame, p1, false);
+                            CardsInfo.sendCardsInfo(loadedGame, p1);
                         }
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
+                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `").append(maxNumber).append("` ");
+                    if (loadedGame.getSavedChannel() instanceof ThreadChannel) {
+                        sb.append("[CLASSIFIED]");
+                    } else {
+                        sb.append(loadedGame.getLatestCommand());
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                     try {
-                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
+                        if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
+                            // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
-                    String msg = "Undoing the last saved command:\n> " + loadedGame.getLatestCommand();
-                    if(loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel){
-                       msg = "Undoing the last saved command:\n> [CLASSIFIED]"; 
-                    }
-
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
@@ -259,7 +255,7 @@ public class GameSaveLoadManager {
                     .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
                     .map(fileName -> fileName.replace(Constants.TXT, ""))
                     .map(Integer::parseInt).toList();
-                if (numbers.size() == 25) {
+                if (numbers.size() == 50) {
                     int minNumber = numbers.stream().mapToInt(value -> value)
                         .min().orElseThrow(NoSuchElementException::new);
                     File mapToDelete = Storage.getMapUndoStorage(mapName + "_" + minNumber + Constants.TXT);
@@ -310,7 +306,6 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(activeGame.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        writer.write(System.lineSeparator());
         writeCards(activeGame.getPurgedActionCards(), writer, Constants.AC_PURGED);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", activeGame.getAllExplores()));
@@ -353,7 +348,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + activeGame.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());
 
-        HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+        Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
 
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
@@ -362,7 +357,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.SC_PLAYED + " " + sb);
         writer.write(System.lineSeparator());
 
-        HashMap<String, String> agendaVoteInfo = activeGame.getCurrentAgendaVotes();
+        Map<String, String> agendaVoteInfo = activeGame.getCurrentAgendaVotes();
         StringBuilder sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -370,7 +365,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        HashMap<String, String> currentCheckingForAllReacts = activeGame.getMessagesThatICheckedForAllReacts();
+        Map<String, String> currentCheckingForAllReacts = activeGame.getMessagesThatICheckedForAllReacts();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -378,7 +373,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        HashMap<String, Integer> displaced1System = activeGame.getCurrentMovedUnitsFrom1System();
+        Map<String, Integer> displaced1System = activeGame.getCurrentMovedUnitsFrom1System();
         StringBuilder sb3 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : displaced1System.entrySet()) {
             sb3.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -386,7 +381,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
         writer.write(System.lineSeparator());
 
-        HashMap<String, Integer> slashCommands = activeGame.getAllSlashCommandsUsed();
+        Map<String, Integer> slashCommands = activeGame.getAllSlashCommandsUsed();
         StringBuilder sb10 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : slashCommands.entrySet()) {
             sb10.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -394,7 +389,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.SLASH_COMMAND_STRING + " " + sb10);
         writer.write(System.lineSeparator());
 
-        HashMap<String, Integer> acSabod = activeGame.getAllActionCardsSabod();
+        Map<String, Integer> acSabod = activeGame.getAllActionCardsSabod();
         StringBuilder sb11 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : acSabod.entrySet()) {
             sb11.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -402,7 +397,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.ACS_SABOD + " " + sb11);
         writer.write(System.lineSeparator());
 
-        HashMap<String, Integer> displacedActivation = activeGame.getMovedUnitsFromCurrentActivation();
+        Map<String, Integer> displacedActivation = activeGame.getMovedUnitsFromCurrentActivation();
         StringBuilder sb4 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
             sb4.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -459,13 +454,15 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
+        writer.write(Constants.SC_COUNT_FOR_MAP + " " + activeGame.getStrategyCardsPerPlayer());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeGame.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RING_COUNT_FOR_MAP + " " + activeGame.getRingCount());
-        writer.write(System.lineSeparator());
-
         writer.write(Constants.VP_COUNT + " " + activeGame.getVp());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MAX_SO_COUNT + " " + activeGame.getMaxSOCountPerPlayer());
         writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
@@ -630,7 +627,7 @@ public class GameSaveLoadManager {
         //Player information
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
-        HashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
             writer.write(PLAYER);
             writer.write(System.lineSeparator());
@@ -643,7 +640,7 @@ public class GameSaveLoadManager {
 
             writer.write(Constants.FACTION + " " + player.getFaction());
             writer.write(System.lineSeparator());
-            writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmoji());
+            writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmojiRaw());
             writer.write(System.lineSeparator());
             //TODO Remove when no longer relevant
             String playerColor = player.getColor();
@@ -685,6 +682,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.PREFERS_DISTANCE + " " + player.doesPlayerPreferDistanceBasedTacticalActions());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.doesPlayerAutoPassOnWhensAfters());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
@@ -850,8 +850,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             StringBuilder fogOfWarSystems = new StringBuilder();
-            HashMap<String, String> fow_systems = player.getFogTiles();
-            HashMap<String, String> fow_labels = player.getFogLabels();
+            Map<String, String> fow_systems = player.getFogTiles();
+            Map<String, String> fow_labels = player.getFogLabels();
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
                 String label = fow_labels.get(key);
@@ -928,7 +928,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(tile.getTileID() + " " + tile.getPosition());
         writer.write(System.lineSeparator());
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         writer.write(UNITHOLDER);
         writer.write(System.lineSeparator());
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -936,17 +936,19 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(unitHolder.getName());
             writer.write(System.lineSeparator());
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
-                writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
-                writer.write(System.lineSeparator());
+                if (entry.getKey() != null) {
+                    writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
+                    writer.write(System.lineSeparator());
+                }
             }
             writer.write(ENDUNITS);
             writer.write(System.lineSeparator());
 
             writer.write(UNITDAMAGE);
             writer.write(System.lineSeparator());
-            HashMap<UnitKey, Integer> unitDamage = unitHolder.getUnitDamage();
+            Map<UnitKey, Integer> unitDamage = unitHolder.getUnitDamage();
             for (Map.Entry<UnitKey, Integer> entry : unitDamage.entrySet()) {
                 writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
                 writer.write(System.lineSeparator());
@@ -987,7 +989,7 @@ public class GameSaveLoadManager {
 
     private static File[] readAllMapFiles() {
         File folder = Storage.getMapImageDirectory();
-        if (folder == null) {
+        if (!folder.exists()) {
             try {
                 if (folder.createNewFile()) {
                     folder = Storage.getMapImageDirectory();
@@ -1002,7 +1004,7 @@ public class GameSaveLoadManager {
 
     private static File[] readAllMapJSONFiles() {
         File folder = Storage.getMapsJSONDirectory();
-        if (folder == null) {
+        if (!folder.exists()) {
             try {
                 if (folder.createNewFile()) {
                     folder = Storage.getMapImageDirectory();
@@ -1101,7 +1103,7 @@ public class GameSaveLoadManager {
     }
 
     @Nullable
-    private static Game loadMap(File mapFile) {
+    public static Game loadMap(File mapFile) {
         if (mapFile != null) {
             Game activeGame = new Game();
             try (Scanner myReader = new Scanner(mapFile)) {
@@ -1156,7 +1158,7 @@ public class GameSaveLoadManager {
                         }
                     }
                 }
-                HashMap<String, Tile> tileMap = new HashMap<>();
+                Map<String, Tile> tileMap = new HashMap<>();
                 try {
                     while (myReader.hasNextLine()) {
                         String tileData = myReader.nextLine();
@@ -1294,8 +1296,8 @@ public class GameSaveLoadManager {
                 case Constants.EXPLORATION_DECK_ID -> activeGame.setExplorationDeckID(info);
                 case Constants.STRATEGY_CARD_SET -> activeGame.setScSetID(info);
                 case Constants.CUSTOM_ADJACENT_TILES -> {
-                    LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
-                    LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
+                    Map<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
+                    Map<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
                     for (Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
                         String key = entry.getKey();
                         List<String> migrated = new ArrayList<>(entry.getValue());
@@ -1337,7 +1339,7 @@ public class GameSaveLoadManager {
                 case Constants.DISCARDED_EXPLORES -> activeGame.setExploreDiscard(getCardList(info));
                 case Constants.LAW_INFO -> {
                     StringTokenizer actionCardToken = new StringTokenizer(info, ";");
-                    LinkedHashMap<String, String> cards = new LinkedHashMap<>();
+                    Map<String, String> cards = new LinkedHashMap<>();
                     while (actionCardToken.hasMoreTokens()) {
                         StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
                         String id = cardInfo.nextToken();
@@ -1348,7 +1350,7 @@ public class GameSaveLoadManager {
                 }
                 case Constants.SC_TRADE_GOODS -> {
                     StringTokenizer scTokenizer = new StringTokenizer(info, ";");
-                    LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+                    Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
                     while (scTokenizer.hasMoreTokens()) {
                         StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
                         Integer id = Integer.parseInt(cardInfo.nextToken());
@@ -1414,13 +1416,25 @@ public class GameSaveLoadManager {
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     try {
                         int playerCount = Integer.parseInt(info);
-                        if (playerCount >= 2 && playerCount <= 30) {
+                        if (playerCount >= 1 && playerCount <= 30) {
                             activeGame.setPlayerCountForMap(playerCount);
                         } else {
                             activeGame.setPlayerCountForMap(6);
                         }
                     } catch (Exception e) {
                         activeGame.setPlayerCountForMap(6);
+                    }
+                }
+                case Constants.SC_COUNT_FOR_MAP -> {
+                    try {
+                        int scCount = Integer.parseInt(info);
+                        if (scCount >= 1 && scCount <= 8) {
+                            activeGame.setStrategyCardsPerPlayer(scCount);
+                        } else {
+                            activeGame.setStrategyCardsPerPlayer(1);
+                        }
+                    } catch (Exception e) {
+                        activeGame.setStrategyCardsPerPlayer(1);
                     }
                 }
                 case Constants.ACTIVATION_COUNT -> {
@@ -1437,6 +1451,14 @@ public class GameSaveLoadManager {
                         activeGame.setVp(vpCount);
                     } catch (Exception e) {
                         activeGame.setVp(10);
+                    }
+                }
+                case Constants.MAX_SO_COUNT -> {
+                    try {
+                        int soCount = Integer.parseInt(info);
+                        activeGame.setMaxSOCountPerPlayer(soCount);
+                    } catch (Exception e) {
+                        activeGame.setVp(3);
                     }
                 }
                 case Constants.DISPLAY_TYPE -> {
@@ -1503,17 +1525,17 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.SLASH_COMMAND_STRING -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
-                        String outcome = null;
-                        String voteInfo;
+                    StringTokenizer commandCounts = new StringTokenizer(info, ":");
+                    while (commandCounts.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(commandCounts.nextToken(), ",");
+                        String commandName = null;
+                        String commandCount;
                         if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
+                            commandName = dataInfo.nextToken();
                         }
                         if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            activeGame.setSpecificSlashCommandCount(outcome, Integer.parseInt(voteInfo));
+                            commandCount = dataInfo.nextToken();
+                            activeGame.setSpecificSlashCommandCount(commandName, Integer.parseInt(commandCount));
                         }
                     }
                 }
@@ -1810,13 +1832,6 @@ public class GameSaveLoadManager {
                         BotLogger.log("Could not parse button press count", exception);
                     }
                 }
-                case Constants.SLASH_COMMAND_COUNT -> {
-                    try {
-                        activeGame.setSlashCommandsRun(Integer.parseInt(info));
-                    } catch (Exception exception) {
-                        BotLogger.log("Could not parse slash command count", exception);
-                    }
-                }
                 case Constants.LAST_MODIFIED_DATE -> {
                     try {
                         activeGame.setLastModifiedDate(Long.parseLong(info));
@@ -1858,18 +1873,18 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static ArrayList<String> getCardList(String tokenizer) {
+    private static List<String> getCardList(String tokenizer) {
         StringTokenizer cards = new StringTokenizer(tokenizer, ",");
-        ArrayList<String> cardList = new ArrayList<>();
+        List<String> cardList = new ArrayList<>();
         while (cards.hasMoreTokens()) {
             cardList.add(cards.nextToken());
         }
         return cardList;
     }
 
-    private static LinkedHashMap<String, Integer> getParsedCards(String tokenizer) {
+    private static Map<String, Integer> getParsedCards(String tokenizer) {
         StringTokenizer actionCardToken = new StringTokenizer(tokenizer, ";");
-        LinkedHashMap<String, Integer> cards = new LinkedHashMap<>();
+        Map<String, Integer> cards = new LinkedHashMap<>();
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
             String id = cardInfo.nextToken();
@@ -1879,9 +1894,9 @@ public class GameSaveLoadManager {
         return cards;
     }
 
-    private static LinkedHashMap<String, List<String>> getParsedCardsForScoredPO(String tokenizer) {
+    private static Map<String, List<String>> getParsedCardsForScoredPO(String tokenizer) {
         StringTokenizer po = new StringTokenizer(tokenizer, ";");
-        LinkedHashMap<String, List<String>> scoredPOs = new LinkedHashMap<>();
+        Map<String, List<String>> scoredPOs = new LinkedHashMap<>();
         while (po.hasMoreTokens()) {
             StringTokenizer poInfo = new StringTokenizer(po.nextToken(), ",");
             String id = poInfo.nextToken();
@@ -1898,9 +1913,9 @@ public class GameSaveLoadManager {
         return scoredPOs;
     }
 
-    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer) {
+    private static Map<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer) {
         StringTokenizer override = new StringTokenizer(tokenizer, ";");
-        LinkedHashMap<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
+        Map<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
         while (override.hasMoreTokens()) {
             String[] overrideInfo = override.nextToken().split("-");
             String primaryTile = overrideInfo[0];
@@ -2126,6 +2141,7 @@ public class GameSaveLoadManager {
                 case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.TEN_MIN_REMINDER -> player.setWhetherPlayerShouldBeTenMinReminded(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PREFERS_DISTANCE -> player.setPreferenceForDistanceBasedTacticalActions(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.AUTO_PASS_WHENS_N_AFTERS -> player.setAutoPassWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG -> player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));

@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -52,22 +51,23 @@ public class ExpInfo extends ExploreSubcommandData {
         }
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
-       secondHalfOfExpInfo(types, event, player, activeGame, over);
+        secondHalfOfExpInfo(types, event, player, activeGame, over);
     }
-    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide){
+
+    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide) {
         secondHalfOfExpInfo(types, event, player, activeGame, overRide, false);
     }
 
-    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide, boolean fullText){
-         for (String currentType : types) {
+    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide, boolean fullText) {
+        for (String currentType : types) {
             StringBuilder info = new StringBuilder();
-            ArrayList<String> deck = activeGame.getExploreDeck(currentType);
+            List<String> deck = activeGame.getExploreDeck(currentType);
             Collections.sort(deck);
             Integer deckCount = deck.size();
             Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
             NumberFormat formatPercent = NumberFormat.getPercentInstance();
             formatPercent.setMaximumFractionDigits(1);
-            ArrayList<String> discard = activeGame.getExploreDiscard(currentType);
+            List<String> discard = activeGame.getExploreDiscard(currentType);
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
@@ -87,8 +87,8 @@ public class ExpInfo extends ExploreSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase())  && activeGame.isFoWMode()&& !overRide) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && activeGame.isFoWMode() && !overRide) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }
 
@@ -110,13 +110,13 @@ public class ExpInfo extends ExploreSubcommandData {
         for (Map.Entry<String, List<ExploreModel>> entry : orderedExplores) {
             String exploreName = entry.getKey();
             List<String> ids = entry.getValue().stream().map(ExploreModel::getId).toList();
-            
-            if(showFullText){
+
+            if (showFullText) {
                 sb.append("> ").append(exploreName).append("\n").append(entry.getValue().get(0).getText()).append(" [").append(String.join(", ", ids)).append("]");
-            }else{
+            } else {
                 sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
             }
-            
+
             if (showPercents && ids.size() > 1) {
                 sb.append(" _").append(formatPercent.format(deckDrawChance * ids.size())).append("_");
             }
@@ -125,12 +125,8 @@ public class ExpInfo extends ExploreSubcommandData {
 
         List<String> unmapped = deck.stream().filter(e -> Mapper.getExplore(e) == null).toList();
         for (String cardID : unmapped) {
-            String card = Mapper.getExploreRepresentation(cardID);
-            String name = null;
-            if (card != null) {
-                StringTokenizer cardInfo = new StringTokenizer(card, ";");
-                name = cardInfo.nextToken();
-            }
+            ExploreModel card = Mapper.getExplore(cardID);
+            String name = card != null ? card.getName() : null;
             sb.append("> (").append(cardID).append(") ").append(name).append("\n");
         }
         return sb.toString();

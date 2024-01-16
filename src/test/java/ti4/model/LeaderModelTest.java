@@ -21,14 +21,14 @@ public class LeaderModelTest extends BaseTi4Test {
     private boolean validateFaction(LeaderModel model) {
         if (model.getFaction().isEmpty()) return true;
         if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction())) return true;
-        BotLogger.log("Tech **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
+        System.out.println("Tech **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
         return false;
     }
 
     private boolean validateHomebrewReplacesID(LeaderModel techModel) {
         if (techModel.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidTech(techModel.getHomebrewReplacesID().get())) return true;
-        BotLogger.log("Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `" + techModel.getHomebrewReplacesID().get() + "`");
+        System.out.println("Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `" + techModel.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }

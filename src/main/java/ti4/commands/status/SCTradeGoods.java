@@ -9,7 +9,7 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class SCTradeGoods extends StatusSubcommandData {
@@ -38,7 +38,7 @@ public class SCTradeGoods extends StatusSubcommandData {
             }
             int sc = scOption.getAsInt();
             int tg = tgOption.getAsInt();
-            LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+            Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             if (!scTradeGoods.containsKey(sc)){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
                 return;
@@ -55,7 +55,7 @@ public class SCTradeGoods extends StatusSubcommandData {
             return;
         }
 
-        LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+        Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player_ : activeGame.getPlayers().values()) {
             scPicked.addAll(player_.getSCs());

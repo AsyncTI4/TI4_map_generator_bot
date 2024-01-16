@@ -1,15 +1,20 @@
 package ti4.commands.agenda;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 public class LookAtTopAgenda extends AgendaSubcommandData {
     public LookAtTopAgenda() {
@@ -28,43 +33,41 @@ public class LookAtTopAgenda extends AgendaSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("-----------\n");
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("`").append(event.getCommandString()).append("`").append("\n");
-        if (count > 1) {
-            sb.append("__**Top ").append(count).append(" agendas:**__\n");
-        } else {
-            sb.append("__**Top agenda:**__\n");
-        }
-        for (int i = 0; i < count; i++) {
-            String agendaID = activeGame.lookAtTopAgenda(i);
-            sb.append(i + 1).append(": ");
-            if (activeGame.getSentAgendas().get(agendaID) != null) {
-                sb.append("This agenda is currently in somebody's hand.");
-            } else {
-                sb.append(Helper.getAgendaRepresentation(agendaID));
-            }
-            sb.append("\n");
-        }
-        sb.append("-----------\n");
-
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
-        if (player == null){
-            MessageHelper.sendMessageToUser(sb.toString(), event);
-        } else {
-            User userById = event.getJDA().getUserById(player.getUserID());
-            if (userById != null) {
-                if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
-                } else {
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-                }
-            } else {
-                MessageHelper.sendMessageToUser(sb.toString(), event);
-            }
+        if (player == null) {
+            sendMessage("You are not a player in this game.");
+            return;
+        }
+
+        lookAtAgendas(activeGame, player, count, false);
+    }
+
+    public static void lookAtAgendas(Game activeGame, Player player, int count, boolean lookFromBottom) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getRepresentation(true, true)).append(" here are the agenda(s) you have looked at:");
+        List<MessageEmbed> agendaEmbeds = getAgendaEmbeds(count, lookFromBottom, activeGame);
+
+        Player realPlayer = Helper.getGamePlayer(activeGame, player, (Member) null, null);
+        if (realPlayer != null) {
+            MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, realPlayer, sb.toString(), agendaEmbeds);
         }
     }
+
+    public static List<MessageEmbed> getAgendaEmbeds(int count, boolean fromBottom, Game activeGame) {
+        List<MessageEmbed> agendaEmbeds = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            String agendaID = fromBottom ? activeGame.lookAtBottomAgenda(i) : activeGame.lookAtTopAgenda(i);
+            if (agendaID != null) {
+                AgendaModel agenda = Mapper.getAgenda(agendaID);
+                if (activeGame.getSentAgendas().get(agendaID) != null) {
+                    agendaEmbeds.add(AgendaModel.agendaIsInSomeonesHandEmbed());
+                } else {
+                    agendaEmbeds.add(agenda.getRepresentationEmbed());
+                }
+            }
+        }
+        return agendaEmbeds;
+    }
+
 }

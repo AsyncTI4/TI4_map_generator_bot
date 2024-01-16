@@ -41,6 +41,19 @@ public class RevealStage1 extends StatusSubcommandData {
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objectives Revealed**");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed())).queue(m -> m.pin().queue());
+        int maxSCsPerPlayer;
+        if (activeGame.getRealPlayers().isEmpty()) {
+            maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
+        } else {
+            maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
+        }
+
+        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
+
+        if(activeGame.getRealPlayers().size() == 1){
+            maxSCsPerPlayer =1;
+        }
+        activeGame.setStrategyCardsPerPlayer(maxSCsPerPlayer);
     }
 
     @Override

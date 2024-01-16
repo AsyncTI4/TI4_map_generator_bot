@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.player.TurnStart;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -20,7 +21,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class Swap extends GameSubcommandData {
         if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
             message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
             Player player = activeGame.getPlayer(removedPlayer.getUserID());
-            LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+            Map<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
             for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
                 List<String> value = poEntry.getValue();
                 boolean removed = value.remove(removedPlayer.getUserID());
@@ -100,7 +100,7 @@ public class Swap extends GameSubcommandData {
                 swapperPlayer.setDummy(true);
             }
             LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
-            player.setSCs(swapperPlayer.getSCs());
+            player.setSCs(new LinkedHashSet<>(swapperPlayer.getSCs()));
             swapperPlayer.setSCs(holder);
             swapperPlayer.setUserName(removedPlayer.getUserName());
             swapperPlayer.setUserID(removedPlayer.getUserID());
@@ -120,7 +120,7 @@ public class Swap extends GameSubcommandData {
                 }
                 String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
                 String buttonText = "Use buttons to do your turn. ";
-                List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
                 MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
             }

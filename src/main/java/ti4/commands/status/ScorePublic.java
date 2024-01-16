@@ -1,7 +1,5 @@
 package ti4.commands.status;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +12,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -78,21 +78,30 @@ public class ScorePublic extends StatusSubcommandData {
 			MessageHelper.sendMessageToChannel(channel, "No such Public Objective ID found or already scored, please retry");
 		} else {
 			informAboutScoring(event, channel, activeGame, player, poID);
+			for(Player p2 : player.getNeighbouringPlayers()){
+				if(p2.hasLeaderUnlocked("syndicatecommander")){
+					p2.setTg(p2.getTg()+1);
+					String msg = p2.getRepresentation(true, true) + " you gained 1tg due to your neighbor scoring a PO while you have syndicate commander. Your tgs went from "+(p2.getTg()-1)+" -> "+p2.getTg();
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),msg);
+					ButtonHelperAbilities.pillageCheck(p2, activeGame);
+					ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+				}
+			}
 		}
 		Helper.checkEndGame(activeGame, player);
 	}
 
 	public static String getNameNEMoji(Game activeGame, int poID) {
 		String id = "";
-		LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
+		Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
 		for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
 			if (po.getValue().equals(poID)) {
 				id = po.getKey();
 				break;
 			}
 		}
-		HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-		HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+		Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+		Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
 		String poName1 = publicObjectivesState1.get(id);
 		String poName2 = publicObjectivesState2.get(id);
 		String poName = id;
@@ -121,7 +130,7 @@ public class ScorePublic extends StatusSubcommandData {
 		if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument") || poName.toLowerCase().contains("found a golden age")
 			|| poName.toLowerCase().contains("amass wealth") || poName.toLowerCase().contains("manipulate galactic law") || poName.toLowerCase().contains("hold vast reserves")) {
 			String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to score the objective.";
-			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "both");
+			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "both");
 			Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
 			buttons.add(DoneExhausting);
 			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);

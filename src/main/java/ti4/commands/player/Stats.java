@@ -1,6 +1,5 @@
 package ti4.commands.player;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -17,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -42,10 +42,10 @@ public class Stats extends PlayerSubcommandData {
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral system for your turn specifically"))
+			//.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
+			//.addOptions(new OptionData(OptionType.INTEGER, Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral system for your turn specifically"))
 			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
-			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE, "Prefers distance based tile selection"))
+			//.addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE, "Prefers distance based tile selection"))
 			.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 	}
@@ -225,6 +225,9 @@ public class Stats extends PlayerSubcommandData {
 			if ("y".equals(value) || "yes".equals(value)) {
 				player.setPassed(true);
 				// Turn.pingNextPlayer(event, activeMap, player);
+				if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+					ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+				}
 			} else if ("n".equals(value) || "no".equals(value)) {
 				player.setPassed(false);
 			} else {
@@ -335,7 +338,7 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
-		LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+		Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
 			return false;
@@ -345,7 +348,7 @@ public class Stats extends PlayerSubcommandData {
 			return false;
 		}
 
-		LinkedHashMap<String, Player> players = activeGame.getPlayers();
+		Map<String, Player> players = activeGame.getPlayers();
 		for (Player playerStats : players.values()) {
 			if (playerStats.getSCs().contains(scNumber)) {
 				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "SC #" + scNumber + " is already picked.");

@@ -1515,7 +1515,7 @@
     "alias": "diplomatic_pressure_ds",
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
-    "window": "When an agenda is revealed:",
+    "window": "When an agenda is revealed",
     "text": "Choose another player; that player must give you 1 promissory note from their hand.",
     "flavorText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
     "source": "ds"
@@ -1587,7 +1587,7 @@
     "alias": "aggressive_broker",
     "name": "Aggressive Broker",
     "phase": "Any",
-    "window": "When a player purges a component:",
+    "window": "When another player purges a component:",
     "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
     "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don't. They brought the money, let's make this quick.”",
     "source": "ds"

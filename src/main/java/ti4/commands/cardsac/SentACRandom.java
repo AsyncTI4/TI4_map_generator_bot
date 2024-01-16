@@ -17,8 +17,8 @@ import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
@@ -50,7 +50,7 @@ public class SentACRandom extends ACCardsSubcommandData {
     }
 
     public void sendRandomACPart2(GenericInteractionCreateEvent event, Game activeGame, Player player, Player player_){
-        LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
+        Map<String, Integer> actionCardsMap = player.getActionCards();
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");

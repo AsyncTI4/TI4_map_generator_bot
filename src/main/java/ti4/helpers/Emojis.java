@@ -44,6 +44,7 @@ public class Emojis {
     public static final String axis = "<:axis:1082705549092737044>";
     public static final String bentor = "<:bentor:1082705559897264199>";
     public static final String blex = "<:blex:1082705569351204995>";
+    public static final String kyro = "<:blex:1082705569351204995>";
     public static final String celdauri = "<:celdauri:1082705576691253288>";
     public static final String cheiran = "<:cheiran:1082705584886915204>";
     public static final String cymiae = "<:cymiae:1082705596836487238>";
@@ -567,19 +568,19 @@ public class Emojis {
     public static final String Nebula = "<:nebula:1137029690004090900>";
 
     // TECHNOLOGY
-    public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
+    public static final String PropulsionTech = "<:propulsion:1120031660025577533>";
     public static final String PropulsionDisabled = "<:propulsionDisabled:1120031664458960896>";
     public static final String Propulsion2 = "<:propulsion2:1120031821304959098>";
     public static final String Propulsion3 = "<:propulsion3:1120031823569895584>";
-    public static final String BioticTech = "<:Biotictech:947250608107315210>";
+    public static final String BioticTech = "<:biotic:1120031648151523369>";
     public static final String BioticDisabled = "<:bioticDisabled:1120031652299681963>";
     public static final String Biotic2 = "<:biotic2:1120031649732771841>";
     public static final String Biotic3 = "<:biotic3:1120031651167227944>";
-    public static final String CyberneticTech = "<:Cybernetictech:1092053090720563211>";
+    public static final String CyberneticTech = "<:cybernetic:1120031653432139896>";
     public static final String CyberneticDisabled = "<:cyberneticDisabled:1120031658582737047>";
     public static final String Cybernetic2 = "<:cybernetic2:1120031655374102718>";
     public static final String Cybernetic3 = "<:cybernetic3:1120031656766619658>";
-    public static final String WarfareTech = "<:Warfaretech:1092053103777427468>";
+    public static final String WarfareTech = "<:warfare:1120031666241536082>";
     public static final String WarfareDisabled = "<:warfareDisabled:1120031828384956446>";
     public static final String Warfare2 = "<:warfare2:1120031824891093113>";
     public static final String Warfare3 = "<:warfare3:1120031825851584523>";
@@ -619,6 +620,36 @@ public class Emojis {
     public static final String Franken7 = "<:Franken7:1180167520821452931>";
     public static final String Franken8 = "<:Franken8:1180167522176213062>";
 
+    // PBD2000 FACTIONS
+    public static final String echoes = "<:echoes:1189668215413026968>";
+    public static final String enclave = "<:enclave:1189668216478367744>";
+    public static final String raven = "<:raven:1189668203580887121>";
+    public static final String syndicate = "<:syndicate:1189668205355073667>";
+    public static final String terminator = "<:terminator:1189668214125363231>";
+
+    // DICE
+    public static final String d10green_0 = "<:d10green_0:1180170565819039916>";
+    public static final String d10green_1 = "<:d10green_1:1180170567337386026>";
+    public static final String d10green_2 = "<:d10green_2:1180170568381763605>";
+    public static final String d10green_3 = "<:d10green_3:1180170569526825092>";
+    public static final String d10green_4 = "<:d10green_4:1180170570533441576>";
+    public static final String d10green_5 = "<:d10green_5:1180170571896606770>";
+    public static final String d10green_6 = "<:d10green_6:1189667939222290434>";
+    public static final String d10green_7 = "<:d10green_7:1189667941407543378>";
+    public static final String d10green_8 = "<:d10green_8:1189667942326079618>";
+    public static final String d10green_9 = "<:d10green_9:1189667944125435924>";
+    public static final String d10red_0 = "<:d10red_0:1189667965600280676>";
+    public static final String d10red_1 = "<:d10red_1:1189667967349301358>";
+    public static final String d10red_2 = "<:d10red_2:1189667968427249754>";
+    public static final String d10red_3 = "<:d10red_3:1189667969597452369>";
+    public static final String d10red_4 = "<:d10red_4:1189667971270979796>";
+    public static final String d10red_5 = "<:d10red_5:1189667992557076661>";
+    public static final String d10red_6 = "<:d10red_6:1189667994025066686>";
+    public static final String d10red_7 = "<:d10red_7:1189667994977181796>";
+    public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
+    public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
+
+
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
@@ -640,7 +671,7 @@ public class Emojis {
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
-    
+
     // SOURCE ICONS
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
@@ -768,6 +799,12 @@ public class Emojis {
             case "franken6" -> Franken6;
             case "franken7" -> Franken7;
             case "franken8" -> Franken8;
+
+            case "echoes" -> echoes;
+            case "enclave" -> enclave;
+            case "raven" -> raven;
+            case "syndicate" -> syndicate;
+            case "terminator" -> terminator;
 
             default -> getRandomizedEmoji(0, null);
         };
@@ -925,9 +962,9 @@ public class Emojis {
             case "sunset" -> sunset + "**Sunset**";
             case "turquoise" -> turquoise + "**Turquoise**";
             case "gold" -> gold + "**Gold**";
-            case "lightgray" -> lightgray + "**Lightgray**";
+            case "lightgray" -> lightgray + "**LightGray**";
             case "teal" -> teal + "**Teal**";
-            case "bloodred" -> bloodred + "**Bloodred**";
+            case "bloodred" -> bloodred + "**BloodRed**";
             case "emerald" -> emerald + "**Emerald**";
             case "navy" -> navy + "**Navy**";
             case "rose" -> rose + "**Rose**";
@@ -938,24 +975,24 @@ public class Emojis {
             case "rainbow" -> rainbow + "**Rainbow**";
             case "ethereal" -> ethereal + "**Ethereal**";
             case "orca" -> orca + "**Orca**";
-            case "splitred" -> splitred + "**Splitred**";
-            case "splitblue" -> splitblue + "**Splitblue**";
-            case "splitgreen" -> splitgreen + "**Splitgreen**";
-            case "splitpurple" -> splitpurple + "**Splitpurple**";
-            case "splitorange" -> splitorange + "**Splitorange**";
-            case "splityellow" -> splityellow + "**Splityellow**";
-            case "splitpink" -> splitpink + "**Splitpink**";
-            case "splitgold" -> splitgold + "**Splitgold**";
-            case "splitlime" -> splitlime + "**Splitlime**";
-            case "splittan" -> splittan + "**Splittan**";
-            case "splitteal" -> splitteal + "**Splitteal**";
-            case "splitturquoise" -> splittorquoise + "**Splitturquoise**";
-            case "splitbloodred" -> splitbloodred + "**Splitbloodred**";
-            case "splitchocolate" -> splitchocolate + "**Splitchocolate**";
-            case "splitemerald" -> splitemerald + "**Splitemerald**";
-            case "splitnavy" -> splitnavy + "**Splitnavy**";
-            case "splitpetrol" -> splitpetrol + "**Splitpetrol**";
-            case "splitrainbow" -> splitrainbow + "**Splitrainbow**";
+            case "splitred" -> splitred + "**SplitRed**";
+            case "splitblue" -> splitblue + "**SplitBlue**";
+            case "splitgreen" -> splitgreen + "**SplitGreen**";
+            case "splitpurple" -> splitpurple + "**SplitPurple**";
+            case "splitorange" -> splitorange + "**SplitOrange**";
+            case "splityellow" -> splityellow + "**SplitYellow**";
+            case "splitpink" -> splitpink + "**SplitPink**";
+            case "splitgold" -> splitgold + "**SplitGold**";
+            case "splitlime" -> splitlime + "**SplitLime**";
+            case "splittan" -> splittan + "**SplitTan**";
+            case "splitteal" -> splitteal + "**SplitTeal**";
+            case "splitturquoise" -> splittorquoise + "**SplitTurquoise**";
+            case "splitbloodred" -> splitbloodred + "**SplitBloodRed**";
+            case "splitchocolate" -> splitchocolate + "**SplitChocolate**";
+            case "splitemerald" -> splitemerald + "**SplitEmerald**";
+            case "splitnavy" -> splitnavy + "**SplitNavy**";
+            case "splitpetrol" -> splitpetrol + "**SplitPetrol**";
+            case "splitrainbow" -> splitrainbow + "**SplitRainbow**";
             default -> color;
         };
     }
@@ -1135,6 +1172,7 @@ public class Emojis {
             case "destroyer" -> destroyer;
             case "carrier" -> carrier;
             case "cruiser" -> cruiser;
+            case "plenaryorbital"-> spacedock;
 
             // LEADERS - AGENTS
             case "arborecagent" -> ArborecAgent;

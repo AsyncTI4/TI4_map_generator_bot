@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Cleanup extends AgendaSubcommandData {
     public Cleanup() {
@@ -24,7 +24,7 @@ public class Cleanup extends AgendaSubcommandData {
             return;
         }
         Game activeGame = getActiveGame();
-               LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {
             player.cleanExhaustedPlanets(false);
         }

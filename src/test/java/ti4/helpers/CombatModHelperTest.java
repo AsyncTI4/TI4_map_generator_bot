@@ -24,13 +24,13 @@ public class CombatModHelperTest extends BaseTi4Test {
         Game game = new Game();
 
         UnitModel nonFighter = new UnitModel();
-        nonFighter.setBaseType(UnitType.Carrier.value);
+        nonFighter.setBaseType("carrier");
 
         List<UnitModel> opponentUnits = new ArrayList<>();
         opponentUnits.add(nonFighter);
         opponentUnits.add(nonFighter);
 
-        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
+        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits, nonFighter));
     }
 
     @Test
@@ -44,15 +44,15 @@ public class CombatModHelperTest extends BaseTi4Test {
         Game game = new Game();
 
         UnitModel nonFighter = new UnitModel();
-        nonFighter.setBaseType(UnitType.Carrier.value);
+        nonFighter.setBaseType("carrier");
 
         UnitModel fighter = new UnitModel();
-        fighter.setBaseType(UnitType.Fighter.value);
+        fighter.setBaseType("fighter");
 
         List<UnitModel> opponentUnits = new ArrayList<>();
         opponentUnits.add(nonFighter);
         opponentUnits.add(fighter);
 
-        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
+        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits, fighter));
     }
 }
