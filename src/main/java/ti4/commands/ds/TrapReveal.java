@@ -2,7 +2,6 @@ package ti4.commands.ds;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -73,7 +72,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
 
     public void revealTrapForPlanet(GenericInteractionCreateEvent event, Game activeGame, String planetName, String trap, Player player, boolean reveal) {
         if (player.getTrapCardsPlanets().containsValue(planetName) || planetName == null) {
-            LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+            Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
                 String planet = entry.getValue();
                 if (planetName.equals(planet) || planet == null) {

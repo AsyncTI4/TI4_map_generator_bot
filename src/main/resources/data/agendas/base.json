@@ -61,7 +61,7 @@
         "name": "Compensated Disarmament",
         "type": "Directive",
         "target": "Elect Planet",
-        "text1": "Destroy each ground force on the elected planet. for each unit that was destroyed, the player who control that planet gains 1 trade good.",
+        "text1": "Destroy each ground force on the elected planet. For each unit that was destroyed, the player who control that planet gains 1 trade good.",
         "text2": "",
         "source": "base"
     },

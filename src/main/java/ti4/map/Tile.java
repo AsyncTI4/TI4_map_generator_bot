@@ -31,7 +31,7 @@ import ti4.model.UnitModel;
 public class Tile {
     private final String tileID;
     private String position;
-    private final HashMap<String, UnitHolder> unitHolders = new HashMap<>();
+    private final Map<String, UnitHolder> unitHolders = new HashMap<>();
 
     private final HashMap<Player, Boolean> fog = new HashMap<>();
     private final HashMap<Player, String> fogLabel = new HashMap<>();
@@ -110,7 +110,7 @@ public class Tile {
     public void addUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             Integer unitCount = units.get(unitID);
             if (unitCount != null) {
                 if (unitCount < count) {
@@ -228,7 +228,7 @@ public class Tile {
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
         List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(tileID);
-        if (fullHyperlaneData.size() == 0) {
+        if (fullHyperlaneData.isEmpty()) {
             return null;
         } else if (sourceDirection < 0 || sourceDirection > 5) {
             return Collections.emptyList();
@@ -306,7 +306,7 @@ public class Tile {
         return tilePath;
     }
 
-    public HashMap<String, UnitHolder> getUnitHolders() {
+    public Map<String, UnitHolder> getUnitHolders() {
         return unitHolders;
     }
 

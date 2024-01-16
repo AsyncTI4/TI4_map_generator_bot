@@ -2,8 +2,9 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -54,7 +55,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
 
-        LinkedHashSet<Integer> playersSCs = player.getSCs();
+        Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
             sendMessage("No SC has been selected");
             return;
@@ -86,7 +87,7 @@ public class SCPlay extends PlayerSubcommandData {
                         continue;
                     }
                     PlayAC.playAC(event, activeGame, p2, "coup", activeGame.getMainGameChannel(), event.getGuild());
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                     activeGame.setJustPlayedComponentAC(true);
                     String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -177,6 +178,9 @@ public class SCPlay extends PlayerSubcommandData {
                     // SEARCH FOR EXISTING OPEN THREAD
                     for (ThreadChannel threadChannel_ : threadChannels) {
                         if (threadChannel_.getName().equals(threadName)) {
+                            if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
+                                MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, activeGame), true);
+                            }
                             if (scToPlay == 5) {
                                 Button transaction = Button.primary("transaction", "Transaction");
                                 scButtons.add(transaction);
@@ -184,6 +188,7 @@ public class SCPlay extends PlayerSubcommandData {
                                 scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
+                            
                         }
                     }
                 });
@@ -197,6 +202,10 @@ public class SCPlay extends PlayerSubcommandData {
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), assignSpeakerMessage, assignSpeakerActionRow);
+        }
+        if(scToPlay == ButtonHelper.getKyroHeroSC(activeGame) && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))){
+             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
+
         }
 
         if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {
@@ -221,7 +230,7 @@ public class SCPlay extends PlayerSubcommandData {
 
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
             Button mahactA = Button.danger("mahactA_follow_" + scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
-            for (Player player3 : activeGame.getPlayers().values()) {
+            for (Player player3 : activeGame.getRealPlayers()) {
                 if (player3 == player) {
                     continue;
                 }

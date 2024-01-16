@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import software.amazon.awssdk.utils.StringUtils;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -17,7 +18,7 @@ import ti4.message.MessageHelper;
 public class Whisper extends FOWSubcommandData {
 
     public Whisper() {
-        super(Constants.WHISPER, "Send a private message to a player");
+        super(Constants.WHISPER, "Send a private message to a player in fog mode");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
@@ -37,6 +38,10 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;
         }
+        if(!activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
+            return;
+        }
         OptionMapping whisperms = event.getOption(Constants.MSG);
         OptionMapping anon = event.getOption(Constants.ANON);
         String msg = "";
@@ -54,6 +59,9 @@ public class Whisper extends FOWSubcommandData {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
+        if(!activeGame.isFoWMode()){
+            player1 = player.getFactionEmoji() + "("+StringUtils.capitalize(player.getFaction())+") "+player1;
+        }
 
         if (anonY.compareToIgnoreCase("y") == 0) {
             message = "[REDACTED] says: " + msg;

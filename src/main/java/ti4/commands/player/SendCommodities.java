@@ -68,7 +68,7 @@ public class SendCommodities extends PlayerSubcommandData {
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
         String message = p1 + " sent " + commString + " to " + p2;
         sendMessage(message);
-        ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities, event);
+        ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities);
         ButtonHelperAbilities.pillageCheck(player_, activeGame);
         ButtonHelperAbilities.pillageCheck(player, activeGame);
 

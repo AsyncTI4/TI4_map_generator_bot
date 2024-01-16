@@ -36,8 +36,8 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         int largestAmountOfButtonsIn1Game = 0;
         String largestGame = "";
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        HashMap<String, Integer> slashCommands = new HashMap<>();
-        HashMap<String, Integer> actionCards = new HashMap<>();
+        Map<String, Integer> slashCommands = new HashMap<>();
+        Map<String, Integer> actionCards = new HashMap<>();
         for (Game activeGame : mapList.values()) {
             if (useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
@@ -80,7 +80,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
-    private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
+    public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
         List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
 
         // Sorting the list based on values

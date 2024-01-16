@@ -25,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
@@ -48,14 +48,13 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
-import ti4.model.Source.ComponentSource;
-import ti4.helpers.Constants;
 
 public class Mapper {
     private static final Properties colors = new Properties();
@@ -188,10 +187,10 @@ public class Mapper {
         if (isValidColor(color)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColor().isPresent() && color.equals(pn.getColor().get())) {
-                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
+                    if ("agendas_absol".equals(activeGame.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
                         continue;
                     }
-                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
+                    if (!"agendas_absol".equals(activeGame.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -205,7 +204,7 @@ public class Mapper {
         return promissoryNotes;
     }
 
-    public static PromissoryNoteModel getPromissoryNoteByID(String id) {
+    public static PromissoryNoteModel getPromissoryNote(String id) {
         return promissoryNotes.get(id);
     }
 
@@ -219,8 +218,8 @@ public class Mapper {
 
     public static Set<String> getDecals() {
         return decals.keySet().stream()
-            .filter(decal -> decal instanceof String)
-            .map(decal -> (String) decal)
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
             .collect(Collectors.toSet());
     }
 
@@ -256,7 +255,7 @@ public class Mapper {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
-            .filter(tileModel -> tileModel.getPlanetIds().size() == 0)
+            .filter(tileModel -> tileModel.getPlanetIds().isEmpty())
             .map(TileModel::getId)
             .toList();
     }
@@ -287,7 +286,7 @@ public class Mapper {
 
     public static Set<String> getWormholes(String tileID) {
         if (TileHelper.getAllTiles().get(tileID).getWormholes() == null) {
-            return null;
+            return new HashSet<>();
         }
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
             .filter(Objects::nonNull)
@@ -406,16 +405,16 @@ public class Mapper {
     }
 
     public static List<String> getColors() {
-        return colors.keySet().stream().filter(color -> color instanceof String)
-            .map(color -> (String) color)
+        return colors.keySet().stream().filter(String.class::isInstance)
+            .map(String.class::cast)
             .sorted()
             .collect(Collectors.toList());
     }
 
     public static List<String> getTokens() {
         return Stream.of(attachments.keySet(), tokens.keySet()).flatMap(Collection::stream)
-            .filter(token -> token instanceof String)
-            .map(token -> (String) token)
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
             .sorted()
             .collect(Collectors.toList());
     }
@@ -456,38 +455,42 @@ public class Mapper {
         return actionCards.containsKey(id);
     }
 
-    @Nullable
-    public static String getActionCardName(String id) {
-        ActionCardModel info = getActionCard(id);
-        // if we would break trying to split the note, just return whatever is there
-        if (info == null) {
-            return "unknown action card, contact developer";
-        }
-        return info.getName();
-    }
-
-    public static String getPromissoryNote(String id, boolean longDisplay) {
+    /**
+     * @deprecated start with {@link #getPromissoryNote(String id)} instead
+     *
+     */
+    @Deprecated
+    public static String getPromissoryNoteText(String id, boolean longDisplay) {
         if (longDisplay) {
-            return getPromissoryNote(id);
+            return getPromissoryNoteLongText(id);
         } else {
-            return getShortPromissoryNote(id);
+            return getPromissoryNoteShortText(id);
         }
     }
 
-    public static String getPromissoryNote(String id) {
+    /**
+     * @deprecated use {@link #getPromissoryNote(String id)}.getText() instead
+     *
+     */
+    @Deprecated
+    public static String getPromissoryNoteLongText(String id) {
         return promissoryNotes.get(id).getText();
     }
 
-    public static String getShortPromissoryNote(String id) {
-        String promStr = promissoryNotes.get(id).getText();
-        // if we would break trying to split the note, just return whatever is there
-        if ((promStr == null) || !promStr.contains(";")) {
-            return promStr;
-        }
-        return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction()
-            + promissoryNotes.get(id).getColor();
+    /**
+     * @deprecated use {@link #getPromissoryNote(String id)}.getShortText() instead
+     *
+     */
+    @Deprecated
+    public static String getPromissoryNoteShortText(String id) {
+        return promissoryNotes.get(id).getShortText();
     }
 
+    /**
+     * @deprecated use {@link #getPromissoryNote(String id)}.getOwner() instead
+     *
+     */
+    @Deprecated
     public static String getPromissoryNoteOwner(String id) {
         if (promissoryNotes.get(id) == null) {
             return "finNullDodger";
@@ -511,6 +514,10 @@ public class Mapper {
         return events.get(id);
     }
 
+    /**
+     * @deprecated Should use representations avaiable in {@link #ExploreModel} instead
+     */
+    @Deprecated
     public static String getExploreRepresentation(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -545,6 +552,10 @@ public class Mapper {
 
     public static boolean isValidAttachment(String id) {
         return attachments.containsKey(id);
+    }
+
+    public static boolean isValidToken(String id) {
+        return getTokens().contains(id);
     }
 
     public static AttachmentModel getAttachmentInfo(String id) {
@@ -618,7 +629,7 @@ public class Mapper {
             .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
-    public static HashMap<String, LeaderModel> getLeaders() {
+    public static Map<String, LeaderModel> getLeaders() {
         return new HashMap<>(leaders);
     }
 
@@ -635,32 +646,32 @@ public class Mapper {
             .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getSecretObjectivesJustNames() {
-        HashMap<String, String> soList = new HashMap<>();
+    public static Map<String, String> getSecretObjectivesJustNames() {
+        Map<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
             soList.put(entry.getKey(), entry.getValue().getName());
         }
         return soList;
     }
 
-    public static HashMap<String, String> getSecretObjectivesJustNamesAndSource() {
-        HashMap<String, String> soList = new HashMap<>();
+    public static Map<String, String> getSecretObjectivesJustNamesAndSource() {
+        Map<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
             soList.put(entry.getKey(), entry.getValue().getName() + " (" + entry.getValue().getSource() + ")");
         }
         return soList;
     }
 
-    public static HashMap<String, String> getAgendaJustNames() {
-        HashMap<String, String> agendaList = new HashMap<>();
+    public static Map<String, String> getAgendaJustNames() {
+        Map<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
             agendaList.put(agenda.getAlias(), agenda.getName());
         }
         return agendaList;
     }
 
-    public static HashMap<String, String> getAgendaJustNames(Game activeGame) {
-        HashMap<String, String> agendaList = new HashMap<>();
+    public static Map<String, String> getAgendaJustNames(Game activeGame) {
+        Map<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
             if (activeGame.isAbsolMode() && agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
@@ -691,11 +702,11 @@ public class Mapper {
         return tokenPath;
     }
 
-    public static HashMap<String, ActionCardModel> getActionCards() {
+    public static Map<String, ActionCardModel> getActionCards() {
         return new HashMap<>(actionCards);
     }
 
-    public static HashMap<String, ActionCardModel> getActionCards(String extra) {
+    public static Map<String, ActionCardModel> getActionCards(String extra) {
         HashMap<String, ActionCardModel> acList = new HashMap<>();
         for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
             acList.put(entry.getKey() + extra, entry.getValue());
@@ -703,8 +714,8 @@ public class Mapper {
         return acList;
     }
 
-    public static HashMap<String, String> getACJustNames() {
-        HashMap<String, String> acNameList = new HashMap<>();
+    public static Map<String, String> getACJustNames() {
+        Map<String, String> acNameList = new HashMap<>();
         for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
             acNameList.put(entry.getKey(), entry.getValue().getName());
         }
@@ -731,21 +742,21 @@ public class Mapper {
         return AliasHandler.getPlanetKeyList().contains(id);
     }
 
-    public static HashMap<String, PublicObjectiveModel> getPublicObjectives() {
+    public static Map<String, PublicObjectiveModel> getPublicObjectives() {
         return new HashMap<>(publicObjectives);
     }
 
-    public static HashMap<String, String> getPublicObjectivesStage1() {
+    public static Map<String, String> getPublicObjectivesStage1() {
         return getPublicObjectives(1);
     }
 
-    public static HashMap<String, String> getPublicObjectivesStage2() {
+    public static Map<String, String> getPublicObjectivesStage2() {
         return getPublicObjectives(2);
     }
 
     @NotNull
-    private static HashMap<String, String> getPublicObjectives(int requiredStage) {
-        HashMap<String, String> poList = new HashMap<>();
+    private static Map<String, String> getPublicObjectives(int requiredStage) {
+        Map<String, String> poList = new HashMap<>();
         for (Map.Entry<String, PublicObjectiveModel> entry : publicObjectives.entrySet()) {
             PublicObjectiveModel po = entry.getValue();
             if (requiredStage == po.getPoints()) {
@@ -755,7 +766,7 @@ public class Mapper {
         return poList;
     }
 
-    public static HashMap<String, ExploreModel> getExplores() {
+    public static Map<String, ExploreModel> getExplores() {
         return new HashMap<>(explore);
     }
 
@@ -771,7 +782,7 @@ public class Mapper {
         return relics.containsKey(relicID);
     }
 
-    public static HashMap<String, AgendaModel> getAgendas() {
+    public static Map<String, AgendaModel> getAgendas() {
         return new HashMap<>(agendas);
     }
 
@@ -779,7 +790,7 @@ public class Mapper {
         return getAgendas().containsKey(agendaID);
     }
 
-    public static HashMap<String, EventModel> getEvents() {
+    public static Map<String, EventModel> getEvents() {
         return new HashMap<>(events);
     }
 
@@ -787,7 +798,7 @@ public class Mapper {
         return getEvents().containsKey(eventID);
     }
 
-    public static HashMap<String, DeckModel> getDecks() {
+    public static Map<String, DeckModel> getDecks() {
         return new HashMap<>(decks);
     }
 
@@ -799,11 +810,11 @@ public class Mapper {
         return getDecks().containsKey(deckID);
     }
 
-    public static HashMap<String, CombatModifierModel> getCombatModifiers() {
+    public static Map<String, CombatModifierModel> getCombatModifiers() {
         return new HashMap<>(combatModifiers);
     }
 
-    public static HashMap<String, AbilityModel> getAbilities() {
+    public static Map<String, AbilityModel> getAbilities() {
         return new HashMap<>(abilities);
     }
 
@@ -817,7 +828,7 @@ public class Mapper {
 
     public static List<String> getFactionIDs() {
         return factions.keySet().stream()
-            .filter(token -> token instanceof String)
+            .filter(Objects::nonNull)
             .sorted()
             .collect(Collectors.toList());
     }
@@ -844,26 +855,26 @@ public class Mapper {
         String displayName = "";
         switch (relatedType) {
             case Constants.AGENDA -> {
-                AgendaModel agenda = Mapper.getAgenda(relatedID);
+                AgendaModel agenda = getAgenda(relatedID);
                 displayName = Emojis.Agenda + " " + agenda.getName();
             }
             case Constants.AC -> {
-                ActionCardModel actionCard = Mapper.getActionCard(relatedID);
+                ActionCardModel actionCard = getActionCard(relatedID);
                 displayName = actionCard.getRepresentation();
             }
             case Constants.PROMISSORY_NOTES -> {
-                PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(relatedID);
+                PromissoryNoteModel pn = getPromissoryNote(relatedID);
                 displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
             }
-            case Constants.TECH -> displayName = Mapper.getTech(relatedID).getRepresentation(true);
-            case Constants.RELIC -> displayName = Mapper.getRelic(relatedID).getSimpleRepresentation();
-            case Constants.ABILITY -> displayName = Mapper.getAbility(relatedID).getRepresentation();
+            case Constants.TECH -> displayName = getTech(relatedID).getRepresentation(true);
+            case Constants.RELIC -> displayName = getRelic(relatedID).getSimpleRepresentation();
+            case Constants.ABILITY -> displayName = getAbility(relatedID).getRepresentation();
             case Constants.UNIT -> {
-                UnitModel unit = Mapper.getUnit(relatedID);
-                displayName = unit.getUnitEmoji() + " "
-                    + unit.getName() + " " + unit.getAbility();
+                UnitModel unit = getUnit(relatedID);
+                displayName = unit.getUnitEmoji() + " " + unit.getName();
+                if (unit.getAbility().isPresent()) displayName += " - *" + unit.getAbility() + "*";
             }
-            case Constants.LEADER -> displayName = Mapper.getLeader(relatedID).getRepresentation(true, true, false);
+            case Constants.LEADER -> displayName = getLeader(relatedID).getRepresentation(true, true, false);
             default -> {
             }
         }

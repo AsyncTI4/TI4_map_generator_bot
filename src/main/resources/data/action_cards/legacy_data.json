@@ -412,5 +412,77 @@
     "text": "If the \"Politics\" strategy card is in another player's play area, take it and give that player 1 of your other strategy cards; otherwise, gain the speaker token.",
     "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "mechanized_workforce",
+    "name": "Mechanized Workforce",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Remove 1 or more of your mechs from the game board; gain trade goods equal to the combined cost of those mechs.",
+    "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "fire_for_effect",
+    "name": "Fire for Effect",
+    "phase": "Action",
+    "window": "At the end of a round of space combat",
+    "text": "Your units in the active system use their SPACE CANNON abilities against your opponent's ships.",
+    "flavorText": "Trrakan had stockpiled munitions for this moment. If the reports were correct, and their forces were able to stave off the invasion for long enough, the enemy would find themselves under near continuous fire.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "smuggler_routes",
+    "name": "Smuggler Routes",
+    "phase": "Status",
+    "window": "At the start of the status phase",
+    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's ships to gain 1 trade good.",
+    "flavorText": "Greg looked to the skies longingly, \"I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "shock_troops",
+    "name": "Shock Troops",
+    "phase": "Action",
+    "window": "At the start of the first round of a ground combat",
+    "text": "Roll 1 die for each of up to 2 of your participating ground forces. For each result equal to or greater than that unit's combat value, produce 1 hit against your opponent's units; on a result of 9 or 10, produce 1 additional hit.",
+    "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "seized_facility",
+    "name": "Seized Facility",
+    "phase": "Action",
+    "window": "When you gain control of a planet that contains another player's structure",
+    "text": "Gain a non-faction technology owned by that player.",
+    "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL DATA << BELONGS TO US",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "grand_operation",
+    "name": "Grand Operation",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport ground forces during this movement.]",
+    "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished for her, \"A logistical nightmare? I recommend you get to it then.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "firing_solution_",
+    "name": "Continuous Barrage",
+    "phase": "Action",
+    "window": "At the end of a round of space combat",
+    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units. [Note: This AFB still only targets fighters.]",
+    "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "border_skirmish",
+    "name": "Border Skirmish",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to or greater than that ship's combat value, they produce 1 hit against the other player's ships in those systems.",
+    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand, \"Our dominion knows no border.\" The man hesitated, then agreed.",
+    "source": "action_deck_2"
   }
 ]

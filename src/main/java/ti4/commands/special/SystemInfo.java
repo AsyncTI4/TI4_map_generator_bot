@@ -1,6 +1,5 @@
 package ti4.commands.special;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -131,7 +130,7 @@ public class SystemInfo extends SpecialSubcommandData {
                     sb.append("\n");
                 }
 
-                HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+                Map<UnitKey, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey unitKey = unitEntry.getKey();
                     String color = AliasHandler.resolveColor(unitKey.getColorID());

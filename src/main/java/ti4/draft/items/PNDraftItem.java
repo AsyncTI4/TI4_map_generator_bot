@@ -18,7 +18,7 @@ public class PNDraftItem extends DraftItem {
 
     @JsonIgnore
     private PromissoryNoteModel getPn() {
-        return Mapper.getPromissoryNoteByID(ItemId);
+        return Mapper.getPromissoryNote(ItemId);
     }
 
     @JsonIgnore

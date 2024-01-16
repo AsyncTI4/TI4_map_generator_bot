@@ -58,6 +58,7 @@ public class StatisticsCommand implements Command {
 
     private Collection<StatisticsSubcommandData> getSubcommands() {
         Collection<StatisticsSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new OtherStats());
         subcommands.add(new AverageTurnTime());
         subcommands.add(new MedianTurnTime());
         subcommands.add(new CompareAFKTimes());

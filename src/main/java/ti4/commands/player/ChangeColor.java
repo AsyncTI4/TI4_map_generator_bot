@@ -36,7 +36,7 @@ public class ChangeColor extends PlayerSubcommandData {
             return;
         }
 
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (newColor.equals(playerInfo.getColor())) {
@@ -54,9 +54,9 @@ public class ChangeColor extends PlayerSubcommandData {
         String newColorID = Mapper.getColorID(newColor);
 
         for (Player playerInfo : players.values()) {
-            LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
+            Map<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
 
-            LinkedHashMap<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
+            Map<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 String key = pn.getKey();
                 Integer value = pn.getValue();
@@ -99,7 +99,7 @@ public class ChangeColor extends PlayerSubcommandData {
         }
 
         Set<String> ownedPromissoryNotes = player.getPromissoryNotesOwned();
-        HashSet<String> ownedPromissoryNotesChanged = new HashSet<>();
+        Set<String> ownedPromissoryNotesChanged = new HashSet<>();
         for (String pn : ownedPromissoryNotes) {
             String newKey = pn;
             if (pn.startsWith(oldColorKey)) {

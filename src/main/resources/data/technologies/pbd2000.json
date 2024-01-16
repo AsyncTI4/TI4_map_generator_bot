@@ -1,0 +1,74 @@
+[
+    {
+        "alias": "cop",
+        "name": "Coproduction",
+        "type": "CYBERNETIC",
+        "requirements": "Y",
+        "faction": "syndicate",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "tac",
+        "name": "Tactical Retreat",
+        "type": "PROPULSION",
+        "requirements": "B",
+        "faction": "syndicate",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "negr",
+        "name": "Nexus Grid",
+        "type": "PROPULSION",
+        "requirements": "BB",
+        "faction": "raven",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "stco",
+        "name": "Stellar Corridors",
+        "type": "PROPULSION",
+        "requirements": "BB",
+        "faction": "raven",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "clmu",
+        "name": "Cluster Munitions",
+        "type": "WARFARE",
+        "requirements": "RRR",
+        "faction": "terminator",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "aug",
+        "name": "Augmentation",
+        "type": "CYBERNETIC",
+        "requirements": "YY",
+        "faction": "terminator",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "doba",
+        "name": "Double Barrels",
+        "type": "WARFARE",
+        "requirements": "RR",
+        "faction": "enclave",
+        "source": "pbd2000",
+        "text": "Secret"
+    },
+    {
+        "alias": "sap",
+        "name": "Sappers",
+        "type": "CYBERNETIC",
+        "requirements": "YYY",
+        "faction": "enclave",
+        "source": "pbd2000",
+        "text": "Secret"
+    }
+]

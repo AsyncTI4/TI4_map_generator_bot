@@ -53,6 +53,9 @@ public class Units {
             if(UnitType.TyrantsLament == unitType || UnitType.Lady == unitType){
                 return String.format("%s_%s.png", colorID, "fs");
             }
+            if(UnitType.PlenaryOrbital == unitType){
+                return String.format("%s_%s.png", colorID, "sd");
+            }
             
             return String.format("%s_%s.png", colorID, asyncID());
         }
@@ -70,7 +73,7 @@ public class Units {
             return String.format("%s%s%s", colorID, emdash, asyncID());
         }
 
-        UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
+        public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
             this.unitType = unitType;
             this.colorID = colorID;
         }
@@ -123,7 +126,7 @@ public class Units {
                 case "dn" -> "dreadnought";
                 case "fs" -> "flagship";
                 case "ws" -> "warsun";
-                case "plenaryorbital" -> null;
+                case "plenaryorbital" -> "plenaryorbital";
                 case "tyrantslament" -> "tyrantslament";
                 case "lady" -> "lady";
                 default -> null;

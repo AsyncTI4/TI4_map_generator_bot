@@ -77,8 +77,8 @@ public class PositionMapper {
         return tileImageCoordinates.getProperty(position) != null;
     }
 
-    public static HashSet<String> getTilePositions() {
-        HashSet<String> positions = new HashSet<>();
+    public static Set<String> getTilePositions() {
+        Set<String> positions = new HashSet<>();
         for (Object key : tileImageCoordinates.keySet()) {
             if (key instanceof String position) {
                 positions.add(position);
@@ -130,8 +130,8 @@ public class PositionMapper {
         return point;
     }
 
-    public static ArrayList<Point> getPlayerPosition(int playerPosition) {
-        ArrayList<Point> positions = new ArrayList<>();
+    public static List<Point> getPlayerPosition(int playerPosition) {
+        List<Point> positions = new ArrayList<>();
         String info = (String) playerInfo8ring.get(Integer.toString(playerPosition));
         if (info == null) {
             return positions;

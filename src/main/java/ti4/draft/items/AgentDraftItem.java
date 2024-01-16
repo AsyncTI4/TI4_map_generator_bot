@@ -9,9 +9,8 @@ import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
 public class AgentDraftItem extends DraftItem {
     public AgentDraftItem(String itemId) {
@@ -56,7 +55,7 @@ public class AgentDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
-        HashMap<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
             agents.removeIf((String leader) -> {

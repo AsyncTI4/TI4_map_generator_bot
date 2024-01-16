@@ -245,7 +245,7 @@
         "faction": "muaat",
         "baseUpgrade": "ws",
         "source": "base",
-        "text": "Cost 10, Combat 3(x3), Move 2, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
     },
     {
         "alias": "qdn",
@@ -370,7 +370,7 @@
     },
     {
         "alias": "scc",
-        "name": "Spacial Conduit Cylinders",
+        "name": "Spatial Conduit Cylinders",
         "type": "PROPULSION",
         "requirements": "BB",
         "faction": "jolnar",

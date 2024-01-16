@@ -10,8 +10,8 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RiseOfMessiah extends SpecialSubcommandData {
     public RiseOfMessiah() {
@@ -39,7 +39,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())){
-                    HashSet<String> tokenList = unitHolder.getTokenList();
+                    Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;
                     for (String token : tokenList) {
                         if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG)){

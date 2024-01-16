@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -82,6 +84,8 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         tgGainMsg.append(player.getTg()).append("->").append(player.getTg() + resourcesSum).append(").");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg.toString());
         player.gainTg(resourcesSum);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, resourcesSum);
 
         //Add the zelian asteroid field to the map and copy over the space unitholder
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
