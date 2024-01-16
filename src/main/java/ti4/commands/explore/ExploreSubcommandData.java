@@ -87,12 +87,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     }
 
     public static String displayExplore(String cardID) {
-        String card = Mapper.getExploreRepresentation(cardID);
+        ExploreModel card = Mapper.getExplore(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
-            String[] cardInfo = card.split(";");
-            String name = cardInfo[0];
-            String description = cardInfo[4];
+            String name = card.getName();
+            String description = card.getText();
             sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
         } else {
             sb.append("Invalid ID ").append(cardID);

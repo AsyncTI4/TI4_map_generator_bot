@@ -19,6 +19,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 
 public class SendFragments extends ExploreSubcommandData {
 
@@ -58,8 +59,8 @@ public class SendFragments extends ExploreSubcommandData {
 
 		List<String> fragments = new ArrayList<>();
 		for (String cardID : sender.getFragments()) {
-			String[] card = Mapper.getExploreRepresentation(cardID).split(";");
-			if (card[1].equalsIgnoreCase(trait)) {
+			ExploreModel card = Mapper.getExplore(cardID);
+			if (card.getType().equalsIgnoreCase(trait)) {
 				fragments.add(cardID);
 			}
 		}
@@ -89,11 +90,11 @@ public class SendFragments extends ExploreSubcommandData {
 		String message = p1 + " sent " + fragString + " to " + p2;
 		MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeGame), message);
 		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(receiver, activeGame, "kollecc", event);
-        }
+			ButtonHelper.commanderUnlockCheck(receiver, activeGame, "kollecc", event);
+		}
 		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorcommander")) {
-            ButtonHelper.commanderUnlockCheck(receiver, activeGame, "bentor", event);
-        }
+			ButtonHelper.commanderUnlockCheck(receiver, activeGame, "bentor", event);
+		}
 		if (activeGame.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";

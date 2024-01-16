@@ -93,7 +93,6 @@ public class CreateGameButton extends GameSubcommandData {
     }
 
     public static void decodeButtonMsg(ButtonInteractionEvent event) {
-        event.editButton(null).queue();
         event.getChannel().sendMessage(event.getUser().getEffectiveName() + " pressed the [Create Game] button").queue();
         Member member = event.getMember();
         boolean isAdmin = false;
@@ -111,7 +110,8 @@ public class CreateGameButton extends GameSubcommandData {
                     "Only authorized users can press this button successfully.");
             return;
         }
-
+        event.editButton(null).queue();
+        
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         List<Member> members = new ArrayList<>();

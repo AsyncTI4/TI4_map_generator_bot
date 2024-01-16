@@ -154,7 +154,8 @@ public class HeroPlay extends LeaderAction {
                         }
                     }
                 }
-                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)+"Added 2 fighters to every system with an owned planet and no opponent ships. Please steal the token yourself with /remove_token and /add_token");
+                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)+"Added 2 fighters to every system with an owned planet and no opponent ships.");
+                 ButtonHelperHeroes.resolveFlorzenHeroStep1(player, activeGame);
             }
             case "kyrohero"->{
                 int dieResult = player.getLowestSC();
@@ -166,8 +167,23 @@ public class HeroPlay extends LeaderAction {
              case "ghotihero"->{
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGhotiHeroIn(player, activeGame, event));
             }
+            case "gledgehero"->{
+                ButtonHelperHeroes.resolveGledgeHero(player, activeGame);
+            }
+            case "khraskhero"->{
+                ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
+                ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
+                ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
+                ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
+            }
              case "mortheushero"->{
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, activeGame, event));
+            }
+            case "axishero"->{
+                ButtonHelperHeroes.resolveAxisHeroStep1(player, activeGame);
+            }
+            case "lanefirhero"->{
+                ButtonHelperHeroes.resolveLanefirHeroStep1(player, activeGame);
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " removed all of your ccs from the board");

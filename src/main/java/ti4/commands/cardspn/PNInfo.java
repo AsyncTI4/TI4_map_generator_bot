@@ -47,9 +47,9 @@ public class PNInfo extends PNCardsSubcommandData {
 
     public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat) {
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                getPromissoryNoteCardInfo(activeGame, player, longFormat),
-                getPNButtons(activeGame, player));
+            player.getCardsInfoThread(),
+            getPromissoryNoteCardInfo(activeGame, player, longFormat, false),
+            getPNButtons(activeGame, player));
     }
 
     private static List<Button> getPNButtons(Game activeGame, Player player) {
@@ -66,22 +66,21 @@ public class PNInfo extends PNCardsSubcommandData {
             Button transact;
             if (activeGame.isFoWMode()) {
                 transact = Button.success("resolvePNPlay_" + pnShortHand,
-                        "Play " + owner.getColor() + " " + promissoryNote.getName());
+                    "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
                 transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
-                        .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
             }
             buttons.add(transact);
         }
         return buttons;
     }
 
-    public static String getPromissoryNoteCardInfo(Game activeGame, Player player, boolean longFormat) {
+    public static String getPromissoryNoteCardInfo(Game activeGame, Player player, boolean longFormat, boolean excludePlayArea) {
         StringBuilder sb = new StringBuilder();
-        sb.append("_ _\n");
 
         //PROMISSORY NOTES
-        sb.append("__**Promissory Notes:**__").append("\n");
+        sb.append("**Promissory Notes:**").append("\n");
         int index = 1;
         Map<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -91,34 +90,31 @@ public class PNInfo extends PNCardsSubcommandData {
             } else {
                 for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                     if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                        sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
+                        sb.append("> `").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
                         sb.append(getPromissoryNoteRepresentation(activeGame, pn.getKey(), longFormat));
                         index++;
                     }
                 }
-                sb.append("\n");
 
-                //PLAY AREA PROMISSORY NOTES
-                sb.append("\n").append("__**PLAY AREA Promissory Notes:**__").append("\n");
-                if (promissoryNotesInPlayArea.isEmpty()) {
-                    sb.append("> None");
-                } else {
-                    for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                        if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                            sb.append("`").append(index).append(".");
-                            sb.append("(").append(pn.getValue()).append(")`");
-                            sb.append(getPromissoryNoteRepresentation(activeGame, pn.getKey(), longFormat));
-                            index++;
+                if (!excludePlayArea) {
+                    //PLAY AREA PROMISSORY NOTES
+                    sb.append("\n\n").append("__**PLAY AREA Promissory Notes:**__").append("\n");
+                    if (promissoryNotesInPlayArea.isEmpty()) {
+                        sb.append("> None");
+                    } else {
+                        for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                            if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                                sb.append("`").append(index).append(".");
+                                sb.append("(").append(pn.getValue()).append(")`");
+                                sb.append(getPromissoryNoteRepresentation(activeGame, pn.getKey(), longFormat));
+                                index++;
+                            }
                         }
                     }
                 }
             }
         }
         return sb.toString();
-    }
-
-    private static String getPromissoryNoteRepresentationShort(Game activeGame, String pnID) {
-        return getPromissoryNoteRepresentation(activeGame, pnID, null, false);
     }
 
     public static String getPromissoryNoteRepresentation(Game activeGame, String pnID) {
@@ -153,11 +149,11 @@ public class PNInfo extends PNCardsSubcommandData {
             pnText = pnText.replaceAll(pnOwner.getColor(), Emojis.getColorEmojiWithName(pnOwner.getColor()));
         }
 
-        if (longFormat || 
+        if (longFormat ||
             Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
             (pnModel.getSource() != ComponentSource.base && pnModel.getSource() != ComponentSource.pok)) {
-                sb.append("      ").append(pnText);
-            }
+            sb.append("      ").append(pnText);
+        }
         sb.append("\n");
         return sb.toString();
     }

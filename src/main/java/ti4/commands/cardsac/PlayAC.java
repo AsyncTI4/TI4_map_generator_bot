@@ -21,6 +21,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -76,7 +77,7 @@ public class PlayAC extends ACCardsSubcommandData {
             boolean foundSimilarName = false;
             String cardName = "";
             for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-                String actionCardName = Mapper.getActionCardName(ac.getKey());
+                String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
                 if (actionCardName != null) {
                     actionCardName = actionCardName.toLowerCase();
                     if (actionCardName.contains(value)) {
@@ -109,8 +110,8 @@ public class PlayAC extends ACCardsSubcommandData {
         if ("Action".equalsIgnoreCase(actionCardWindow) && activeGame.getPlayer(activePlayerID) != player) {
             return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
         }
-        if(ButtonHelper.isPlayerOverLimit(activeGame, player)){
-            return player.getRepresentation(true, true)+" The bot thinks you are over the limit and thus will not allow you to play ACs at this time. Ping Fin if this is an error";
+        if (ButtonHelper.isPlayerOverLimit(activeGame, player)) {
+            return player.getRepresentation(true, true) + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. Ping Fin if this is an error";
         }
 
         if (player.hasAbility("cybernetic_madness")) {
@@ -195,8 +196,15 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     player.getRepresentation() + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
             }
+            if (actionCardTitle.contains("Planetary Rigs")) {
+                List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(activeGame, player);
+                String msg = player.getRepresentation() + " After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, acbuttons);
+            }
+
             String codedName = "Plagiarize";
-            String codedMessage = player.getRepresentation() + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
+            String codedMessage = player.getRepresentation()
+                + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
             List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
@@ -505,7 +513,7 @@ public class PlayAC extends ACCardsSubcommandData {
                         && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
                         List<Button> reverseButtons = new ArrayList<>();
                         String key = "reverse_engineer";
-                        String ac_name = Mapper.getActionCardName(key);
+                        String ac_name = Mapper.getActionCard(key).getName();
                         if (ac_name != null) {
                             reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key) + "_reverse_" + actionCardTitle, "Reverse engineer " + actionCardTitle));
                         }
@@ -527,9 +535,10 @@ public class PlayAC extends ACCardsSubcommandData {
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             List<Button> buttons2 = new ArrayList<>();
-            Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_"+player.getFaction(), "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+            Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you can use Cymiae agent to draw an AC", buttons2);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
+                buttons2);
         }
 
         ACInfo.sendActionCardInfo(activeGame, player);

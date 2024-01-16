@@ -3,7 +3,6 @@ package ti4.commands.franken;
 import java.util.List;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Player;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -21,7 +20,7 @@ public class FactionTechAdd extends FactionTechAddRemove {
             if (player.getFactionTechs().contains(techID)) {
                 sb.append("> ").append(techID).append(" (player had this faction tech)");
             } else {
-                sb.append("> ").append(Helper.getTechRepresentation(techID));
+                sb.append("> ").append(Mapper.getTech(techID).getRepresentation(true));
             }
             sb.append("\n");
             player.addFactionTech(techID);

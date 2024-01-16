@@ -456,19 +456,6 @@ public class Mapper {
     }
 
     /**
-     * @deprecated use {@link #getActionCard(String id)}.getName() instead
-     */
-    @Nullable @Deprecated
-    public static String getActionCardName(String id) {
-        ActionCardModel info = getActionCard(id);
-        // if we would break trying to split the note, just return whatever is there
-        if (info == null) {
-            return "unknown action card, contact developer";
-        }
-        return info.getName();
-    }
-
-    /**
      * @deprecated start with {@link #getPromissoryNote(String id)} instead
      *
      */
@@ -884,8 +871,8 @@ public class Mapper {
             case Constants.ABILITY -> displayName = getAbility(relatedID).getRepresentation();
             case Constants.UNIT -> {
                 UnitModel unit = getUnit(relatedID);
-                displayName = unit.getUnitEmoji() + " "
-                    + unit.getName() + " " + unit.getAbility();
+                displayName = unit.getUnitEmoji() + " " + unit.getName();
+                if (unit.getAbility().isPresent()) displayName += " - *" + unit.getAbility() + "*";
             }
             case Constants.LEADER -> displayName = getLeader(relatedID).getRepresentation(true, true, false);
             default -> {

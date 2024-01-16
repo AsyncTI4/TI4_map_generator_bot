@@ -530,31 +530,18 @@ public class ButtonHelperAbilities {
 
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game activeGame, String finChecker) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
-        List<String> tiles = new ArrayList<>();
-        for (String planet : planets) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
-            Tile tile = activeGame.getTile(AliasHandler.resolveTile(planet));
-            if (tiles.contains(tile.getPosition())) {
-                continue;
-            } else {
-                tiles.add(tile.getPosition());
-            }
+        for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if ("space".equalsIgnoreCase(unitHolder.getName())) {
-                    continue;
-                }
                 String colorID = Mapper.getColorID(player.getColor());
-                int numInf = 0;
-                if (unitHolder.getUnits() != null) {
-                    numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
-                }
+                int numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
+                
                 if (numInf > 0) {
-                    String buttonID = finChecker + "mitoMechPlacement_" + unitHolder.getName().toLowerCase().replace("'", "").replace("-", "").replace(" ", "");
-                    Button button = Button.success(buttonID, Helper.getPlanetRepresentation(unitHolder.getName(), activeGame));
-                    planetButtons.add(button);
+                    String buttonID = finChecker + "mitoMechPlacement_" + tile.getPosition()+"_"+unitHolder.getName();
+                    if(unitHolder.getName().equalsIgnoreCase("space")){
+                        planetButtons.add(Button.success(buttonID, "Space Area of "+tile.getRepresentationForButtons(activeGame, player)));
+                    }else{
+                        planetButtons.add(Button.success(buttonID, Helper.getPlanetRepresentation(unitHolder.getName(), activeGame)));
+                    }
                 }
             }
         }
@@ -922,11 +909,18 @@ public class ButtonHelperAbilities {
     }
 
     public static void resolveMitosisMechPlacement(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
-        String planetName = buttonID.replace("mitoMechPlacement_", "");
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        String uH = buttonID.split("_")[2];
+        String successMessage = "";
+        if(uH.equalsIgnoreCase("space")){
+            successMessage= ident + " Replaced an infantry with a mech in the space area of " + tile.getRepresentationForButtons(activeGame,player) + ".";
+        }else{
+            successMessage= ident + " Replaced an infantry with a mech on " + Helper.getPlanetRepresentation(uH, activeGame) + ".";
+        }
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColor());
-        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, activeGame);
-        new RemoveUnits().removeStuff(event, activeGame.getTile(AliasHandler.resolveTile(planetName)), 1, planetName, key, player.getColor(), false, activeGame);
-        String successMessage = ident + " Replaced an infantry with a mech on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+        new AddUnits().unitParsing(event, player.getColor(), tile, "mech " + uH.replace("space", ""), activeGame);
+        new RemoveUnits().removeStuff(event, tile, 1, uH, key, player.getColor(), false, activeGame);
+        
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), successMessage);
         event.getMessage().delete().queue();
     }

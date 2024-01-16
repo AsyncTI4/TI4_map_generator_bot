@@ -2,6 +2,7 @@ package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -49,7 +50,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         sb.append(displayExplore(topCard));
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-        sendMessage("top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
                 + " Cards info thread.");
 
     }

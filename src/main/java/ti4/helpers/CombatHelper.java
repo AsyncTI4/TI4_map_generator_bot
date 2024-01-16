@@ -32,20 +32,20 @@ public class CombatHelper {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
-                entry -> player.getUnitsByAsyncID(entry.getKey()).stream()
-                        .map(x -> new ImmutablePair<>(x, entry.getValue())))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> player.getUnitsByAsyncID(entry.getKey()).stream()
+                .map(x -> new ImmutablePair<>(x, entry.getValue())))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output;
 
         output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .toList();
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .toList();
         for (String dupe : dupes) {
             for (UnitModel mod : output.keySet()) {
                 if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
@@ -58,51 +58,51 @@ public class CombatHelper {
     }
 
     public static Map<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
-            GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
+        GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
         Planet unitHolderPlanet = null;
         if (unitHolder instanceof Planet) {
             unitHolderPlanet = (Planet) unitHolder;
         }
-      return switch (roleType) {
-        case combatround -> GetUnitsInCombatRound(unitHolder, player, event, tile);
-        case AFB -> GetUnitsInAFB(tile, player, event);
-        case bombardment -> GetUnitsInBombardment(tile, player, event);
-        case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
-        case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
-      };
+        return switch (roleType) {
+            case combatround -> GetUnitsInCombatRound(unitHolder, player, event, tile);
+            case AFB -> GetUnitsInAFB(tile, player, event);
+            case bombardment -> GetUnitsInBombardment(tile, player, event);
+            case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
+            case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
+        };
     }
 
     public static Map<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player,
-            GenericInteractionCreateEvent event, Tile tile) {
+        GenericInteractionCreateEvent event, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
             if (unitsByAsyncId.containsKey("fs") && player.hasUnit("nekro_flagship")) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()
-                        .filter(entry -> entry.getKey() != null
-                                && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
-                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                    .filter(entry -> entry.getKey() != null
+                        && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
                 for (UnitHolder u2 : tile.getUnitHolders().values()) {
                     if (u2 == unitHolder) {
                         continue;
                     }
                     Map<String, Integer> unitsByAsyncId2 = u2.getUnitAsyncIdsOnHolder(colorID);
                     Map<UnitModel, Integer> unitsInCombat2 = unitsByAsyncId2.entrySet().stream().map(
-                            entry -> new ImmutablePair<>(
-                                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
-                                    entry.getValue()))
-                            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                        entry -> new ImmutablePair<>(
+                            player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
+                            entry.getValue()))
+                        .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
                     HashMap<UnitModel, Integer> output2;
                     output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
-                            .filter(entry -> entry.getKey() != null
-                                    && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
-                            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                        .filter(entry -> entry.getKey() != null
+                            && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
                     for (UnitModel unit : output2.keySet()) {
                         if (output.containsKey(unit)) {
                             output.put(unit, output.get(unit) + output2.get(unit));
@@ -113,14 +113,14 @@ public class CombatHelper {
                 }
             } else {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()
-                        .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip())
-                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                    .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip())
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
             }
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
-                    .filter(entry -> entry.getKey() != null
-                            && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                .filter(entry -> entry.getKey() != null
+                    && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         }
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -128,7 +128,7 @@ public class CombatHelper {
     }
 
     public static Map<UnitModel, Integer> GetUnitsInAFB(Tile tile, Player player,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -144,21 +144,21 @@ public class CombatHelper {
         }
 
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
     }
 
     public static Map<UnitModel, Integer> GetUnitsInBombardment(Tile tile, Player player,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -172,21 +172,21 @@ public class CombatHelper {
             }
         }
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
     }
 
     public static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(Planet planet, Player player,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -204,10 +204,10 @@ public class CombatHelper {
         }
 
         Map<UnitModel, Integer> unitsOnPlanet = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
@@ -225,8 +225,8 @@ public class CombatHelper {
         }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -234,7 +234,7 @@ public class CombatHelper {
     }
 
     public static Map<UnitModel, Integer> getUnitsInSpaceCannonOffense(Tile tile, Player player,
-            GenericInteractionCreateEvent event, Game activeGame) {
+        GenericInteractionCreateEvent event, Game activeGame) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -271,15 +271,15 @@ public class CombatHelper {
         }
 
         Map<UnitModel, Integer> unitsOnTile = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         Map<UnitModel, Integer> unitsOnAdjacentTiles = adjacentUnitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planets
         for (UnitHolder unitHolder : unitHolders) {
@@ -291,7 +291,7 @@ public class CombatHelper {
                     planetFakeUnit.setSpaceCannonHitsOn(planet.getSpaceCannonHitsOn());
                     planetFakeUnit.setSpaceCannonDieCount(planet.getSpaceCannonDieCount());
                     planetFakeUnit
-                            .setName(Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
+                        .setName(Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
                     planetFakeUnit.setAsyncId(planet.getName() + "pds");
                     planetFakeUnit.setId(planet.getName() + "pds");
                     planetFakeUnit.setBaseType("pds");
@@ -302,14 +302,14 @@ public class CombatHelper {
         }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
-                .filter(entry -> entry.getKey() != null
-                        && entry.getKey().getSpaceCannonDieCount() > 0
-                        && entry.getKey().getDeepSpaceCannon())
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null
+                && entry.getKey().getSpaceCannonDieCount() > 0
+                && entry.getKey().getDeepSpaceCannon())
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (var entry : adjacentOutput.entrySet()) {
             if (output.containsKey(entry.getKey())) {
@@ -325,20 +325,20 @@ public class CombatHelper {
     }
 
     private static void checkBadUnits(Player player, GenericInteractionCreateEvent event,
-            Map<String, Integer> unitsByAsyncId, HashMap<UnitModel, Integer> output) {
+        Map<String, Integer> unitsByAsyncId, HashMap<UnitModel, Integer> output) {
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .collect(Collectors.toList());
         List<String> missing = unitsByAsyncId.keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
+            .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+            .collect(Collectors.toList());
 
-        if(dupes.size() > 0){
+        if (dupes.size() > 0) {
             CombatMessageHelper.displayDuplicateUnits(event, missing);
         }
-        if(missing.size() > 0){
+        if (missing.size() > 0) {
             CombatMessageHelper.displayMissingUnits(event, missing);
         }
     }
@@ -347,19 +347,19 @@ public class CombatHelper {
         Player opponent = null;
         String playerColorID = Mapper.getColorID(player.getColor());
         List<Player> opponents = unitHolders.stream().flatMap(holder -> holder.getUnitColorsOnHolder().stream())
-                .filter(color -> !color.equals(playerColorID))
-                .map(activeGame::getPlayerByColorID)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+            .filter(color -> !color.equals(playerColorID))
+            .map(activeGame::getPlayerByColorID)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .toList();
 
         if (opponents.size() >= 1) {
             opponent = opponents.get(0);
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
-                    .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
-                    .findAny();
+                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
+                .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
             }
@@ -368,10 +368,11 @@ public class CombatHelper {
     }
 
     public static String RollForUnits(Map<UnitModel, Integer> playerUnits, Map<UnitModel, Integer> opponentUnits,
-            List<NamedCombatModifierModel> extraRolls, 
-            List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
-            Player opponent,
-            Game activeGame, CombatRollType rollType) {
+        List<NamedCombatModifierModel> extraRolls,
+        List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
+        Player opponent,
+        Game activeGame, CombatRollType rollType) {
+
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(autoMods);
@@ -394,11 +395,11 @@ public class CombatHelper {
 
             int toHit = unit.getCombatDieHitsOnForAbility(rollType);
             int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, mods, player, opponent,
-                    activeGame,
-                    playerUnitsList, opponentUnitsList, rollType);
+                activeGame,
+                playerUnitsList, opponentUnitsList, rollType);
             int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, extraRolls, player,
-                    opponent,
-                    activeGame, playerUnitsList, opponentUnitsList, rollType);
+                opponent,
+                activeGame, playerUnitsList, opponentUnitsList, rollType);
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
@@ -406,47 +407,46 @@ public class CombatHelper {
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
 
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
-            if(unit.getId().equalsIgnoreCase("jolnar_flagship")){
-                for(Die die : resultRolls){
-                    if(die.getResult() > 8){
+            if (unit.getId().equalsIgnoreCase("jolnar_flagship")) {
+                for (Die die : resultRolls) {
+                    if (die.getResult() > 8) {
                         hitRolls = hitRolls + 2;
                     }
                 }
             }
-            
+
             totalHits += hitRolls;
 
-            
             String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
             resultBuilder.append(unitRoll);
             List<Die> resultRolls2 = new ArrayList<>();
             int numMisses = numRolls - hitRolls;
-            if(activeGame.playerHasLeaderUnlockedOrAlliance(player,"jolnarcommander") && rollType != CombatRollType.combatround && numMisses > 0){
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander") && rollType != CombatRollType.combatround && numMisses > 0) {
                 int numRolls2 = numMisses;
                 resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numRolls2);
                 player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls2 * (11 - toHit + modifierToHit)));
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("\nRerolling "+numMisses+" misses due to Jol-Nar Commander:\n "+unitRoll2);
+                resultBuilder.append("\nRerolling " + numMisses + " misses due to Jol-Nar Commander:\n " + unitRoll2);
             }
 
-           int argentInfKills = 0;
-            if(player != opponent && unit.getId().equalsIgnoreCase("argent_destroyer2") && rollType == CombatRollType.AFB && space.getUnitCount(UnitType.Infantry, opponent.getColor()) > 0 ){
-                for(Die die : resultRolls){
-                    if(die.getResult() > 8){
+            int argentInfKills = 0;
+            if (player != opponent && unit.getId().equalsIgnoreCase("argent_destroyer2") && rollType == CombatRollType.AFB && space.getUnitCount(UnitType.Infantry, opponent.getColor()) > 0) {
+                for (Die die : resultRolls) {
+                    if (die.getResult() > 8) {
                         argentInfKills++;
                     }
                 }
-                for(Die die : resultRolls2){
-                    if(die.getResult() > 8){
+                for (Die die : resultRolls2) {
+                    if (die.getResult() > 8) {
                         argentInfKills++;
                     }
                 }
                 argentInfKills = Math.min(argentInfKills, space.getUnitCount(UnitType.Infantry, opponent.getColor()));
             }
-            if(argentInfKills > 0){
-                String kills = "\nDue to SWA II destroyer ability, "+argentInfKills +" of "+opponent.getRepresentation(false, true)+" infantry were destroyed\n";
+            if (argentInfKills > 0) {
+                String kills = "\nDue to SWA II destroyer ability, " + argentInfKills + " of " + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
                 resultBuilder.append(kills);
                 space.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), opponent.getColorID()), argentInfKills);
                 ButtonHelper.resolveInfantryDeath(activeGame, opponent, argentInfKills);
@@ -456,8 +456,8 @@ public class CombatHelper {
 
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
-        if(player.hasRelic("thalnos") && rollType == CombatRollType.combatround){
-            result = result + "\n"+player.getFactionEmoji()+" You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives. (Not yet automated)";
+        if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround) {
+            result = result + "\n" + player.getFactionEmoji() + " You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives. (Not yet automated)";
         }
         return result;
     }

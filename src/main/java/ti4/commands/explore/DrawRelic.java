@@ -114,7 +114,7 @@ public class DrawRelic extends GenericRelicAction {
         if (activeGame.isFoWMode()) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message.toString());
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message.toString());
         if (checked) {
             activeGame.shuffleRelics();
         }

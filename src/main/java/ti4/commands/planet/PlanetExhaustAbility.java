@@ -19,13 +19,15 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     public PlanetExhaustAbility() {
         super(Constants.PLANET_EXHAUST_ABILITY, "Exhaust Planet Ability");
     }
+
     @Override
     public void doAction(Player player, String planet, Game activeGame) {
         doAction(player, planet, activeGame, true);
     }
-    
+
     public void doAction(Player player, String planet, Game activeGame, boolean exhaust) {
-        if(exhaust){
+        if (player == null) return;
+        if (exhaust) {
             player.exhaustPlanetAbility(planet);
         }
         MessageChannel channel = activeGame.getMainGameChannel();
@@ -124,10 +126,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     public void resolvePrismStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
-       
-            buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_AC", "Send AC"));
-            buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_PN", "Send PN"));
-        
+
+        buttons.add(Button.secondary("prismStep3_" + player.getFaction() + "_AC", "Send AC"));
+        buttons.add(Button.secondary("prismStep3_" + player.getFaction() + "_PN", "Send PN"));
+
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             ButtonHelper.getIdent(player) + " chose " + ButtonHelper.getIdentOrColor(p2, activeGame) + " as the target of the prism ability. The target has been sent buttons to resolve.");
@@ -140,9 +142,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         List<Button> buttons;
         String pnOrAC = buttonID.split("_")[2];
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),ButtonHelper.getIdent(player)+" chose to send a "+pnOrAC);
-        if("pn".equalsIgnoreCase(pnOrAC)){
-            buttons =  ButtonHelper.getForcedPNSendButtons(activeGame, p2, player);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " chose to send a " + pnOrAC);
+        if ("pn".equalsIgnoreCase(pnOrAC)) {
+            buttons = ButtonHelper.getForcedPNSendButtons(activeGame, p2, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " resolve", buttons);
 
         } else {
