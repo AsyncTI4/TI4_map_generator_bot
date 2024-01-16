@@ -435,6 +435,10 @@ public class Mapper {
         return tokensToName;
     }
 
+    public static String getTokenIDFromTokenPath(String tokenPath) {
+        return getTokensToName().get(tokenPath);
+    }
+
     public static SecretObjectiveModel getSecretObjective(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
