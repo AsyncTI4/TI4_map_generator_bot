@@ -505,12 +505,16 @@ public class MessageListener extends ListenerAdapter {
         }
 
         if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz) {
+            final String messageContent = StringUtils.substringAfter(messageText, " ");
+
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Game activeGame = GameManager.getInstance().getGame(gameName);
-            if (activeGame != null) {
-                final String messageContent = StringUtils.substringAfter(messageText, " ");
+
+            if (messageContent.isEmpty()) {
+                BotLogger.log("User tried to send an empty whisper " + event.getJumpUrl());
+            } else if (activeGame != null) {
                 Player player = activeGame.getPlayer(event.getAuthor().getId());
                 if (activeGame.isCommunityMode()) {
                     Collection<Player> players = activeGame.getPlayers().values();
@@ -520,11 +524,6 @@ public class MessageListener extends ListenerAdapter {
                             player = player2;
                         }
                     }
-                }
-
-                if (messageContent.isEmpty()) {
-                    BotLogger.log("User tried to send an empty whisper " + event.getJumpUrl());
-                    return;
                 }
 
                 Player player_ = activeGame.getPlayer(event.getAuthor().getId());
