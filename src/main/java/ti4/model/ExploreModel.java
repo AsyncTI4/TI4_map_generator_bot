@@ -43,6 +43,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(attachmentId);
     }
 
+    public Optional<String> getFlavorText() {
+        return Optional.ofNullable(flavorText);
+    }
+
     /**
      * @deprecated This only exists to support legacy code reliant on String.split(";")
      */
@@ -65,10 +69,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed() {
-        return getRepresentationEmbed(false);
+        return getRepresentationEmbed(false, false);
     }
 
-    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+    public MessageEmbed getRepresentationEmbed(boolean includeID, boolean showFlavorText) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSource().emoji(), null);
         eb.setColor(getEmbedColor());
@@ -79,6 +83,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
             if (getAttachmentId().isPresent()) sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
             sb.append("ID: ").append(getId()).append("  Source: ").append(getSource());
             eb.setFooter(sb.toString());
+        }
+
+        if (showFlavorText && getFlavorText().isPresent()) {
+            eb.addField("", getFlavorText().get(), false);
         }
 
         return eb.build();
