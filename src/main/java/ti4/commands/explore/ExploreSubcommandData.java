@@ -86,13 +86,15 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 
+    /**
+     * @deprecated should use {@link ExploreModel#getRepresentationEmbed()} instead
+     */
+    @Deprecated
     public static String displayExplore(String cardID) {
-        ExploreModel card = Mapper.getExplore(cardID);
+        ExploreModel model = Mapper.getExplore(cardID);
         StringBuilder sb = new StringBuilder();
-        if (card != null) {
-            String name = card.getName();
-            String description = card.getText();
-            sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
+        if (model != null) {
+            sb.append("(").append(cardID).append(") ").append(model.getName()).append(" - ").append(model.getText());
         } else {
             sb.append("Invalid ID ").append(cardID);
         }
