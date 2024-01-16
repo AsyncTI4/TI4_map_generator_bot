@@ -521,6 +521,12 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                 }
+
+                if (messageContent.isEmpty()) {
+                    BotLogger.log("User tried to send an empty whisper " + event.getJumpUrl());
+                    return;
+                }
+
                 Player player_ = activeGame.getPlayer(event.getAuthor().getId());
 
                 String jazzId = "228999251328368640";
