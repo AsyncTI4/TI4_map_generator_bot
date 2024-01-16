@@ -43,6 +43,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(attachmentId);
     }
 
+    public Optional<String> getFlavorText() {
+        return Optional.ofNullable(flavorText);
+    }
+
     /**
      * @deprecated This only exists to support legacy code reliant on String.split(";")
      */
@@ -53,19 +57,22 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || 
+                getText().toLowerCase().contains(searchString) ||
+                getId().toLowerCase().contains(searchString) ||
+                getType().toLowerCase().contains(searchString) ||
+                getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getType() + ") (" + getSource() + ")";
+        return getName() + " (" + getType() + ") [" + getSource() + "]";
     }
 
     public MessageEmbed getRepresentationEmbed() {
-        return getRepresentationEmbed(false);
+        return getRepresentationEmbed(false, false);
     }
 
-    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+    public MessageEmbed getRepresentationEmbed(boolean includeID, boolean showFlavorText) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSource().emoji(), null);
         eb.setColor(getEmbedColor());
@@ -76,6 +83,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
             if (getAttachmentId().isPresent()) sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
             sb.append("ID: ").append(getId()).append("  Source: ").append(getSource());
             eb.setFooter(sb.toString());
+        }
+
+        if (showFlavorText && getFlavorText().isPresent()) {
+            eb.addField("", getFlavorText().get(), false);
         }
 
         return eb.build();
