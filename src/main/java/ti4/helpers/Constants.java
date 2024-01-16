@@ -1038,4 +1038,5 @@ public class Constants {
     public static final String REFRESH_LEADER_INFO = "refreshLeaderInfo";
     public static final String REFRESH_UNIT_INFO = "refreshUnitInfo";
     public static final String REFRESH_TECH_INFO = "refreshTechInfo";
+    public static final String REFRESH_PLANET_INFO = "refreshPlanetInfo";
 }

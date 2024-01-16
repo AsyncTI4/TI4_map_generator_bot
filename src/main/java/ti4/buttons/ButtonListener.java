@@ -54,6 +54,7 @@ import ti4.commands.game.Swap;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
+import ti4.commands.planet.PlanetInfo;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
@@ -2503,6 +2504,7 @@ public class ButtonListener extends ListenerAdapter {
                 case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
                 case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
                 case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
+                case Constants.REFRESH_PLANET_INFO -> PlanetInfo.sendPlanetInfo(player);
                 case "warfareBuild" -> {
                     List<Button> buttons;
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
