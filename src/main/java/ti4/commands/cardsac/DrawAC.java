@@ -36,8 +36,8 @@ public class DrawAC extends ACCardsSubcommandData {
             activeGame.drawActionCard(player.getUserID());
         }
         ACInfo.sendActionCardInfo(activeGame, player);
-         ButtonHelper.checkACLimit(activeGame, event, player);
-        if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+        ButtonHelper.checkACLimit(activeGame, event, player);
+        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
         }
     }
