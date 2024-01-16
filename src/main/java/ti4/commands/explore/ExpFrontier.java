@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 public class ExpFrontier extends ExploreSubcommandData {
     public ExpFrontier() {
-        super(Constants.FRONTIER, "Explore a frontier tile");
+        super(Constants.FRONTIER, "Explore a Frontier token on a Tile");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile").setRequired(true).setAutoComplete(true));
     }
 
@@ -41,9 +41,8 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeGame.drawExplore(Constants.FRONTIER);
-          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":\n" +
-              displayExplore(cardID);
-            resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
+            String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
+            resolveExplore(event, cardID, tile, null, messageText, player, activeGame);
             
             if(player.hasTech("dslaner")){
                 player.setAtsCount(player.getAtsCount()+1);
@@ -58,24 +57,15 @@ public class ExpFrontier extends ExploreSubcommandData {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
-          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":\n" +
-              displayExplore(cardID);
-            resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
+            String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
+            resolveExplore(event, cardID, tile, null, messageText, player, activeGame);
 
-            if(player.hasTech("dslaner")){
-                player.setAtsCount(player.getAtsCount()+1);
+            if (player.hasTech("dslaner")) {
+                player.setAtsCount(player.getAtsCount() + 1);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
-    }
-
-    public static boolean checkIfEngimaticDevice(@NotNull Player player, String cardID) {
-        if ("ed1".equals(cardID) || "ed2".equals(cardID)) {
-            player.addRelic(Constants.ENIGMATIC_DEVICE);
-            return true;
-        }
-        return false;
     }
 }

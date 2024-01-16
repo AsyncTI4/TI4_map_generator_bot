@@ -20,6 +20,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
+import ti4.commands.player.TurnStart;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -58,7 +59,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 

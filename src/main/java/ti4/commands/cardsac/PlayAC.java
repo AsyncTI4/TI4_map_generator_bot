@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -495,7 +496,7 @@ public class PlayAC extends ACCardsSubcommandData {
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
                 activeGame.setJustPlayedComponentAC(true);
-                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentation(true, true) + " you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";

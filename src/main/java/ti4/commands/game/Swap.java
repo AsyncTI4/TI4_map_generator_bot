@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.player.TurnStart;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -119,7 +120,7 @@ public class Swap extends GameSubcommandData {
                 }
                 String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
                 String buttonText = "Use buttons to do your turn. ";
-                List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
                 MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
             }

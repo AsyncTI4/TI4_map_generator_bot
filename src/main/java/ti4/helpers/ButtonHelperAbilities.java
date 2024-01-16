@@ -14,6 +14,7 @@ import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
+import ti4.commands.player.TurnStart;
 import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -780,7 +781,7 @@ public class ButtonHelperAbilities {
             + Helper.getPlanetRepresentation(planetName, activeGame) + " and gained 4tg (" + oldTg + "->" + player.getTg() + "). This is technically an optional gain");
         pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 4);
-        List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+        List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         String message = "Use buttons to end turn or do another action";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
@@ -886,7 +887,7 @@ public class ButtonHelperAbilities {
             successMessage = "Exhausted scepter of emelpar";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
-        List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+        List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         if ("destroyer".equals(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", activeGame);
             successMessage = "Produced 1 " + Emojis.destroyer + " in tile "
@@ -997,18 +998,16 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void distantSuns(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
+    public static void distantSuns(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         String bID = buttonID.replace("distant_suns_", "");
         String[] info = bID.split("_");
         String message;
         if ("decline".equalsIgnoreCase(info[0])) {
-            message = "Rejected Distant Suns Ability";
+            message = player.getFactionEmoji() + " declined to use their Distant Suns ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 1, false);
         } else {
-            message = "Exploring twice";
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 2, false);
         }
