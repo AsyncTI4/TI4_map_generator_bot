@@ -280,6 +280,9 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
+                if(!unitModel.getIsShip()){
+                    continue;
+                }
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
@@ -379,6 +382,47 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
+        //catch any sustains not already caught
+        if(hits > 0){
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                if(!unitModel.getIsShip()){
+                    continue;
+                }
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                int totalUnits = unitEntry.getValue() - damagedUnits;
+                int min = Math.min(totalUnits, hits);
+                if(player.hasTech("nes")){
+                    min = Math.min(totalUnits, (hits+1)/2);
+                }
+                String stuffNotToSustain = activeGame.getFactionsThatReactedToThis("stuffNotToSustainFor"+player.getFaction());
+
+                if(stuffNotToSustain.isEmpty()){
+                    activeGame.setCurrentReacts("stuffNotToSustainFor"+player.getFaction(), "warsun");
+                    stuffNotToSustain = "warsun";
+                }
+                if (unitModel.getSustainDamage() && min > 0 && !(!stuffNotToSustain.contains(unitName.toLowerCase()) || (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")))) {
+                    msg = msg + "> Sustained "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    hits = hits - min;
+                    if(player.hasTech("nes")){
+                        hits = hits - min;
+                    }
+                    if(!justSummarizing){
+                        tile.addUnitDamage("space", unitKey, min);
+                        for (int x = 0; x < min; x++) {
+                            ButtonHelperCommanders.resolveLetnevCommanderCheck(player, activeGame, event);
+                        }
+                    }
+                }
+            }
+        }
         if(hits > 0){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -456,44 +500,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
-        //catch any sustains not already caught
-        if(hits > 0){
-            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
-                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null) continue;
-                UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
-                int damagedUnits = 0;
-                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
-                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
-                }
-                int totalUnits = unitEntry.getValue() - damagedUnits;
-                int min = Math.min(totalUnits, hits);
-                if(player.hasTech("nes")){
-                    min = Math.min(totalUnits, (hits+1)/2);
-                }
-                String stuffNotToSustain = activeGame.getFactionsThatReactedToThis("stuffNotToSustainFor"+player.getFaction());
-
-                if(stuffNotToSustain.isEmpty()){
-                    activeGame.setCurrentReacts("stuffNotToSustainFor"+player.getFaction(), "warsun");
-                    stuffNotToSustain = "warsun";
-                }
-                if (unitModel.getSustainDamage() && min > 0 && !(!stuffNotToSustain.contains(unitName.toLowerCase()) || (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")))) {
-                    msg = msg + "> Sustained "+min+" "+unitModel.getUnitEmoji()+"\n";
-                    hits = hits - min;
-                    if(player.hasTech("nes")){
-                        hits = hits - min;
-                    }
-                    if(!justSummarizing){
-                        tile.addUnitDamage("space", unitKey, min);
-                        for (int x = 0; x < min; x++) {
-                            ButtonHelperCommanders.resolveLetnevCommanderCheck(player, activeGame, event);
-                        }
-                    }
-                }
-            }
-        }
+        
         if(hits > 0){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
