@@ -409,7 +409,7 @@
     "name": "Kickbacks",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for that outcome must gives you 1 promissory note from their hand.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for that outcome must give you 1 promissory note from their hand.",
     "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
