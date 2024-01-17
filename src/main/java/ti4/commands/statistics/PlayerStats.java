@@ -1,0 +1,129 @@
+package ti4.commands.statistics;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
+import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
+
+public class PlayerStats extends StatisticsSubcommandData {
+
+    private static final String MINIMUM_GAME_COUNT_FILTER = "has_minimum_game_count";
+
+    public PlayerStats() {
+        super("players", "Player Statistics");
+        addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, GameStatisticFilterer.PLAYER_COUNT_FILTER, "Filter games of player by player count, e.g. 3-8"));
+        addOptions(new OptionData(OptionType.INTEGER, GameStatisticFilterer.VICTORY_POINT_GOAL_FILTER, "Filter games of player by victory point goal, e.g. 10-14"));
+        addOptions(new OptionData(OptionType.STRING, GameStatisticFilterer.GAME_TYPE_FILTER, "Filter games of player by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+        addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.FOG_FILTER, "Filter games of player by if the game is a fog game"));
+        addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HOMEBREW_FILTER, "Filter games of player by if the game has any homebrew"));
+        addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HAS_WINNER_FILTER, "Filter games of player by if the game has a winner"));
+        addOptions(new OptionData(OptionType.INTEGER, MINIMUM_GAME_COUNT_FILTER, "Filter by the minimum number of games player has played"));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        String statisticToShow = event.getOption(Constants.PLAYER_STATISTIC, null, OptionMapping::getAsString);
+        PlayerStatistics stat = PlayerStatistics.fromString(statisticToShow);
+        if (stat == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
+            return;
+        }
+        if (stat == PlayerStatistics.PLAYER_WIN_PERCENT) {
+            showPlayerWinPercent(event);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
+        }
+    }
+
+    private static void showPlayerWinPercent(SlashCommandInteractionEvent event) {
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        Map<String, Integer> playerWinCount = new HashMap<>();
+        Map<String, Integer> playerGameCount = new HashMap<>();
+        Map<String, String> playerUserIdToUsername = new HashMap<>();
+        for (Game game : filteredGames) {
+            Player winner = GameStatisticFilterer.getWinner(game);
+            if (winner == null) {
+                continue;
+            }
+            String winningUserId = winner.getUserID();
+            playerWinCount.put(winningUserId,
+                1 + playerWinCount.getOrDefault(winningUserId, 0));
+
+            game.getRealPlayers().forEach(player -> {
+                String userId = player.getUserID();
+                playerUserIdToUsername.put(userId, player.getUserName());
+                playerGameCount.put(userId,
+                    1 + playerGameCount.getOrDefault(userId, 0));
+            });
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("**Player Win Percent:**").append("\n");
+
+        int minimumGameCountFilter = event.getOption(MINIMUM_GAME_COUNT_FILTER, 1, OptionMapping::getAsInt);
+        playerUserIdToUsername.keySet().stream()
+            .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
+            .map(userId -> {
+                double winCount = playerWinCount.getOrDefault(userId, 0);
+                double gameCount = playerGameCount.get(userId);
+                return Map.entry(userId, Math.round(100 * winCount / gameCount));
+            })
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+            .forEach(entry ->
+                sb.append("`")
+                    .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
+                    .append(" ")
+                    .append(entry.getValue())
+                    .append("% (")
+                    .append(playerGameCount.get(entry.getKey()))
+                    .append(" games) ")
+                    .append("\n")
+            );
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Player Win Percent", sb.toString());
+    }
+
+    public enum PlayerStatistics {
+
+        PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer");
+    
+        private final String name;
+        private final String description;
+    
+        PlayerStatistics(String name, String description) {
+            this.name = name;
+            this.description = description;
+        }
+    
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+
+        public static PlayerStatistics fromString(String id) {
+            for (PlayerStatistics stat : values()) {
+                if (id.equals(stat.toString())) {
+                    return stat;
+                }
+            }
+            return null;
+        }
+
+        public String getAutoCompleteName() {
+            return name + ": " + description;
+        }
+
+        public boolean search(String searchString) {
+            return name.toLowerCase().contains(searchString) || description.toLowerCase().contains(searchString) || toString().contains(searchString);
+        }
+    }
+
+}

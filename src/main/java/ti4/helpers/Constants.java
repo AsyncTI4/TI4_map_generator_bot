@@ -393,7 +393,7 @@ public class Constants {
     public static final String IMPERIAL_SECONDARY = "imperial_secondary";
     public static final String CUSTOM_SECONDARY = "custom_secondary";
 
-    public static final String GAME = "game";
+    public static final String GAMES = "games";
     public static final String MAP = "map";
     public static final String INFO = "info";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
@@ -1029,8 +1029,8 @@ public class Constants {
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
     public static final String RESTORE_GAME = "restore_game";
     public static final String SAVE_FILE = "save_file";
-    public static final String OTHER = "other";
-    public static final String STATISTIC = "statistic";
+    public static final String GAME_STATISTIC = "game_statistic";
+    public static final String PLAYER_STATISTIC = "player_statistic";
     public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";

@@ -1,9 +1,7 @@
 package ti4.commands.statistics;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +24,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
-public class OtherStats extends StatisticsSubcommandData {
+public class GameStats extends StatisticsSubcommandData {
 
     private static final String PLAYER_COUNT_FILTER = "player_count";
     private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
@@ -35,9 +33,9 @@ public class OtherStats extends StatisticsSubcommandData {
     private static final String HOMEBREW_FILTER = "has_homebrew";
     private static final String HAS_WINNER_FILTER = "has_winner";
 
-    public OtherStats() {
-        super(Constants.OTHER, "Other Various Statistics");
-        addOptions(new OptionData(OptionType.STRING, Constants.STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
+    public GameStats() {
+        super(Constants.GAMES, "Game Statistics");
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
@@ -48,8 +46,8 @@ public class OtherStats extends StatisticsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String statisticToShow = event.getOption(Constants.STATISTIC, null, OptionMapping::getAsString);
-        SimpleStatistics stat = SimpleStatistics.fromString(statisticToShow);
+        String statisticToShow = event.getOption(Constants.GAME_STATISTIC, null, OptionMapping::getAsString);
+        GameStatistics stat = GameStatistics.fromString(statisticToShow);
         if (stat == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
             return;
@@ -72,7 +70,7 @@ public class OtherStats extends StatisticsSubcommandData {
      * Represents a simple statistic.
      * Just add a new enum for every statistic and it will handle the autocomplete for you.
      */
-    public enum SimpleStatistics {
+    public enum GameStatistics {
         // Add your new statistic here
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
         GAME_LENGTH("Game Length", "Show game lengths"),
@@ -87,7 +85,7 @@ public class OtherStats extends StatisticsSubcommandData {
         private final String name;
         private final String description;
     
-        SimpleStatistics(String name, String description) {
+        GameStatistics(String name, String description) {
             this.name = name;
             this.description = description;
         }
@@ -102,8 +100,8 @@ public class OtherStats extends StatisticsSubcommandData {
          * @param id the string identifier
          * @return the SimpleStatistics enum value, or null if not found
          */
-        public static SimpleStatistics fromString(String id) {
-            for (SimpleStatistics stat : values()) {
+        public static GameStatistics fromString(String id) {
+            for (GameStatistics stat : values()) {
                 if (id.equals(stat.toString())) {
                     return stat;
                 }
@@ -132,7 +130,7 @@ public class OtherStats extends StatisticsSubcommandData {
     public static void sendAllNames(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
-        List<Game> filteredGames = getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
             num++;
             names.append(num).append(". ").append(game.getName());
@@ -145,7 +143,7 @@ public class OtherStats extends StatisticsSubcommandData {
     }
 
     public static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
-        List<Game> filteredGames = getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         if (pastDays == null) pastDays = 3650;
         int num = 0;
         int total = 0;
@@ -169,17 +167,6 @@ public class OtherStats extends StatisticsSubcommandData {
         }
         longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths" , longMsg.toString());
-    }
-
-    private static List<Game> getFilteredGames(SlashCommandInteractionEvent event) {
-        return GameManager.getInstance().getGameNameToGame().values().stream()
-            .filter(game -> filterOnPlayerCount(event, game))
-            .filter(game -> filterOnVictoryPointGoal(event, game))
-            .filter(game -> filterOnGameType(event, game))
-            .filter(game -> filterOnFogType(event, game))
-            .filter(game -> filterOnHomebrew(event, game))
-            .filter(game -> filterOnHasWinner(event, game))
-            .toList();
     }
 
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
@@ -212,14 +199,14 @@ public class OtherStats extends StatisticsSubcommandData {
 
     private static void showGameCount(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Game count: " + getFilteredGames(event).size());
+            "Game count: " + GameStatisticFilterer.getFilteredGames(event).size());
     }
 
     private static void showMostWinningFactions(SlashCommandInteractionEvent event) {
         Map<String, Integer> winnerFactionCount = new HashMap<>();
-        List<Game> filteredGames = getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
-            Player winner = getWinner(game);
+            Player winner = GameStatisticFilterer.getWinner(game);
             if (winner == null) {
                 continue;
             }
@@ -244,11 +231,11 @@ public class OtherStats extends StatisticsSubcommandData {
     }
 
     private static void showFactionWinPercent(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         for (Game game : filteredGames) {
-            Player winner = getWinner(game);
+            Player winner = GameStatisticFilterer.getWinner(game);
             if (winner == null) {
                 continue;
             }
@@ -286,98 +273,11 @@ public class OtherStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
 
-    private static boolean filterOnFogType(SlashCommandInteractionEvent event, Game game) {
-        Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
-        return fogFilter == null
-            || (fogFilter && (game.isFoWMode() || game.isLightFogMode()))
-            || (!fogFilter && (!game.isFoWMode() && !game.isLightFogMode())) ;
-    }
-
-    private static boolean filterOnGameType(SlashCommandInteractionEvent event, Game game) {
-        String gameTypeFilter = event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString);
-        if (gameTypeFilter == null) {
-            return true;
-        }
-        switch (gameTypeFilter) {
-            case "base" -> {
-                return game.isBaseGameMode();
-            }
-            case "absol" -> {
-                return game.isAbsolMode();
-            }
-            case "ds" -> {
-                return isDiscordantStarsGame(game);
-            }
-            case "pok" -> {
-                return !game.isBaseGameMode();
-            }
-            case "action_deck_2" -> {
-                return "action_deck_2".equals(game.getAcDeckID());
-            }
-            case "little_omega" -> {
-                return "public_stage_1_objectives_little_omega".equals(game.getStage1PublicDeckID())
-                    || "public_stage_2_objectives_little_omega".equals(game.getStage2PublicDeckID())
-                    || "agendas_little_omega".equals(game.getAgendaDeckID());
-            }
-            default -> {
-                return false;
-            }
-        }
-    }
-
-    private static boolean filterOnHasWinner(SlashCommandInteractionEvent event, Game game) {
-        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
-        return hasWinnerFilter == null || (hasWinnerFilter && getWinner(game) != null) || (!hasWinnerFilter && getWinner(game) == null);
-    }
-
-    private static boolean filterOnHomebrew(SlashCommandInteractionEvent event, Game game) {
-        Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
-        return homebrewFilter == null || game.hasHomebrew() == homebrewFilter;
-    }
-
-    private static boolean isDiscordantStarsGame(Game game) {
-        return game.isDiscordantStarsMode() ||
-            Mapper.getFactions().stream()
-                .filter(faction -> "ds".equals(faction.getSource().name()))
-                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
-    }
-
-    private static boolean filterOnVictoryPointGoal(SlashCommandInteractionEvent event, Game game) {
-        int victoryPointGoal = event.getOption(VICTORY_POINT_GOAL_FILTER, 0, OptionMapping::getAsInt);
-        return victoryPointGoal <= 0 || game.getVp() == victoryPointGoal;
-    }
-
-    private static boolean filterOnPlayerCount(SlashCommandInteractionEvent event, Game game) {
-        int playerCountFilter = event.getOption(PLAYER_COUNT_FILTER, 0, OptionMapping::getAsInt);
-        return playerCountFilter <= 0 || game.getPlayerCountForMap() == playerCountFilter;
-    }
-
-    private static Player getWinner(Game game) {
-        Player winner = null;
-        for (Player player : game.getRealPlayers()) {
-            if (game.getVp() <= player.getTotalVictoryPoints()) {
-                if (winner == null) {
-                    winner = player;
-                } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
-                    winner = getLowestInitiativePlayer(player, winner);
-                } else {
-                    return null;
-                }
-            }
-        }
-        return winner;
-    }
-
-    private static Player getLowestInitiativePlayer(Player player1, Player player2) {
-        if (Collections.min(player1.getSCs()) < Collections.min(player2.getSCs())) {
-            return player1;
-        }
-        return player2;
-    }
+   
 
     private static void showMostPlayedColour(SlashCommandInteractionEvent event) {
         Map<String, Integer> colorCount = new HashMap<>();
-        List<Game> filteredGames = getFilteredGames(event);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
             for (Player player : game.getRealPlayers()) {
                 String color = player.getColor();
@@ -404,7 +304,7 @@ public class OtherStats extends StatisticsSubcommandData {
         Map<String, Integer> winnerColorCount = new HashMap<>();
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            Player winner = getWinner(game);
+            Player winner = GameStatisticFilterer.getWinner(game);
             if (winner == null) {
                 continue;
             }

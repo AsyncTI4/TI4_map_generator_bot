@@ -29,7 +29,7 @@ public class GameCommand implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.GAME;
+        return Constants.GAMES;
     }
 
     @Override
