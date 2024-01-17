@@ -220,7 +220,7 @@ public class MessageListener extends ListenerAdapter {
                                 } else {
                                     long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
                                     int autoPingSpacer = (int) spacer;
-                                    int pingNumber = (int) (milliSinceLastTurnChange) / (60 * 60 * multiplier * (int) autoPingSpacer);
+                                    int pingNumber = (int) (milliSinceLastTurnChange) / (60 * 60 * multiplier * autoPingSpacer);
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 2)) {
                                         ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
@@ -419,8 +419,8 @@ public class MessageListener extends ListenerAdapter {
 
         List<String> colors = Mapper.getColors();
         colors.addAll(Mapper.getFactionIDs());
-        final String messageText = msg.getContentRaw();
-        final String messageLowerCase = messageText.toLowerCase();
+        String messageText = msg.getContentRaw();
+        String messageLowerCase = messageText.toLowerCase();
         boolean messageToColor = false;
         boolean messageToFutureColor = false;
         boolean messageToMyself = false;
@@ -505,7 +505,7 @@ public class MessageListener extends ListenerAdapter {
         }
 
         if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz) {
-            final String messageContent = StringUtils.substringAfter(messageText, " ");
+            String messageContent = StringUtils.substringAfter(messageText, " ");
 
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
@@ -550,7 +550,7 @@ public class MessageListener extends ListenerAdapter {
                             player_ = player3;
                             break;
                         }
-                        if (player3.getUserID().equals("228999251328368640") && messageToJazz) {
+                        if ("228999251328368640".equals(player3.getUserID()) && messageToJazz) {
                             player_ = player3;
                             break;
                         }
@@ -573,7 +573,7 @@ public class MessageListener extends ListenerAdapter {
                             player_ = player3;
                             break;
                         }
-                        if (player3.getUserID().equals("228999251328368640") && messageToJazz) {
+                        if ("228999251328368640".equals(player3.getUserID()) && messageToJazz) {
                             player_ = player3;
                             break;
                         }
