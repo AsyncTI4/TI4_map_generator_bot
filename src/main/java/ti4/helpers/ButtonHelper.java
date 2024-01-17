@@ -2213,10 +2213,18 @@ public class ButtonHelper {
 
     public static List<Player> getOtherPlayersWithShipsInTheSystem(Player player, Game activeGame, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player p2 : activeGame.getPlayers().values()) {
-            if (p2 == player || !p2.isRealPlayer()) {
-                continue;
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) continue;
+            if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
+                playersWithShips.add(p2);
             }
+        }
+        return playersWithShips;
+    }
+
+    public static List<Player> getPlayersWithShipsInTheSystem(Game activeGame, Tile tile) {
+        List<Player> playersWithShips = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
                 playersWithShips.add(p2);
             }
@@ -2226,10 +2234,8 @@ public class ButtonHelper {
 
     public static List<Player> getOtherPlayersWithUnitsInTheSystem(Player player, Game activeGame, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player p2 : activeGame.getPlayers().values()) {
-            if (p2 == player || !p2.isRealPlayer()) {
-                continue;
-            }
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) continue;
             if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
                 playersWithShips.add(p2);
             }
@@ -2239,10 +2245,7 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithUnitsInTheSystem(Game activeGame, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player player : activeGame.getPlayers().values()) {
-            if (!player.isRealPlayer()) {
-                continue;
-            }
+        for (Player player : activeGame.getRealPlayers()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 playersWithShips.add(player);
             }
