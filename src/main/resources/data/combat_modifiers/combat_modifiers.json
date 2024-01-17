@@ -58,6 +58,24 @@
         ]
     },
     {
+        "alias": "plus1_roll_mechs_naaz_flagship",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "CONDITIONAL",
+        "scope": "mf",
+        "forCombatAbility": "combatround",
+        "condition": "naazFS",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Naaz Mechs get +1 die due to Flagship"
+            }
+        ]
+
+    },
+    {
         "alias": "plus1_1round_all",
         "type": "DIE_MOD",
         "value": "+1",
@@ -154,7 +172,7 @@
         "type": "mods",
         "value": "-1",
         "persistenceType": "ALWAYS",
-        "scope": "pd",
+        "scope": "",
         "forCombatAbility": "SpaceCannonOffence",
         "related": [
             {
@@ -197,7 +215,7 @@
         "type": "mods",
         "value": "-1",
         "persistenceType": "ALWAYS",
-        "scope": "pd",
+        "scope": "",
         "forCombatAbility": "SpaceCannonDefence",
         "related": [
             {
@@ -237,6 +255,55 @@
         ]
     },
     {
+        "alias": "nivyn_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "damaged_units_same_type",
+        "persistenceType": "CONDITIONAL",
+        "condition": "nivyn_commander_damaged",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "> Nivyn Commander Grants an Extra Die To Sustained Ships\n"
+            }
+        ]
+    },
+    {
+        "alias": "lizho_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "lizho_commander_particular",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "> Lizho Commander Grants an Extra Die\n"
+            }
+        ]
+    },
+    {
+        "alias": "plus1_vaylerian_hero",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "vaylerianhero",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Vaylerian Ships get +1 to combat rolls due to Hero"
+            }
+        ]
+    },
+    {
         "alias": "plus1_roll_argent_commander_afb",
         "type": "extrarolls",
         "value": "+1",
@@ -263,21 +330,6 @@
             }
         ],
         "forCombatAbility": "bombardment"
-    },
-    {
-        "alias": "plus1_roll_mechs_naaz_flagship",
-        "type": "extrarolls",
-        "value": "+1",
-        "applyEachForQuantity": true,
-        "persistenceType": "ALWAYS",
-        "scope": "mf",
-        "related": [
-            {
-                "type": "unit",
-                "alias": "naaz_flagship"
-            }
-        ],
-        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_roll_argent_commander_spacecannonoffence",
@@ -359,7 +411,7 @@
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition": "units_two_matching_not_ff",
-        "scope": "",
+        "scope": "_ship_",
         "related": [
             {
                 "type": "ability",
@@ -610,6 +662,60 @@
             }
         ],
         "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "plus_1_always_space_cannon_defence",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "kolumecommander"
+            },
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "plus_1_always_space_cannon_offense",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "kolumecommander"
+            },
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_1_always_bombardment",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "kolumecommander"
+            },
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "bombardment"
     },
     {
         "alias": "plus_x_frag_always_flagship_afb",

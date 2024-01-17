@@ -8,9 +8,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
+import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -24,6 +26,70 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperCommanders {
+
+    public static void cheiranCommanderBlock(Player player, Game activeGame, ButtonInteractionEvent event){
+        String msg2 = "";
+        int oldThing = 0;
+        int newThing = 0;
+        if(player.getCommodities() > 0){
+            oldThing = player.getCommodities();
+            player.setCommodities(oldThing-1);
+            newThing = player.getCommodities();
+            msg2 = "commodity ("+oldThing+"->"+newThing+")";
+        }else if(player.getTg() > 0){
+            oldThing = player.getTg();
+            player.setTg(oldThing-1);
+            newThing = player.getTg();
+            msg2 = "tg ("+oldThing+"->"+newThing+")";
+        }else{
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You cant afford Cheiran Commander cost right now. Get more money ya broke crab");
+            return;
+        }
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " used Cheiran Commander to spend 1 "+msg2+" to cancel 1 hit. They can do this once per round of combat";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+    public static void kortaliCommanderBlock(Player player, Game activeGame, ButtonInteractionEvent event){
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " used Kortali Commander to cancel 1 hit in the first round of combat.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+    public static void olradinCommanderStep1(Player player, Game activeGame){
+        List<Button> buttons = new ArrayList<>();
+        for(String planet : player.getReadiedPlanets()){
+            Tile tile = activeGame.getTileFromPlanet(planet);
+            if(planet.equalsIgnoreCase("mr") || tile == null || ButtonHelper.isTileHomeSystem(tile)){
+                continue;
+            }
+            buttons.add(Button.success("olradinCommanderStep2_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        buttons.add(Button.danger("deleteButtons","Decline"));
+        String msg = player.getRepresentation(true, true)+ " you can exhaust 1 planet to gain tgs equal to its influence or resources";
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+    }
+    public static void olradinCommanderStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        int oldTg = player.getTg();
+        int count = 0;
+        Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        count = Math.max(p.getInfluence(), p.getResources());
+        player.setTg(oldTg + count);
+        new PlanetExhaust().doAction(player, planet, activeGame);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+        String msg = player.getRepresentation(true, true)+ " used Olradin Commander to exhaust "+Helper.getPlanetRepresentation(planet, activeGame) +" and gain " + count + " tgs (" + oldTg + "->" + player.getTg() + ")";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
+
+    public static void cymiaeCommanderRes(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        String msg = ButtonHelper.getIdent(player) + " will discard 1 AC to move or place a mech on " + Helper.getPlanetRepresentation(planet, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "mech " + planet, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " use buttons to discard",
+                            ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+        event.getMessage().delete().queue();
+    }
 
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
@@ -99,6 +165,16 @@ public class ButtonHelperCommanders {
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             ButtonHelper.getIdent(player) + " placed 1 fighter in " + tile.getRepresentation() + " using Ghost Commander");
+    }
+    public static void resolveKhraskCommanderPlacement(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "inf", activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        ButtonHelper.getIdent(player) + " placed 1 infantry in " + tile.getRepresentation() + " using Khrask Commander");
+        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
+        event.getMessage().editMessage(event.getMessage().getContentRaw())
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
     public static List<Button> resolveFlorzenCommander(Player player, Game activeGame) {
@@ -259,7 +335,7 @@ public class ButtonHelperCommanders {
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
-                if (AddCC.hasCC(event, player.getColor(), tile2)) {
+                if (AddCC.hasCC(event, player.getColor(), tile2) && !activeGame.getDominusOrbStatus()) {
                     continue;
                 }
                 for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {

@@ -64,7 +64,7 @@
         "name": "Psychoarchaeology",
         "type": "BIOTIC",
         "source": "absol",
-        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\n \n At the end of your turn, you may discard an action card to explore a readied planet you control.",
+        "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nAt the end of your turn, you may discard an action card to explore a readied planet you control.",
         "homebrewReplacesID": "pa"
     },
     {
@@ -418,7 +418,7 @@
         "requirements": "YY",
         "faction": "l1z1x",
         "source": "absol",
-        "text": "When you research a technology, you may exhaust this card to ignore all prerequisites on that technology.\n \n Action: You may exhaust this card and spend 1 command token from your strategy pool and 4 resources to research a technology.",
+        "text": "When you research a technology, you may exhaust this card to ignore all prerequisites on that technology.\n \n ACTION: You may exhaust this card and spend 1 command token from your strategy pool and 4 resources to research a technology.",
         "homebrewReplacesID": "is"
     },
     {
@@ -581,7 +581,7 @@
         "requirements": "BB",
         "faction": "ghost",
         "source": "absol",
-        "text": "Action: Exhaust this card to place or move up to 2 Creuss wormhole tokens into systems that contain a planet you control and/or non-home systems that do not contain another player's ships.",
+        "text": "ACTION: Exhaust this card to place or move up to 2 Creuss wormhole tokens into systems that contain a planet you control and/or non-home systems that do not contain another player's ships.",
         "homebrewReplacesID": "wg"
     },
     {
@@ -705,7 +705,7 @@
         "requirements": "R",
         "faction": "cabal",
         "source": "absol",
-        "text": "Action: Exhaust this card to choose another player's non-structure unit in a system that is adjacent to 1 or more of your space docks. Capture 1 unit of that type from that player's reinforcements.",
+        "text": "ACTION: Exhaust this card to choose another player's non-structure unit in a system that is adjacent to 1 or more of your space docks. Capture 1 unit of that type from that player's reinforcements.",
         "homebrewReplacesID": "vtx"
     },
     {

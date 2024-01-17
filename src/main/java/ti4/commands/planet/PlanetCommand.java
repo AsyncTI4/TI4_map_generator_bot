@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
+import ti4.generator.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -66,7 +66,7 @@ public class PlanetCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        new GenerateMap().saveImageToWebsiteOnly(activeGame, event);
+        MapGenerator.saveImageToWebsiteOnly(activeGame, event);
     }
 
     protected String getActionDescription() {
@@ -83,6 +83,7 @@ public class PlanetCommand implements Command {
         subcommands.add(new PlanetRefreshAbility());
         subcommands.add(new PlanetRefreshAll());
         subcommands.add(new PlanetExhaustAll());
+        subcommands.add(new PlanetInfo());
 
         return subcommands;
     }

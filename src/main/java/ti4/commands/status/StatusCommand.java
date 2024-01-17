@@ -9,10 +9,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACCardsCommand;
-import ti4.generator.GenerateMap;
+import ti4.generator.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -85,8 +84,8 @@ public class StatusCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        FileUpload fileUpload = new GenerateMap().saveImage(activeGame, event);
-        MessageHelper.replyToMessage(event, fileUpload, false, message, message != null);
+        MapGenerator.saveImage(activeGame, event)
+                .thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
     }
 
     protected String getActionDescription() {
@@ -108,6 +107,7 @@ public class StatusCommand implements Command {
         subcommands.add(new ListTurnOrder());
         subcommands.add(new ListTurnStats());
         subcommands.add(new ListDiceLuck());
+        subcommands.add(new POInfo());
         return subcommands;
     }
 

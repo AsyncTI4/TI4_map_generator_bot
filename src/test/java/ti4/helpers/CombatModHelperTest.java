@@ -4,14 +4,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
-import ti4.helpers.CombatModHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.CombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.testUtils.BaseTi4Test;
 
-public class CombatModHelperTest {
+public class CombatModHelperTest extends BaseTi4Test {
 
     @Test
     public void testNonFighters() {
@@ -24,13 +24,13 @@ public class CombatModHelperTest {
         Game game = new Game();
 
         UnitModel nonFighter = new UnitModel();
-        nonFighter.setBaseType(UnitType.Carrier.value);
+        nonFighter.setBaseType("carrier");
 
         List<UnitModel> opponentUnits = new ArrayList<>();
         opponentUnits.add(nonFighter);
         opponentUnits.add(nonFighter);
 
-        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
+        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits, nonFighter));
     }
 
     @Test
@@ -44,15 +44,15 @@ public class CombatModHelperTest {
         Game game = new Game();
 
         UnitModel nonFighter = new UnitModel();
-        nonFighter.setBaseType(UnitType.Carrier.value);
+        nonFighter.setBaseType("carrier");
 
         UnitModel fighter = new UnitModel();
-        fighter.setBaseType(UnitType.Fighter.value);
+        fighter.setBaseType("fighter");
 
         List<UnitModel> opponentUnits = new ArrayList<>();
         opponentUnits.add(nonFighter);
         opponentUnits.add(fighter);
 
-        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
+        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits, fighter));
     }
 }

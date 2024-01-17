@@ -31,7 +31,7 @@ import ti4.model.UnitModel;
 public class Tile {
     private final String tileID;
     private String position;
-    private final HashMap<String, UnitHolder> unitHolders = new HashMap<>();
+    private final Map<String, UnitHolder> unitHolders = new HashMap<>();
 
     private final HashMap<Player, Boolean> fog = new HashMap<>();
     private final HashMap<Player, String> fogLabel = new HashMap<>();
@@ -71,7 +71,7 @@ public class Tile {
     @Nullable
     public static String getUnitPath(UnitKey unitID) {
         if (unitID == null) return null;
-        
+
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
             BotLogger.log("Could not find unit: " + unitID);
@@ -110,7 +110,7 @@ public class Tile {
     public void addUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
-            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
             Integer unitCount = units.get(unitID);
             if (unitCount != null) {
                 if (unitCount < count) {
@@ -228,7 +228,7 @@ public class Tile {
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
         List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(tileID);
-        if (fullHyperlaneData.size() == 0) {
+        if (fullHyperlaneData.isEmpty()) {
             return null;
         } else if (sourceDirection < 0 || sourceDirection > 5) {
             return Collections.emptyList();
@@ -252,7 +252,7 @@ public class Tile {
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         if (("44".equals(tileID) || ("45".equals(tileID)))
-                && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
+            && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
             tileName = "S15_Cucumber.png";
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
@@ -266,7 +266,7 @@ public class Tile {
         Boolean hasFog = fog.get(player);
 
         Game activeGame = player.getGame();
-        if(activeGame.isLightFogMode() && player.getFogTiles().containsKey(getPosition())){
+        if (activeGame.isLightFogMode() && player.getFogTiles().containsKey(getPosition())) {
             return false;
         }
         //default all tiles to being foggy to prevent unintended info leaks
@@ -306,14 +306,14 @@ public class Tile {
         return tilePath;
     }
 
-    public HashMap<String, UnitHolder> getUnitHolders() {
+    public Map<String, UnitHolder> getUnitHolders() {
         return unitHolders;
     }
 
     public List<UnitHolder> getPlanetUnitHolders() {
         List<UnitHolder> planets = new ArrayList<>();
-        for(UnitHolder uH : unitHolders.values()){
-            if(uH instanceof Planet){
+        for (UnitHolder uH : unitHolders.values()) {
+            if (uH instanceof Planet) {
                 planets.add(uH);
             }
         }
@@ -321,10 +321,21 @@ public class Tile {
     }
 
     @JsonIgnore
+    @Nullable
+    public UnitHolder getUnitHolderFromPlanet(String planetName) {
+        for (Map.Entry<String, UnitHolder> unitHolderEntry : this.getUnitHolders().entrySet()) {
+            if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                return unitHolderEntry.getValue();
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public String getRepresentation() {
         try {
-            if (Mapper.getTileRepresentations().get(getTileID()) == null){
-                return getTileID() + "(" + getPosition()+ ")";
+            if (Mapper.getTileRepresentations().get(getTileID()) == null) {
+                return getTileID() + "(" + getPosition() + ")";
             }
             return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
@@ -445,6 +456,7 @@ public class Tile {
         }
         return false;
     }
+
     @JsonIgnore
     public boolean isAnomaly(Game activeGame) {
         if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(activeGame)) {
@@ -489,7 +501,7 @@ public class Tile {
     @JsonIgnore
     public boolean search(String searchString) {
         return getTileID().contains(searchString) ||
-            getPosition().contains(searchString)  ||
+            getPosition().contains(searchString) ||
             getTileModel().search(searchString);
     }
 }

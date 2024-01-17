@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.CombatModHelper;
+import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
@@ -44,12 +44,12 @@ public class ExhaustLeader extends LeaderAction {
 	
 	public static void exhaustLeader(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader leader, Integer tgCount) {
 		leader.setExhausted(true);
-		MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " exhausted:");
 		LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
+		String message = player.getRepresentation() + " exhausted: ";
 		if (leaderModel != null) {
-			event.getMessageChannel().sendMessageEmbeds(leaderModel.getRepresentationEmbed()).queue();
+			MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, leaderModel.getRepresentationEmbed());
 		} else {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), leader.getId());
+			MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + leader.getId());
 		}
 
 		if (tgCount != null) {
@@ -63,7 +63,7 @@ public class ExhaustLeader extends LeaderAction {
 			MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 		}
 		
-		var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
+		var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
 		if (posssibleCombatMod != null) {
 			player.addNewTempCombatMod(posssibleCombatMod);
 			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");

@@ -1,6 +1,9 @@
 package ti4.commands.special;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -61,6 +65,45 @@ public class CheckDistance extends SpecialSubcommandData {
             return distances.get(tilePosition2);
          }
          return 100;
+    }
+
+
+    public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game activeGame, Player player){
+        Map<String, Integer> distances = new HashMap<>();
+        List<Tile> originTiles = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(!AddCC.hasCC(player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)){
+                distances.put(tile.getPosition(), 0);
+                originTiles.add(tile);
+            }
+        }
+        for(Tile tile : originTiles){
+            Map<String, Integer> someDistances = getTileDistances(activeGame, player, tile.getPosition(), 8);
+            for(String tilePos : someDistances.keySet()){
+                if(AddCC.hasCC(player, activeGame.getTileByPosition(tilePos))){
+                    continue;
+                }
+                if(distances.get(tilePos) == null){
+                    distances.put(tilePos, someDistances.get(tilePos));
+                }else{
+                    if(distances.get(tilePos) > someDistances.get(tilePos)){
+                        distances.put(tilePos, someDistances.get(tilePos));
+                    }
+                }
+            }
+        }
+        return distances;
+    }
+
+    public static List<String> getAllTilesACertainDistanceAway(Game activeGame, Player player, Map<String, Integer> distances, int target){
+        List<String> tiles = new ArrayList<>();
+        for(String pos : distances.keySet()){
+            if(distances.get(pos) != null && distances.get(pos)== target){
+                tiles.add(pos);
+            }
+        }
+        Collections.sort(tiles);
+        return tiles;
     }
 
     public static Map<String, Integer> getTileDistances(Game activeGame, Player player, String tilePosition, int maxDistance) {

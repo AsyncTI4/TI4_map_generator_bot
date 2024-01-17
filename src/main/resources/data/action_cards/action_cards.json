@@ -1515,7 +1515,7 @@
     "alias": "diplomatic_pressure_ds",
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
-    "window": "When an agenda is revealed:",
+    "window": "When an agenda is revealed",
     "text": "Choose another player; that player must give you 1 promissory note from their hand.",
     "flavorText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
     "source": "ds"
@@ -1543,7 +1543,7 @@
     "name": "Abyssal Starpaths",
     "phase": "Action",
     "window": "After you activate a system:",
-    "text": "Choose any 2 systems that do not contain planets; those systems are adjacent to until the end of this tactical action.",
+    "text": "Choose any 2 systems that do not contain planets; those 2 systems are adjacent to each other until the end of this tactical action.",
     "flavorText": "The calls of the Ghoti all-mother have left many unsuspecting captains lost in the void.",
     "source": "ds"
   },
@@ -1587,7 +1587,7 @@
     "alias": "aggressive_broker",
     "name": "Aggressive Broker",
     "phase": "Any",
-    "window": "When a player purges a component:",
+    "window": "When another player purges a component:",
     "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
     "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don't. They brought the money, let's make this quick.”",
     "source": "ds"

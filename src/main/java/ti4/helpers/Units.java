@@ -1,6 +1,10 @@
 package ti4.helpers;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import lombok.Getter;
 
@@ -8,11 +12,23 @@ public class Units {
 
     private static final String emdash = "—";
 
+    /**
+     * <H3>
+     * DO NOT ADD NEW VALUES TO THIS OBJECT.
+     * </H3>
+     * 
+     * <p>
+     * It is being used as a key in some major hashmaps which causes issues when we attempt to 
+     * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
+     * us to use custom mappers to resolve.
+     * </p>
+     */
     @Data
     public static class UnitKey {
         private UnitType unitType;
         private String colorID;
 
+        @JsonIgnore
         public String getColor() {
             return AliasHandler.resolveColor(colorID);
         }
@@ -29,6 +45,7 @@ public class Units {
             return unitType.getUnitTypeEmoji();
         }
 
+        @JsonIgnore
         public String getFileName() {
             if (unitType == UnitType.Destroyer && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
                 return String.format("%s_dd_eyes.png", colorID);
@@ -36,10 +53,14 @@ public class Units {
             if(UnitType.TyrantsLament == unitType || UnitType.Lady == unitType){
                 return String.format("%s_%s.png", colorID, "fs");
             }
+            if(UnitType.PlenaryOrbital == unitType){
+                return String.format("%s_%s.png", colorID, "sd");
+            }
             
             return String.format("%s_%s.png", colorID, asyncID());
         }
 
+        @JsonIgnore
         public String getOldUnitID() {
             return String.format("%s_%s.png", colorID, asyncID());
         }
@@ -52,7 +73,7 @@ public class Units {
             return String.format("%s%s%s", colorID, emdash, asyncID());
         }
 
-        UnitKey(UnitType unitType, String colorID) {
+        public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
             this.unitType = unitType;
             this.colorID = colorID;
         }
@@ -105,7 +126,7 @@ public class Units {
                 case "dn" -> "dreadnought";
                 case "fs" -> "flagship";
                 case "ws" -> "warsun";
-                case "plenaryorbital" -> null;
+                case "plenaryorbital" -> "plenaryorbital";
                 case "tyrantslament" -> "tyrantslament";
                 case "lady" -> "lady";
                 default -> null;

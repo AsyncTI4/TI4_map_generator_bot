@@ -133,9 +133,32 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         String name = getName() == null ? "" : getName();
         eb.setTitle(Emojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
         eb.setColor(Color.blue);
-        eb.setDescription(getType() + "\n" + getTarget());
-        eb.addField("", getText1() + "\n" + getText2(), false);
+
+        // DESCRIPTION
+        StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
+        if (getText1().length() > 0) {
+            String arg = getText1().replace("For:", "__**For:**__");
+            text.append(arg).append("\n");
+        }
+        if (getText2().length() > 0) {
+            String arg = getText2().replace("Against:", "__**Against:**__");
+            text.append(arg).append("\n");
+        }
+        eb.setDescription(text.toString());
+
         if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        return eb.build();
+    }
+
+    public static MessageEmbed agendaIsInSomeonesHandEmbed() {
+        EmbedBuilder eb = new EmbedBuilder();
+        String name = "No info available";
+        eb.setTitle(Emojis.Agenda + "__" + name + "__", null);
+        eb.setColor(Color.blue);
+
+        // DESCRIPTION
+        StringBuilder text = new StringBuilder("This agenda is in somebody's hand");
+        eb.setDescription(text.toString());
         return eb.build();
     }
 

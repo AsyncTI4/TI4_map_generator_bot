@@ -7,11 +7,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.units.AddRemoveUnits;
-import ti4.generator.GenerateMap;
+import ti4.generator.MapGenerator;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -46,7 +45,6 @@ public class ShowDistances implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Game activeGame;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         GameManager gameManager = GameManager.getInstance();
@@ -80,10 +78,8 @@ public class ShowDistances implements Command {
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
         activeGame.setTileDistances(CheckDistance.getTileDistances(activeGame, player, tile.getPosition(), maxDistance));
 
-        FileUpload fileUpload = new GenerateMap().saveImage(activeGame, DisplayType.map, event, false);
-        MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
-
-        activeGame.setTileDistances(new HashMap<>());
+        MapGenerator.saveImage(activeGame, DisplayType.map, event, true)
+                .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

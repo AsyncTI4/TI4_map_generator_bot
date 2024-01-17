@@ -2,26 +2,12 @@ package ti4.model;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Storage;
+import ti4.testUtils.BaseTi4Test;
 
-public class UnitModelTest {
-    
-    @BeforeAll
-    public static void init() {
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-    }
-
+public class UnitModelTest extends BaseTi4Test {
     @Test
     public void testUnitModels() {
         for (UnitModel unitModel : Mapper.getUnits().values()) {

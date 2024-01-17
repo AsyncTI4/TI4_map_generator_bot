@@ -4,28 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Storage;
-import ti4.message.BotLogger;
+import ti4.testUtils.BaseTi4Test;
 
-public class FactionModelTest {
-    
-    @BeforeAll
-    public static void init() {
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-    }
-
+class FactionModelTest extends BaseTi4Test {
     @Test
-    public void testFactions() {
+    void testFactions() {
         for (FactionModel faction : Mapper.getFactions()) {
             assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
             assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
@@ -121,7 +107,7 @@ public class FactionModelTest {
     private boolean validateHomebrewReplacesID(FactionModel faction) {
         if (faction.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidFaction(faction.getHomebrewReplacesID().get())) return true;
-        BotLogger.log("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }

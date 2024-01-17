@@ -157,7 +157,7 @@
         "id": "miltymod_muaat_warsun",
         "baseType": "warsun",
         "asyncId": "ws",
-        "name": "Prototype War Sun II",
+        "name": "Prototype War Sun I",
         "upgradesToUnitId": "miltymod_muaat_warsun2",
         "source": "miltymod",
         "faction": "Muaat",
@@ -209,6 +209,7 @@
         "source": "miltymod",
         "faction": "Naalu",
         "capacityUsed": 1,
+        "cost": 0.5,
         "isShip": true,
         "combatHitsOn": 8,
         "combatDieCount": 1,
@@ -223,11 +224,14 @@
         "requiredTechId": "miltymod_hcf2",
         "source": "miltymod",
         "faction": "Naalu",
+        "moveValue": 2,
         "capacityUsed": 1,
+        "cost": 0.5,
         "isShip": true,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "homebrewReplacesID": "naalu_fighter2"
+        "homebrewReplacesID": "naalu_fighter2",
+        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "id": "miltymod_saar_spacedock",
@@ -607,7 +611,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "warsun"
+        "homebrewReplacesID": "warsun",
+        "ability": "Other players' units in this system lose PLANETARY SHIELD."
     },
     {
         "id": "miltymod_carrier",

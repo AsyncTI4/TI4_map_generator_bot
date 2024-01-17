@@ -1,7 +1,11 @@
 package ti4.message;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -26,7 +30,7 @@ public class BotLogger {
      * @param msg - message to send to the #bot-log channel
      * @e - Exception
      */
-    public static void log(String msg, Exception e) {
+    public static void log(String msg, Throwable e) {
         log(null, msg, e);
     }
 
@@ -50,7 +54,7 @@ public class BotLogger {
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      * @param e Exception
      */
-    public static void log(GenericInteractionCreateEvent event, String msg, Exception e) {
+    public static void log(GenericInteractionCreateEvent event, String msg, Throwable e) {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
         
@@ -58,7 +62,7 @@ public class BotLogger {
         // logger.info(msg);
         System.out.println("[BOT-LOG] " + msg);
 
-        //Adding so we dont cause an exception by attempting to log 
+        //Adding so we don't cause an exception by attempting to log
         if (msg.length() > 2000){
             String ellipses = "...(log message too long)";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
@@ -67,7 +71,6 @@ public class BotLogger {
         if (botLogChannel == null) {
             String name;
             if (event == null) {
-                // System.out.println(e);
                 return;
             } else {
                 name = event.getGuild().getName();
@@ -121,6 +124,79 @@ public class BotLogger {
                     t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                 }));
             }
+        }
+    }
+
+    public static void logButton(ButtonInteractionEvent event) {
+        TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
+        if (primaryBotLogChannel == null) return;
+        try {
+            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
+            String threadName = "button-log";
+            ThreadChannel buttonLogThread = null;
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getName().equals(threadName)) {
+                    buttonLogThread = threadChannel;
+                }
+            }
+
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (buttonLogThread == null) {
+                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel : hiddenThreadChannels) {
+                    if (threadChannel.getName().equals(threadName)) {
+                        buttonLogThread = threadChannel;
+                    }
+                }
+            }
+            if (buttonLogThread == null) return;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(event.getUser().getEffectiveName()).append(" ");
+            sb.append("[");
+            if (event.getButton().getEmoji() != null) sb.append(event.getButton().getEmoji().getFormatted());
+            sb.append(event.getButton().getLabel()).append("]");
+            sb.append(" `").append(event.getButton().getId()).append("` ");
+            sb.append(event.getMessage().getJumpUrl());
+            MessageHelper.sendMessageToChannel(buttonLogThread, sb.toString());
+        } catch (Exception e) {
+            // Do nothing
+        }
+    }
+
+    public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
+        TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
+        if (primaryBotLogChannel == null) return;
+        try {
+            List<ThreadChannel> threadChannels = primaryBotLogChannel.getThreadChannels();
+            String threadName = "slash-command-log";
+            ThreadChannel slashCommandLogThread = null;
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getName().equals(threadName)) {
+                    slashCommandLogThread = threadChannel;
+                }
+            }
+
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (slashCommandLogThread == null) {
+                List<ThreadChannel> hiddenThreadChannels = primaryBotLogChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel : hiddenThreadChannels) {
+                    if (threadChannel.getName().equals(threadName)) {
+                        slashCommandLogThread = threadChannel;
+                    }
+                }
+            }
+            if (slashCommandLogThread == null) return;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(event.getUser().getEffectiveName()).append(" ");
+            sb.append("`").append(event.getCommandString()).append("` ");
+            sb.append(commandResponseMessage.getJumpUrl());
+            MessageHelper.sendMessageToChannel(slashCommandLogThread, sb.toString());
+        } catch (Exception e) {
+            // Do nothing
         }
     }
 

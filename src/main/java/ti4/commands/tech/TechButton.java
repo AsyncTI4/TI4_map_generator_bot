@@ -13,6 +13,6 @@ public class TechButton extends TechSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Button getTech = Button.success("acquireATech", "Get a Tech");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", getTech);
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", getTech);
     }
 }

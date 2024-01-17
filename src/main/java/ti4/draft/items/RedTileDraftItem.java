@@ -9,9 +9,7 @@ import ti4.commands.milty.MiltyDraftTile;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
-import ti4.map.Tile;
 import ti4.model.*;
 
 public class RedTileDraftItem extends DraftItem {

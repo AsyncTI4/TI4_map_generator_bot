@@ -3,6 +3,8 @@ package ti4.commands.leaders;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.cardspn.PNInfo;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -46,6 +48,16 @@ public class UnlockLeader extends LeaderAction {
             String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader);
             MessageHelper.sendMessageToChannel(channel, message);
         }
+        if(leaderID.contains("bentorcommander")){
+            player.setCommoditiesTotal(player.getCommoditiesTotal()+1);
+            MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player)+"Set Commodity Total to "+player.getCommoditiesTotal());
+        }
+        if(leaderID.contains("naalucommander")){
+            PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true)+ " you can use Naalu Commander via button in your cards info thread");
+
+        }
+        
 
         if (playerLeader.isExhausted()) {
             MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");

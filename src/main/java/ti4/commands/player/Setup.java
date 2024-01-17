@@ -2,7 +2,6 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +17,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -36,6 +36,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -77,7 +78,7 @@ public class Setup extends PlayerSubcommandData {
     }
 
     public void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
@@ -102,6 +103,11 @@ public class Setup extends PlayerSubcommandData {
         }
 
         FactionModel setupInfo = player.getFactionSetupInfo();
+
+        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !activeGame.isMiltyModMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
+            return;
+        }
 
         // HOME SYSTEM
         if (!PositionMapper.isTilePositionValid(positionHS)) {
@@ -161,13 +167,13 @@ public class Setup extends PlayerSubcommandData {
 
         // STARTING PNs
         player.initPNs();
-        HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+        Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         playerPNs.addAll(setupInfo.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
         if (activeGame.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
+                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                 }
             }
@@ -175,7 +181,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isAbsolMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
+                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNote(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                     player.addOwnedPromissoryNoteByID("absol_" + pnID);
                 }
@@ -183,7 +189,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING OWNED UNITS
-        HashSet<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
 
         // SEND STUFF
@@ -192,6 +198,7 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
+        
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
                 Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
@@ -215,33 +222,34 @@ public class Setup extends PlayerSubcommandData {
 
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up free people ability markers. " + player.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set up free people ability markers. " + player.getRepresentation(true, true)
                 + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
             player.setUnitCap(unitID, 7);
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
         }
         if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
                 + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
             GameSaveLoadManager.saveMap(activeGame, event);
         }
+        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
 
         if (!activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Player: " + player.getRepresentation() + " has been set up");
@@ -255,6 +263,9 @@ public class Setup extends PlayerSubcommandData {
                     player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
                     if (player2.getPersonalPingInterval() > 0) {
                         player.setPersonalPingInterval(player2.getPersonalPingInterval());
+                    }
+                    if(player2.doesPlayerPreferDistanceBasedTacticalActions()){
+                        player.setPreferenceForDistanceBasedTacticalActions(true);
                     }
                 }
             }

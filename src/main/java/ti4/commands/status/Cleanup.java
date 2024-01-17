@@ -16,8 +16,6 @@ import ti4.generator.Mapper;
 import ti4.model.PromissoryNoteModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -41,23 +39,25 @@ public class Cleanup extends StatusSubcommandData {
 
     public void runStatusCleanup(Game activeGame) {
 
-        HashMap<String, Tile> tileMap = activeGame.getTileMap();
+
+
+        Map<String, Tile> tileMap = activeGame.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
-            HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeAllCC();
                 unitHolder.removeAllUnitDamage();
             }
         }
-        HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+        Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
 
         returnEndStatusPNs(activeGame); // return any PNs with "end of status phase" return timing
 
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
 
         for (Player player : players.values()) {
             player.setPassed(false);
@@ -82,7 +82,7 @@ public class Cleanup extends StatusSubcommandData {
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()){
-                    if (leader.isActive()){
+                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")){
                         player.removeLeader(leader.getId());
                     } else {
                         RefreshLeader.refreshLeader(player, leader, activeGame);
@@ -91,6 +91,10 @@ public class Cleanup extends StatusSubcommandData {
             }
         }
         activeGame.setCurrentReacts("absolMOW", "");
+        activeGame.setCurrentReacts("agendaCount", "0");
+        activeGame.setCurrentReacts("politicalStabilityFaction", "");
+        activeGame.setCurrentReacts("forcedScoringOrder", "");
+        activeGame.setCurrentReacts("factionsThatScored", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
             new SpinTilesInFirstThreeRings().spinRings(activeGame);
@@ -99,7 +103,7 @@ public class Cleanup extends StatusSubcommandData {
   
 
     public void returnEndStatusPNs(Game activeGame) {
-        LinkedHashMap<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
          for (Player player : players.values()) {
              List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){

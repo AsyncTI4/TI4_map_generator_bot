@@ -21,8 +21,7 @@ public class ShuffleExpBackIntoDeck extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            String card = Mapper.getExploreRepresentation(id);
-            if (card != null) {
+            if (Mapper.getExplore(id) != null) {
                 activeGame.addExplore(id);
                 sb.append("Card shuffled into exploration deck: ").append(displayExplore(id)).append(System.lineSeparator());
             } else {

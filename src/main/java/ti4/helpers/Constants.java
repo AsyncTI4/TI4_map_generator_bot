@@ -7,6 +7,8 @@ import java.util.List;
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
+    public static final String PREFERS_DISTANCE = "prefers_distance";
+    public static final String AUTO_PASS_WHENS_N_AFTERS = "auto_pass_whens_n_afters";
     public static final String DRAFT_HAND = "franken_personal_bag";
     public static final String DRAFT_BAG = "franken_bag_to_pass";
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
@@ -24,6 +26,7 @@ public class Constants {
     public static final String AFK_HOURS = "afk_hours";
     public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
+    public static final String WORMHOLE_RESEARCH_FOR = "wormhole_research_for";
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
     public static final String REVISE_LAW = "revise_law";
@@ -94,7 +97,7 @@ public class Constants {
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
-    public static final String RING_COUNT_FOR_MAP = "ring_count_for_map";
+    public static final String SC_COUNT_FOR_MAP = "sc_count_for_map";
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
@@ -165,6 +168,17 @@ public class Constants {
     public static final String HELP = "help";
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
+
+    public static final String PRESET = "preset";
+    public static final String MAP_TEMPLATE = "map_template";
+    public static final String SLICE_1 = "slice_1";
+    public static final String SLICE_2 = "slice_2";
+    public static final String SLICE_3 = "slice_3";
+    public static final String SLICE_4 = "slice_4";
+    public static final String SLICE_5 = "slice_5";
+    public static final String SLICE_6 = "slice_6";
+    public static final String SLICE_7 = "slice_7";
+    public static final String SLICE_8 = "slice_8";
 
     public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";
@@ -265,6 +279,7 @@ public class Constants {
     public static final String NOVA_SEED = "nova_seed";
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
+    public static final String REMATCH = "rematch";
     public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String LIZHO_TRAP = "lizho_trap";
@@ -605,6 +620,8 @@ public class Constants {
     public static final String SAVED_BUTTONS = "saved_buttons";
     public static final String PO2PEAKABLE = "publicObjectives2peakable";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
+    public static final String INCLUDE_SCORED = "include_scored";
+    public static final String SO_LIST_SCORED = "list_scored";
 
     public static final String TURN_ORDER = "turn_order";
     public static final String TURN_STATS = "turn_stats";
@@ -681,6 +698,7 @@ public class Constants {
     public static final String PLANET_EXHAUST_ALL = "exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
+    public static final String PLANET_INFO = "info";
 
     public static final String EXPLORE = "explore";
     public static final String CULTURAL = "cultural";
@@ -742,11 +760,13 @@ public class Constants {
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
     public static final String BOTHELPER = "bothelper";
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
+    public static final String CREATE_GAME_BUTTON = "create_game_button";
     public static final String CREATE_FOW_GAME_CHANNELS = "create_fow_game_channels";
     public static final String IMPORT_TTPG = "import_ttpg";
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String CATEGORY = "category";
+    public static final String SEND_JSON_TO_S3 = "send_games_to_s3";
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
     public static final String GAME_END = "end";
     public static final String GAME_HAS_ENDED = "game_has_ended";
@@ -962,6 +982,7 @@ public class Constants {
     public static final String TECH_DECK_ID = "tech_deck_id";
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
     public static final String ADD_OMEN_DIE = "add_omen_die";
+    public static final String KYRO_HERO = "kyro_hero";
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
     public static final String COMBAT_ROLL_TYPE = "rolltype";
@@ -1006,4 +1027,17 @@ public class Constants {
     public static final String EVENT_PLAY = "play";
     public static final String SEARCH_EMOJIS = "emojis";
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
+    public static final String RESTORE_GAME = "restore_game";
+    public static final String SAVE_FILE = "save_file";
+    public static final String OTHER = "other";
+    public static final String STATISTIC = "statistic";
+    public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
+    public static final String SHOW_GAME_MODES = "show_game_modes";
+    public static final String MAX_SO_COUNT = "max_so_count";
+    public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";
+    public static final String REFRESH_LEADER_INFO = "refreshLeaderInfo";
+    public static final String REFRESH_UNIT_INFO = "refreshUnitInfo";
+    public static final String REFRESH_TECH_INFO = "refreshTechInfo";
+    public static final String REFRESH_PLANET_INFO = "refreshPlanetInfo";
+    public static final String SERVER_GAME_STATS = "server_game_stats";
 }

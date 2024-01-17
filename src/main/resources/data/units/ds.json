@@ -210,7 +210,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "When this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area."
     },
     {
         "id": "cheiran_flagship",
@@ -605,7 +605,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "ability": "You may reroll 1 of your unit's combat dice during each round of ground combat on a planet in this system that contains 2 or fewer of your infantry."
     },
     {
         "id": "ghoti_flagship",
@@ -1718,7 +1719,8 @@
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 1,
         "sustainDamage": true,
-        "isShip": true
+        "isShip": true,
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
     },
     {
         "id": "veldyr_flagship",

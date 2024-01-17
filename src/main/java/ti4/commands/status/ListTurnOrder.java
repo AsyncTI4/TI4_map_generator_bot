@@ -1,9 +1,12 @@
 package ti4.commands.status;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -11,10 +14,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
 
 public class ListTurnOrder extends StatusSubcommandData {
     public ListTurnOrder() {
@@ -42,14 +41,14 @@ public class ListTurnOrder extends StatusSubcommandData {
         int naaluSC = 0;
         for (Player player : activeGame.getRealPlayers()) {
             int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeGame, Integer.toString(sc));
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }
             boolean passed = player.isPassed();
 
             Set<Integer> SCs = player.getSCs();
-            HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+            Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
             StringBuilder textBuilder = new StringBuilder();
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
@@ -91,6 +90,9 @@ public class ListTurnOrder extends StatusSubcommandData {
             msg.append("`").append(0).append(".`").append(text).append("\n");
         }
         Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
+            max = max+1;
+        }
         for (int i = 1; i <= max; i++) {
             if (naaluSC != 0 && i == naaluSC) {
                 continue;

@@ -21,8 +21,8 @@ import java.util.Date;
 public class SelectionMenuListener extends ListenerAdapter {
     @Override
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.readyToReceiveCommands) {
-            event.reply("Please try again in a moment. The bot is rebooting.").setEphemeral(true).queue();
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+            event.reply("Please try again in a moment. The bot is not ready to receive selections.").setEphemeral(true).queue();
             return;
         }
 

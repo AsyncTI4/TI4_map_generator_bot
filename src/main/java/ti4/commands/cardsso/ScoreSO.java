@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -16,7 +18,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ScoreSO extends SOCardsSubcommandData {
@@ -46,7 +50,7 @@ public class ScoreSO extends SOCardsSubcommandData {
 
     public static void scoreSO(GenericInteractionCreateEvent event, Game activeGame, Player player, int soID, MessageChannel channel) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
-        boolean scored = activeGame.scoreSecretObjective(player.getUserID(), soID, activeGame);
+        boolean scored = activeGame.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return;
@@ -58,6 +62,19 @@ public class ScoreSO extends SOCardsSubcommandData {
                 continue;
             }
             message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
+            for(Player p2: activeGame.getRealPlayers()){
+                if(p2 == player){
+                    continue;
+                }
+                if(p2.hasLeaderUnlocked("tnelishero")){
+                    List<Button> buttons = new ArrayList<>();
+                    String soStringID = entry.getKey();
+                    buttons.add(Button.success("tnelisHeroAttach_", "Attach to "+Mapper.getSecretObjectivesJustNames().get(soStringID)));
+                    buttons.add(Button.danger("deleteButtons","Decline"));
+                    String msg = p2.getRepresentation(true, true)+ " you have the opportunity to attach your hero to the recently scored SO "+Mapper.getSecretObjectivesJustNames().get(soStringID) +". Use buttons to resolve";
+                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
+                }
+            }
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());

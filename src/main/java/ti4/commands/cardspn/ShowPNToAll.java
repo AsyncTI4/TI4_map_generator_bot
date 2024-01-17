@@ -1,6 +1,8 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -10,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShowPNToAll extends PNCardsSubcommandData {
     public ShowPNToAll() {
@@ -32,28 +35,25 @@ public class ShowPNToAll extends PNCardsSubcommandData {
             return;
         }
 
-        int soIndex = option.getAsInt();
-        String acID = null;
-        boolean scored = false;
-        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-            if (so.getValue().equals(soIndex)) {
-                acID = so.getKey();
+        int pnIndex = option.getAsInt();
+        String pnID = null;
+        for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+            if (pn.getValue().equals(pnIndex)) {
+                pnID = pn.getKey();
                 break;
             }
         }
 
-        if (acID == null) {
+        if (pnID == null) {
             sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
-      String sb = "Game: " + activeGame.getName() + "\n" +
-          "Player: " + player.getUserName() + "\n" +
-          "Showed Promissory Note:" + "\n" +
-          Mapper.getPromissoryNote(acID) + "\n";
-        if (!scored) {
-            player.setPromissoryNote(acID);
-        }
-        sendMessage(sb);
+        MessageEmbed pnEmbed = Mapper.getPromissoryNote(pnID).getRepresentationEmbed(false, false, false);
+        player.setPromissoryNote(pnID);
+
+        String message = player.getRepresentation(false, false) + " showed a promissory note:";
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+        MessageHelper.sendMessageToChannelWithEmbed(event.getChannel(), message, pnEmbed);
     }
 }

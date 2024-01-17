@@ -29,8 +29,14 @@ public class StartPhase extends GameSubcommandData {
     public static void startPhase(GenericInteractionCreateEvent event, Game activeGame, String phase) {
         switch (phase) {
             case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
-            case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
+            case "voting" -> AgendaHelper.startTheVoting(activeGame);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
+            //case "unleashTheNames" -> OtherStats.sendAllNames(event);
+            //case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
+            //case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);
+            //case "unleashTheNamesEnded" -> OtherStats.showGameLengths(event, 120);
+            case "ixthian"-> AgendaHelper.rollIxthian(activeGame, false);
+            case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(activeGame);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
             case "statusScoring" -> {

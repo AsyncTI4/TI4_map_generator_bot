@@ -2,27 +2,13 @@ package ti4.model;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Storage;
 import ti4.message.BotLogger;
+import ti4.testUtils.BaseTi4Test;
 
-public class PromissoryNoteModelTest {
-
-    @BeforeAll
-    public static void init() {
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-    }
-
+public class PromissoryNoteModelTest extends BaseTi4Test {
     @Test
     public void testPromissoryNotes() {
         for (PromissoryNoteModel pnModel : Mapper.getPromissoryNotes().values()) {
@@ -34,7 +20,7 @@ public class PromissoryNoteModelTest {
     private boolean validateHomebrewReplacesID(PromissoryNoteModel pnModel) {
         if (pnModel.getHomebrewReplacesID().isEmpty()) return true;
         if (Mapper.isValidPromissoryNote(pnModel.getHomebrewReplacesID().get())) return true;
-        BotLogger.log("PN **" + pnModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + pnModel.getHomebrewReplacesID().get() + "`");
+        System.out.println("PN **" + pnModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + pnModel.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }
