@@ -3,6 +3,7 @@ package ti4.selections;
 import java.util.ArrayList;
 import java.util.List;
 
+import ti4.selections.selectmenus.BigSelectDemo;
 import ti4.selections.selectmenus.SelectFaction;
 
 public class SelectionManager {
@@ -30,5 +31,6 @@ public class SelectionManager {
     public static void init() {
         SelectionManager selectionManager = getInstance();
         selectionManager.addSelectionMenu(new SelectFaction());
+        selectionManager.addSelectionMenu(new BigSelectDemo());
     }
 }
