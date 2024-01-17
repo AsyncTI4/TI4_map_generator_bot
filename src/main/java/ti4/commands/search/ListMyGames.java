@@ -28,6 +28,7 @@ public class ListMyGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_SECONDARIES, "True to show secondaries you need to follow in each game (default = false)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GAME_MODES, "True to the game's set modes (default = false)"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to Show"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "ignore_spectate", "Do not show games you are spectating (default = true)"));
     }
 
     @Override
@@ -37,22 +38,24 @@ public class ListMyGames extends SearchSubcommandData {
         boolean showAverageTurnTime = event.getOption(Constants.SHOW_AVERAGE_TURN_TIME, false, OptionMapping::getAsBoolean);
         boolean showSecondaries = event.getOption(Constants.SHOW_SECONDARIES, false, OptionMapping::getAsBoolean);
         boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, false, OptionMapping::getAsBoolean);
+        boolean ignoreSpectate = event.getOption("ignore_spectate", true, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
 
         String userID = user.getId();
 
+        Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
         Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer() != null && m.getActivePlayer().equals(userID) : m -> true;
-        Predicate<Game> endedGamesFilter = includeEndedGames ? m -> m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
+        Predicate<Game> endedGamesFilter = includeEndedGames ? m -> true : m -> !m.isHasEnded() && !m.isFoWMode();
         Predicate<Game> onlyEndedFoWGames = game -> !game.isFoWMode() || game.isHasEnded();
+        Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames);
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
         List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
-                .filter(onlyMyTurnFilter)
-                .filter(endedGamesFilter)
-                .filter(onlyEndedFoWGames)
-                .sorted(mapSort).toList();
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
