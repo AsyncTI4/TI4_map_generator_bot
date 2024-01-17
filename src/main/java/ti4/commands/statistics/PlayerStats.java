@@ -88,9 +88,10 @@ public class PlayerStats extends StatisticsSubcommandData {
         }
         for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
             Map.Entry<String, Long> entry = entries.get(i);
-            sb.append("`")
+            sb.append(i + 1)
+                .append(". `")
                 .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
-                .append(" ")
+                .append("` ")
                 .append(entry.getValue())
                 .append("% (")
                 .append(playerGameCount.get(entry.getKey()))
