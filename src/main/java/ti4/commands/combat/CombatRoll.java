@@ -205,30 +205,32 @@ public class CombatRoll extends CombatSubcommandData {
                 String msg = "\n"+opponent.getRepresentation(true, true) + " your opponent rolled and got "+h+" hit(s)";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
-                int round = 0;
-                String combatName = "combatRoundTracker"+opponent.getFaction()+tile.getPosition()+combatOnHolder.getName();
-                if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
-                    round = 1;
-                }else{
-                    round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                if(h > 0){
+                    int round = 0;
+                    String combatName = "combatRoundTracker"+opponent.getFaction()+tile.getPosition()+combatOnHolder.getName();
+                    if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
+                        round = 1;
+                    }else{
+                        round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                    }
+                    int round2 = 0;
+                    String combatName2 = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
+                    if(activeGame.getFactionsThatReactedToThis(combatName2).isEmpty()){
+                        round2 = 1;
+                    }else{
+                        round2 = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName2))+1;
+                    }
+                    if(round2 > round){
+                        buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),"Roll Dice For Combat Round #"+round));
+                    }
+                    String finChecker = "FFCC_" + opponent.getFaction() + "_";
+                    buttons.add(Button.success(finChecker+"autoAssignSpaceHits_"+tile.getPosition()+"_"+h,"Auto-assign Hits"));
+                    buttons.add(Button.danger("getDamageButtons_" + tile.getPosition(),"Manually Assign Hits"));
+                    buttons.add(Button.secondary(finChecker+"cancelSpaceHits_"+tile.getPosition()+"_"+h,"Cancel a Hit"));
+                    
+                    String msg2 = opponent.getFactionEmoji()+" can automatically assign hits. The hits would be assigned in the following way:\n\n"+ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, activeGame, tile, h, event, true);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                 }
-                int round2 = 0;
-                String combatName2 = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
-                if(activeGame.getFactionsThatReactedToThis(combatName2).isEmpty()){
-                    round2 = 1;
-                }else{
-                    round2 = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName2))+1;
-                }
-                if(round2 > round){
-                    buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),"Roll Dice For Combat Round #"+round));
-                }
-                String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                buttons.add(Button.success(finChecker+"autoAssignSpaceHits_"+tile.getPosition()+"_"+h,"Auto-assign Hits"));
-                buttons.add(Button.danger("getDamageButtons_" + tile.getPosition(),"Manually Assign Hits"));
-                buttons.add(Button.secondary(finChecker+"cancelSpaceHits_"+tile.getPosition()+"_"+h,"Cancel a Hit"));
-                
-                String msg2 = opponent.getFactionEmoji()+" can automatically assign hits. The hits would be assigned in the following way:\n\n"+ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, activeGame, tile, h, event, true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
 
             }
         }
