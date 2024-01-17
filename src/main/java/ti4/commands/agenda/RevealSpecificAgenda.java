@@ -49,7 +49,6 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         revealAgenda(event, activeGame, event.getChannel(), agendaID);
     }
 
-    
     /**
      * @deprecated This needs to be refactored to use RevealAgenda.java's version
      */

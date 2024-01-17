@@ -24,7 +24,7 @@ public class CombatModHelperTest extends BaseTi4Test {
         Game game = new Game();
 
         UnitModel nonFighter = new UnitModel();
-        nonFighter.setBaseType(UnitType.Carrier.value);
+        nonFighter.setBaseType("carrier");
 
         List<UnitModel> opponentUnits = new ArrayList<>();
         opponentUnits.add(nonFighter);
@@ -44,10 +44,10 @@ public class CombatModHelperTest extends BaseTi4Test {
         Game game = new Game();
 
         UnitModel nonFighter = new UnitModel();
-        nonFighter.setBaseType(UnitType.Carrier.value);
+        nonFighter.setBaseType("carrier");
 
         UnitModel fighter = new UnitModel();
-        fighter.setBaseType(UnitType.Fighter.value);
+        fighter.setBaseType("fighter");
 
         List<UnitModel> opponentUnits = new ArrayList<>();
         opponentUnits.add(nonFighter);

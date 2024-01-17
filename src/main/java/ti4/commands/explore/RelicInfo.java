@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.uncategorized.CardsInfoHelper;
+import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -17,10 +18,14 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
-public class RelicInfo extends ExploreSubcommandData {
+public class RelicInfo extends ExploreSubcommandData implements InfoThreadCommand{
     public RelicInfo() {
 		super(Constants.RELIC_INFO, "Send relic information to your Cards Info channel");
 	}
+
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return acceptEvent(event, getActionID());
+    }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {

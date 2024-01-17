@@ -87,7 +87,7 @@ public class SCPlay extends PlayerSubcommandData {
                         continue;
                     }
                     PlayAC.playAC(event, activeGame, p2, "coup", activeGame.getMainGameChannel(), event.getGuild());
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
                     activeGame.setJustPlayedComponentAC(true);
                     String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);

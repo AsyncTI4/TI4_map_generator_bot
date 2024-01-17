@@ -47,6 +47,7 @@ import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
+import ti4.commands.planet.PlanetInfo;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.search.SearchCommand;
 import ti4.commands.special.SpecialCommand;
@@ -59,11 +60,7 @@ import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveAllCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.tokens.RemoveToken;
-import ti4.commands.uncategorized.AllInfo;
-import ti4.commands.uncategorized.CardsInfo;
-import ti4.commands.uncategorized.DeleteGame;
-import ti4.commands.uncategorized.ShowDistances;
-import ti4.commands.uncategorized.ShowGame;
+import ti4.commands.uncategorized.*;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -190,6 +187,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new StatisticsCommand());
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
+        commandManager.addCommand(new SelectionBoxDemo());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);

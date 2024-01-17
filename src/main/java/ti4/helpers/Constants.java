@@ -698,6 +698,7 @@ public class Constants {
     public static final String PLANET_EXHAUST_ALL = "exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
+    public static final String PLANET_INFO = "info";
 
     public static final String EXPLORE = "explore";
     public static final String CULTURAL = "cultural";
@@ -1028,8 +1029,9 @@ public class Constants {
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
     public static final String RESTORE_GAME = "restore_game";
     public static final String SAVE_FILE = "save_file";
-    public static final String OTHER = "other";
-    public static final String STATISTIC = "statistic";
+    public static final String GAMES = "games";
+    public static final String GAME_STATISTIC = "game_statistic";
+    public static final String PLAYER_STATISTIC = "player_statistic";
     public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";
     public static final String SHOW_GAME_MODES = "show_game_modes";
     public static final String MAX_SO_COUNT = "max_so_count";
@@ -1037,4 +1039,6 @@ public class Constants {
     public static final String REFRESH_LEADER_INFO = "refreshLeaderInfo";
     public static final String REFRESH_UNIT_INFO = "refreshUnitInfo";
     public static final String REFRESH_TECH_INFO = "refreshTechInfo";
+    public static final String REFRESH_PLANET_INFO = "refreshPlanetInfo";
+    public static final String SERVER_GAME_STATS = "server_game_stats";
 }

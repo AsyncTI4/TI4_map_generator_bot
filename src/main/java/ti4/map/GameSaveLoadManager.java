@@ -215,7 +215,7 @@ public class GameSaveLoadManager {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
-                           // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting to regenerate buttons:");
+                            // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
                     } catch (Exception e) {
@@ -640,7 +640,7 @@ public class GameSaveLoadManager {
 
             writer.write(Constants.FACTION + " " + player.getFaction());
             writer.write(System.lineSeparator());
-            writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmoji());
+            writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmojiRaw());
             writer.write(System.lineSeparator());
             //TODO Remove when no longer relevant
             String playerColor = player.getColor();
@@ -938,7 +938,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
-                if(entry.getKey() != null){
+                if (entry.getKey() != null) {
                     writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
                     writer.write(System.lineSeparator());
                 }

@@ -1,6 +1,9 @@
 package ti4.commands.statistics;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
@@ -8,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class StellarConverter extends StatisticsSubcommandData {
@@ -32,7 +36,7 @@ public class StellarConverter extends StatisticsSubcommandData {
             List<String> worldsThisGame = g.getTileMap().values().stream()
                 .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
                 .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
-                .map(uh -> uh.getName())
+                .map(UnitHolder::getName)
                 .toList();
 
             if (worldsThisGame.size() == 1) {
@@ -46,9 +50,7 @@ public class StellarConverter extends StatisticsSubcommandData {
             }
         }
 
-        Comparator<Entry<String, Integer>> comparator = (p1, p2) -> {
-            return (-1) * p1.getValue().compareTo(p2.getValue());
-        };
+        Comparator<Entry<String, Integer>> comparator = (p1, p2) -> (-1) * p1.getValue().compareTo(p2.getValue());
 
         int index = 1;
         int width = (int) Math.round(Math.ceil(Math.log10(count + 1)));
@@ -57,7 +59,7 @@ public class StellarConverter extends StatisticsSubcommandData {
         for (Entry<String, Integer> planetStats : numberConverts.entrySet().stream().sorted(comparator).toList()) {
             String planetName = planetRepresentations.get(planetStats.getKey());
             output.append("`(").append(Helper.leftpad(String.valueOf(index), width)).append(")` ");
-            output.append(planetName + ": " + planetStats.getValue());
+            output.append(planetName).append(": ").append(planetStats.getValue());
             output.append("\n");
             index++;
         }

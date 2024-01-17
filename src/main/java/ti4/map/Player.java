@@ -1197,7 +1197,7 @@ public class Player {
         if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
             emoji = factionEmoji;
         }
-        if (getFactionModel() != null) {
+        if (emoji == null && getFactionModel() != null) {
             emoji = getFactionModel().getFactionEmoji();
         }
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
@@ -1212,6 +1212,10 @@ public class Player {
 
     public void setFactionEmoji(String factionEmoji) {
         this.factionEmoji = factionEmoji;
+    }
+
+    public String getFactionEmojiRaw() {
+        return factionEmoji;
     }
 
     public boolean hasCustomFactionEmoji() {
