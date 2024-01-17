@@ -385,6 +385,18 @@ public class Player {
             || getTechs().contains("dslizhff") || ownsUnit("florzen_fighter");
     }
 
+    @JsonIgnore
+    public boolean hasUpgradedUnit(String baseUpgradeID) {
+        for(String tech : techs){
+            TechnologyModel model = Mapper.getTech(tech);
+            if(tech.equalsIgnoreCase(baseUpgradeID) || model.getBaseUpgrade().orElse("Bah").equalsIgnoreCase(baseUpgradeID)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }

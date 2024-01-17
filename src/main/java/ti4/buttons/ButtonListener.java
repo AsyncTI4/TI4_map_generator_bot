@@ -880,6 +880,22 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {//"autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
+        } else if (buttonID.startsWith("autoAssignSpaceHits_")) {//"autoAssignGroundHits_"
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, activeGame, activeGame.getTileByPosition(buttonID.split("_")[1]), Integer.parseInt(buttonID.split("_")[2]), event, false));
+        } else if (buttonID.startsWith("cancelSpaceHits_")) {//"autoAssignGroundHits_"
+            Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+            int h = Integer.parseInt(buttonID.split("_")[2])-1;
+            Player opponent = player;
+            String msg = "\n"+opponent.getRepresentation(true, true) + " cancelled 1 hit with an ability";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            List<Button> buttons = new ArrayList<>();
+            String finChecker = "FFCC_" + opponent.getFaction() + "_";
+            buttons.add(Button.success(finChecker+"autoAssignSpaceHits_"+tile.getPosition()+"_"+h,"Auto-assign Hits"));
+            buttons.add(Button.danger("getDamageButtons_" + tile.getPosition(),"Manually Assign Hits"));
+            buttons.add(Button.secondary("cancelSpaceHits_"+tile.getPosition()+"_"+h,"Cancel a Hit"));
+            String msg2 = "You can automatically assign hits. The hits would be assigned in the following way:\n\n"+ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, activeGame, tile, h, event, true);
+           // MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+            event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons)).queue();
         } else if (buttonID.startsWith("autoAssignAFBHits_")) {//"autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignAntiFighterBarrageHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
@@ -1618,6 +1634,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveMaw(activeGame, player, event);
         } else if (buttonID.startsWith("playerPref_")) {
             ButtonHelper.resolvePlayerPref(player, event, buttonID, activeGame);
+        } else if (buttonID.startsWith("riskDirectHit_")) {
+            ButtonHelper.resolveRiskDirectHit(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("setPersonalAutoPingInterval_")) {
             int interval = Integer.parseInt(buttonID.split("_")[1]);
             player.setPersonalPingInterval(interval);

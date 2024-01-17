@@ -1530,8 +1530,12 @@ public class ButtonHelperAgents {
         int oldTg = player.getTg();
         int numOfBPs = bentor.getNumberOfBluePrints();
         int tgGain = numOfBPs + player.getCommodities() - player.getCommoditiesTotal();
+        if(tgGain < 0){
+            tgGain = 0;
+        }
         int commGain = numOfBPs - tgGain;
         player.setCommodities(player.getCommodities() + commGain);
+        
         player.setTg(oldTg + tgGain);
         String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " gained " + tgGain + "tg (" + oldTg + "->" + player.getTg() + ") and " + commGain + " commodities due to bentor agent";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
