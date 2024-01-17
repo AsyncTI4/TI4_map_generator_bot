@@ -133,7 +133,7 @@ public class GameEnd extends GameSubcommandData {
               }
 
               // TIGL Extras
-              if (activeGame.isCompetitiveTIGLGame() && activeGame.getGameWinner().isPresent()) {
+              if (activeGame.isCompetitiveTIGLGame() && activeGame.getWinner().isPresent()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(activeGame, event));
               }
 
@@ -188,7 +188,7 @@ public class GameEnd extends GameSubcommandData {
 
               // send game json file to s3
               File jsonGameFile = Storage.getMapsJSONStorage(activeGame.getName() + ".json");
-              boolean isWon = activeGame.getGameWinner().isPresent() && activeGame.isHasEnded();
+              boolean isWon = activeGame.getWinner().isPresent() && activeGame.isHasEnded();
               if (isWon) {
                 WebHelper.putFile(activeGame.getName(), jsonGameFile);
               }
@@ -231,7 +231,7 @@ public class GameEnd extends GameSubcommandData {
     public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
-        sb.append("This was a TIGL game! 👑").append(activeGame.getGameWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
+        sb.append("This was a TIGL game! 👑").append(activeGame.getWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
         sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(" (TIGL wants Game End Date for Async)\n");
         sb.append("Match Start Time: 00:00\n\n");
         sb.append("Players:").append("\n");
