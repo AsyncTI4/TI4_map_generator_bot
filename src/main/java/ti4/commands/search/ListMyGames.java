@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,6 +19,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ListMyGames extends SearchSubcommandData {
+
     public ListMyGames() {
         super(Constants.SEARCH_MY_GAMES, "List all of your games you are currently in");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_MY_TURN, "True to only show games where it is your turn"));
