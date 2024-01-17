@@ -2372,7 +2372,7 @@ public class ButtonHelper {
     }
 
     public static void resolveMinisterOfPeace(Player minister, Game activeGame, ButtonInteractionEvent event) {
-        Player target = activeGame.getActivePlayerObject();
+        Player target = activeGame.getActivePlayer();
 
         if (target == null || target == minister) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Target player not found");
@@ -2845,13 +2845,13 @@ public class ButtonHelper {
                 buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment, "Roll Bombardment"));
             }
         }
-        if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayerObject()) {
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace) && p1 != activeGame.getActivePlayer()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Cheiran Commander Block")
                 .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
         }
         if (!activeGame.isFoWMode() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander") && "ground".equalsIgnoreCase(groundOrSpace)
-            && p2 != activeGame.getActivePlayerObject()) {
+            && p2 != activeGame.getActivePlayer()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Cheiran Commander Block")
                 .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
@@ -2870,12 +2870,12 @@ public class ButtonHelper {
             String nameOfHolder = "Space";
             if (unitH instanceof Planet) {
                 nameOfHolder = Helper.getPlanetRepresentation(unitH.getName(), activeGame);
-                if (p1 != activeGame.getActivePlayerObject() && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "solcommander") && "ground".equalsIgnoreCase(groundOrSpace)) {
+                if (p1 != activeGame.getActivePlayer() && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "solcommander") && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "utilizeSolCommander_" + unitH.getName(), "Sol Commander on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
                 }
-                if (p2 != activeGame.getActivePlayerObject() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !activeGame.isFoWMode()
+                if (p2 != activeGame.getActivePlayer() && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !activeGame.isFoWMode()
                     && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "utilizeSolCommander_" + unitH.getName(), "Sol Commander on " + nameOfHolder)
@@ -3133,7 +3133,7 @@ public class ButtonHelper {
             fleetSupplyViolated = true;
         }
         if (capacity > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "vayleriancommander") && tile.getPosition().equals(activeGame.getActiveSystem())
-            && player == activeGame.getActivePlayerObject()) {
+            && player == activeGame.getActivePlayer()) {
             capacity = capacity + 2;
         }
         if (numInfNFightersNMechs > capacity) {
@@ -4702,7 +4702,7 @@ public class ButtonHelper {
 
                     if ((("mech".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("articles_war") && player.getUnitsOwned().contains("nomad_mech"))
                         || "dreadnought".equalsIgnoreCase(unitName)
-                        || (player != activeGame.getActivePlayerObject() && !"fighter".equalsIgnoreCase(unitName) && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
+                        || (player != activeGame.getActivePlayer() && !"fighter".equalsIgnoreCase(unitName) && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
                             && activeGame.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander"))
                         || ("warsun".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("schematics")) || "lady".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName)
                         || ("mech".equalsIgnoreCase(unitName) && doesPlayerHaveFSHere("nekro_flagship", player, tile))

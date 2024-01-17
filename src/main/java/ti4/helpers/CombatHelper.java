@@ -358,7 +358,7 @@ public class CombatHelper {
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
-                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
+                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayerID()))
                 .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();

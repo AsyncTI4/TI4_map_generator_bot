@@ -459,7 +459,7 @@ public class ButtonHelperAgents {
             }
         }
         if ("kjalengardagent".equalsIgnoreCase(agent)) {
-            Player activePlayer = activeGame.getActivePlayerObject();
+            Player activePlayer = activeGame.getActivePlayer();
             if (activePlayer != null) {
                 int oldComms = activePlayer.getCommodities();
                 int newComms = oldComms + activePlayer.getNeighbourCount();
@@ -1459,7 +1459,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), "Player did not have the money, please resolve manually.");
             return;
         }
-        if (activeGame.getActivePlayerObject() != player) {
+        if (activeGame.getActivePlayer() != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), "Target player is not active player, please resolve manually.");
             return;
         }
@@ -1587,7 +1587,7 @@ public class ButtonHelperAgents {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        if (player == activeGame.getActivePlayerObject()) {
+        if (player == activeGame.getActivePlayer()) {
             activeGame.setComponentAction(true);
             Button getTech = Button.success("acquireATech", "Get a tech");
             List<Button> buttons = new ArrayList<>();

@@ -100,7 +100,7 @@ public class PlayAC extends ACCardsSubcommandData {
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
 
-        String activePlayerID = activeGame.getActivePlayer();
+        String activePlayerID = activeGame.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = activeGame.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {

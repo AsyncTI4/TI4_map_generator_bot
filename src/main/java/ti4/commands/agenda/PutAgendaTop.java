@@ -21,7 +21,7 @@ public class PutAgendaTop extends AgendaSubcommandData {
         if (success && !activeGame.isFoWMode()) {
 
             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on top");
-            ButtonHelper.sendMessageToRightStratThread(activeGame.getPlayer(activeGame.getActivePlayer()), activeGame, "Agenda put on top", "politics");
+            ButtonHelper.sendMessageToRightStratThread(activeGame.getPlayer(activeGame.getActivePlayerID()), activeGame, "Agenda put on top", "politics");
         } else {
             if (!activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Agenda ID found");

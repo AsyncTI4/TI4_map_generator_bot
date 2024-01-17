@@ -217,7 +217,7 @@ public class ButtonListener extends ListenerAdapter {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
 
-        if (activeGame != null && activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
+        if (activeGame != null && activeGame.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayerID())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
 
@@ -4340,7 +4340,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
 
                 if (activeGame.getNaaluAgent()) {
-                    player = activeGame.getPlayer(activeGame.getActivePlayer());
+                    player = activeGame.getPlayer(activeGame.getActivePlayerID());
                     activeGame.setNaaluAgent(false);
                 }
                 activeGame.setCurrentReacts("tnelisCommanderTracker", "");

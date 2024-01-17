@@ -286,7 +286,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
         }
         if (activeGame.getNaaluAgent()) {
-            player = activeGame.getPlayer(activeGame.getActivePlayer());
+            player = activeGame.getPlayer(activeGame.getActivePlayerID());
             activeGame.setNaaluAgent(false);
         }
         activeGame.setCurrentReacts("tnelisCommanderTracker", "");

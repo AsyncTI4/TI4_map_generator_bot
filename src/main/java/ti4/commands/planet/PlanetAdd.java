@@ -125,7 +125,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if(!activeGame.getCurrentPhase().contains("agenda")){
             activeGame.setCurrentReacts("planetsTakenThisRound",activeGame.getFactionsThatReactedToThis("planetsTakenThisRound")+"_"+planet);
         }
-        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && !doubleCheck && event != null) {
+        if (activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID())) && player.hasAbility("scavenge") && !doubleCheck && event != null) {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
@@ -135,7 +135,7 @@ public class PlanetAdd extends PlanetAddRemove {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
 
-        if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasUnexhaustedLeader("vaylerianagent")){
+        if(activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID())) && player.hasUnexhaustedLeader("vaylerianagent")){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_vaylerianagent_"+player.getFaction(), "Use Vaylerian Agent").withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -143,7 +143,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
 
-        if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))  && player.hasAbility("scour")){
+        if(activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))  && player.hasAbility("scour")){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("scourPlanet_"+planet, "Use Scour").withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -151,14 +151,14 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
         Tile tile = activeGame.getTileFromPlanet(planet);
-        if(tile != null && activeGame.getActivePlayerObject() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !ButtonHelper.isTileHomeSystem(tile) && FoWHelper.playerHasShipsInSystem(player, tile)){
+        if(tile != null && activeGame.getActivePlayer() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !ButtonHelper.isTileHomeSystem(tile) && FoWHelper.playerHasShipsInSystem(player, tile)){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship").withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " you can produce 1 ship in the system due to Free Systems Commander";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
-        if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+        if (((activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("saarMechRes_" + planet, "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
@@ -166,7 +166,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
         }
-        if (activeGame.getActivePlayerObject() == player && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
+        if (activeGame.getActivePlayer() == player && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("cymiaeCommanderRes_" + planet, "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
@@ -174,7 +174,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 player.getRepresentation(true, true) + " due to Cymiae Commander, you can discard an AC here to place or move a mech on "+Helper.getPlanetRepresentation(planet, activeGame)+". Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
         }
 
-        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2"))
+        if (activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2"))
             && !doubleCheck && event != null) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("deployMykoSD_" + planet, "Deploy Dock " + planet));

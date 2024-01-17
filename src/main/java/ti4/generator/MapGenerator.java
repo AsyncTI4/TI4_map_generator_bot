@@ -602,7 +602,7 @@ public class MapGenerator {
                     }
                 }
 
-                String activePlayerID = game.getActivePlayer();
+                String activePlayerID = game.getActivePlayerID();
                 String phase = game.getCurrentPhase();
                 if (player.isPassed()) {
                     graphics.setFont(Storage.getFont20());
@@ -2192,7 +2192,7 @@ public class MapGenerator {
         graphics.drawString("ROUND: " + game.getRound(), x, deltaY);
 
         //TURN ORDER
-        String activePlayerUserID = game.getActivePlayer();
+        String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getCurrentPhase())) {
             x += 450;
 
@@ -2381,7 +2381,7 @@ public class MapGenerator {
                     graphics.setColor(Color.WHITE);
                 }
             }
-            String activePlayerID = game.getActivePlayer();
+            String activePlayerID = game.getActivePlayerID();
             String phase = game.getCurrentPhase();
             if (player.isPassed()) {
                 point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
