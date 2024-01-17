@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 public class PlayerStats extends StatisticsSubcommandData {
 
     private static final String MINIMUM_GAME_COUNT_FILTER = "has_minimum_game_count";
+    private static final String MAX_LIST_SIZE = "max_list_size";
 
     public PlayerStats() {
         super("players", "Player Statistics");
@@ -27,7 +28,8 @@ public class PlayerStats extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.FOG_FILTER, "Filter games of player by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HOMEBREW_FILTER, "Filter games of player by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HAS_WINNER_FILTER, "Filter games of player by if the game has a winner"));
-        addOptions(new OptionData(OptionType.INTEGER, MINIMUM_GAME_COUNT_FILTER, "Filter by the minimum number of games player has played"));
+        addOptions(new OptionData(OptionType.INTEGER, MINIMUM_GAME_COUNT_FILTER, "Filter by the minimum number of games player has played, default 10"));
+        addOptions(new OptionData(OptionType.INTEGER, MAX_LIST_SIZE, "The maximum number of players listed, default 50"));
     }
 
     @Override
@@ -66,11 +68,10 @@ public class PlayerStats extends StatisticsSubcommandData {
                     1 + playerGameCount.getOrDefault(userId, 0));
             });
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("**Player Win Percent:**").append("\n");
 
-        int minimumGameCountFilter = event.getOption(MINIMUM_GAME_COUNT_FILTER, 1, OptionMapping::getAsInt);
-        playerUserIdToUsername.keySet().stream()
+        int maximumListedPlayers = event.getOption(MAX_LIST_SIZE, 50, OptionMapping::getAsInt);
+        int minimumGameCountFilter = event.getOption(MINIMUM_GAME_COUNT_FILTER, 10, OptionMapping::getAsInt);
+        List<Map.Entry<String, Long>> entries = playerUserIdToUsername.keySet().stream()
             .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
             .map(userId -> {
                 double winCount = playerWinCount.getOrDefault(userId, 0);
@@ -78,16 +79,25 @@ public class PlayerStats extends StatisticsSubcommandData {
                 return Map.entry(userId, Math.round(100 * winCount / gameCount));
             })
             .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-            .forEach(entry ->
-                sb.append("`")
-                    .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
-                    .append(" ")
-                    .append(entry.getValue())
-                    .append("% (")
-                    .append(playerGameCount.get(entry.getKey()))
-                    .append(" games) ")
-                    .append("\n")
-            );
+            .toList();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Player Win Percent:**__").append("\n");
+        if (entries.size() == 0) {
+            sb.append("No players found for the given filters!");
+        }
+        for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
+            Map.Entry<String, Long> entry = entries.get(i);
+            sb.append("`")
+                .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
+                .append(" ")
+                .append(entry.getValue())
+                .append("% (")
+                .append(playerGameCount.get(entry.getKey()))
+                .append(" games) ")
+                .append("\n");
+        }
+
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Player Win Percent", sb.toString());
     }
 

@@ -535,7 +535,7 @@
     "name": "Rehashed Debates",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Choose 1 agenda in play or in the discard pile. Then, discard the revealed agenda. Players vote on the chosen agenda instead, as if it were just revealed from the agenda deck.",
+    "text": "Choose 1 agenda in play or in the discard pile. Then, discard the revealed agenda. Players vote on the chosen agenda instead, as if it were revealed from the agenda deck.",
     "flavorText": "Ciel was met by a crowd when he arrived at the Senate Possessional. His agreements to fund research on the Ixthian artifact had conjured up doomsayers. They would learn the providence of Winnaran wisdom.",
     "source": "action_deck_2"
   },
