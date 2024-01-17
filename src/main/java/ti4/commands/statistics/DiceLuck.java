@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,6 +28,7 @@ public class DiceLuck extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, "Minimum number of expected hits to show (Default = 10)").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "ascending", "True to sort the values in ascending order, lowest to highest (default = true)"));
     }
 
     @Override
@@ -66,38 +68,43 @@ public class DiceLuck extends StatisticsSubcommandData {
 
         sb.append("## __**Dice Luck**__\n");
 
-        int index = 1;
+        boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Entry<Double, Integer>>> comparator = (o1, o2) -> {
-            Double o1TurnCount = o1.getValue().getKey();
-            Double o2TurnCount = o2.getValue().getKey();
+            double o1TurnCount = o1.getValue().getKey();
+            double o2TurnCount = o2.getValue().getKey();
             int o1total = o1.getValue().getValue();
             int o2total = o2.getValue().getValue();
             if (o1TurnCount == 0 || o2TurnCount == 0) return -1;
 
-            Double total1 = o1total / o1TurnCount;
-            Double total2 = o2total / o2TurnCount;
-            return total1.compareTo(total2);
+            double total1 = o1total / o1TurnCount;
+            double total2 = o2total / o2TurnCount;
+            return sortOrderAscending ? Double.compare(total1, total2) : -Double.compare(total1, total2);
         };
 
+        AtomicInteger index = new AtomicInteger(1);
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 10, OptionMapping::getAsInt);
-        for (Entry<String, Entry<Double, Integer>> userTurnCountTotalTime : playerDiceLucks.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
-            .sorted(comparator).limit(topLimit).toList()) {
+
+        playerDiceLucks.entrySet().stream()
+            .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
+            .sorted(comparator)
+            .limit(topLimit)
+            .forEach(userTurnCountTotalTime -> {
             User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
             double expectedHits = userTurnCountTotalTime.getValue().getKey();
             int actualHits = userTurnCountTotalTime.getValue().getValue();
 
-            if (user == null || expectedHits == 0 || actualHits == 0) continue;
+            if (user == null || expectedHits == 0 || actualHits == 0) return;
 
             double averageDiceLuck = actualHits / expectedHits;
 
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
+            sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
             sb.append(String.format("%.2f", averageDiceLuck));
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" average/expected]");
             sb.append("\n");
-            index++;
-        }
+            index.getAndIncrement();
+        });
 
         return sb.toString();
     }

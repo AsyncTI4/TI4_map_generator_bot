@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.player.TurnStart;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -291,7 +292,7 @@ public class ButtonHelperTacticalAction {
         activeGame.setL1Hero(false);
         activeGame.setCurrentReacts("vaylerianHeroActive", "");
         String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
-        List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (activeGame.isFoWMode()) {
             channel = player.getPrivateChannel();

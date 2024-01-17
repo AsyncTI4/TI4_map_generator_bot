@@ -435,6 +435,10 @@ public class Mapper {
         return tokensToName;
     }
 
+    public static String getTokenIDFromTokenPath(String tokenPath) {
+        return getTokensToName().get(tokenPath);
+    }
+
     public static SecretObjectiveModel getSecretObjective(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -871,8 +875,8 @@ public class Mapper {
             case Constants.ABILITY -> displayName = getAbility(relatedID).getRepresentation();
             case Constants.UNIT -> {
                 UnitModel unit = getUnit(relatedID);
-                displayName = unit.getUnitEmoji() + " "
-                    + unit.getName() + " " + unit.getAbility();
+                displayName = unit.getUnitEmoji() + " " + unit.getName();
+                if (unit.getAbility().isPresent()) displayName += " - *" + unit.getAbility() + "*";
             }
             case Constants.LEADER -> displayName = getLeader(relatedID).getRepresentation(true, true, false);
             default -> {

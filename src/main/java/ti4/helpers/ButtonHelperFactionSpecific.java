@@ -20,6 +20,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
+import ti4.commands.player.TurnStart;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -58,7 +59,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
-        List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
@@ -571,9 +572,10 @@ public class ButtonHelperFactionSpecific {
         Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
-            int amount = unitEntry.getValue();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
-            if (!unitName.contains("pds")) {
+            UnitModel unit = player.getUnitFromUnitKey(unitKey);
+            if (player.unitBelongsToPlayer(unitKey) && unit.getIsGroundForce()) {
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int amount = unitEntry.getValue();
                 new RemoveUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(origPlanet), amount + " " + unitName + " " + origPlanet, activeGame);
                 new AddUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(newPlanet), amount + " " + unitName + " " + newPlanet, activeGame);
             }
