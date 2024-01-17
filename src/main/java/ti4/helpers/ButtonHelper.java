@@ -2237,6 +2237,19 @@ public class ButtonHelper {
         return playersWithShips;
     }
 
+    public static List<Player> getPlayersWithUnitsInTheSystem(Game activeGame, Tile tile) {
+        List<Player> playersWithShips = new ArrayList<>();
+        for (Player player : activeGame.getPlayers().values()) {
+            if (!player.isRealPlayer()) {
+                continue;
+            }
+            if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                playersWithShips.add(player);
+            }
+        }
+        return playersWithShips;
+    }
+
     public static List<Player> getPlayersWithUnitsOnAPlanet(Game activeGame, Tile tile, String planet) {
         List<Player> playersWithShips = new ArrayList<>();
         for (Player p2 : activeGame.getPlayers().values()) {
@@ -2458,152 +2471,6 @@ public class ButtonHelper {
 
     public static List<Button> getButtonsForAgentSelection(Game activeGame, String agent) {
         return AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "exhaustAgent_" + agent, null);
-    }
-
-    public static String combatThreadName(Game activeGame, Player p1, Player p2, Tile tile) {
-        String thread = activeGame.getName() + "-round-" + activeGame.getRound() + "-system-" + tile.getPosition() + "-";
-        if (activeGame.isFoWMode()) {
-            thread += p1.getColor() + "-vs-" + p2.getColor() + "-private";
-        } else {
-            thread += p1.getFaction() + "-vs-" + p2.getFaction();
-        }
-        return thread;
-    }
-
-    public static void makeACombatThread(Game activeGame, MessageChannel channel, Player p1, Player p2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        TextChannel textChannel = (TextChannel) channel;
-        Helper.checkThreadLimitAndArchive(event.getGuild());
-        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent("Resolve combat");
-        for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
-            if (threadChannel_.getName().equals(threadName)) {
-                initializeCombatThread(threadChannel_, activeGame, p1, p2, tile, event, spaceOrGround);
-                return;
-            }
-        }
-        List<Player> playersWithPds2;
-        if (activeGame.isFoWMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
-            playersWithPds2 = new ArrayList<>();
-        } else {
-            playersWithPds2 = tileHasPDS2Cover(p1, activeGame, tile.getPosition());
-        }
-        int context = 0;
-        if (playersWithPds2.size() > 0) {
-            context = 1;
-        }
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
-        channel.sendMessage(baseMessageObject.build()).queue(message -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message.getId());
-            if (activeGame.isFoWMode()) {
-                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-            } else {
-                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-            }
-            threadChannel.queue(tc -> initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround, systemWithContext));
-        });
-
-    }
-
-    private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround, null);
-    }
-
-    private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file) {
-        StringBuilder message = new StringBuilder();
-        if (activeGame.isFoWMode()) {
-            message.append(p1.getRepresentation(true, true));
-        } else {
-            message.append(p1.getRepresentation(true, true));
-            message.append(p2.getRepresentation());
-        }
-
-        message.append(" Please resolve the interaction here. ");
-        if ("ground".equalsIgnoreCase(spaceOrGround)) {
-            message.append("Steps for Invasion:").append("\n");
-            message.append("> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)").append("\n");
-            message.append("> 2. Bombardment").append("\n");
-            message.append("> 3. Commit Ground Forces").append("\n");
-            message.append("> 4. After commit window (Parley, Ghost Squad, etc.)").append("\n");
-            message.append("> 5. Start of Combat (morale boost, etc.)").append("\n");
-            message.append("> 6. Roll Dice!").append("\n");
-        } else {
-            message.append("Steps for Space Combat:").append("\n");
-            message.append("> 1. End of movement abilities (Foresight, Stymie, etc.)").append("\n");
-            message.append("> 2. Firing of PDS").append("\n");
-            message.append("> 3. Start of Combat (Skilled retreat, Morale boost, etc.)").append("\n");
-            message.append("> 4. Anti-Fighter Barrage").append("\n");
-            message.append("> 5. Declare Retreats (including rout)").append("\n");
-            message.append("> 6. Roll Dice!").append("\n");
-        }
-
-        MessageHelper.sendMessageToChannel(tc, message.toString());
-        List<Player> playersWithPds2;
-        if (activeGame.isFoWMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
-            playersWithPds2 = new ArrayList<>();
-        } else {
-            playersWithPds2 = tileHasPDS2Cover(p1, activeGame, tile.getPosition());
-        }
-        int context = 0;
-        if (playersWithPds2.size() > 0) {
-            context = 1;
-        }
-        FileUpload systemWithContext;
-        if (file == null) {
-            systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
-        } else {
-            systemWithContext = file;
-        }
-        MessageHelper.sendMessageWithFile(tc, systemWithContext, "Picture of system", false);
-        List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
-        Button graviton = null;
-        MessageHelper.sendMessageToChannelWithButtons(tc, "Combat", buttons);
-        if (playersWithPds2.size() > 0 && !activeGame.isFoWMode() && "space".equalsIgnoreCase(spaceOrGround)) {
-            StringBuilder pdsMessage = new StringBuilder("The following players have space cannon offense cover in the region, and can use the button to fire it:");
-            for (Player playerWithPds : playersWithPds2) {
-                pdsMessage.append(" ").append(playerWithPds.getRepresentation());
-                if (playerWithPds.hasTechReady("gls") && graviton == null) {
-                    graviton = Button.secondary("exhaustTech_gls", "Exhaust Graviton Laser Systems");
-                }
-            }
-            MessageHelper.sendMessageToChannel(tc, pdsMessage.toString());
-        } else {
-            if (activeGame.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(tc, "In fog, it is the players responsibility to check for pds2");
-            }
-        }
-        if ("space".equalsIgnoreCase(spaceOrGround)) {
-            List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
-            buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
-            if (!activeGame.isFoWMode()) {
-                buttons2.add(Button.danger("declinePDS", "Decline PDS"));
-                if ((p1.hasTech("asc") && checkNumberNonFighterShips(p1, activeGame, tile) > 2) || (p2.hasTech("asc") && checkNumberNonFighterShips(p2, activeGame, tile) > 2)) {
-                    buttons2.add(Button.primary("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
-                }
-                if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition()) && (p1.hasTech("ds") || p2.hasTech("ds"))) {
-                    buttons2.add(Button.primary("assCannonNDihmohn_ds_" + tile.getPosition(), "Use Dimensional Splicer").withEmoji(Emoji.fromFormatted(Emojis.Ghost)));
-                }
-                if ((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && checkNumberNonFighterShips(p1, activeGame, tile) > 2)
-                    || (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander") && checkNumberNonFighterShips(p2, activeGame, tile) > 2)) {
-                    buttons2.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dihmohn Commander").withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
-                }
-                if ((p1.hasAbility("ambush")) || (!activeGame.isFoWMode() && p2.hasAbility("ambush"))) {
-
-                    buttons2.add(Button.secondary("rollForAmbush_" + tile.getPosition(), "Ambush").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
-                }
-
-                buttons2.add(Button.secondary("announceARetreat", "Announce A Retreat"));
-
-            }
-            if (graviton != null) {
-                buttons2.add(graviton);
-            }
-            MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
-        }
-
-        if ((p1.hasTech("dslaner") && p1.getAtsCount() > 0) || (p2.hasTech("dslaner") && p2.getAtsCount() > 0)) {
-            List<Button> buttons3 = new ArrayList<>(ButtonHelperFactionSpecific.getLanefirATSButtons(p1, p2));
-            MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to remove commodities from ATS Armaments", buttons3);
-        }
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event) {

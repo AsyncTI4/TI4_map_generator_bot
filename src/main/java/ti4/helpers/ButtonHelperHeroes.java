@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.combat.StartCombatThread;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.explore.ExploreAndDiscard;
@@ -1307,17 +1308,17 @@ public class ButtonHelperHeroes {
                     player2 = players.get(1);
                 }
 
-                String threadName = ButtonHelper.combatThreadName(activeGame, player, player2, tile2);
+                String threadName = StartCombatThread.combatThreadName(activeGame, player, player2, tile2);
                 if (threadName.contains("private")) {
                     threadName = threadName.replace("private", "benediction-private");
                 } else {
                     threadName = threadName + "-benediction";
                 }
                 if (!activeGame.isFoWMode()) {
-                    ButtonHelper.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
+                    StartCombatThread.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
                 } else {
-                    ButtonHelper.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
-                    ButtonHelper.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
+                    StartCombatThread.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
+                    StartCombatThread.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (player3 == player2 || player3 == player) {
                             continue;
@@ -1325,7 +1326,7 @@ public class ButtonHelperHeroes {
                         if (!tile2.getRepresentationForButtons(activeGame, player3).contains("(")) {
                             continue;
                         }
-                        ButtonHelper.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
+                        StartCombatThread.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
                     }
                 }
             }
