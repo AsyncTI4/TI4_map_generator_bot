@@ -5091,9 +5091,10 @@ public class ButtonHelper {
             });
 
         int charValue = name.charAt(name.length() - 1);
+        String present =String.valueOf(charValue);
         String next = String.valueOf((char) (charValue + 1));
         String newName = "";
-        if (isNumeric(next)) {
+        if (isNumeric(present)) {
             newName = name + "b";
         } else {
             newName = name.substring(0, name.length() - 1) + next;
@@ -6280,6 +6281,13 @@ public class ButtonHelper {
             buttons);
     }
 
+    public static void offerDirectHitManagementOptions(Game activeGame, Player player) {
+        List<Button> buttons = getDirectHitManagementButtons(activeGame, player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
+            + " select the units you would like to either risk or not risk direct hit. Dread 2s will automatically risk direct hits.  ",
+            buttons);
+    }
+
     public static void resolveSpecificTransButtons(Game activeGame, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
 
@@ -6635,6 +6643,62 @@ public class ButtonHelper {
         buttons.add(Button.secondary("setPersonalAutoPingInterval_" + 48, "" + 48));
         return buttons;
     }
+
+    public static List<Button> getDirectHitManagementButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String stuffNotToSustain = activeGame.getFactionsThatReactedToThis("stuffNotToSustainFor"+player.getFaction());
+        if(stuffNotToSustain.isEmpty()){
+            activeGame.setCurrentReacts("stuffNotToSustainFor"+player.getFaction(), "warsun");
+            stuffNotToSustain = "warsun";
+        }
+        String unit = "warsun";
+        if(stuffNotToSustain.contains(unit)){
+            buttons.add(Button.danger("riskDirectHit_"+unit+"_yes", "Risk "+StringUtils.capitalize(unit)));
+        }else{
+            buttons.add(Button.success("riskDirectHit_"+unit+"_no", "Don't Risk "+StringUtils.capitalize(unit)));
+        }
+        unit = "flagship";
+        if(stuffNotToSustain.contains(unit)){
+            buttons.add(Button.danger("riskDirectHit_"+unit+"_yes", "Risk "+StringUtils.capitalize(unit)));
+        }else{
+            buttons.add(Button.success("riskDirectHit_"+unit+"_no", "Don't Risk "+StringUtils.capitalize(unit)));
+        }
+         unit = "dreadnought";
+        if(stuffNotToSustain.contains(unit)){
+            buttons.add(Button.danger("riskDirectHit_"+unit+"_yes", "Risk "+StringUtils.capitalize(unit)));
+        }else{
+            buttons.add(Button.success("riskDirectHit_"+unit+"_no", "Don't Risk "+StringUtils.capitalize(unit)));
+        }
+        unit = "cruiser";
+        if(player.hasTech("se2")){
+            if(stuffNotToSustain.contains(unit)){
+                buttons.add(Button.danger("riskDirectHit_"+unit+"_yes", "Risk "+StringUtils.capitalize(unit)));
+            }else{
+                buttons.add(Button.success("riskDirectHit_"+unit+"_no", "Don't Risk "+StringUtils.capitalize(unit)));
+            }
+        }
+        buttons.add(Button.secondary("deleteButtons", "Done"));
+        return buttons;
+    }
+    public static void resolveRiskDirectHit(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String yesOrNo = buttonID.split("_")[2];
+        String unit = buttonID.split("_")[1];
+        String stuffNotToSustain = activeGame.getFactionsThatReactedToThis("stuffNotToSustainFor"+player.getFaction());
+        if(yesOrNo.equalsIgnoreCase("yes")){
+            stuffNotToSustain = stuffNotToSustain.replace(unit, "");
+        }else{
+            stuffNotToSustain = stuffNotToSustain+unit;
+        }
+        if(stuffNotToSustain.isEmpty()){
+            stuffNotToSustain = "none";
+        }
+        activeGame.setCurrentReacts("stuffNotToSustainFor"+player.getFaction(), stuffNotToSustain);
+        List<Button> systemButtons = getDirectHitManagementButtons(activeGame, player);
+                event.getMessage().editMessage(event.getMessage().getContentRaw())
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+        
+    }
+
 
     public static List<Button> getAllPossibleCompButtons(Game activeGame, Player p1, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
@@ -7552,6 +7616,7 @@ public class ButtonHelper {
         buttons.add(Button.secondary("playerPref_tacticalAction", "Change Distance-Based Tactical Action Preference"));
         buttons.add(Button.secondary("playerPref_autoNoWhensAfters", "Change Auto No Whens/Afters React").withEmoji(Emoji.fromFormatted(Emojis.Agenda)));
         buttons.add(Button.secondary("playerPref_personalPingInterval", "Change Personal Ping Interval"));
+        buttons.add(Button.secondary("playerPref_directHitManagement", "Tell The Bot What Units Not To Risk Direct Hit On"));
         //deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }
@@ -7583,6 +7648,9 @@ public class ButtonHelper {
             }
             case "personalPingInterval" -> {
                 offerPersonalPingOptions(activeGame, player);
+            }
+            case "directHitManagement"-> {
+                offerDirectHitManagementOptions(activeGame, player);
             }
         }
         event.getMessage().delete().queue();
