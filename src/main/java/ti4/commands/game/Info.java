@@ -50,7 +50,7 @@ public class Info extends GameSubcommandData {
         sb.append("Last Modified: ").append(Helper.getDateRepresentation(activeGame.getLastModifiedDate())).append(NEW_LINE);
         sb.append("Ended: `").append(activeGame.isHasEnded()).append("`").append(NEW_LINE);
         if (activeGame.isHasEnded()) sb.append("> Date Ended: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(NEW_LINE);
-        sb.append("Game Completed: `").append(activeGame.getGameWinner().isPresent()).append("`").append(NEW_LINE);
+        sb.append("Game Completed: `").append(activeGame.getWinner().isPresent()).append("`").append(NEW_LINE);
 
         sb.append("### Setup: ").append(NEW_LINE);
         sb.append("VP Count: ").append(activeGame.getVp()).append(NEW_LINE);

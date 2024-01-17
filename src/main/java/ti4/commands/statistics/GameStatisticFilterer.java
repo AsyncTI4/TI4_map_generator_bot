@@ -1,15 +1,11 @@
 package ti4.commands.statistics;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-
-import java.util.Collections;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 
 public final class GameStatisticFilterer {
 
@@ -74,7 +70,7 @@ public final class GameStatisticFilterer {
 
   private static boolean filterOnHasWinner(SlashCommandInteractionEvent event, Game game) {
     Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
-    return hasWinnerFilter == null || (hasWinnerFilter && getWinner(game) != null) || (!hasWinnerFilter && getWinner(game) == null);
+    return hasWinnerFilter == null || (hasWinnerFilter && game.getWinner().isPresent()) || (!hasWinnerFilter && game.getWinner().isEmpty());
   }
 
   private static boolean filterOnHomebrew(SlashCommandInteractionEvent event, Game game) {
@@ -97,29 +93,6 @@ public final class GameStatisticFilterer {
   private static boolean filterOnPlayerCount(SlashCommandInteractionEvent event, Game game) {
     int playerCountFilter = event.getOption(PLAYER_COUNT_FILTER, 0, OptionMapping::getAsInt);
     return playerCountFilter <= 0 || game.getPlayerCountForMap() == playerCountFilter;
-  }
-
-  public static Player getWinner(Game game) {
-    Player winner = null;
-    for (Player player : game.getRealPlayers()) {
-      if (game.getVp() <= player.getTotalVictoryPoints()) {
-        if (winner == null) {
-          winner = player;
-        } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
-          winner = getLowestInitiativePlayer(player, winner);
-        } else {
-          return null;
-        }
-      }
-    }
-    return winner;
-  }
-
-  private static Player getLowestInitiativePlayer(Player player1, Player player2) {
-    if (Collections.min(player1.getSCs()) < Collections.min(player2.getSCs())) {
-      return player1;
-    }
-    return player2;
   }
 
 }

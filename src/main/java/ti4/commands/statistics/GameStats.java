@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -149,7 +150,7 @@ public class GameStats extends StatisticsSubcommandData {
         int total = 0;
         Map<String, Integer> endedGames = new HashMap<>();
         for (Game activeGame : filteredGames) {
-            if (activeGame.isHasEnded() && activeGame.getGameWinner().isPresent() && activeGame.getRealPlayers().size() > 2
+            if (activeGame.isHasEnded() && activeGame.getWinner().isPresent() && activeGame.getRealPlayers().size() > 2
                 && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
@@ -206,12 +207,13 @@ public class GameStats extends StatisticsSubcommandData {
         Map<String, Integer> winnerFactionCount = new HashMap<>();
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
-            Player winner = GameStatisticFilterer.getWinner(game);
-            if (winner == null) {
+            Optional<Player> winner = game.getWinner();
+            if (winner.isEmpty()) {
                 continue;
             }
-            winnerFactionCount.put(winner.getFaction(),
-                1 + winnerFactionCount.getOrDefault(winner.getFaction(), 0));
+            String winningFaction = winner.get().getFaction();
+            winnerFactionCount.put(winningFaction,
+                1 + winnerFactionCount.getOrDefault(winningFaction, 0));
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Faction:").append("\n");
@@ -235,11 +237,11 @@ public class GameStats extends StatisticsSubcommandData {
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
         for (Game game : filteredGames) {
-            Player winner = GameStatisticFilterer.getWinner(game);
-            if (winner == null) {
+            Optional<Player> winner = game.getWinner();
+            if (winner.isEmpty()) {
                 continue;
             }
-            String winningFaction = winner.getFaction();
+            String winningFaction = winner.get().getFaction();
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
 
@@ -304,12 +306,13 @@ public class GameStats extends StatisticsSubcommandData {
         Map<String, Integer> winnerColorCount = new HashMap<>();
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            Player winner = GameStatisticFilterer.getWinner(game);
-            if (winner == null) {
+            Optional<Player> winner = game.getWinner();
+            if (winner.isEmpty()) {
                 continue;
             }
-            winnerColorCount.put(winner.getColor(),
-                1 + winnerColorCount.getOrDefault(winner.getColor(), 0));
+            String winningColor = winner.get().getColor();
+            winnerColorCount.put(winningColor,
+                1 + winnerColorCount.getOrDefault(winningColor, 0));
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Colour:").append("\n");

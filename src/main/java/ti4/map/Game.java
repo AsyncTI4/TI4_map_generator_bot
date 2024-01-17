@@ -1,5 +1,7 @@
 package ti4.map;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,7 +40,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
@@ -363,7 +364,7 @@ public class Game {
             .filter(anomaly -> anomaly.getTile().equals(tile))
             .filter(anomaly -> anomaly.getDirection() == direction)
             .collect(Collectors.toList());
-        return CollectionUtils.isNotEmpty(anomaliesOnBorder);
+        return isNotEmpty(anomaliesOnBorder);
     }
 
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
@@ -511,14 +512,27 @@ public class Game {
     }
 
     @JsonIgnore
-    public Optional<Player> getGameWinner() {
+    public Optional<Player> getWinner() {
+        Player winner = null;
         for (Player player : getRealPlayers()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
-                return Optional.of(player);
-                // TODO: Handle if there are more than one player with a winning amount of VP
+                if (winner == null) {
+                    winner = player;
+                } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
+                    winner = getLowestInitiativePlayer(player, winner);
+                } else {
+                    return Optional.empty();
+                }
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(winner);
+    }
+
+    private static Player getLowestInitiativePlayer(Player player1, Player player2) {
+        if (Collections.min(player1.getSCs()) < Collections.min(player2.getSCs())) {
+            return player1;
+        }
+        return player2;
     }
 
     public int getRound() {
