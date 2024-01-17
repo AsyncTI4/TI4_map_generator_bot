@@ -3,6 +3,7 @@ package ti4.commands.statistics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -53,11 +54,11 @@ public class PlayerStats extends StatisticsSubcommandData {
         Map<String, Integer> playerGameCount = new HashMap<>();
         Map<String, String> playerUserIdToUsername = new HashMap<>();
         for (Game game : filteredGames) {
-            Player winner = GameStatisticFilterer.getWinner(game);
-            if (winner == null) {
+            Optional<Player> winner = game.getWinner();
+            if (winner.isEmpty()) {
                 continue;
             }
-            String winningUserId = winner.getUserID();
+            String winningUserId = winner.get().getUserID();
             playerWinCount.put(winningUserId,
                 1 + playerWinCount.getOrDefault(winningUserId, 0));
 

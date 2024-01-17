@@ -65,21 +65,21 @@ public class ListMyGames extends SearchSubcommandData {
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Game List", sb.toString());
     }
 
-    private String getPlayerMapListRepresentation(Game playerGame, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
-        Player player = playerGame.getPlayer(userID);
+    private String getPlayerMapListRepresentation(Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
+        Player player = game.getPlayer(userID);
         if (player == null) return "";
-        String gameChannelLink = playerGame.getActionsChannel() == null ? "" : playerGame.getActionsChannel().getAsMention();
+        String gameChannelLink = game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
         if (Mapper.isValidFaction(player.getFaction())) sb.append(player.getFactionEmoji());
         if (player.getColor() != null && !"null".equals(player.getColor())) sb.append(Emojis.getColorEmoji(player.getColor()));
-        sb.append("**").append(playerGame.getName()).append("**");
+        sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
-        if (playerGame.getGameWinner().isPresent() && player == playerGame.getGameWinner().get()) sb.append(" **👑WINNER👑**");
-        if (playerGame.getActivePlayer() != null && playerGame.getActivePlayer().equals(userID) && !playerGame.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (game.getWinner().filter(winner -> winner.getUserID().equals(player.getUserID())).isPresent()) sb.append(" **👑WINNER👑**");
+        if (game.getActivePlayer() != null && game.getActivePlayer().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (showSecondaries) {
             List<String> secondaries = new ArrayList<>();
-            for (int sc : playerGame.getPlayedSCs()) {
+            for (int sc : game.getPlayedSCs()) {
                 if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {
                     secondaries.add(Emojis.getSCBackEmojiFromInteger(sc));
                 }
@@ -88,8 +88,8 @@ public class ListMyGames extends SearchSubcommandData {
                 sb.append("\n> Please follow: ").append(String.join(" ", secondaries));
             }
         }
-        if (showGameModes) sb.append(" | Game Modes: ").append(playerGame.getGameModesText());
-        if (playerGame.isHasEnded()) sb.append(" [GAME IS OVER]");
+        if (showGameModes) sb.append(" | Game Modes: ").append(game.getGameModesText());
+        if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
         return sb.toString();
     }
 
