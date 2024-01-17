@@ -194,7 +194,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Remove 1 or 2 of another player's ships that do not have a capacity value from any systems that are adjacent to your ships. Then, place matching units from your reinforcements in any system containing your ships.",
-    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked on what she was being ordered to do. \"What's left of her,\" said the Hacan, not unkindly.",
+    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked on what she was being ordered to do. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
   {
