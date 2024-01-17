@@ -484,5 +484,14 @@
     "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to or greater than that ship's combat value, they produce 1 hit against the other player's ships in those systems.",
     "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand, \"Our dominion knows no border.\" The man hesitated, then agreed.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "illusory_duplication",
+    "name": "Illusory Duplication",
+    "phase": "Action",
+    "window": "At the start of a space combat",
+    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy ship's signature in a thirteenth different location.",
+    "source": "action_deck_2"
   }
 ]

@@ -147,9 +147,9 @@
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
-    "window": "At the end of a round of space combat",
-    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units. [Note: This AFB still only targets fighters.]",
-    "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
+    "window": "At the start of a round of space combat other than the first",
+    "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
+    "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
     "source": "action_deck_2"
   },
   {
@@ -183,7 +183,7 @@
     "alias": "decisive_victory",
     "name": "Decisive Victory",
     "phase": "Action",
-    "window": "After you win a combat that ended during its first round",
+    "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
     "text": "Remove your command token from the active system.",
     "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
     "source": "action_deck_2"
@@ -202,7 +202,7 @@
     "name": "Defense Installation",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust 1 planet you control. Then, place 1 PDS from your reinforcements on that planet.",
+    "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
     "flavorText": "Tellurian raised their arms high above their head and emitted a strange noise that the locals presumed was joyous. In the near distance, one of its own broke through the earth, shattering the landscape.",
     "source": "action_deck_2"
   },
@@ -255,7 +255,7 @@
     "alias": "double_agents",
     "name": "Double Agents",
     "phase": "Any",
-    "window": "When another player plays an action card that does not have a component action, other than \"Sabotage\"",
+    "window": "When another player, other than the active player, plays an action card",
     "text": "Cancel and take that action card.",
     "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
     "source": "action_deck_2"
@@ -283,8 +283,8 @@
     "name": "Efficiency Initiative",
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
-    "text": "Reduce the total PRODUCTION value of those units by any amount, to a minimum of 0. Then, gain trade goods equal to the amount you reduced it by. [Note: These trade goods are available to be spent during this production.]",
-    "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11% - and with a little work, he was sure the enhancers could increase efficiency by another 4%.",
+    "text": "Reduce the total PRODUCTION value of those units by up to 4 to reduce the combined cost of the produced units by an equal amount. Then, gain 2 trade goods. [Note: These trade goods are available to be spent during this production.]",
+    "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11%. With a little work, he was sure he could increase efficiency by another 4%.",
     "source": "action_deck_2"
   },
   {
@@ -373,8 +373,8 @@
     "name": "Hidden Initiatives",
     "phase": "Action",
     "window": "Action",
-    "text": "Discard 1 or more of your action cards to draw an equal number of action cards. Then, draw 1 action card.",
-    "flavorText": "M'aban sighed at her assistant's pleas. How many others in the galaxy could hide their intentions so well? Hunting this prey had filled her with exhilaration, but seeing him now, bathed in the stench of fear and his composure completely broken, disgusted her.",
+    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to reaching your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
+    "flavorText": "M'aban sighed at her assistant's pleas. How many others could hide their intentions so well? Hunting this prey had filled her with exhilaration, but seeing him now, bathed in the stench of fear and his composure completely broken, disgusted her.",
     "source": "action_deck_2"
   },
   {
@@ -387,20 +387,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "illusory_duplication",
-    "name": "Illusory Duplication",
-    "phase": "Action",
-    "window": "At the start of a space combat",
-    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
-    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy ship's signature in a thirteenth different location.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "intrigue",
     "name": "Intrigue",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order. Then, draw 1 action card.",
+    "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order; draw 1 action card for each card you put on top of the deck.",
     "flavorText": "Ne Ruk had reflected on hundreds of hours of private conversations between the various representatives. Undermining their schemes would be a treat well worth the effort.",
     "source": "action_deck_2"
   },
@@ -418,8 +409,8 @@
     "name": "Kickbacks",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for that outcome must give you 1 promissory note.",
-    "flavorText": "Gil was an emissary to the Civita Planetar. His career on Mecatol had made him a well-connected individual, with comrades in hundreds of bureaucracies, and favors owed in many more.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for that outcome must give you 1 promissory note from their hand.",
+    "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
   {
@@ -469,10 +460,10 @@
   },
   {
     "alias": "pivoted_plan",
-    "name": "Pivoted Plan",
+    "name": "Pivoted Plans",
     "phase": "Action",
     "window": "Action",
-    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to reaching your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
+    "text": "Discard 1 or more of your action cards to draw an equal number of action cards. Then, draw 1 action card.",
     "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
     "source": "action_deck_2"
   },
@@ -600,6 +591,15 @@
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
     "flavorText": "Berekar passionately discussed the Keleres' technological inferiority with Qanoj. Though he argue their inferiority presented a peril to the galaxy, in truth, of course, he could not care less.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "sensor_jam",
+    "name": "Sensor Jam",
+    "phase": "Action",
+    "window": "At the start of a space combat",
+    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
   {
