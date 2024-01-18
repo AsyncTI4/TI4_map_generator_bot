@@ -41,12 +41,10 @@ public class PlayerStats extends StatisticsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
             return;
         }
-        if (stat == PlayerStatistics.PLAYER_WIN_PERCENT) {
-            showPlayerWinPercent(event);
-        } else if (stat == PlayerStatistics.PLAYER_GAME_COUNT) {
-            showPlayerGameCount(event);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
+        switch (stat) {
+            case PLAYER_WIN_PERCENT -> showPlayerWinPercent(event);
+            case PLAYER_GAME_COUNT -> showPlayerGameCount(event);
+            default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
 
