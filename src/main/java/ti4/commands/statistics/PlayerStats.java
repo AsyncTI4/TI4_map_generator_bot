@@ -43,9 +43,51 @@ public class PlayerStats extends StatisticsSubcommandData {
         }
         if (stat == PlayerStatistics.PLAYER_WIN_PERCENT) {
             showPlayerWinPercent(event);
+        } else if (stat == PlayerStatistics.PLAYER_GAME_COUNT) {
+            showPlayerGameCount(event);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
+    }
+
+    private void showPlayerGameCount(SlashCommandInteractionEvent event) {
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        Map<String, Integer> playerGameCount = new HashMap<>();
+        Map<String, String> playerUserIdToUsername = new HashMap<>();
+        for (Game game : filteredGames) {
+            game.getRealPlayers().forEach(player -> {
+                String userId = player.getUserID();
+                playerUserIdToUsername.put(userId, player.getUserName());
+                playerGameCount.put(userId,
+                    1 + playerGameCount.getOrDefault(userId, 0));
+            });
+        }
+
+        int maximumListedPlayers = event.getOption(MAX_LIST_SIZE, 50, OptionMapping::getAsInt);
+        int minimumGameCountFilter = event.getOption(MINIMUM_GAME_COUNT_FILTER, 10, OptionMapping::getAsInt);
+        List<Map.Entry<String, Integer>> entries = playerUserIdToUsername.keySet().stream()
+            .filter(userId -> playerGameCount.get(userId) >= minimumGameCountFilter)
+            .map(userId -> Map.entry(userId, playerGameCount.get(userId)))
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+            .toList();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Player Game Count:**__").append("\n");
+        if (entries.size() == 0) {
+            sb.append("No players found for the given filters!");
+        }
+        for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
+            Map.Entry<String, Integer> entry = entries.get(i);
+            sb.append(i + 1)
+                .append(". `")
+                .append(StringUtils.leftPad(playerUserIdToUsername.get(entry.getKey()), 4))
+                .append("` ")
+                .append(entry.getValue())
+                .append(" games")
+                .append("\n");
+        }
+
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Player Game Count", sb.toString());
     }
 
     private static void showPlayerWinPercent(SlashCommandInteractionEvent event) {
@@ -105,7 +147,8 @@ public class PlayerStats extends StatisticsSubcommandData {
 
     public enum PlayerStatistics {
 
-        PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer");
+        PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"),
+        PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in");
     
         private final String name;
         private final String description;

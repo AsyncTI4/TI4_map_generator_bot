@@ -31,7 +31,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "Return that player's command token in the active system to their tactic pool and end their turn. [Note: They do not have to have a token in the system to place this card.]",
+    "text": "End that player's turn and return their command token in the active system to their tactic pool. [Note: They do not have to have a token in the system to play this card.]",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
     "source": "action_deck_2"
   },
@@ -166,7 +166,7 @@
     "name": "Crisis Management",
     "phase": "Action",
     "window": "Action",
-    "text": "Pass. Then, perform the secondary ability of 1 readied strategy card in a player's play area; while performing that ability, spend command tokens from your reinforcements instead of your strategy pool.",
+    "text": "Pass. Then, perform the secondary ability of 1 readied strategy card in a player's play area; while performing that ability, spend command tokens from your reinforcements instead of your strategy pool. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
     "flavorText": "\"They've stretched themselves to the brink of destruction. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Elder Junn shook his head. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
@@ -175,8 +175,8 @@
     "name": "Custodian Support",
     "phase": "Action",
     "window": "Action",
-    "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first to pass; otherwise, gain 1 command token.",
-    "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
+    "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, gain 2 commodities. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
+    "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. They would regret their underhanded partnerships.",
     "source": "action_deck_2"
   },
   {
@@ -193,8 +193,8 @@
     "name": "Defectors",
     "phase": "Action",
     "window": "Action",
-    "text": "Remove 1 or 2 of another player's ships that do not have a capacity value from any systems that are adjacent to your ships. Then, place matching units from your reinforcements in any system containing your ships.",
-    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked on what she was being ordered to do. \"What's left of her,\" said Kuuasi, not unkindly.",
+    "text": "Choose 1 system that contains 1 or 2 of another player's ships that do not have a capacity value. Spend trade goods equal to the combined cost of those ships to replace those ships with matching ships from your reinforcements.",
+    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative choked on her words. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
   {
@@ -255,7 +255,7 @@
     "alias": "double_agents",
     "name": "Double Agents",
     "phase": "Any",
-    "window": "When another player, other than the active player, plays an action card",
+    "window": "When another player, other than the active player, plays an action card other than \"Sabotage\"",
     "text": "Cancel and take that action card.",
     "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
     "source": "action_deck_2"
@@ -328,7 +328,7 @@
     "name": "Foreign Policy",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Then, give 1 of those action cards to each other player and take the remaining card.",
+    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Give 1 of those action cards to each other player and take the remaining card.",
     "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
     "source": "action_deck_2"
   },
@@ -617,7 +617,7 @@
     "phase": "Action",
     "window": "At the start of a space combat",
     "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x2) until the end of the combat.",
-    "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
+    "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. If we get it movin' fast enough, it'll shred them up just fine.\"",
     "source": "action_deck_2"
   },
   {
