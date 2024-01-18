@@ -932,7 +932,7 @@ public class MapGenerator {
             String relicStatus = isExhausted ? "_exh" : "_rdy";
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
 
-            int extraAxisOrderWidth = relicID.contains("axisorder") ? 0 : 10;
+            int extraAxisOrderWidth = relicID.contains("axisorder") ? 10 : 0;
             graphics.drawRect(x + deltaX - 2, y - 2, 44 + extraAxisOrderWidth, 152);
             if (!relicID.contains("axisorder")) {
                 drawPAImage(x + deltaX, y, "pa_relics_icon.png");
