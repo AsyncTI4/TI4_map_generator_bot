@@ -172,7 +172,9 @@ public class StartCombat extends CombatSubcommandData {
         // Start of Space Combat Buttons
         if ("space".equalsIgnoreCase(spaceOrGround)) {
             List<Button> startOfSpaceCombatButtons = getStartOfSpaceCombatButtons(activeGame, player1, player2, tile);
-            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Start of Space Combat:", startOfSpaceCombatButtons);
+            if (!startOfSpaceCombatButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Start of Space Combat:", startOfSpaceCombatButtons);
+            }
         }
 
         // General Space Combat
@@ -186,9 +188,11 @@ public class StartCombat extends CombatSubcommandData {
     }
 
     private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game activeGame, List<Player> combatPlayers, Tile tile) {
+        boolean thereAreAFBUnits = false;
         for (Player player : combatPlayers) {
-            if (CombatHelper.GetUnitsInAFB(tile, player, event).isEmpty()) return;
+            if (!CombatHelper.GetUnitsInAFB(tile, player, event).isEmpty()) thereAreAFBUnits = true;
         }
+        if (!thereAreAFBUnits) return;
         
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
