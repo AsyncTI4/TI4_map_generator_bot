@@ -695,6 +695,7 @@ public class MapGenerator {
                 int xDeltaFirstRowFromRightSide = 0;
                 int xDeltaSecondRowFromRightSide = 0;
                 // FIRST ROW RIGHT SIDE
+                xDeltaFirstRowFromRightSide = unitValues(player, xDeltaFirstRowFromRightSide, yPlayArea);
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
 
                 // SECOND ROW RIGHT SIDE
@@ -922,22 +923,23 @@ public class MapGenerator {
 
         List<String> exhaustedRelics = player.getExhaustedRelics();
         for (String relicID : player.getRelics()) {
-
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
             } else {
                 graphics.setColor(Color.WHITE);
             }
-            String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
-            String relicFileName = "pa_relics_" + relicID + statusOfPlanet + ".png";
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            String relicStatus = isExhausted ? "_exh" : "_rdy";
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
+
+            int extraAxisOrderWidth = relicID.contains("axisorder") ? 0 : 10;
+            graphics.drawRect(x + deltaX - 2, y - 2, 44 + extraAxisOrderWidth, 152);
             if (!relicID.contains("axisorder")) {
                 drawPAImage(x + deltaX, y, "pa_relics_icon.png");
             }
 
             drawPAImage(x + deltaX, y, relicFileName);
-            deltaX += 48;
+            deltaX += 48 + extraAxisOrderWidth;
         }
         return x + deltaX + 20;
     }
@@ -1267,24 +1269,6 @@ public class MapGenerator {
             if (-5 <= remainingReinforcements){
                 paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
             }
-            
-            UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
-            if (unitHolder != null && unitHolder.getUnits().isEmpty()) {
-                drawPAImage(x-00, y-150, "pa_resources.png");
-                drawPAImage(x+100, y-150, "pa_health.png");
-                drawPAImage(x+200, y-150, "pa_hit.png");
-                drawPAImage(x+300, y-150, "pa_hit.png");
-                drawPAImage(x+300, y-150, "pa_unitimage.png");
-                graphics.setColor(Color.WHITE);
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalResourceValueOfUnits(player, game)), new Rectangle(x -20, y -60, 120, 35), Storage.getFont35());
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalHPValueOfUnits(player, game)), new Rectangle(x +80, y -60, 120, 35), Storage.getFont35());
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalCombatValueOfUnits(player, game)), new Rectangle(x +180, y -60, 120, 35), Storage.getFont35());
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalUnitAbilityValueOfUnits(player,game)), new Rectangle(x +280, y -60, 120, 35), Storage.getFont35());
-            }
-            
- 
-            
-
         }
         return xDeltaFromRightSide + 450;
     }
@@ -1309,8 +1293,28 @@ public class MapGenerator {
         }
     }
 
+    private int unitValues(Player player, int xDeltaFromRightSide, int y) {
+        int widthOfSection = 120;
+        int leftSide = width - widthOfSection - xDeltaFromRightSide;
+        int verticalSpacing = 39;
+        int imageSize = verticalSpacing - 2;
+        drawPAImageScaled(leftSide, y + verticalSpacing * 0, "pa_resources.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 1, "pa_health.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_hit.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_unitimage.png", imageSize);
+        graphics.setColor(Color.WHITE);
+        leftSide += verticalSpacing + 10;
+        drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
+        return xDeltaFromRightSide + widthOfSection;
+    }
+
     private int nombox(Player player, int xDeltaFromRightSide, int y) {
-        int x = width - 450 - xDeltaFromRightSide;
+        int widthOfNombox = 450;
+        int x = width - widthOfNombox - xDeltaFromRightSide;
         UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
         if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
             return 0;
@@ -1471,7 +1475,7 @@ public class MapGenerator {
                 }
             }
         }
-        return xDeltaFromRightSide + 450;
+        return xDeltaFromRightSide + widthOfNombox;
     }
 
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
@@ -2052,6 +2056,16 @@ public class MapGenerator {
         try {
             String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            // BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
+    private void drawPAImageScaled(int x, int y, String resourceName, int size) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, size, size);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
             // BotLogger.log("Could not display play area: " + resourceName, e);
