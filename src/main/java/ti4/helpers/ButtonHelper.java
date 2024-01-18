@@ -4548,6 +4548,7 @@ public class ButtonHelper {
             case "dn" -> "dreadnought";
             case "lady" -> "lady";
             case "plenaryorbital" -> "plenaryorbital";
+            case "cavalry" -> "cavalry";
             default -> "";
         };
     }
@@ -4837,7 +4838,7 @@ public class ButtonHelper {
                         || "dreadnought".equalsIgnoreCase(unitName)
                         || (player != activeGame.getActivePlayerObject() && !"fighter".equalsIgnoreCase(unitName) && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
                             && activeGame.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander"))
-                        || ("warsun".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("schematics")) || "lady".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName)
+                        || ("warsun".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("schematics")) || "lady".equalsIgnoreCase(unitName) || "cavalry".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName)
                         || ("mech".equalsIgnoreCase(unitName) && doesPlayerHaveFSHere("nekro_flagship", player, tile))
                         || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2")) || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
                         Button validTile2 = Button
@@ -7613,6 +7614,9 @@ public class ButtonHelper {
             String message = player.getRepresentation(true, true) + " select planet to raghs call on";
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message,
                 ButtonHelperFactionSpecific.getRaghsCallButtons(player, activeGame, activeGame.getTileByPosition(activeGame.getActiveSystem())));
+        }
+        if ("cavalry".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.resolveCavStep1(activeGame, player);
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));

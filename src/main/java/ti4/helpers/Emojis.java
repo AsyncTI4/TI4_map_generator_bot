@@ -1166,6 +1166,7 @@ public class Emojis {
             case "infantry" -> infantry;
             case "flagship" -> flagship;
             case "lady" -> flagship;
+            case "cavalry" -> flagship;
             case "tyrantslament" -> flagship;
             case "fighter" -> fighter;
             case "dreadnought" -> dreadnought;
