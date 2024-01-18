@@ -37,9 +37,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class StartCombatThread extends CombatSubcommandData {
+public class StartCombat extends CombatSubcommandData {
 
-    public StartCombatThread() {
+    public StartCombat() {
         super(Constants.START_COMBAT, "Start a new combat thread for a given tile.");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_TYPE, "Type of combat to start 'space' or 'ground' - Default: space").setRequired(false).setAutoComplete(true));

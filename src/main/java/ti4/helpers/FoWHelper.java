@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import ti4.commands.combat.StartCombatThread;
+import ti4.commands.combat.StartCombat;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Units.UnitKey;
@@ -730,7 +730,7 @@ public class FoWHelper {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
 			MessageChannel channel = player_.getPrivateChannel();
 			MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-				StartCombatThread.getGeneralCombatButtons(activeGame, position, player_, player_, "justPicture"));
+				StartCombat.getGeneralCombatButtons(activeGame, position, player_, player_, "justPicture"));
 			successfulCount += success ? 1 : 0;
 		}
 		feedbackMessage(event, successfulCount, players.size());

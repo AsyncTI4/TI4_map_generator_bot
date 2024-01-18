@@ -73,7 +73,7 @@ public class CombatCommand implements Command {
     private Collection<CombatSubcommandData> getSubcommands() {
         HashSet<CombatSubcommandData> hashSet = new HashSet<>();
         hashSet.add(new CombatRoll());
-        hashSet.add(new StartCombatThread());
+        hashSet.add(new StartCombat());
         return hashSet;
     }
 

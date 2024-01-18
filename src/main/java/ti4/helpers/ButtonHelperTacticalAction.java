@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.combat.StartCombatThread;
+import ti4.commands.combat.StartCombat;
 import ti4.commands.player.TurnStart;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.units.AddUnits;
@@ -353,12 +353,12 @@ public class ButtonHelperTacticalAction {
                         player2 = players.get(1);
                     }
 
-                    String threadName = StartCombatThread.combatThreadName(activeGame, player, player2, tile);
+                    String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                     if (!activeGame.isFoWMode()) {
-                        StartCombatThread.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "space");
+                        StartCombat.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "space");
                     } else {
-                        StartCombatThread.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "space");
-                        StartCombatThread.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "space");
+                        StartCombat.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "space");
+                        StartCombat.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "space");
                         for (Player player3 : activeGame.getRealPlayers()) {
                             if (player3 == player2 || player3 == player) {
                                 continue;
@@ -366,7 +366,7 @@ public class ButtonHelperTacticalAction {
                             if (!tile.getRepresentationForButtons(activeGame, player3).contains("(")) {
                                 continue;
                             }
-                            StartCombatThread.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "space");
+                            StartCombat.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "space");
                         }
                     }
                 }
