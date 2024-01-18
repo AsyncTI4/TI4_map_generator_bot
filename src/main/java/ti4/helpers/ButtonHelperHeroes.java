@@ -1315,10 +1315,10 @@ public class ButtonHelperHeroes {
                     threadName = threadName + "-benediction";
                 }
                 if (!activeGame.isFoWMode()) {
-                    StartCombat.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
+                    StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
                 } else {
-                    StartCombat.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
-                    StartCombat.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
+                    StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
+                    StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (player3 == player2 || player3 == player) {
                             continue;
@@ -1326,7 +1326,7 @@ public class ButtonHelperHeroes {
                         if (!tile2.getRepresentationForButtons(activeGame, player3).contains("(")) {
                             continue;
                         }
-                        StartCombat.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
+                        StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
                     }
                 }
             }

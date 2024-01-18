@@ -89,7 +89,7 @@ public class StartCombat extends CombatSubcommandData {
         playersForCombat.remove(player1);
         Player player2 = playersForCombat.get(0);
 
-        makeACombatThread(activeGame, event.getChannel(), player1, player2, tile, event, combatType);
+        findOrCreateCombatThread(activeGame, event.getChannel(), player1, player2, tile, event, combatType);
     }
 
     public static String combatThreadName(Game activeGame, Player player1, @Nullable Player player2, Tile tile) {
@@ -105,11 +105,11 @@ public class StartCombat extends CombatSubcommandData {
         return sb.toString();
     }
 
-    public static void makeACombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        makeACombatThread(activeGame, channel, player1, player2, null, tile, event, spaceOrGround);
+    public static void findOrCreateCombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
+        findOrCreateCombatThread(activeGame, channel, player1, player2, null, tile, event, spaceOrGround);
     }
 
-    public static void makeACombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
+    public static void findOrCreateCombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null) threadName = combatThreadName(activeGame, player1, player2, tile);
         TextChannel textChannel = (TextChannel) channel;
@@ -117,7 +117,7 @@ public class StartCombat extends CombatSubcommandData {
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
-                initializeCombatThread(threadChannel_, activeGame, player1, player2, tile, event, spaceOrGround);
+                initializeCombatThread(threadChannel_, activeGame, player1, player2, tile, event, spaceOrGround, null);
                 return;
             }
         }
@@ -136,10 +136,6 @@ public class StartCombat extends CombatSubcommandData {
             }
             threadChannel.queue(tc -> initializeCombatThread(tc, activeGame, player1, player2, tile, event, spaceOrGround, systemWithContext));
         });
-    }
-
-    private static void initializeCombatThread(ThreadChannel threadChannel, Game activeGame, Player player1, Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        initializeCombatThread(threadChannel, activeGame, player1, player2, tile, event, spaceOrGround, null);
     }
 
     private static void initializeCombatThread(ThreadChannel threadChannel, Game activeGame, Player player1, Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file) {

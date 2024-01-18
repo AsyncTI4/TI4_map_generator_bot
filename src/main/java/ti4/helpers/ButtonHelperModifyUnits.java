@@ -721,10 +721,10 @@ public class ButtonHelperModifyUnits {
                 }
                 String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                 if (!activeGame.isFoWMode()) {
-                    StartCombat.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "ground");
+                    StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "ground");
                 } else {
-                    StartCombat.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "ground");
-                    StartCombat.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "ground");
+                    StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "ground");
+                    StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "ground");
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (player3 == player2 || player3 == player) {
                             continue;
@@ -732,7 +732,7 @@ public class ButtonHelperModifyUnits {
                         if (!tile.getRepresentationForButtons(activeGame, player3).contains("(")) {
                             continue;
                         }
-                        StartCombat.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "ground");
+                        StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "ground");
                     }
                 }
                 if (player2.ownsUnit("keleres_mech") && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) > 0) {
