@@ -939,7 +939,7 @@ public class MapGenerator {
             }
 
             drawPAImage(x + deltaX, y, relicFileName);
-            deltaX += 48;
+            deltaX += 48 + extraAxisOrderWidth;
         }
         return x + deltaX + 20;
     }
