@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -40,6 +41,100 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
 
+
+
+
+
+    public static void resolveCavStep1(Game activeGame, Player player){
+        String msg = player.getRepresentation()+" choose the non-fighter ship you wish to use the cav on";
+        List<Button> buttons = new ArrayList<>();
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+
+        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+            if (!(player.unitBelongsToPlayer(unitEntry.getKey()))) continue;
+
+            UnitKey unitKey = unitEntry.getKey();
+            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            // System.out.println(unitKey.asyncID());
+            int totalUnits = unitEntry.getValue();
+            int damagedUnits = 0;
+
+            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+            }
+            EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
+            if(damagedUnits > 0){
+                String buttonID = "cavStep2_" + unitName + "damaged";
+                String buttonText = "Damaged " + unitKey.unitName();
+                Button validTile2 = Button.danger(buttonID, buttonText);
+                validTile2 = validTile2.withEmoji(emoji);
+                buttons.add(validTile2);
+            }
+            
+            totalUnits = totalUnits - damagedUnits;
+            if(totalUnits > 0){
+                String buttonID =  "cavStep2_" + unitName;
+                String buttonText =  unitKey.unitName();
+                Button validTile2 = Button.danger(buttonID, buttonText);
+                validTile2 = validTile2.withEmoji(emoji);
+                buttons.add(validTile2);
+            }
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+    public static void resolveCavStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String unit = buttonID.split("_")[1];
+        boolean damaged = false;
+        if(unit.contains("damaged")){
+            damaged = true;
+            unit = unit.replace("damaged","");
+        }
+        String msg = player.getFactionEmoji()+" choose a "+unit+" to use the cav on. It has been temporarily replaced with a Cavalry Unit. It will be automatically put back at the end of the tactical action.";
+        activeGame.setCurrentReacts("nomadPNShip",unit);
+        String cav = "cavalry1";
+        if(activeGame.getPNOwner("cavalry").hasTech("m2")){
+            cav = "cavalry2";
+        }
+        event.getMessage().delete().queue();
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+
+        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        player.addOwnedUnitByID(cav);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "cavalry", activeGame);
+        if(damaged){
+            unitHolder.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+            unitHolder.addUnitDamage(Mapper.getUnitKey("cavalry", player.getColorID()),1);
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+    }
+    public static void cleanCavUp(Game activeGame, GenericInteractionCreateEvent event){
+        for(Player player : activeGame.getRealPlayers()){
+            if(player.hasUnit("cavalry1") || player.hasUnit("cavalry2")){
+                String cav = "cavalry1";
+                String unit = activeGame.getFactionsThatReactedToThis("nomadPNShip");
+                if(player.hasUnit("cavalry2")){
+                    cav = "cavalry2";
+                }
+                for(Tile tile : activeGame.getTileMap().values()){
+                    UnitHolder unitHolder = tile.getUnitHolders().get("space");
+                    if(unitHolder.getUnitCount(UnitType.Cavalry, player.getColor()) > 0){
+                        if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(Mapper.getUnitKey("cavalry", player.getColorID())) != null && unitHolder.getUnitDamage().get(Mapper.getUnitKey("cavalry", player.getColorID())) > 0){
+                            unitHolder.addUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+                            unitHolder.removeUnitDamage(Mapper.getUnitKey("cavalry", player.getColorID()),1);
+                        }
+                        new RemoveUnits().unitParsing(event, player.getColor(), tile, "cavalry", activeGame);
+                        new AddUnits().unitParsing(event, player.getColor(), tile, unit, activeGame);
+                        
+                    }
+                }
+                player.removeOwnedUnitByID(cav);
+                activeGame.setCurrentReacts("nomadPNShip","");
+            }
+        }
+    }
     public static boolean doesAnyoneElseHaveJr(Game activeGame, Player player) {
         for (Player p1 : activeGame.getRealPlayers()) {
             if (p1 == player) {

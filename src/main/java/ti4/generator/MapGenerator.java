@@ -3484,6 +3484,9 @@ public class MapGenerator {
                     if (unitKey.getUnitType() == UnitType.Lady) {
                         unitPath = unitPath.replace("lady", "fs");
                     }
+                    if (unitKey.getUnitType() == UnitType.Cavalry) {
+                        unitPath = unitPath.replace("cavalry", "fs");
+                    }
                     if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
                         unitPath = unitPath.replace("plenaryorbital", "sd");
                         String name = "PlenaryNew.png";
@@ -3669,7 +3672,7 @@ public class MapGenerator {
     private static Point getUnitTagLocation(String unitID) {
         return switch (unitID) {
             case "ws" -> new Point(-10, 45); //War Sun
-            case "fs", "lord", "lady", "tyrantslament" -> new Point(10, 55); //Flagship
+            case "fs", "lord", "lady", "tyrantslament","cavalry" -> new Point(10, 55); //Flagship
             case "dn" -> new Point(10, 50); //Dreadnought
             case "ca" -> new Point(0, 40); //Cruiser
             case "cv" -> new Point(0, 40); //Carrier
