@@ -32,6 +32,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private List<TechSpecialtyModel.TechSpecialty> techSpecialties;
     private String legendaryAbilityName;
     private String legendaryAbilityText;
+    private String legendaryAbilityFlavourText;
     private String flavourText;
     private UnitTokenPosition unitPositions;
     private int spaceCannonDieCount;
