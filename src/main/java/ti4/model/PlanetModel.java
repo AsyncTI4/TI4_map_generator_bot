@@ -37,7 +37,6 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonDieCount;
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
-    private String flavorText;
 
     public boolean isValid() {
         return getId() != null
