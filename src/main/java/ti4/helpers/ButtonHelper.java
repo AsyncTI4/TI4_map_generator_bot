@@ -1631,13 +1631,6 @@ public class ButtonHelper {
         return count;
     }
 
-    public static float getTotalResourceValueOfUnits(Player player, Game activeGame) {
-        float count = 0;
-        for (Tile tile : activeGame.getTileMap().values()) {
-            count = count + checkValuesOfUnits(player, activeGame, tile);
-        }
-        return count;
-    }
 
     public static float checkValuesOfUnits(Player player, Game activeGame, Tile tile) {
         float count = 0;
@@ -1654,14 +1647,6 @@ public class ButtonHelper {
                     count = count + removedUnit.getCost() * uh.getUnits().get(unit);
                 }
             }
-        }
-        return Math.round(count * 10) / (float) 10.0;
-    }
-
-    public static float getTotalUnitAbilityValueOfUnits(Player player, Game activeGame) {
-        float count = 0;
-        for (Tile tile : activeGame.getTileMap().values()) {
-            count = count + checkUnitAbilityValuesOfUnits(player, activeGame, tile);
         }
         return Math.round(count * 10) / (float) 10.0;
     }
@@ -1704,14 +1689,6 @@ public class ButtonHelper {
         return Math.round(count * 10) / (float) 10.0;
     }
 
-    public static float getTotalCombatValueOfUnits(Player player, Game activeGame) {
-        float count = 0;
-        for (Tile tile : activeGame.getTileMap().values()) {
-            count = count + checkCombatValuesOfUnits(player, activeGame, tile);
-        }
-        return Math.round(count * 10) / (float) 10.0;
-    }
-
     public static float checkCombatValuesOfUnits(Player player, Game activeGame, Tile tile) {
         float count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
@@ -1735,14 +1712,6 @@ public class ButtonHelper {
             }
         }
         return Math.round(count * 10) / (float) 10.0;
-    }
-
-    public static int getTotalHPValueOfUnits(Player player, Game activeGame) {
-        int count = 0;
-        for (Tile tile : activeGame.getTileMap().values()) {
-            count = count + checkHPOfUnits(player, activeGame, tile);
-        }
-        return count;
     }
 
     public static int checkHPOfUnits(Player player, Game activeGame, Tile tile) {

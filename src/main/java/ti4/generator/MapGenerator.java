@@ -695,6 +695,7 @@ public class MapGenerator {
                 int xDeltaFirstRowFromRightSide = 0;
                 int xDeltaSecondRowFromRightSide = 0;
                 // FIRST ROW RIGHT SIDE
+                xDeltaFirstRowFromRightSide = unitValues(player, xDeltaFirstRowFromRightSide, yPlayArea);
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
 
                 // SECOND ROW RIGHT SIDE
@@ -1267,24 +1268,6 @@ public class MapGenerator {
             if (-5 <= remainingReinforcements){
                 paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
             }
-            
-            UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
-            if (unitHolder != null && unitHolder.getUnits().isEmpty()) {
-                drawPAImage(x-00, y-150, "pa_resources.png");
-                drawPAImage(x+100, y-150, "pa_health.png");
-                drawPAImage(x+200, y-150, "pa_hit.png");
-                drawPAImage(x+300, y-150, "pa_hit.png");
-                drawPAImage(x+300, y-150, "pa_unitimage.png");
-                graphics.setColor(Color.WHITE);
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalResourceValueOfUnits(player, game)), new Rectangle(x -20, y -60, 120, 35), Storage.getFont35());
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalHPValueOfUnits(player, game)), new Rectangle(x +80, y -60, 120, 35), Storage.getFont35());
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalCombatValueOfUnits(player, game)), new Rectangle(x +180, y -60, 120, 35), Storage.getFont35());
-                drawCenteredString(graphics, String.valueOf(ButtonHelper.getTotalUnitAbilityValueOfUnits(player,game)), new Rectangle(x +280, y -60, 120, 35), Storage.getFont35());
-            }
-            
- 
-            
-
         }
         return xDeltaFromRightSide + 450;
     }
@@ -1307,6 +1290,23 @@ public class MapGenerator {
             }
             unitCount.put(unitKey, count);
         }
+    }
+
+    private int unitValues(Player player, int xDeltaFromRightSide, int y) {
+        int x = width - 400 - xDeltaFromRightSide;
+        int imageOffsetFromTop = 10;
+        int textOffsetFromTop = imageOffsetFromTop + 90;
+        drawPAImage(x - 000, y + imageOffsetFromTop, "pa_resources.png");
+        drawPAImage(x + 100, y + imageOffsetFromTop, "pa_health.png");
+        drawPAImage(x + 200, y + imageOffsetFromTop, "pa_hit.png");
+        drawPAImage(x + 300, y + imageOffsetFromTop, "pa_hit.png");
+        drawPAImage(x + 300, y + imageOffsetFromTop, "pa_unitimage.png");
+        graphics.setColor(Color.WHITE);
+        drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits()), new Rectangle(x - 20, y + textOffsetFromTop, 120, 35), Storage.getFont30());
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits()), new Rectangle(x + 80, y + textOffsetFromTop, 120, 35), Storage.getFont30());
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits()), new Rectangle(x + 180, y + textOffsetFromTop, 120, 35), Storage.getFont30());
+        drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()), new Rectangle(x + 280, y + textOffsetFromTop, 120, 35), Storage.getFont30());
+        return xDeltaFromRightSide + 400;
     }
 
     private int nombox(Player player, int xDeltaFromRightSide, int y) {

@@ -2472,4 +2472,40 @@ public class Player {
     public void addTempCombatMod(TemporaryCombatModifierModel mod) {
         tempCombatModifiers.add(mod);
     }
+
+    @JsonIgnore
+    public float getTotalResourceValueOfUnits() {
+        float count = 0;
+        for (Tile tile : getGame().getTileMap().values()) {
+            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile);
+        }
+        return count;
+    }
+
+    @JsonIgnore
+    public int getTotalHPValueOfUnits() {
+        int count = 0;
+        for (Tile tile : getGame().getTileMap().values()) {
+            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile);
+        }
+        return count;
+    }
+
+    @JsonIgnore
+    public float getTotalCombatValueOfUnits() {
+        float count = 0;
+        for (Tile tile : getGame().getTileMap().values()) {
+            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile);
+        }
+        return Math.round(count * 10) / (float) 10.0;
+    }
+
+    @JsonIgnore
+    public float getTotalUnitAbilityValueOfUnits() {
+        float count = 0;
+        for (Tile tile : getGame().getTileMap().values()) {
+            count = count + ButtonHelper.checkUnitAbilityValuesOfUnits(this, getGame(), tile);
+        }
+        return Math.round(count * 10) / (float) 10.0;
+    }
 }
