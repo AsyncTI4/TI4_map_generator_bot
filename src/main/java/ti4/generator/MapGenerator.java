@@ -1293,24 +1293,27 @@ public class MapGenerator {
     }
 
     private int unitValues(Player player, int xDeltaFromRightSide, int y) {
-        int x = width - 400 - xDeltaFromRightSide;
-        int imageOffsetFromTop = 10;
-        int textOffsetFromTop = imageOffsetFromTop + 90;
-        drawPAImage(x - 000, y + imageOffsetFromTop, "pa_resources.png");
-        drawPAImage(x + 100, y + imageOffsetFromTop, "pa_health.png");
-        drawPAImage(x + 200, y + imageOffsetFromTop, "pa_hit.png");
-        drawPAImage(x + 300, y + imageOffsetFromTop, "pa_hit.png");
-        drawPAImage(x + 300, y + imageOffsetFromTop, "pa_unitimage.png");
+        int widthOfSection = 120;
+        int leftSide = width - widthOfSection - xDeltaFromRightSide;
+        int verticalSpacing = 39;
+        int imageSize = verticalSpacing - 2;
+        drawPAImageScaled(leftSide, y + verticalSpacing * 0, "pa_resources.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 1, "pa_health.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_hit.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_unitimage.png", imageSize);
         graphics.setColor(Color.WHITE);
-        drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits()), new Rectangle(x - 20, y + textOffsetFromTop, 120, 35), Storage.getFont30());
-        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits()), new Rectangle(x + 80, y + textOffsetFromTop, 120, 35), Storage.getFont30());
-        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits()), new Rectangle(x + 180, y + textOffsetFromTop, 120, 35), Storage.getFont30());
-        drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()), new Rectangle(x + 280, y + textOffsetFromTop, 120, 35), Storage.getFont30());
-        return xDeltaFromRightSide + 400;
+        leftSide += verticalSpacing + 10;
+        drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()), new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
+        return xDeltaFromRightSide + widthOfSection;
     }
 
     private int nombox(Player player, int xDeltaFromRightSide, int y) {
-        int x = width - 450 - xDeltaFromRightSide;
+        int widthOfNombox = 450;
+        int x = width - widthOfNombox - xDeltaFromRightSide;
         UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
         if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
             return 0;
@@ -1471,7 +1474,7 @@ public class MapGenerator {
                 }
             }
         }
-        return xDeltaFromRightSide + 450;
+        return xDeltaFromRightSide + widthOfNombox;
     }
 
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
@@ -2052,6 +2055,16 @@ public class MapGenerator {
         try {
             String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            // BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
+    private void drawPAImageScaled(int x, int y, String resourceName, int size) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, size, size);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
             // BotLogger.log("Could not display play area: " + resourceName, e);
