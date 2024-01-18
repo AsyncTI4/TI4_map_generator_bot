@@ -78,7 +78,7 @@ public class CombatModHelper {
         }
 
         if (opponent != null && opponent != player
-            && ((player != activeGame.getActivePlayerObject() && opponent == activeGame.getActivePlayerObject()) || player == activeGame.getActivePlayerObject())) {
+            && ((player != activeGame.getActivePlayer() && opponent == activeGame.getActivePlayer()) || player == activeGame.getActivePlayer())) {
             for (String tech : opponent.getTechs()) {
                 Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo("opponent_tech", tech))
@@ -248,12 +248,12 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
-                if (onTile.isNebula() && !game.getActivePlayer().equals(player.getUserID())) {
+                if (onTile.isNebula() && !game.getActivePlayerID().equals(player.getUserID())) {
                     meetsCondition = true;
                 }
             }
             case "vaylerianhero" -> {
-                if (player == game.getActivePlayerObject() && !game.getFactionsThatReactedToThis("vaylerianHeroActive").isEmpty()) {
+                if (player == game.getActivePlayer() && !game.getFactionsThatReactedToThis("vaylerianHeroActive").isEmpty()) {
                     meetsCondition = true;
                 }
             }

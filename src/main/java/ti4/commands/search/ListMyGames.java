@@ -45,7 +45,7 @@ public class ListMyGames extends SearchSubcommandData {
         String userID = user.getId();
 
         Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
-        Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer() != null && m.getActivePlayer().equals(userID) : m -> true;
+        Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayerID() != null && m.getActivePlayerID().equals(userID) : m -> true;
         Predicate<Game> endedGamesFilter = includeEndedGames ? m -> true : m -> !m.isHasEnded() && !m.isFoWMode();
         Predicate<Game> onlyEndedFoWGames = game -> !game.isFoWMode() || game.isHasEnded();
         Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames);
@@ -79,7 +79,7 @@ public class ListMyGames extends SearchSubcommandData {
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
         if (game.getWinner().filter(winner -> winner.getUserID().equals(player.getUserID())).isPresent()) sb.append(" **👑WINNER👑**");
-        if (game.getActivePlayer() != null && game.getActivePlayer().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (showSecondaries) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {

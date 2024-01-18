@@ -38,6 +38,7 @@ import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
+import ti4.commands.combat.StartCombat;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.ds.TrapReveal;
@@ -217,7 +218,7 @@ public class ButtonListener extends ListenerAdapter {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
 
-        if (activeGame != null && activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
+        if (activeGame != null && activeGame.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayerID())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
 
@@ -989,7 +990,7 @@ public class ButtonListener extends ListenerAdapter {
             String groundOrSpace = rest.split("_")[3];
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, pos, event);
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-            List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, pos, p1, p2, groundOrSpace);
+            List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } else if (buttonID.startsWith("getDamageButtons_")) {// "repealLaw_"
             String pos = buttonID.replace("getDamageButtons_", "");
@@ -4343,7 +4344,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
 
                 if (activeGame.getNaaluAgent()) {
-                    player = activeGame.getPlayer(activeGame.getActivePlayer());
+                    player = activeGame.getPlayer(activeGame.getActivePlayerID());
                     activeGame.setNaaluAgent(false);
                 }
                 activeGame.setCurrentReacts("tnelisCommanderTracker", "");

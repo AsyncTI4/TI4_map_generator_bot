@@ -20,7 +20,7 @@ public class PingActivePlayer extends FOWSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-        String playerID = activeGame.getActivePlayer();
+        String playerID = activeGame.getActivePlayerID();
         if (playerID == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;

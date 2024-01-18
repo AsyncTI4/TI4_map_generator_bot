@@ -341,7 +341,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge")
+                if (((activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge")
                     && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
@@ -351,7 +351,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                 }
 
-                if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+                if (((activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
                     && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Button.success("saarMechRes_" + "mirage", "Pay 1tg for mech on " + Helper.getPlanetRepresentation("mirage", activeGame)));

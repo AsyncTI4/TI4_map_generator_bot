@@ -107,7 +107,7 @@ public class Swap extends GameSubcommandData {
             player.setUserName(addedUser.getName());
             player.setUserID(addedUser.getId());
 
-            if (activeGame.getActivePlayer() != null && activeGame.getActivePlayer().equalsIgnoreCase(player.getUserID())) {
+            if (activeGame.getActivePlayerID() != null && activeGame.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
                 if (!activeGame.isFoWMode()) {
                     try {
                         if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {

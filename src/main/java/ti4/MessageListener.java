@@ -194,7 +194,7 @@ public class MessageListener extends ListenerAdapter {
                     continue;
                 }
                 long spacer = activeGame.getAutoPingSpacer();
-                String playerID = activeGame.getActivePlayer();
+                String playerID = activeGame.getActivePlayerID();
                 Player player = null;
                 if (playerID != null) {
                     player = activeGame.getPlayer(playerID);

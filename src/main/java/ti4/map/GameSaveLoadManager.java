@@ -320,7 +320,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.SPEAKER + " " + activeGame.getSpeaker());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.ACTIVE_PLAYER + " " + activeGame.getActivePlayer());
+        writer.write(Constants.ACTIVE_PLAYER + " " + activeGame.getActivePlayerID());
         writer.write(System.lineSeparator());
         writer.write(Constants.ACTIVE_SYSTEM + " " + activeGame.getActiveSystem());
         writer.write(System.lineSeparator());
