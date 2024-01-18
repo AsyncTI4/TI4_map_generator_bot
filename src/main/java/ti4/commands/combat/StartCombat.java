@@ -143,39 +143,35 @@ public class StartCombat extends CombatSubcommandData {
         message.append(player1.getRepresentation(true, true));
         if (!activeGame.isFoWMode()) message.append(player2.getRepresentation());
 
-        message.append(" Please resolve the interaction here.\n");
-        switch (spaceOrGround) {
-            case "space" -> message.append(getSpaceCombatIntroMessage());
-            case "ground" -> message.append(getGroundCombatIntroMessage());
-        }
+        boolean isSpaceCombat = "space".equalsIgnoreCase(spaceOrGround);
+        boolean isGroundCombat = "ground".equalsIgnoreCase(spaceOrGround);
 
+        message.append(" Please resolve the interaction here.\n");
+        if (isSpaceCombat) message.append(getSpaceCombatIntroMessage());
+        if (isGroundCombat) message.append(getGroundCombatIntroMessage());
+
+        // PDS2 Context
         int context = getTileImageContextForPDS2(activeGame, player1, tile, spaceOrGround);
-        FileUpload systemWithContext;
         if (file == null) {
-            systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, player1);
-        } else {
-            systemWithContext = file;
+            file = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, player1);
         }
 
         message.append("\nImage of System:");
-        MessageHelper.sendMessageWithFile(threadChannel, systemWithContext, message.toString(), false);
+        MessageHelper.sendMessageWithFile(threadChannel, file, message.toString(), false);
 
     
         // Space Cannon Offense
-        if ("space".equalsIgnoreCase(spaceOrGround)) {
+        if (isSpaceCombat) {
             sendSpaceCannonButtonsToThread(threadChannel, activeGame, player1, tile);
+        }
+
+        // Start of Space Combat Buttons
+        if (isSpaceCombat) {
+            sendStartOfSpaceCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile);
         }
 
         // AFB
         sendAFBButtonsToThread(event, threadChannel, activeGame, ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
-
-        // Start of Space Combat Buttons
-        if ("space".equalsIgnoreCase(spaceOrGround)) {
-            List<Button> startOfSpaceCombatButtons = getStartOfSpaceCombatButtons(activeGame, player1, player2, tile);
-            if (!startOfSpaceCombatButtons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Start of Space Combat:", startOfSpaceCombatButtons);
-            }
-        }
 
         // General Space Combat
         sendGeneralCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile, spaceOrGround);
@@ -185,18 +181,6 @@ public class StartCombat extends CombatSubcommandData {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from ATS Armaments:", lanefirATSButtons);
         }
-    }
-
-    private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game activeGame, List<Player> combatPlayers, Tile tile) {
-        boolean thereAreAFBUnits = false;
-        for (Player player : combatPlayers) {
-            if (!CombatHelper.GetUnitsInAFB(tile, player, event).isEmpty()) thereAreAFBUnits = true;
-        }
-        if (!thereAreAFBUnits) return;
-        
-        List<Button> afbButtons = new ArrayList<>();
-        afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
-        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
     }
 
     private static void sendSpaceCannonButtonsToThread(ThreadChannel threadChannel, Game activeGame, Player activePlayer, Tile tile) {
@@ -214,6 +198,28 @@ public class StartCombat extends CombatSubcommandData {
         pdsMessage.append("Buttons for Space Cannon Offence:");
         List<Button> spaceCannonButtons = getSpaceCannonButtons(activeGame, activePlayer, tile);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
+    }
+
+    private static void sendStartOfSpaceCombatButtonsToThread(ThreadChannel threadChannel, Game activeGame, Player player1, Player player2, Tile tile) {
+        List<Button> startOfSpaceCombatButtons = getStartOfSpaceCombatButtons(activeGame, player1, player2, tile);
+        if (!startOfSpaceCombatButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Start of Space Combat:",
+                    startOfSpaceCombatButtons);
+        }
+    }
+
+    private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game activeGame, List<Player> combatPlayers, Tile tile) {
+        boolean thereAreAFBUnits = false;
+        for (Player player : combatPlayers) {
+            if (!CombatHelper.GetUnitsInAFB(tile, player, event).isEmpty())
+                thereAreAFBUnits = true;
+        }
+        if (!thereAreAFBUnits)
+            return;
+
+        List<Button> afbButtons = new ArrayList<>();
+        afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
+        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
     }
 
     private static List<Button> getSpaceCannonButtons(Game activeGame, Player activePlayer, Tile tile) {
@@ -259,18 +265,18 @@ public class StartCombat extends CombatSubcommandData {
         return buttons;
     }
 
+    /**
+     * # of extra rings to show around the tile image
+     * @return 0 if no PDS2 nearby, 1 if PDS2 is nearby
+     */
     private static int getTileImageContextForPDS2(Game activeGame, Player player1, Tile tile, String spaceOrGround) {
-        List<Player> playersWithPds2;
         if (activeGame.isFoWMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
-            playersWithPds2 = new ArrayList<>();
-        } else {
-            playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player1, activeGame, tile.getPosition());
+            return 0;
+        }     
+        if (!ButtonHelper.tileHasPDS2Cover(player1, activeGame, tile.getPosition()).isEmpty()) {
+            return 1;
         }
-        int context = 0;
-        if (playersWithPds2.size() > 0) {
-            context = 1;
-        }
-        return context;
+        return 0;
     }
 
     private static void sendGeneralCombatButtonsToThread(ThreadChannel threadChannel, Game activeGame, Player player1, Player player2, Tile tile, String spaceOrGround) {
