@@ -133,21 +133,10 @@ public class CombatHelper {
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-            for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
-                Integer existingCount = 0;
-                if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
-                    existingCount = unitsByAsyncId.get(unitEntry.getKey());
-                }
-                unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
-            }
+            getUnitsOnHolderByAsyncId(colorID, unitsByAsyncId, unitHolder);
         }
 
-        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-            entry -> new ImmutablePair<>(
-                player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                entry.getValue()))
-            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
             .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
@@ -157,25 +146,33 @@ public class CombatHelper {
         return output;
     }
 
+    private static Map<UnitModel, Integer> getUnitsInCombat(Player player, Map<String, Integer> unitsByAsyncId) {
+        return unitsByAsyncId.entrySet().stream().map(
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+    }
+
+    private static void getUnitsOnHolderByAsyncId(String colorID, Map<String, Integer> unitsByAsyncId, UnitHolder unitHolder) {
+        Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+            Integer existingCount = 0;
+            if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
+                existingCount = unitsByAsyncId.get(unitEntry.getKey());
+            }
+            unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
+        }
+    }
+
     public static Map<UnitModel, Integer> GetUnitsInBombardment(Tile tile, Player player,
         GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-            for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
-                Integer existingCount = 0;
-                if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
-                    existingCount = unitsByAsyncId.get(unitEntry.getKey());
-                }
-                unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
-            }
+            getUnitsOnHolderByAsyncId(colorID, unitsByAsyncId, unitHolder);
         }
-        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-            entry -> new ImmutablePair<>(
-                player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                entry.getValue()))
-            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
             .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
@@ -241,14 +238,7 @@ public class CombatHelper {
 
         Collection<UnitHolder> unitHolders = tile.getUnitHolders().values();
         for (UnitHolder unitHolder : unitHolders) {
-            Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-            for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
-                Integer existingCount = 0;
-                if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
-                    existingCount = unitsByAsyncId.get(unitEntry.getKey());
-                }
-                unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
-            }
+            getUnitsOnHolderByAsyncId(colorID, unitsByAsyncId, unitHolder);
         }
 
         Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
@@ -259,14 +249,7 @@ public class CombatHelper {
             }
             Tile adjTile = activeGame.getTileByPosition(adjacentTilePosition);
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-                for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
-                    Integer existingCount = 0;
-                    if (adjacentUnitsByAsyncId.containsKey(unitEntry.getKey())) {
-                        existingCount = adjacentUnitsByAsyncId.get(unitEntry.getKey());
-                    }
-                    adjacentUnitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
-                }
+                getUnitsOnHolderByAsyncId(colorID, adjacentUnitsByAsyncId, unitHolder);
             }
         }
 
@@ -358,7 +341,7 @@ public class CombatHelper {
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
-                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
+                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayerID()))
                 .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();

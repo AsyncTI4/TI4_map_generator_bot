@@ -1080,11 +1080,12 @@ public class Game {
         hasHackElectionBeenPlayed = hack;
     }
 
-    public String getActivePlayer() {
+    public String getActivePlayerID() {
         return activePlayer;
     }
 
-    public Player getActivePlayerObject() {
+    @JsonIgnore
+    public Player getActivePlayer() {
         return getPlayer(activePlayer);
     }
 

@@ -149,7 +149,7 @@ public class Helper {
             && activeGame.getDiscardActionCards().containsKey("sabo4")) {
             return false;
         }
-        if (player.hasTech("tp") && activeGame.getActivePlayer() != null && activeGame.getActivePlayer().equalsIgnoreCase(player.getUserID())) {
+        if (player.hasTech("tp") && activeGame.getActivePlayerID() != null && activeGame.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
             for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
