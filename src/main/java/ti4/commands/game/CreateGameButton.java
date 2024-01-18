@@ -38,10 +38,6 @@ public class CreateGameButton extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
         String gameName = CreateGameChannels.getNextGameName();
-        if ("pbd2000".equals(gameName)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No more games can be created. Please contact @Developer to resolve."); // See comments in getAllExistingPBDNumbers
-            return;
-        }
 
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);
@@ -129,10 +125,7 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         String gameName = CreateGameChannels.getNextGameName();
-        if ("pbd2000".equals(gameName)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No more games can be created. Please contact @Developer to resolve."); // See comments in getAllExistingPBDNumbers
-            return;
-        }
+        
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
