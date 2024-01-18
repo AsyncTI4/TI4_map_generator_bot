@@ -319,6 +319,10 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
 		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
 		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
+		sb.append("> Total Resource Value of Units: ").append(Emojis.resources).append("`").append(player.getTotalResourceValueOfUnits()).append("`\n");
+		sb.append("> Total Hit-point Value of Units: ").append(Emojis.PinkHeart).append("`").append(player.getTotalHPValueOfUnits()).append("`\n");
+		sb.append("> Total Combat Value of Units: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits()).append("`\n");
+		sb.append("> Total Unit Ability Value of Units: ").append(Emojis.UnitUpgradeTech).append("`").append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 		Guild guild = activeGame.getGuild();
 		if (guild != null && activeGame.isFrankenGame() && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {

@@ -671,6 +671,7 @@ public class Emojis {
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
+    public static final String PinkHeart = "<:PinkHeart:1197584926359425145>";
 
     // SOURCE ICONS
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
