@@ -59,7 +59,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && name != null
             && asyncId != null
             && source != null
-            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament", "lady").contains(getAsyncId())
+            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament", "lady", "cavalry").contains(getAsyncId())
             // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
             // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
             // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))

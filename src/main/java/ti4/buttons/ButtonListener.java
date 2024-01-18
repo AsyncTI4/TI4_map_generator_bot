@@ -1290,6 +1290,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveDiploPrimary(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("doneWithOneSystem_")) {
             ButtonHelperTacticalAction.finishMovingFromOneTile(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("cavStep2_")) {
+            ButtonHelperFactionSpecific.resolveCavStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("resolveAgendaVote_")) {
             AgendaHelper.resolvingAnAgendaVote(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("bombardConfirm_")) {
@@ -4299,6 +4301,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             if (buttonID.contains("tacticalAction")) {
                 ButtonHelper.exploreDET(player, activeGame, event);
+                ButtonHelperFactionSpecific.cleanCavUp(activeGame, event);
                 if (player.hasAbility("cunning")) {
                     List<Button> trapButtons = new ArrayList<>();
                     for (UnitHolder uH : activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().values()) {
@@ -4480,9 +4483,18 @@ public class ButtonListener extends ListenerAdapter {
                     msg.delete().queue();
                 } else if (activeGame.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
-                    ;
+                    
                 } else {
-                    msg.reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+                    String msg2 = "All players have indicated 'No Sabotage'";
+                    if (activeGame.getMessageIDsForSabo().contains(messageId)) {
+                        String faction = "bob"+activeGame.getFactionsThatReactedToThis(messageId);
+                        faction = faction.split("_")[1];
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+                        if(p2 != null && !activeGame.isFoWMode()){
+                            msg2 = p2.getRepresentation()+" "+msg2;
+                        }
+                    }
+                    msg.reply(msg2).queueAfter(1, TimeUnit.SECONDS);
                 }
             });
 
@@ -4556,10 +4568,19 @@ public class ButtonListener extends ListenerAdapter {
 
             }
             case "no_sabotage" -> {
-                event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+                String msg = "All players have indicated 'No Sabotage'";
                 if (activeGame.getMessageIDsForSabo().contains(event.getMessageId())) {
+                    String faction = activeGame.getFactionsThatReactedToThis(event.getMessageId());
+                    System.err.println(faction);
+                    faction = faction.split("_")[0];
+                    Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+                    if(p2 != null && !activeGame.isFoWMode()){
+                        msg = p2.getRepresentation()+" "+msg;
+                    }
                     activeGame.removeMessageIDForSabo(event.getMessageId());
                 }
+                event.getInteraction().getMessage().reply(msg).queueAfter(1, TimeUnit.SECONDS);
+                
             }
 
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {

@@ -254,6 +254,7 @@ public class ButtonHelperTacticalAction {
     public static void concludeTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (!activeGame.getL1Hero()) {
             ButtonHelper.exploreDET(player, activeGame, event);
+            ButtonHelperFactionSpecific.cleanCavUp(activeGame, event);
             if (player.hasAbility("cunning")) {
                 List<Button> trapButtons = new ArrayList<>();
                 for (UnitHolder uH : activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().values()) {
