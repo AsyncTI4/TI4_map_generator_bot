@@ -923,16 +923,17 @@ public class MapGenerator {
 
         List<String> exhaustedRelics = player.getExhaustedRelics();
         for (String relicID : player.getRelics()) {
-
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
             } else {
                 graphics.setColor(Color.WHITE);
             }
-            String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
-            String relicFileName = "pa_relics_" + relicID + statusOfPlanet + ".png";
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            String relicStatus = isExhausted ? "_exh" : "_rdy";
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
+
+            int extraAxisOrderWidth = relicID.contains("axisorder") ? 0 : 10;
+            graphics.drawRect(x + deltaX - 2, y - 2, 44 + extraAxisOrderWidth, 152);
             if (!relicID.contains("axisorder")) {
                 drawPAImage(x + deltaX, y, "pa_relics_icon.png");
             }
