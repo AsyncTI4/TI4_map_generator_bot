@@ -63,10 +63,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
             gameName = gameNameOption.getAsString();
         } else {
             gameName = getNextGameName();
-            if ("pbd2000".equals(gameName)) {
-                sendMessage("No more games can be created. Please contact @Developer to resolve."); // See comments in getAllExistingPBDNumbers
-                return;
-            }
         }
         if (gameOrRoleAlreadyExists(gameName)) {
             sendMessage("Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
@@ -345,9 +341,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             //EXISTING ROLE NAMES
             for (Role role : pbdRoles) {
                 String pbdNum = role.getName().replace("pbd", "");
-                if (Helper.isInteger(pbdNum)
-                && Integer.parseInt(pbdNum) < 2000) // REMOVE AFTER pbd1999 GETS CREATED
-                {
+                if (Helper.isInteger(pbdNum)) {
                     pbdNumbers.add(Integer.parseInt(pbdNum));
                 }
             }
@@ -359,9 +353,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .toList();
         for (String mapName : mapNames) {
             String pbdNum = mapName.replace("pbd", "");
-            if (Helper.isInteger(pbdNum)
-                 && Integer.parseInt(pbdNum) < 2000) // REMOVE AFTER pbd1999 GETS CREATED
-            {
+            if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }
