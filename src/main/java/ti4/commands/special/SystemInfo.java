@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.commands.combat.StartCombatThread;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -162,7 +163,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         if (player2 == player) {
                             player2 = players.get(1);
                         }
-                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "space");
+                        List<Button> buttons = StartCombatThread.getGeneralCombatButtons(activeGame, tile.getPosition(), player, player2, "space");
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                         return;
                     } else {
@@ -170,7 +171,7 @@ public class SystemInfo extends SpecialSubcommandData {
                             if (unitHolder instanceof Planet) {
                                 if (ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName()).size() > 1) {
                                     List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName());
-                                    List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), listP.get(0), listP.get(1), "ground");
+                                    List<Button> buttons = StartCombatThread.getGeneralCombatButtons(activeGame, tile.getPosition(), listP.get(0), listP.get(1), "ground");
                                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                                     return;
                                 }

@@ -1151,7 +1151,7 @@ public class ButtonHelperHeroes {
                                     int context = 0;
                                     FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
                                     MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext, "Picture of system", false);
-                                    List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "ground");
+                                    List<Button> buttons = StartCombatThread.getGeneralCombatButtons(activeGame, tile.getPosition(), player, player2, "ground");
                                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                                 }
                             }

@@ -24,28 +24,22 @@ import ti4.model.UnitModel;
 
 public class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
+        if (dupes.isEmpty()) return;
         // Gracefully fail when units don't exist
         StringBuilder error = new StringBuilder();
-        if (dupes.size() > 0) {
-            error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-            error.append("> Duplicate units: ").append(dupes);
-        }
-        if (dupes.size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
+        error.append("You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+        error.append("> Duplicate units: ").append(dupes);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
     }
+
     public static void displayMissingUnits(GenericInteractionCreateEvent event, List<String> missing) {
+        if (missing.isEmpty()) return;
         // Gracefully fail when units don't exist
         StringBuilder error = new StringBuilder();
-        if (missing.size() > 0) {
-            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(missing).append("\n");
-        }
-        if (missing.size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
+        error.append("You do not seem to own any of the following unit types, so they will be skipped.");
+        error.append(" Ping bothelper if this seems to be in error.\n");
+        error.append("> Unowned units: ").append(missing).append("\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
     }
 
     public static String displayUnitRoll(UnitModel unit, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit){
