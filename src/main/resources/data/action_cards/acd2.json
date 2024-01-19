@@ -49,7 +49,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may exhaust that planet and purge that relic fragment to gain 1 relic.",
+    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 4 resources and purge that relic fragment to gain 1 relic.",
     "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -139,7 +139,7 @@
     "name": "Concise Legal Text",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Players cannot resolve abilities other than those of this agenda until after this agenda has been resolved.",
+    "text": "Players cannot resolve abilities, other than those of this agenda, until after this agenda has been resolved.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
   },
@@ -158,6 +158,24 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player who voted for the resolved outcome gain 2 trade goods.",
+    "flavorText": "As he signed the last of the trade deals, Mot sank into his chair. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "corporate_lobbying",
+    "name": "Corporate Lobbying",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player who voted for the resolved outcome gain 2 trade goods.",
+    "flavorText": "As he signed the last of the trade deals, Mot sank into his chair. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "corruption",
+    "name": "Corruption",
+    "phase": "Status",
+    "window": "After the speaker reveals a public objective",
+    "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
     "flavorText": "As he signed the last of the trade deals, Mot sank into his chair. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },
@@ -193,7 +211,7 @@
     "name": "Defectors",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that contains 1 or 2 of another player's ships that do not have a capacity value. Spend trade goods equal to the combined cost of those ships to replace those ships with matching ships from your reinforcements.",
+    "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend trade goods equal to the combined cost of those ships to replace them with matching ships from your reinforcements.",
     "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative choked on her words. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
@@ -283,7 +301,7 @@
     "name": "Efficiency Initiative",
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
-    "text": "Reduce the total PRODUCTION value of those units by up to 4 to reduce the combined cost of the produced units by an equal amount. Then, gain 2 trade goods. [Note: These trade goods are available to be spent during this production.]",
+    "text": "Reduce the total PRODUCTION value of those units by up to 2 to reduce the combined cost of the produced units by an equal amount. Then, gain 2 trade goods. [Note: These trade goods are available to be spent during this production.]",
     "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11%. With a little work, he was sure he could increase efficiency by another 4%.",
     "source": "action_deck_2"
   },
@@ -445,7 +463,7 @@
     "name": "Miraculous Escape",
     "phase": "Any",
     "window": "When 1 of your non-fighter ships would be destroyed",
-    "text": "That ship is not destroyed. That ship becomes damaged, if able.",
+    "text": "That ship is not destroyed.",
     "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
     "source": "action_deck_2"
   },
@@ -481,8 +499,8 @@
     "name": "Propaganda",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex. Then, place a number of infantry on each of those planets equal to their influence value.",
-    "flavorText": "Sara, Blake, and Nolad stepped in front of the camera with a salute. \"They're doing their part. Are you? Join the Mobile Infantry and save the universe. Service guarantees citizenship.\"",
+    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry on each of those planets equal to their influence value.",
+    "flavorText": "The Federation anthem accompanied Sara, Blake, and Nolad on the screen. \"They're doing their part. Are you? Join the Mobile Legion and save the galaxy. Service guarantees citizenship.\"",
     "source": "action_deck_2"
   },
   {
@@ -591,15 +609,6 @@
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
     "flavorText": "Berekar passionately discussed the Keleres' technological inferiority with Qanoj. Though he argue their inferiority presented a peril to the galaxy, in truth, of course, he could not care less.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "sensor_jam",
-    "name": "Sensor Jam",
-    "phase": "Action",
-    "window": "At the start of a space combat",
-    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
-    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
   {
@@ -715,7 +724,7 @@
     "name": "Terraforming Initiative",
     "phase": "Action",
     "window": "Action",
-    "text": "Ready up to 2 hazardous planets that any player controls.",
+    "text": "Ready 1 or 2 hazardous planets that any players control.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected. Not what he'd wanted. But it had to be done. There would be time for fighting later.",
     "source": "action_deck_2"
   },
@@ -733,7 +742,7 @@
     "name": "Tomb Raiders",
     "phase": "Action",
     "window": "Action",
-    "text": "For each exploration deck, look at the top card of that deck; you may either gain that card, if it is a relic fragment, or gain 1 commodity.",
+    "text": "For each exploration deck, look at the top card of that deck; either gain that card, if it is a relic fragment, or gain 1 commodity.",
     "flavorText": "As her hostages hurled insults, S'Ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
     "source": "action_deck_2"
   },
