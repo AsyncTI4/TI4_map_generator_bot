@@ -75,7 +75,7 @@ public final class GameStatisticFilterer {
   }
 
   private static boolean filterAbortedGames(Game game) {
-    return game.isHasEnded() && game.getWinner().isEmpty();
+    return !game.isHasEnded() || game.getWinner().isPresent();
   }
 
   private static boolean filterOnHomebrew(SlashCommandInteractionEvent event, Game game) {
