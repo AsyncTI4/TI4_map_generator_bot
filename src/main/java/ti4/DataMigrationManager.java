@@ -679,9 +679,7 @@ public class DataMigrationManager {
             return false;
         }
         Map<String, String> replacements = new HashMap<>();
-        replacements.put("border_skirmish", "smuggler_routes_acd2");
-        replacements.put("firing_solution_", "continuous_barrage");
-        replacements.put("grand_operation", "rendezvous_point");
+        replacements.put("sensor_jam", "corruption");
         List<String> decksToCheck = List.of("action_deck_2");
         return replaceActionCards(game, decksToCheck, replacements);
     }
