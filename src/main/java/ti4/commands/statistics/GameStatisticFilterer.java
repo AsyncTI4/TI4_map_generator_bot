@@ -20,6 +20,7 @@ public final class GameStatisticFilterer {
 
   public static List<Game> getFilteredGames(SlashCommandInteractionEvent event) {
     return GameManager.getInstance().getGameNameToGame().values().stream()
+        .filter(GameStatisticFilterer::filterAbortedGames)
         .filter(game -> filterOnPlayerCount(event, game))
         .filter(game -> filterOnVictoryPointGoal(event, game))
         .filter(game -> filterOnGameType(event, game))
@@ -71,6 +72,10 @@ public final class GameStatisticFilterer {
   private static boolean filterOnHasWinner(SlashCommandInteractionEvent event, Game game) {
     Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
     return hasWinnerFilter == null || (hasWinnerFilter && game.getWinner().isPresent()) || (!hasWinnerFilter && game.getWinner().isEmpty());
+  }
+
+  private static boolean filterAbortedGames(Game game) {
+    return !game.isHasEnded() || game.getWinner().isPresent();
   }
 
   private static boolean filterOnHomebrew(SlashCommandInteractionEvent event, Game game) {
