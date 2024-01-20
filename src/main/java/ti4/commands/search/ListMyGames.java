@@ -29,6 +29,7 @@ public class ListMyGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GAME_MODES, "True to the game's set modes (default = false)"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to Show"));
         addOptions(new OptionData(OptionType.BOOLEAN, "ignore_spectate", "Do not show games you are spectating (default = true)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "ignore_aborted", "Do not show games that have ended without a winner (default = true)"));
     }
 
     @Override
@@ -39,15 +40,17 @@ public class ListMyGames extends SearchSubcommandData {
         boolean showSecondaries = event.getOption(Constants.SHOW_SECONDARIES, false, OptionMapping::getAsBoolean);
         boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, false, OptionMapping::getAsBoolean);
         boolean ignoreSpectate = event.getOption("ignore_spectate", true, OptionMapping::getAsBoolean);
+        boolean ignoreAborted = event.getOption("ignore_aborted", true, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
 
         String userID = user.getId();
 
         Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
-        Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayerID() != null && m.getActivePlayerID().equals(userID) : m -> true;
-        Predicate<Game> endedGamesFilter = includeEndedGames ? m -> true : m -> !m.isHasEnded() && !m.isFoWMode();
+        Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? game -> game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) : game -> true;
+        Predicate<Game> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFoWMode();
         Predicate<Game> onlyEndedFoWGames = game -> !game.isFoWMode() || game.isHasEnded();
+        Predicate<Game> ignoreAbortedFilter = ignoreAborted ? game -> !game.isHasEnded() || game.getWinner().isPresent() : game -> true;
         Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames);
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
