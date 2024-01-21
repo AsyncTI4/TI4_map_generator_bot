@@ -397,7 +397,7 @@ public class GameStats extends StatisticsSubcommandData {
                 PublicObjectiveModel po = Mapper.getPublicObjective(poID);
                 if (po == null) {
                     int frequency = Collections.frequency(scoredPOEntry.getValue(), userId);
-                    otherVictoryPoints.put(poID, frequency);
+                    otherVictoryPoints.put(normalizeOtherVictoryPoints(poID), frequency);
                 }
             }
         }
@@ -405,6 +405,28 @@ public class GameStats extends StatisticsSubcommandData {
             .sorted(Comparator.reverseOrder())
             .map(key -> otherVictoryPoints.get(key) + " " + key)
             .collect(Collectors.joining(", "));
+    }
+
+    private static String normalizeOtherVictoryPoints(String otherVictoryPoint) {
+        otherVictoryPoint = otherVictoryPoint.toLowerCase().replaceAll("[^a-z]", "");
+        if (otherVictoryPoint.contains("seed")) {
+            otherVictoryPoint = "seed";
+        } else if (otherVictoryPoint.contains("mutiny")) {
+            otherVictoryPoint = "mutiny";
+        } else if (otherVictoryPoint.contains("shard")) {
+            otherVictoryPoint = "shard";
+        } else if (otherVictoryPoint.contains("custodian")) {
+            otherVictoryPoint = "custodian/imperial";
+        } else if (otherVictoryPoint.contains("imperial")) {
+            otherVictoryPoint = "imperial rider";
+        } else if (otherVictoryPoint.contains("censure")) {
+            otherVictoryPoint = "censure";
+        } else if (otherVictoryPoint.contains("crown") || otherVictoryPoint.contains("emph")) {
+            otherVictoryPoint = "crown";
+        } else {
+            otherVictoryPoint = "other (probably Classified Document Leaks)";
+        }
+        return otherVictoryPoint;
     }
 
 }
