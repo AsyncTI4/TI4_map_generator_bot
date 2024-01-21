@@ -5,7 +5,7 @@
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
     "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
-    "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
+    "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
   {
@@ -127,7 +127,7 @@
   },
   {
     "alias": "collaborative_planning",
-    "name": "Collaborative Planning",
+    "name": "Collaboration",
     "phase": "Action",
     "window": "After another player performs an action",
     "text": "That player must perform an additional action this turn or pass.",
@@ -176,7 +176,7 @@
     "phase": "Status",
     "window": "After the speaker reveals a public objective",
     "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
-    "flavorText": "As he signed the last of the trade deals, Mot sank into his chair. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
+    "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
     "source": "action_deck_2"
   },
   {
@@ -211,7 +211,7 @@
     "name": "Defectors",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend trade goods equal to the combined cost of those ships to replace them with matching ships from your reinforcements.",
+    "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend trade goods equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
     "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative choked on her words. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
@@ -356,7 +356,7 @@
     "phase": "Action",
     "window": "At the start of the second round of a ground combat on another player's non-home planet",
     "text": "Place 2 infantry from your reinforcements on that planet.",
-    "flavorText": "Harrugh had brought them supplies, lived among them, honored their traditions, and filled them with hope. On the day that was promised, they would repay him with their determination for liberation.",
+    "flavorText": "Harrugh had brought them supplies, lived among them, honored their traditions, and filled them with hope. On the promised day, they would repay him with their determination for liberation.",
     "source": "action_deck_2"
   },
   {
@@ -370,16 +370,16 @@
   },
   {
     "alias": "garner_tribute",
-    "name": "Garnered Tribute",
+    "name": "Tributes",
     "phase": "Action",
     "window": "Action",
     "text": "Gain trade goods equal to the influence value of 1 planet you control.",
-    "flavorText": "Berekar's forte was in leveraging prestige towards economic goals.",
+    "flavorText": "Berekar excelled at using prestige to achieve economic goals. The worlds governed by his people became lavishly rich through tourism, driven by their impressive collection of Lazax artifacts.",
     "source": "action_deck_2"
   },
   {
     "alias": "grand_heist",
-    "name": "Grand Heist",
+    "name": "Heist",
     "phase": "Action",
     "window": "After you gain control of a planet that was controlled by another player",
     "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
@@ -509,7 +509,7 @@
     "phase": "Any",
     "window": "After a die is rolled",
     "text": "Apply +3 or -3 to the result of that roll.",
-    "flavorText": "\"Well, I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
+    "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
     "source": "action_deck_2"
   },
   {
@@ -626,7 +626,7 @@
     "phase": "Action",
     "window": "At the start of a space combat",
     "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x2) until the end of the combat.",
-    "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. If we get it movin' fast enough, it'll shred them up just fine.\"",
+    "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. If we get it movin' fast enough, it'll shred 'em up just fine.\"",
     "source": "action_deck_2"
   },
   {
@@ -635,7 +635,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Spend 2 influence or resources to research a technology that has no prerequisites.",
-    "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
+    "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
     "source": "action_deck_2"
   },
   {
@@ -653,7 +653,7 @@
     "phase": "Any",
     "window": "After 1 of your ships is destroyed",
     "text": "Produce a matching unit in your home system; reduce the cost of that unit by half, rounded up.",
-    "flavorText": "The production of the Van Hauge XVIII had finished in record time. As it left the docking bay, Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
+    "flavorText": "The production of the Van Hauge VI had finished in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
   {
@@ -716,7 +716,7 @@
     "phase": "Any",
     "window": "When or after you research a technology",
     "text": "Ready each of your planets that have a technology specialty.",
-    "flavorText": "The conference erupted in cheers as Doctor Sucaban announced their findings. Countless sacrifices were made to reach these results, but the vast applications made it hard to feel regret.",
+    "flavorText": "The conference erupted in cheers as Doctor Sucaban announced their findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
     "source": "action_deck_2"
   },
   {
@@ -725,12 +725,12 @@
     "phase": "Action",
     "window": "Action",
     "text": "Ready 1 or 2 hazardous planets that any players control.",
-    "flavorText": "Captain Agerro sighed. The work was not what he had expected. Not what he'd wanted. But it had to be done. There would be time for fighting later.",
+    "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
     "source": "action_deck_2"
   },
   {
     "alias": "timely_reinforcements",
-    "name": "Timely Reinforcements",
+    "name": "Reinforcements",
     "phase": "Action",
     "window": "At the start of the second round of a space combat",
     "text": "Place 2 fighters from your reinforcements into the active system.",
