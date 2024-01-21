@@ -69,6 +69,7 @@ public class GameStats extends StatisticsSubcommandData {
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
             case WINNING_PATH -> showWinningPath(event);
+            case SUPPORT_WIN_COUNT -> showWinsWithSupport(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
@@ -88,6 +89,7 @@ public class GameStats extends StatisticsSubcommandData {
         FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
+        SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"),
         GAME_COUNT("Total game count", "Shows the total game count");
     
         private final String name;
@@ -370,7 +372,7 @@ public class GameStats extends StatisticsSubcommandData {
                     .append(entry.getKey())
                     .append("\n")
             );
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Paths", sb.toString());
     }
 
     private static int getPublicVictoryPoints(Game game, String userId, int stage) {
@@ -427,6 +429,37 @@ public class GameStats extends StatisticsSubcommandData {
             otherVictoryPoint = "other (probably Classified Document Leaks)";
         }
         return otherVictoryPoint;
+    }
+
+    public static void showWinsWithSupport(SlashCommandInteractionEvent event) {
+        Map<Integer, Integer> supportWinCount = new HashMap<>();
+        AtomicInteger gameWithWinnerCount = new AtomicInteger();
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        for (Game game : filteredGames) {
+            game.getWinner().ifPresent(winner -> {
+                gameWithWinnerCount.getAndIncrement();
+                int supportCount = winner.getSupportForTheThroneVictoryPoints();
+                supportWinCount.put(supportCount,
+                    1 + supportWinCount.getOrDefault(supportCount, 0));
+            });
+        }
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Winning Paths With SftT Count:**__").append("\n");
+        supportWinCount.entrySet().stream()
+            .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
+            .forEach(entry ->
+                sb.append(atomicInteger.getAndIncrement() + 1)
+                    .append(". `")
+                    .append(entry.getValue().toString())
+                    .append(" (")
+                    .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
+                    .append("%)` ")
+                    .append(entry.getKey())
+                    .append(" SftT wins")
+                    .append("\n")
+            );
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "SftT wins", sb.toString());
     }
 
 }
