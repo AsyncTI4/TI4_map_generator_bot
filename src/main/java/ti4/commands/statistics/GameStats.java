@@ -3,13 +3,14 @@ package ti4.commands.statistics;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -335,9 +336,11 @@ public class GameStats extends StatisticsSubcommandData {
 
     public static void showWinningPath(SlashCommandInteractionEvent event) {
         Map<String, Integer> winningPathCount = new HashMap<>();
+        AtomicInteger gameWithWinnerCount = new AtomicInteger();
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
             game.getWinner().ifPresent(winner -> {
+                gameWithWinnerCount.getAndIncrement();
                 int stage1Count = getPublicVictoryPoints(game, winner.getUserID(), 1);
                 int stage2Count = getPublicVictoryPoints(game, winner.getUserID(), 2);
                 int secretCount = winner.getSecretVictoryPoints();
@@ -360,8 +363,10 @@ public class GameStats extends StatisticsSubcommandData {
             .forEach(entry ->
                 sb.append(atomicInteger.getAndIncrement() + 1)
                     .append(". `")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("x` ")
+                    .append(entry.getValue().toString())
+                    .append(" (")
+                    .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
+                    .append("%)` ")
                     .append(entry.getKey())
                     .append("\n")
             );
@@ -385,18 +390,21 @@ public class GameStats extends StatisticsSubcommandData {
 
     private static String getOtherVictoryPoints(Game game, String userId) {
         Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
-        StringJoiner otherVictoryPoints = new StringJoiner(", ");
+        Map<String, Integer> otherVictoryPoints = new HashMap<>();
         for (Map.Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
             if (scoredPOEntry.getValue().contains(userId)) {
                 String poID = scoredPOEntry.getKey();
                 PublicObjectiveModel po = Mapper.getPublicObjective(poID);
                 if (po == null) {
                     int frequency = Collections.frequency(scoredPOEntry.getValue(), userId);
-                    otherVictoryPoints.add(frequency + " " + poID);
+                    otherVictoryPoints.put(poID, frequency);
                 }
             }
         }
-        return otherVictoryPoints.toString();
+        return otherVictoryPoints.keySet().stream()
+            .sorted(Comparator.reverseOrder())
+            .map(key -> otherVictoryPoints.get(key) + " " + key)
+            .collect(Collectors.joining(", "));
     }
 
 }
