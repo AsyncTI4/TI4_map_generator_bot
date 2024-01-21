@@ -68,6 +68,7 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
+            case WINNING_PATH -> showWinningPath(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
@@ -86,6 +87,7 @@ public class GameStats extends StatisticsSubcommandData {
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
         FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
         GAME_COUNT("Total game count", "Shows the total game count");
     
         private final String name;
@@ -279,8 +281,6 @@ public class GameStats extends StatisticsSubcommandData {
             );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
-
-   
 
     private static void showMostPlayedColour(SlashCommandInteractionEvent event) {
         Map<String, Integer> colorCount = new HashMap<>();

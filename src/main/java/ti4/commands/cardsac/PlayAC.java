@@ -61,8 +61,8 @@ public class PlayAC extends ACCardsSubcommandData {
         }
     }
 
-    public static String playAC(GenericInteractionCreateEvent event, Game activeGame, Player player, String value, MessageChannel channel, Guild guild) {
-        MessageChannel mainGameChannel = activeGame.getMainGameChannel() == null ? channel : activeGame.getMainGameChannel();
+    public static String playAC(GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel, Guild guild) {
+        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
 
         String acID = null;
         int acIndex = -1;
@@ -100,29 +100,29 @@ public class PlayAC extends ACCardsSubcommandData {
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
 
-        String activePlayerID = activeGame.getActivePlayerID();
+        String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
-            Player activePlayer = activeGame.getPlayer(activePlayerID);
+            Player activePlayer = game.getPlayer(activePlayerID);
             if (activePlayer != null && activePlayer.hasTech("tp")) {
                 return "You are passed and the active player has researched Transparasteel Plating. AC Play command cancelled.";
             }
         }
-        if ("Action".equalsIgnoreCase(actionCardWindow) && activeGame.getPlayer(activePlayerID) != player) {
+        if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
             return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
         }
-        if (ButtonHelper.isPlayerOverLimit(activeGame, player)) {
+        if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentation(true, true) + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. Ping Fin if this is an error";
         }
 
         if (player.hasAbility("cybernetic_madness")) {
-            activeGame.purgedActionCard(player.getUserID(), acIndex);
+            game.purgedActionCard(player.getUserID(), acIndex);
         } else {
-            activeGame.discardActionCard(player.getUserID(), acIndex);
+            game.discardActionCard(player.getUserID(), acIndex);
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(activeGame.getPing()).append(" ").append(activeGame.getName()).append("\n");
-        if (activeGame.isFoWMode()) {
+        sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
+        if (game.isFoWMode()) {
             sb.append("Someone played an Action Card:\n");
         } else {
             sb.append(player.getRepresentation()).append(" played an Action Card:\n");
@@ -131,8 +131,8 @@ public class PlayAC extends ACCardsSubcommandData {
         List<Button> buttons = new ArrayList<>();
         Button sabotageButton = Button.danger("sabotage_ac_" + actionCardTitle, "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
-        Player empy = Helper.getPlayerFromUnit(activeGame, "empyrean_mech");
-        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeGame, player, empy) && !activeGame.getLaws().containsKey("articles_war")) {
+        Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
+        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy) && !game.getLaws().containsKey("articles_war")) {
             Button empyButton = Button.secondary("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Empyrean Mech ")
                 .withEmoji(Emoji.fromFormatted(Emojis.mech));
             List<Button> empyButtons = new ArrayList<>();
@@ -142,10 +142,9 @@ public class PlayAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 empy.getRepresentation(true, true) + "You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.",
                 empyButtons);
-
         }
         String instinctTrainingID = "it";
-        for (Player player2 : activeGame.getPlayers().values()) {
+        for (Player player2 : game.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
                 Button instinctButton = Button.secondary("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training")
                     .withEmoji(Emoji.fromFormatted(Emojis.Xxcha));
@@ -164,17 +163,17 @@ public class PlayAC extends ACCardsSubcommandData {
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
         } else {
-            if (Helper.isSaboAllowed(activeGame, player)) {
-                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, sb.toString(), activeGame, player, Collections.singletonList(acEmbed), buttons, true);
+            if (Helper.isSaboAllowed(game, player)) {
+                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, sb.toString(), game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
 
-                StringBuilder noSabosMessage = new StringBuilder("> Either all **Sabotage** are in the discard or the active player has ");
-                noSabosMessage.append(Emojis.Yssaril).append("**Transparasteel Plating** and everyone else has passed.\n");
-                noSabosMessage.append("> ").append(Emojis.Xxcha).append("**Instinct Training** and ").append(Emojis.Empyrean).append(Emojis.mech).append("**Watcher** may still be viable, who knows.");
-                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
+                String noSabosMessage = "> Either all **Sabotage** are in the discard or the active player has "
+                    + Emojis.Yssaril + "**Transparasteel Plating** and everyone else has passed.\n" +
+                    "> " + Emojis.Xxcha + "**Instinct Training** and " + Emojis.Empyrean + Emojis.mech + "**Watcher** may still be viable, who knows.";
+                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage);
             }
-            MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
+            MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, game);
             if (actionCardTitle.contains("Manipulate Investments")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc = 1; sc < 9; sc++) {
@@ -183,7 +182,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                         button = Button.secondary("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc, " ").withEmoji(scEmoji);
                     } else {
-                        button = Button.secondary("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, activeGame));
+                        button = Button.secondary("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
@@ -192,14 +191,14 @@ public class PlayAC extends ACCardsSubcommandData {
                     scButtons);
             }
             if (actionCardTitle.contains("Archaeological Expedition")) {
-                List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(activeGame, player);
+                List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     player.getRepresentation() + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
             }
             if (actionCardTitle.contains("Planetary Rigs")) {
-                List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(activeGame, player);
+                List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
                 String msg = player.getRepresentation() + " After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, acbuttons);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg, acbuttons);
             }
 
             String codedName = "Plagiarize";
@@ -235,7 +234,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
             codedName = "Skilled Retreat";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success("retreat_" + activeGame.getActiveSystem() + "_skilled", "Resolve " + codedName));
+                codedButtons.add(Button.success("retreat_" + game.getActiveSystem() + "_skilled", "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
 
@@ -283,7 +282,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Upgrade";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success("resolveUpgrade_" + activeGame.getActiveSystem(), "Resolve " + codedName));
+                codedButtons.add(Button.success("resolveUpgrade_" + game.getActiveSystem(), "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
             codedName = "Infiltrate";
@@ -293,7 +292,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Emergency Repairs";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success("resolveEmergencyRepairs_" + activeGame.getActiveSystem(), "Resolve " + codedName));
+                codedButtons.add(Button.success("resolveEmergencyRepairs_" + game.getActiveSystem(), "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
             codedName = "Insider Information";
@@ -377,7 +376,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Decoy Operation";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success("resolveDecoyOperationStep1_" + activeGame.getActiveSystem(), "Resolve " + codedName));
+                codedButtons.add(Button.success("resolveDecoyOperationStep1_" + game.getActiveSystem(), "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
             codedName = "Reactor Meltdown";
@@ -453,7 +452,7 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Veto";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.primary("flip_agenda", "Reveal next Agenda"));
-                MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), codedMessage + codedName, codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), codedMessage + codedName, codedButtons);
             }
 
             codedName = "Fighter Conscription";
@@ -469,34 +468,34 @@ public class PlayAC extends ACCardsSubcommandData {
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
 
-                List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeGame, afterButtons, "after");
+                List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
                 Date newTime = new Date();
-                activeGame.setLastActivePlayerPing(newTime);
+                game.setLastActivePlayerPing(newTime);
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction")) {
-                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, activeGame, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeGame, player, riderButtons);
+                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", game, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election")) {
-                    activeGame.setHackElectionStatus(true);
+                    game.setHackElectionStatus(true);
                     Button setHack = Button.danger("hack_election", "Set the voting order as normal");
                     List<Button> hackButtons = List.of(setHack);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if hack election is sabod", activeGame, player, hackButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if hack election is sabod", game, player, hackButtons);
                 }
 
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
                 Date newTime = new Date();
-                activeGame.setLastActivePlayerPing(newTime);
-                List<Button> whenButtons = AgendaHelper.getWhenButtons(activeGame);
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", activeGame, whenButtons, "when");
+                game.setLastActivePlayerPing(newTime);
+                List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
+                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", game, whenButtons, "when");
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
-                activeGame.setJustPlayedComponentAC(true);
-                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
+                game.setJustPlayedComponentAC(true);
+                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentation(true, true) + " you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
@@ -505,12 +504,12 @@ public class PlayAC extends ACCardsSubcommandData {
                     buttons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
-                for (Player p2 : activeGame.getRealPlayers()) {
+                for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
                     }
-                    if (p2.getActionCards().containsKey("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
-                        && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
+                    if (p2.getActionCards().containsKey("reverse_engineer") && !ButtonHelper.isPlayerElected(game, player, "censure")
+                        && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
                         List<Button> reverseButtons = new ArrayList<>();
                         String key = "reverse_engineer";
                         String ac_name = Mapper.getActionCard(key).getName();
@@ -528,20 +527,20 @@ public class PlayAC extends ACCardsSubcommandData {
         }
 
         //Fog of war ping
-        if (activeGame.isFoWMode()) {
+        if (game.isFoWMode()) {
             String fowMessage = player.getRepresentation() + " played an Action Card: " + actionCardTitle;
-            FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, fowMessage);
-            MessageHelper.sendPrivateMessageToPlayer(player, activeGame, "Played action card: " + actionCardTitle);
+            FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
+            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: " + actionCardTitle);
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             List<Button> buttons2 = new ArrayList<>();
             Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
                 buttons2);
         }
 
-        ACInfo.sendActionCardInfo(activeGame, player);
+        ACInfo.sendActionCardInfo(game, player);
         return null;
     }
 }
