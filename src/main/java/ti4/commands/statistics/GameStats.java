@@ -2,11 +2,14 @@ package ti4.commands.statistics;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,6 +27,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.PublicObjectiveModel;
 
 public class GameStats extends StatisticsSubcommandData {
 
@@ -63,6 +67,7 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
+            case WINNING_PATH -> showWinningPath(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
@@ -81,6 +86,7 @@ public class GameStats extends StatisticsSubcommandData {
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
         FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
         GAME_COUNT("Total game count", "Shows the total game count");
     
         private final String name;
@@ -275,8 +281,6 @@ public class GameStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
 
-   
-
     private static void showMostPlayedColour(SlashCommandInteractionEvent event) {
         Map<String, Integer> colorCount = new HashMap<>();
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
@@ -328,4 +332,71 @@ public class GameStats extends StatisticsSubcommandData {
                 );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Colour", sb.toString());
     }
+
+    public static void showWinningPath(SlashCommandInteractionEvent event) {
+        Map<String, Integer> winningPathCount = new HashMap<>();
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        for (Game game : filteredGames) {
+            game.getWinner().ifPresent(winner -> {
+                int stage1Count = getPublicVictoryPoints(game, winner.getUserID(), 1);
+                int stage2Count = getPublicVictoryPoints(game, winner.getUserID(), 2);
+                int secretCount = winner.getSecretVictoryPoints();
+                int supportCount = winner.getSupportForTheThroneVictoryPoints();
+                String others = getOtherVictoryPoints(game, winner.getUserID());
+                String path = stage1Count + " stage 1s, " +
+                    stage2Count + " stage 2s, " +
+                    secretCount + " secrets, " +
+                    supportCount + " supports" +
+                    (others.isEmpty() ? "" : ", " + others);
+                winningPathCount.put(path,
+                    1 + winningPathCount.getOrDefault(path, 0));
+            });
+        }
+        AtomicInteger atomicInteger = new AtomicInteger(0);
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Winning Paths Count:**__").append("\n");
+        winningPathCount.entrySet().stream()
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+            .forEach(entry ->
+                sb.append(atomicInteger.getAndIncrement() + 1)
+                    .append(". `")
+                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                    .append("x` ")
+                    .append(entry.getKey())
+                    .append("\n")
+            );
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
+    }
+
+    private static int getPublicVictoryPoints(Game game, String userId, int stage) {
+        Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
+        int vpCount = 0;
+        for (Map.Entry<String, List<String>> scoredPublic : scoredPOs.entrySet()) {
+            if (scoredPublic.getValue().contains(userId)) {
+                String poID = scoredPublic.getKey();
+                PublicObjectiveModel po = Mapper.getPublicObjective(poID);
+                if (po != null && po.getPoints() == stage) {
+                    vpCount += 1;
+                }
+            }
+        }
+        return vpCount;
+    }
+
+    private static String getOtherVictoryPoints(Game game, String userId) {
+        Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
+        StringJoiner otherVictoryPoints = new StringJoiner(", ");
+        for (Map.Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
+            if (scoredPOEntry.getValue().contains(userId)) {
+                String poID = scoredPOEntry.getKey();
+                PublicObjectiveModel po = Mapper.getPublicObjective(poID);
+                if (po == null) {
+                    int frequency = Collections.frequency(scoredPOEntry.getValue(), userId);
+                    otherVictoryPoints.add(frequency + " " + poID);
+                }
+            }
+        }
+        return otherVictoryPoints.toString();
+    }
+
 }

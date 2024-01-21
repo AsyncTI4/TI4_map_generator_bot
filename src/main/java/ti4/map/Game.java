@@ -71,7 +71,6 @@ public class Game {
     private String ownerID;
     private String ownerName = "";
     private String name;
-
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String latestAfterMsg = "";

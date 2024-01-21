@@ -63,8 +63,8 @@ public class Player {
     private boolean readyToPassBag;
     private boolean searchWarrant;
     private boolean isDummy;
-    private boolean prefersDistanceBasedTacticalActions = false;
-    private boolean autoPassOnWhensAfters = false;
+    private boolean prefersDistanceBasedTacticalActions;
+    private boolean autoPassOnWhensAfters;
 
     private String faction;
     private String factionEmoji;
@@ -1539,6 +1539,7 @@ public class Player {
         return totalExpenses;
     }
 
+    @JsonIgnore
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
         Map<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
@@ -1750,7 +1751,7 @@ public class Player {
     }
 
     public boolean hasTech(String techID) {
-        if (techID.equals("det") || techID.equals("amd")) {
+        if ("det".equals(techID) || "amd".equals(techID)) {
             if (techs.contains("absol_" + techID)) {
                 return true;
             }
