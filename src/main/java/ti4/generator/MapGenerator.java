@@ -52,6 +52,7 @@ import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -3500,6 +3501,11 @@ public class MapGenerator {
                     }
                     if (unitKey.getUnitType() == UnitType.Cavalry) {
                         unitPath = unitPath.replace("cavalry", "fs");
+                        String name = "Memoria_1.png";
+                        if(game.getPNOwner("cavalry") != null && game.getPNOwner("cavalry").hasTech("m2")){
+                            name = "Memoria_2.png";
+                        }
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);   
                     }
                     if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
                         unitPath = unitPath.replace("plenaryorbital", "sd");

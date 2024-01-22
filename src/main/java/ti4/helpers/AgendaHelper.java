@@ -1241,7 +1241,7 @@ public class AgendaHelper {
                     + "You are being skipped because the bot believes you cannot vote";
                 if(activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())){
                     skippedMessage = realIdentity2
-                    + "You are being skipped because the you told the bot you wanted to preset an abstain";
+                    + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame.getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(),""));
                 }
                 if (activeGame.isFoWMode()) {
@@ -1659,7 +1659,7 @@ public class AgendaHelper {
                 String skippedMessage = realIdentity + "You are being skipped because the bot thinks you cant vote";
                 if(activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())){
                     skippedMessage = realIdentity
-                    + "You are being skipped because the you told the bot you wanted to preset an abstain";
+                    + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame.getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(),""));
                 }
                 if (activeGame.isFoWMode()) {
