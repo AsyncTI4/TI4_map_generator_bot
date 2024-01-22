@@ -3713,6 +3713,10 @@ public class Game {
                 .anyMatch(faction -> getFactions().contains(faction.getAlias()))
             || Mapper.getLeaders().values().stream()
                 .filter(leader -> !leader.getSource().isPok())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()));
+                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || publicObjectives1.size() < 5 && round >= 4
+            || publicObjectives2.size() < (round - 4)
+            || getRealPlayers().stream()
+                .anyMatch(player -> player.getSecretVictoryPoints() > 3 && !player.getRelics().contains("obsidian"));
     }
 }
