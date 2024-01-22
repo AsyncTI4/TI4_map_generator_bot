@@ -1648,6 +1648,7 @@ public class ButtonHelperFactionSpecific {
             String type = "sling";
             List<Button> buttons;
             buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type, "placeOneNDone_dontskip");
+            buttons.add(Button.danger("deleteButtons","Decline"));
             String message = player.getRepresentation() + " Use the buttons to produce 1 ship that was destroyed in the combat. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
