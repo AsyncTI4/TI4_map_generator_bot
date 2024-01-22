@@ -1519,6 +1519,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveForwardSupplyBaseStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("divertFunding@")) {
             ButtonHelperActionCards.divertFunding(activeGame, player, buttonID, event);
+        } else if (buttonID.startsWith("newPrism@")) {
+            PlanetExhaustAbility.newPrismPart2(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("cabalAgentCapture_")) {
             ButtonHelperAgents.resolveCabalAgentCapture(buttonID, player, activeGame, event);
         } else if (buttonID.startsWith("cabalRelease_")) {
