@@ -4590,7 +4590,14 @@ public class ButtonListener extends ListenerAdapter {
                 Button drawStage1 = Button.success("reveal_stage_1", "Reveal Stage 1");
                 // Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status
                 // Cleanup");
-                List<Button> buttons = List.of(drawStage1, drawStage2);
+                List<Button> buttons = new ArrayList<>();
+
+                if(activeGame.getRound() < 4){
+                    buttons.add(drawStage1);
+                }
+                if(activeGame.getRound() > 2){
+                    buttons.add(drawStage2);
+                }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 event.getMessage().delete().queueAfter(20, TimeUnit.SECONDS);
             }
