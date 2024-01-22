@@ -5,8 +5,10 @@ import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
@@ -29,6 +31,25 @@ public class RevealStage1 extends StatusSubcommandData {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
+        if(activeGame.getCurrentPhase().equalsIgnoreCase("status")){
+            // first do cleanup if necessary
+            int playersWithSCs = 0;
+            for (Player player : activeGame.getRealPlayers()) {
+                if (player.getSCs() != null && player.getSCs().size() > 0 && !player.getSCs().contains(0)) {
+                    playersWithSCs++;
+                }
+            }
+
+            if (playersWithSCs > 0) {
+                new Cleanup().runStatusCleanup(activeGame);
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing() + "Status Cleanup Run!");
+                if (!activeGame.isFoWMode()) {
+                    DisplayType displayType = DisplayType.map;
+                    MapGenerator.saveImage(activeGame, displayType, event)
+                        .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
+                }
+            }
+        }
     }
 
     public static void revealTwoStage1(GenericInteractionCreateEvent event, MessageChannel channel) {

@@ -1228,6 +1228,9 @@ public class Helper {
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
             if (player.hasWarsunTech()) {
                 Button wsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp, "Produce Warsun");
+                if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "warsun") > 1){
+                    wsButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp, "Produce Warsun");
+                }
                 wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.warsun));
                 unitButtons.add(wsButton);
             }
@@ -1237,19 +1240,34 @@ public class Helper {
                 unitButtons.add(wsButton);
             }
             Button fsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp, "Produce Flagship");
+            if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "flagship") > 0){
+                fsButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp, "Produce Flagship");
+            }
             fsButton = fsButton.withEmoji(Emoji.fromFormatted(Emojis.flagship));
             unitButtons.add(fsButton);
         }
         Button dnButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp, "Produce Dreadnought");
+        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 4){
+            dnButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp, "Produce Dreadnought");
+        }
         dnButton = dnButton.withEmoji(Emoji.fromFormatted(Emojis.dreadnought));
         unitButtons.add(dnButton);
         Button cvButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp, "Produce Carrier");
+        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "carrier") > 3){
+            cvButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp, "Produce Carrier");
+        }
         cvButton = cvButton.withEmoji(Emoji.fromFormatted(Emojis.carrier));
         unitButtons.add(cvButton);
         Button caButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp, "Produce Cruiser");
+        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 7){
+            caButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp, "Produce Cruiser");
+        }
         caButton = caButton.withEmoji(Emoji.fromFormatted(Emojis.cruiser));
         unitButtons.add(caButton);
         Button ddButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp, "Produce Destroyer");
+        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer") > 7){
+            ddButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp, "Produce Destroyer");
+        }
         ddButton = ddButton.withEmoji(Emoji.fromFormatted(Emojis.destroyer));
         unitButtons.add(ddButton);
         Button ff1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tp, "Produce 1 Fighter");
@@ -1302,6 +1320,9 @@ public class Helper {
                     unitButtons.add(inf2Button);
                 }
                 Button mfButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, activeGame));
+                if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 3){
+                    mfButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, activeGame));
+                }
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 unitButtons.add(mfButton);
 
