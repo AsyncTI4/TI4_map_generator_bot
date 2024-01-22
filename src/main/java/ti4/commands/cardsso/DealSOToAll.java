@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -52,11 +53,12 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is /player stats speaker:y)");
             }
-            List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Button.success("setOrder", "Set Speaker Order"));
-            buttons2.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
-                activeGame.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
+            // List<Button> buttons2 = new ArrayList<>();
+            // buttons2.add(Button.success("setOrder", "Set Speaker Order"));
+            // buttons2.add(Button.danger("deleteButtons", "Decline"));
+            // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
+            //     activeGame.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
+            Helper.setOrder(activeGame);
         }
     }
 }

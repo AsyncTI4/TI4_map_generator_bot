@@ -134,7 +134,18 @@ public class CombatRoll extends CombatSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
             }
+            if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
+                if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "xxcha_mech".equals(unit.getAlias()))) {
+                    playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
+                            .filter(e -> !"xxcha_mech".equals(e.getKey().getAlias()))
+                            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "Skipping " + Emojis.Xxcha + " mechs due to Articles of War agenda.");
+                }
+            }
+    
         }
+        
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
             if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
