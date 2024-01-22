@@ -1518,6 +1518,15 @@ public class AgendaHelper {
             Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresAfter);
         }
+        if (!activeGame.isFoWMode() && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
+            for(Player player : activeGame.getRealPlayers()){
+                String finChecker = "FFCC_" + player.getFaction() + "_";
+                String planet = "tarrock";
+                if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+                    afterButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Tarrock Ability").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+                }
+            }
+        }
         if (activeGame.getPNOwner("dspnedyn") != null && !activeGame.isFoWMode()) {
             Button playKeleresAfter = Button.secondary("play_after_Edyn Rider", "Play Edyn PN Rider").withEmoji(Emoji.fromFormatted(Emojis.edyn));
             afterButtons.add(playKeleresAfter);
@@ -2546,7 +2555,7 @@ public class AgendaHelper {
                 }
             }
             int votes = totalVotes;
-            if (votes >= currentHighest) {
+            if (votes >= currentHighest && votes != 0) {
                 if (votes == currentHighest) {
                     winner.append("*").append(outcome);
                 } else {

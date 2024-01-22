@@ -2125,6 +2125,7 @@ public class Helper {
     public static void setOrder(Game activeGame) {
         List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
+        boolean different = false;
         for (Player player : activeGame.getRealPlayers()) {
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
             if (tile == null) {
@@ -2139,28 +2140,45 @@ public class Helper {
             unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
         }
         Collections.sort(hsLocations);
-        List<Player> sortedPlayers = new ArrayList<>();
-        for (Integer location : hsLocations) {
-            sortedPlayers.add(unsortedPlayers.get(location));
+        int lastNum = 0;
+        for(int location : hsLocations){
+            int firstNum = location/100;
+            if(lastNum == 0){
+                lastNum = firstNum;
+            }
+            if(lastNum != firstNum){
+                different = true;
+            }
+            lastNum = firstNum;
         }
-        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        Map<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
-        Map<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
         String msg = activeGame.getPing() + " set order in the following way: \n";
-        try {
-            for (Player player : sortedPlayers) {
-                new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
-                msg = msg + player.getRepresentation(true, true) + " \n";
+        if(!different){
+            List<Player> sortedPlayers = new ArrayList<>();
+            for (Integer location : hsLocations) {
+                sortedPlayers.add(unsortedPlayers.get(location));
             }
-            if (!players.isEmpty()) {
-                newPlayerOrder.putAll(players);
+            Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+            Map<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+            Map<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
+            try {
+                for (Player player : sortedPlayers) {
+                    new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
+                    msg = msg + player.getRepresentation(true, true) + " \n";
+                }
+                if (!players.isEmpty()) {
+                    newPlayerOrder.putAll(players);
+                }
+                activeGame.setPlayers(newPlayerOrder);
+            } catch (Exception e) {
+                activeGame.setPlayers(playersBackup);
             }
-            activeGame.setPlayers(newPlayerOrder);
-        } catch (Exception e) {
-            activeGame.setPlayers(playersBackup);
+            msg += "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
+        }else{
+            msg = "Detected an abnormal map, so did not assign speaker order automatically. Set the speaker order with /game set_order, with the speaker as the first player";
         }
-        msg += "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+        if(!activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+        }
     }
 
     public static void checkEndGame(Game activeGame, Player player) {
