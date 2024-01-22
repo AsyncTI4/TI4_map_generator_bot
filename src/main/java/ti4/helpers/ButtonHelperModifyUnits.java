@@ -273,18 +273,27 @@ public class ButtonHelperModifyUnits {
     public static String autoAssignSpaceCombatHits(Player player, Game activeGame, Tile tile, int hits, GenericInteractionCreateEvent event, boolean justSummarizing){
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
         String msg = ButtonHelper.getIdent(player)+" assigned hits in the following way:\n";
+        if(justSummarizing){
+            msg = ButtonHelper.getIdent(player)+" would assign hits in the following way:\n";
+        }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
+        boolean noMechPowers = activeGame.getLaws().containsKey("articles_war");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         if(numSustains > 0){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
-                if(!unitModel.getIsShip()){
+                UnitKey unitKey = unitEntry.getKey();
+                boolean isNomadMechApplicable = false;
+                if((ButtonHelper.getUnitName(unitKey.asyncID()).equalsIgnoreCase("mech") && player.hasUnit("nomad_mech") && !noMechPowers)){
+                    isNomadMechApplicable = true;
+                }
+                if(!unitModel.getIsShip() && !isNomadMechApplicable){
                     continue;
                 }
-                UnitKey unitKey = unitEntry.getKey();
+               
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
@@ -302,16 +311,18 @@ public class ButtonHelperModifyUnits {
                     stuffNotToSustain = "warsun";
                 }
                 if (unitModel.getSustainDamage() && min > 0 && (!stuffNotToSustain.contains(unitName.toLowerCase()) || (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")))) {
-                    msg = msg + "> Sustained "+min+" "+unitModel.getUnitEmoji()+"\n";
                     hits = hits - min;
                     if(player.hasTech("nes")){
                         hits = hits - min;
                     }
                     if(!justSummarizing){
+                        msg = msg + "> Sustained "+min+" "+unitModel.getUnitEmoji()+"\n";
                         tile.addUnitDamage("space", unitKey, min);
                         for (int x = 0; x < min; x++) {
                             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, activeGame, event);
                         }
+                    }else{
+                        msg = msg + "> Would sustain "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
@@ -326,7 +337,7 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("fighter") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.fighter+"\n";
+                    
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -334,6 +345,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
@@ -348,7 +362,6 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("destroyer") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.destroyer+"\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -356,6 +369,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
@@ -371,7 +387,6 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("cruiser") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.cruiser+"\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -379,6 +394,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
@@ -434,7 +452,6 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("dreadnought") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.dreadnought+"\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -442,11 +459,14 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
         }
-        if(hits > 0 && player.hasUnit("naaz_mech_space")){
+        if(hits > 0 && player.hasUnit("naaz_mech_space") && !noMechPowers){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
@@ -456,15 +476,14 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("mech") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+unitName+"(s)\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
-                            
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
                         if(player.hasTech("sar")){
                             for (int x = 0; x < min; x++) {
                                 player.setTg(player.getTg() + 1);
@@ -474,6 +493,8 @@ public class ButtonHelperModifyUnits {
                             }
                             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                         }
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
 
                 }
@@ -489,7 +510,6 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("carrier") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.carrier+"\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -497,6 +517,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
@@ -512,7 +535,6 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("flagship") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.flagship+"\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -520,6 +542,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
@@ -534,7 +559,6 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("warsun") && min > 0) {
-                    msg = msg + "> Destroyed "+min+" "+Emojis.warsun+"\n";
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -542,6 +566,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
                 }
             }
