@@ -236,7 +236,7 @@ public class CombatRoll extends CombatSubcommandData {
                     }
                     String finChecker = "FFCC_" + opponent.getFaction() + "_";
                     buttons.add(Button.success(finChecker+"autoAssignSpaceHits_"+tile.getPosition()+"_"+h,"Auto-assign Hits"));
-                    buttons.add(Button.danger("getDamageButtons_" + tile.getPosition(),"Manually Assign Hits"));
+                    buttons.add(Button.danger("getDamageButtons_" + tile.getPosition()+"deleteThis","Manually Assign Hits"));
                     buttons.add(Button.secondary(finChecker+"cancelSpaceHits_"+tile.getPosition()+"_"+h,"Cancel a Hit"));
                     
                     String msg2 = opponent.getFactionEmoji()+" can automatically assign hits. The hits would be assigned in the following way:\n\n"+ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, activeGame, tile, h, event, true);
