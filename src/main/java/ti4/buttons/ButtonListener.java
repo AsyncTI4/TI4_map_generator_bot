@@ -1404,9 +1404,9 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "pi" -> { // Predictive Intelligence
-                    Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
+                    event.getMessage().delete().queue();
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(redistribute, deleButton));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(Buttons.REDISTRIBUTE_CCs, deleButton));
                 }
                 case "gls" -> { // Graviton Laser System
                     // Do Nothing
