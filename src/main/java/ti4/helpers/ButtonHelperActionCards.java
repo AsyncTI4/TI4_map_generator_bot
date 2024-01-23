@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
@@ -1283,11 +1284,8 @@ public class ButtonHelperActionCards {
     public static void resolveFocusedResearch(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event) {
         if (!player.hasAbility("propagation")) {
             activeGame.setComponentAction(true);
-            Button getTech = Button.success("acquireATech", "Get a tech");
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(getTech);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " you can use the button to get your tech", buttons);
+                player.getRepresentation(true, true) + " you can use the button to get your tech", List.of(Buttons.GET_A_TECH));
         } else {
             Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
             Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");

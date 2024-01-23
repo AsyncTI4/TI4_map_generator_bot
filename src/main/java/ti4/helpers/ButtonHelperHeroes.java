@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.custom.PeakAtStage1;
@@ -1461,7 +1462,7 @@ public class ButtonHelperHeroes {
         }
         if (activeGame.getScPlayed().get(7) == null || !activeGame.getScPlayed().get(7)) {
             activeGame.setComponentAction(true);
-            scButtons.add(Button.success("acquireATech", "Get a Tech"));
+            scButtons.add(Buttons.GET_A_TECH);
         }
         if (activeGame.getScPlayed().get(8) == null || !activeGame.getScPlayed().get(8)) {
             scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
