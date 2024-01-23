@@ -494,14 +494,6 @@ public class ButtonHelperTacticalAction {
         List<Player> playersWithPds2 = new ArrayList<>();
         if (!activeGame.isFoWMode()) {
             playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, pos);
-            int abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, true);
-            if (abilities > 0 || activeGame.getL1Hero()) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("doActivation_" + pos, "Confirm"));
-                buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
-                String msg = "# " + ButtonHelper.getIdent(player) + " You are about to automatically trigger some abilities by activating this system. Please hit confirm before continuing";
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-            }
             for (Player player_ : activeGame.getRealPlayers()) {
                 if (!activeGame.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, activeGame.getTileByPosition(pos))) {
@@ -565,6 +557,19 @@ public class ButtonHelperTacticalAction {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(activeGame, player);
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select which unit to recycle", buttons);
+            }
+        }
+        if (!activeGame.isFoWMode()) {
+            int abilities = 0;
+            if(!activeGame.getL1Hero()){
+                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, true);
+            }
+            if (abilities > 0 ) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("doActivation_" + pos, "Confirm"));
+                buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
+                String msg = "# " + ButtonHelper.getIdent(player) + " You are about to automatically trigger some abilities by activating this system. Please hit confirm before continuing";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
         }
 

@@ -218,7 +218,7 @@ public class ButtonListener extends ListenerAdapter {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
 
-        if (activeGame != null && activeGame.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayerID())) {
+        if (player != null && activeGame != null && activeGame.getActivePlayerID() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayerID())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
 
@@ -386,6 +386,8 @@ public class ButtonListener extends ListenerAdapter {
             new Swap().secondHalfOfSwap(activeGame, player, activeGame.getPlayerFromColorOrFaction(faction), event.getUser(), event);
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
             ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("drawSpecificSO_")) {
+            DiscardSO.drawSpecificSO(event, player, buttonID.split("_")[1], activeGame);
         } else if (buttonID.startsWith("olradinHeroFlip_")) {
             ButtonHelperHeroes.olradinHeroFlipPolicy(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("tnelisHeroAttach_")) {
@@ -993,6 +995,10 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } else if (buttonID.startsWith("getDamageButtons_")) {// "repealLaw_"
+            if(buttonID.contains("deleteThis")){
+                buttonID.replace("deleteThis", "");
+                event.getMessage().delete().queue();
+            }
             String pos = buttonID.replace("getDamageButtons_", "");
             List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);

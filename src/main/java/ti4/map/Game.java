@@ -38,11 +38,13 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -2445,6 +2447,17 @@ public class Game {
             if (player != null) {
                 secretObjectives.remove(id);
                 player.setSecret(id);
+                if(player.getSecretsScored().size()+player.getSecretsUnscored().size() > player.getMaxSOCount()){
+                    String msg = player.getRepresentation(true, true)+" you have more SOs than the limit ("+player.getMaxSOCount()+") and should discard one. If your game is playing with a higher SO limit, you can change that in /game setup.";
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg);
+                    String secretScoreMsg = "Click a button below to discard your Secret Objective";
+                    List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
+                    if (soButtons != null && !soButtons.isEmpty()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg, soButtons);
+                    } else {
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Something went wrong. Please report to Fin");
+                    }
+                }
             }
         }
     }

@@ -63,6 +63,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         }
         GameSaveLoadManager.saveMap(activeGame, event);
         sendMessage("SO sent to user's hand - please check `/ac info`");
+        SOInfo.sendSecretObjectiveInfo(activeGame, activeGame.getPlayer(user.getId()));
     }
 }
     
