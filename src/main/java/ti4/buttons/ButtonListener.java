@@ -1368,8 +1368,12 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
-            String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+            TechnologyModel techModel = Mapper.getTech(tech);
+            String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
+            switch (activeGame.getOutputVerbosity()) {
+                case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
+                default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+            }
             player.exhaustTech(tech);
             switch (tech) {
                 case "bs" -> { //Bio-stims
