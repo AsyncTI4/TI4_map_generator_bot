@@ -78,6 +78,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
+        if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
 
         sb = new StringBuilder();
