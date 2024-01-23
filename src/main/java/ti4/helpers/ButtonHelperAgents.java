@@ -813,9 +813,8 @@ public class ButtonHelperAgents {
             if (p2 == null) return;
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, activeGame);
             List<Button> redistributeButton = new ArrayList<>();
-            Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
             Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
-            redistributeButton.add(redistribute);
+            redistributeButton.add(Buttons.REDISTRIBUTE_CCs);
             redistributeButton.add(deleButton);
             MessageHelper.sendMessageToChannelWithButtons(channel,
                 p2.getRepresentation(true, true) + " use buttons to redistribute 1 CC (the bot allows more but the agent is restricted to 1)", redistributeButton);
