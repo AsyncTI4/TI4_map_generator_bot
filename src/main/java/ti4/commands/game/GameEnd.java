@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Guild;
@@ -21,6 +22,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.statistics.GameStatisticFilterer;
+import ti4.commands.statistics.GameStats;
 import ti4.generator.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -195,15 +198,15 @@ public class GameEnd extends GameSubcommandData {
             });
     }
 
-    public static String getGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
+    public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("__**").append(activeGame.getName()).append("**__ - ").append(activeGame.getCustomName()).append("\n");
-        sb.append(activeGame.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(activeGame.getLastModifiedDate()));
+        sb.append("__**").append(game.getName()).append("**__ - ").append(game.getCustomName()).append("\n");
+        sb.append(game.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(game.getLastModifiedDate()));
         sb.append("\n");
         sb.append("\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
-        for (Player player : activeGame.getRealPlayers()) {
+        for (Player player : game.getRealPlayers()) {
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
@@ -215,15 +218,29 @@ public class GameEnd extends GameSubcommandData {
                 sb.append(player.getUserName());
             }
             sb.append(" - *").append(playerVP).append("VP* ");
-            if (playerVP >= activeGame.getVp()) sb.append(" - **WINNER**");
+            if (playerVP >= game.getVp()) sb.append(" - **WINNER**");
             sb.append("\n");
             index++;
         }
 
         sb.append("\n");
-        String gameModesText = activeGame.getGameModesText();
+        String gameModesText = game.getGameModesText();
         if (gameModesText.isEmpty()) gameModesText = "None";
-        sb.append("Game Modes: ").append(gameModesText).append("\n");
+        sb.append("**Game Modes:** ").append(gameModesText).append(", ")
+            .append(game.getVp()).append(" victory points")
+            .append("\n");
+
+        if (!game.hasHomebrew()) {
+            List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
+            Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
+            int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
+            String winningPath = GameStats.getWinningPath(game, game.getWinner().get());
+            sb.append("**Winning Path:** ").append(winningPath).append("\n");
+            int winningPathCount = winningPathCounts.get(winningPath);
+            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ")
+                .append(winningPathCount).append(" (").append(100 * winningPathCount / (double) gamesWithWinnerCount)
+                .append("%) times before!").append("\n");
+        }
 
         return sb.toString();
     }
