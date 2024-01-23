@@ -890,6 +890,7 @@ public class Player {
         int maxSOCount = getGame().getMaxSOCountPerPlayer();
         if (hasRelic("obsidian")) maxSOCount++;
         if (hasRelic("absol_obsidian")) maxSOCount++;
+        if(hasAbility("information_brokers")) maxSOCount++;
         return maxSOCount;
     }
 

@@ -243,6 +243,9 @@ public class Setup extends PlayerSubcommandData {
             player.setUnitCap(unitID, 5);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
         }
+        if (player.hasAbility("necrophage")) {
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+        }
         if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
