@@ -421,9 +421,7 @@ public class ButtonHelperHeroes {
             }
         }
         Integer poIndex = activeGame.addCustomPO("Tnelis Hero (" + Mapper.getSecretObjectivesJustNames().get(soID) + ")", 1);
-        String sb = "Attached Tnelis Hero to an SO. This PO" + "\n" +
-            "(" + poIndex + ") should only be scored by them " + "\n" +
-            Mapper.getSecretObjectivesJustNames().get(soID) + "\n";
+        String sb = "Attached Tnelis Hero to an SO ("+Mapper.getSecretObjectivesJustNames().get(soID)+"). This is represented in the bot as a custom PO (" + poIndex + ") and should only be scored by them. This PO will be removed/changed automatically if the hero is attached to another SO via button.";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(tnelis, activeGame), sb);
         event.getMessage().delete().queue();
     }

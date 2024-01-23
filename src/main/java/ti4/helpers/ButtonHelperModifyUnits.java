@@ -836,12 +836,12 @@ public class ButtonHelperModifyUnits {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
             if (unitHolder instanceof Planet) continue;
-            //retreat non-capacity units first to avoid false cap flags
+            //retreat capacity units first to avoid false cap flags
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
-                if(unitModel.getCapacityUsed() > 0){
+                if(unitModel.getCapacityValue() < 1){
                     continue;
                 }
                 UnitKey unitKey = unitEntry.getKey();
