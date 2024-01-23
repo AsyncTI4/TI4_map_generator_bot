@@ -709,6 +709,9 @@ public class Game {
                 put(Emojis.Absol + "Absol", isAbsolMode());
                 put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomeBrewSCMode());
+                put("Little Omega", isLittleOmega());
+                put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+                put("Homebrew", hasHomebrew());
             }
         };
         return gameModes.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.joining(", "));
@@ -3696,6 +3699,12 @@ public class Game {
         }
 
         return scText;
+    }
+
+    @JsonIgnore
+    public boolean isLittleOmega() {
+        return stage1PublicDeckID.contains("little_omega") || stage2PublicDeckID.contains("little_omega")
+            || agendaDeckID.contains("little_omega");
     }
 
     @JsonIgnore

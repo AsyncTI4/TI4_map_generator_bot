@@ -337,42 +337,50 @@ public class GameStats extends StatisticsSubcommandData {
     }
 
     public static void showWinningPath(SlashCommandInteractionEvent event) {
-        Map<String, Integer> winningPathCount = new HashMap<>();
-        AtomicInteger gameWithWinnerCount = new AtomicInteger();
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
-        for (Game game : filteredGames) {
-            game.getWinner().ifPresent(winner -> {
-                gameWithWinnerCount.getAndIncrement();
-                int stage1Count = getPublicVictoryPoints(game, winner.getUserID(), 1);
-                int stage2Count = getPublicVictoryPoints(game, winner.getUserID(), 2);
-                int secretCount = winner.getSecretVictoryPoints();
-                int supportCount = winner.getSupportForTheThroneVictoryPoints();
-                String others = getOtherVictoryPoints(game, winner.getUserID());
-                String path = stage1Count + " stage 1s, " +
-                    stage2Count + " stage 2s, " +
-                    secretCount + " secrets, " +
-                    supportCount + " supports" +
-                    (others.isEmpty() ? "" : ", " + others);
-                winningPathCount.put(path,
-                    1 + winningPathCount.getOrDefault(path, 0));
-            });
-        }
+        Map<String, Integer> winningPathCount = getAllWinningPathCounts(filteredGames);
+        int gamesWithWinnerCount = winningPathCount.values().stream().reduce(0, Integer::sum);
         AtomicInteger atomicInteger = new AtomicInteger(0);
         StringBuilder sb = new StringBuilder();
         sb.append("__**Winning Paths Count:**__").append("\n");
         winningPathCount.entrySet().stream()
             .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
             .forEach(entry ->
-                sb.append(atomicInteger.getAndIncrement() + 1)
+                sb.append(atomicInteger.incrementAndGet())
                     .append(". `")
                     .append(entry.getValue().toString())
                     .append(" (")
-                    .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
+                    .append(Math.round(100 * entry.getValue() / (double) gamesWithWinnerCount))
                     .append("%)` ")
                     .append(entry.getKey())
                     .append("\n")
             );
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Paths", sb.toString());
+    }
+
+    public static Map<String, Integer> getAllWinningPathCounts(List<Game> games) {
+        Map<String, Integer> winningPathCount = new HashMap<>();
+        for (Game game : games) {
+            game.getWinner().ifPresent(winner -> {
+                String path = getWinningPath(game, winner);
+                winningPathCount.put(path,
+                    1 + winningPathCount.getOrDefault(path, 0));
+            });
+        }
+        return winningPathCount;
+    }
+
+    public static String getWinningPath(Game game, Player winner) {
+        int stage1Count = getPublicVictoryPoints(game, winner.getUserID(), 1);
+        int stage2Count = getPublicVictoryPoints(game, winner.getUserID(), 2);
+        int secretCount = winner.getSecretVictoryPoints();
+        int supportCount = winner.getSupportForTheThroneVictoryPoints();
+        String others = getOtherVictoryPoints(game, winner.getUserID());
+        return stage1Count + " stage 1s, " +
+            stage2Count + " stage 2s, " +
+            secretCount + " secrets, " +
+            supportCount + " supports" +
+            (others.isEmpty() ? "" : ", " + others);
     }
 
     private static int getPublicVictoryPoints(Game game, String userId, int stage) {
