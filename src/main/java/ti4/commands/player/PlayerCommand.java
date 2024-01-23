@@ -125,6 +125,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new AddTeamMate());
         subcommands.add(new RemoveTeamMate());
         subcommands.add(new SetStatsAnchor());
+        subcommands.add(new CCsButton());
         return subcommands;
     }
 
