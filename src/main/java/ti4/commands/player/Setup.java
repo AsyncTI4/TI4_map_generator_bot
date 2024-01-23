@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+
+import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
@@ -212,11 +214,8 @@ public class Setup extends PlayerSubcommandData {
                 ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
             } else {
                 activeGame.setComponentAction(true);
-                Button getTech = Button.success("acquireATech", "Get a tech");
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    player.getRepresentation(true, true) + " you can use the button to get your starting tech", buttons);
+                    player.getRepresentation(true, true) + " you can use the button to get your starting tech", List.of(Buttons.GET_A_TECH));
             }
         }
 

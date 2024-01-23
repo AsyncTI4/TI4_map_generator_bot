@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
@@ -773,9 +774,8 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Target did not have a strat cc, no action taken");
                 return;
             }
-            Button getTech = Button.success("acquireATech", "Get a tech");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(getTech);
+            buttons.add(Buttons.GET_A_TECH);
             buttons.add(Button.danger("deleteButtons", "Delete This"));
             p2.setStrategicCC(p2.getStrategicCC() - 1);
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, activeGame);
@@ -813,9 +813,8 @@ public class ButtonHelperAgents {
             if (p2 == null) return;
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, activeGame);
             List<Button> redistributeButton = new ArrayList<>();
-            Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
             Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
-            redistributeButton.add(redistribute);
+            redistributeButton.add(Buttons.REDISTRIBUTE_CCs);
             redistributeButton.add(deleButton);
             MessageHelper.sendMessageToChannelWithButtons(channel,
                 p2.getRepresentation(true, true) + " use buttons to redistribute 1 CC (the bot allows more but the agent is restricted to 1)", redistributeButton);
@@ -1589,10 +1588,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         if (player == activeGame.getActivePlayer()) {
             activeGame.setComponentAction(true);
-            Button getTech = Button.success("acquireATech", "Get a tech");
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(getTech);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " can spend 4tg to RESEARCH a unit upgrade of one of their units in the system", buttons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " can spend 4tg to RESEARCH a unit upgrade of one of their units in the system", List.of(Buttons.GET_A_TECH));
         }
         event.getMessage().delete().queue();
     }

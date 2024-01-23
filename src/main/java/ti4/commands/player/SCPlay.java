@@ -19,6 +19,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
+
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -386,9 +388,8 @@ public class SCPlay extends PlayerSubcommandData {
 
     private List<Button> getTechnologyButtons() {
         Button followButton = Button.success("sc_follow_7", "Spend A Strategy CC");
-        Button getTech = Button.success("acquireATech", "Get a Tech");
         Button noFollowButton = Button.primary("sc_no_follow_7", "Not Following");
-        return List.of(followButton, getTech, noFollowButton);
+        return List.of(followButton, Buttons.GET_A_TECH, noFollowButton);
     }
 
     private List<Button> getImperialButtons() {
