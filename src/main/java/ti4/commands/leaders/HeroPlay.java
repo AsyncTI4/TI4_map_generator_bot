@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.DrawRelic;
@@ -109,11 +110,10 @@ public class HeroPlay extends LeaderAction {
             playerLeader.setActive(true);
             sb.append("\nLeader will be PURGED after status cleanup");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
-            if("zealotshero".equals(playerLeader.getId())){
-                Button getTech = Button.success("acquireAFreeTech", "Get a tech");
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your first non-faction tech", getTech);
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your second non-faction tech", getTech);
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your third non-faction tech", getTech);
+            if ("zealotshero".equals(playerLeader.getId())) {
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your first non-faction tech", Buttons.GET_A_FREE_TECH);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your second non-faction tech", Buttons.GET_A_FREE_TECH);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your third non-faction tech", Buttons.GET_A_FREE_TECH);
             }
         } else {
             boolean purged = true;
