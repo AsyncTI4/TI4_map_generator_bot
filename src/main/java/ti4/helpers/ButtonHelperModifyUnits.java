@@ -864,6 +864,9 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
+                if(unitModel.getCapacityValue() >0){
+                    continue;
+                }
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int totalUnits = unitEntry.getValue();
