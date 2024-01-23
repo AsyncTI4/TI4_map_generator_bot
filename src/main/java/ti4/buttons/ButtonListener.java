@@ -222,6 +222,11 @@ public class ButtonListener extends ListenerAdapter {
             activeGame.setLastActivePlayerPing(new Date());
         }
 
+        if (buttonID.contains("deleteThisButton")) {
+            buttonID = buttonID.replace("deleteThisButton", "");
+            event.editButton(null).queue();
+        }
+
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             MessageChannel channel;
@@ -1363,8 +1368,12 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
-            String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+            TechnologyModel techModel = Mapper.getTech(tech);
+            String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
+            switch (activeGame.getOutputVerbosity()) {
+                case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
+                default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+            }
             player.exhaustTech(tech);
             switch (tech) {
                 case "bs" -> { //Bio-stims
@@ -1395,30 +1404,34 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "pi" -> { // Predictive Intelligence
-                    Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
+                    event.getMessage().delete().queue();
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(redistribute, deleButton));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(Buttons.REDISTRIBUTE_CCs, deleButton));
                 }
                 case "gls" -> { // Graviton Laser System
                     // Do Nothing
                 }
                 case "mi" -> { // Mageon
+                    event.getMessage().delete().queue();
                     List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + " Select who you would like to Mageon.", buttons);
                     ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
                 case "vtx", "absol_vtx" -> { // Vortex
+                    event.getMessage().delete().queue();
                     List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, activeGame, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + " Select what unit you would like to capture", buttons);
                     ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
                 case "wg" -> { // Wormhole Generator
+                    event.getMessage().delete().queue();
                     List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                     String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
                     ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
                 case "absol_wg" -> { // Absol's Wormhole Generator
+                    event.getMessage().delete().queue();
                     List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                     String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
@@ -1426,17 +1439,23 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
                 case "pm" -> { // Production Biomes
+                    event.getMessage().delete().queue();
                     ButtonHelperFactionSpecific.resolveProductionBiomesStep1(player, activeGame, event);
                     ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
                 case "lgf" -> { // Lazax Gate Folding
                     if (player.getPlanets().contains("mr")) {
+                        event.getMessage().delete().queue();
                         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet("mr"), "inf mr", activeGame);
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                         ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                    } else {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " You do not control Mecatol Rex");
+                        player.refreshTech("lgf");
                     }
                 }
                 case "sr" -> { // Sling Relay
+                    event.getMessage().delete().queue();
                     List<Button> buttons = new ArrayList<>();
                     List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
                     if (player.hasUnit("ghoti_flagship")) {
@@ -2573,7 +2592,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "combatDrones" -> ButtonHelperModifyUnits.offerCombatDroneButtons(event, activeGame, player);
                 case "offerMirvedaCommander" -> ButtonHelperModifyUnits.offerMirvedaCommanderButtons(event, activeGame, player);
-                case "acquireAFreeTech" -> {
+                case "acquireAFreeTech" -> { // Buttons.GET_A_FREE_TECH
                     List<Button> buttons = new ArrayList<>();
 
                     Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech");
@@ -2600,8 +2619,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     event.getMessage().delete().queue();
                 }
-                case "acquireATech" -> {
-
+                case "acquireATech" -> { // Buttons.GET_A_TECH
                     List<Button> buttons = new ArrayList<>();
 
                     Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion", "Get a Blue Tech");
@@ -2759,7 +2777,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, activeGame);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                 }
-                case "redistributeCCButtons" -> {
+                case "redistributeCCButtons" -> { // Buttons.REDISTRIBUTE_CCs
                     String message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
 
                     Button getTactic = Button.success(finsFactionCheckerPrefix + "increase_tactic_cc", "Gain 1 Tactic CC");
@@ -2806,7 +2824,6 @@ public class ButtonListener extends ListenerAdapter {
                             if (properGain > 2) {
                                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                     player.getRepresentation(true, true) + " heads up, bot thinks you should gain " + properGain + " cc now due to: " + reasons);
-
                             }
 
                         }
@@ -4173,7 +4190,6 @@ public class ButtonListener extends ListenerAdapter {
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
-
     }
 
     private void deleteButtons(ButtonInteractionEvent event, String buttonID, String buttonLabel, Game activeGame, Player player, MessageChannel actionsChannel, String trueIdentity) {

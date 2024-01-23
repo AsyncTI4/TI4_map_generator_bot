@@ -33,9 +33,6 @@ import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import lombok.Data;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
+import ti4.buttons.Buttons;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.agenda.ShowDiscardedAgendas;
 import ti4.commands.cardsac.ACInfo;
@@ -5552,7 +5550,6 @@ public class ButtonHelper {
     }
 
     public static void resolveMaw(Game activeGame, Player player, ButtonInteractionEvent event) {
-
         player.removeRelic("mawofworlds");
         player.removeExhaustedRelic("mawofworlds");
         for (String planet : player.getPlanets()) {
@@ -5561,8 +5558,7 @@ public class ButtonHelper {
         activeGame.setComponentAction(true);
 
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " purged Maw Of Worlds.");
-        Button getTech = Button.success("acquireAFreeTech", "Get a tech");
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech", getTech);
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
     }
 
