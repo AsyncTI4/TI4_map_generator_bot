@@ -29,6 +29,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.buttons.Buttons;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
@@ -393,11 +394,8 @@ public class AgendaHelper {
                 }
                 if ("grant_reallocation".equalsIgnoreCase(agID)) {
                     activeGame.setComponentAction(true);
-                    Button getTech = Button.success("acquireATech", "Get a tech");
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(getTech);
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player2, activeGame),
-                        player2.getRepresentation() + " Use the button to get a tech. You will need to lose any fleet CC manually", buttons);
+                        player2.getRepresentation() + " Use the button to get a tech. You will need to lose any fleet CC manually", List.of(Buttons.GET_A_TECH));
                 }
 
             } //"abolishment" || "absol_abolishment", "miscount" || "absol_miscount"
@@ -772,7 +770,7 @@ public class AgendaHelper {
                         }
                         case "7"-> {
                             activeGame.setComponentAction(true);
-                            scButtons.add(Button.success("acquireATech", "Get a Tech"));
+                            scButtons.add(Buttons.GET_A_TECH);
                         }
                         case "8"-> {
                             scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
@@ -987,8 +985,7 @@ public class AgendaHelper {
         }
         if (d1.isSuccess() && !activeGame.isFoWMode()) {
             activeGame.setComponentAction(true);
-           Button getTech = Button.success("acquireATech", "Get a tech");
-            if(Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
+            if (Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
                 Player player = Helper.getPlayerFromAbility(activeGame, "propagation");
                 Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                 Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
@@ -998,7 +995,7 @@ public class AgendaHelper {
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
             }
-            MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "You can use the button to get your tech", getTech);
+            MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "You can use the button to get your tech", Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !activeGame.isFoWMode()) {
             Button modify = Button.secondary("getModifyTiles", "Modify Units");
             MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "Remove units on or adjacent to mecatol please", modify);
@@ -1895,10 +1892,8 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
                             activeGame.setComponentAction(true);
-                            Button getTech = Button.success("acquireATech", "Get a tech");
-                            List<Button> buttons = new ArrayList<>();
-                            buttons.add(getTech);
-                            MessageHelper.sendMessageToChannelWithButtons(channel, identity + " resolve Technology Rider by using the button to get a tech", buttons);
+
+                            MessageHelper.sendMessageToChannelWithButtons(channel, identity + " resolve Technology Rider by using the button to get a tech", List.of(Buttons.GET_A_TECH));
                         }
                         if (specificVote.contains("Leadership Rider") || (specificVote.contains("Technology Rider") && winningR.hasAbility("propagation"))) {
                             Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");

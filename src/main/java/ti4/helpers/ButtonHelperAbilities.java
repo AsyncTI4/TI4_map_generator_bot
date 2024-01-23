@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
@@ -115,7 +117,7 @@ public class ButtonHelperAbilities {
         }
         if (scPlayed > 7 && (activeGame.getScPlayed().get(7) == null || !activeGame.getScPlayed().get(7))) {
             activeGame.setComponentAction(true);
-            scButtons.add(Button.success("acquireATech", "Get a Tech"));
+            scButtons.add(Buttons.GET_A_TECH);
         }
         if (scPlayed > 8 && (activeGame.getScPlayed().get(8) == null || !activeGame.getScPlayed().get(8))) {
             scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
@@ -641,9 +643,8 @@ public class ButtonHelperAbilities {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "axiscommander") && !p2.hasTech(techName)) {
                 activeGame.setComponentAction(true);
-                Button getTech = Button.success("acquireATech", "Get a tech");
                 List<Button> buttons2 = new ArrayList<>();
-                buttons2.add(getTech);
+                buttons2.add(Buttons.GET_A_TECH);
                 buttons2.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true)
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName() + ") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r", buttons2);
