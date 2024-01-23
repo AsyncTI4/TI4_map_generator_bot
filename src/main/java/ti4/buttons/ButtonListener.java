@@ -996,7 +996,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } else if (buttonID.startsWith("getDamageButtons_")) {// "repealLaw_"
             if(buttonID.contains("deleteThis")){
-                buttonID.replace("deleteThis", "");
+                buttonID = buttonID.replace("deleteThis", "");
                 event.getMessage().delete().queue();
             }
             String pos = buttonID.replace("getDamageButtons_", "");
