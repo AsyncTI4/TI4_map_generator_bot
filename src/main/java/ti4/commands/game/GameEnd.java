@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -238,19 +239,25 @@ public class GameEnd extends GameSubcommandData {
             String winningPath = GameStats.getWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
             int winningPathCount = winningPathCounts.get(winningPath) - 1;
-            long winningPathPercent = gamesWithWinnerCount == 0 ? 0 : Math.round(100 * winningPathCount / (double) gamesWithWinnerCount);
+            double winningPathPercent = gamesWithWinnerCount == 0 ? 0 : winningPathCount / (double) gamesWithWinnerCount;
             sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
-                .append(" times before! That's ").append(winningPathPercent).append("% of games!").append("\n");
+                .append(" times before! That's ").append(formatPercent(winningPathPercent)).append("% of games!").append("\n");
             if (winningPathCount == 0) {
               sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
-            } else if (winningPathPercent == 1) {
-              sb.append("🎉__**Who needs a conventional win? Not you! Good job!**__🎉").append("\n");
-            } else if (winningPathPercent == 0) {
+            } else if (winningPathPercent <= .01) {
               sb.append("🤯__**Few have traveled your path! We celebrate your boldness!**__🤯").append("\n");
+            } else if (winningPathPercent <= .02) {
+              sb.append("🎉__**Who needs a conventional win? Not you! Good job!**__🎉").append("\n");
             }
         }
 
         return sb.toString();
+    }
+
+    private static String formatPercent(double d) {
+        NumberFormat numberFormat = NumberFormat.getPercentInstance();
+        numberFormat.setMinimumFractionDigits(1);
+        return numberFormat.format(d);
     }
 
     public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
