@@ -243,11 +243,11 @@ public class GameEnd extends GameSubcommandData {
             sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
                 .append(" times before! That's ").append(formatPercent(winningPathPercent)).append(" of games!").append("\n");
             if (winningPathCount == 0) {
-              sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
+                sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
             } else if (winningPathPercent <= .01) {
-              sb.append("🤯__**Few have traveled your path! We celebrate your boldness!**__🤯").append("\n");
+                sb.append("🤯__**Few have traveled your path! We celebrate your boldness!**__🤯").append("\n");
             } else if (winningPathPercent <= .02) {
-              sb.append("🎉__**Who needs a conventional win? Not you! Good job!**__🎉").append("\n");
+                sb.append("🎉__**Who needs a conventional win? Not you! Good job!**__🎉").append("\n");
             }
         }
 
