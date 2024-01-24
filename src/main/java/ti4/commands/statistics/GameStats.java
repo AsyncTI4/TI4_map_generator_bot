@@ -70,6 +70,7 @@ public class GameStats extends StatisticsSubcommandData {
             case GAME_COUNT -> showGameCount(event);
             case WINNING_PATH -> showWinningPath(event);
             case SUPPORT_WIN_COUNT -> showWinsWithSupport(event);
+            // case WINNING_PATH_NAMES
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
     }
