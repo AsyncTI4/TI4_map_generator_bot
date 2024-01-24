@@ -120,7 +120,7 @@ public class ButtonHelperAbilities {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (scPlayed > 8 && (activeGame.getScPlayed().get(8) == null || !activeGame.getScPlayed().get(8))) {
-            scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+            scButtons.add(Button.secondary("non_sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
         }
         scButtons.add(Button.danger("deleteButtons", "Done resolving"));
 

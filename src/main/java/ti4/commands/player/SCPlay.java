@@ -298,6 +298,23 @@ public class SCPlay extends PlayerSubcommandData {
             String scId = String.valueOf(sc);
             sc = Integer.parseInt(StringUtils.left(scId, 1));
         }
+        
+        if(sc == 8){
+            Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+            String key = "factionsThatAreNotDiscardingSOs";
+            String key2 = "queueToDrawSOs";
+            String key3 = "potentialBlockers";
+            activeGame.setCurrentReacts(key,"");
+            activeGame.setCurrentReacts(key2,"");
+            activeGame.setCurrentReacts(key3,"");
+            for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
+                if(player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount() || (player == imperialHolder && player.getPlanets().contains("mr"))){
+                    activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
+                }else{
+                    activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+                }
+            }
+        }
 
         return switch (sc) {
             case 1 -> getLeadershipButtons();

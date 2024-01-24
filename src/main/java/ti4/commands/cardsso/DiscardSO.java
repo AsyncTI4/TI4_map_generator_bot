@@ -64,6 +64,21 @@ public class DiscardSO extends SOCardsSubcommandData {
             buttons.add(Button.danger("deleteButtons","Delete These Buttons"));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg, buttons);
         }
+
+        String key = "factionsThatAreNotDiscardingSOs";
+        String key2 = "queueToDrawSOs";
+        String key3 = "potentialBlockers";
+        if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
+            activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+        }
+        if(!activeGame.getFactionsThatReactedToThis(key).contains(player.getFaction()+"*")){
+            activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
+        }
+        if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
+            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
+            Helper.resolveQueue(activeGame, event);
+        }
+        
         
     }
     public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game activeGame){
