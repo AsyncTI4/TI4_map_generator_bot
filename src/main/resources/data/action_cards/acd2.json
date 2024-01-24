@@ -23,7 +23,7 @@
     "phase": "Action",
     "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
     "text": "That player must remove all of their ground forces from that planet and place them on a different planet they control, if able.",
-    "flavorText": "Gila's silver tongue had scored the Emirates a victory. She, however, was more pleased with the enumerable lives that were spared.",
+    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand, \"Our dominion knows no border.\" The man hesitated, then agreed.",
     "source": "action_deck_2"
   },
   {
@@ -59,7 +59,7 @@
     "phase": "Action",
     "window": "When you spend resources to research a technology",
     "text": "Discard 1 of your relic fragments to reduce the resources spent by 4 and ignore 1 of that technology's prerequisites.",
-    "flavorText": "The observation team had protested with one voice, threatening to return with fleets should the Creuss continue to bar them from this discovery.",
+    "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
     "source": "action_deck_2"
   },
   {
@@ -162,11 +162,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "corruption",
+    "alias": "corruption_acd2",
     "name": "Corruption",
-    "phase": "Status",
-    "window": "After the speaker reveals a public objective",
-    "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, draw 2 action cards. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
     "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
     "source": "action_deck_2"
   },
@@ -177,15 +177,6 @@
     "window": "Action",
     "text": "Pass. Then, perform the secondary ability of 1 readied strategy card in a player's play area; while performing that ability, spend command tokens from your reinforcements instead of your strategy pool. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
     "flavorText": "\"They've stretched themselves to the brink of destruction. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Elder Junn shook his head. \"We must remain focused. Steady.\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "custodian_support",
-    "name": "Custodian Support",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, gain 2 commodities. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
-    "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. They would regret their underhanded partnerships.",
     "source": "action_deck_2"
   },
   {
@@ -468,6 +459,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "patronage",
+    "name": "Patronage",
+    "phase": "Status",
+    "window": "After the speaker reveals a public objective",
+    "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
+    "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of tradition.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "pivoted_plan",
     "name": "Pivoted Plans",
     "phase": "Action",
@@ -500,7 +500,7 @@
     "phase": "Any",
     "window": "After a die is rolled",
     "text": "Apply +3 or -3 to the result of that roll.",
-    "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
+    "flavorText": "Ahk-Syl Siven flared, bright red briefly overtaking blue. \"Would I lie to you?\" The flame pulsed, suspended in the air before him. Was it real? Or just an illusion?",
     "source": "action_deck_2"
   },
   {
@@ -545,7 +545,7 @@
     "phase": "Agenda",
     "window": "When an agenda is revealed",
     "text": "Choose 1 agenda in play or in the discard pile. Then, discard the revealed agenda. Players vote on the chosen agenda instead, as if it were revealed from the agenda deck.",
-    "flavorText": "Ciel was met by a crowd when he arrived at the Senate Possessional. His agreements to fund research on the Ixthian artifact had conjured up doomsayers. They would learn the providence of Winnaran wisdom.",
+    "flavorText": "Perdin was met by a crowd when he arrived at the Senate Possessional. His agreements to fund research on the Ixthian artifact had conjured up doomsayers. They would learn the providence of Winnaran wisdom.",
     "source": "action_deck_2"
   },
   {
@@ -554,7 +554,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Produce 1 ship in a system that contains 1 of your space docks. Then, you may produce 1 ship of that type in any number of other systems that contain 1 of your space docks.",
-    "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns, my soul alight! This is our freedom!\"",
+    "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns my soul alight! This is our freedom!\"",
     "source": "action_deck_2"
   },
   {
