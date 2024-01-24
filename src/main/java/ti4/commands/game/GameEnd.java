@@ -214,9 +214,9 @@ public class GameEnd extends GameSubcommandData {
             sb.append(player.getFactionEmoji());
             sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
             if (user.isPresent()) {
-              sb.append(user.get().getAsMention());
+                sb.append(user.get().getAsMention());
             } else {
-              sb.append(player.getUserName());
+                sb.append(player.getUserName());
             }
             sb.append(" - *").append(playerVP).append("VP* ");
             if (winner.isPresent() && winner.get() == player) sb.append(" - **WINNER**");
