@@ -206,21 +206,22 @@ public class GameEnd extends GameSubcommandData {
         sb.append("\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
+        Optional<Player> winner = game.getWinner();
         for (Player player : game.getRealPlayers()) {
-            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
-            int playerVP = player.getTotalVictoryPoints();
-            sb.append("> `").append(index).append(".` ");
-            sb.append(player.getFactionEmoji());
-            sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
-            if (user.isPresent()) {
-                sb.append(user.get().getAsMention());
-            } else {
-                sb.append(player.getUserName());
-            }
-            sb.append(" - *").append(playerVP).append("VP* ");
-            if (playerVP >= game.getVp()) sb.append(" - **WINNER**");
-            sb.append("\n");
-            index++;
+          Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
+          int playerVP = player.getTotalVictoryPoints();
+          sb.append("> `").append(index).append(".` ");
+          sb.append(player.getFactionEmoji());
+          sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
+          if (user.isPresent()) {
+            sb.append(user.get().getAsMention());
+          } else {
+            sb.append(player.getUserName());
+          }
+          sb.append(" - *").append(playerVP).append("VP* ");
+          if (winner.isPresent() && winner.get() == player) sb.append(" - **WINNER**");
+          sb.append("\n");
+          index++;
         }
 
         sb.append("\n");
@@ -230,23 +231,22 @@ public class GameEnd extends GameSubcommandData {
             .append(game.getVp()).append(" victory points")
             .append("\n");
 
-        Optional<Player> winner = game.getWinner();
         if (winner.isPresent() && !game.hasHomebrew()) {
             List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
             Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
-            String winningPath = GameStats.getWinningPath(game, game.getWinner().get());
+            String winningPath = GameStats.getWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
             int winningPathCount = winningPathCounts.get(winningPath) - 1;
             double winningPathPercent = gamesWithWinnerCount == 0 ? 0 : Math.round(100 * winningPathCount / (double) gamesWithWinnerCount);
             sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
                 .append(" times before! That's ").append(winningPathPercent).append("% of games!").append("\n");
-            if (winningPathPercent == 1) {
+            if (winningPathCount == 0) {
+              sb.append("🥳__**An async first - may your victory live on in the halls of fame!**__🥳").append("\n");
+            } else if (winningPathPercent == 1) {
               sb.append("🎉__**Congratulations on your unique victory!**__🎉").append("\n");
             } else if (winningPathPercent == 0) {
               sb.append("🤯__**What an incredible path, good job!**__🤯").append("\n");
-            } else if (winningPathCount == 0) {
-              sb.append("🥳__**An async first - may your victory live on in the halls of fame!**__🥳").append("\n");
             }
         }
 
