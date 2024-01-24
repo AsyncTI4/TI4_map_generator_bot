@@ -99,30 +99,30 @@ public class Swap extends GameSubcommandData {
                 player.setDummy(false);
                 swapperPlayer.setDummy(true);
             }
-            LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
-            player.setSCs(new LinkedHashSet<>(swapperPlayer.getSCs()));
-            swapperPlayer.setSCs(holder);
+            // LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
+            // player.setSCs(new LinkedHashSet<>(swapperPlayer.getSCs()));
+            // swapperPlayer.setSCs(holder);
             swapperPlayer.setUserName(removedPlayer.getUserName());
             swapperPlayer.setUserID(removedPlayer.getUserID());
             player.setUserName(addedUser.getName());
             player.setUserID(addedUser.getId());
 
             if (activeGame.getActivePlayerID() != null && activeGame.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-                if (!activeGame.isFoWMode()) {
-                    try {
-                        if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
-                            activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
-                            activeGame.setLatestTransactionMsg("");
-                        }
-                    } catch (Exception e) {
-                        //  Block of code to handle errors
-                    }
-                }
-                String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
-                String buttonText = "Use buttons to do your turn. ";
-                List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
-                MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
+                // if (!activeGame.isFoWMode()) {
+                //     try {
+                //         if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
+                //             activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
+                //             activeGame.setLatestTransactionMsg("");
+                //         }
+                //     } catch (Exception e) {
+                //         //  Block of code to handle errors
+                //     }
+                // }
+                // String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
+                // String buttonText = "Use buttons to do your turn. ";
+                // List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
+                // MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
+                // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
             }
         } else {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");

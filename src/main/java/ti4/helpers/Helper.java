@@ -48,6 +48,7 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.capture.RemoveUnits;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.milty.MiltyDraftManager;
@@ -318,6 +319,45 @@ public class Helper {
             }
         }
         return players;
+    }
+    public static void resolveQueue(Game activeGame, GenericInteractionCreateEvent event){
+
+        Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+        String key = "factionsThatAreNotDiscardingSOs";
+        String key2 = "queueToDrawSOs";
+        String key3 = "potentialBlockers";
+        if(activeGame.getFactionsThatReactedToThis(key2).length() < 2){
+            return;
+        }
+        
+        for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
+            String message = player.getRepresentation(true, true)+" Drew Queued Secret Objective From Imperial. ";
+            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
+                activeGame.drawSecretObjective(player.getUserID());
+                if (player.hasAbility("plausible_deniability")) {
+                    activeGame.drawSecretObjective(player.getUserID());
+                    message = message + ". Drew a second SO due to plausible deniability";
+                }
+                SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+            }
+            if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*") && activeGame.getFactionsThatReactedToThis(key2).length() < 2){
+                if(!activeGame.isFoWMode()){
+                    message =player.getRepresentation(true, true)+ " is the one the game is currently waiting on before advancing to the next person";
+                }
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                break;
+            }
+        }
+    }
+    public static Player getPlayerWithThisSC(Game activeGame, int sc){
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2.getSCs().contains(sc)){
+                return p2;
+            }
+        }
+        return null;
     }
     public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game activeGame){
         List<Player> players = new ArrayList<>();
