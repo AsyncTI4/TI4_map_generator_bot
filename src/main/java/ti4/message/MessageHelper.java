@@ -74,7 +74,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
-		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
+		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions") && !messageText.contains("end of turn ability")) {
 			buttons.add(Button.secondary("ultimateUndo", "UNDO"));
 		}
 		splitAndSent(messageText, channel, embeds, buttons);

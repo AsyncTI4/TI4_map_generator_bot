@@ -359,10 +359,8 @@ public class ButtonListener extends ListenerAdapter {
             if (channel != null) {
                 try {
                     int soIndex = Integer.parseInt(soID);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ident + " discarded an SO");
                     new DiscardSO().discardSO(event, player, soIndex, activeGame);
-                    if (!activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), ident + " discarded an SO");
-                    }
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse SO ID: " + soID, e);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please discard manually.")
@@ -798,6 +796,23 @@ public class ButtonListener extends ListenerAdapter {
             }
             players.remove(player);
             playerUsedSC.put(messageID, players);
+            if(scnum2 == 8 && !activeGame.isHomeBrewSCMode()){
+                String key = "factionsThatAreNotDiscardingSOs";
+                String key2 = "queueToDrawSOs";
+                String key3 = "potentialBlockers";
+                if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
+                    activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+                }
+                if(!activeGame.getFactionsThatReactedToThis(key).contains(player.getFaction()+"*")){
+                    activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
+                }
+                if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
+                    activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
+                    Helper.resolveQueue(activeGame, event);
+                }
+
+                
+            }
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ButtonHelper.addReaction(event, false, false, null, "");
         } else if (buttonID.startsWith("movedNExplored_")) {
@@ -1378,6 +1393,7 @@ public class ButtonListener extends ListenerAdapter {
             switch (tech) {
                 case "bs" -> { //Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
+                    ButtonHelper.deleteTheOneButton(event);
                 }
                 case "absol_bs" -> { //Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
@@ -1404,7 +1420,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "pi" -> { // Predictive Intelligence
-                    event.getMessage().delete().queue();
+                    ButtonHelper.deleteTheOneButton(event);
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(Buttons.REDISTRIBUTE_CCs, deleButton));
                 }
@@ -2899,16 +2915,43 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
+                    if (!player.getFollowedSCs().contains(8)) {
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 8, activeGame, event);
+                    }
+
+                    Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+                    String key = "factionsThatAreNotDiscardingSOs";
+                    String key2 = "queueToDrawSOs";
+                    String key3 = "potentialBlockers";
+                    String message = "Drew Secret Objective";
+                    for(Player player2 : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
+                        if (player2 == player){
+                            activeGame.drawSecretObjective(player.getUserID());
+                            if (player.hasAbility("plausible_deniability")) {
+                                activeGame.drawSecretObjective(player.getUserID());
+                                message = message + ". Drew a second SO due to plausible deniability";
+                            }
+                            SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                            break;
+                        }
+                        if(activeGame.getFactionsThatReactedToThis(key3).contains(player2.getFaction()+"*")){
+                            message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear. ";
+                            if(!activeGame.isFoWMode()){
+                                message = message +player2.getRepresentation(true, true)+ " is the one the game is currently waiting on";
+                            }
+                            activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2)+player.getFaction()+"*");
+                            break;
+                        }
+                    }
+                    ButtonHelper.addReaction(event, false, false, message, "");
+                }
+                case "non_sc_draw_so" -> {
                     String message = "Drew Secret Objective";
                     activeGame.drawSecretObjective(player.getUserID());
                     if (player.hasAbility("plausible_deniability")) {
                         activeGame.drawSecretObjective(player.getUserID());
                         message = message + ". Drew a second SO due to plausible deniability";
                     }
-                    if (!player.getFollowedSCs().contains(8)) {
-                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 8, activeGame, event);
-                    }
-                    //  player.addFollowedSC(8);
                     SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
