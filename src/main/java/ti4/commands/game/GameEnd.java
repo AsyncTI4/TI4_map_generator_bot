@@ -208,20 +208,20 @@ public class GameEnd extends GameSubcommandData {
         int index = 1;
         Optional<Player> winner = game.getWinner();
         for (Player player : game.getRealPlayers()) {
-          Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
-          int playerVP = player.getTotalVictoryPoints();
-          sb.append("> `").append(index).append(".` ");
-          sb.append(player.getFactionEmoji());
-          sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
-          if (user.isPresent()) {
-            sb.append(user.get().getAsMention());
-          } else {
-            sb.append(player.getUserName());
-          }
-          sb.append(" - *").append(playerVP).append("VP* ");
-          if (winner.isPresent() && winner.get() == player) sb.append(" - **WINNER**");
-          sb.append("\n");
-          index++;
+            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
+            int playerVP = player.getTotalVictoryPoints();
+            sb.append("> `").append(index).append(".` ");
+            sb.append(player.getFactionEmoji());
+            sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
+            if (user.isPresent()) {
+              sb.append(user.get().getAsMention());
+            } else {
+              sb.append(player.getUserName());
+            }
+            sb.append(" - *").append(playerVP).append("VP* ");
+            if (winner.isPresent() && winner.get() == player) sb.append(" - **WINNER**");
+            sb.append("\n");
+            index++;
         }
 
         sb.append("\n");
