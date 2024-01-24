@@ -206,6 +206,7 @@ public class GameEnd extends GameSubcommandData {
         sb.append("\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
+        Optional<Player> winner = game.getWinner();
         for (Player player : game.getRealPlayers()) {
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             int playerVP = player.getTotalVictoryPoints();
@@ -218,7 +219,7 @@ public class GameEnd extends GameSubcommandData {
                 sb.append(player.getUserName());
             }
             sb.append(" - *").append(playerVP).append("VP* ");
-            if (playerVP >= game.getVp()) sb.append(" - **WINNER**");
+            if (winner.isPresent() && winner.get() == player) sb.append(" - **WINNER**");
             sb.append("\n");
             index++;
         }
@@ -230,7 +231,7 @@ public class GameEnd extends GameSubcommandData {
             .append(game.getVp()).append(" victory points")
             .append("\n");
 
-        if (!game.hasHomebrew()) {
+        if (winner.isPresent() && !game.hasHomebrew()) {
             List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
             Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
