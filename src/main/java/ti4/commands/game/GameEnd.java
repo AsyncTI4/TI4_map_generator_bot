@@ -241,7 +241,7 @@ public class GameEnd extends GameSubcommandData {
             int winningPathCount = winningPathCounts.get(winningPath) - 1;
             double winningPathPercent = gamesWithWinnerCount == 0 ? 0 : winningPathCount / (double) gamesWithWinnerCount;
             sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
-                .append(" times before! That's ").append(formatPercent(winningPathPercent)).append("% of games!").append("\n");
+                .append(" times before! That's ").append(formatPercent(winningPathPercent)).append(" of games!").append("\n");
             if (winningPathCount == 0) {
               sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
             } else if (winningPathPercent <= .01) {
