@@ -235,18 +235,18 @@ public class GameEnd extends GameSubcommandData {
             List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
             Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
-            String winningPath = GameStats.getWinningPath(game, game.getWinner().get());
+            String winningPath = GameStats.getWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
             int winningPathCount = winningPathCounts.get(winningPath) - 1;
             double winningPathPercent = gamesWithWinnerCount == 0 ? 0 : Math.round(100 * winningPathCount / (double) gamesWithWinnerCount);
             sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
                 .append(" times before! That's ").append(winningPathPercent).append("% of games!").append("\n");
-            if (winningPathPercent == 1) {
+            if (winningPathCount == 0) {
+              sb.append("🥳__**An async first - may your victory live on in the halls of fame!**__🥳").append("\n");
+            } else if (winningPathPercent == 1) {
               sb.append("🎉__**Congratulations on your unique victory!**__🎉").append("\n");
             } else if (winningPathPercent == 0) {
               sb.append("🤯__**What an incredible path, good job!**__🤯").append("\n");
-            } else if (winningPathCount == 0) {
-              sb.append("🥳__**An async first - may your victory live on in the halls of fame!**__🥳").append("\n");
             }
         }
 
