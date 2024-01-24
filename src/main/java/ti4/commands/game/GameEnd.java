@@ -230,7 +230,8 @@ public class GameEnd extends GameSubcommandData {
             .append(game.getVp()).append(" victory points")
             .append("\n");
 
-        if (!game.hasHomebrew()) {
+        Optional<Player> winner = game.getWinner();
+        if (winner.isPresent() && !game.hasHomebrew()) {
             List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
             Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
