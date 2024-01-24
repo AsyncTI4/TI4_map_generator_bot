@@ -773,7 +773,7 @@ public class AgendaHelper {
                             scButtons.add(Buttons.GET_A_TECH);
                         }
                         case "8"-> {
-                            scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                            scButtons.add(Button.secondary("non_sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
                         }
                     }
                     MessageHelper.sendMessageToChannel(actionsChannel, "You can use this button to resolve the secondary", scButtons);
