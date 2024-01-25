@@ -233,21 +233,23 @@ public class GameEnd extends GameSubcommandData {
             .append("\n");
 
         if (winner.isPresent() && !game.hasHomebrew()) {
+            String winningPath = GameStats.getWinningPath(game, winner.get());
+            sb.append("**Winning Path:** ").append(winningPath).append("\n");
             List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
             Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
-            String winningPath = GameStats.getWinningPath(game, winner.get());
-            sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            int winningPathCount = winningPathCounts.get(winningPath) - 1;
-            double winningPathPercent = gamesWithWinnerCount == 0 ? 0 : winningPathCount / (double) gamesWithWinnerCount;
-            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
-                .append(" times before! That's ").append(formatPercent(winningPathPercent)).append(" of games!").append("\n");
-            if (winningPathCount == 0) {
-                sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
-            } else if (winningPathPercent <= .01) {
-                sb.append("🤯__**Few have traveled your path! We celebrate your boldness!**__🤯").append("\n");
-            } else if (winningPathPercent <= .02) {
-                sb.append("🎉__**Who needs a conventional win? Not you! Good job!**__🎉").append("\n");
+            if (gamesWithWinnerCount >= 100) {
+                int winningPathCount = winningPathCounts.get(winningPath) - 1;
+                double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
+                sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
+                    .append(" times before. That's ").append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
+                if (winningPathCount == 0) {
+                    sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
+                } else if (winningPathPercent <= .005) {
+                    sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉").append("\n");
+                } else if (winningPathPercent <= .01) {
+                    sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append("\n");
+                }
             }
         }
 
