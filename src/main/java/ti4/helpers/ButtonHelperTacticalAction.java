@@ -498,7 +498,7 @@ public class ButtonHelperTacticalAction {
                 if (!activeGame.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, activeGame.getTileByPosition(pos))) {
                     String msgA = player_.getRepresentation()
-                        + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. You can proceed and float them unless you think they are particularly relevant, or wish to offer a pleading window. ";
+                        + " has units in the system and has a potential/floatable window to play stuff";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
                 }
             }

@@ -189,6 +189,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
         String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
         event.getMessage().delete().queue();
     }
 
@@ -1294,6 +1295,7 @@ public class ButtonHelperActionCards {
             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
             String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
         }
         event.getMessage().delete().queue();
     }
