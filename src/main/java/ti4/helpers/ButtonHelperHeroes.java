@@ -184,6 +184,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
         revealedRelics = getAllRevealedRelics(activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), revealMsg);

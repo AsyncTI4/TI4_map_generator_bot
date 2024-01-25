@@ -975,6 +975,7 @@ public class ButtonHelperFactionSpecific {
                 String trueIdentity = p2.getRepresentation(true, true);
                 String message = trueIdentity + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
                 String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation() + ". Use buttons to gain CCs";
+                activeGame.setCurrentReacts("originalCCsFor"+p2.getFaction(), p2.getCCRepresentation());
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message2, buttons);
                 break;

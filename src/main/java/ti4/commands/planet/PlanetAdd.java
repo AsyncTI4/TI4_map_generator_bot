@@ -100,8 +100,7 @@ public class PlanetAdd extends PlanetAddRemove {
                         activeGame.scorePublicObjective(player.getUserID(), shardID);
                         Helper.checkEndGame(activeGame, player);
                     }
-                    String msg = player_.getRepresentation() + " has a window to play reparations for the taking of the planet " + planet
-                        + " (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";
+                    String msg = player_.getRepresentation() + " has a window to play reparations for the taking of " + planet;
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
                     if (moveTitanPN) {
                         if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)) {

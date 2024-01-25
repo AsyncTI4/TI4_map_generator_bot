@@ -534,6 +534,7 @@ public class AgendaHelper {
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
                         String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation()+". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
                     }
                 }else{
                     for(Player player : activeGame.getRealPlayers()){
@@ -599,6 +600,7 @@ public class AgendaHelper {
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
                         String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation()+". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
                     }
                 }
             }
@@ -994,6 +996,7 @@ public class AgendaHelper {
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
             }
             MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "You can use the button to get your tech", Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !activeGame.isFoWMode()) {
@@ -1902,6 +1905,7 @@ public class AgendaHelper {
                             Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                             String message = identity + "! Your current CCs are " + winningR.getCCRepresentation() + ". Use buttons to gain CCs";
+                            activeGame.setCurrentReacts("originalCCsFor"+winningR.getFaction(),winningR.getCCRepresentation());
                             MessageHelper.sendMessageToChannel(channel, identity + " resolve rider by using the button to get 3 command counters");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
