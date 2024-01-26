@@ -1,5 +1,7 @@
 package ti4.commands.game;
 
+import static ti4.helpers.StringHelper.ordinal;
+
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.Comparator;
@@ -241,8 +243,10 @@ public class GameEnd extends GameSubcommandData {
             if (gamesWithWinnerCount >= 100) {
                 int winningPathCount = winningPathCounts.get(winningPath) - 1;
                 double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
+                String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
                 sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
-                    .append(" times before. That's ").append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
+                    .append(" times before. That's the ").append(winningPathCommonality).append("most common path at ")
+                    .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
                 if (winningPathCount == 0) {
                     sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
                 } else if (winningPathPercent <= .005) {
@@ -256,7 +260,17 @@ public class GameEnd extends GameSubcommandData {
         return sb.toString();
     }
 
-    private static String formatPercent(double d) {
+  private static String getWinningPathCommonality(Map<String, Integer> winningPathCounts, int winningPathCount) {
+      int commonality = 1;
+      for (int i : winningPathCounts.values()) {
+          if (i > winningPathCount) {
+              commonality++;
+          }
+      }
+      return commonality == 1 ? "" : ordinal(commonality) + " ";
+  }
+
+  private static String formatPercent(double d) {
         NumberFormat numberFormat = NumberFormat.getPercentInstance();
         numberFormat.setMinimumFractionDigits(1);
         return numberFormat.format(d);
