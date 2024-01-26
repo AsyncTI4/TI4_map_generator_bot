@@ -238,7 +238,7 @@
     "name": "Discord",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "Choose 1 player. When that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
+    "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
     "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
     "source": "action_deck_2"
   },
