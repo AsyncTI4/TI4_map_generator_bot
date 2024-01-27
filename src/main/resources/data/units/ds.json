@@ -368,7 +368,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After this unit moves into a system, produce up to 2 units that have a combined cost of 4 or less, regardless of other players' ships."
+        "ability": "After this unit moves into the active system, you may produce up to 2 units that have a combined cost of 4 or less in that system."
     },
     {
         "id": "dihmohn_mech",
@@ -827,7 +827,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After the first round of combat in this system, you may place up to 2 of your captured units in this system or on that planet."
+        "ability": "After the first round of combat in this system, place up to 2 of your captured units in this system or on that planet."
     },
     {
         "id": "kjalengard_mech",
@@ -966,7 +966,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During invasion, commit up to 1 infantry from your reinforcements to each planet in this system."
+        "ability": "When you commit units to a planet in this system, commit 1 infantry from your reinforcements to that planet."
     },
     {
         "id": "kyro_mech",
@@ -981,7 +981,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Apply +1 to the results of this unit's combat rolls for each public objective your opponent has scored that you have not."
+        "ability": "When this unit would be destroyed, if it is damaged, you may discard 1 action card to repair it instead."
     },
     {
         "id": "lanefir_flagship",

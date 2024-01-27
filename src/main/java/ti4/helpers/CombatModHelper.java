@@ -371,7 +371,7 @@ public class CombatModHelper {
                         count = space.getUnitDamage().get(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()));
                     }
                     scalingCount += count;
-
+                    scalingCount = Math.min(scalingCount,2);
                 }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
