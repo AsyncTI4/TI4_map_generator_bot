@@ -498,7 +498,7 @@ public class ButtonHelperTacticalAction {
                 if (!activeGame.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, activeGame.getTileByPosition(pos))) {
                     String msgA = player_.getRepresentation()
-                        + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. You can proceed and float them unless you think they are particularly relevant, or wish to offer a pleading window. ";
+                        + " has units in the system and has a potential/floatable window to play stuff";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
                 }
             }
@@ -562,15 +562,15 @@ public class ButtonHelperTacticalAction {
         if (!activeGame.isFoWMode()) {
             int abilities = 0;
             if(!activeGame.getL1Hero()){
-                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, true);
+                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
             }
-            if (abilities > 0 ) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("doActivation_" + pos, "Confirm"));
-                buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
-                String msg = "# " + ButtonHelper.getIdent(player) + " You are about to automatically trigger some abilities by activating this system. Please hit confirm before continuing";
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-            }
+            // if (abilities > 0 ) {
+            //     List<Button> buttons = new ArrayList<>();
+            //     buttons.add(Button.success("doActivation_" + pos, "Confirm"));
+            //     buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
+            //     String msg = "# " + ButtonHelper.getIdent(player) + " You are about to automatically trigger some abilities by activating this system. Please hit confirm before continuing";
+            //     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            // }
         }
 
         event.getMessage().delete().queue();

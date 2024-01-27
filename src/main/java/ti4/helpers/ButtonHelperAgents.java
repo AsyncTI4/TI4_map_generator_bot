@@ -240,7 +240,7 @@ public class ButtonHelperAgents {
         p2.setTg(p2.getTg() + 2);
         ButtonHelperAbilities.pillageCheck(p2, activeGame);
         resolveArtunoCheck(p2, activeGame, 2);
-        String msg2 = ButtonHelper.getIdent(player) + " selected " + ButtonHelper.getIdent(p2) + " as user of Nekro agent";
+        String msg2 = ButtonHelper.getIdentOrColor(player,activeGame) + " selected " + ButtonHelper.getIdentOrColor(p2,activeGame) + " as user of Nekro agent";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
         String message = p2.getRepresentation(true, true) + " increased your tgs by 2 (" + (p2.getTg() - 2) + "->" + p2.getTg()
             + "). Use buttons in your cards info thread to discard an AC, or lose a cc";
@@ -270,7 +270,7 @@ public class ButtonHelperAgents {
     public static void kolleccAgentResStep1(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         String faction = buttonID.split("_")[1];
         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
-        String msg2 = ButtonHelper.getIdent(player) + " selected " + ButtonHelper.getIdent(p2) + " as user of Kollecc agent";
+        String msg2 = ButtonHelper.getIdentOrColor(player,activeGame) + " selected " + ButtonHelper.getIdentOrColor(p2,activeGame) + " as user of Kollecc agent";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
         List<Button> buttons = getKolleccAgentButtons(activeGame, p2);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), p2.getRepresentation(true, true) + " use buttons to resolve",
@@ -495,6 +495,7 @@ public class ButtonHelperAgents {
             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
             String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+            activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
         }
         if ("mykomentoriagent".equalsIgnoreCase(agent)) {
             ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
@@ -522,7 +523,8 @@ public class ButtonHelperAgents {
             Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
             String trueIdentity2 = p2.getRepresentation(true, true);
-            String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation() + ". Use buttons to gain CCs";
+            String message2 = trueIdentity2 + "! Your current CCs are " + p2.getCCRepresentation() + ". Use buttons to gain CCs";
+            activeGame.setCurrentReacts("originalCCsFor"+p2.getFaction(), p2.getCCRepresentation());
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message2, buttons);
         }
         if ("veldyragent".equalsIgnoreCase(agent)) {
@@ -1152,11 +1154,11 @@ public class ButtonHelperAgents {
         String msg = player.getRepresentation(true, true) + " choose the legendary planet ability that you wish to use";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
 
-        List<Button> buttons2 = Helper.getPlanetExhaustButtons(player, activeGame, "both");
-        Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
-        buttons2.add(DoneExhausting);
-        String msg2 = player.getRepresentation(true, true) + " exhaust one planet to pay for the ability";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
+        // List<Button> buttons2 = Helper.getPlanetExhaustButtons(player, activeGame, "both");
+        // Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+        // buttons2.add(DoneExhausting);
+        // String msg2 = player.getRepresentation(true, true) + " exhaust one planet to pay for the ability";
+        // MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
     }
 
     public static void resolveRefreshWithOlradinAgent(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {

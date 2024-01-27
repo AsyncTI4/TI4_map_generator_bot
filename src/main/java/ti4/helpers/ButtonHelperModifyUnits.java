@@ -235,6 +235,11 @@ public class ButtonHelperModifyUnits {
                         }
                         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                     }
+                    if ( player.hasUnit("mykomentori_mech")) {
+                        for (int x = 0; x < min; x++) {
+                            ButtonHelper.rollMykoMechRevival(activeGame, player);
+                        }
+                    }
                 }
                 
             }

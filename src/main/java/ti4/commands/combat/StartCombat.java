@@ -121,6 +121,12 @@ public class StartCombat extends CombatSubcommandData {
                 return;
             }
         }
+        if ("18".equalsIgnoreCase(tile.getTileID()) && player1.getLeaderIDs().contains("winnucommander") && !player1.hasLeaderUnlocked("winnucommander")) {
+            ButtonHelper.commanderUnlockCheck(player1, activeGame, "winnu", event);
+        }
+        if ("18".equalsIgnoreCase(tile.getTileID()) && player2.getLeaderIDs().contains("winnucommander") && !player2.hasLeaderUnlocked("winnucommander")) {
+            ButtonHelper.commanderUnlockCheck(player2, activeGame, "winnu", event);
+        }
 
         int context = getTileImageContextForPDS2(activeGame, player1, tile, spaceOrGround);
         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, player1);

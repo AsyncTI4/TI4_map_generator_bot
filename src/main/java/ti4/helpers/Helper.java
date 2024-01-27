@@ -342,7 +342,7 @@ public class Helper {
                 activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
             }
-            if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*") && activeGame.getFactionsThatReactedToThis(key2).length() < 2){
+            if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*") && activeGame.getFactionsThatReactedToThis(key2).length() > 2){
                 if(!activeGame.isFoWMode()){
                     message =player.getRepresentation(true, true)+ " is the one the game is currently waiting on before advancing to the next person";
                 }
@@ -529,6 +529,11 @@ public class Helper {
     public static String getDateRepresentation(long dateInfo) {
         Date date = new Date(dateInfo);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
+        return simpleDateFormat.format(date);
+    }
+    public static String getDateRepresentationTIGL(long dateInfo) {
+        Date date = new Date(dateInfo);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM.dd.yyyy");
         return simpleDateFormat.format(date);
     }
 
@@ -1096,7 +1101,7 @@ public class Helper {
                 String un = unit.split("_")[0];
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
-                if(uniquePlace.contains(tilePos+"_"+planetOrSpace)){
+                if(uniquePlace.equalsIgnoreCase(tilePos+"_"+planetOrSpace)){
                     localPlace = localPlace + ButtonHelper.getIdent(player) + " produced "+producedUnits.get(unit)+ " "+removedUnit.getUnitEmoji() + "\n";
                 }
             }
@@ -1331,6 +1336,9 @@ public class Helper {
                 Button argentButton = Button.success("sarMechStep1_" + tile.getPosition()+"_"+warfareNOtherstuff, "Use Self Assembly Routines");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                 unitButtons.add(argentButton);
+            }
+            if (player.getActionCards().containsKey("war_machine1") || player.getActionCards().containsKey("war_machine2") ||player.getActionCards().containsKey("war_machine3") ||player.getActionCards().containsKey("war_machine4") ||player.getActionCards().containsKey("war_machine_ds")) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()+" Reminder that you have war machine and this is the window for it");
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
