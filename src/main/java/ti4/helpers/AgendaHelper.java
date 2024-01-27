@@ -354,11 +354,9 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew relic for "+ButtonHelper.getIdentOrColor(player2, activeGame));
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
-                    String message = "Discarded elected player's ACs and exhausted all their planets (not technically the way its done but for the most part equivalent)";
+                    String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda";
                     new DiscardACRandom().discardRandomAC(event, activeGame, player2, player2.getAc());
-                    for (String planet : player2.getPlanets()) {
-                        player2.exhaustPlanet(planet);
-                    }
+                    activeGame.setCurrentReacts("PublicExecution", player2.getFaction());
                     if(activeGame.getSpeaker().equalsIgnoreCase(player2.getUserID())){
                         message = message + ". Also passed the speaker token";
                         boolean foundSpeaker = false;
@@ -2153,7 +2151,7 @@ public class AgendaHelper {
             }
         }
 
-        if (hasXxchaAlliance == 0 && activeGame.getFactionsThatReactedToThis("AssassinatedReps").contains(player.getFaction())) {
+        if (hasXxchaAlliance == 0 && (activeGame.getFactionsThatReactedToThis("AssassinatedReps").contains(player.getFaction()) || activeGame.getFactionsThatReactedToThis("PublicExecution").contains(player.getFaction()))) {
             voteCount = 0;
         }
 
@@ -2444,7 +2442,7 @@ public class AgendaHelper {
         }
         Button button = Button.secondary("exhaustForVotes_allPlanets_"+totalPlanetVotes, "Exhaust All Voting Planets ("+totalPlanetVotes+")");
         planetButtons.add(button);
-        planetButtons.add(Button.danger("proceedToFinalizingVote", "Done exhausting planets."));
+        planetButtons.add(Button.danger(player.getFinsFactionCheckerPrefix()+"proceedToFinalizingVote", "Done exhausting planets."));
         return planetButtons;
     }
 
@@ -2456,8 +2454,8 @@ public class AgendaHelper {
             msg = msg + " Any Blood Pact Votes will be automatically added";
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("resolveAgendaVote_" + votes, "Vote "+votes + " votes"));
-        buttons.add(Button.primary("distinguished_" + votes, "Modify Votes"));
+        buttons.add(Button.success(player.getFinsFactionCheckerPrefix()+"resolveAgendaVote_" + votes, "Vote "+votes + " votes"));
+        buttons.add(Button.primary(player.getFinsFactionCheckerPrefix()+"distinguished_" + votes, "Modify Votes"));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
     }
 

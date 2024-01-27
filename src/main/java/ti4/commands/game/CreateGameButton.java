@@ -18,6 +18,8 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class CreateGameButton extends GameSubcommandData {
@@ -110,6 +112,16 @@ public class CreateGameButton extends GameSubcommandData {
         
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        String gameName = CreateGameChannels.getNextGameName();
+        String lastGame = CreateGameChannels.getLastGameName();
+        Game activeGame = GameManager.getInstance().getGame(lastGame);
+        if(activeGame != null){
+            if(activeGame.getCustomName().equalsIgnoreCase(gameSillyName)){
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "The custom name of the last game is the same as the one for this game, so the bot suspects a double press occurred and is cancelling the creation of another game. Ping Fin if this worked incorrectly. ");
+                return;
+            }
+        }
         List<Member> members = new ArrayList<>();
         Member gameOwner = null;
         for (int i = 3; i <= 10; i++) {
@@ -124,7 +136,7 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
 
-        String gameName = CreateGameChannels.getNextGameName();
+        
         
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);

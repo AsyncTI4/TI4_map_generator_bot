@@ -842,7 +842,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When you pass, if this unit is on a planet in or adjacent to a system that contains 1 of your Glory tokens, place 1 infantry from your reinforcements on this planet."
+        "ability": "When you pass, place 1 infantry from your reinforcements on this planet if there is a Glory token in or adjacent to this system."
     },
     {
         "id": "kollecc_flagship",

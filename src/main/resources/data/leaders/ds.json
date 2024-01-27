@@ -779,7 +779,7 @@
         "title": "Councilman",
         "abilityName": "Trader Mobilization Act - Merchant Rearmament",
         "abilityWindow": "After a player activates a system other than Mecatol Rex:",
-        "abilityText": "You may place 1 space dock on a planet you control in the active system, if able, replenish your commodities, and use the PRODUCTION ability of each of your units in the active system. Then, purge this card.",
+        "abilityText": "You may place 1 space dock on a planet you control in the active system, convert each of your commodities to a trade good, and use the PRODUCTION ability of each of your units in the active system. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },

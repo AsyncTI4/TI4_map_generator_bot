@@ -307,6 +307,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }
+    public static String getLastGameName() {
+        List<Integer> existingNums = getAllExistingPBDNumbers();
+        if (existingNums.size() == 0) {
+            return "pbd1";
+        }
+        int nextPBDNumber = Collections.max(getAllExistingPBDNumbers());
+        return "pbd" + nextPBDNumber;
+    }
+    
 
     private static boolean gameOrRoleAlreadyExists(String name) {
         List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();

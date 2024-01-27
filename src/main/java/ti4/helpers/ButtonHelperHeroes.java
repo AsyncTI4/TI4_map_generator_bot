@@ -697,8 +697,7 @@ public class ButtonHelperHeroes {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
         }
-        player.setCommodities(player.getCommoditiesTotal());
-        ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
+        player.setTg(player.getCommodities()+player.getTg());
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
@@ -1022,7 +1021,7 @@ public class ButtonHelperHeroes {
     }
 
     public static void offerOlradinHeroFlips(Game activeGame, Player player) {
-        List<Button> buttons = new ArrayList();
+        List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("olradinHeroFlip_people", "People Policy"));
         buttons.add(Button.success("olradinHeroFlip_environment", "Environment Policy"));
         buttons.add(Button.success("olradinHeroFlip_economy", "Economy Policy"));

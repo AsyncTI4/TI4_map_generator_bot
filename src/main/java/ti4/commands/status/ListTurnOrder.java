@@ -104,7 +104,7 @@ public class ListTurnOrder extends StatusSubcommandData {
         }
         msg.append("_ _"); // forced extra line
         
-        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), msg.toString());
+        MessageHelper.sendMessageToChannel((MessageChannel) activeGame.getMainGameChannel(), msg.toString());
         
     }
 
