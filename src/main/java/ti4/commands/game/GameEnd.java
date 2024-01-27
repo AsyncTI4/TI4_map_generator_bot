@@ -1,6 +1,9 @@
 package ti4.commands.game;
 
+import static ti4.helpers.StringHelper.ordinal;
+
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -206,6 +209,7 @@ public class GameEnd extends GameSubcommandData {
         sb.append("\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
+        Optional<Player> winner = game.getWinner();
         for (Player player : game.getRealPlayers()) {
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             int playerVP = player.getTotalVictoryPoints();
@@ -218,7 +222,7 @@ public class GameEnd extends GameSubcommandData {
                 sb.append(player.getUserName());
             }
             sb.append(" - *").append(playerVP).append("VP* ");
-            if (playerVP >= game.getVp()) sb.append(" - **WINNER**");
+            if (winner.isPresent() && winner.get() == player) sb.append(" - **WINNER**");
             sb.append("\n");
             index++;
         }
@@ -230,19 +234,46 @@ public class GameEnd extends GameSubcommandData {
             .append(game.getVp()).append(" victory points")
             .append("\n");
 
-        if (!game.hasHomebrew()) {
+        if (winner.isPresent() && !game.hasHomebrew()) {
+            String winningPath = GameStats.getWinningPath(game, winner.get());
+            sb.append("**Winning Path:** ").append(winningPath).append("\n");
             List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
             Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
             int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
-            String winningPath = GameStats.getWinningPath(game, game.getWinner().get());
-            sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            int winningPathCount = winningPathCounts.get(winningPath);
-            sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ")
-                .append(winningPathCount).append(" (").append(100 * winningPathCount / (double) gamesWithWinnerCount)
-                .append("%) times before!").append("\n");
+            if (gamesWithWinnerCount >= 100) {
+                int winningPathCount = winningPathCounts.get(winningPath) - 1;
+                double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
+                String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
+                sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ").append(winningPathCount)
+                    .append(" times before. That's the ").append(winningPathCommonality).append("most common path at ")
+                    .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
+                if (winningPathCount == 0) {
+                    sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
+                } else if (winningPathPercent <= .005) {
+                    sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉").append("\n");
+                } else if (winningPathPercent <= .01) {
+                    sb.append("🎉__**Who needs a conventional win? Not you!**__🎉").append("\n");
+                }
+            }
         }
 
         return sb.toString();
+    }
+
+  private static String getWinningPathCommonality(Map<String, Integer> winningPathCounts, int winningPathCount) {
+      int commonality = 1;
+      for (int i : winningPathCounts.values()) {
+          if (i > winningPathCount) {
+              commonality++;
+          }
+      }
+      return commonality == 1 ? "" : ordinal(commonality) + " ";
+  }
+
+  private static String formatPercent(double d) {
+        NumberFormat numberFormat = NumberFormat.getPercentInstance();
+        numberFormat.setMinimumFractionDigits(1);
+        return numberFormat.format(d);
     }
 
     public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
