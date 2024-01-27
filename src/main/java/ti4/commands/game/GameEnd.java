@@ -280,7 +280,7 @@ public class GameEnd extends GameSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑").append(activeGame.getWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-        sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(" (TIGL wants Game End Date for Async)\n");
+        sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentationTIGL(activeGame.getEndedDate())).append(" (TIGL wants Game End Date for Async)\n");
         sb.append("Match Start Time: 00:00\n\n");
         sb.append("Players:").append("\n");
         int index = 1;

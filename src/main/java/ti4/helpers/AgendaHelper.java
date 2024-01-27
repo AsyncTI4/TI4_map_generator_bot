@@ -354,11 +354,9 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew relic for "+ButtonHelper.getIdentOrColor(player2, activeGame));
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
-                    String message = "Discarded elected player's ACs and exhausted all their planets (not technically the way its done but for the most part equivalent)";
+                    String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda";
                     new DiscardACRandom().discardRandomAC(event, activeGame, player2, player2.getAc());
-                    for (String planet : player2.getPlanets()) {
-                        player2.exhaustPlanet(planet);
-                    }
+                    activeGame.setCurrentReacts("PublicExecution", player2.getFaction());
                     if(activeGame.getSpeaker().equalsIgnoreCase(player2.getUserID())){
                         message = message + ". Also passed the speaker token";
                         boolean foundSpeaker = false;
@@ -534,6 +532,7 @@ public class AgendaHelper {
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
                         String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation()+". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
                     }
                 }else{
                     for(Player player : activeGame.getRealPlayers()){
@@ -599,6 +598,7 @@ public class AgendaHelper {
                         List<Button> buttons = List.of( loseTactic, loseFleet, loseStrat, DoneGainingCC);
                         String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation()+". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
                     }
                 }
             }
@@ -994,6 +994,7 @@ public class AgendaHelper {
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
             }
             MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(), "You can use the button to get your tech", Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !activeGame.isFoWMode()) {
@@ -1902,6 +1903,7 @@ public class AgendaHelper {
                             Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                             String message = identity + "! Your current CCs are " + winningR.getCCRepresentation() + ". Use buttons to gain CCs";
+                            activeGame.setCurrentReacts("originalCCsFor"+winningR.getFaction(),winningR.getCCRepresentation());
                             MessageHelper.sendMessageToChannel(channel, identity + " resolve rider by using the button to get 3 command counters");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
@@ -2149,7 +2151,7 @@ public class AgendaHelper {
             }
         }
 
-        if (hasXxchaAlliance == 0 && activeGame.getFactionsThatReactedToThis("AssassinatedReps").contains(player.getFaction())) {
+        if (hasXxchaAlliance == 0 && (activeGame.getFactionsThatReactedToThis("AssassinatedReps").contains(player.getFaction()) || activeGame.getFactionsThatReactedToThis("PublicExecution").contains(player.getFaction()))) {
             voteCount = 0;
         }
 
@@ -2440,7 +2442,7 @@ public class AgendaHelper {
         }
         Button button = Button.secondary("exhaustForVotes_allPlanets_"+totalPlanetVotes, "Exhaust All Voting Planets ("+totalPlanetVotes+")");
         planetButtons.add(button);
-        planetButtons.add(Button.danger("proceedToFinalizingVote", "Done exhausting planets."));
+        planetButtons.add(Button.danger(player.getFinsFactionCheckerPrefix()+"proceedToFinalizingVote", "Done exhausting planets."));
         return planetButtons;
     }
 
@@ -2452,8 +2454,8 @@ public class AgendaHelper {
             msg = msg + " Any Blood Pact Votes will be automatically added";
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("resolveAgendaVote_" + votes, "Vote "+votes + " votes"));
-        buttons.add(Button.primary("distinguished_" + votes, "Modify Votes"));
+        buttons.add(Button.success(player.getFinsFactionCheckerPrefix()+"resolveAgendaVote_" + votes, "Vote "+votes + " votes"));
+        buttons.add(Button.primary(player.getFinsFactionCheckerPrefix()+"distinguished_" + votes, "Modify Votes"));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
     }
 

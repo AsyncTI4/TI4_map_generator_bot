@@ -260,7 +260,7 @@ public class HeroPlay extends LeaderAction {
                 String trueIdentity = player.getRepresentation(true, true);
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
-
+                activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" ->{
                 if(!activeGame.getNaaluAgent()){
@@ -283,7 +283,7 @@ public class HeroPlay extends LeaderAction {
                 String trueIdentity = player.getRepresentation(true, true);
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
-
+                activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
             }
             case "freesystemshero"->{
                 ButtonHelperHeroes.offerFreeSystemsButtons(player, activeGame, event);

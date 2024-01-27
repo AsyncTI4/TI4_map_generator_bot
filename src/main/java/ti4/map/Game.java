@@ -1372,7 +1372,7 @@ public class Game {
     }
 
     public Map.Entry<String, Integer> revealState1() {
-        if (publicObjectives1Peakable.isEmpty()) {
+        if (publicObjectives1Peakable.isEmpty() || getCurrentPhase().contains("agenda")) {
             return revealObjective(publicObjectives1);
         } else {
             return revealObjective(publicObjectives1Peakable);
@@ -1380,7 +1380,7 @@ public class Game {
     }
 
     public Map.Entry<String, Integer> revealState2() {
-        if (publicObjectives2Peakable.isEmpty()) {
+        if (publicObjectives2Peakable.isEmpty() || getCurrentPhase().contains("agenda")) {
             return revealObjective(publicObjectives2);
         } else {
             return revealObjective(publicObjectives2Peakable);

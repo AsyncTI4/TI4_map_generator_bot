@@ -184,6 +184,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+        activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
         revealedRelics = getAllRevealedRelics(activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), revealMsg);
@@ -696,8 +697,7 @@ public class ButtonHelperHeroes {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
         }
-        player.setCommodities(player.getCommoditiesTotal());
-        ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
+        player.setTg(player.getCommodities()+player.getTg());
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
@@ -1021,7 +1021,7 @@ public class ButtonHelperHeroes {
     }
 
     public static void offerOlradinHeroFlips(Game activeGame, Player player) {
-        List<Button> buttons = new ArrayList();
+        List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("olradinHeroFlip_people", "People Policy"));
         buttons.add(Button.success("olradinHeroFlip_environment", "Environment Policy"));
         buttons.add(Button.success("olradinHeroFlip_economy", "Economy Policy"));

@@ -207,6 +207,15 @@ public class CardsInfo implements Command, InfoThreadCommand {
         }
         Button playerPref = Button.secondary("offerPlayerPref", "Change Player Settings");
         buttons.add(playerPref);
+        boolean hadAnyUnplayedSCs = false;
+        for (Integer SC : player.getSCs()) {
+            if (!activeGame.getPlayedSCs().contains(SC)) {
+                hadAnyUnplayedSCs = true;
+            }
+        }
+        if(!hadAnyUnplayedSCs){
+            buttons.add(Button.danger("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
+        }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nYou can use these buttons to do various things", buttons);
     }
