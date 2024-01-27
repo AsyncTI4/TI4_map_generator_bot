@@ -82,8 +82,8 @@
         "type": "agent",
         "name": "Cordo Haved",
         "title": "Friendly Diplomat",
-        "abilityWindow": "At the end of a player's turn:",
-        "abilityText": "You may exhaust this card to allow that player to exhaust 1 planet they control. If they do, they may choose and resolve the ability of 1 legendary planet ability card that is in a player's play area, without exhausting that card.",
+        "abilityWindow": "",
+        "abilityText": "While ready, this card has the text ability of each legendary planet ability card any player controls, even if that card is exhausted. You may allow another player to use this card's ability.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -403,7 +403,7 @@
         "title": "Starbase Commander",
         "abilityWindow": "After you activate a system that contains 1 or more of your space docks",
         "abilityText": "Gain 1 commodity. Your ships may treat systems that contain 1 or more of your space docks as adjacent to each other.",
-        "unlockCondition": "Have 1 space dock on the game board that is not adjacent to your home system.",
+        "unlockCondition": "Have 1 space dock on the game board that is not in or adjacent to your home system.",
         "source": "ds"
     },
     {
@@ -490,7 +490,7 @@
         "name": "Ceie Doleegueaunm",
         "title": "Abyssal Queen",
         "abilityWindow": "After you activate a system",
-        "abilityText": "You may treat each system that contains no planets as adjacent to each other system that contains no planets during this tactical action.",
+        "abilityText": "You may treat systems that contain no planets as adjacent to each other during this tactical action.",
         "unlockCondition": "Have units in 3 systems that do not contain planets.",
         "source": "ds"
     },
@@ -522,8 +522,8 @@
         "type": "commander",
         "name": "Sdallari Tvungovot",
         "title": "Marshal Engineer",
-        "abilityWindow": "After you roll dice during the first round of a combat:",
-        "abilityText": "Reroll the combat dice of up to 4 of your fighters or infantry, applying +1 to the results - the Kjalengard player captures any units that reroll dice this way and do not produce at least 1 hit.",
+        "abilityWindow": "When researching a unit upgrade technology",
+        "abilityText": "Each of your unit upgrade technologies may satisfy 1 prerequisite it shares with the technology you are researching",
         "unlockCondition": "Have 2 Glory tokens on the game board.",
         "source": "ds"
     },
@@ -599,7 +599,7 @@
         "type": "commander",
         "name": "Hkot Tokal",
         "title": "Crystal Druid",
-        "abilityWindow": "At the start of invasion:",
+        "abilityWindow": "At the start of invasion in a system that contains 1 or more planets:",
         "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system.",
         "unlockCondition": "Win a ground combat on a planet you do not control.",
         "source": "ds"
@@ -623,7 +623,7 @@
         "title": "Vibrant Blue",
         "abilityWindow": "At the start of a space combat while you are not the active player:",
         "abilityText": "Choose 1 of your non-fighter ships in the active system to gain SUSTAIN DAMAGE until the end of combat.",
-        "unlockCondition": "Have ships in 3 systems not adjacent to your home system.",
+        "unlockCondition": "Have ships in 3 systems not adjacent to or including your home system",
         "source": "ds"
     },
     {
@@ -644,7 +644,7 @@
         "name": "Thussad Krath",
         "title": "High Inquisitor",
         "abilityWindow": "During combat:",
-        "abilityText": "Your damaged ships roll 1 additional combat die during combat.",
+        "abilityText": "When 1 or more of your damaged units make a combat roll, up to 2 of those units may roll an additional combat die.",
         "unlockCondition": "Have units in 2 different non-home anomalies.",
         "source": "ds"
     },

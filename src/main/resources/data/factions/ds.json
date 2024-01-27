@@ -227,7 +227,7 @@
         "factionTech": ["dskjalg", "dskjalcv"],
         "startingTech": [],
         "homePlanets": ["kjalengard", "hulgade"],
-        "abilities": ["heroic_tales", "for_glory", "military_engineers"],
+        "abilities": ["heroism", "glory", "valor"],
         "leaders": ["kjalengardagent", "kjalengardcommander", "kjalengardhero"],
         "promissoryNotes": ["dspnkjal"],
         "units": ["fighter", "destroyer", "cruiser", "kjalengard_carrier", "dreadnought", "kjalengard_flagship", "infantry", "kjalengard_mech", "pds", "spacedock"],
