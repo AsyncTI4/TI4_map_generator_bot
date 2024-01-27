@@ -52,7 +52,7 @@
         "id": "fortune_seekers",
         "name": "Fortune Seekers",
         "faction": "bentor",
-        "window": "After you explore a planet or frontier token",
+        "window": "Once per action, after you explore a planet or frontier token",
         "windowEffect": "You may gain 1 commodity.",
         "source": "ds"
     },
@@ -61,7 +61,7 @@
         "name": "Secret Maps",
         "faction": "bentor",
         "window": "At the end of your tactical actions",
-        "windowEffect": "You may explore 1 of your planets in the active system that is or contains 1 of your units with PRODUCTION and that you did not explore during that tactical action.",
+        "windowEffect": "You may explore 1 planet in the active system that is or contains 1 of your units with PRODUCTION and that you did not explore during that tactical action.",
         "source": "ds"
     },
     {
@@ -83,7 +83,7 @@
         "id": "byssus",
         "name": "Byssus",
         "faction": "cheiran",
-        "permanentEffect": "You may treat your mechs as structures for any purpose other than scoring objectives.",
+        "permanentEffect": "You may treat your mechs on planets you control as structures for any purpose other than scoring objectives.",
         "source": "ds"
     },
     {
@@ -318,6 +318,14 @@
         "source": "ds"
     },
     {
+        "id": "glory",
+        "name": "For Glory",
+        "faction": "kjalengard",
+        "window": "After you win a combat",
+        "windowEffect": "You may place or move a Glory token into the active system, or spend 1 token from your strategy pool to research a unit upgrade technology of the same type as 1 of your units that participated in that combat.",
+        "source": "ds"
+    },
+    {
         "id": "heroic_tales",
         "name": "Heroic Tales",
         "faction": "kjalengard",
@@ -327,11 +335,28 @@
         "source": "ds"
     },
     {
+        "id": "heroism",
+        "name": "Heroic Tales",
+        "faction": "kjalengard",
+        "permanentEffect": "Capture your infantry and fighters that are destroyed during combat.",
+        "window": "When you pass",
+        "windowEffect": "For each Glory token on the game board, you may return 4 of your captured units to gain 1 command token.",
+        "source": "ds"
+    },
+    {
         "id": "military_engineers",
         "name": "Military Engineers",
         "faction": "kjalengard",
         "window": "When you research a unit upgrade technology",
         "windowEffect": "When you research a unit upgrade technology, each of your unit upgrade technologies may satisfy 1 prerequisite it shares with the technology you are researching.",
+        "source": "ds"
+    },
+    {
+        "id": "valor",
+        "name": "Valor",
+        "faction": "kjalengard",
+        "window": "When units make a combat roll in a system that contains a Glory token",
+        "windowEffect": "Each result of 10, before applying modifiers, produces 1 additional hit.",
         "source": "ds"
     },
     {
@@ -404,7 +429,7 @@
         "name": "Contagion",
         "faction": "kyro",
         "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
-        "windowEffect": "Commit 1 infantry from your reinforcements to each of 2 planets that are adjacent to a planet you control; resolve invasion on those planets, if able.",
+        "windowEffect": "Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets.",
         "source": "ds"
     },
     {
@@ -546,22 +571,22 @@
         "name": "Desperados",
         "faction": "nokar",
         "window": "When you produce one or more units",
-        "windowEffect": "One destroyer does not count against your production limit.",
+        "windowEffect": "One destroyer does not count against your PRODUCTION limit. Apply +1 to your destroyers' move values while you are not the active player.",
         "source": "ds"
     },
     {
         "id": "hired_guns",
         "name": "Hired Guns",
         "faction": "nokar",
-        "window": "After a player activates a system",
-        "windowEffect": "Choose up to 3 of your ships. During this tactical action, the active player may control those ships as if they were their own. At the end of this tactical action, that player replaces each ship they moved with their own of the same unit type.",
+        "window": "After system is activated",
+        "windowEffect": "Choose up to 3 of your ships. Those ships are also treated as the active players and participate in combat as their units. At the end of this tactical action, that player may replace each of those ships in the active system with their own of the same unit type. Then, remove the rest from the game board.",
         "source": "ds"
     },
     {
         "id": "private_fleet",
         "name": "Private Fleet",
         "faction": "nokar",
-        "permanentEffect": "During setup, place the 4 Nokar Destroyer tokens in your reinforcements; the Nokar Destroyer tokens are additional destroyers.",
+        "permanentEffect": "During setup, place 4 additional destroyers in your reinforcements",
         "source": "ds"
     },
     {
