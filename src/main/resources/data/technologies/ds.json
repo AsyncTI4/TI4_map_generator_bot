@@ -247,7 +247,7 @@
         "requirements": "G",
         "faction": "kjalengard",
         "source": "ds",
-        "text": "After you activate a system that contains a Glory token, you may return 3 of your captured units to gain 1 command token. After a player rolls combat dice, you may exhaust this card to allow that player reroll up to 3 of those dice."
+        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good. After a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice. "
     },
     {
         "alias": "dskjalcv",
