@@ -12,11 +12,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 public class ListSlashCommandsUsed extends BothelperSubcommandData {
     public ListSlashCommandsUsed() {
@@ -38,6 +40,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
+        Map<String, Integer> actionCardsPlayed = new HashMap<>();
         for (Game activeGame : mapList.values()) {
             if (useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
@@ -56,14 +59,38 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 }
                 slashCommands.put(command, numUsed + numUsed2);
             }
-            for (String command : activeGame.getAllActionCardsSabod().keySet()) {
-                int numUsed = activeGame.getAllActionCardsSabod().get(command);
-                int numUsed2 = 0;
-                if (actionCards.containsKey(command)) {
-                    numUsed2 = actionCards.get(command);
+            if(Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) < 0){
+                for (String acName : activeGame.getAllActionCardsSabod().keySet()) {
+                    int numUsed = activeGame.getAllActionCardsSabod().get(acName);
+                    int numUsed2 = 0;
+                    if (actionCards.containsKey(acName)) {
+                        numUsed2 = actionCards.get(acName);
+                    }
+                    acsSabod = acsSabod+numUsed;
+                    actionCards.put(acName, numUsed + numUsed2);
                 }
-                acsSabod = acsSabod+numUsed;
-                actionCards.put(command, numUsed + numUsed2);
+                for (String acID : activeGame.getDiscardActionCards().keySet()) {
+                    ActionCardModel ac = Mapper.getActionCard(acID);
+                    String acName = ac.getName();
+                    int numUsed = 1;
+                    int numUsed2 = 0;
+                    if (actionCardsPlayed.containsKey(acName)) {
+                        numUsed2 = actionCardsPlayed.get(acName);
+                    }
+                    acsSabod = acsSabod+numUsed;
+                    actionCardsPlayed.put(acName, numUsed + numUsed2);
+                }
+                for (String acID : activeGame.getPurgedActionCards().keySet()) {
+                    ActionCardModel ac = Mapper.getActionCard(acID);
+                    String acName = ac.getName();
+                    int numUsed = 1;
+                    int numUsed2 = 0;
+                    if (actionCardsPlayed.containsKey(acName)) {
+                        numUsed2 = actionCardsPlayed.get(acName);
+                    }
+                    acsSabod = acsSabod+numUsed;
+                    actionCardsPlayed.put(acName, numUsed + numUsed2);
+                }
             }
         }
         StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
@@ -75,7 +102,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         longMsg.append("\n The number of times an AC has been sabod is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
-            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" \n");
+            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of "+actionCardsPlayed.get(command)+" times played").append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }

@@ -1154,11 +1154,11 @@ public class ButtonHelperAgents {
         String msg = player.getRepresentation(true, true) + " choose the legendary planet ability that you wish to use";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
 
-        List<Button> buttons2 = Helper.getPlanetExhaustButtons(player, activeGame, "both");
-        Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
-        buttons2.add(DoneExhausting);
-        String msg2 = player.getRepresentation(true, true) + " exhaust one planet to pay for the ability";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
+        // List<Button> buttons2 = Helper.getPlanetExhaustButtons(player, activeGame, "both");
+        // Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+        // buttons2.add(DoneExhausting);
+        // String msg2 = player.getRepresentation(true, true) + " exhaust one planet to pay for the ability";
+        // MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
     }
 
     public static void resolveRefreshWithOlradinAgent(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {

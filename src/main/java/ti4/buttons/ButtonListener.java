@@ -1029,6 +1029,10 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeGame, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);
             //("autoneticMemoryStep2
+        } else if(buttonID.startsWith("codexCardPick_")){
+            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.pickACardFromDiscardStep1(activeGame, player);
+            
         } else if (buttonID.startsWith("pickFromDiscard_")) {
             ButtonHelper.pickACardFromDiscardStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("autoneticMemoryStep2_")) {
@@ -1385,9 +1389,13 @@ public class ButtonListener extends ListenerAdapter {
             String tech = buttonID.replace("exhaustTech_", "");
             TechnologyModel techModel = Mapper.getTech(tech);
             String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
-            switch (activeGame.getOutputVerbosity()) {
-                case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
-                default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+            if(tech.contains("absol")){
+                switch (activeGame.getOutputVerbosity()) {
+                    case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
+                    default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+                }
+            }else{
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
             }
             player.exhaustTech(tech);
             switch (tech) {
@@ -3090,6 +3098,7 @@ public class ButtonListener extends ListenerAdapter {
                             + " since you do not currently hold your TA, washing here seems likely an error and will mess with the TA resolution. Nothing has been processed as a result. Try a different route of washing your comms if this correction is wrong");
                         return;
                     }
+
                     boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "Replenish and Wash");
                     if (used) {
                         break;
@@ -3121,6 +3130,9 @@ public class ButtonListener extends ListenerAdapter {
                                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, p2, player.getCommoditiesTotal());
                                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, player, p2.getCommoditiesTotal());
                             }
+                        }
+                        if(p2.getSCs().contains(5)){
+                            ButtonHelper.checkTransactionLegality(activeGame, player, p2);
                         }
                     }
                     if (!player.getFollowedSCs().contains(5)) {
@@ -4155,7 +4167,9 @@ public class ButtonListener extends ListenerAdapter {
                     GameSaveLoadManager.undo(activeGame, event);
 
                     if ("action".equalsIgnoreCase(activeGame.getCurrentPhase()) || "agendaVoting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
-                        event.getMessage().delete().queue();
+                        if(!event.getMessage().getContentRaw().contains(finsFactionCheckerPrefix)){
+                            event.getMessage().delete().queue();
+                        }
                     }
                 }
                 case "getDiscardButtonsACs" -> {

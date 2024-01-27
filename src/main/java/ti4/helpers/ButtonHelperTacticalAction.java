@@ -562,15 +562,15 @@ public class ButtonHelperTacticalAction {
         if (!activeGame.isFoWMode()) {
             int abilities = 0;
             if(!activeGame.getL1Hero()){
-                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, true);
+                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
             }
-            if (abilities > 0 ) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("doActivation_" + pos, "Confirm"));
-                buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
-                String msg = "# " + ButtonHelper.getIdent(player) + " You are about to automatically trigger some abilities by activating this system. Please hit confirm before continuing";
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-            }
+            // if (abilities > 0 ) {
+            //     List<Button> buttons = new ArrayList<>();
+            //     buttons.add(Button.success("doActivation_" + pos, "Confirm"));
+            //     buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
+            //     String msg = "# " + ButtonHelper.getIdent(player) + " You are about to automatically trigger some abilities by activating this system. Please hit confirm before continuing";
+            //     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            // }
         }
 
         event.getMessage().delete().queue();

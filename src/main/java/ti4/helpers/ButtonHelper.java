@@ -1127,6 +1127,14 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " lost 1 fleet cc due to neuroglaive (" + cTG + "->" + player.getFleetCC() + ")");
                 }
             }
+            if (FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
+                if (nonActivePlayer.getActionCards().containsKey("fsb")) {
+                    MessageHelper.sendMessageToChannel(nonActivePlayer.getCardsInfoThread(), nonActivePlayer.getRepresentation()+" Reminder that you have forward supply base and this is the window for it");
+                }
+                if (nonActivePlayer.getPromissoryNotes().containsKey(player.getColor()+"_cf")) {
+                    MessageHelper.sendMessageToChannel(nonActivePlayer.getCardsInfoThread(), nonActivePlayer.getRepresentation()+" Reminder that you have the active players ceasefire and this is the window for it");
+                }
+            }
             if (nonActivePlayer.getTechs().contains("vw") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
@@ -5923,8 +5931,8 @@ public class ButtonHelper {
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms);
-                ButtonHelperAbilities.pillageCheck(p1, activeGame);
-                ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                //ButtonHelperAbilities.pillageCheck(p1, activeGame);
+                //ButtonHelperAbilities.pillageCheck(p2, activeGame);
                 String id1 = ButtonHelper.getIdentOrColor(p1, activeGame);
                 String id2 = ButtonHelper.getIdentOrColor(p2, activeGame);
                 message2 = ident + " washed their " + (oldP1Comms - newP1Comms) + " Commodities with " + ident2 + "  (" + id1 + " tg went from (" + oldP1Tg + "->" + p1.getTg() + "))\n" + id2
@@ -6683,6 +6691,9 @@ public class ButtonHelper {
                     if (relicModel.getName().contains("Nanoforge")) {
                         offerNanoforgeButtons(p1, activeGame, event);
                     }
+                    if (relicModel.getName().contains("The Codex")) {
+                        offerNanoforgeButtons(p1, activeGame, event);
+                    }
                     if (buttonID.contains("decrypted_cartoglyph")) {
                         new DrawBlueBackTile().drawBlueBackTiles(event, activeGame, p1, 3, false);
                     }
@@ -6920,6 +6931,13 @@ public class ButtonHelper {
         }
         String message = "Use buttons to select which planet to nanoforge";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+    public static void offerCodexButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        Button codex1 = Button.success("codexCardPick_1","Card #1");
+        Button codex2 = Button.success("codexCardPick_2","Card #2");
+        Button codex3 = Button.success("codexCardPick_3","Card #3");
+        String message = "Use buttons to select cards from the discard";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, List.of(codex1, codex2, codex3));
     }
 
     public static void resolveSARMechStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -7170,7 +7188,7 @@ public class ButtonHelper {
         }
         if (!"agendas_absol".equals(activeGame.getAgendaDeckID()) && id.endsWith("_ps")) {
             MessageHelper.sendMessageToChannel(getCorrectChannel(owner, activeGame), owner.getRepresentation(true, true)
-                + " due to a play of your PS, you will be unable to vote in agenda (unless you have xxcha alliance). The bot doesnt enforce the other restrictions regarding no abilities, but you should abide by them.");
+                + " due to a play of your Political Secret, you will be unable to vote in agenda (unless you have xxcha alliance). The bot doesnt enforce the other restrictions regarding no abilities, but you should abide by them.");
             activeGame.setCurrentReacts("AssassinatedReps", activeGame.getFactionsThatReactedToThis("AssassinatedReps") + owner.getFaction());
         }
 
