@@ -1,7 +1,10 @@
 package ti4.commands.units;
 
 import com.amazonaws.util.CollectionUtils;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
+import ti4.commands.combat.StartCombat;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
@@ -103,19 +107,11 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame) {
+        
         commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
     }
 
-    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
-        commonUnitParsing(event, color, tile, unitList, activeGame);
-        actionAfterAll(event, tile, color, activeGame);
-    }
-
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
-        commonUnitParsing(event, color, tile, unitList, activeGame);
-        actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
-    }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
@@ -196,9 +192,39 @@ abstract public class AddRemoveUnits implements Command {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
                 continue;
             }
-
+            int numPlayersOld = 0;
+            int numPlayersNew = 0;
+            if(event instanceof SlashCommandInteractionEvent){
+                List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
+                if(!planetName.equalsIgnoreCase("space")&& !activeGame.isFoWMode()){
+                    playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, planetName);
+                }
+                numPlayersOld = playersForCombat.size();
+            }
             unitAction(event, tile, count, planetName, unitID, color, activeGame);
+            if(event instanceof SlashCommandInteractionEvent && !activeGame.isFoWMode()){
+                List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
+                if(!planetName.equalsIgnoreCase("space")){
+                    playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, planetName);
+                }
+                numPlayersNew = playersForCombat.size();
+            }
             addPlanetToPlayArea(event, tile, planetName, activeGame);
+            if(numPlayersNew == 2 && numPlayersOld == 1){
+                List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
+                String combatType = "space";
+                if(!planetName.equalsIgnoreCase("space")){
+                    combatType = "ground";
+                    playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, planetName);
+                }
+
+                // Try to get players in order of [activePlayer, otherPlayer, ... (discarded players)]
+                Player player1 = activeGame.getActivePlayer();
+                if (player1 == null) player1 = playersForCombat.get(0);
+                playersForCombat.remove(player1);
+                Player player2 = playersForCombat.get(0);
+                StartCombat.findOrCreateCombatThread(activeGame, event.getMessageChannel(), player1, player2, tile, event, combatType);
+            }
         }
 
         if (activeGame.isFoWMode()) {

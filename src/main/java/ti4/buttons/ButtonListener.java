@@ -1735,6 +1735,12 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();//"resolveReverse_"
         } else if (buttonID.startsWith("resolveReverse_")) {
             ButtonHelperActionCards.resolveReverse(activeGame, player, buttonID, event);
+        } else if (buttonID.startsWith("removeAllStructures_")) {
+            event.getMessage().delete().queue();
+            String planet = buttonID.split("_")[1];
+            UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            plan.removeAllUnits(player.getColor());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed all units on "+planet+" for "+player.getRepresentation());
         } else if (buttonID.startsWith("winnuStructure_")) {
             String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
             String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
@@ -1987,7 +1993,7 @@ public class ButtonListener extends ListenerAdapter {
             Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
-            if (activeGame.getFactionsThatReactedToThis("Public Disgrace") != null && activeGame.getFactionsThatReactedToThis("Public Disgrace").contains("_" + scpick)) {
+            if (activeGame.getFactionsThatReactedToThis("Public Disgrace") != null && activeGame.getFactionsThatReactedToThis("Public Disgrace").contains("_" + scpick) && (activeGame.getFactionsThatReactedToThis("Public Disgrace Only").isEmpty() || activeGame.getFactionsThatReactedToThis("Public Disgrace Only").contains(player.getFaction()))) {
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player) {
                         continue;

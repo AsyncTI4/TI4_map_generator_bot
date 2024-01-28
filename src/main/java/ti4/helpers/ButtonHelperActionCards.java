@@ -1057,7 +1057,7 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("disgrace")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which SC you will public disgrace. Public disgrace is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it or are unsure of the target";
+                + " you have the option to pre-assign which SC you will public disgrace. Public disgrace is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it or are unsure of the target. You will be given the option for it to only trigger on a particular person";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : activeGame.getSCList()) {
                 if (sc <= 0) continue; // some older games have a 0 in the list of SCs
