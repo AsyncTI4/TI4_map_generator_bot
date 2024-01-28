@@ -3739,6 +3739,9 @@ public class Game {
             || publicObjectives1.size() < 5 && round >= 4
             || publicObjectives2.size() < (round - 4)
             || getRealPlayers().stream()
-                .anyMatch(player -> player.getSecretVictoryPoints() > 3 && !player.getRelics().contains("obsidian"));
+                .anyMatch(player -> player.getSecretVictoryPoints() > 3 && !player.getRelics().contains("obsidian"))
+            || getRealPlayers().size() < 3
+            || getRealPlayers().size() > 8
+            || getTileMap().values().stream().map(Tile::getTileID).distinct().count() != getTileMap().size();
     }
 }
