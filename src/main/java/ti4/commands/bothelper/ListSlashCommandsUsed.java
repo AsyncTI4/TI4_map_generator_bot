@@ -77,7 +77,6 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                     if (actionCardsPlayed.containsKey(acName)) {
                         numUsed2 = actionCardsPlayed.get(acName);
                     }
-                    acsSabod = acsSabod+numUsed;
                     actionCardsPlayed.put(acName, numUsed + numUsed2);
                 }
                 for (String acID : activeGame.getPurgedActionCards().keySet()) {
@@ -88,7 +87,6 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                     if (actionCardsPlayed.containsKey(acName)) {
                         numUsed2 = actionCardsPlayed.get(acName);
                     }
-                    acsSabod = acsSabod+numUsed;
                     actionCardsPlayed.put(acName, numUsed + numUsed2);
                 }
             }
