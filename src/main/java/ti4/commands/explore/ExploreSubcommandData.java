@@ -393,7 +393,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "mo1", "mo2", "mo3" -> {
                 if (tile != null && planetID != null) {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, activeGame, planetID);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, activeGame);
                 }
                 message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                     + ", however this placement *is* optional.";

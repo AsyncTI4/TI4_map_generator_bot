@@ -1099,6 +1099,30 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
     }
 
+    public static void checkForAssigningGeneticRecombination(Game activeGame) {
+        
+        for(Player player : activeGame.getRealPlayers()){
+            activeGame.setCurrentReacts("Genetic Recomination "+player.getFaction(), "");
+            if (player.hasTechReady("gr")) {
+                String msg = player.getRepresentation()
+                    + " you have the option to pre-assign the declaration of using genetic recombination on someone. When they are up to vote, it will ping them saying that you wish to use genetic recombination, and then it will be your job to clarify. Feel free to not preassign if you dont want to use it on this agenda";
+                    List<Button> buttons2 = new ArrayList<>();
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if (!activeGame.isFoWMode()) {
+                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination_" + p2.getFaction(), p2.getFaction()));
+                    } else {
+                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination_" + p2.getFaction(), p2.getColor()));
+                    }
+                }
+                buttons2.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
+            }
+        }
+    }
+
     public static void exhaustStuffForVoting(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
         String planetName = StringUtils.substringAfter(buttonID, "_");
         String votes = StringUtils.substringBetween(buttonLabel, "(", ")");

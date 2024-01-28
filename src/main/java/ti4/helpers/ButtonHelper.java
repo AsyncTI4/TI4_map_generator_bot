@@ -6346,7 +6346,22 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.danger("removePreset_" + messageID, "Remove The Preset"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " you can use this button to undo the preset. Ignore it otherwise", buttons);
-
+        if(messageID.equalsIgnoreCase("Public Disgrace")){
+            String msg2 = player.getRepresentation() + " Additionally, you can set Public Disgrace to only trigger on a particular person. Choose to do so if you wish, or decline, or ignore this";
+            List<Button> buttons2 = new ArrayList<>();
+            for(Player p2 : activeGame.getRealPlayers()){
+                if(p2 == player){
+                    continue;
+                }
+                if (!activeGame.isFoWMode()) {
+                    buttons2.add(Button.secondary("resolvePreassignment_Public Disgrace Only_" + p2.getFaction(), p2.getFaction()));
+                } else {
+                    buttons2.add(Button.secondary("resolvePreassignment_Public Disgrace Only_" + p2.getFaction(), p2.getColor()));
+                }
+            }
+            buttons2.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons2);
+        }
     }
 
     public static void resolveRemovalOfPreAssignment(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {

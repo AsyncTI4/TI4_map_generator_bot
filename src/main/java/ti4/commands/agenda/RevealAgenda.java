@@ -129,6 +129,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (!action) {
             AgendaHelper.offerEveryonePrepassOnShenanigans(activeGame);
             AgendaHelper.offerEveryonePreAbstain(activeGame);
+            AgendaHelper.checkForAssigningGeneticRecombination(activeGame);
         }
         String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
         int aCount = 0;

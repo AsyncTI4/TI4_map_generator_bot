@@ -96,6 +96,7 @@ public class Cleanup extends StatusSubcommandData {
         activeGame.setCurrentReacts("forcedScoringOrder", "");
         activeGame.setCurrentReacts("factionsThatScored", "");
         activeGame.setCurrentReacts("Public Disgrace", "");
+        activeGame.setCurrentReacts("Public Disgrace Only", "");
         activeGame.setCurrentReacts("edynAgentPreset", "");
         activeGame.setCurrentReacts("Coup", "");
         activeGame.setCurrentReacts("PublicExecution", "");
