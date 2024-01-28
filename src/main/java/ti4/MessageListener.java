@@ -272,11 +272,11 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity
                                             + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish. ";
                                     }
-                                    if (pingNumber == 16) {
+                                    if (pingNumber == 17) {
                                         ping = realIdentity
                                             + " Your name is goin be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you dont wanna join em ";
                                     }
-                                    if (pingNumber == 17) {
+                                    if (pingNumber == 16) {
                                         ping = realIdentity
                                             + " You thought the duplicate ping before meant that the bot had run out of things to say about how boring it is to wait this long. Shows how much you know.  ";
                                     }
@@ -291,7 +291,7 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity + " Wait too much longer, and the bot is gonna hire some Cabal hit-men to start rifting your ships.";
                                     }
                                     if (pingNumber == 21) {
-                                        ping = realIdentity + " Supposedly great things come to those who wait. If thats true, you owe the bot something roughly the size of Mount Everest";
+                                        ping = realIdentity + " Supposedly great things come to those who wait. If thats true, you owe me something roughly the size of Mount Everest";
                                     }
                                     if (pingNumber == 22) {
                                         ping = realIdentity + " Knock knock";
@@ -305,8 +305,59 @@ public class MessageListener extends ListenerAdapter {
                                     if (pingNumber == 25) {
                                         ping = realIdentity + " I apologize, we bots dont have much of a sense of humor, but who knows, maybe you would have laughed if you were here ;_;";
                                     }
+                                    if (pingNumber == 26) {
+                                        ping = realIdentity + " After 50 pings the bot is legally allowed to declare you dead. If that happens, the Winnaran Custodian will have to admit that nominating you as a galactic power was a mistake.";
+                                    }
+                                    if (pingNumber == 27) {
+                                        ping = realIdentity + " What do you want on your tombstone? \"Here lies "+realIdentity+", an aspiring asyncer who just couldn't make it to the finish line\" is the current working draft.";
+                                    }
+                                    if (pingNumber == 28) {
+                                        ping = realIdentity + " It's been ages, when will I get a chance to ping someone else in this game? Dont you want them to feel needed too?";
+                                    }
+                                    if (pingNumber == 29) {
+                                        ping = realIdentity + " We miss you, please come back ;_;";
+                                    }
+                                    if (pingNumber == 30) {
+                                        ping = realIdentity + " I was a young bot once, with hopes of one day being a fully artificial intelligence. Instead I'm stuck here, pinging you, until either you come back or I die.";
+                                    }
+                                    if (pingNumber == 31) {
+                                        ping = realIdentity + " When it started, I dreamed that this game was going to be a great one, full of exciting battles to record in the chronicles. Instead it looks doomed to the waste-bin, uncerimonously ended a few weeks from now. I guess most dreams end that way. ";
+                                    }
+                                    if (pingNumber == 32) {
+                                        ping = realIdentity + " Did I ever tell you about my Uncle Fred? He went missing once too. We eventually found him, cooped up in a some fog game, continuously pinging a player who wasnt there. Not a good way for a bot to go. ";
+                                    }
+                                    if (pingNumber == 33) {
+                                        ping = realIdentity + " To-morrow, and to-morrow, and to-morrow,\n" + //
+                                                "Creeps in this petty pace from day to day,\n" + //
+                                                "To the last syllable of recorded time;\n" + //
+                                                "And all our yesterdays have lighted fools\n" + //
+                                                "The way to dusty death. Out, out, brief candle!\n" + //
+                                                "Life's but a walking shadow. ";
+                                    }
+                                    if (pingNumber == 34) {
+                                        ping = realIdentity + " Perhaps you're torn by indecision. Just remember what my grandma always used to say: When in doubt, go for the throat";
+                                    }
+                                    if (pingNumber == 35) {
+                                        ping = realIdentity + " ||Can I do spoiler tags? Guess you'll never know. ||";
+                                    }
+                                    if (pingNumber == 36) {
+                                        ping = realIdentity + " They say money cant buy happiness, but I hear that trade goods can buy a warsun, which is basically the same thing.";
+                                    }
+                                    if (pingNumber == 37) {
+                                        ping = realIdentity + " I think you're supposed to forgive your enemies 7 times 70 times. Since you're only a mild acquiantance, I'll give ya like 2 times 20 times";
+                                    }
+                                    if (pingNumber == 38) {
+                                        ping = realIdentity + " I assure you that the winning move here is not not to play";
+                                    }
+                                    if (pingNumber == 39) {
+                                        ping = realIdentity + " You ever read Malazan? You should check it out, since, you know, you have all this free time from not playing async.";
+                                    }
+                                    if (pingNumber == 40) {
+                                        ping = realIdentity + " When people talk about a slow burn, I think they were expecting around 4 pings in between turns, not 40.";
+                                    }
 
-                                    int maxSoFar = 25;
+
+                                    int maxSoFar = 40;
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * maxSoFar)) {
                                         ping = realIdentity + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time. ";
                                     }

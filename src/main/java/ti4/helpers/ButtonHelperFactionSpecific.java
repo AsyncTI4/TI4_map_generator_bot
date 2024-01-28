@@ -822,12 +822,11 @@ public class ButtonHelperFactionSpecific {
                 continue;
             }
             if (p2.hasTechReady("gr")) {
-                String genetic = Emojis.BioticTech + " " + Emojis.Mahact + " Genetic Recombination";
-                String msg1 = voter.getRepresentation(true, true) + " you may want to wait for " + genetic + " here. Use your discretion.";
-                String msg2 = p2.getRepresentation(true, true) + " you may use " + genetic + " here on ";
-                msg2 += StringUtils.capitalize(voter.getColor()) + ". This is not automated/tracked by the bot";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), msg1);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg2);
+                if(activeGame.getFactionsThatReactedToThis("Genetic Recomination "+p2.getFaction()).contains(voter.getFaction())){
+                    p2.exhaustTech("gr");
+                    String msg = p2.getRepresentation(false,true)+" is using genetic recombination to force "+voter.getRepresentation(false, true)+" to vote a particular way. Tech has been exhausted, the owner should elaborate on which way to vote";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), msg);
+                }
             }
         }
     }

@@ -35,6 +35,10 @@ public class ButtonHelperModifyUnits {
         if(mentak != null && mentak != player && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0){
             return 0;
         }
+        Player mentakFS = Helper.getPlayerFromUnit(activeGame,"mentak_flagship");
+        if(mentakFS != null && mentakFS != player && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0){
+            return 0;
+        }
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
             UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
@@ -115,6 +119,25 @@ public class ButtonHelperModifyUnits {
             && !activeGame.getLaws().containsKey("articles_war");
         Tile tile = activeGame.getTileFromPlanet(planet);
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
+        boolean usedDuraniumAlready = true;
+        String duraniumMsg = "";
+        if(player.hasTech("da")){
+            usedDuraniumAlready = false;
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                if (damagedUnits > 0) {
+                    duraniumMsg = duraniumMsg + unitName;
+                }
+            }
+        }
         if(numSustains > 0){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -202,6 +225,9 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("pds") && min > 0) {
+                    if(min+1 > totalUnits){
+                        duraniumMsg = duraniumMsg.replace(unitName,"");
+                    }
                     msg = msg + "> Destroyed "+min+" "+Emojis.pds+"\n";
                     hits = hits - min;
                     new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -221,6 +247,9 @@ public class ButtonHelperModifyUnits {
                 if (unitName.equalsIgnoreCase("mech") && min > 0) {
                     msg = msg + "> Destroyed "+min+" "+unitName+"(s)\n";
                     hits = hits - min;
+                    if(min+1 > totalUnits){
+                        duraniumMsg = duraniumMsg.replace(unitName,"");
+                    }
                     new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
                     if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                     && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planet)) {
@@ -243,10 +272,36 @@ public class ButtonHelperModifyUnits {
                 }
                 
             }
+            
+        }
+        if(!usedDuraniumAlready){
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                if (!usedDuraniumAlready&& damagedUnits > 0 && duraniumMsg.contains(unitName)) {
+                    msg = msg + "> Repaired 1 "+unitModel.getUnitEmoji()+" due to Duranium Armor\n";
+                    tile.removeUnitDamage(unitHolder.getName(), unitKey, 1);
+                    usedDuraniumAlready = true;
+                }
+            }
         }
 
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if((unitHolder.getUnitCount(UnitType.Pds, player.getColor()) < 1 || (!player.hasUnit("titans_pds") && !player.hasUnit("titans_pds2")) )&& unitHolder.getUnitCount(UnitType.Mech, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1 && (unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)){
+            String msg2 = player.getRepresentation() + " you may want to remove structures if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.danger(player.getFinsFactionCheckerPrefix()+"removeAllStructures_"+unitHolder.getName(), "Remove Structures"));
+            buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+        }
         event.getMessage().delete().queue();
     }
 
@@ -285,6 +340,25 @@ public class ButtonHelperModifyUnits {
         int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
         boolean noMechPowers = activeGame.getLaws().containsKey("articles_war");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
+        boolean usedDuraniumAlready = true;
+        String duraniumMsg = "";
+        if(player.hasTech("da")){
+            usedDuraniumAlready = false;
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                if (damagedUnits > 0) {
+                    duraniumMsg = duraniumMsg + unitName;
+                }
+            }
+        }
         if(numSustains > 0){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -391,7 +465,11 @@ public class ButtonHelperModifyUnits {
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
+                
                 if (unitName.equalsIgnoreCase("cruiser") && min > 0) {
+                    if(min+1 > totalUnits){
+                        duraniumMsg = duraniumMsg.replace(unitName,"");
+                    }
                     hits = hits - min;
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
@@ -458,6 +536,9 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("dreadnought") && min > 0) {
                     hits = hits - min;
+                    if(min+1 > totalUnits){
+                        duraniumMsg = duraniumMsg.replace(unitName,"");
+                    }
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
@@ -541,6 +622,9 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("flagship") && min > 0) {
                     hits = hits - min;
+                    if(min+1 > totalUnits){
+                        duraniumMsg = duraniumMsg.replace(unitName,"");
+                    }
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
@@ -565,6 +649,9 @@ public class ButtonHelperModifyUnits {
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("warsun") && min > 0) {
                     hits = hits - min;
+                    if(min+1 > totalUnits){
+                        duraniumMsg = duraniumMsg.replace(unitName,"");
+                    }
                     if(!justSummarizing){
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
@@ -580,6 +667,28 @@ public class ButtonHelperModifyUnits {
         }
 
 
+        if(!usedDuraniumAlready){
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                if (!usedDuraniumAlready&& damagedUnits > 0 && duraniumMsg.contains(unitName)) {
+                    if(!justSummarizing){
+                        msg = msg + "> Repaired 1 "+unitModel.getUnitEmoji()+" due to Duranium Armor\n";
+                        tile.removeUnitDamage("space", unitKey, 1);
+                    }else{
+                        msg = msg + "> Would repair 1 "+unitModel.getUnitEmoji()+" due to Duranium Armor\n";
+                    }
+                    usedDuraniumAlready = true;
+                }
+            }
+        }
         if(!justSummarizing && event instanceof ButtonInteractionEvent bevent){
             bevent.getMessage().delete().queue();
         }
