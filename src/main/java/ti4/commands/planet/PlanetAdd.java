@@ -25,7 +25,7 @@ import ti4.model.PlanetModel;
 
 public class PlanetAdd extends PlanetAddRemove {
     public PlanetAdd() {
-        super(Constants.PLANET_ADD, "Add Planet");
+        super(Constants.PLANET_ADD, "Add or transfer a planet card to your player area");
     }
 
     @Override
