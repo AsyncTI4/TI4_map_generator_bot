@@ -112,9 +112,10 @@ public class StartCombat extends CombatSubcommandData {
     public static void findOrCreateCombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null) threadName = combatThreadName(activeGame, player1, player2, tile);
-        TextChannel textChannel = activeGame.getMainGameChannel();
-        
-
+        if(!activeGame.isFoWMode()){
+            channel =  activeGame.getMainGameChannel();
+        }
+        TextChannel textChannel = (TextChannel)channel;
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
@@ -134,7 +135,8 @@ public class StartCombat extends CombatSubcommandData {
 
         // Create the thread
         final String finalThreadName = threadName;
-        textChannel.sendMessage("Resolve Combat in this thread:").queue(m -> {
+       
+        channel.sendMessage("Resolve Combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             if (activeGame.isFoWMode()) {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
