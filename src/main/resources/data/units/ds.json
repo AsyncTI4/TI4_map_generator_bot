@@ -1264,7 +1264,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When a unit in this system would be destroyed, you may remove it from the game board instead."
+        "ability": "If a unit in this system would be destroyed, you may remove it from the game board instead."
     },
     {
         "id": "nivyn_mech",

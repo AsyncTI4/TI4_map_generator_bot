@@ -672,7 +672,7 @@ public class ButtonHelper {
     public static boolean canIBuildGFInSpace(Game activeGame, Player player, Tile tile, String kindOfBuild) {
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
 
-        if ("freelancers".equalsIgnoreCase(kindOfBuild) || "genericBuild".equalsIgnoreCase(kindOfBuild) || "muaatagent".equalsIgnoreCase(kindOfBuild)) {
+        if ("arboCommander".equalsIgnoreCase(kindOfBuild) ||"freelancers".equalsIgnoreCase(kindOfBuild) || "genericBuild".equalsIgnoreCase(kindOfBuild) || "muaatagent".equalsIgnoreCase(kindOfBuild)) {
             return true;
         }
 
@@ -1160,7 +1160,7 @@ public class ButtonHelper {
                     }
                     numberOfAbilities++;
                 } else {
-                    Button gainTG = Button.success(fincheckerForNonActive + "freelancersBuild_" + activeSystem.getPosition(), "Build 1 Unit");
+                    Button gainTG = Button.success(fincheckerForNonActive + "arboCommanderBuild_" + activeSystem.getPosition(), "Build 1 Unit");
                     Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(gainTG, decline);
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Arborec commander ", buttons);
@@ -6707,7 +6707,7 @@ public class ButtonHelper {
                         offerNanoforgeButtons(p1, activeGame, event);
                     }
                     if (relicModel.getName().contains("The Codex")) {
-                        offerNanoforgeButtons(p1, activeGame, event);
+                        offerCodexButtons(p1, activeGame, event);
                     }
                     if (buttonID.contains("decrypted_cartoglyph")) {
                         new DrawBlueBackTile().drawBlueBackTiles(event, activeGame, p1, 3, false);

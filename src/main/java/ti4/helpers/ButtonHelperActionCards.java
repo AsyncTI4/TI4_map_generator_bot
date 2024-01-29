@@ -58,6 +58,29 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    public static List<Button> getTilesToLuckyShot(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
+            if (FoWHelper.otherPlayersHaveShipsInSystem(player, tileEntry.getValue(), activeGame) && FoWHelper.playerHasPlanetsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                UnitHolder space = tile.getUnitHolders().get("space");
+                boolean rightKindPresent = false;
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if(space.getUnitCount(UnitType.Dreadnought, p2.getColor()) > 0 || space.getUnitCount(UnitType.Cruiser, p2.getColor()) > 0 || space.getUnitCount(UnitType.Destroyer, p2.getColor()) > 0){
+                        rightKindPresent = true;
+                    }
+                }
+                if(rightKindPresent){
+                    Button validTile = Button.success(finChecker + "luckyShotIn_" + tileEntry.getKey(), tile.getRepresentationForButtons(activeGame, player));
+                    buttons.add(validTile);
+                }
+                
+            }
+        }
+        return buttons;
+    }
+
     public static List<Button> getUnitsToScuttle(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
@@ -104,11 +127,92 @@ public class ButtonHelperActionCards {
         }
         return buttons;
     }
+    public static List<Button> getUnitsToLuckyShot(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
+
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            UnitHolder unitHolder = entry.getValue();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet) continue;
+
+            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
+            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (player.unitBelongsToPlayer(unitKey)) continue;
+
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                    continue;
+                }
+                Player p2 = activeGame.getPlayerFromColorOrFaction(unitKey.getColor());
+                if(p2 == null){
+                    continue;
+                }
+
+                UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String unitName = unitKey.unitName();
+                int totalUnits = unitEntry.getValue();
+                int damagedUnits = 0;
+
+                if (unitHolder.getUnitDamage() != null) {
+                    damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
+                }
+
+                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
+                for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
+                    String buttonID = finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "damaged" + "_" + unitKey.getColor();
+                    Button validTile2 = Button.danger(buttonID, "Destroy A Damaged " + prettyName);
+                    validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+                totalUnits = totalUnits - damagedUnits;
+                for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                    Button validTile2 = Button.danger(finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "_" + unitKey.getColor(), "Destroy " + x + " " + prettyName);
+                    validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+            }
+        }
+        return buttons;
+    }
 
     public static void resolveScuttleStart(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
         List<Button> buttons = getTilesToScuttle(player, activeGame, event, tgAlready);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation(true, true) + " Use buttons to select tile to scuttle in", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveLuckyShotStart(Player player, Game activeGame, ButtonInteractionEvent event) {
+        
+        List<Button> buttons = getTilesToLuckyShot(player, activeGame, event);
+        if(buttons.size() == 0){
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true) + " no tiles to lucky shot in found. Remember you cant lucky shot yourself. Report bug if in error. If not an error, please take a different action");
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation(true, true) + " Use buttons to select tile to lucky shot in", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveLuckyShotRemoval(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        String color = buttonID.split("_")[3];
+        Tile tile = activeGame.getTileByPosition(pos);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(color);
+        boolean damaged = false;
+        if (unit.contains("damaged")) {
+            unit = unit.replace("damaged", "");
+            damaged = true;
+        }
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
+        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), damaged, activeGame);
+        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " owned by "+ButtonHelper.getIdentOrColor(p2, activeGame)+" in tile " + tile.getRepresentation() + " was removed via the Lucky Shot AC";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg);
+        }
         event.getMessage().delete().queue();
     }
 
@@ -131,6 +235,13 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
+    public static void resolveLuckyShotTileSelection(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        List<Button> buttons = getUnitsToLuckyShot(player, activeGame, event, tile);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation(true, true) + " Use buttons to select unit to lucky shot", buttons);
+        event.getMessage().delete().queue();
+    }
     public static void resolveScuttleRemoval(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
