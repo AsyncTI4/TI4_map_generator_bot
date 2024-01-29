@@ -78,7 +78,7 @@ public class CreateGameButton extends GameSubcommandData {
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
 
         if (members.size() > 0) {
-            buttonMsg = "Game Fun Name: " + gameFunName + "\nPlayers:\n";
+            buttonMsg = "Game Fun Name: " + gameFunName.replace(":","") + "\nPlayers:\n";
             int counter = 1;
             for (Member member : members) {
                 buttonMsg = buttonMsg + counter + ":" + member.getId() + ".(" + member.getAsMention() + ")\n";
