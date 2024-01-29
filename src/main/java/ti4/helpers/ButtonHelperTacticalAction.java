@@ -519,7 +519,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
         }
         if (!activeGame.isFoWMode() && playersWithPds2.size() > 0 && !activeGame.getL1Hero()) {
-            StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true) + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
+            StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true) + " the selected system is in range of space cannon units owned by");
             List<Button> buttons2 = new ArrayList<>();
             Button graviton = null;
             buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
@@ -533,7 +533,7 @@ public class ButtonHelperTacticalAction {
             if (graviton != null) {
                 buttons2.add(graviton);
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), pdsMessage.toString(), buttons2);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), pdsMessage.toString() +" They can use these buttons to shoot after movement is done if there is no space combat.", buttons2);
         }
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(activeGame, player);
