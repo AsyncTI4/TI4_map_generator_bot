@@ -1278,10 +1278,9 @@ public class ButtonHelperHeroes {
         if (players2.size() != 0) {
             player = players2.get(0);
         }
-        for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
-            UnitHolder unitHolder = entry.getValue();
+       
+            UnitHolder unitHolder = tile1.getUnitHolders().get("space");
             Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-            if (unitHolder instanceof Planet) continue;
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
 
@@ -1330,7 +1329,7 @@ public class ButtonHelperHeroes {
                 }
             }
 
-        }
+        
     }
 
     public static void getGhostHeroTilesStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {

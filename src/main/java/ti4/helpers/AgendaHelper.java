@@ -2391,7 +2391,7 @@ public class AgendaHelper {
             }
             for(String attachment :p.getTokenList()){
                 if(attachment.contains("council_preserve")){
-                    voteAmount+=4;
+                    voteAmount+=5;
                 }
             }
 
@@ -2788,7 +2788,7 @@ public class AgendaHelper {
             if (p == null) continue;
             for(String attachment :p.getTokenList()){
                 if(attachment.contains("council_preserve")){
-                    voteCount+=4;
+                    voteCount+=5;
                 }
             }
         }

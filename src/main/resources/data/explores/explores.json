@@ -753,7 +753,7 @@
         "name": "Council Preserve",
         "type": "Cultural",
         "resolution": "Attach",
-        "text": "ATTACH: When you exhaust this planet to cast votes, cast 4 additional votes.",
+        "text": "ATTACH: When you exhaust this planet to cast votes, cast 5 additional votes.",
         "attachmentId": "council_preserve",
         "source": "ds"
     },
@@ -776,11 +776,29 @@
         "source": "ds"
     },
     {
+        "id": "scorcheddepot",
+        "name": "Scorched Depot",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, remove 1 command token from this system or redistribute 1 of your command tokens.",
+        "flavorText": "*Magma spurted through cracks in the surface, but the exploratory team knew the risk was worth the reward.*",
+        "source": "ds"
+    },
+    {
         "id": "arcaneshieldemitter",
         "name": "Arcane Shield Emitter",
         "type": "Hazardous",
         "resolution": "Attach",
         "text": "ATTACH: Return all infantry on this planet to the space area or destroy them. This planet cannot be bombarded. Infantry cannot be committed to, produced on, or placed on this planet.",
+        "attachmentId": "arcane_shield",
+        "source": "ds"
+    },
+    {
+        "id": "arcanecitadel",
+        "name": "Arcane Citadel",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: When you exhaust this planet, place 1 infantry from your reinforcements on this planet. Apply +1 to each of your unit's combat rolls on this planet.",
         "attachmentId": "arcane_shield",
         "source": "ds"
     },

@@ -75,6 +75,7 @@ import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
+import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -1694,12 +1695,18 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.placeRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("startToScuttleAUnit_")) {
             ButtonHelperActionCards.resolveScuttleStart(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("startToLuckyShotAUnit_")) {
+            ButtonHelperActionCards.resolveLuckyShotStart(player, activeGame, event);
         } else if (buttonID.startsWith("endScuttle_")) {
             ButtonHelperActionCards.resolveScuttleEnd(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("scuttleOn_")) {
             ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("luckyShotOn_")) {
+            ButtonHelperActionCards.resolveLuckyShotRemoval(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("scuttleIn_")) {
             ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("luckyShotIn_")) {
+            ButtonHelperActionCards.resolveLuckyShotTileSelection(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("winnuHero_")) {
             ButtonHelperHeroes.resolveWinnuHeroSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("construction_")) {
@@ -1741,6 +1748,7 @@ public class ButtonListener extends ListenerAdapter {
             UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
             plan.removeAllUnits(player.getColor());
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed all units on "+planet+" for "+player.getRepresentation());
+            AddRemoveUnits.addPlanetToPlayArea(event, activeGame.getTileFromPlanet(planet), planet, activeGame);
         } else if (buttonID.startsWith("winnuStructure_")) {
             String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
             String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
@@ -1938,6 +1946,18 @@ public class ButtonListener extends ListenerAdapter {
                 tile = activeGame.getTileByPosition(planet);
             }
             buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
+            String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
+                + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("arboCommanderBuild_")) {
+            String planet = buttonID.replace("arboCommanderBuild_", "");
+            List<Button> buttons;
+            Tile tile = activeGame.getTile(AliasHandler.resolveTile(planet));
+            if (tile == null) {
+                tile = activeGame.getTileByPosition(planet);
+            }
+            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "arboCommander", "placeOneNDone_dontskiparboCommander");
             String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -4419,17 +4439,21 @@ public class ButtonListener extends ListenerAdapter {
                 if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
                     String message = trueIdentity + " You can use the button to explore using crown of emphidia";
                     systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
+                    systemButtons2.add(Button.danger("deleteButtons","Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
                 systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("sardakkagent")) {
                     String message = trueIdentity + " You can use the button to do sardakk agent";
                     systemButtons2.addAll(ButtonHelperAgents.getSardakkAgentButtons(activeGame, player));
+                    systemButtons2.add(Button.danger("deleteButtons","Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
+                systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("nomadagentmercer")) {
                     String message = trueIdentity + " You can use the button to do General Mercer";
                     systemButtons2.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(activeGame, player));
+                    systemButtons2.add(Button.danger("deleteButtons","Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
 

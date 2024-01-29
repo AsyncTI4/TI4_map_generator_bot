@@ -1444,7 +1444,7 @@
     "name": "Fulfillment Protocols",
     "phase": "Action",
     "window": "After a player activates a system that contains 1 or more of your ships",
-    "text": "Spend 2 trade goods to place 1 cruiser and 1 destroyer in that system.",
+    "text": "Place up to 1 ship from your reinforcements whose cost is 4 or less in the active system",
     "flavorText": "The Shipwrights were never late, though they had a habit of straining the meaning of “just in time” fulfillment.",
     "source": "ds"
   },
@@ -1453,7 +1453,7 @@
     "name": "Secured Trove",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "Purge any 3 of your relic fragments to gain 1 relic.",
+    "text": "Purge any 2 of your relic fragments to gain 1 relic.",
     "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
     "source": "ds"
   },
@@ -1462,7 +1462,7 @@
     "name": "Secured Trove",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "Purge any 3 of your relic fragments to gain 1 relic.",
+    "text": "Purge any 2 of your relic fragments to gain 1 relic.",
     "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
     "source": "ds"
   },
@@ -1486,7 +1486,7 @@
   },
   {
     "alias": "psionic_hammer",
-    "name": "Psionic Hammer",
+    "name": "Neural Hammer",
     "phase": "Action",
     "window": "ACTION:",
     "text": "Choose 1 player with the most victory points. Look at up to 1 of their unscored secret objectives, at random.",
@@ -1507,7 +1507,7 @@
     "name": "Special Session",
     "phase": "Agenda",
     "window": "At the end of the agenda phase, after players ready planets:",
-    "text": "Reveal the top card of the agenda deck and resolve that agenda. Then, players who voted on that agenda may ready 1 planet they control.",
+    "text": "Reveal the top card of the agenda deck and resolve that agenda. Then, players who voted on that agenda may ready up to 3 planets they control.",
     "flavorText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
     "source": "ds"
   },
@@ -1525,7 +1525,7 @@
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "At the start of ground combat:",
-    "text": "You may roll 1 die for up to 2 of your ground forces on that planet. For each result equal to or greater than that unit's combat value, produce and assign 1 hit to 1 of your opponent's ground forces on that planet.",
+    "text": "You may place a number of infantry from your reinforcements on that planet equal to half that planet's influence value, rounded down.",
     "flavorText": "Otto's Outlaws were among the galaxy's most feared guerilla groups.",
     "source": "ds"
   },
@@ -1597,7 +1597,7 @@
     "name": "Meditative Firing Cycles",
     "phase": "Any",
     "window": "At any time:",
-    "text": "You may use the SPACE CANNON ability of 1 of your units in any system against another player's ship in or adjacent to that system.",
+    "text": "You may use the SPACE CANNON ability of each of up to 3 of your units in any system against another player's ship in or adjacent to that system.",
     "flavorText": "",
     "source": "ds"
   },
@@ -1642,7 +1642,7 @@
     "name": "Hostile World",
     "phase": "Action",
     "window": "After a player commits ground forces to land on a planet you control:",
-    "text": "Roll 2 dice. For each result equal to or less than either that planet's resource or influence value, choose and destroy up to 1 of those ground forces.",
+    "text": "Roll a number of dice equal to that planet's resource value, for each result of 6 or greater, produce 1 hit against those ground forces.",
     "flavorText": "“Y'ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship's engines. “We're touching down on a world that wants us dead.”",
     "source": "ds"
   },
@@ -1651,7 +1651,7 @@
     "name": "Echo Shielding",
     "phase": "Action",
     "window": "At the start of invasion:",
-    "text": "Choose 1 of your units in the active system; that unit gains PLANETARY SHIELD until the end of this tactical action.",
+    "text": "Units you control in the active system gain PLANETARY SHIELD until the end of this tactical action.",
     "flavorText": "The admiral swore as a shimmering veil spread to envelope the planet's critical infrastructure.",
     "source": "ds"
   },
@@ -1660,7 +1660,7 @@
     "name": "Illusory Duplication",
     "phase": "Action",
     "window": "At the start of space combat:",
-    "text": "Choose 1 of your non-fighter ships in the active system that does not have SUSTAIN DAMAGE; that unit gains SUSTAIN DAMAGE until the end of the combat.",
+    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain that unit ability this combat round.",
     "flavorText": "Sensors indicated only one Mortheus ship; it remained unclear which of the visible dozen it actually was.",
     "source": "ds"
   },
@@ -1678,7 +1678,7 @@
     "name": "Singularity Charge",
     "phase": "Action",
     "window": "At the start of a round of combat:",
-    "text": "Choose 1 unit participating in that combat; that unit becomes damaged, if able.",
+    "text": "Each unit participating in that combat becomes damaged, if able.",
     "flavorText": "Mosk Graezon knew the time had come, if he couldn't have the system, he'd take as many down with him as he could.",
     "source": "ds"
   },
@@ -1704,8 +1704,8 @@
     "alias": "forbidden_knowledge",
     "name": "Forbidden Knowledge",
     "phase": "Any",
-    "window": "When you research a technology that is not a unit upgrade technology:",
-    "text": "You may ignore 1 of that technology's prerequisites.",
+    "window": "When you research a technology:",
+    "text": "You may ignore 1 of that technologys prerequisites. If that technology is not a unit upgrade technology, you may ignore 2 of that technology's prerequisites.",
     "flavorText": "The Zealots knew many secrets long forgotten.",
     "source": "ds"
   },
@@ -1839,8 +1839,8 @@
     "alias": "classified_weapons",
     "name": "Classified Weapons",
     "phase": "Action",
-    "window": "Before 1 or more of your units would make a combat roll or roll for a unit ability:",
-    "text": "Hits produced by that roll cannot be canceled.",
+    "window": "Before 1 or more of your units would make a roll for a unit ability:",
+    "text": "Apply +4 to the result of each of those rolls. Hits produced by that roll cannot be canceled.",
     "flavorText": "Dr. Morden stood still, in awe. “They're… beautiful.”",
     "source": "ds"
   }
