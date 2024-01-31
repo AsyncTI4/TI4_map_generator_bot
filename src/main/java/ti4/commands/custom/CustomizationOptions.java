@@ -38,6 +38,7 @@ public class CustomizationOptions extends CustomSubcommandData{
                 activeGame.setStratPings(false);
             }
         }
+        
 
         OptionMapping ccNPlastic = event.getOption(Constants.CC_N_PLASTIC_LIMIT);
         if (ccNPlastic != null){
