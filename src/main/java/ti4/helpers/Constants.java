@@ -58,6 +58,8 @@ public class Constants {
     public static final String NAALU_AGENT = "naalu_agent";
     public static final String L1_HERO = "l1_hero";
     public static final String NOMAD_COIN = "nomad_coin";
+    public static final String QUEUE_SO = "queue_so";
+    public static final String UNDO_BUTTON = "undo_button";
     public static final String PURGED_FRAGMENTS = "purged_fragment";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
