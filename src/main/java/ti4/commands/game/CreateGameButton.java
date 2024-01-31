@@ -94,7 +94,7 @@ public class CreateGameButton extends GameSubcommandData {
             Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
             buttonMsg = buttonMsg + "\n\n" + " A bothelper has been pinged to start the game";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg);
-            MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
+            //MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
             //message_.getJumpUrl()
