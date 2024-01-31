@@ -2994,7 +2994,7 @@ public class ButtonHelper {
             endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Tarrock Ability"));
         }
         planet = "prism";
-        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet) && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
             endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Prism Ability"));
         }
         planet = "echo";
@@ -6155,6 +6155,10 @@ public class ButtonHelper {
         if (getNumberOfStarCharts(p1) > 1) {
             Button tButton = Button.danger(finChecker + prefix + "doStarCharts_", "Purge 2 Starcharts ");
             compButtons.add(tButton);
+        }
+        String planet = "prism";
+        if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet) && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
+            compButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Prism Ability"));
         }
         //leaders
         for (Leader leader : p1.getLeaders()) {

@@ -307,11 +307,13 @@ public class SCPlay extends PlayerSubcommandData {
             activeGame.setCurrentReacts(key,"");
             activeGame.setCurrentReacts(key2,"");
             activeGame.setCurrentReacts(key3,"");
-            for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
-                if(player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount() || (player == imperialHolder && player.getPlanets().contains("mr"))){
-                    activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
-                }else{
-                    activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+            if(activeGame.getQueueSO()){
+                for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
+                    if(player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount() || (player == imperialHolder && player.getPlanets().contains("mr"))){
+                        activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
+                    }else{
+                        activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+                    }
                 }
             }
         }

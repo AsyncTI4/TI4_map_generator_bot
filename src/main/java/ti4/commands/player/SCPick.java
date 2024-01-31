@@ -225,7 +225,7 @@ public class SCPick extends PlayerSubcommandData {
 
     public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
-        String msg;
+        
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
@@ -240,9 +240,7 @@ public class SCPick extends PlayerSubcommandData {
             maxSCsPerPlayer = 1;
         }
 
-        String sb = player.getRepresentation(true, true) +
-            "\n> Picked: " + Helper.getSCRepresentation(activeGame, scPicked);
-
+        
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
@@ -328,8 +326,8 @@ public class SCPick extends PlayerSubcommandData {
                 activeGame.setCurrentPhase("action");
             }
         }
-        msg = sb;
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+       
+        
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
