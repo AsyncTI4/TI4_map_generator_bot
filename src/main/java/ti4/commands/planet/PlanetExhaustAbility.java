@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
+import ti4.commands.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -93,11 +94,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
         }
         if ("prism".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
-            if (!activeGame.isFoWMode() && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
-
-            }else{
+            if (!activeGame.isFoWMode() && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
                 MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Prism's Ability to Force Another Player to give either an AC or PN");
                 resolvePrismStep1(player, activeGame);
+            }else{
+                MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Prism's Ability to Return a Non-Faction, Non-Unit Upgrade tech and get one with the same number of prereqs");
+                MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Choose a tech to return",getNewPrismLoseTechOptions(player, activeGame));
             }
         }
         if ("echo".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
@@ -139,6 +141,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         activeGame.setComponentAction(true);
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of pre-requisites", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
+        String message2 = "Use buttons to end turn or do another action.";
+        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);
     }
     public void resolvePrismStep1(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();

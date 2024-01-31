@@ -8,15 +8,22 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -85,8 +92,27 @@ public class CreateGameButton extends GameSubcommandData {
                 counter++;
             }
             Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
-            buttonMsg = buttonMsg + "\n\n" + bothelperRole.getAsMention() + " this game is ready for you to create";
+            buttonMsg = buttonMsg + "\n\n" + " A bothelper has been pinged to start the game";
+            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg);
             MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
+            ActionRow actionRow = ActionRow.of(buttons);
+            baseMessageObject.addComponents(actionRow);
+            //message_.getJumpUrl()
+            event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
+                String msg = bothelperRole.getAsMention()+ " this game is ready for launching "+message_.getJumpUrl();
+                TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
+                if (bothelperLoungeChannel == null) return;
+                List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+                if (threadChannels.isEmpty()) return;
+                String threadName = "game-starts-and-ends";
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        MessageHelper.sendMessageToChannel(threadChannel_, msg);
+                        break;
+                    }
+                }
+                    });
         }
     }
 

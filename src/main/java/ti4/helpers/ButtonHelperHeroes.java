@@ -1279,55 +1279,84 @@ public class ButtonHelperHeroes {
             player = players2.get(0);
         }
        
-            UnitHolder unitHolder = tile1.getUnitHolders().get("space");
-            Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
-
-                UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
-                int totalUnits = unitEntry.getValue();
-                int damagedUnits = 0;
-
-                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
-                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
-                }
-
-                new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false, activeGame);
-                new AddUnits().unitParsing(event, player.getColor(), tile2, totalUnits + " " + unitName, activeGame);
-                if (damagedUnits > 0) {
-                    activeGame.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
-                }
+        UnitHolder unitHolder = tile1.getUnitHolders().get("space");
+        Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+            if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+            UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+            if (unitModel == null) continue;
+            if(unitModel.getCapacityValue() < 1){
+                continue;
             }
-            List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile2);
-            if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())) {
-                Player player2 = players.get(0);
-                if (player2 == player) {
-                    player2 = players.get(1);
-                }
+            UnitKey unitKey = unitEntry.getKey();
+            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            int totalUnits = unitEntry.getValue();
+            int damagedUnits = 0;
 
-                String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile2);
-                if (threadName.contains("private")) {
-                    threadName = threadName.replace("private", "benediction-private");
-                } else {
-                    threadName = threadName + "-benediction";
-                }
-                if (!activeGame.isFoWMode()) {
-                    StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
-                } else {
-                    StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
-                    StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
-                    for (Player player3 : activeGame.getRealPlayers()) {
-                        if (player3 == player2 || player3 == player) {
-                            continue;
-                        }
-                        if (!tile2.getRepresentationForButtons(activeGame, player3).contains("(")) {
-                            continue;
-                        }
-                        StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
+            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+            }
+
+            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false, activeGame);
+            new AddUnits().unitParsing(event, player.getColor(), tile2, totalUnits + " " + unitName, activeGame);
+            if (damagedUnits > 0) {
+                activeGame.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
+            }
+        }
+        //this will catch all the capacity units left behind in the previous iteration
+        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+            if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+            UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+            if (unitModel == null) continue;
+            if(unitModel.getCapacityValue() >0){
+                continue;
+            }
+            UnitKey unitKey = unitEntry.getKey();
+            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            int totalUnits = unitEntry.getValue();
+            int damagedUnits = 0;
+
+            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+            }
+
+            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false, activeGame);
+            new AddUnits().unitParsing(event, player.getColor(), tile2, totalUnits + " " + unitName, activeGame);
+            if (damagedUnits > 0) {
+                activeGame.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
+            }
+        }
+
+
+        List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile2);
+        if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())) {
+            Player player2 = players.get(0);
+            if (player2 == player) {
+                player2 = players.get(1);
+            }
+
+            String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile2);
+            if (threadName.contains("private")) {
+                threadName = threadName.replace("private", "benediction-private");
+            } else {
+                threadName = threadName + "-benediction";
+            }
+            if (!activeGame.isFoWMode()) {
+                StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
+            } else {
+                StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
+                StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
+                for (Player player3 : activeGame.getRealPlayers()) {
+                    if (player3 == player2 || player3 == player) {
+                        continue;
                     }
+                    if (!tile2.getRepresentationForButtons(activeGame, player3).contains("(")) {
+                        continue;
+                    }
+                    StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
                 }
             }
+        }
 
         
     }

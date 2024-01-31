@@ -371,6 +371,9 @@ public class Stats extends PlayerSubcommandData {
 		}
 
 		Integer tgCount = scTradeGoods.get(scNumber);
+		String msg = player.getRepresentation(true, true) +
+            "\n> Picked: " + Helper.getSCRepresentation(activeGame, scNumber);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;

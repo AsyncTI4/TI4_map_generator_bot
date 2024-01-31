@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
@@ -74,7 +75,12 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
-		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions") && !messageText.contains("end of turn ability")) {
+		String gameName = channel.getName();
+        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
+        gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
+        gameName = StringUtils.substringBefore(gameName, "-");
+        Game activeGame = GameManager.getInstance().getGame(gameName);
+		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions") && !messageText.contains("end of turn ability") && activeGame != null && activeGame.getUndoButton()) {
 			buttons.add(Button.secondary("ultimateUndo", "UNDO"));
 		}
 		splitAndSent(messageText, channel, embeds, buttons);
