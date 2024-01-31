@@ -799,7 +799,7 @@
         "type": "Hazardous",
         "resolution": "Attach",
         "text": "ATTACH: When you exhaust this planet, place 1 infantry from your reinforcements on this planet. Apply +1 to each of your unit's combat rolls on this planet.",
-        "attachmentId": "arcane_shield",
+        "attachmentId": "arcane_citadel",
         "source": "ds"
     },
     {

@@ -123,6 +123,10 @@ public class Game {
     @ExportableField
     private boolean nomadCoin;
     @ExportableField
+    private boolean undoButtonOffered = true;
+    @ExportableField
+    private boolean queueSO = true;
+    @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
     private boolean dominusOrb;
@@ -967,6 +971,12 @@ public class Game {
     public boolean getNomadCoin() {
         return nomadCoin;
     }
+    public boolean getUndoButton() {
+        return undoButtonOffered;
+    }
+    public boolean getQueueSO() {
+        return queueSO;
+    }
 
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
@@ -994,6 +1004,12 @@ public class Game {
 
     public void setNomadCoin(boolean onStatus) {
         nomadCoin = onStatus;
+    }
+    public void setUndoButton(boolean onStatus) {
+        undoButtonOffered = onStatus;
+    }
+    public void setQueueSO(boolean onStatus) {
+        queueSO = onStatus;
     }
 
     public void setTemporaryPingDisable(boolean onStatus) {
