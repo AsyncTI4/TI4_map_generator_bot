@@ -241,6 +241,10 @@
         "imagePath": "attachment_arc_shield.png"
     },
     {
+        "id": "arcane_citadel",
+        "imagePath": "attachment_arcane_citadel.png"
+    },
+    {
         "id": "council_preserve",
         "imagePath": "attachment_council_preserve.png"
     },
