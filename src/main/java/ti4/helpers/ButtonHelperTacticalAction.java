@@ -326,9 +326,7 @@ public class ButtonHelperTacticalAction {
         if (activeGame.getMovedUnitsFromCurrentActivation().isEmpty() && !activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")) {
             message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
-            if(FoWHelper.playerHasShipsInSystem(player, tile)){
-                needPDSCheck = true;
-            }
+            needPDSCheck = true;
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
         } else {
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()) {
