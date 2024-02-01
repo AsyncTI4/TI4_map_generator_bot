@@ -749,13 +749,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership"))
             && (!buttonID.contains("trade"))) {
-            boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
-            if (!used) {
-                if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
-                }
-                String message = deductCC(player, event);
-
                 int scnum = 1;
                 boolean setstatus = true;
                 try {
@@ -767,6 +760,17 @@ public class ButtonListener extends ListenerAdapter {
                         setstatus = false;
                     }
                 }
+                if(player.getSCs().contains(scnum)){
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" you have the SC card in hand and therefore should not be spending a CC here. You can override this protection via /player stats");
+                    return;
+                }
+            boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+            if (!used) {
+                if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                }
+                String message = deductCC(player, event);
+
                 if (setstatus) {
                     if (!player.getFollowedSCs().contains(scnum)) {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scnum, activeGame, event);
@@ -902,7 +906,7 @@ public class ButtonListener extends ListenerAdapter {
                 + " Cards info thread.");
             ButtonHelper.addReaction(event, true, false, "Looked at top of Hazardous, Cultural and Industrial decks.", "");
             event.getMessage().delete().queue();
-        } else if (buttonID.startsWith("distant_suns_")) {//"autoAssignGroundHits_"
+        } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {//"autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
@@ -1293,6 +1297,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().editMessage(editedMessage).queue();
         } else if (buttonID.startsWith("lanefirAgentRes_")) {
             ButtonHelperAgents.resolveLanefirAgent(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("absolsdn_")) {
+            ButtonHelper.resolveAbsolScanlink(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resFrontier_")) {
             buttonID = buttonID.replace("resFrontier_", "");
             String[] stuff = buttonID.split("_");
@@ -2212,6 +2218,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveSignalJammingStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep3_")) {
             ButtonHelperActionCards.resolveSignalJammingStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("edynAgendaStuffStep2_")) {
+            ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("edynAgendaStuffStep3_")) {
+            ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep4_")) {
             ButtonHelperActionCards.resolveSignalJammingStep4(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("reactorMeltdownStep2_")) {
