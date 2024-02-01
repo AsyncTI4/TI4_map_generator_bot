@@ -958,7 +958,7 @@ public class Helper {
         int bestRes = 0;
         int keleresAgent = 0;
         for(String thing : spentThings){
-            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
+            if(!thing.contains("tg_") && !thing.contains("sarween")  && !thing.contains("absol_sarween")&& !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
@@ -1015,6 +1015,11 @@ public class Helper {
                 if(thing.contains("sarween")){
                     msg = msg + "> Used Sarween Tools "+Emojis.CyberneticTech +"\n";
                     res = res+1;
+                }
+                if(thing.contains("absol_sarween")){
+                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, activeGame, true)/5;
+                    msg = msg + "> Used Sarween Tools "+Emojis.CyberneticTech +" for " +sarweenVal+" resources\n";
+                    res = res+sarweenVal;
                 }
                 if(thing.contains("warmachine")){
                     msg = msg + "> Used War Machine "+Emojis.ActionCard +"\n";
