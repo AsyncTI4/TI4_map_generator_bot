@@ -322,9 +322,13 @@ public class ButtonHelperTacticalAction {
         String message = "Moved all units to the space area.";
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         List<Button> systemButtons;
+        boolean needPDSCheck = false;
         if (activeGame.getMovedUnitsFromCurrentActivation().isEmpty() && !activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")) {
             message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
+            if(FoWHelper.playerHasShipsInSystem(player, tile)){
+                needPDSCheck = true;
+            }
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
         } else {
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()) {
@@ -370,6 +374,8 @@ public class ButtonHelperTacticalAction {
                             StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "space");
                         }
                     }
+                }else{
+                    needPDSCheck = true;
                 }
             }
         }
@@ -391,6 +397,9 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "empyrean", event);
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        if(needPDSCheck){
+            StartCombat.sendSpaceCannonButtonsToThread(ButtonHelper.getCorrectChannel(player, activeGame), activeGame, player, tile);
+        }
         event.getMessage().delete().queue();
     }
 
@@ -491,9 +500,8 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true) + " activated "
             + activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player));
 
-        List<Player> playersWithPds2 = new ArrayList<>();
         if (!activeGame.isFoWMode()) {
-            playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, pos);
+            
             for (Player player_ : activeGame.getRealPlayers()) {
                 if (!activeGame.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, activeGame.getTileByPosition(pos))) {
@@ -518,22 +526,15 @@ public class ButtonHelperTacticalAction {
             String msg = player.getRepresentation() + " you have Celdauri Commander and activated a system with your SD. Please hit button to get a commodity";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
         }
+
+
+        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, pos);
         if (!activeGame.isFoWMode() && playersWithPds2.size() > 0 && !activeGame.getL1Hero()) {
             StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true) + " the selected system is in range of space cannon units owned by");
-            List<Button> buttons2 = new ArrayList<>();
-            Button graviton = null;
-            buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
-            buttons2.add(Button.danger("declinePDS", "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append(" ").append(playerWithPds.getRepresentation());
-                if (playerWithPds.hasTechReady("gls") && graviton == null) {
-                    graviton = Button.secondary("exhaustTech_gls", "Exhaust Graviton Laser Systems");
-                }
             }
-            if (graviton != null) {
-                buttons2.add(graviton);
-            }
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), pdsMessage.toString() +" They can use these buttons to shoot after movement is done if there is no space combat.", buttons2);
+            MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
         }
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(activeGame, player);

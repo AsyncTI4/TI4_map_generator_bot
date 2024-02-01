@@ -42,6 +42,7 @@ import lombok.Data;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.agenda.ShowDiscardedAgendas;
 import ti4.commands.cardsac.ACInfo;
@@ -53,6 +54,7 @@ import ti4.commands.combat.CombatRoll;
 import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.explore.ShowRemainingRelics;
 import ti4.commands.game.GameCreate;
@@ -62,6 +64,7 @@ import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
@@ -3352,6 +3355,40 @@ public class ButtonHelper {
             unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.PROPULSION));
     }
 
+    public static void resolveAbsolScanlink(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        if (buttonID.contains("Decline")) {
+
+            String drawColor = buttonID.split("_")[2];
+            String cardID = buttonID.split("_")[3];
+            String planetName = buttonID.split("_")[4];
+            Tile tile = activeGame.getTileFromPlanet(planetName);
+            String messageText = player.getRepresentation() + " explored " +
+                Emojis.getEmojiFromDiscord(drawColor) +
+                "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+            ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, activeGame);
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
+                new PlanetRefresh().doAction(player, planetName, activeGame);
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+                ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
+            }
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+                UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+                activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
+            }
+            if (player.hasTech("dslaner")) {
+                player.setAtsCount(player.getAtsCount() + 1);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+            } 
+        } else {
+            int oldTg = player.getTg();
+            player.setTg(oldTg+1);
+            ButtonHelperAbilities.pillageCheck(player, activeGame);
+            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " used Absol Scanlink to decline explore and gained 1tg (tg went from "+oldTg+"->"+player.getTg()+")");
+        }
+        event.getMessage().delete().queue();
+    }
     public static List<Button> scanlinkResolution(Player player, Game activeGame, ButtonInteractionEvent event) {
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         List<Button> buttons = new ArrayList<>();

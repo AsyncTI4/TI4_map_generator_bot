@@ -147,10 +147,27 @@ public class ExpPlanet extends ExploreSubcommandData {
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and on " + planetName);
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-            String msg2 = "As a reminder of the text, the card reads as: \n";
-            msg2 = msg2 + name1 + ": " + exploreModel.getText() + "\n";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
+            ExploreModel exploreModel1 = Mapper.getExplore(cardID);
+            List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
+            return;
+        }
+        if(player.hasTech("absol_sdn")){
+            ExploreModel exploreModel = Mapper.getExplore(cardID);
+            String name1 = exploreModel.getName();
+            Button resolveExplore1 = Button.success("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
+            Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1tg");
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            String message = player.getRepresentation(true, true) + " You have Absol Scanlink, and thus can decline this explore to get a tg.";
+            if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and on " + planetName);
+            }
+            ExploreModel exploreModel1 = Mapper.getExplore(cardID);
+            List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
         resolveExplore(event, cardID, tile, planetName, messageText, player, activeGame);
