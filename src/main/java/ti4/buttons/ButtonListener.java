@@ -1414,8 +1414,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
                 }
                 case "absol_nm" -> { //Absol's Neural Motivator
+                    event.getMessage().delete().queue();
                     Button draw2ACButton = Button.secondary(player.getFinsFactionCheckerPrefix() + "sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                     MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
                 case "td" -> { //Transit Diodes
                     ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
@@ -1613,7 +1615,7 @@ public class ButtonListener extends ListenerAdapter {
             if (median > 0) {
                 if (player.hasAbility("quash") || player.ownsPromissoryNote("rider") || player.getPromissoryNotes().keySet().contains("riderm")
                     || player.hasAbility("radiance") || player.hasAbility("galactic_threat") || player.ownsPromissoryNote("riderx")
-                    || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")) {
+                    || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera") || player.hasTechReady("gr")) {
                 } else {
                     List<Button> buttons = new ArrayList<>();
                     String msg = player.getRepresentation()
