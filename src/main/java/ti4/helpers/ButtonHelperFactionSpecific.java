@@ -45,6 +45,64 @@ public class ButtonHelperFactionSpecific {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static void resolveEdynAgendaStuffStep1(Player player, Game activeGame, List<Tile> tiles) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : tiles) {
+            buttons.add(Button.secondary("edynAgendaStuffStep2_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        player.getRepresentation(true, true) + " Tell the bot where you want to place someone's CC", buttons);
+    }
+
+    public static void resolveEdynAgendaStuffStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        String pos = buttonID.split("_")[1];
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("edynAgendaStuffStep3_" + p2.getFaction()+"_"+pos, p2.getColor()));
+            } else {
+                Button button = Button.secondary("edynAgendaStuffStep3_" + p2.getFaction()+"_"+pos, " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " tell the bot who's cc you want to place down",
+            buttons);
+    }
+
+
+    public static void resolveEdynAgendaStuffStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String pos = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(pos);
+        AddCC.addCC(event, p2.getColor(), tile);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            player.getRepresentation(true, true) + " you placed "+ButtonHelper.getIdentOrColor(p2,activeGame)+" CC in tile: " + tile.getRepresentationForButtons(activeGame, player));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+            p2.getRepresentation(true, true) + " you were signal jammed in tile: " + tile.getRepresentationForButtons(activeGame, p2));
+
+    }
+
+
     public static void resolveCavStep1(Game activeGame, Player player){
         String msg = player.getRepresentation()+" choose the non-fighter ship you wish to use the cav on";
         List<Button> buttons = new ArrayList<>();
@@ -60,6 +118,9 @@ public class ButtonHelperFactionSpecific {
             // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
+            if(unitName.equalsIgnoreCase("fighter")){
+                continue;
+            }
 
             if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
                 damagedUnits = unitHolder.getUnitDamage().get(unitKey);

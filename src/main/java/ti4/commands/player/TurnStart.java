@@ -252,6 +252,10 @@ public class TurnStart extends PlayerSubcommandData {
                 transit = transit.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                 startButtons.add(transit);
             }
+            if (player.hasUnexhaustedLeader("kolleccagent")) {
+                Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent").withEmoji(Emoji.fromFormatted(Emojis.kollecc));
+                startButtons.add(nekroButton);
+            }
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
             Button psycho = Button.success(finChecker + "getPsychoButtons", "Use Psychoarcheology");
@@ -274,10 +278,7 @@ public class TurnStart extends PlayerSubcommandData {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             startButtons.add(nekroButton);
         }
-        if (player.hasUnexhaustedLeader("kolleccagent")) {
-            Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent").withEmoji(Emoji.fromFormatted(Emojis.kollecc));
-            startButtons.add(nekroButton);
-        }
+        
         if (activeGame.getLatestTransactionMsg() != null && !"".equalsIgnoreCase(activeGame.getLatestTransactionMsg())) {
             activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue(null, error -> {});
             activeGame.setLatestTransactionMsg("");

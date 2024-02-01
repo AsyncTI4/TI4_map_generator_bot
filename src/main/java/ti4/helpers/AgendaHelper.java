@@ -915,6 +915,9 @@ public class AgendaHelper {
             String msg = ButtonHelper.getIdent(player)
                 + " if you intend to abstain from voting on this agenda, you have the option to preset an abstain here. Feel free not to pre-abstain, this is simply an optional way to resolve agendas faster";
             List<Button> buttons = new ArrayList<>();
+            if(player.hasAbility("future_sight")){
+                msg = msg +". Reminder that you have future sight and may not want to abstain";
+            }
 
             buttons.add(Button.success("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -1902,7 +1905,7 @@ public class AgendaHelper {
                                 p2.getRepresentation() + " you lost 1 fleet CC due to voting the same way as a sanction");
                         }
                     }
-                    if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight"))) {
+                    if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight") || specificVote.contains("Radiance"))) {
 
                         MessageChannel channel = ButtonHelper.getCorrectChannel(winningR, activeGame);
                         String identity = winningR.getRepresentation(true, true);
@@ -2000,6 +2003,25 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning Trade Rider, you have been given 5 tg (" + cTG + "->" + winningR.getTg() + ")");
                             ButtonHelperAbilities.pillageCheck(winningR, activeGame);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 5);
+                        }
+                        if (specificVote.contains("Radiance")) {
+                            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, winningR, UnitType.Mech);
+                            ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR,activeGame, tiles);
+                        }
+                        if (specificVote.contains("Kyro Rider")) {
+                            Player player = winningR;
+                            String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to drop 3 infantry on";
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "3gf", "placeOneNDone_skipbuild"));
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+                        }
+                        if (specificVote.contains("Edyn Rider")) {
+                            List<Tile> tiles = new ArrayList<>();
+                            for(Tile tile : activeGame.getTileMap().values()){
+                                if(FoWHelper.playerHasUnitsInSystem(winningR, tile)){
+                                    tiles.add(tile);
+                                }
+                            }
+                            ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR,activeGame, tiles);
                         }
                         if (specificVote.contains("Imperial Rider")) {
                             String msg = identity + " due to having a winning Imperial Rider, you have scored a pt\n";

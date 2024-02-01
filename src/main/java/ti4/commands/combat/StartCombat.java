@@ -192,12 +192,15 @@ public class StartCombat extends CombatSubcommandData {
         }
     }
 
-    private static void sendSpaceCannonButtonsToThread(ThreadChannel threadChannel, Game activeGame, Player activePlayer, Tile tile) {
+    public static void sendSpaceCannonButtonsToThread(MessageChannel threadChannel, Game activeGame, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
         if (activeGame.isFoWMode()) {
             pdsMessage.append("In fog, it is the Players' responsibility to check for PDS2\n");
         }  
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, activeGame, tile.getPosition());
+        if(playersWithPds2.size() < 1){
+            return;
+        }
         if (!activeGame.isFoWMode() && playersWithPds2.size() > 0) {
             pdsMessage.append("These players have space cannon offense coverage in this system:\n");
             for (Player playerWithPds : playersWithPds2) {

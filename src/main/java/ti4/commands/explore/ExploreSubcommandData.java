@@ -385,11 +385,24 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
-                message = "Resolve using the buttons";
-                Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
-                Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-                List<Button> buttons = List.of(convert2CommButton, get2CommButton);
-                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+                if(player.getCommodities() > 0){
+                    message = "Resolve using the buttons";
+                    Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+                    Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
+                    List<Button> buttons = List.of(convert2CommButton, get2CommButton);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+                }else{
+                    String message2 = "Gained 2 Commodities automatically due to having no comms to convert";
+                    player.setCommodities(player.getCommodities() + 2);
+                    if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                            player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+                    }
+                    if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
+                    }
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji() + " " + message2);
+                }
             }
             case "mo1", "mo2", "mo3" -> {
                 if (tile != null && planetID != null) {
