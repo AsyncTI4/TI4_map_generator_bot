@@ -145,7 +145,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and on " + planetName);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " on " + planetName);
             }
             ExploreModel exploreModel1 = Mapper.getExplore(cardID);
             List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());
@@ -163,7 +163,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and on " + planetName);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " on " + planetName);
             }
             ExploreModel exploreModel1 = Mapper.getExplore(cardID);
             List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed());

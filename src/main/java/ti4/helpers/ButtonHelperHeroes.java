@@ -391,7 +391,7 @@ public class ButtonHelperHeroes {
         for (String attachment : getAttachmentsForFlorzenHero(activeGame, player)) {
             String planet = attachment.split("_")[0];
             String attach = attachment.split("_")[1];
-            buttons.add(Button.success("florzeHeroStep2_" + attachment, attach + " on " + Helper.getPlanetRepresentation(planet, activeGame)));
+            buttons.add(Button.success("florzenHeroStep2_" + attachment, attach + " on " + Helper.getPlanetRepresentation(planet, activeGame)));
         }
         String msg = player.getRepresentation(true, true) + " choose the attachment you wish to steal";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);

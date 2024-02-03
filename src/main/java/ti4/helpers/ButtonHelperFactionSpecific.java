@@ -810,6 +810,19 @@ public class ButtonHelperFactionSpecific {
 
     }
 
+    public static void resolveKolleccReleaseButton(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String unit = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        new RemoveUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getRepresentation(true, true) + " put 1 captured " + unit + " in the space area of "+tile.getRepresentationForButtons(activeGame, player) + " using Shroud of Lith abiility");
+        new AddUnits().unitParsing(event, player.getColor(), tile, unit, activeGame);
+        if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
+
+    }
+
     public static void checkBlockadeStatusOfEverything(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (doesPlayerHaveAnyCapturedUnits(p2, player)) {
@@ -871,6 +884,22 @@ public class ButtonHelperFactionSpecific {
                         }
                     }
                 }
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+        return buttons;
+    }
+    public static List<Button> getKolleccReleaseButtons(Player kollecc, Game activeGame) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitHolder unitHolder : kollecc.getNomboxTile().getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
+                Player player = kollecc;
+                if (player.unitBelongsToPlayer(unitKey)) {
+                    String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                    String buttonID = "kolleccRelease_" + unitName;
+                    buttons.add(Button.secondary(buttonID, "Release 1  " + unitName).withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+                }
+                
             }
         }
         buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
@@ -1087,9 +1116,28 @@ public class ButtonHelperFactionSpecific {
         if (player.hasAbility("treasure_hunters")) {
             // resolve treasure hunters
             String msg = "Kollecc player, please choose which exploration deck to look at the top card of";
-            Button transact1 = Button.success("resolveExp_Look_industrial", "Peek at Industrial deck");
-            Button transact2 = Button.success("resolveExp_Look_hazardous", "Peek at Hazardous deck");
-            Button transact3 = Button.success("resolveExp_Look_cultural", "Peek at Cultural deck");
+            
+            String deckType = "industrial";
+            List<String> deck = activeGame.getExploreDeck(deckType);
+            String msg2 = StringUtils.capitalize(deckType);
+            if(activeGame.getFactionsThatReactedToThis("lastExpLookedAt"+player.getFaction()+deckType).equalsIgnoreCase(deck.get(0))){
+                msg2 = msg2 + " (Same as last time)";
+            }
+            Button transact1 = Button.success("resolveExp_Look_industrial", msg2);
+            deckType = "hazardous";
+            deck = activeGame.getExploreDeck(deckType);
+            msg2 = StringUtils.capitalize(deckType);
+            if(activeGame.getFactionsThatReactedToThis("lastExpLookedAt"+player.getFaction()+deckType).equalsIgnoreCase(deck.get(0))){
+                msg2 = msg2 + " (Same as last time)";
+            }
+            Button transact2 = Button.success("resolveExp_Look_hazardous", msg2);
+            deckType = "cultural";
+            deck = activeGame.getExploreDeck(deckType);
+            msg2 = StringUtils.capitalize(deckType);
+            if(activeGame.getFactionsThatReactedToThis("lastExpLookedAt"+player.getFaction()+deckType).equalsIgnoreCase(deck.get(0))){
+                msg2 = msg2 + " (Same as last time)";
+            }
+            Button transact3 = Button.success("resolveExp_Look_cultural", msg2);
             List<Button> buttons1 = new ArrayList<>();
             buttons1.add(transact1);
             buttons1.add(transact2);
@@ -1098,29 +1146,20 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons1);
 
             Button transact = Button.success("relic_look_top", "Look at top of Relic Deck");
-            String msg2 = "Kollecc may also look at the top card of the relic deck.";
+            msg2 = "Kollecc may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);
             buttons2.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
         }
-        {
-
-            if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNote("dspnkoll").getOwner()) == player) {
-                for (Player p2 : activeGame.getRealPlayers()) {
-                    if (p2 == player) {
-                        continue;
-                    }
-                    if (p2.getPromissoryNotes().containsKey("dspnkoll")) {
-                        String msg = p2.getRepresentation(true, true) + " the Kollecc AI Survey PN owner has started their turn, use the button to play AI Survey if you want";
-                        Button transact = Button.success("resolvePNPlay_dspnkoll", "Play AI Survey");
-                        List<Button> buttons = new ArrayList<>();
-                        buttons.add(transact);
-                        buttons.add(Button.danger("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
-                    }
-                }
-            }
+        if (player.getPromissoryNotes().containsKey("dspnkoll") && !player.ownsPromissoryNote("dspnkoll")) {
+            Player p2 = player;
+            String msg = p2.getRepresentation(true, true) + " use the button to play AI Survey if you want";
+            Button transact = Button.success("resolvePNPlay_dspnkoll", "Play AI Survey");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(transact);
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }
 
