@@ -368,6 +368,9 @@ public class ButtonHelperActionCards {
         }
         MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
         MessageHelper.sendMessageToChannel(channel, sb.toString());
+        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
+        }
         event.getMessage().delete().queue();
     }
 

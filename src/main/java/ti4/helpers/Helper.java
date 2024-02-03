@@ -1184,6 +1184,9 @@ public class Helper {
                     if(token.contains("orbital_foundries")){
                         productionValueTotal = productionValueTotal +2;
                     }
+                    if(token.contains("automatons")){
+                        productionValueTotal = productionValueTotal +3;
+                    }
                 }
             }
             if(tile.isSupernova() && player.hasTech("mr")){
