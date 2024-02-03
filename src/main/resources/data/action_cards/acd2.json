@@ -49,7 +49,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 4 resources and purge that relic fragment to gain 1 relic.",
+    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 5 influence and purge that relic fragment to gain 1 relic.",
     "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -102,9 +102,9 @@
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
-    "window": "After you destroy 1 of your opponent's non-fighter ships",
-    "text": "Produce 2 hits against your opponent's ships.",
-    "flavorText": "Jace smiled at the rookie pilot's disbelief. The ship that the youngster's ordinance connected with had become a deadlier weapon than any their fleet was equipped with.",
+    "window": "After you destroy 1 of your opponent's ships",
+    "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
+    "flavorText": "Jace smiled at the rookie pilot's disbelief. The ship the youngster's ordnance connected with had transformed into a deadlier weapon than any in their fleet.",
     "source": "action_deck_2"
   },
   {
@@ -131,7 +131,7 @@
     "phase": "Action",
     "window": "After another player performs an action",
     "text": "That player must perform an additional action this turn or pass.",
-    "flavorText": "Mathis pursed his lips with disdain at the Yssaril informant. \"You will see to our agreements with the correct expedience,\" he said, before his anger broke through. \"Perhaps our massive fleets could provide you with motivation, should you continue to test us!\"",
+    "flavorText": "Mathis pursed his lips with disdain, \"You will see to our agreements with the correct expedience.\" When Ssruu did not respond, his anger broke through, \"Perhaps our massive fleets could provide you with motivation, should you continue to test us!\"",
     "source": "action_deck_2"
   },
   {
@@ -336,7 +336,7 @@
     "alias": "freedom_fighters",
     "name": "Freedom Fighters",
     "phase": "Action",
-    "window": "At the start of the second round of a ground combat on another player's non-home planet",
+    "window": "At the start of a ground combat on another player's non-home planet",
     "text": "Place 2 infantry from your reinforcements on that planet.",
     "flavorText": "Harrugh had brought them supplies, lived among them, honored their traditions, and filled them with hope. On the promised day, they would repay him with their determination for liberation.",
     "source": "action_deck_2"
@@ -356,7 +356,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Gain trade goods equal to the influence value of 1 planet you control.",
-    "flavorText": "Berekar excelled at using prestige to achieve economic goals. The worlds governed by his people became lavishly rich through tourism, driven by their impressive collection of Lazax artifacts.",
+    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
     "source": "action_deck_2"
   },
   {
@@ -374,7 +374,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to reaching your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
-    "flavorText": "M'aban sighed at her assistant's pleas. How many others could hide their intentions so well? Hunting this prey had filled her with exhilaration, but seeing him now, bathed in the stench of fear and his composure completely broken, disgusted her.",
+    "flavorText": "M'aban sighed at the man's pleas. How many others could mask their intentions so well? The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
     "source": "action_deck_2"
   },
   {
@@ -391,8 +391,8 @@
     "name": "Intrigue",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order; draw 1 action card for each card you put on top of the deck.",
-    "flavorText": "Ne Ruk had reflected on hundreds of hours of private conversations between the various representatives. Undermining their schemes would be a treat well worth the effort.",
+    "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order. Then, draw 1 action card.",
+    "flavorText": "After years of honing the stillness of his mind, Ronald's schemes were finally paying off. Jord had paid him well to infiltrate M'aban's inner circle, but they would only ever receive a pittance of the benefits. No, only the Cabal could provide him with the power he truly desired.",
     "source": "action_deck_2"
   },
   {
@@ -463,7 +463,7 @@
     "name": "Patronage",
     "phase": "Status",
     "window": "After the speaker reveals a public objective",
-    "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
+    "text": "Look at the top 2 cards of the matching public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of tradition.",
     "source": "action_deck_2"
   },
@@ -526,7 +526,7 @@
     "name": "Reconstruction",
     "phase": "Action",
     "window": "Action",
-    "text": "Ready 1 planet you control that has a trait. Then, reveal cards from the exploration deck that matches that planet until you reveal an attachment; attach that attachment to that planet and shuffle the other cards back into the deck.",
+    "text": "Ready 1 planet you control that has a trait. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
     "flavorText": "Tungstantus collapsed mid-step as their energy completely depleted. The world was far from its former glory, and they would not stop until it was a paradise once more.",
     "source": "action_deck_2"
   },
@@ -581,7 +581,7 @@
     "phase": "Action",
     "window": "After you activate a system",
     "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1 or 2, remove that ship from the game board, along with any units it is transporting.",
-    "flavorText": "They were alive and ahead of schedule, but the captain had no intention of allowing the pilot to \"eyeball it\" ever again.",
+    "flavorText": "They were alive and ahead of schedule, but Mendosa had no intention of allowing his pilot to \"eyeball it\" ever again.",
     "source": "action_deck_2"
   },
   {
@@ -625,7 +625,7 @@
     "name": "Side Project",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 2 influence or resources to research a technology that has no prerequisites.",
+    "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
     "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
     "source": "action_deck_2"
   },
@@ -723,9 +723,9 @@
     "alias": "timely_reinforcements",
     "name": "Reinforcements",
     "phase": "Action",
-    "window": "At the start of the second round of a space combat",
-    "text": "Place 2 fighters from your reinforcements into the active system.",
-    "flavorText": "Most researchers question how the Naalu's prescience had not led them down a path of debilitating caution. The answer seems to lie in their excessive confidence.",
+    "window": "After your opponent destroys 1 of your non-fighter ships",
+    "text": "Place 3 fighters in the active system.",
+    "flavorText": "Many researchers questioned why the Naalu's prescience had not guided them toward a path of excessive caution. Ta Zern postulated that it is linked to their excessive confidence.",
     "source": "action_deck_2"
   },
   {
