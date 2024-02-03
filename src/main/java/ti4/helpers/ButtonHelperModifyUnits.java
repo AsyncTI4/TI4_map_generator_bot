@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import kotlin.Unit;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -1116,6 +1118,19 @@ public class ButtonHelperModifyUnits {
                     successMessage = "Produced 2 " + Emojis.fighter + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
                      player.produceUnit(producedInput);
+                     Tile tile2 = activeGame.getTileByPosition(planetName);
+                     if(player.hasAbility("cloaked_fleets")){
+                         List<Button> shroadedFleets = new ArrayList<>();
+                         shroadedFleets.add(Button.success("cloakedFleets_"+tile2.getPosition()+"_ff", "Capture 1 fighter"));
+                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
+                         MessageHelper.sendMessageToChannel(event.getChannel(), "You can use your cloaked fleets ability to capture this produced ship", shroadedFleets);
+                     }
+                     if(player.hasAbility("cloaked_fleets")){
+                        List<Button> shroadedFleets = new ArrayList<>();
+                        shroadedFleets.add(Button.success("cloakedFleets_"+tile2.getPosition()+"_ff", "Capture 1 fighter"));
+                        shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "You can use your cloaked fleets ability to capture this produced ship", shroadedFleets);
+                    }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 destroyer", activeGame);
@@ -1128,6 +1143,13 @@ public class ButtonHelperModifyUnits {
                         unit, activeGame);
                     successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
+                    Tile tile2 = activeGame.getTileByPosition(planetName);
+                    if(player.hasAbility("cloaked_fleets")){
+                        List<Button> shroadedFleets = new ArrayList<>();
+                        shroadedFleets.add(Button.success("cloakedFleets_"+tile2.getPosition()+"_"+unit+"", "Capture 1 "+ButtonHelper.getUnitName(unit)));
+                        shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "You can use your cloaked fleets ability to capture this produced ship", shroadedFleets);
+                    }
                         
                 }
 
@@ -1251,6 +1273,35 @@ public class ButtonHelperModifyUnits {
         }
     }
 
+    public static void resolveCloakedFleets(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        String unit = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            player.getRepresentation(true, true) + " captured 1 newly produced " + ButtonHelper.getUnitName(unit) + " in "+tile.getRepresentationForButtons(activeGame, player) + " using the Cloaked Fleets abiility (limit of 2 ships can be captured per build)");
+        new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, activeGame);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveKolleccMechCapture(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        String unit = buttonID.split("_")[2];
+        String planet = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileFromPlanet(buttonID.split("_")[1]);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit + " "+planet, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            player.getRepresentation(true, true) + " captured 1 " + unit + " on "+Helper.getPlanetRepresentation(planet, activeGame) + " using the Kollecc Mech abiility");
+        new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, activeGame);
+        UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        if(unit.equalsIgnoreCase("mech")){
+            if(uh.getUnitCount(UnitType.Mech,player.getColor()) < 1){
+                ButtonHelper.deleteTheOneButton(event);
+            }
+        }else{
+            if(uh.getUnitCount(UnitType.Infantry,player.getColor()) < 1){
+                ButtonHelper.deleteTheOneButton(event);
+            }
+        }
+    }
+
     public static void placeUnitAndDeleteButton(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String trueIdentity) {
         String unitNPlanet = buttonID.replace("placeOneNDone_", "");
         String skipbuild = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
@@ -1332,6 +1383,13 @@ public class ButtonHelperModifyUnits {
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName), unit, activeGame);
                     successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile " + AliasHandler.resolveTile(planetName) + ".";
+                    Tile tile2 = activeGame.getTileByPosition(planetName);
+                    if(player.hasAbility("cloaked_fleets")){
+                        List<Button> shroadedFleets = new ArrayList<>();
+                        shroadedFleets.add(Button.success("cloakedFleets_"+tile2.getPosition()+"_"+unit+"", "Capture 1 "+ButtonHelper.getUnitName(unit)));
+                        shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "You can use your cloaked fleets ability to capture this produced ship", shroadedFleets);
+                    }
                 }
 
             }
@@ -1543,6 +1601,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select unit you want to move", buttons);
         event.getMessage().delete().queue();
     }
+   
 
     public static void offerDomnaStep3Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID) {
         String pos1 = buttonID.split("_")[1];

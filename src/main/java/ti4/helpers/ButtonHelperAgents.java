@@ -292,6 +292,9 @@ public class ButtonHelperAgents {
                 activeGame.purgeExplore(cardID);
             }
         }
+        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
+        }
         MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         event.getMessage().delete().queue();

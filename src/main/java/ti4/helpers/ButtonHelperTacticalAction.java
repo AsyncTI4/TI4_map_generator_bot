@@ -390,7 +390,7 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "zelian", event);
         }
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "gledge", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "morpheus", event);
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "mortheus", event);
         for (Player p2 : activeGame.getRealPlayers()) {
             ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "empyrean", event);
         }

@@ -208,6 +208,7 @@ public class ButtonListener extends ListenerAdapter {
         String fowIdentity = null;
         String ident = null;
 
+
         if (player != null) {
             trueIdentity = player.getRepresentation(true, true);
             fowIdentity = player.getRepresentation(false, true);
@@ -225,8 +226,9 @@ public class ButtonListener extends ListenerAdapter {
 
         if (buttonID.contains("deleteThisButton")) {
             buttonID = buttonID.replace("deleteThisButton", "");
-            event.editButton(null).queue();
+            ButtonHelper.deleteTheOneButton(event);
         }
+
 
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
@@ -826,7 +828,8 @@ public class ButtonListener extends ListenerAdapter {
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2], player, false, activeGame, 1, false);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveExp_Look_")) {
-            List<String> deck = activeGame.getExploreDeck(buttonID.replace("resolveExp_Look_", ""));
+            String deckType = buttonID.replace("resolveExp_Look_", "");
+            List<String> deck = activeGame.getExploreDeck(deckType);
             List<String> discardPile = activeGame.getExploreDiscard(buttonID.replace("resolveExp_Look_", ""));
             ButtonHelper.addReaction(event, true, false, "Looked at top of the " + buttonID.replace("resolveExp_Look_", "") + " deck.", "");
             event.getMessage().delete().queue();
@@ -839,6 +842,7 @@ public class ButtonListener extends ListenerAdapter {
             StringBuilder sb = new StringBuilder();
             sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             String topCard = deck.get(0);
+            activeGame.setCurrentReacts("lastExpLookedAt"+player.getFaction()+deckType,topCard);
             sb.append(ExploreSubcommandData.displayExplore(topCard));
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
@@ -1415,7 +1419,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "absol_nm" -> { //Absol's Neural Motivator
                     event.getMessage().delete().queue();
-                    Button draw2ACButton = Button.secondary(player.getFinsFactionCheckerPrefix() + "sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                    Button draw2ACButton = Button.secondary(player.getFinsFactionCheckerPrefix() + "sc_ac_drawdeleteThisButton", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                     MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                     ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
                 }
@@ -1583,6 +1587,11 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.resolveCabalAgentCapture(buttonID, player, activeGame, event);
         } else if (buttonID.startsWith("cabalRelease_")) {
             ButtonHelperFactionSpecific.resolveReleaseButton(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("kolleccRelease_")) {
+            ButtonHelperFactionSpecific.resolveKolleccReleaseButton(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("shroudOfLithStart")) {
+            ButtonHelper.deleteTheOneButton(event);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Select up to 2 ships and 2 ground forces to place in the space area",ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, activeGame));
         } else if (buttonID.startsWith("getReleaseButtons")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " you can release units one at a time with the buttons",
                 ButtonHelperFactionSpecific.getReleaseButtons(player, activeGame));
@@ -2546,6 +2555,14 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("combatDroneConvert_")) {
             ButtonHelperModifyUnits.resolvingCombatDrones(event, activeGame, player, ident, buttonID);
+        } else if (buttonID.startsWith("cloakedFleets_")) {//kolleccMechCapture_
+            ButtonHelperModifyUnits.resolveCloakedFleets(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("kolleccMechCapture_")) {//kolleccMechCapture_
+            ButtonHelperModifyUnits.resolveKolleccMechCapture(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("refreshLandingButtons")) {
+            List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
+            event.getMessage().editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         } else if (buttonID.startsWith("resolveMirvedaCommander_")) {
             ButtonHelperModifyUnits.resolvingMirvedaCommander(event, activeGame, player, ident, buttonID);
         } else if (buttonID.startsWith("removeCCFromBoard_")) {

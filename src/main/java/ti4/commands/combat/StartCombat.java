@@ -264,6 +264,10 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.primary("assCannonNDihmohn_ds_" + tile.getPosition(), "Use Dimensional Splicer").withEmoji(Emoji.fromFormatted(Emojis.Ghost)));
         }
 
+        if((p1.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(p1, activeGame).size() > 1)||(p2.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(p1, activeGame).size() > 1)){
+            buttons.add(Button.primary("shroudOfLithStart", "Use Shroud of Lith").withEmoji(Emoji.fromFormatted(Emojis.kollecc)));
+        }
+
         // Dihmohn Commander
         if ((activeGame.playerHasLeaderUnlockedOrAlliance(p1, "dihmohncommander") && ButtonHelper.checkNumberNonFighterShips(p1, activeGame, tile) > 2)
             || (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander") && ButtonHelper.checkNumberNonFighterShips(p2, activeGame, tile) > 2)) {
