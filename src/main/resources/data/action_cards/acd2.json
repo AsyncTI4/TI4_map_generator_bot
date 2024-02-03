@@ -723,7 +723,7 @@
     "alias": "timely_reinforcements",
     "name": "Reinforcements",
     "phase": "Action",
-    "window": "After your opponent destroys 1 of your non-fighter ships",
+    "window": "After 1 of your non-fighter ships is destroyed during a space combat",
     "text": "Place 3 fighters in the active system.",
     "flavorText": "Many researchers questioned why the Naalu's prescience had not guided them toward a path of excessive caution. Ta Zern postulated that it is linked to their excessive confidence.",
     "source": "action_deck_2"
