@@ -104,5 +104,9 @@ public class SendFragments extends ExploreSubcommandData {
 			FoWHelper.pingPlayersTransaction(activeGame, event, sender, receiver, fragString, null);
 		}
 		ButtonHelper.checkTransactionLegality(activeGame, sender, receiver);
+		Player player = receiver;
+		if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
+        }
 	}
 }

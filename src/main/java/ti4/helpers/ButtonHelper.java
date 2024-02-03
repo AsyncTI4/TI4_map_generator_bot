@@ -171,7 +171,7 @@ public class ButtonHelper {
     public static List<Button> getForcedPNSendButtons(Game activeGame, Player player, Player p1) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
-            if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
+            if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand) || (player.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
@@ -496,7 +496,7 @@ public class ButtonHelper {
             Button lost2C = Button.danger("reduceComm_2_" + whatIsItFor, "Spend 2 comms");
             buttons.add(lost2C);
         }
-        if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0 && !whatIsItFor.contains("inf") && !whatIsItFor.contains("both")) {
+        if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0 && !whatIsItFor.contains("inf") && !whatIsItFor.contains("both") && (player.hasAbility("devour") || player.hasAbility("riftmeld"))) {
             Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("cabal")));
             buttons.add(release);
         }
@@ -752,33 +752,31 @@ public class ButtonHelper {
         if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
             commanderUnlockCheck(player, activeGame, "dihmohn", event);
         }
-        if (StringUtils.countMatches(buttonID, "_") < 2) { //TODO: Better explain what this is doing and why this way
-            if (activeGame.getComponentAction() || !activeGame.getCurrentPhase().equalsIgnoreCase("action")) {
-                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
-            } else {
-                sendMessageToRightStratThread(player, activeGame, message.toString(), "technology");
-            }
-            if (paymentRequired) {
-                payForTech(activeGame, player, event, buttonID);
-            } else {
-                if (player.hasLeader("zealotshero") && player.getLeader("zealotshero").get().isActive()) {
-                    if (activeGame.getFactionsThatReactedToThis("zealotsHeroTechs").isEmpty()) {
-                        activeGame.setCurrentReacts("zealotsHeroTechs", techID);
-                    } else {
-                        activeGame.setCurrentReacts("zealotsHeroTechs", activeGame.getFactionsThatReactedToThis("zealotsHeroTechs") + "-" + techID);
-                    }
+        
+        if (activeGame.getComponentAction() || !activeGame.getCurrentPhase().equalsIgnoreCase("action")) {
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
+        } else {
+            sendMessageToRightStratThread(player, activeGame, message.toString(), "technology");
+        }
+        if (paymentRequired) {
+            payForTech(activeGame, player, event, buttonID);
+        } else {
+            if (player.hasLeader("zealotshero") && player.getLeader("zealotshero").get().isActive()) {
+                if (activeGame.getFactionsThatReactedToThis("zealotsHeroTechs").isEmpty()) {
+                    activeGame.setCurrentReacts("zealotsHeroTechs", techID);
+                } else {
+                    activeGame.setCurrentReacts("zealotsHeroTechs", activeGame.getFactionsThatReactedToThis("zealotsHeroTechs") + "-" + techID);
                 }
             }
-            if (player.hasUnit("augers_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
-                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
-                    player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
-                String message2 = player.getRepresentation(true, true) + " Use buttons to drop a mech on a legendary planet or planet with a tech skip";
-                List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
-            }
-        } else {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
         }
+        if (player.hasUnit("augers_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
+                player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
+            String message2 = player.getRepresentation(true, true) + " Use buttons to drop a mech on a legendary planet or planet with a tech skip";
+            List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
+        }
+        
         event.getMessage().delete().queue();
     }
 
@@ -3260,6 +3258,26 @@ public class ButtonHelper {
                 }
             }
         }
+        if(player.hasUnit("kollecc_mech")){
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                    List<Button> buttons = new ArrayList<>();
+                    String planet = uH.getName();
+                    Button sdButton = Button.success("kolleccMechCapture_" + planet+"_mech", "Capture a mech on " + Helper.getPlanetRepresentation(planet, activeGame));
+                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
+                    buttons.add(sdButton);
+                    if (uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                        Button pdsButton = Button.success("kolleccMechCapture_" + planet+"_infantry", "Capture an infantry on " + Helper.getPlanetRepresentation(planet, activeGame));
+                        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                        buttons.add(pdsButton);
+                    }
+                    Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
+                    buttons.add(tgButton);
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame),
+                        player.getRepresentation(true, true) + " Use buttons to resolve capturing up to 2 ground forces on each planet with your mechs", buttons);
+                }
+            }
+        }
         if (!FoWHelper.playerHasShipsInSystem(player, tile)) {
             return;
         }
@@ -3785,6 +3803,7 @@ public class ButtonHelper {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")) {
             buttons.addAll(ButtonHelperCommanders.getSardakkCommanderButtons(activeGame, player, event));
         }
+        
         if (player.getPromissoryNotes().containsKey("ragh")) {
             buttons.addAll(ButtonHelperFactionSpecific.getRaghsCallButtons(player, activeGame, tile));
         }
@@ -3793,6 +3812,10 @@ public class ButtonHelper {
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
             Button combatDrones = Button.primary(finChecker + "combatDrones", "Use Combat Drones Ability").withEmoji(Emoji.fromFormatted(Emojis.mirveda));
             buttons.add(combatDrones);
+        }
+        if(player.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, activeGame).size() > 1){
+            buttons.add(Button.primary("shroudOfLithStart", "Use Shroud of Lith").withEmoji(Emoji.fromFormatted(Emojis.kollecc)));
+            buttons.add(Button.secondary("refreshLandingButtons", "Refresh Landing Buttons").withEmoji(Emoji.fromFormatted(Emojis.kollecc)));
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
             Button combatDrones = Button.primary(finChecker + "offerMirvedaCommander", "Use Mirveda Commander").withEmoji(Emoji.fromFormatted(Emojis.mirveda));
@@ -3934,6 +3957,9 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("nomadagentmercer")) {
             buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(activeGame, player));
+        }
+        if(player.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, activeGame).size() > 1){
+            buttons.add(Button.primary("shroudOfLithStart", "Use Shroud of Lith").withEmoji(Emoji.fromFormatted(Emojis.kollecc)));
         }
         Button concludeMove = Button.danger(finChecker + "doneWithTacticalAction", "Conclude tactical action (will DET if applicable)");
         buttons.add(concludeMove);
@@ -5838,7 +5864,7 @@ public class ButtonHelper {
                 String message = p1.getRepresentation(true, true) + " Click the PN you would like to send.";
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
-                    if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
+                    if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand) ||(p2.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
                         continue;
                     }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
