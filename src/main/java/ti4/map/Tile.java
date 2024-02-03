@@ -87,7 +87,6 @@ public class Tile {
 
     @Nullable
     public String getAttachmentPath(String tokenID) {
-        //            LoggerHandler.log("Could not find attachment token: " + tokenID);
         return ResourceHelper.getInstance().getAttachmentFile(tokenID);
     }
 
@@ -323,7 +322,7 @@ public class Tile {
     @JsonIgnore
     @Nullable
     public UnitHolder getUnitHolderFromPlanet(String planetName) {
-        for (Map.Entry<String, UnitHolder> unitHolderEntry : this.getUnitHolders().entrySet()) {
+        for (Map.Entry<String, UnitHolder> unitHolderEntry : getUnitHolders().entrySet()) {
             if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                 return unitHolderEntry.getValue();
             }
