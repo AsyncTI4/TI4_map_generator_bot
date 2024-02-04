@@ -163,5 +163,16 @@
         "abilityText": "Secret Card Text",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pbd2000"
+    },
+    {
+        "id": "pbd2000agent",
+        "faction": "franken1",
+        "type": "agent",
+        "name": "Name",
+        "title": "Title",
+        "abilityWindow": "Secret Window",
+        "abilityText": "Secret Card Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "pbd2000"
     }
 ]
