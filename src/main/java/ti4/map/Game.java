@@ -2101,9 +2101,17 @@ public class Game {
 
     public boolean removeLaw(String id) {
         if (!id.isEmpty()) {
+            if(id.equalsIgnoreCase("warrant")){
+                for(Player p2 : getRealPlayers()){
+                    if(ButtonHelper.isPlayerElected(this, p2, id)){
+                        p2.setSearchWarrant(false);
+                    }
+                }
+            }
             laws.remove(id);
             lawsInfo.remove(id);
             addDiscardAgenda(id);
+
             return true;
         }
         return false;
