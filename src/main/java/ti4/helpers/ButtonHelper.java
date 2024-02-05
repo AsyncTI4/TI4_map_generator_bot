@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -81,6 +82,7 @@ import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -98,11 +100,13 @@ import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
+import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 
@@ -759,7 +763,7 @@ public class ButtonHelper {
             sendMessageToRightStratThread(player, activeGame, message.toString(), "technology");
         }
         if (paymentRequired) {
-            payForTech(activeGame, player, event, buttonID);
+            payForTech(activeGame, player, event, techID);
         } else {
             if (player.hasLeader("zealotshero") && player.getLeader("zealotshero").get().isActive()) {
                 if (activeGame.getFactionsThatReactedToThis("zealotsHeroTechs").isEmpty()) {
@@ -780,11 +784,10 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
-    public static void payForTech(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void payForTech(Game activeGame, Player player, ButtonInteractionEvent event, String tech) {
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
         List<Button> buttons = getExhaustButtonsWithTG(activeGame, player, "res");
-        String tech = buttonID.split("_")[1];
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
         if ("unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasTechReady("aida")) {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
@@ -4472,6 +4475,263 @@ public class ButtonHelper {
         return buttons;
     }
 
+
+
+
+
+
+    public static void resolveThalnosStart(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String pos = buttonID.split("_")[1];
+        activeGame.resetThalnosUnits();
+        String unitHolderName = buttonID.split("_")[2];
+        activeGame.setCurrentReacts("thalnosInitialHolder", unitHolderName);
+        Tile tile = activeGame.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(getButtonsForRollingThalnos(player, activeGame, tile, tile.getUnitHolders().get(unitHolderName)));
+        if(unitHolderName.equalsIgnoreCase("space") && ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)){
+            buttons = new ArrayList<>();
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                buttons.addAll(getButtonsForRollingThalnos(player, activeGame, tile, uH));
+            }
+        }
+        buttons.add(Button.primary("rollThalnos_"+tile.getPosition()+"_"+unitHolderName, "Roll Now"));
+        buttons.add(Button.danger("deleteButtons", "Dont roll anything"));
+        buttons.add(Button.secondary("ultimateUndo", "UNDO"));
+        ButtonHelper.deleteTheOneButton(event);
+        String message = player.getRepresentation()+" select the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed";
+        MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
+    }
+    public static void resolveSetForThalnos(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String pos = buttonID.split("_")[1];
+        String unitHolderName =activeGame.getFactionsThatReactedToThis("thalnosInitialHolder");
+        Tile tile = activeGame.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(getButtonsForRollingThalnos(player, activeGame, tile, tile.getUnitHolders().get(unitHolderName)));
+        if(unitHolderName.equalsIgnoreCase("space") && ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)){
+            buttons = new ArrayList<>();
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                buttons.addAll(getButtonsForRollingThalnos(player, activeGame, tile, uH));
+            }
+        }
+        buttons.add(Button.primary("rollThalnos_"+tile.getPosition()+"_"+unitHolderName, "Roll Now"));
+        buttons.add(Button.danger("deleteButtons", "Dont roll anything"));
+        buttons.add(Button.secondary("ultimateUndo", "UNDO"));
+        String id = buttonID.replace("setForThalnos_", "");
+        activeGame.setSpecificThalnosUnit(id, activeGame.getSpecificThalnosUnit(id)+1);
+
+        String message = player.getRepresentation()+" select the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed\n"+
+        "Currently you are rerolling: \n";
+        String damaged = "";
+        for(String unit : activeGame.getThalnosUnits().keySet()){
+            String rep = unit.split("_")[2];
+            if(rep.contains("damaged")){
+                damaged = "damaged ";
+                rep = rep.replace("damaged","");
+            }
+            message = message + player.getFactionEmoji()+" "+activeGame.getSpecificThalnosUnit(unit)+" "+damaged+rep+"\n";
+        }
+        List<Button> systemButtons = buttons;
+                event.getMessage().editMessage(message)
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+
+    public static void resolveRollForThalnos(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String pos = buttonID.split("_")[1];
+        String unitHolderName = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(pos);
+
+
+        String sb = "";
+        UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
+        if (combatOnHolder == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+            return;
+        }
+        CombatRollType rollType = CombatRollType.combatround;
+        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
+                rollType, activeGame);
+        List<UnitModel> units = new ArrayList<>();
+        units.addAll(playerUnitsByQuantity.keySet());
+        for(UnitModel unit : units){
+            playerUnitsByQuantity.put(unit, 0);
+            for(String thalnosUnit : activeGame.getThalnosUnits().keySet()){
+                int amount = activeGame.getSpecificThalnosUnit(thalnosUnit);
+                String unitName = getUnitName(unit.getAsyncId());
+                thalnosUnit = thalnosUnit.split("_")[2].replace("damaged","");
+                if(thalnosUnit.equals(unitName)){
+                    playerUnitsByQuantity.put(unit,amount+playerUnitsByQuantity.get(unit));
+                }
+            }
+            if(playerUnitsByQuantity.get(unit) == 0){
+                playerUnitsByQuantity.remove(unit);
+            }
+        }
+        
+        if (playerUnitsByQuantity.isEmpty()) {
+            String fightingOnUnitHolderName = unitHolderName;
+            if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
+                fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "There were no units selected to reroll");
+            return;
+        }
+        activeGame.setCurrentReacts("thalnosPlusOne","true");
+        List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
+        Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, activeGame);
+        if(opponent == null){
+            opponent = player;
+        }
+        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event,
+                rollType, activeGame);
+
+        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
+        List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
+                playerUnitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_MODIFIERS);
+
+        List<NamedCombatModifierModel> extraRolls = CombatModHelper.GetModifiers(player, opponent,
+                playerUnitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_EXTRA_ROLLS);
+
+        // Check for temp mods
+        CombatTempModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
+        CombatTempModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
+        List<NamedCombatModifierModel> tempMods = new ArrayList<>(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
+                combatOnHolder, false, rollType));
+        List<NamedCombatModifierModel> tempOpponentMods = new ArrayList<>();
+        if(opponent != null){
+            tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
+                combatOnHolder, true, rollType);
+        }
+        tempMods.addAll(tempOpponentMods);
+
+        String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
+        message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player,
+                opponent,
+                activeGame, rollType, event);
+        String hits = StringUtils.substringAfter(message, "Total hits ");
+        hits = hits.split(" ")[0].replace("*","");
+        int h = Integer.parseInt(hits);
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
+        message = StringUtils.removeEnd(message, ";\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if(!activeGame.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && h > 0 && opponent != null && opponent != player){
+            String msg = opponent.getRepresentation(true, true) + " you can autoassign "+h+" hit(s)";
+            List<Button> buttons = new ArrayList<>();
+            String finChecker = "FFCC_" + opponent.getFaction() + "_";
+            buttons.add(Button.success(finChecker+"autoAssignGroundHits_"+combatOnHolder.getName()+"_"+h,"Auto-assign Hits"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        }else{
+            if(!activeGame.isFoWMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player){
+                String msg = "\n"+opponent.getRepresentation(true, true) + " your opponent rolled and got "+h+" hit(s)";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                List<Button> buttons = new ArrayList<>();
+                if(h > 0){
+                    int round = 0;
+                    String combatName = "combatRoundTracker"+opponent.getFaction()+tile.getPosition()+combatOnHolder.getName();
+                    if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
+                        round = 1;
+                    }else{
+                        round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                    }
+                    int round2 = 0;
+                    String combatName2 = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
+                    if(activeGame.getFactionsThatReactedToThis(combatName2).isEmpty()){
+                        round2 = 1;
+                    }else{
+                        round2 = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName2));
+                    }
+                    if(round2 > round){
+                        buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),"Roll Dice For Combat Round #"+round));
+                    }
+                    String finChecker = "FFCC_" + opponent.getFaction() + "_";
+                    buttons.add(Button.success(finChecker+"autoAssignSpaceHits_"+tile.getPosition()+"_"+h,"Auto-assign Hits"));
+                    buttons.add(Button.danger("getDamageButtons_" + tile.getPosition()+"deleteThis","Manually Assign Hits"));
+                    buttons.add(Button.secondary(finChecker+"cancelSpaceHits_"+tile.getPosition()+"_"+h,"Cancel a Hit"));
+                    
+                    String msg2 = opponent.getFactionEmoji()+" can automatically assign hits. The hits would be assigned in the following way:\n\n"+ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, activeGame, tile, h, event, true);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                }
+
+            }
+        }
+        activeGame.setCurrentReacts("thalnosPlusOne","false");
+        event.getMessage().delete().queue();
+    }
+
+
+
+    public static List<Button> getButtonsForRollingThalnos(Player player, Game activeGame, Tile tile, UnitHolder unitHolder) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        if (unitHolder instanceof Planet) {
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = getUnitName(unitKey.asyncID());
+                if(!unitModel.getIsGroundForce()){
+                    continue;
+                }
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                int totalUnits = unitEntry.getValue() - damagedUnits;
+                EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                totalUnits = totalUnits - activeGame.getSpecificThalnosUnit(tile.getPosition()+"_"+unitHolder.getName() + "_" +  unitName);
+                if(totalUnits > 0){
+                    String buttonID = finChecker + "setForThalnos_" + tile.getPosition()+"_"+unitHolder.getName() + "_" +  unitName;
+                    String buttonText = "Roll 1 " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(unitHolder.getName(), activeGame);
+                    Button validTile2 = Button.danger(buttonID, buttonText);
+                    validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+                damagedUnits = damagedUnits - activeGame.getSpecificThalnosUnit(tile.getPosition()+"_"+unitHolder.getName() + "_" +  unitName+ "damaged");
+                if(damagedUnits > 0){
+                    String buttonID = finChecker + "setForThalnos_" + tile.getPosition()+"_"+unitHolder.getName() + "_"  + unitName + "damaged";
+                    String buttonText = "Roll 1 damaged " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(unitHolder.getName(), activeGame);
+                    Button validTile2 = Button.danger(buttonID, buttonText);
+                    validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+            }
+        } else {
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey key = unitEntry.getKey();
+                String unitName = getUnitName(key.asyncID());
+                int totalUnits = unitEntry.getValue();
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(key);
+                }
+                totalUnits = totalUnits - damagedUnits;
+                EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                damagedUnits = damagedUnits - activeGame.getSpecificThalnosUnit(tile.getPosition()+"_"+unitHolder.getName() + "_" +  unitName+ "damaged");
+                if(damagedUnits > 0){
+                    Button validTile2 = Button.danger(finChecker + "setForThalnos_" + tile.getPosition()+"_"+unitHolder.getName() + "_"  + unitName + "damaged",
+                        "Roll 1 damaged " + unitModel.getBaseType());
+                    validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+                totalUnits = totalUnits - activeGame.getSpecificThalnosUnit(tile.getPosition()+"_"+unitHolder.getName() + "_" +  unitName);
+                if(totalUnits > 0){
+                    Button validTile2 = Button.danger(finChecker + "setForThalnos_" + tile.getPosition()+"_"+unitHolder.getName()+"_" + unitName, "Roll 1 " + unitModel.getBaseType());
+                    validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+            }
+        }
+        return buttons;
+    }
+
     public static List<Button> getUserSetupButtons(Game activeGame) {
         List<Button> buttons = new ArrayList<>();
         for (Player player : activeGame.getPlayers().values()) {
@@ -7324,6 +7584,9 @@ public class ButtonHelper {
         if (("scepter".equalsIgnoreCase(id))) {
             String message = player.getRepresentation(true, true) + " Use buttons choose which system to mahact diplo";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, owner));
+        }
+        if (("dspnkoll".equalsIgnoreCase(id))) {
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame);
         }
         if (id.contains("rider")) {
             String riderName = "Keleres Rider";

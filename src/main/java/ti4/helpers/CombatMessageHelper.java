@@ -161,10 +161,18 @@ public class CombatMessageHelper {
             if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
                 round = 1;
             }else{
-                round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                if(activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+                    round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName));
+                }else{
+                    round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                }
             }
             activeGame.setCurrentReacts(combatName, ""+round);
-            combatTypeName=combatTypeName+" (Combat Round #"+round+")";
+            if(activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+                combatTypeName=combatTypeName+" (Thalnos Reroll for Combat Round #"+round+")";
+            }else{
+                combatTypeName=combatTypeName+" (Combat Round #"+round+")";
+            }
         }
         return String.format("**%s** rolls for %s on %s %s:  \n",
                 combatTypeName, player.getFactionEmoji(),
