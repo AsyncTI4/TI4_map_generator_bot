@@ -1213,7 +1213,7 @@ public class ButtonHelperHeroes {
                             continue;
                         }
                         Tile tile2 = activeGame.getTileByPosition(pos2);
-                        if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)) {
+                        if (FoWHelper.otherPlayersHaveShipsInSystem(p2, tile2, activeGame)) {
                             adjacentPeeps = true;
                         }
                     }
