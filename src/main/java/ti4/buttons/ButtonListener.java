@@ -2211,6 +2211,12 @@ public class ButtonListener extends ListenerAdapter {
             new PlanetExhaustAbility().resolvePrismStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("showDeck_")) {
             ButtonHelper.resolveDeckChoice(activeGame, event, buttonID, player);
+        } else if (buttonID.startsWith("setForThalnos_")) {
+            ButtonHelper.resolveSetForThalnos(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("rollThalnos_")) {
+            ButtonHelper.resolveRollForThalnos(player, activeGame, buttonID, event); 
+        } else if (buttonID.startsWith("startThalnos_")) {
+            ButtonHelper.resolveThalnosStart(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("showTextOfDeck_")) {
             ButtonHelper.resolveShowFullTextDeckChoice(activeGame, event, buttonID, player);
         } else if (buttonID.startsWith("assRepsStep2_")) {

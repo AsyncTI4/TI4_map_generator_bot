@@ -1267,13 +1267,14 @@ public class ButtonHelperActionCards {
         if (p2.getReadiedPlanets().contains(planet)) {
             p2.exhaustPlanet(planet);
         }
+        int amountToKill = 3;
         if (p2.hasInf2Tech()) {
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-            int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
-            if (amount > 3) {
-                amount = 3;
+            amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+            if (amountToKill > 3) {
+                amountToKill = 3;
             }
-            ButtonHelper.resolveInfantryDeath(activeGame, p2, amount);
+            ButtonHelper.resolveInfantryDeath(activeGame, p2, amountToKill);
             boolean cabalMech = false;
             Tile tile = activeGame.getTileFromPlanet(planet);
             if (p2.hasAbility("amalgamation") && activeGame.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech, p2.getColor()) > 0 && p2.hasUnit("cabal_mech")
@@ -1281,13 +1282,13 @@ public class ButtonHelperActionCards {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, amount, "infantry", event);
+                ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, amountToKill, "infantry", event);
             }
         }
         if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(p2, activeGame);
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "3 inf " + planet, activeGame);
+        new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), amountToKill+" inf " + planet, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " you exhausted " + planetRep + " and killed up to 3 infantry there");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),

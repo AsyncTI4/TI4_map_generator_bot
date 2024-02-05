@@ -1278,6 +1278,8 @@ public class ButtonHelperHeroes {
         if (players2.size() != 0) {
             player = players2.get(0);
         }
+
+        activeGame.setCurrentReacts("mahactHeroTarget",player.getFaction());
        
         UnitHolder unitHolder = tile1.getUnitHolders().get("space");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
