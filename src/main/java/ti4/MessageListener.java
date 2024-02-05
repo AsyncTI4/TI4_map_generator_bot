@@ -337,17 +337,21 @@ public class MessageListener extends ListenerAdapter {
                                     if (pingNumber == 34) {
                                         ping = realIdentity + " Perhaps you're torn by indecision. Just remember what my grandma always used to say: When in doubt, go for the throat";
                                     }
-                                    if (pingNumber == 35) {
-                                        ping = realIdentity + " ||Can I do spoiler tags? Guess you'll never know. ||";
+                                    if(pingNumber == 35){
+                                        ping = realIdentity + "Lifes but a walking shadow, a poor player,\n" +
+                                                        "That struts and frets his hour upon the stage\n" +
+                                                        "And then is heard no more. It is a tale\n" +
+                                                        "Told by an idiot, full of sound and fury\n" +
+                                                        "Signifying nothing.";
                                     }
                                     if (pingNumber == 36) {
-                                        ping = realIdentity + " They say money cant buy happiness, but I hear that trade goods can buy a warsun, which is basically the same thing.";
+                                        ping = realIdentity + " Life may not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience wont wait forever!";
                                     }
                                     if (pingNumber == 37) {
-                                        ping = realIdentity + " I think you're supposed to forgive your enemies 7 times 70 times. Since you're only a mild acquiantance, I'll give ya like 2 times 20 times";
+                                        ping = realIdentity + " I think you're supposed to forgive your enemies 7 times 70 times. Since I consider you only a mild acquiantance, I'll give you 2 times 20 times";
                                     }
                                     if (pingNumber == 38) {
-                                        ping = realIdentity + " I assure you that the winning move here is not not to play";
+                                        ping = realIdentity + " I assure you that the winning move here is TO PLAY";
                                     }
                                     if (pingNumber == 39) {
                                         ping = realIdentity + " You ever read Malazan? You should check it out, since, you know, you have all this free time from not playing async.";
@@ -355,9 +359,15 @@ public class MessageListener extends ListenerAdapter {
                                     if (pingNumber == 40) {
                                         ping = realIdentity + " When people talk about a slow burn, I think they were expecting around 4 pings in between turns, not 40.";
                                     }
+                                    if (pingNumber == 41) {
+                                        ping = realIdentity + " ||Can I do spoiler tag pings? Guess you'll never know. ||";
+                                    }
+                                    if (pingNumber == 42) {
+                                        ping = realIdentity + " They say money cant buy happiness, but I hear that trade goods can buy a warsun, which is basically the same thing.";
+                                    }
 
 
-                                    int maxSoFar = 40;
+                                    int maxSoFar = 42;
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * maxSoFar)) {
                                         ping = realIdentity + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time. ";
                                     }

@@ -344,7 +344,7 @@ public class Helper {
             }
             if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*") && activeGame.getFactionsThatReactedToThis(key2).length() > 2){
                 if(!activeGame.isFoWMode()){
-                    message =player.getRepresentation(true, true)+ " is the one the game is currently waiting on before advancing to the next person";
+                    message =player.getRepresentation(true, true)+ " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                 break;

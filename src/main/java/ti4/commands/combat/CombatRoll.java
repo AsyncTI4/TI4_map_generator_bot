@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -196,7 +198,7 @@ public class CombatRoll extends CombatSubcommandData {
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player,
                 opponent,
-                activeGame, rollType);
+                activeGame, rollType, event);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*","");
         int h = Integer.parseInt(hits);
@@ -204,6 +206,9 @@ public class CombatRoll extends CombatSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if(message.contains("at the risk of your troops lives")){
+            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,",Button.success("startThalnos_"+tile.getPosition()+"_"+unitHolderName,"Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+        }
         if(!activeGame.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && h > 0 && opponent != null && opponent != player){
             String msg = opponent.getRepresentation(true, true) + " you can autoassign "+h+" hit(s)";
             List<Button> buttons = new ArrayList<>();

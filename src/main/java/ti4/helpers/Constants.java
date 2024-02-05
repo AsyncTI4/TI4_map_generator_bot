@@ -354,6 +354,7 @@ public class Constants {
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String CHECK_REACTS_INFO = "check_reacts_info";
     public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
+    public static final String THALNOS_UNITS = "thalnos_units";
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
     public static final String AC_ID = "ac_id";
 

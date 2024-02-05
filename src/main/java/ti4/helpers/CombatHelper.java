@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import ti4.commands.capture.RemoveUnits;
+import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitType;
@@ -22,6 +22,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
@@ -354,7 +355,7 @@ public class CombatHelper {
         List<NamedCombatModifierModel> extraRolls,
         List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
         Player opponent,
-        Game activeGame, CombatRollType rollType) {
+        Game activeGame, CombatRollType rollType, GenericInteractionCreateEvent event) {
 
         String result = "";
 
@@ -371,7 +372,9 @@ public class CombatHelper {
         StringBuilder resultBuilder = new StringBuilder(result);
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
         List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
+        int totalMisses = 0;
         UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space");
+        String extra = "";
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
@@ -384,6 +387,12 @@ public class CombatHelper {
                 opponent,
                 activeGame, playerUnitsList, opponentUnitsList, rollType);
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
+            boolean extraRollsCount = false;
+            if((numRollsPerUnit > 1 || extraRollsForUnit > 0) && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+                extraRollsCount = true;
+                numRollsPerUnit = 1;
+                extraRollsForUnit = 0;
+            }
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
@@ -395,6 +404,39 @@ public class CombatHelper {
                     if (die.getResult() > 8) {
                         hitRolls = hitRolls + 2;
                     }
+                }
+            }
+            int misses = numRolls-hitRolls;
+            totalMisses = totalMisses+misses;
+            
+            if(misses > 0 && !extraRollsCount && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+                extra = player.getFactionEmoji()+" destroyed "+misses+" of their own "+unit.getName() +" due to Thalnos misses";
+                for(String thalnosUnit : activeGame.getThalnosUnits().keySet()){
+                    String pos = thalnosUnit.split("_")[0];
+                    String unitHolderName = thalnosUnit.split("_")[1];
+                    Tile tile = activeGame.getTileByPosition(pos);
+                    int amount = activeGame.getSpecificThalnosUnit(thalnosUnit);
+                    String unitName = ButtonHelper.getUnitName(unit.getAsyncId());
+                    thalnosUnit = thalnosUnit.split("_")[2].replace("damaged","");
+                    if(thalnosUnit.equals(unitName)){
+                        new RemoveUnits().unitParsing(event, player.getColor(), tile, misses +" "+ unitName+" "+unitHolderName, activeGame);
+                        if(unitName.equalsIgnoreCase("infantry")){
+                            ButtonHelper.resolveInfantryDeath(activeGame, player, misses);
+                        }
+                        if(unitName.equalsIgnoreCase("mech")){
+                            if ( player.hasUnit("mykomentori_mech")) {
+                                for (int x = 0; x < misses; x++) {
+                                    ButtonHelper.rollMykoMechRevival(activeGame, player);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+                
+            }else{
+                if(misses > 0 && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),player.getFactionEmoji()+" had "+misses+" "+unit.getName() +" misses on a thalnos roll, but no units were removed due to extra rolls being unaccounted for");
                 }
             }
 
@@ -439,8 +481,11 @@ public class CombatHelper {
 
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
-        if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround) {
-            result = result + "\n" + player.getFactionEmoji() + " You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives. (Not yet automated)";
+        if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")) {
+            result = result + "\n" + player.getFactionEmoji() + " You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives";
+        }
+        if(!extra.isEmpty()){
+            result = result + "\n\n"+extra;
         }
         return result;
     }

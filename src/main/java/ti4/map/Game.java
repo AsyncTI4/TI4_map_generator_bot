@@ -251,6 +251,7 @@ public class Game {
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
+    private Map<String, Integer> thalnosUnits = new HashMap<>();
     private Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
     private Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
@@ -1121,6 +1122,17 @@ public class Game {
         return displacedUnitsFrom1System;
     }
 
+    public Map<String, Integer> getThalnosUnits() {
+        return thalnosUnits;
+    }
+    public int getSpecificThalnosUnit(String unit) {
+        if(thalnosUnits.containsKey(unit)){
+            return thalnosUnits.get(unit);
+        }else{
+            return 0;
+        }
+    }
+
     public Map<String, Integer> getAllSlashCommandsUsed() {
         return slashCommandsUsed;
     }
@@ -1137,6 +1149,10 @@ public class Game {
         displacedUnitsFrom1System.put(unit, count);
     }
 
+    public void setSpecificThalnosUnit(String unit, int count) {
+        thalnosUnits.put(unit, count);
+    }
+
     public void incrementSpecificSlashCommandCount(String fullCommandName) {
         slashCommandsUsed.merge(fullCommandName, 1, (oldValue, newValue) -> oldValue + 1);
     }
@@ -1151,6 +1167,9 @@ public class Game {
 
     public void setCurrentMovedUnitsFrom1System(Map<String, Integer> displacedUnits) {
         displacedUnitsFrom1System = displacedUnits;
+    }
+    public void setThalnosUnits(Map<String, Integer> displacedUnits) {
+        thalnosUnits = displacedUnits;
     }
 
     public void setSlashCommandsUsed(Map<String, Integer> commands) {
@@ -1171,6 +1190,9 @@ public class Game {
 
     public void resetCurrentMovedUnitsFrom1System() {
         displacedUnitsFrom1System = new HashMap<>();
+    }
+    public void resetThalnosUnits() {
+        thalnosUnits = new HashMap<>();
     }
 
     public void resetCurrentMovedUnitsFrom1TacticalAction() {

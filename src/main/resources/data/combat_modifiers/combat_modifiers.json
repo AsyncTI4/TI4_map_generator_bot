@@ -57,6 +57,7 @@
             }
         ]
     },
+    
     {
         "alias": "plus1_roll_mechs_naaz_flagship",
         "type": "extrarolls",
@@ -300,6 +301,22 @@
                 "type": "custom",
                 "alias": "custom",
                 "message": "Vaylerian Ships get +1 to combat rolls due to Hero"
+            }
+        ]
+    },
+    {
+        "alias": "plus1_thalnos",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "thalnosPlusOne",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Units get +1 to combat rolls due to Thalnos"
             }
         ]
     },
