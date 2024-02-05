@@ -874,29 +874,11 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveExp_Look_")) {
             String deckType = buttonID.replace("resolveExp_Look_", "");
-            List<String> deck = activeGame.getExploreDeck(deckType);
-            List<String> discardPile = activeGame.getExploreDiscard(buttonID.replace("resolveExp_Look_", ""));
-            ButtonHelper.addReaction(event, true, false,
-                    "Looked at top of the " + buttonID.replace("resolveExp_Look_", "") + " deck.", "");
+            ButtonHelperFactionSpecific.resolveExpLook(player, activeGame, event, deckType);
             event.getMessage().delete().queue();
-            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(buttonID.replace("resolveExp_Look_", ""))
-                    + buttonID.replace("resolveExp_Look_", "");
-            String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
-            if (deck.isEmpty() && discardPile.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
-            String topCard = deck.get(0);
-            activeGame.setCurrentReacts("lastExpLookedAt" + player.getFaction() + deckType, topCard);
-            sb.append(ExploreSubcommandData.displayExplore(topCard));
-
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
-                            + " Cards info thread.");
+        } else if (buttonID.startsWith("discardExploreTop_")) {
+            String deckType = buttonID.replace("discardExploreTop_", "");
+            ButtonHelperFactionSpecific.resolveExpDiscard(player, activeGame, event, deckType);
         } else if (buttonID.startsWith("relic_look_top")) {
             List<String> relicDeck = activeGame.getAllRelics();
             if (relicDeck.isEmpty()) {
@@ -3014,7 +2996,7 @@ public class ButtonListener extends ListenerAdapter {
                     AgendaHelper.proceedToFinalizingVote(activeGame, player, event);
                 }
                 case "drawAgenda_2" -> {
-                    new DrawAgenda().drawAgenda(event, 2, activeGame, player);
+                    DrawAgenda.drawAgenda(event, 2, activeGame, player);
                     event.getMessage().delete().queue();
                 }
                 case "nekroFollowTech" -> {
@@ -4053,6 +4035,10 @@ public class ButtonListener extends ListenerAdapter {
                     new FighterConscription().doFfCon(event, player, activeGame);
                     event.getMessage().delete().queue();
                 }
+                case "shuffleExplores" -> {
+                    activeGame.shuffleExplores();
+                    event.getMessage().delete().queue();
+                }
                 case "miningInitiative" -> ButtonHelperActionCards.miningInitiative(player, activeGame, event);
                 case "forwardSupplyBase" ->
                     ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, activeGame, event, buttonID);
@@ -4061,9 +4047,12 @@ public class ButtonListener extends ListenerAdapter {
                         "Use buttons to select Law to repeal",
                         ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
                 case "resolveCounterStroke" -> ButtonHelperActionCards.resolveCounterStroke(activeGame, player, event);
-                case "getDivertFundingButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                        "Use buttons to select tech to return",
-                        ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, activeGame));
+                case "getDivertFundingButtons" -> {
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                            "Use buttons to select tech to return",
+                            ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, activeGame));
+                    event.getMessage().delete().queue();
+                }
                 case "focusedResearch" ->
                     ButtonHelperActionCards.resolveFocusedResearch(activeGame, player, buttonID, event);
                 case "resolveReparationsStep1" ->
@@ -4105,6 +4094,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveWarEffort" -> ButtonHelperActionCards.resolveWarEffort(activeGame, player, event);
                 case "resolveInsiderInformation" ->
                     ButtonHelperActionCards.resolveInsiderInformation(player, activeGame, event);
+                case "resolveEmergencyMeeting" ->
+                    ButtonHelperActionCards.resolveEmergencyMeeting(player, activeGame, event);
                 case "resolveSalvageStep1" ->
                     ButtonHelperActionCards.resolveSalvageStep1(player, activeGame, event, buttonID);
                 case "resolveGhostShipStep1" ->

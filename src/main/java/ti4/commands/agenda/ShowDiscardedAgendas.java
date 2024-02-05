@@ -23,12 +23,15 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
 
     public void showDiscards(Game activeGame, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
         sb.append("### __**Discarded Agendas:**__");
         Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         List<MessageEmbed> agendaEmbeds = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
             agendaEmbeds.add(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
+            sb2.append(Mapper.getAgenda(entry.getKey()).getName() + " (ID: " + entry.getValue() + ")\n");
         }
         MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb.toString(), agendaEmbeds);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb2.toString());
     }
 }

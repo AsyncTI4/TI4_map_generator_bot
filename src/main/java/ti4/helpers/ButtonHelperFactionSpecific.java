@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
@@ -36,6 +37,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 
@@ -1231,6 +1233,44 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         }
+    }
+
+    public static void resolveExpLook(Player player, Game activeGame, GenericInteractionCreateEvent event,
+            String deckType) {
+        List<String> deck = activeGame.getExploreDeck(deckType);
+        List<String> discardPile = activeGame.getExploreDiscard(deckType);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation() + " Looked at top of the " + deckType + " deck.");
+        String traitNameWithEmoji = Emojis.getEmojiFromDiscord(deckType)
+                + deckType;
+        String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
+        if (deck.isEmpty() && discardPile.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+        String topCard = deck.get(0);
+        activeGame.setCurrentReacts("lastExpLookedAt" + player.getFaction() + deckType, topCard);
+        sb.append(ExploreSubcommandData.displayExplore(topCard));
+
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+                        + " Cards info thread.");
+    }
+
+    public static void resolveExpDiscard(Player player, Game activeGame, ButtonInteractionEvent event,
+            String deckType) {
+        List<String> deck = activeGame.getExploreDeck(deckType);
+        List<String> discardPile = activeGame.getExploreDiscard(deckType);
+        String topCard = deck.get(0);
+        ExploreModel top = Mapper.getExplore(topCard);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation() + " Discarded the top of the " + deckType + " deck. The discarded card was "
+                        + top.getName());
+        activeGame.discardExplore(topCard);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveKolleccAbilities(Player player, Game activeGame) {
