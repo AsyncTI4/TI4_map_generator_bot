@@ -313,6 +313,9 @@ public class ButtonHelperTacticalAction {
         if(Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false) > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")){
             message3 = message3 + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
         }
+        if(Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false) > 0 && ButtonHelper.isPlayerElected(activeGame, player, "prophecy")){
+            message3 = message3 + ". Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated\n";
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
@@ -514,7 +517,7 @@ public class ButtonHelperTacticalAction {
                 String playerMessage = player_.getRepresentation(true, true) + " - System " + pos + " has been activated ";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
             }
-            ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
+            ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false, event);
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
             && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock).contains(activeGame.getTileByPosition(pos))) {
@@ -561,7 +564,7 @@ public class ButtonHelperTacticalAction {
         if (!activeGame.isFoWMode()) {
             int abilities = 0;
             if(!activeGame.getL1Hero()){
-                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
+                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false, event);
             }
             // if (abilities > 0 ) {
             //     List<Button> buttons = new ArrayList<>();
