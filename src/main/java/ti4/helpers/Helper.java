@@ -1012,7 +1012,7 @@ public class Helper {
                     }
                 }
             }else{
-                if(thing.contains("sarween")){
+                if(thing.contains("sarween") && !thing.contains("absol_sarween")){
                     msg = msg + "> Used Sarween Tools "+Emojis.CyberneticTech +"\n";
                     res = res+1;
                 }
@@ -2161,12 +2161,11 @@ public class Helper {
             int scoredPOCount = 0;
             Map<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
-                if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())) {
+                if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey()) || activeGame.getSoToPoList().contains(scoredPublic.getKey())) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
                         scoredPOCount++;
                     }
                 }
-
             }
             int scoredObjectiveCount = scoredPOCount + scoredSOCount;
             if (scoredObjectiveCount >= 3) {
