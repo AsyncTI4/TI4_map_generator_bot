@@ -1192,6 +1192,12 @@ public class Helper {
             if(tile.isSupernova() && player.hasTech("mr")){
                 productionValueTotal = productionValueTotal +5;
             }
+            if(tile.getUnitHolders().size() ==1 && player.hasTech("dsmorty")){
+                productionValueTotal = productionValueTotal +2;
+                if(player.hasRelic("boon_of_the_cerulean_god")){
+                    productionValueTotal++;
+                }
+            }
         }else{
             int highestProd = 0;
             for(UnitHolder uH : tile.getUnitHolders().values()){
