@@ -540,7 +540,7 @@ public class ButtonHelperTacticalAction {
             String msg = player.getRepresentation(true, true) + " You can use buttons to resolve L1 Agent if you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
-        if (player.getTechs().contains("sdn") && !button2.isEmpty() && !activeGame.getL1Hero()) {
+        if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty() && !activeGame.getL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink", button2);
             if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos), event);

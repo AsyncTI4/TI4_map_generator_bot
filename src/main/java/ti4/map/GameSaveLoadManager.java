@@ -102,7 +102,7 @@ public class GameSaveLoadManager {
             if (event instanceof SlashCommandInteractionEvent) {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent) {
-                if (event.getMessageChannel() instanceof ThreadChannel || activeGame.isFoWMode()) {
+                if ((event.getMessageChannel() instanceof ThreadChannel && event.getMessageChannel().getName().contains("Cards Info"))|| activeGame.isFoWMode()) {
                     activeGame.setLatestCommand(username + " pressed button: [CLASSIFIED]");
                 } else {
                     activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- " + ((ButtonInteraction) event).getButton().getLabel());
@@ -207,7 +207,7 @@ public class GameSaveLoadManager {
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
                     StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `").append(maxNumber).append("` ");
-                    if (loadedGame.getSavedChannel() instanceof ThreadChannel) {
+                    if (loadedGame.getSavedChannel() instanceof ThreadChannel && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
                         sb.append("[CLASSIFIED]");
                     } else {
                         sb.append(loadedGame.getLatestCommand());
@@ -217,6 +217,8 @@ public class GameSaveLoadManager {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
                             // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
+                        }else{
+                            System.out.println("Boop"+loadedGame.getSavedButtons().size());
                         }
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
@@ -379,6 +381,14 @@ public class GameSaveLoadManager {
             sb3.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
+        writer.write(System.lineSeparator());
+
+        Map<String, Integer> thalnosUnits = activeGame.getThalnosUnits();
+        StringBuilder sb16 = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : thalnosUnits.entrySet()) {
+            sb16.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
+        }
+        writer.write(Constants.THALNOS_UNITS + " " + sb16);
         writer.write(System.lineSeparator());
 
         Map<String, Integer> slashCommands = activeGame.getAllSlashCommandsUsed();
@@ -1525,6 +1535,21 @@ public class GameSaveLoadManager {
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
                             activeGame.setSpecificCurrentMovedUnitsFrom1System(outcome, Integer.parseInt(voteInfo));
+                        }
+                    }
+                }
+                case Constants.THALNOS_UNITS -> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = null;
+                        String voteInfo;
+                        if (dataInfo.hasMoreTokens()) {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if (dataInfo.hasMoreTokens()) {
+                            voteInfo = dataInfo.nextToken();
+                            activeGame.setSpecificThalnosUnit(outcome, Integer.parseInt(voteInfo));
                         }
                     }
                 }
