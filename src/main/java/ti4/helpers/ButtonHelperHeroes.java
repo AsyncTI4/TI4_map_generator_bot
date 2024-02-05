@@ -1617,7 +1617,6 @@ public class ButtonHelperHeroes {
                         message, buttons);
             }
         }
-
     }
 
     public static List<Button> getWinnuHeroSCButtons(Game activeGame) {

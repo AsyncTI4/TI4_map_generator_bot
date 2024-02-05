@@ -17,6 +17,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
+
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -29,6 +31,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -38,6 +41,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -452,6 +456,50 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                         + ", however this placement *is* optional.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
+            }
+            case "darkvisions" -> {
+                List<Button> discardButtons = new ArrayList<>();
+                String type = "industrial";
+                ButtonHelperFactionSpecific.resolveExpLook(player, activeGame, event, type);
+                discardButtons.add(
+                        Button.success("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                type = "hazardous";
+                ButtonHelperFactionSpecific.resolveExpLook(player, activeGame, event, type);
+                discardButtons
+                        .add(Button.danger("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                type = "cultural";
+                ButtonHelperFactionSpecific.resolveExpLook(player, activeGame, event, type);
+                discardButtons.add(
+                        Button.primary("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                type = "frontier";
+                ButtonHelperFactionSpecific.resolveExpLook(player, activeGame, event, type);
+                discardButtons.add(
+                        Button.secondary("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                discardButtons.add(Button.danger("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                        player.getRepresentation()
+                                + " you can use the buttons to discard the top of the explore decks if you choose",
+                        discardButtons);
+                List<Button> buttonsAll = new ArrayList<>();
+                for (String planet : player.getPlanetsAllianceMode()) {
+                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+                    if (unitHolder == null) {
+                        continue;
+                    }
+                    Planet planetReal = (Planet) unitHolder;
+                    List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
+                    if (buttons != null && !buttons.isEmpty()) {
+                        buttonsAll.addAll(buttons);
+                    }
+                }
+                String msg = "Click button to explore a planet after resolving any discards";
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                        msg, buttonsAll);
+
+                MessageHelper.sendMessageToChannelWithButton(ButtonHelper.getCorrectChannel(player, activeGame),
+                        "Use this button to shuffle explore decks once youre done with the rest",
+                        Button.danger("shuffleExplores", "Shuffle Explore Decks"));
+
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";

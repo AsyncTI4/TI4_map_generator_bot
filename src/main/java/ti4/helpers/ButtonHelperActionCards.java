@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
@@ -1054,6 +1055,14 @@ public class ButtonHelperActionCards {
         NaaluCommander.sendTopAgendaToCardsInfoSkipCovert(activeGame, player);
         MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Sent top agenda info to " + ButtonHelper.getIdentOrColor(player, activeGame) + " cards info");
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveEmergencyMeeting(Player player, Game activeGame, ButtonInteractionEvent event) {
+        activeGame.shuffleAllAgendasBackIntoDeck();
+        DrawAgenda.drawAgenda(event, 3, activeGame, player);
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Sent top 3 agendas to " + ButtonHelper.getIdentOrColor(player, activeGame) + " cards info");
         event.getMessage().delete().queue();
     }
 
