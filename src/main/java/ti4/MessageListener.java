@@ -338,7 +338,7 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity + " Perhaps you're torn by indecision. Just remember what my grandma always used to say: When in doubt, go for the throat";
                                     }
                                     if(pingNumber == 35){
-                                        ping = realIdentity + "Lifes but a walking shadow, a poor player,\n" +
+                                        ping = realIdentity + " Lifes but a walking shadow, a poor player\n" +
                                                         "That struts and frets his hour upon the stage\n" +
                                                         "And then is heard no more. It is a tale\n" +
                                                         "Told by an idiot, full of sound and fury\n" +

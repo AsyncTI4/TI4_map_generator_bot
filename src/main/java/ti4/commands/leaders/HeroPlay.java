@@ -63,8 +63,11 @@ public class HeroPlay extends LeaderAction {
 
     @Override
     protected void options() {
-        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -90,103 +93,127 @@ public class HeroPlay extends LeaderAction {
         playHero(event, activeGame, player, playerLeader);
     }
 
-    
-
-    public static void playHero(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader playerLeader) {
+    public static void playHero(GenericInteractionCreateEvent event, Game activeGame, Player player,
+            Leader playerLeader) {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " played:");
-            ButtonHelper.getCorrectChannel(player, activeGame).sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    player.getRepresentation() + " played:");
+            ButtonHelper.getCorrectChannel(player, activeGame)
+                    .sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
         } else {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Emojis.getFactionLeaderEmoji(playerLeader));
-            sb.append(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    Emojis.getFactionLeaderEmoji(playerLeader));
+            sb.append(player.getRepresentation()).append(" played ")
+                    .append(Helper.getLeaderFullRepresentation(playerLeader));
             BotLogger.log(event, "Missing LeaderModel: " + playerLeader.getId());
         }
 
-        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId()) || "zealotshero".equals(playerLeader.getId()) || "nokarhero".equals(playerLeader.getId()) || "kolumehero".equals(playerLeader.getId())) {
+        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())
+                || "zealotshero".equals(playerLeader.getId()) || "nokarhero".equals(playerLeader.getId())
+                || "kolumehero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be PURGED after status cleanup");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
             if ("zealotshero".equals(playerLeader.getId())) {
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your first non-faction tech", Buttons.GET_A_FREE_TECH);
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your second non-faction tech", Buttons.GET_A_FREE_TECH);
-                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get your third non-faction tech", Buttons.GET_A_FREE_TECH);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
+                        player.getRepresentation() + " Use the button to get your first non-faction tech",
+                        Buttons.GET_A_FREE_TECH);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
+                        player.getRepresentation() + " Use the button to get your second non-faction tech",
+                        Buttons.GET_A_FREE_TECH);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
+                        player.getRepresentation() + " Use the button to get your third non-faction tech",
+                        Buttons.GET_A_FREE_TECH);
             }
         } else {
             boolean purged = true;
-            if(!"mykomentorihero".equals(playerLeader.getId())){
+            if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
             }
-            
 
             if (purged) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Leader " + playerLeader.getId() + " has been purged");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        "Leader " + playerLeader.getId() + " has been purged");
                 ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Leader was not purged - something went wrong");
                 return;
             }
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> DrawRelic.drawWithAdvantage(player, event, activeGame, activeGame.getRealPlayers().size());
+            case "kollecchero" ->
+                DrawRelic.drawWithAdvantage(player, event, activeGame, activeGame.getRealPlayers().size());
             case "titanshero" -> {
                 String titanshero = Mapper.getTokenID("titanshero");
                 System.out.println(titanshero);
                 Tile t = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
-                if (activeGame.getTileFromPlanet("elysium") != null && activeGame.getTileFromPlanet("elysium").getPosition().equalsIgnoreCase(t.getPosition())) {
+                if (activeGame.getTileFromPlanet("elysium") != null
+                        && activeGame.getTileFromPlanet("elysium").getPosition().equalsIgnoreCase(t.getPosition())) {
                     t.addToken("attachment_titanshero.png", "elysium");
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "Attachment added to Elysium and it has been readied");
                     new PlanetRefresh().doAction(player, "elysium", activeGame);
                 } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "`Use the following command to add the attachment: /add_token token:titanshero`");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "`Use the following command to add the attachment: /add_token token:titanshero`");
                 }
             }
-            case "florzenhero"->{
-                for(Tile tile : activeGame.getTileMap().values()){
-                    for(UnitHolder uH : tile.getPlanetUnitHolders()){
-                        if(player.getPlanets().contains(uH.getName()) && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)){
+            case "florzenhero" -> {
+                for (Tile tile : activeGame.getTileMap().values()) {
+                    for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                        if (player.getPlanets().contains(uH.getName())
+                                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)) {
                             new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", activeGame);
                             break;
                         }
                     }
                 }
-                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)+"Added 2 fighters to every system with an owned planet and no opponent ships.");
-                 ButtonHelperHeroes.resolveFlorzenHeroStep1(player, activeGame);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)
+                        + "Added 2 fighters to every system with an owned planet and no opponent ships.");
+                ButtonHelperHeroes.resolveFlorzenHeroStep1(player, activeGame);
             }
-            case "kyrohero"->{
+            case "kyrohero" -> {
                 int dieResult = player.getLowestSC();
-                activeGame.setCurrentReacts("kyroHeroSC", dieResult+"");
+                activeGame.setCurrentReacts("kyroHeroSC", dieResult + "");
                 activeGame.setCurrentReacts("kyroHeroPlayer", player.getFaction());
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Marked the Blex Hero Target as SC #"+dieResult + " and the faction that played the hero as "+player.getFaction());
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Marked the Blex Hero Target as SC #"
+                        + dieResult + " and the faction that played the hero as " + player.getFaction());
                 ListTurnOrder.turnOrder(event, activeGame);
             }
-             case "ghotihero"->{
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGhotiHeroIn(player, activeGame, event));
+            case "ghotihero" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Choose the tiles you would like to resolve ghoti hero in",
+                        ButtonHelperHeroes.getTilesToGhotiHeroIn(player, activeGame, event));
             }
-            case "gledgehero"->{
+            case "gledgehero" -> {
                 ButtonHelperHeroes.resolveGledgeHero(player, activeGame);
             }
-            case "khraskhero"->{
+            case "khraskhero" -> {
                 ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
                 ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
                 ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
                 ButtonHelperHeroes.resolveKhraskHero(player, activeGame);
             }
-             case "mortheushero"->{
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Choose the tiles you would like to resolve ghoti hero in", ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, activeGame, event));
+            case "mortheushero" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Choose the tiles you would like to resolve ghoti hero in",
+                        ButtonHelperHeroes.getTilesToGlimmersHeroIn(player, activeGame, event));
             }
-            case "axishero"->{
+            case "axishero" -> {
                 ButtonHelperHeroes.resolveAxisHeroStep1(player, activeGame);
             }
-            case "lanefirhero"->{
+            case "lanefirhero" -> {
                 ButtonHelperHeroes.resolveLanefirHeroStep1(player, activeGame);
             }
             case "solhero" -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " removed all of your ccs from the board");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        player.getRepresentation(true, true) + " removed all of your ccs from the board");
                 for (Tile t : activeGame.getTileMap().values()) {
                     if (AddCC.hasCC(event, player.getColor(), t)) {
                         RemoveCC.removeCC(event, player.getColor(), t, activeGame);
@@ -194,13 +221,14 @@ public class HeroPlay extends LeaderAction {
                 }
             }
             case "olradinhero" -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " added 1 infantry to each planet");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        player.getRepresentation(true, true) + " added 1 infantry to each planet");
                 new RiseOfMessiah().doRise(player, event, activeGame);
                 ButtonHelperHeroes.offerOlradinHeroFlips(activeGame, player);
-            }   
+            }
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
-                    + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical cc from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
+                        + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical cc from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
                 activeGame.setL1Hero(true);
                 activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
@@ -208,174 +236,212 @@ public class HeroPlay extends LeaderAction {
             }
             case "winnuhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
+                        showFlavourText)
+                        + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
+                        buttons);
             }
             case "gheminaherolady" -> {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true)
-                    + " use the button to pick which planet you want to resolve the hero on",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, true)
+                                + " use the button to pick which planet you want to resolve the hero on",
+                        buttons);
             }
             case "gheminaherolord" -> {
                 List<Button> buttons = ButtonHelperHeroes.getButtonsForGheminaLordHero(player, activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true)
-                    + " use the button to pick which planet you want to resolve the hero on",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, true)
+                                + " use the button to pick which planet you want to resolve the hero on",
+                        buttons);
             }
             case "arborechero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the buttons to build in a system", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + " use the buttons to build in a system",
+                        buttons);
             }
             case "saarhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(activeGame, player);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the buttons to select the system to remove all opposing ff and inf from",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + " use the buttons to select the system to remove all opposing ff and inf from",
+                        buttons);
             }
-            case "edynhero"-> {
+            case "edynhero" -> {
                 int size = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size();
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can resolve "+size +" agendas cause thats how many sigils they got. After putting the agendas on top in the order you want (dont bottom any), please press the button to reveal an agenda");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player
+                        .getFactionEmoji() + " can resolve " + size
+                        + " agendas cause thats how many sigils they got. After putting the agendas on top in the order you want (dont bottom any), please press the button to reveal an agenda");
                 new DrawAgenda().drawAgenda(event, size, activeGame, player);
                 Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
             }
-            case "kjalengardhero" ->{
+            case "kjalengardhero" -> {
                 int size = ButtonHelperAgents.getGloryTokenTiles(activeGame).size();
-                for(Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)){
-                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "kjalHero_"+tile.getPosition());
-                    if(buttons.size() > 0){
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to remove token from "+tile.getRepresentationForButtons(activeGame, player)+" or an adjacent tile", buttons);
+                for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)) {
+                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event,
+                            "kjalHero_" + tile.getPosition());
+                    if (buttons.size() > 0) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                                "Use buttons to remove token from "
+                                        + tile.getRepresentationForButtons(activeGame, player) + " or an adjacent tile",
+                                buttons);
                     }
                 }
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain "+size +" CCs");
-                Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
-                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
-                Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
-                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        player.getFactionEmoji() + " can gain " + size + " CCs");
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
-                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
+                        + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
-                activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
+                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
-            case "vaylerianhero" ->{
-                if(!activeGame.getNaaluAgent()){
+            case "vaylerianhero" -> {
+                if (!activeGame.getNaaluAgent()) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
                     AddCC.addCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()));
                     activeGame.setCurrentReacts("vaylerianHeroActive", "true");
                 }
-                for(Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)){
-                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "vaylerianhero");
-                    if(buttons.size() > 0){
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to remove a token from the board", buttons);
+                for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)) {
+                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event,
+                            "vaylerianhero");
+                    if (buttons.size() > 0) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                                "Use buttons to remove a token from the board", buttons);
                     }
                 }
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getFactionEmoji()+" can gain 1 CC");
-                Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
-                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
-                Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
-                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        player.getFactionEmoji() + " can gain 1 CC");
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
-                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
+                        + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
-                activeGame.setCurrentReacts("originalCCsFor"+player.getFaction(), player.getCCRepresentation());
+                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
-            case "freesystemshero"->{
+            case "freesystemshero" -> {
                 ButtonHelperHeroes.offerFreeSystemsButtons(player, activeGame, event);
             }
-            case "veldyrhero"->{
+            case "veldyrhero" -> {
                 activeGame.setComponentAction(true);
-                for(Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player)){
-                    if(ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame).size() > 0){
-                        String msg = player.getRepresentation(true, true)+ " you can retrieve a unit upgrade tech from players with branch offices. Here is the possible techs from "+ButtonHelper.getIdentOrColor(p2, activeGame);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame));
+                for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player)) {
+                    if (ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame)
+                            .size() > 0) {
+                        String msg = player.getRepresentation(true, true)
+                                + " you can retrieve a unit upgrade tech from players with branch offices. Here is the possible techs from "
+                                + ButtonHelper.getIdentOrColor(p2, activeGame);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg,
+                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame));
                     }
                 }
             }
             case "nekrohero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to pick which planet youd like to get a tech and tgs from (and kill any opponent units)",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
+                        showFlavourText)
+                        + " use the button to pick which planet youd like to get a tech and tgs from (and kill any opponent units)",
+                        buttons);
             }
             case "bentorhero" -> {
                 ButtonHelperHeroes.resolveBentorHero(activeGame, player);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " offered buttons to explore all planets");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        ButtonHelper.getIdent(player) + " offered buttons to explore all planets");
             }
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(activeGame, player);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " sustained all units except their mechs");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        ButtonHelper.getIdent(player) + " sustained all units except their mechs");
             }
             case "jolnarhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(player);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the buttons to pick what tech you would like to swap out. Reminder that since all swap are simultenous, you cannot swap out a tech and then swap it back in.",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
+                        showFlavourText)
+                        + " use the buttons to pick what tech you would like to swap out. Reminder that since all swap are simultenous, you cannot swap out a tech and then swap it back in.",
+                        buttons);
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart", "Invade a planet with Yin Hero"));
+                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
+                        "Invade a planet with Yin Hero"));
                 buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
+                        showFlavourText)
+                        + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
+                        buttons);
             }
             case "naazhero" -> {
                 DrawRelic.drawRelicAndNotify(player, event, activeGame);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to do TWO of the available secondaries. (note, all are presented for conveinence, but two is the limit)", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
+                        showFlavourText)
+                        + " use the button to do TWO of the available secondaries. (note, all are presented for conveinence, but two is the limit)",
+                        buttons);
             }
             case "mahacthero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getBenediction1stTileOptions(player, activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to decide which tile you wish to force ships to move from.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + " use the button to decide which tile you wish to force ships to move from.",
+                        buttons);
             }
             case "ghosthero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getGhostHeroTilesStep1(activeGame, player);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)
-                    + " use the button to select the first tile you would like to swap with your hero.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, showFlavourText)
+                                + " use the button to select the first tile you would like to swap with your hero.",
+                        buttons);
             }
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1, "Resolve Augers Hero on Stage 1 Deck"));
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2, "Resolve Augers Hero on Stage 2 Deck"));
+                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
+                        "Resolve Augers Hero on Stage 1 Deck"));
+                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
+                        "Resolve Augers Hero on Stage 2 Deck"));
                 buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getRepresentation(true, showFlavourText) + " use the button to choose which objective type you wanna hero on", buttons);
+                        player.getRepresentation(true, showFlavourText)
+                                + " use the button to choose which objective type you wanna hero on",
+                        buttons);
             }
             case "empyreanhero" -> {
                 new AddFrontierTokens().parsingForTile(event, activeGame);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to explore empties", ButtonHelperHeroes.getEmpyHeroButtons(player, activeGame));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        "Use Buttons to explore empties", ButtonHelperHeroes.getEmpyHeroButtons(player, activeGame));
             }
             case "cabalhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getCabalHeroButtons(player, activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to capture people", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        "Use Buttons to capture people", buttons);
             }
             case "yssarilhero" -> {
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player || p2.getAc() == 0) {
                         continue;
                     }
-                    List<Button> buttons = new ArrayList<>(ACInfo.getYssarilHeroActionCardButtons(activeGame, player, p2));
+                    List<Button> buttons = new ArrayList<>(
+                            ACInfo.getYssarilHeroActionCardButtons(activeGame, player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-                        p2.getRepresentation(true, true) + " Yssaril hero played.  Use buttons to select which AC you will offer to them.",
-                        buttons);
+                            p2.getRepresentation(true, true)
+                                    + " Yssaril hero played.  Use buttons to select which AC you will offer to them.",
+                            buttons);
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getRepresentation(true, showFlavourText) + " sent everyone a ping in their private threads with buttons to send you an AC");
+                        player.getRepresentation(true, showFlavourText)
+                                + " sent everyone a ping in their private threads with buttons to send you an AC");
             }
             case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
         }
-        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, playerLeader.getId(), player.getNumberTurns());
+        TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER,
+                playerLeader.getId(), player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 }
