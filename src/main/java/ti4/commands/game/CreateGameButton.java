@@ -92,7 +92,8 @@ public class CreateGameButton extends GameSubcommandData {
             buttonMsg = "Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n";
             int counter = 1;
             for (Member member : members) {
-                buttonMsg = buttonMsg + counter + ":" + member.getId() + ".(" + member.getNickname().replace(":", "")
+                buttonMsg = buttonMsg + counter + ":" + member.getId() + ".("
+                        + member.getEffectiveName().replace(":", "")
                         + ")\n";
                 counter++;
             }
