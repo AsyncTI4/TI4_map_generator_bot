@@ -5500,7 +5500,7 @@ public class ButtonHelper {
                 "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
                 "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
         MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel);
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = gameRole.getAsMention() + " - bot/map channel\n" +
@@ -5539,9 +5539,16 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void offerPlayerSetupButtons(MessageChannel channel) {
+    public static void offerPlayerSetupButtons(MessageChannel channel, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
+
         buttons.add(Button.success("startPlayerSetup", "Setup a Player"));
+        for (Player player : activeGame.getPlayers().values()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                    player.getRepresentation()
+                            + "After setting up the map, you can use this button instead of /player setup if you wish",
+                    buttons);
+        }
         MessageHelper.sendMessageToChannelWithButtons(channel,
                 "After setting up the map, you can use this button instead of /player setup if you wish", buttons);
     }
