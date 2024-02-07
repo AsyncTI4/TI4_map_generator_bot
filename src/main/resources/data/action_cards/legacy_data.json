@@ -495,15 +495,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "sensor_jam",
-    "name": "Sensor Jam",
-    "phase": "Action",
-    "window": "At the start of a space combat",
-    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
-    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "custodian_support",
     "name": "Custodian Support",
     "phase": "Action",
@@ -518,6 +509,15 @@
     "phase": "Status",
     "window": "After the speaker reveals a public objective",
     "text": "Look at the top 2 cards of the corresponding public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
+    "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "corruption_acd2",
+    "name": "Corruption",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, draw 2 action cards. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
     "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
     "source": "action_deck_2"
   }

@@ -147,7 +147,7 @@
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
-    "window": "At the start of a round of space combat other than the first",
+    "window": "At the start of a round of space combat",
     "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
     "source": "action_deck_2"
@@ -159,15 +159,6 @@
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player who voted for the resolved outcome gain 2 trade goods.",
     "flavorText": "As he signed the last of the trade deals, Mot sank into his chair. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "corruption_acd2",
-    "name": "Corruption",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, draw 2 action cards. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
-    "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
     "source": "action_deck_2"
   },
   {
@@ -185,7 +176,7 @@
     "phase": "Action",
     "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
     "text": "Remove your command token from the active system.",
-    "flavorText": "The fury and majesty of G'hom Sek'kus and her Valkyrie broke the enemy. It was clear they were no match for such reckless hate.",
+    "flavorText": "The Letnev fleet had sliced through the blockade in an instant. Their survival was owed solely to T'ro's prudent decision to retreat.",
     "source": "action_deck_2"
   },
   {
@@ -508,7 +499,7 @@
     "name": "Proxy War",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "During this turn, until you activate another player's home system, treat all promissory notes and laws as blank.",
+    "text": "During this turn, until you activate another player's home system, players treat all promissory notes and laws as blank.",
     "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as an entire fleet of unmarked ships poured forth from the wormhole, raining destruction upon the unsuspecting convoy. Reports be damned, these were no mere pirates.",
     "source": "action_deck_2"
   },
@@ -594,12 +585,21 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "sensor_jam",
+    "name": "Sensor Jam",
+    "phase": "Action",
+    "window": "At the start of a round of space combat",
+    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "schematics_rider",
     "name": "Schematics Rider",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
-    "flavorText": "Berekar passionately discussed the Keleres' technological inferiority with Qanoj. Though he argue their inferiority presented a peril to the galaxy, in truth, of course, he could not care less.",
+    "flavorText": "R7-82's optic servo motors malfunctioned for a moment as the council discussed 'feeding' the Virus to satiate its hunger. These fools would doom them all.",
     "source": "action_deck_2"
   },
   {
@@ -607,7 +607,7 @@
     "name": "Short-lived Clone",
     "phase": "Any",
     "window": "At the start of your turn",
-    "text": "Choose 1 of your agents. At the end of your turn, ready that agent. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted.",
+    "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted. At the end of your turn, ready the chosen agent.",
     "flavorText": "Commandeering the genetic spinner for the task was arduous and the creature it produced quickly became unpredictable.",
     "source": "action_deck_2"
   },
