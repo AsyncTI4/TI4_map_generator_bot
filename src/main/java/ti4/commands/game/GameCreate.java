@@ -46,7 +46,7 @@ public class GameCreate extends GameSubcommandData {
         reportNewGameCreated(game);
         MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
         if (event.getMessageChannel().getName().startsWith(game.getName() + "-")) {
-            ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel());
+            ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
         }
     }
 
@@ -71,18 +71,23 @@ public class GameCreate extends GameSubcommandData {
     }
 
     public static void reportNewGameCreated(Game game) {
-        if (game == null) return;
-        
-        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-        if (bothelperLoungeChannel == null) return;
+        if (game == null)
+            return;
+
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true)
+                .stream().findFirst().orElse(null);
+        if (bothelperLoungeChannel == null)
+            return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels.isEmpty()) return;
+        if (threadChannels.isEmpty())
+            return;
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 String guildName = game.getGuild() == null ? "Server Unknown" : game.getGuild().getName();
-                MessageHelper.sendMessageToChannel(threadChannel_, "Game: **" + game.getName() + "** on server **" + guildName + "** has been created.");
+                MessageHelper.sendMessageToChannel(threadChannel_,
+                        "Game: **" + game.getName() + "** on server **" + guildName + "** has been created.");
                 break;
             }
         }
