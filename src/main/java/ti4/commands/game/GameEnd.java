@@ -197,6 +197,9 @@ public class GameEnd extends GameSubcommandData {
           }
           if (actionsChannel != null) {
             for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+              if(threadChannel.getName().contains("Cards Info")){
+                continue;
+              }
               threadChannel.getManager().setArchived(true).queue();
             }
           }
