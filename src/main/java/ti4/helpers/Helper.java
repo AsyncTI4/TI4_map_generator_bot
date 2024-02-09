@@ -230,14 +230,24 @@ public class Helper {
             counter++;
         }
     }
+    public static boolean canPlayerConceivablySabo(Player player, Game activeGame) {
+        if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
+            return true;
+        }
+        if (player.hasUnit("empyrean_mech")
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
+            return true;
+        }
+        if(player.getAc() > 0){
+            return true;
+        }
+
+        return false;
+    }
 
     public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID) {
-        if (player.getAutoSaboPassMedian() == 0) {
-            return false;
-        }
-        if (player.isAFK()) {
-            return false;
-        }
+        
+        
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return false;
         }
@@ -251,6 +261,15 @@ public class Helper {
         }
         if (player.hasUnit("empyrean_mech")
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
+            return false;
+        }
+        if(player.getAc() == 0){
+            return !ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame);
+        }
+        if (player.isAFK()) {
+            return false;
+        }
+        if (player.getAutoSaboPassMedian() == 0) {
             return false;
         }
         return !ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame);
@@ -425,7 +444,7 @@ public class Helper {
             int highNum = player.getAutoSaboPassMedian() * 6 * 3 / 2;
             int result = ThreadLocalRandom.current().nextInt(1, highNum + 1);
             boolean shouldDoIt = result == highNum;
-            if (shouldDoIt) {
+            if (shouldDoIt || !canPlayerConceivablySabo(player, activeGame)) {
                 for (String messageID : messageIDs) {
                     if (shouldPlayerLeaveAReact(player, activeGame, messageID)) {
                         String message = activeGame.isFoWMode() ? "No sabotage" : null;
