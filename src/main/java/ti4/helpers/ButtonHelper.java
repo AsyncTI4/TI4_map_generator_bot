@@ -112,6 +112,59 @@ import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
 
+    public static void offerEveryoneTitlePossibilities(Game activeGame){
+
+        for(Player player : activeGame.getRealPlayers()){
+            String msg = player.getRepresentation()+" you have the opportunity to anonymously bestow one title on someone else in this game. Titles are just for fun, and have no real significance, but could a nice way to take something away from this game. Feel free to not. If you choose to, its a 2 button process. First select the title, then the player you want to bestow it upon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("bestowTitleStep1_A Kind Soul","A Kind Soul"));
+            buttons.add(Button.success("bestowTitleStep1_A Worthy Opponent","A Worthy Opponent"));
+            buttons.add(Button.success("bestowTitleStep1_A Brilliant Tactician","A Brilliant Tactician"));
+            buttons.add(Button.success("bestowTitleStep1_A Master Diplomat","A Master Diplomat"));
+            buttons.add(Button.success("bestowTitleStep1_A Good Ally","A Good Ally"));
+            buttons.add(Button.success("bestowTitleStep1_A Sneaky One","A Sneaky One"));
+
+            buttons.add(Button.success("bestowTitleStep1_Lightning Fast","Lightning Fast"));
+            buttons.add(Button.success("bestowTitleStep1_Fortune Favored","Fortune Favored"));
+            buttons.add(Button.success("bestowTitleStep1_Possesses Cursed Dice","Possesses Cursed Dice"));
+            buttons.add(Button.success("bestowTitleStep1_Life Of The Table","Life Of The Table"));
+
+            buttons.add(Button.success("bestowTitleStep1_Fun To Be Around","Fun To Be Around"));
+            buttons.add(Button.success("bestowTitleStep1_Trustworthy To A Fault","Trustworthy To A Fault"));
+            buttons.add(Button.success("bestowTitleStep1_You Made The Game Better","You Made The Game Better"));
+            buttons.add(Button.success("bestowTitleStep1_You Made Me Mad","You Made Me Mad"));
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg, buttons);
+        }
+    }
+    public static void resolveBestowTitleStep1(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String title = buttonID.split("_")[1];
+        String msg = player.getRepresentation()+" choose the player you wish to give the title of "+title;
+            List<Button> buttons = new ArrayList<>();
+        for(Player player2 : activeGame.getRealPlayers()){
+            if(player2 == player){
+                continue;
+            }
+            buttons.add(Button.success("bestowTitleStep2_"+title+"_"+player2.getFaction(),player2.getFactionModel().getFactionName()));
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveBestowTitleStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String title = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        String msg = p2.getRepresentation()+" someone has chosen to give you the title of \'"+title+"\'";
+        String titles = activeGame.getFactionsThatReactedToThis("TitlesFor"+p2.getUserID());
+        if(titles.isEmpty()){
+            activeGame.setCurrentReacts("TitlesFor"+p2.getUserID(), title);
+        }else{
+            activeGame.setCurrentReacts("TitlesFor"+p2.getUserID(), titles+"_"+title);
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),"Successfully bestowed title");
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),msg);
+        event.getMessage().delete().queue();
+    }
+
     public static void pickACardFromDiscardStep1(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : activeGame.getDiscardActionCards().keySet()) {
@@ -5411,7 +5464,7 @@ public class ButtonHelper {
                 });
 
         int charValue = name.charAt(name.length() - 1);
-        String present = String.valueOf(charValue);
+        String present = name.substring(name.length() - 1, name.length());
         String next = String.valueOf((char) (charValue + 1));
         String newName = "";
         if (isNumeric(present)) {

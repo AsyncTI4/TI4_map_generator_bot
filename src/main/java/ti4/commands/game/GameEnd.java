@@ -28,6 +28,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.statistics.GameStatisticFilterer;
 import ti4.commands.statistics.GameStats;
 import ti4.generator.MapGenerator;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -209,6 +210,7 @@ public class GameEnd extends GameSubcommandData {
                   "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
             }
           }
+          
 
           // send game json file to s3
           File jsonGameFile = Storage.getMapsJSONStorage(activeGame.getName() + ".json");
@@ -217,6 +219,7 @@ public class GameEnd extends GameSubcommandData {
             WebHelper.putFile(activeGame.getName(), jsonGameFile);
           }
         });
+        ButtonHelper.offerEveryoneTitlePossibilities(activeGame);
   }
 
   public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
