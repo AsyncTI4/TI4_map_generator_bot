@@ -2336,6 +2336,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("bestowTitleStep1_")) {
+            ButtonHelper.resolveBestowTitleStep1(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("bestowTitleStep2_")) {
+            ButtonHelper.resolveBestowTitleStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("khraskHeroStep2_")) {
             ButtonHelperHeroes.resolveKhraskHeroStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("khraskHeroStep3Exhaust_")) {
