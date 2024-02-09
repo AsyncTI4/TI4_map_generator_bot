@@ -1177,7 +1177,7 @@ public class ButtonHelperFactionSpecific {
             }
             if (p2.hasTech("iihq")) {
                 String finChecker = "FFCC_" + p2.getFaction() + "_";
-                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
                 String trueIdentity = p2.getRepresentation(true, true);
                 String message = trueIdentity
                         + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
