@@ -921,6 +921,7 @@ public class Constants {
     public static final String ENDED_DATE = "ended_date";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
     public static final String DICE_LUCK = "dice_luck";
+    public static final String SPENDS = "spends";
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";
     public static final String MINIMUM_NUMBER_OF_EXPECTED_HITS = "minimum_number_of_expected_hits";

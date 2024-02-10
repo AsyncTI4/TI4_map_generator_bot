@@ -687,6 +687,19 @@ public class FoWHelper {
 		return false;
 	}
 
+	public static boolean playerHasFightersInAdjacentSystems(Player player, Tile tile, Game activeGame) {
+		String colorID = Mapper.getColorID(player.getColor());
+		if (colorID == null) return false; // player doesn't have a color
+		for(String pos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false)){
+			Tile tile2 = activeGame.getTileByPosition(pos);
+			UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
+			if(unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
 		String colorID = Mapper.getColorID(player.getColor());
 		if (colorID == null) return false; // player doesn't have a color

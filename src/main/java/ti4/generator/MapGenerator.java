@@ -559,6 +559,10 @@ public class MapGenerator {
                            graphics.drawString(""+(game.getSCList().size()+1), x + 90, y + 70 + yDelta);
                         }else{
                             graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                            if(getSCColor(sc, game).equals(Color.GRAY)){
+                                graphics.setColor(Color.RED);
+                                graphics.drawString("X", x + 90, y + 70 + yDelta);
+                            }
                         }
                     }
                 } else { // if (playerSCs.size() <= 4) {
@@ -2364,6 +2368,7 @@ public class MapGenerator {
                 point = PositionMapper.getPlayerStats(Constants.STATS_SC);
                 if (sc != 0) {
                     graphics.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
+                    
                 }
                 count++;
             }
