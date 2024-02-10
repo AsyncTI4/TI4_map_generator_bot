@@ -107,6 +107,7 @@ public class StatusCommand implements Command {
         subcommands.add(new ListTurnOrder());
         subcommands.add(new ListTurnStats());
         subcommands.add(new ListDiceLuck());
+        subcommands.add(new ListSpends());
         subcommands.add(new POInfo());
         return subcommands;
     }

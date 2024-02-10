@@ -1176,7 +1176,6 @@ public class ButtonHelperFactionSpecific {
                 continue;
             }
             if (p2.hasTech("iihq")) {
-                String finChecker = "FFCC_" + p2.getFaction() + "_";
                 List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
                 String trueIdentity = p2.getRepresentation(true, true);
                 String message = trueIdentity
