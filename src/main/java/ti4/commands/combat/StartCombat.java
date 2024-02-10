@@ -278,6 +278,12 @@ public class StartCombat extends CombatSubcommandData {
         if ((p1.hasAbility("ambush")) || p2.hasAbility("ambush")) {
             buttons.add(Button.secondary("rollForAmbush_" + tile.getPosition(), "Ambush").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
+
+        //mercenaries
+        Player florzen = Helper.getPlayerFromAbility(activeGame, "mercenaries");
+        if (florzen != null && FoWHelper.playerHasFightersInAdjacentSystems(florzen, tile,activeGame)) {
+            buttons.add(Button.secondary(florzen.getFinsFactionCheckerPrefix()+"mercenariesStep1_" + tile.getPosition(), "Mercenaries").withEmoji(Emoji.fromFormatted(Emojis.florzen)));
+        }
         return buttons;
     }
 

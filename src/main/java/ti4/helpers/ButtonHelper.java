@@ -8403,7 +8403,7 @@ public class ButtonHelper {
             String message = player.getRepresentation(true, true) + " select planet you wish to use greyfire on";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
         }
-        if ("dspnlizh".equalsIgnoreCase(id)) {
+        if ("dspnlizh".equalsIgnoreCase(id) || "dspnchei".equalsIgnoreCase(id)) {
             new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTileByPosition(activeGame.getActiveSystem()), "2 ff", activeGame);
             String message = player.getRepresentation(true, true) + " added 2 ff to the active system";

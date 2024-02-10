@@ -562,6 +562,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.resolveAxisOrderBuy(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("bindingDebtsRes_")) {
             ButtonHelperAbilities.bindingDebtRes(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("mercenariesStep1_")) {
+            ButtonHelperAbilities.mercenariesStep1(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("mercenariesStep2_")) {
+            ButtonHelperAbilities.mercenariesStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("mercenariesStep3_")) {
+            ButtonHelperAbilities.mercenariesStep3(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("mercenariesStep4_")) {
+            ButtonHelperAbilities.mercenariesStep4(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("naaluCommander")) {
             new NaaluCommander().secondHalfOfNaaluCommander(event, activeGame, player);
         } else if (buttonID.startsWith("mahactMechHit_")) {

@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 public class DiceLuck extends StatisticsSubcommandData {
 
     public DiceLuck() {
-        super(Constants.DICE_LUCK, "Average dice luck as recorded by the bot");
+        super(Constants.DICE_LUCK, "Dice luck as recorded by the bot");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, "Minimum number of expected hits to show (Default = 10)").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
@@ -101,7 +101,7 @@ public class DiceLuck extends StatisticsSubcommandData {
             sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
             sb.append(String.format("%.2f", averageDiceLuck));
             sb.append("` ").append(user.getEffectiveName());
-            sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" average/expected]");
+            sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
             sb.append("\n");
             index.getAndIncrement();
         });

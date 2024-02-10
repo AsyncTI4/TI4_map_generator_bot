@@ -42,6 +42,70 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
+    public static void mercenariesStep1(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
+        String pos2 = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos2);
+        List<Button> buttons = new ArrayList<>();
+        for(String pos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false)){
+			Tile tile2 = activeGame.getTileByPosition(pos);
+			UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
+			if(unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0){
+				buttons.add(Button.success("mercenariesStep2_"+pos2+"_"+pos, tile2.getRepresentationForButtons(activeGame,player)));
+			}
+		}
+        String msg = player.getRepresentation()+" choose the tile you wish to pull fighters from";
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg, buttons);
+    }
+    public static void mercenariesStep2(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
+        String pos2 = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos2);
+        String pos = buttonID.split("_")[2];
+        Tile tile2 = activeGame.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+		buttons.add(Button.success("mercenariesStep3_"+pos2+"_"+pos+"_1", "1 fighter"));
+        if(tile2.getUnitHolders().get("space").getUnitCount(UnitType.Fighter, player.getColor()) > 1){
+            buttons.add(Button.success("mercenariesStep3_"+pos2+"_"+pos+"_2", "2 fighters"));
+        }
+        String msg = player.getRepresentation()+" choose whether to pull 1 or 2 fighters";
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg, buttons);
+    }
+    public static void mercenariesStep3(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
+        String pos2 = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos2);
+        String pos = buttonID.split("_")[2];
+        Tile tile2 = activeGame.getTileByPosition(pos);
+        String fighters = buttonID.split("_")[3];
+        List<Button> buttons = new ArrayList<>();
+		for(Player p2 : activeGame.getRealPlayers()){
+            if(FoWHelper.playerHasShipsInSystem(p2, tile)){
+                if(activeGame.isFoWMode()){
+                    buttons.add(Button.success("mercenariesStep4_"+pos2+"_"+pos+"_"+fighters+"_"+p2.getFaction(), StringUtils.capitalize(p2.getColor())));
+                }else{
+                    buttons.add(Button.success("mercenariesStep4_"+pos2+"_"+pos+"_"+fighters+"_"+p2.getFaction(), p2.getFactionModel().getFactionName()));
+                }
+            }
+        }
+        String msg = player.getRepresentation()+" choose which player to give the fighters too";
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg, buttons);
+    }
+    public static void mercenariesStep4(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
+        String pos2 = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos2);
+        String pos = buttonID.split("_")[2];
+        Tile tile2 = activeGame.getTileByPosition(pos);
+        String fighters = buttonID.split("_")[3];
+		String faction = buttonID.split("_")[4];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile2, fighters +" fighters", activeGame);
+        new AddUnits().unitParsing(event, p2.getColor(), tile2, fighters +" fighters", activeGame);
+        String msg = player.getRepresentation()+" used the mercenaries ability and transferred "+fighters+" fighter(s) from "+tile2.getRepresentationForButtons(activeGame,player)+" to "+tile.getRepresentationForButtons(activeGame,player) +" and gave them to "+ButtonHelper.getIdentOrColor(p2, activeGame);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg);
+    }
+
     public static void bindingDebtRes(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
         event.getMessage().delete().queue();
         Player vaden = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
