@@ -567,8 +567,9 @@ public class MapGenerator {
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setFont(Storage.getFont40());
                                 graphics.setColor(Color.RED);
-                                graphics.drawString("X", x + 90, y + 70 + yDelta);
+                                graphics.drawString("X", x + 100, y + 60 + yDelta);
                             }
+                            
                         }
                     }
                 } else { // if (playerSCs.size() <= 4) {

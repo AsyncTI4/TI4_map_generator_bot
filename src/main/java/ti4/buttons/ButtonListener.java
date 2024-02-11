@@ -93,6 +93,7 @@ import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
@@ -570,6 +571,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.mercenariesStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("mercenariesStep4_")) {
             ButtonHelperAbilities.mercenariesStep4(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("rallyToTheCauseStep2_")) {
+            ButtonHelperAbilities.rallyToTheCauseStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("startRallyToTheCause")) {
+            ButtonHelperAbilities.startRallyToTheCause(activeGame, player, event);
         } else if (buttonID.startsWith("naaluCommander")) {
             new NaaluCommander().secondHalfOfNaaluCommander(event, activeGame, player);
         } else if (buttonID.startsWith("mahactMechHit_")) {
@@ -1473,6 +1478,7 @@ public class ButtonListener extends ListenerAdapter {
                             absolPAButtons.addAll(planetButtons);
                         }
                     }
+                    ButtonHelper.deleteTheOneButton(event);
                     MessageHelper
                             .sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation(true, true)
@@ -2019,8 +2025,9 @@ public class ButtonListener extends ListenerAdapter {
 
                 ActionCardModel ac = Mapper.getActionCard(acStringID);
                 if (ac != null) {
-                    MessageHelper.sendMessageToChannel(yssaril.getCardsInfoThread(),
-                            "For your reference, the text of the AC offered reads as follows: \n" + ac.getText());
+                    MessageHelper.sendMessageToChannelWithEmbed(
+                        yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as", ac.getRepresentationEmbed());
+                    
                 }
 
             }
@@ -2980,8 +2987,25 @@ public class ButtonListener extends ListenerAdapter {
                     if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
                         ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
                     }
+                    
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
+                    if(player.hasTech("absol_aida")){
+                        String msg = player.getRepresentation()+" since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                        if (!player.hasAbility("propagation")) {
+                            activeGame.setComponentAction(true);
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                                    player.getRepresentation(true, true) + " you can use the button to get your tech",
+                                    List.of(Buttons.GET_A_TECH));
+                        } else {
+                            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
+                                    + ". Use buttons to gain CCs";
+                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                            activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                        }
+                    }
                     TurnEnd.pingNextPlayer(event, activeGame, player, true);
                     event.getMessage().delete().queue();
                     ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round "
@@ -2999,8 +3023,8 @@ public class ButtonListener extends ListenerAdapter {
                     // event.getMessage().delete().queue();
                 }
                 case "forceACertainScoringOrder" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Players will be forced to score in order");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
+                            "vPlayers will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
                     activeGame.setCurrentReacts("forcedScoringOrder", "true");
                     event.getMessage().delete().queue();
                 }
@@ -4734,7 +4758,12 @@ public class ButtonListener extends ListenerAdapter {
         if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
                 || "Done Producing Units".equalsIgnoreCase(buttonLabel))
                 && !event.getMessage().getContentRaw().contains("Click the names of the planets you wish")) {
-
+            Tile tile = null;
+            if("Done Producing Units".equalsIgnoreCase(buttonLabel) && buttonID.contains("_")){
+                String pos = buttonID.split("_")[1];
+                buttonID = buttonID.split("_")[0];
+                tile = activeGame.getTileByPosition(pos);
+            }
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
 
@@ -4821,6 +4850,14 @@ public class ButtonListener extends ListenerAdapter {
                         "Result of build on turn " + player.getTurnCount() + " for " + ButtonHelper.getIdent(player));
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                if(tile != null && player.hasAbility("rally_to_the_cause") && FoWHelper.getPlayerHS(activeGame, player) == tile && ButtonHelperAbilities.getTilesToRallyToTheCause(activeGame, player).size() > 0){
+                    String msg = player.getRepresentation()+" due to your rally to the cause ability, if you just produced a ship in your HS, you can produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units. Press button to resolve";
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Button.success("startRallyToTheCause","Rally To The Cause"));
+                    buttons2.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),msg,buttons2);
+
+                }
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
