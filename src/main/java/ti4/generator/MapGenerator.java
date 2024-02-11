@@ -563,6 +563,7 @@ public class MapGenerator {
                                 graphics.setColor(Color.RED);
                                 graphics.drawString("X", x + 90, y + 70 + yDelta);
                             }
+                            
                         }
                     }
                 } else { // if (playerSCs.size() <= 4) {

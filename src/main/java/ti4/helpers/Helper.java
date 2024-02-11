@@ -1701,16 +1701,18 @@ public class Helper {
         }
         String factionColor = AliasHandler.resolveColor(color.toLowerCase());
         factionColor = AliasHandler.resolveFaction(factionColor);
-        for (Player player_ : activeGame.getPlayers().values()) {
-            if (Objects.equals(factionColor, player_.getFaction())
-                    || Objects.equals(factionColor, player_.getColor())) {
+        Player player = activeGame.getPlayerFromColorOrFaction(factionColor);
+        if(player == null){
+            return 0;
+        }
+        for (Player player_ : activeGame.getRealPlayers()) {
+            if (player == player_) {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
-                break;
-            } else if ("mahact".equals(player_.getFaction())) {
+            } else if (player_.hasAbility("imperia") || player_.hasAbility("edict")) {
                 for (String color_ : player_.getMahactCC()) {
-                    if (factionColor.equals(color_)) {
+                    if (player.getColor().equalsIgnoreCase(color_)) {
                         ccCount++;
                     }
                 }
