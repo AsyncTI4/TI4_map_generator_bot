@@ -42,6 +42,37 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
+    public static void startRallyToTheCause(Game activeGame, Player player, ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Choose the tile to produce up to 2 ships in", getTilesToRallyToTheCause(activeGame, player));
+    }
+    public static void rallyToTheCauseStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String pos = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+        String type = "sling";
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
+        "placeOneNDone_dontskip");
+        String message = player.getRepresentation() + " Use the buttons to produce the first of potentially 2 ships. "
+                + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+        String message2 = player.getRepresentation() + " Use the buttons to produce the second of potentially 2 ships. "
+        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getTilesToRallyToTheCause(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, activeGame) || ButtonHelper.isTileHomeSystem(tile) || ButtonHelper.isTileLegendary(tile, activeGame) || tile.getTileID().equals("18")){
+                continue;
+            }
+            buttons.add(Button.success("rallyToTheCauseStep2_"+tile.getPosition(),tile.getRepresentationForButtons(activeGame, player)));
+            
+        }
+        return buttons;
+    }
+
     public static void mercenariesStep1(Game activeGame, Player player,  ButtonInteractionEvent event, String buttonID){
         String pos2 = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos2);
