@@ -554,12 +554,18 @@ public class MapGenerator {
                         graphics.setFont(Storage.getFont32());
                         graphics.setColor(Color.WHITE);
                         graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
+                        if (getSCColor(sc, game).equals(Color.GRAY)) {
+                            graphics.setFont(Storage.getFont24());
+                            graphics.setColor(Color.RED);
+                            graphics.drawString("X", x + 120, y + 80 + yDelta);
+                        }
                     } else {
-                        if(sc == ButtonHelper.getKyroHeroSC(game)){
-                           graphics.drawString(""+(game.getSCList().size()+1), x + 90, y + 70 + yDelta);
-                        }else{
+                        if (sc == ButtonHelper.getKyroHeroSC(game)) {
+                            graphics.drawString("" + (game.getSCList().size() + 1), x + 90, y + 70 + yDelta);
+                        } else {
                             graphics.drawString(scText, x + 90, y + 70 + yDelta);
-                            if(getSCColor(sc, game).equals(Color.GRAY)){
+                            if (getSCColor(sc, game).equals(Color.GRAY)) {
+                                graphics.setFont(Storage.getFont40());
                                 graphics.setColor(Color.RED);
                                 graphics.drawString("X", x + 90, y + 70 + yDelta);
                             }
@@ -590,20 +596,29 @@ public class MapGenerator {
                         }
                         graphics.setColor(getSCColor(sc, game));
 
-                        if (scText.contains("0/")) {
+                        if (scText.contains("0/") && count == 1) {
                             graphics.setFont(Storage.getFont64());
                             graphics.drawString("0", x + 90, y + 70 + yDelta);
                             graphics.setFont(Storage.getFont32());
                             graphics.setColor(Color.WHITE);
                             graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
+                        }
+
+                        if (sc == ButtonHelper.getKyroHeroSC(game)) {
+                            String kyroScNum = "" + (game.getSCList().size() + 1);
+                            drawCenteredString(graphics, kyroScNum, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                            if (getSCColor(sc, game).equals(Color.GRAY)) {
+                                graphics.setColor(Color.RED);
+                                drawCenteredString(graphics, "X", new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont24());
+                            }
                         } else {
-                            if(sc == ButtonHelper.getKyroHeroSC(game)){
-                                drawCenteredString(graphics, (game.getSCList().size()+1)+"", new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
-                            }else{
-                                drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                            drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                            if (getSCColor(sc, game).equals(Color.GRAY)) {
+                                graphics.setColor(Color.RED);
+                                drawCenteredString(graphics, "X", new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont24());
                             }
                         }
-                        
+
                         count++;
                     }
                 }
@@ -1244,9 +1259,11 @@ public class MapGenerator {
                     if (remainingReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
                         String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID));
                         if (game.isFoWMode()) {
-                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage, ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
+                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage,
+                                ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
                         } else {
-                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), warningMessage,  ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
+                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), warningMessage,
+                                ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
                         }
                     }
                 }
@@ -1272,7 +1289,7 @@ public class MapGenerator {
                     }
                 }
             }
-            if (-5 <= remainingReinforcements){
+            if (-5 <= remainingReinforcements) {
                 paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
             }
         }
@@ -2369,7 +2386,7 @@ public class MapGenerator {
                 point = PositionMapper.getPlayerStats(Constants.STATS_SC);
                 if (sc != 0) {
                     graphics.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
-                    
+
                 }
                 count++;
             }
@@ -3499,7 +3516,7 @@ public class MapGenerator {
                     if (unitKey.getUnitType() == UnitType.TyrantsLament) {
                         unitPath = unitPath.replace("tyrantslament", "fs");
                         String name = "TyrantNew.png";
-                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
                         //spoopy = ImageHelper.read(spoopyPath);
                     }
                     if (unitKey.getUnitType() == UnitType.Lady) {
@@ -3508,15 +3525,15 @@ public class MapGenerator {
                     if (unitKey.getUnitType() == UnitType.Cavalry) {
                         unitPath = unitPath.replace("cavalry", "fs");
                         String name = "Memoria_1.png";
-                        if(game.getPNOwner("cavalry") != null && game.getPNOwner("cavalry").hasTech("m2")){
+                        if (game.getPNOwner("cavalry") != null && game.getPNOwner("cavalry").hasTech("m2")) {
                             name = "Memoria_2.png";
                         }
-                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);   
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
                     }
                     if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
                         unitPath = unitPath.replace("plenaryorbital", "sd");
                         String name = "PlenaryNew.png";
-                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name); 
+                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
                     }
                 }
 
@@ -3698,7 +3715,7 @@ public class MapGenerator {
     private static Point getUnitTagLocation(String unitID) {
         return switch (unitID) {
             case "ws" -> new Point(-10, 45); //War Sun
-            case "fs", "lord", "lady", "tyrantslament","cavalry" -> new Point(10, 55); //Flagship
+            case "fs", "lord", "lady", "tyrantslament", "cavalry" -> new Point(10, 55); //Flagship
             case "dn" -> new Point(10, 50); //Dreadnought
             case "ca" -> new Point(0, 40); //Cruiser
             case "cv" -> new Point(0, 40); //Carrier
