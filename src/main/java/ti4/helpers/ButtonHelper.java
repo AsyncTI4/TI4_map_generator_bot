@@ -813,6 +813,9 @@ public class ButtonHelper {
                 }
             }
         }
+        if(tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")){
+            return true;
+        }
 
         return player.getTechs().contains("mr") && tile.getTileModel().isSupernova();
     }
@@ -2743,6 +2746,7 @@ public class ButtonHelper {
             exhaustedMessage = "Updated";
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
+        int buttons = 0;
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
@@ -2750,11 +2754,16 @@ public class ButtonHelper {
                 buttonRow.remove(buttonIndex);
             }
             if (buttonRow.size() > 0) {
+                buttons = buttons + buttonRow.size();
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
         if (actionRow2.size() > 0) {
-            event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+            if(exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1){
+                event.getMessage().delete().queue();
+            }else{
+                event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+            }
         } else {
             event.getMessage().delete().queue();
         }
@@ -3157,6 +3166,12 @@ public class ButtonHelper {
         if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
             if (player.getLeaderIDs().contains("letnevcommander") && !player.hasLeaderUnlocked("letnevcommander")) {
                 commanderUnlockCheck(player, activeGame, "letnev", event);
+            }
+        }
+        if(player.hasAbility("flotilla")){
+            int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
+            if(numInf > ((numOfCapitalShips+tile.getUnitHolders().get("space").getUnitCount(UnitType.Destroyer, player.getColor()))/2)   ){
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),player.getRepresentation()+" reminder that your flotilla ability says you cant have more infantry than non-fighter ships in the space area of a system. You seem to be violating this in "+tile.getRepresentationForButtons(activeGame, player));
             }
         }
         String message = player.getRepresentation(true, true);
@@ -3719,6 +3734,26 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
                 new ExpFrontier().expFront(event, tile, activeGame, player);
+            }
+
+            if(player.hasAbility("migrant_fleet")){
+                String msg3 = player.getRepresentation()+" after you resolve the frontier explore, you can use your migrant explorers ability to explore a planet you control in an adjacent system";
+                List<Button> buttons = new ArrayList<>();
+                for(String pos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false)){
+                    Tile tile2 = activeGame.getTileByPosition(pos);
+                    for(UnitHolder uH : tile2.getPlanetUnitHolders()){
+                        Planet planetReal = (Planet) uH;
+                        String planet = planetReal.getName();
+                        if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)) {
+                            List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
+                            buttons.addAll(planetButtons);
+                        }
+                        
+                    }
+                }
+                if(buttons.size() > 0){
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg3, buttons);
+                }
             }
 
         }

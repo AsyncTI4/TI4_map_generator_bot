@@ -1556,7 +1556,7 @@ public class Helper {
             }
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
-            Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff, "Done Producing Units");
+            Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff+"_"+tile.getPosition(), "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
             unitButtons.add(Button.secondary("resetProducedThings", "Reset Build"));
         }
