@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import org.jetbrains.annotations.Nullable;
 import javax.imageio.ImageIO;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.message.BotLogger;
 
@@ -146,7 +146,7 @@ public class ImageHelper {
     try {
       return ImageIO.read(new File(filePath));
     } catch (IOException e) {
-      BotLogger.log("Failed to read image: " + Arrays.toString(e.getStackTrace()));
+      BotLogger.log("Failed to read image '" + filePath + "': " + Arrays.toString(e.getStackTrace()));
     }
     return null;
   }
@@ -166,7 +166,7 @@ public class ImageHelper {
     try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
       return readImage(inputStream);
     } catch (IOException e) {
-      BotLogger.log("Failed to read image URL: " + Arrays.toString(e.getStackTrace()));
+      BotLogger.log("Failed to read image URL'" + imageURL + "': " + Arrays.toString(e.getStackTrace()));
     }
     return null;
   }

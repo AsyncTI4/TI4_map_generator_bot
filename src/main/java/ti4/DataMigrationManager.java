@@ -66,7 +66,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
-            runMigration("migrateInitializeACD2_1", DataMigrationManager::migrateInitializeACD2_1);
+            //runMigration("migrateInitializeACD2_1", DataMigrationManager::migrateInitializeACD2_1); //name is formatted improperly and throwing errors
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
