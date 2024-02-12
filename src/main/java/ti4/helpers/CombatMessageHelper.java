@@ -172,6 +172,8 @@ public class CombatMessageHelper {
                 combatTypeName=combatTypeName+" (Thalnos Reroll for Combat Round #"+round+")";
             }else{
                 combatTypeName=combatTypeName+" (Combat Round #"+round+")";
+                activeGame.setCurrentReacts("solagent","");
+                activeGame.setCurrentReacts("letnevagent", "");
             }
         }
         return String.format("**%s** rolls for %s on %s %s:  \n",

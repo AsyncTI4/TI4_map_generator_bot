@@ -852,6 +852,42 @@ public class ButtonHelper {
                                 + " you can use mirveda agent to spend a CC and research a tech of the same color as a prereq of the tech you just got",
                         buttons);
             }
+            if(player.hasAbility("obsessive_designs") && paymentRequired && activeGame.getCurrentPhase().equalsIgnoreCase("action")){
+                String msg = player.getRepresentation()+" due to your obsessive designs ability, you can use your space dock at home PRODUCTION ability to build units of the type you just upgraded, reducing the total cost by 2. ";
+                String generalMsg = ButtonHelper.getIdentOrColor(player, activeGame)+" has an opportunity to use their obsessive designs ability to build "+techM.getName()+" at home";
+                List<Button> buttons;
+                Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+                if (player.hasAbility("mobile_command") && ButtonHelper
+                        .getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0) {
+                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship)
+                            .get(0);
+                }
+                if (tile == null) {
+                    tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
+                }
+                if (tile == null) {
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                            "Could not find a HS, sorry bro");
+                }
+                buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "obsessivedesigns", "place");
+                int val = Helper.getProductionValue(player, activeGame, tile, true);
+                String message2 = msg
+                        + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame) + "\n"
+                        + "The bot believes you have " + val + " PRODUCTION value in this system";
+                if (val > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                    message2 = message2
+                            + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit";
+                }
+                if (val > 0 && ButtonHelper.isPlayerElected(activeGame, player, "prophecy")) {
+                    message2 = message2
+                            + "Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated";
+                }
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), generalMsg);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units",
+                        buttons);
+                    
+            }
         }
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
@@ -869,6 +905,23 @@ public class ButtonHelper {
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, activeGame);
         if ("iihq".equalsIgnoreCase(techID)) {
             message.append("\n Automatically added the Custodia Vigilia planet");
+        }
+        if ("cm".equalsIgnoreCase(techID) && activeGame.getActivePlayerID() != null && activeGame.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+            if (!activeGame.isFoWMode()) {
+                try {
+                    if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
+                        activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
+                        activeGame.setLatestTransactionMsg("");
+                    }
+                } catch (Exception e) {
+                    //  Block of code to handle errors
+                }
+            }
+            String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
+            String buttonText = "Use buttons to do your turn. ";
+            List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), buttonText, buttons);
         }
         if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
             commanderUnlockCheck(player, activeGame, "jolnar", event);
@@ -3341,7 +3394,8 @@ public class ButtonHelper {
             endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Silence Ability"));
         }
         planet = "tarrock";
-        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet) && Helper
+        .getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
             endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Tarrock Ability"));
         }
         planet = "prism";
@@ -3623,6 +3677,25 @@ public class ButtonHelper {
                             player.getRepresentation(true, true)
                                     + " Due to the reclamation ability, A pds and SD have been added to Mecatol Rex. This is optional though.");
                 }
+            }
+        }
+        if(player.hasAbility("secret_maps")){
+            String msg = player.getRepresentation()+" you can use your secret maps ability to explore a planet with production that you did not explore this turn";
+            List<Button> buttons = new ArrayList<>();
+            for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
+                if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                    continue;
+                }
+                Planet planetReal = (Planet) planetUnit;
+                String planet = planetReal.getName();
+                if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
+                        && Helper.getProductionValueOfUnitHolder(player, activeGame, tile, planetUnit) > 0 && !activeGame.getFactionsThatReactedToThis(player.getFaction()+"planetsExplored").contains(planetUnit.getName()+"*")) {
+                    List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
+                    buttons.addAll(planetButtons);
+                }
+            }
+            if(buttons.size() > 0){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
             }
         }
         if (player.hasUnit("winnu_mech")) {

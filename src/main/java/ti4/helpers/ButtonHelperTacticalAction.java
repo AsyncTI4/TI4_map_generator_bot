@@ -347,7 +347,7 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false) > 0
                 && ButtonHelper.isPlayerElected(activeGame, player, "prophecy")) {
             message3 = message3
-                    + ". Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated\n";
+                    + "Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
                 message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
