@@ -109,7 +109,7 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append(emojiToUse).append(Emojis.PN).append("**").append(pnName).append("**\n");
 
         if ("dspnkoll".equalsIgnoreCase(pnID)) {
-            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame);
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame, player);
         }
 
         //Fog of war ping

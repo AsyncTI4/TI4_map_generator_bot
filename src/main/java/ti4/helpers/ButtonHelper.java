@@ -2392,12 +2392,14 @@ public class ButtonHelper {
             case "winnu" -> shouldBeUnlocked = true;
             case "naalu" -> {
                 Tile rex = activeGame.getTileFromPlanet("mr");
-                for (String tilePos : FoWHelper.getAdjacentTiles(activeGame, rex.getPosition(), player, false)) {
-                    Tile tile = activeGame.getTileByPosition(tilePos);
-                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                        if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
-                                || unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
-                            shouldBeUnlocked = true;
+                if(rex != null){
+                    for (String tilePos : FoWHelper.getAdjacentTiles(activeGame, rex.getPosition(), player, false)) {
+                        Tile tile = activeGame.getTileByPosition(tilePos);
+                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                            if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
+                                    || unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                                shouldBeUnlocked = true;
+                            }
                         }
                     }
                 }
@@ -8613,7 +8615,7 @@ public class ButtonHelper {
                     Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, owner));
         }
         if (("dspnkoll".equalsIgnoreCase(id))) {
-            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame);
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame, player);
         }
         if (id.contains("rider")) {
             String riderName = "Keleres Rider";
