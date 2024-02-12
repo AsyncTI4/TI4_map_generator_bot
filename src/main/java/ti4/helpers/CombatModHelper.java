@@ -257,6 +257,16 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "solagent" -> {
+                if (game.getFactionsThatReactedToThis("solagent").contains(player.getFaction())) {
+                    meetsCondition = true;
+                }
+            }
+            case "letnevagent" -> {
+                if (game.getFactionsThatReactedToThis("letnevagent").contains(player.getFaction())) {
+                    meetsCondition = true;
+                }
+            }
             case "thalnosPlusOne" -> {
                 if (game.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")) {
                     meetsCondition = true;

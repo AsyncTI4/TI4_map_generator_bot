@@ -216,6 +216,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         if(!hadAnyUnplayedSCs){
             buttons.add(Button.danger("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
         }
+        buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nYou can use these buttons to do various things", buttons);
     }
