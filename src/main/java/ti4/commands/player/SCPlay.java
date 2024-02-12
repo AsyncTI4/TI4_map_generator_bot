@@ -121,7 +121,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Indicate your choice by pressing a button below and post additional details in the thread.";
+        message += "Indicate your choice by pressing a button below";
 
         String scName = Helper.getSCName(scToPlay, activeGame).toLowerCase();
         if (winnuHero) {
