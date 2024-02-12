@@ -305,6 +305,38 @@
         ]
     },
     {
+        "alias": "letnev_agent",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "letnevagent",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Letnev Agent gives +1 die to best ship"
+            }
+        ]
+    },
+    {
+        "alias": "sol_agent",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "solagent",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Letnev Agent gives +1 die to best ship"
+            }
+        ]
+    },
+    {
         "alias": "plus1_thalnos",
         "type": "mods",
         "value": "+1",

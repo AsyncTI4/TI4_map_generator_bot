@@ -1128,6 +1128,19 @@ public class ButtonHelperAbilities {
         }
         return buttons;
     }
+    public static void resolveMoult(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        ButtonHelper.deleteTheOneButton(event);
+        String pos = buttonID.split("_")[1];
+        String generalMsg = player.getFactionEmoji()+" is resolving moult (after winning the space combat) to build 1 ship, reducing the cost by 1 for each of their non-fighter ships destroyed in the combat";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), generalMsg);
+        String type = "sling";
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
+        "placeOneNDone_dontskip");
+        String message = player.getRepresentation() + " Use the buttons to produce a ship. "
+                + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+
+    }
     public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         String planet = buttonID.split("_")[1];
         String amount = "1";

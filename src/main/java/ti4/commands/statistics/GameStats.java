@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -65,6 +68,7 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
+            case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
@@ -89,6 +93,7 @@ public class GameStats extends StatisticsSubcommandData {
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
         FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        UNFINISHED_GAMES("Unfinisheed games", "Show the games where at least 1 pt was scored but no winner was declared"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
         SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"),
         GAME_COUNT("Total game count", "Shows the total game count");
@@ -147,6 +152,69 @@ public class GameStats extends StatisticsSubcommandData {
             names.append(num).append(". ").append(game.getName());
             if (isNotBlank(game.getCustomName())) {
                 names.append(" (").append(game.getCustomName()).append(")");
+            }
+            names.append("\n");
+        }
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
+    }
+
+    public static boolean hasPlayerFinishedAGame(Player player){
+        
+        String userID = player.getUserID();
+
+        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
+        Predicate<Game> endedGamesFilter = game ->  game.getWinner().isPresent();
+        Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
+
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
+        if(games.size() > 0){
+            return true;
+        }
+
+        return false;
+    }
+    public static int numberOfPlayersUnfinishedGames(String userID){
+
+        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
+        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && !game.getWinner().isPresent() && game.getHighestScore() > 0;
+        Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
+
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
+        return games.size();
+    }
+
+    public static void findHowManyUnfinishedGamesAreDueToNewPlayers(SlashCommandInteractionEvent event) {
+        StringBuilder names = new StringBuilder();
+        int num = 0;
+        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && !game.getWinner().isPresent() && game.getHighestScore() > 0;
+        Predicate<Game> allFilterPredicates = endedGamesFilter;
+
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
+        for (Game game : games) {
+            num++;
+            names.append(num).append(". ").append(game.getName());
+            if (isNotBlank(game.getCustomName())) {
+                names.append(" (").append(game.getCustomName()).append(")");
+            }
+            for(Player player : game.getRealPlayers()){
+                if(!hasPlayerFinishedAGame(player)){
+                    names.append(" "+player.getUserName() +" had not finished any games and had "+ numberOfPlayersUnfinishedGames(player.getUserID()) + " unfinished games. ");
+                }
             }
             names.append("\n");
         }

@@ -668,6 +668,18 @@ public class ButtonHelperAgents {
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             resolveOlradinAgentStep2(activeGame, p2);
         }
+        if ("solagent".equalsIgnoreCase(agent)) {
+            String faction = rest.split("_")[1];
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),ButtonHelper.getIdentOrColor(p2, activeGame) + " will receive Sol agent on their next roll");
+            activeGame.setCurrentReacts("solagent",p2.getFaction());
+        }
+        if ("letnevagent".equalsIgnoreCase(agent)) {
+            String faction = rest.split("_")[1];
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),ButtonHelper.getIdentOrColor(p2, activeGame) + " will receive Letnev agent on their next roll");
+            activeGame.setCurrentReacts("letnevagent",p2.getFaction());
+        }
 
         if ("cymiaeagent".equalsIgnoreCase(agent)) {
             String faction = rest.split("_")[1];

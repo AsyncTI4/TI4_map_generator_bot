@@ -178,6 +178,8 @@ public class StartCombat extends CombatSubcommandData {
         if (isSpaceCombat) {
             sendStartOfSpaceCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile);
         }
+        activeGame.setCurrentReacts("solagent","");
+        activeGame.setCurrentReacts("letnevagent", "");
 
         // AFB
         sendAFBButtonsToThread(event, threadChannel, activeGame, ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
@@ -264,7 +266,7 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.primary("assCannonNDihmohn_ds_" + tile.getPosition(), "Use Dimensional Splicer").withEmoji(Emoji.fromFormatted(Emojis.Ghost)));
         }
 
-        if((p1.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(p1, activeGame).size() > 1)||(p2.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(p1, activeGame).size() > 1)){
+        if((p1.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(p1, activeGame).size() > 1)||(p2.hasAbility("shroud_of_lith") && ButtonHelperFactionSpecific.getKolleccReleaseButtons(p2, activeGame).size() > 1)){
             buttons.add(Button.primary("shroudOfLithStart", "Use Shroud of Lith").withEmoji(Emoji.fromFormatted(Emojis.kollecc)));
         }
 
@@ -353,7 +355,7 @@ public class StartCombat extends CombatSubcommandData {
         Player sol = Helper.getPlayerFromUnlockedLeader(activeGame, "solagent");
         if (!activeGame.isFoWMode() && sol != null && sol.hasUnexhaustedLeader("solagent") && isGroundCombat) {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_solagent", "Sol Agent").withEmoji(Emoji.fromFormatted(Emojis.Sol)));
+            buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent", "Sol Agent").withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
 
         Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "kyroagent");
@@ -365,7 +367,7 @@ public class StartCombat extends CombatSubcommandData {
         Player letnev = Helper.getPlayerFromUnlockedLeader(activeGame, "letnevagent");
         if ((!activeGame.isFoWMode() || letnev == p1) && letnev != null && letnev.hasUnexhaustedLeader("letnevagent") && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + letnev.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_letnevagent", "Letnev Agent").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
+            buttons.add(Button.secondary(finChecker + "getAgentSelection_letnevagent", "Letnev Agent").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
         Player nomad = Helper.getPlayerFromUnlockedLeader(activeGame, "nomadagentthundarian");
@@ -387,6 +389,15 @@ public class StartCombat extends CombatSubcommandData {
         if (p2.hasAbility("technological_singularity") && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
+        }
+
+        if (p1.hasAbility("moult") && p1 != activeGame.getActivePlayer() && "space".equalsIgnoreCase(groundOrSpace)) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+        if (p2.hasAbility("moult") && !activeGame.isFoWMode() && p2 != activeGame.getActivePlayer() && "space".equalsIgnoreCase(groundOrSpace)) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
         }
 
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !activeGame.isFoWMode() && isGroundCombat && p1.getFragments().size() > 0) {

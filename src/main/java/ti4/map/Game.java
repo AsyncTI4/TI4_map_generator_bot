@@ -1669,6 +1669,16 @@ public class Game {
         return revealedPublicObjectives.get(poName);
     }
 
+    public int getHighestScore(){
+        int most = 0;
+        for (Player p : getRealPlayers()) {
+            if (p.getTotalVictoryPoints() > most) {
+                most = p.getTotalVictoryPoints();
+            }
+        }
+        return most;
+    }
+
     public boolean removeCustomPO(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
