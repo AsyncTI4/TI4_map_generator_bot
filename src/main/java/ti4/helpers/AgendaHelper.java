@@ -1001,7 +1001,7 @@ public class AgendaHelper {
         }
         if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
                 || player.getPromissoryNotes().keySet().contains("riderm")
-                || player.hasAbility("radiance") || player.hasAbility("galactic_threat")
+                || player.hasAbility("radiance") || player.hasAbility("galactic_threat") || player.hasAbility("conspirators")
                 || player.ownsPromissoryNote("riderx")
                 || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")) {
             return true;
@@ -1733,7 +1733,15 @@ public class AgendaHelper {
                     .secondary(finChecker + "play_after_Galactic Threat Rider", "Do Galactic Threat Rider")
                     .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             afterButtons.add(playNekroAfter);
-        }
+        }//conspirators
+        if (Helper.getPlayerFromAbility(activeGame, "conspirators") != null && !activeGame.isFoWMode()) {
+            Player nekroProbably = Helper.getPlayerFromAbility(activeGame, "conspirators");
+            String finChecker = "FFCC_" + nekroProbably.getFaction() + "_";
+            Button playNekroAfter = Button
+                    .secondary(finChecker + "play_after_Conspirators", "Use Conspirators")
+                    .withEmoji(Emoji.fromFormatted(Emojis.zealots));
+            afterButtons.add(playNekroAfter);
+        }//conspirators
         if (Helper.getPlayerFromUnlockedLeader(activeGame, "keleresheroodlynn") != null) {
             Player keleresX = Helper.getPlayerFromUnlockedLeader(activeGame, "keleresheroodlynn");
             String finChecker = "FFCC_" + keleresX.getFaction() + "_";
@@ -2455,6 +2463,16 @@ public class AgendaHelper {
         if (argentPlayer.isPresent()) {
             orderList.remove(argentPlayer.orElse(null));
             orderList.add(0, argentPlayer.get());
+        }
+        String conspiratorsFaction = activeGame.getFactionsThatReactedToThis("conspiratorsFaction");
+        if(!conspiratorsFaction.isEmpty()){
+            Player rhodun = activeGame.getPlayerFromColorOrFaction(conspiratorsFaction);
+            Optional<Player> speaker = orderList.stream()
+                .filter(player -> player.getFaction() != null && activeGame.getSpeaker().equals(player.getUserID())).findFirst();
+            if(speaker.isPresent() && rhodun != null){
+                orderList.remove(rhodun);
+                orderList.add(orderList.indexOf(speaker.get())+1, rhodun);
+            }
         }
 
         // Check if Player has Edyn Mandate faction tech - if it is, put it at the end

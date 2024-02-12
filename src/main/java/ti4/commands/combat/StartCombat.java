@@ -279,6 +279,10 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.secondary("rollForAmbush_" + tile.getPosition(), "Ambush").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
 
+        if ((p1.hasAbility("facsimile") && p1 != activeGame.getActivePlayer()) || p2.hasAbility("facsimile")&& p2 != activeGame.getActivePlayer() && !activeGame.isFoWMode()) {
+            buttons.add(Button.secondary("startFacsimile_" + tile.getPosition(), "Facsimile").withEmoji(Emoji.fromFormatted(Emojis.mortheus)));
+        }
+
         //mercenaries
         Player florzen = Helper.getPlayerFromAbility(activeGame, "mercenaries");
         if (florzen != null && FoWHelper.playerHasFightersInAdjacentSystems(florzen, tile,activeGame)) {

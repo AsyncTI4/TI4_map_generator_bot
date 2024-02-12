@@ -50,6 +50,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeGame.setCurrentReacts("noAfterThisAgenda", "");
         activeGame.setCurrentReacts("AssassinatedReps", "");
         activeGame.setCurrentReacts("riskedPredictive", "");
+        activeGame.setCurrentReacts("conspiratorsFaction", "");
         String agendaID = activeGame.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);

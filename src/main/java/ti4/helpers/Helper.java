@@ -1039,6 +1039,11 @@ public class Helper {
         String msg = ButtonHelper.getIdent(player) + " exhausted the following: \n";
         int res = 0;
         int inf = 0;
+        boolean tech = false;
+        if(resOrInfOrBoth.contains("tech")){
+            resOrInfOrBoth = resOrInfOrBoth.replace("tech", "");
+            tech = true;
+        }
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
         int bestRes = 0;
