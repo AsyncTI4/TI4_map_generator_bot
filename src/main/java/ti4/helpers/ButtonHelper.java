@@ -187,7 +187,7 @@ public class ButtonHelper {
     public static void pickACardFromDiscardStep2(Game activeGame, Player player, ButtonInteractionEvent event,
             String buttonID) {
         event.getMessage().delete().queue();
-        String acID = buttonID.split("_")[1];
+        String acID = buttonID.replace("pickFromDiscard_", "");
         boolean picked = activeGame.pickActionCard(player.getUserID(), activeGame.getDiscardActionCards().get(acID));
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
@@ -917,7 +917,7 @@ public class ButtonHelper {
     public static void payForTech(Game activeGame, Player player, ButtonInteractionEvent event, String tech) {
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
-        List<Button> buttons = getExhaustButtonsWithTG(activeGame, player, "res");
+        List<Button> buttons = getExhaustButtonsWithTG(activeGame, player, "res"+"tech");
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
         if ("unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasTechReady("aida")) {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");

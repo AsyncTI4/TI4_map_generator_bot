@@ -2,15 +2,25 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
@@ -21,6 +31,7 @@ import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -40,6 +51,48 @@ public class ButtonHelperAbilities {
         buttons.add(Button.danger("autoneticMemoryDecline_" + count, "Decline"));
         String msg = player.getRepresentation(true, true) + " you have the ability to draw 1 less action card and utilize your autonetic memory ability. Please use or decline to use.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void startFacsimile(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        UnitHolder unitHolder = tile.getUnitHolders().get("space");
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        String msg = player.getRepresentation() + " choose the opponent ship you wish to build using influence";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+            if ((player.unitBelongsToPlayer(unitEntry.getKey())))
+                continue;
+            UnitKey unitKey = unitEntry.getKey();
+            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            // System.out.println(unitKey.asyncID());
+            int totalUnits = unitEntry.getValue();
+            EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
+            if (totalUnits > 0) {
+                String buttonID2 = "facsimileStep2_" + unitName;
+                String buttonText = unitKey.unitName();
+                Button validTile2 = Button.danger(buttonID2, buttonText);
+                validTile2 = validTile2.withEmoji(emoji);
+                buttons.add(validTile2);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+    public static void resolveFacsimileStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String unit = buttonID.split("_")[1];
+        String msg = player.getFactionEmoji() + " choose to produce a " + unit
+                + " with facsimile ability, and will now spend influence to build it.";
+        event.getMessage().delete().queue();
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        new AddUnits().unitParsing(event, player.getColor(), tile, unit, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        String message2 = player.getRepresentation()+" Click the names of the planets you wish to exhaust.";
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
+        Button DoneExhausting =Button.danger("deleteButtons", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+        
     }
 
     public static void startRallyToTheCause(Game activeGame, Player player, ButtonInteractionEvent event){
@@ -1028,10 +1081,7 @@ public class ButtonHelperAbilities {
             Tile tile = activeGame.getTileFromPlanet(planet);
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
-                for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {
-                    if ("space".equalsIgnoreCase(planetUnit2.getName())) {
-                        continue;
-                    }
+                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
                     Planet planetReal2 = (Planet) planetUnit2;
                     String planet2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, activeGame);
@@ -1045,6 +1095,101 @@ public class ButtonHelperAbilities {
             }
         }
         return buttons;
+    }
+
+    public static List<Button> getKyroContagionButtons(Game activeGame, Player player, GenericInteractionCreateEvent event, String finChecker) {
+        List<String> planetsChecked = new ArrayList<>();
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            Tile tile = activeGame.getTileFromPlanet(planet);
+            for (String pos2 : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false)) {
+                Tile tile2 = activeGame.getTileByPosition(pos2);
+                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
+                    Planet planetReal2 = (Planet) planetUnit2;
+                    String planet2 = planetReal2.getName();
+                    String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, activeGame);
+                    if (!planetsChecked.contains(planet2)) {
+                        buttons.add(Button.success(finChecker + "contagion_" + planet2, planetRepresentation2)
+                            .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
+                        planetsChecked.add(planet2);
+                    }
+                }
+            }
+            for (UnitHolder planetUnit2 : tile.getPlanetUnitHolders()) {
+                Planet planetReal2 = (Planet) planetUnit2;
+                String planet2 = planetReal2.getName();
+                String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, activeGame);
+                if (!planetsChecked.contains(planet2)) {
+                    buttons.add(Button.success(finChecker + "contagion_" + planet2, planetRepresentation2)
+                        .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
+                    planetsChecked.add(planet2);
+                }
+            }
+        }
+        return buttons;
+    }
+    public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String planet = buttonID.split("_")[1];
+        String amount = "1";
+        TextChannel mainGameChannel = activeGame.getMainGameChannel();
+        Tile tile = activeGame.getTile(AliasHandler.resolveTile(planet));
+
+        new AddUnits().unitParsing(event, player.getColor(),
+                activeGame.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet,
+                activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " used contagion ability to land " + amount
+                + " infantry on " + Helper.getPlanetRepresentation(planet, activeGame));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planet);
+        for (Player player2 : activeGame.getRealPlayers()) {
+            if (player2 == player) {
+                continue;
+            }
+            String colorID = Mapper.getColorID(player2.getColor());
+            int numMechs = 0;
+            int numInf = 0;
+            if (unitHolder.getUnits() != null) {
+                numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
+                numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
+            }
+
+            if (numInf > 0 || numMechs > 0) {
+                String messageCombat = "Resolve ground combat.";
+                if (!activeGame.isFoWMode()) {
+                    MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
+                    String threadName = activeGame.getName() + "-contagion-" + activeGame.getRound() + "-planet-" + planet
+                            + "-" + player.getFaction() + "-vs-" + player2.getFaction();
+                    mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+                        ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName,
+                                message_.getId());
+                        threadChannel = threadChannel
+                                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+                        threadChannel.queue(m5 -> {
+                            List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+                            for (ThreadChannel threadChannel_ : threadChannels) {
+                                if (threadChannel_.getName().equals(threadName)) {
+                                    MessageHelper.sendMessageToChannel(threadChannel_,
+                                            player.getRepresentation(true, true)
+                                                    + player2.getRepresentation(true, true)
+                                                    + " Please resolve the interaction here.");
+                                    int context = 0;
+                                    FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame,
+                                            context, tile.getPosition(), event);
+                                    MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext,
+                                            "Picture of system", false);
+                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame,
+                                            tile.getPosition(), player, player2, "ground");
+                                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
+                                }
+                            }
+                        });
+                    });
+                }
+                break;
+            }
+
+        }
+
+        event.getMessage().delete().queue();
     }
 
     public static void resolvePeaceAccords(String buttonID, String ident, Player player, Game activeGame, ButtonInteractionEvent event) {
