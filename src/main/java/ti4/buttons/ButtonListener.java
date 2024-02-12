@@ -1237,6 +1237,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveVortexCapture(buttonID, player, activeGame, event);
         } else if (buttonID.startsWith("takeAC_")) {
             ButtonHelperFactionSpecific.mageon(buttonID, event, activeGame, player, trueIdentity);
+        } else if (buttonID.startsWith("moult_")) {
+            ButtonHelperAbilities.resolveMoult(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("spend_")) {
             String planetName = buttonID.split("_")[1];
             String whatIsItFor = "both";
@@ -1254,6 +1256,15 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if (buttonRow.size() > 0) {
                     actionRow2.add(ActionRow.of(buttonRow));
+                }
+            }
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+            if(uH != null){
+                if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
+                    Tile tile = activeGame.getTileFromPlanet(planetName);
+                    String msg = player.getRepresentation()+" added an infantry to "+planetName+" due to the arcane citadel";
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry "+planetName, activeGame);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
                 }
             }
             if(whatIsItFor.contains("tech") && player.hasAbility("ancient_knowledge")){
@@ -2319,6 +2330,9 @@ public class ButtonListener extends ListenerAdapter {
                     fragmentsToPurge.add(fragid);
                 }
             }
+            if(fragmentsToPurge.size() == count){
+                ButtonHelper.deleteTheOneButton(event);
+            }
             while (fragmentsToPurge.size() > count) {
                 fragmentsToPurge.remove(0);
             }
@@ -2858,6 +2872,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Combat modifier will be applied next time you push the combat roll button.");
             }
+            event.getMessage().delete().queue();
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
@@ -2904,7 +2919,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (val > 0 && ButtonHelper.isPlayerElected(activeGame, player, "prophecy")) {
                         message = message
-                                + ". Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated";
+                                + "Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated";
                     }
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
@@ -4284,6 +4299,15 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "startArbiter" -> ButtonHelper.resolveImperialArbiter(event, activeGame, player);
                 case "pay1tgforKeleres" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, activeGame, event);
+                case "pay1tg"->{
+                    int oldTg = player.getTg();
+                    if (player.getTg() > 0) {
+                        player.setTg(oldTg - 1);
+                    }
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                        ButtonHelper.getIdentOrColor(player, activeGame) + " paid 1tg to announce a retreat " + "(" + oldTg + "->" + player.getTg() + ")");
+                    event.getMessage().delete().queue();
+                }
                 case "announceARetreat" -> {
                     String msg = ident + " announces a retreat";
                     if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
@@ -4291,6 +4315,17 @@ public class ButtonListener extends ListenerAdapter {
                                 + ". Since they have nokar commander, this means they can cancel 2 hits in this coming combat round";
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                    if(activeGame.getActivePlayer() != player && activeGame.getActivePlayer().hasAbility("cargo_raiders")){
+                        int round = 0;
+                        String combatName = "combatRoundTracker"+activeGame.getActivePlayer().getFaction()+activeGame.getActiveSystem()+"space";
+                        if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Button.success("pay1tg","Pay 1 tg"));
+                            buttons.add(Button.danger("deleteButtons","I dont have to pay"));
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()+" reminder that your opponent has the cargo raiders ability, which means you might have to pay 1tg to announce a retreat if they choose.", buttons);
+                        }
+                        
+                    }
                 }
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         ident + " officially declines to fire PDS");

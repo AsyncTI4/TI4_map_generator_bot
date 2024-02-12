@@ -2583,6 +2583,16 @@ public class AgendaHelper {
             if (thing.contains("planet_")) {
                 String planet = thing.replace("planet_", "");
                 player.exhaustPlanet(planet);
+                String planetName = planet;
+                UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+                if(uH != null){
+                    if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
+                        Tile tile = activeGame.getTileFromPlanet(planetName);
+                        String msg = player.getRepresentation()+" added an infantry to "+planetName+" due to the arcane citadel";
+                        new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry "+planetName, activeGame);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    }
+                }
             }
             if (thing.contains("dsghotg")) {
                 player.exhaustTech("dsghotg");
@@ -2614,6 +2624,17 @@ public class AgendaHelper {
                         player.addSpentThing("planet_" + planet);
                         player.exhaustPlanet(planet);
                     }
+                    String planetName = planet;
+                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+                    if(uH != null){
+                        if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
+                            Tile tile = activeGame.getTileFromPlanet(planetName);
+                            String msg = player.getRepresentation()+" added an infantry to "+planetName+" due to the arcane citadel";
+                            new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry "+planetName, activeGame);
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                        }
+                    }
+
                 }
                 ButtonHelper.deleteTheOneButton(event);
             }

@@ -75,6 +75,46 @@ public class ScoreSO extends SOCardsSubcommandData {
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
+            if(entry.getKey().equalsIgnoreCase("dhw")){
+                if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
+                    List<String> fragmentsToPurge = new ArrayList<>();
+                    List<String> playerFragments = player.getFragments();
+                    fragmentsToPurge.addAll(playerFragments);
+                    for (String fragid : fragmentsToPurge) {
+                        player.removeFragment(fragid);
+                        activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
+                    }
+                    String message2 = player.getRepresentation() + " purged fragments: "
+                    + fragmentsToPurge;
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2);
+                }else{
+                    Player p1 = player;
+                    String finChecker = p1.getFinsFactionCheckerPrefix();
+                    List<Button> purgeFragButtons = new ArrayList<>();
+                    if (p1.getCrf() > 0) {
+                        Button transact = Button.primary(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getIrf() > 0) {
+                        Button transact = Button.success(finChecker + "purge_Frags_IRF_1",
+                                "Purge 1 Industrial Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getHrf() > 0) {
+                        Button transact = Button.danger(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getUrf() > 0) {
+                        Button transact = Button.secondary(finChecker + "purge_Frags_URF_1",
+                                "Purge 1 Frontier Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    Button transact2 = Button.success(finChecker + "deleteButtons", "Done purging");
+                    purgeFragButtons.add(transact2);
+                    
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Purge 2 fragments please", purgeFragButtons);
+                }
+            }
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());

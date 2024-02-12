@@ -56,6 +56,12 @@ public class TurnStart extends PlayerSubcommandData {
                 activeGame.removeMessageIDFromCurrentReacts(id);
             }
         }
+        activeGame.setCurrentReacts(player.getFaction()+"planetsExplored","");
+        activeGame.setNaaluAgent(false);
+        activeGame.setL1Hero(false);
+        activeGame.setCurrentReacts("vaylerianHeroActive", "");
+        activeGame.setCurrentReacts("tnelisCommanderTracker", "");
+        activeGame.setCurrentReacts("planetsTakenThisRound", "");
         boolean goingToPass = false;
         if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
             && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {

@@ -1238,62 +1238,98 @@ public class Helper {
         player.resetProducedUnits();
     }
 
+    public static int getProductionValueOfUnitHolder(Player player, Game activeGame, Tile tile, UnitHolder uH) {
+        int productionValueTotal = 0;
+        for (UnitKey unit : uH.getUnits().keySet()) {
+            if (unit.getColor().equalsIgnoreCase(player.getColor())) {
+                if (unit.getUnitType() == UnitType.TyrantsLament
+                        && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
+                    player.addOwnedUnitByID("tyrantslament");
+                }
+                if (unit.getUnitType() == UnitType.PlenaryOrbital
+                        && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
+                    player.addOwnedUnitByID("plenaryorbital");
+                }
+                UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+                int productionValue = unitModel.getProductionValue();
+                if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
+                    productionValueTotal = productionValueTotal + player.getFleetCC();
+                }
+                if ("sd".equals(unitModel.getAsyncId()) && (productionValue == 2 || productionValue == 4
+                        || player.ownsUnit("mykomentori_spacedock2")
+                        || player.ownsUnit("miltymod_spacedock2"))) {
+                    if (uH instanceof Planet planet) {
+                        productionValue = planet.getResources() + productionValue;
+                    }
+                }
+                if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValue++;
+                }
+                productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
+            }
+        }
+        if ("mr".equalsIgnoreCase(uH.getName()) && player.hasTech("iihq")
+                && player.getPlanets().contains("mr")) {
+            productionValueTotal = productionValueTotal + 3;
+        }
+        String planet = uH.getName();
+        if (player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+                || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+            productionValueTotal = productionValueTotal + 1;
+            if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
+            }
+        } else {
+            if (player.hasTech("absol_ie") && player.getPlanets().contains(uH.getName())) {
+                productionValueTotal = productionValueTotal + 1;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+            } else{
+                if (player.getPlanets().contains(uH.getName())
+                && player.hasTech("dsbentg") && (!uH.getTokenList().isEmpty() || (Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0))) {
+                    productionValueTotal = productionValueTotal + 1;
+                    if (player.hasRelic("boon_of_the_cerulean_god")) {
+                        productionValueTotal++;
+                    }
+                }
+            }
+        }
+        if (player.getPlanets().contains(uH.getName())
+                && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
+            productionValueTotal = productionValueTotal + 3;
+            if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
+            }
+        }
+        
+        
+        for (String token : uH.getTokenList()) {
+            if (token.contains("orbital_foundries")) {
+                productionValueTotal = productionValueTotal + 2;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+            }
+            
+            if (token.contains("automatons")) {
+                productionValueTotal = productionValueTotal + 3;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+            }
+        }
+
+        return productionValueTotal;
+
+
+    }
+
     public static int getProductionValue(Player player, Game activeGame, Tile tile, boolean warfare) {
         int productionValueTotal = 0;
         if (!warfare) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
-                for (UnitKey unit : uH.getUnits().keySet()) {
-                    if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                        if (unit.getUnitType() == UnitType.TyrantsLament
-                                && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
-                            player.addOwnedUnitByID("tyrantslament");
-                        }
-                        if (unit.getUnitType() == UnitType.PlenaryOrbital
-                                && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
-                            player.addOwnedUnitByID("plenaryorbital");
-                        }
-                        UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
-                        int productionValue = unitModel.getProductionValue();
-                        if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
-                            productionValueTotal = productionValueTotal + player.getFleetCC();
-                        }
-                        if ("sd".equals(unitModel.getAsyncId()) && (productionValue == 2 || productionValue == 4
-                                || player.ownsUnit("mykomentori_spacedock2")
-                                || player.ownsUnit("miltymod_spacedock2"))) {
-                            if (uH instanceof Planet planet) {
-                                productionValue = planet.getResources() + productionValue;
-                            }
-                        }
-                        if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
-                            productionValue++;
-                        }
-                        productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
-                    }
-                }
-                if ("mr".equalsIgnoreCase(uH.getName()) && player.hasTech("iihq")
-                        && player.getPlanets().contains("mr")) {
-                    productionValueTotal = productionValueTotal + 3;
-                }
-                if (player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                        || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
-                    productionValueTotal = productionValueTotal + 1;
-                } else {
-                    if (player.hasTech("absol_ie") && player.getPlanets().contains(uH.getName())) {
-                        productionValueTotal = productionValueTotal + 1;
-                    }
-                }
-                if (player.getPlanets().contains(uH.getName())
-                        && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
-                    productionValueTotal = productionValueTotal + 3;
-                }
-                for (String token : uH.getTokenList()) {
-                    if (token.contains("orbital_foundries")) {
-                        productionValueTotal = productionValueTotal + 2;
-                    }
-                    if (token.contains("automatons")) {
-                        productionValueTotal = productionValueTotal + 3;
-                    }
-                }
+                productionValueTotal = productionValueTotal + getProductionValueOfUnitHolder(player, activeGame, tile, uH);
             }
             if (tile.isSupernova() && player.hasTech("mr")) {
                 productionValueTotal = productionValueTotal + 5;
