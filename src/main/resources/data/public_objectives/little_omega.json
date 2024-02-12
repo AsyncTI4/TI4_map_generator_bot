@@ -43,7 +43,7 @@
     "alias": "monopolize_a_trade_route_little_omega",
     "name": "Monopolize a Trade Route ω",
     "phase": "Status",
-    "text": "Have ships in 2 systems that both contain an alpha wormhole or both contain a beta wormhole.",
+    "text": "Have ships in 2 systems that each contain a non-delta wormhole of the same type.",
     "points": 1,
     "source": "little_omega"
   },

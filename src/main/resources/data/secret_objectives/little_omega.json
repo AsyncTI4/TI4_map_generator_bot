@@ -91,7 +91,7 @@
     "alias": "ctc_little_omega",
     "name": "Contain Their Culture ω",
     "phase": "Action",
-    "text": "Win a ground combat on another player's highest influence planet.",
+    "text": "Gain control of another player's highest influence planet.",
     "points": 1,
     "source": "little_omega"
   },
@@ -99,7 +99,7 @@
     "alias": "cte_little_omega",
     "name": "Cripple Their Economy ω",
     "phase": "Action",
-    "text": "Win a ground combat on another player's highest resource planet.",
+    "text": "Gain control of another player's highest resource planet.",
     "points": 1,
     "source": "little_omega"
   },
