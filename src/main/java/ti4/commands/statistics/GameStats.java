@@ -68,7 +68,7 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
-            case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
+            //case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
@@ -93,7 +93,7 @@ public class GameStats extends StatisticsSubcommandData {
         FACTION_WINS("Wins per Faction", "Show the wins per faction"),
         FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
         COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
-        UNFINISHED_GAMES("Unfinisheed games", "Show the games where at least 1 pt was scored but no winner was declared"),
+       // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 pt was scored but no winner was declared"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
         SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"),
         GAME_COUNT("Total game count", "Shows the total game count");

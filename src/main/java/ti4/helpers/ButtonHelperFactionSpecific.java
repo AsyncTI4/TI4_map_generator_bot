@@ -1328,7 +1328,7 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static void offerKolleccPNButtons(Game activeGame) {
+    public static void offerKolleccPNButtons(Game activeGame, Player player) {
         Button transact1 = Button.success("explore_look_All", "Peek at Industrial/Hazardous/Cultural decks");
         Button transact2 = Button.success("relic_look_top", "Peek at Relic deck");
         List<Button> buttons = new ArrayList<>();
@@ -1337,7 +1337,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String message = "Use buttons to select how to use the Kollecc AI Survey PN";
         // System.out.println(player.getFaction() + " is playing PN KOLLEC");
-        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
