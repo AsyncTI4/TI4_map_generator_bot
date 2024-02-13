@@ -184,7 +184,7 @@ public class ButtonHelperAbilities {
 		String faction = buttonID.split("_")[4];
         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
         new RemoveUnits().unitParsing(event, player.getColor(), tile2, fighters +" fighters", activeGame);
-        new AddUnits().unitParsing(event, p2.getColor(), tile2, fighters +" fighters", activeGame);
+        new AddUnits().unitParsing(event, p2.getColor(), tile, fighters +" fighters", activeGame);
         String msg = player.getRepresentation()+" used the mercenaries ability and transferred "+fighters+" fighter(s) from "+tile2.getRepresentationForButtons(activeGame,player)+" to "+tile.getRepresentationForButtons(activeGame,player) +" and gave them to "+ButtonHelper.getIdentOrColor(p2, activeGame);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg);
