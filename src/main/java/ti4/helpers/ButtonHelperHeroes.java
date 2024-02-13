@@ -51,6 +51,105 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
+
+    public static void argentHeroStep1(Game activeGame, Player player, GenericInteractionCreateEvent event){
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : ButtonHelper.getTilesWithYourCC(player, activeGame, event)){
+            buttons.add(Button.success("argentHeroStep2_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+        }
+        buttons.add(Button.danger("deleteButtons", "Done resolving"));
+        String msg = player.getRepresentation()+" choose the tile you wish to move stuff to using the hero";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+    public static void argentHeroStep2(Game activeGame, Player player, GenericInteractionCreateEvent event, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String pos1 = buttonID.split("_")[1];
+        Tile destination = activeGame.getTileByPosition(pos1);
+        for(Tile tile : ButtonHelper.getTilesWithShipsInTheSystem(player, activeGame)){
+            buttons.add(Button.success("argentHeroStep3_"+pos1+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+        }
+        String msg = player.getRepresentation()+" choose the tile you wish to move stuff from. These will move stuff to "+destination.getRepresentationForButtons(activeGame,player);
+        buttons.add(Button.danger("deleteButtons", "Done moving to "+destination.getRepresentationForButtons(activeGame,player)));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+
+    public static List<Button> getArgentHeroStep3Buttons(Game activeGame, Player player, GenericInteractionCreateEvent event, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String pos1 = buttonID.split("_")[1];
+        Tile destination = activeGame.getTileByPosition(pos1);
+        String pos2 = buttonID.split("_")[2];
+        Tile origin = activeGame.getTileByPosition(pos2);
+        for(UnitHolder unitHolder : origin.getUnitHolders().values()){
+            Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey()))
+                    continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null)
+                    continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int totalUndamagedUnits = unitEntry.getValue();
+                int damagedUnits = 0;
+
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                String end = "";
+                if(!unitHolder.getName().equalsIgnoreCase("space")){
+                    end = " from "+Helper.getPlanetRepresentation(unitHolder.getName(), activeGame);
+                }
+                totalUndamagedUnits = totalUndamagedUnits - damagedUnits;
+                if(totalUndamagedUnits > 0){
+                    buttons.add(Button.success("argentHeroStep4_"+pos1+"_"+origin.getPosition()+"_"+unitHolder.getName()+"_"+unitName, "1 "+unitName+end));
+                }
+                if(damagedUnits > 0){
+                    buttons.add(Button.success("argentHeroStep4_"+pos1+"_"+origin.getPosition()+"_"+unitHolder.getName()+"_"+unitName+"damaged", "1 damaged "+unitName+end));
+                }
+                
+            }
+         }
+         buttons.add(Button.danger("deleteButtons", "Done moving to "+destination.getRepresentationForButtons(activeGame,player)+" from "+origin.getRepresentationForButtons(activeGame,player)));
+         return buttons;
+    }
+    public static void argentHeroStep3(Game activeGame, Player player, GenericInteractionCreateEvent event, String buttonID){
+        List<Button> buttons = getArgentHeroStep3Buttons(activeGame, player, event, buttonID);
+        String pos1 = buttonID.split("_")[1];
+        Tile destination = activeGame.getTileByPosition(pos1);
+        String pos2 = buttonID.split("_")[2];
+        Tile origin = activeGame.getTileByPosition(pos2);
+        String msg = player.getRepresentation()+" choose the units you wish to move. These will move stuff to "+destination.getRepresentationForButtons(activeGame,player);
+        
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+    public static void argentHeroStep4(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        List<Button> buttons = getArgentHeroStep3Buttons(activeGame, player, event, buttonID);
+        String pos1 = buttonID.split("_")[1];
+        Tile destination = activeGame.getTileByPosition(pos1);
+        String pos2 = buttonID.split("_")[2];
+        Tile origin = activeGame.getTileByPosition(pos2);
+        String unitHolderName = buttonID.split("_")[3];
+        String unitName = buttonID.split("_")[4];
+        boolean damaged = false;
+        if(unitName.contains("damaged")){
+            damaged = true;
+            unitName = unitName.replace("damaged", "");
+        }
+        new RemoveUnits().unitParsing(event, player.getColor(), origin, unitName +" "+unitHolderName, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), destination, unitName, activeGame);
+        String msg2 = player.getFactionEmoji() + " moved 1 "+unitName+" from "+origin.getRepresentationForButtons(activeGame,player)+" to "+destination.getRepresentationForButtons(activeGame,player);
+        if(damaged){
+            origin.getUnitHolders().get(unitHolderName).removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColorID()), 1);
+            destination.getUnitHolders().get("space").addUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColorID()), 1);
+            msg2 = player.getFactionEmoji() + " moved 1 damaged "+unitName+" from "+origin.getRepresentationForButtons(activeGame,player)+" to "+destination.getRepresentationForButtons(activeGame,player);
+        }
+        
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg2);
+        String msg = player.getRepresentation()+" choose the units you wish to move. These will move stuff to "+destination.getRepresentationForButtons(activeGame,player);
+        event.getMessage().editMessage(msg)
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons)).queue();
+    }
+
     public static List<String> getAttachmentsForFlorzenHero(Game activeGame, Player player) {
         List<String> legendaries = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
