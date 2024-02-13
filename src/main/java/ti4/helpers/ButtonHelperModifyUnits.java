@@ -667,6 +667,26 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
+        if(hits > 0){
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null) continue;
+                UnitKey unitKey = unitEntry.getKey();
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int totalUnits = unitEntry.getValue();
+                int min =totalUnits;
+                if(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0) continue;
+                if (unitName.equalsIgnoreCase("mech") || unitName.equalsIgnoreCase("infantry")) {
+                    if(!justSummarizing){
+                        new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
+                        msg = msg + "> Removed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }else{
+                        msg = msg + "> Would remove "+min+" "+unitModel.getUnitEmoji()+"\n";
+                    }
+                }
+            }
+        }
 
 
         if(!usedDuraniumAlready){
@@ -788,8 +808,8 @@ public class ButtonHelperModifyUnits {
             checked.add(pos2);
             Tile tile2 = activeGame.getTileByPosition(pos2);
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)) {
-                if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, activeGame) || skilled) {
-                    if (FoWHelper.playerIsInSystem(activeGame, tile2, player) || player.hasTech("det") || skilled) {
+                if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, activeGame) || skilled || FoWHelper.playerHasShipsInSystem(player, tile2)) {
+                    if (FoWHelper.playerIsInSystem(activeGame, tile2, player) || player.hasTech("det") || player.hasTech("absol_det") || skilled) {
                         buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS, "Retreat to " + tile2.getRepresentationForButtons(activeGame, player)));
                     }
                 }
@@ -1276,7 +1296,8 @@ public class ButtonHelperModifyUnits {
     public static void resolveCloakedFleets(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
         String unit = buttonID.split("_")[2];
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit, activeGame);
+        UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
+        new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), false, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " captured 1 newly produced " + ButtonHelper.getUnitName(unit) + " in "+tile.getRepresentationForButtons(activeGame, player) + " using the Cloaked Fleets abiility (limit of 2 ships can be captured per build)");
         new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, activeGame);

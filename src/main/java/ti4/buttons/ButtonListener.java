@@ -2387,6 +2387,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveBestowTitleStep1(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("bestowTitleStep2_")) {
             ButtonHelper.resolveBestowTitleStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("argentHeroStep2_")) {
+            ButtonHelperHeroes.argentHeroStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("argentHeroStep3_")) {
+            ButtonHelperHeroes.argentHeroStep3(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("argentHeroStep4_")) {
+            ButtonHelperHeroes.argentHeroStep4(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("khraskHeroStep2_")) {
             ButtonHelperHeroes.resolveKhraskHeroStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("khraskHeroStep3Exhaust_")) {
@@ -4044,7 +4050,6 @@ public class ButtonListener extends ListenerAdapter {
                     int netGain = ButtonHelper.checkNetGain(player, originalCCs);
                     String editedMessage = player.getRepresentation() + " CCs have gone from " + originalCCs + " -> "
                             + player.getCCRepresentation() + ". Net gain of: " + netGain;
-                    event.getMessage().editMessage(editedMessage).queue();
                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "gain_1_tg" -> {
