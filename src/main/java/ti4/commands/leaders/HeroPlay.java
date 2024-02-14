@@ -131,14 +131,18 @@ public class HeroPlay extends LeaderAction {
             }
         } else {
             boolean purged = true;
+            String msg = "Leader " + playerLeader.getId() + " has been purged";
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
+                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
+            }else{
+                msg ="Leader " + playerLeader.getId() + " was used to copy a hero";
             }
 
             if (purged) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                        "Leader " + playerLeader.getId() + " has been purged");
-                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
+                        msg);
+                
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Leader was not purged - something went wrong");
