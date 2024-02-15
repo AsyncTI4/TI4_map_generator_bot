@@ -1710,8 +1710,7 @@ public class Game {
             return true;
         if (publicObjectives2.remove(id))
             return true;
-        if (revealedPublicObjectives.remove(id) != null)
-            return true;
+        return revealedPublicObjectives.remove(id) != null;
     }
 
     public boolean removeACFromGame(String id) {
