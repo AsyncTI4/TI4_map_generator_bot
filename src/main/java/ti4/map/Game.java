@@ -1708,7 +1708,9 @@ public class Game {
     public boolean removePOFromGame(String id) {
         if (publicObjectives1.remove(id))
             return true;
-        return publicObjectives2.remove(id);
+        if (publicObjectives2.remove(id))
+            return true;
+        return revealedPublicObjectives.remove(id) != null;
     }
 
     public boolean removeACFromGame(String id) {
@@ -1995,7 +1997,7 @@ public class Game {
             }
         }
         if (!id.isEmpty()) {
-            if (id.equalsIgnoreCase("warrant")) {
+            if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
@@ -2138,7 +2140,7 @@ public class Game {
             }
         }
         if (!id.isEmpty()) {
-            if (id.equalsIgnoreCase("warrant")) {
+            if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
@@ -2155,7 +2157,7 @@ public class Game {
 
     public boolean removeLaw(String id) {
         if (!id.isEmpty()) {
-            if (id.equalsIgnoreCase("warrant")) {
+            if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
