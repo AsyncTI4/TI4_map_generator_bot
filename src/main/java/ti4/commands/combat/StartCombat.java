@@ -185,7 +185,7 @@ public class StartCombat extends CombatSubcommandData {
         sendAFBButtonsToThread(event, threadChannel, activeGame, ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
 
         // General Space Combat
-        sendGeneralCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile, spaceOrGround);
+        sendGeneralCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile, spaceOrGround, event);
 
         // DS Lanefir ATS Armaments
         if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0) || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {
@@ -311,13 +311,13 @@ public class StartCombat extends CombatSubcommandData {
         return 0;
     }
 
-    private static void sendGeneralCombatButtonsToThread(ThreadChannel threadChannel, Game activeGame, Player player1, Player player2, Tile tile, String spaceOrGround) {
-        List<Button> buttons = getGeneralCombatButtons(activeGame, tile.getPosition(), player1, player2, spaceOrGround);
+    private static void sendGeneralCombatButtonsToThread(ThreadChannel threadChannel, Game activeGame, Player player1, Player player2, Tile tile, String spaceOrGround, GenericInteractionCreateEvent event) {
+        List<Button> buttons = getGeneralCombatButtons(activeGame, tile.getPosition(), player1, player2, spaceOrGround, event);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Combat:", buttons);
     }
 
     // TODO: Break apart into: [all combats, space combat, ground combat] methods
-    public static List<Button> getGeneralCombatButtons(Game activeGame, String pos, Player p1, Player p2, String groundOrSpace) {
+    public static List<Button> getGeneralCombatButtons(Game activeGame, String pos, Player p1, Player p2, String groundOrSpace, GenericInteractionCreateEvent event) {
         Tile tile = activeGame.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
 
@@ -628,7 +628,13 @@ public class StartCombat extends CombatSubcommandData {
                 if (!isSpaceCombat && !"space".equalsIgnoreCase(nameOfHolder)) {
                     buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(),
                         "Roll Ground Combat for " + nameOfHolder + ""));
-                    buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence", "Roll Space Cannon Defence for " + nameOfHolder));
+                    Player nonActive = p1;
+                    if(p1 == activeGame.getActivePlayer()){
+                        nonActive=p2;
+                    }
+                    if(new CombatRoll().checkIfUnitsOfType(nonActive, activeGame, event, tile, groundOrSpace, CombatRollType.SpaceCannonDefence)){
+                        buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence", "Roll Space Cannon Defence for " + nameOfHolder));
+                    }
                 }
             }
         }

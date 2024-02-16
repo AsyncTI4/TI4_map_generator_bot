@@ -881,6 +881,9 @@ public class ButtonHelperHeroes {
     public static void purgeCeldauriHero(Player player, Game activeGame, ButtonInteractionEvent event,
             String buttonID) {
         Leader playerLeader = player.unsafeGetLeader("celdaurihero");
+        if(playerLeader == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(),player.getFactionEmoji()+"You dont have this hero");
+        }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
@@ -926,6 +929,9 @@ public class ButtonHelperHeroes {
     public static void purgeMentakHero(Player player, Game activeGame, ButtonInteractionEvent event,
             String buttonID) {
         Leader playerLeader = player.unsafeGetLeader("mentakhero");
+        if(playerLeader == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(),player.getFactionEmoji()+"You dont have this hero");
+        }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
@@ -1413,7 +1419,7 @@ public class ButtonHelperHeroes {
                                     MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext,
                                             "Picture of system", false);
                                     List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame,
-                                            tile.getPosition(), player, player2, "ground");
+                                            tile.getPosition(), player, player2, "ground", event);
                                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                                 }
                             }

@@ -62,6 +62,8 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.setCurrentReacts("vaylerianHeroActive", "");
         activeGame.setCurrentReacts("tnelisCommanderTracker", "");
         activeGame.setCurrentReacts("planetsTakenThisRound", "");
+        activeGame.setCurrentReacts("absolLux", "");
+        activeGame.setCurrentReacts("mentakHero", "");
         boolean goingToPass = false;
         if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
             && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
