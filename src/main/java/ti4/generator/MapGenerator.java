@@ -2602,7 +2602,7 @@ public class MapGenerator {
             try {
                 String agendaType = Mapper.getAgendaType(lawID);
 
-                if ("1".equals(agendaType) || optionalText == null || optionalText.isEmpty()) {
+                if (optionalText == null || optionalText.isEmpty() || game.getPlayerFromColorOrFaction(optionalText) == null) {
                     paintAgendaIcon(y, x);
                 } else if ("0".equals(agendaType)) {
                     Player electedPlayer = null;
