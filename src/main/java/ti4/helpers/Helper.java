@@ -374,6 +374,9 @@ public class Helper {
                 activeGame.setCurrentReacts(key2,
                         activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if(!activeGame.isFoWMode()){
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
+                }
             }
             if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
                     && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
@@ -382,6 +385,9 @@ public class Helper {
                             + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if(!activeGame.isFoWMode()){
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
+                }
                 break;
             }
         }

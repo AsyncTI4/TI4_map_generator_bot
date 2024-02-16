@@ -1228,7 +1228,7 @@
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+    "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
     "flavorText": "The Arborec emissary leaned close, and Brother Milor flinched at the faint whiff of decay. \"You do not understand,\" Dirzuga Ohao rasped. \"You must support this measure.\"",
     "source": "pok"
   },
@@ -1237,7 +1237,7 @@
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+    "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
     "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
     "source": "pok"
   },
@@ -1246,7 +1246,7 @@
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+    "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
     "flavorText": "It would be unfortunate, the Arborec Dirzuga said, \"if your supplies of diraxium were to dry up. How would your fleet defend you if we stopped supplying its fuel?\"",
     "source": "pok"
   },
@@ -1255,7 +1255,7 @@
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Choose another player. That player must give you 1 promissory note from their hand.",
+    "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
     "flavorText": "Damn you! Brother MIlor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
     "source": "pok"
   },
@@ -1516,7 +1516,7 @@
     "name": "Diplomatic Pressure",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Choose another player; that player must give you 1 promissory note from their hand.",
+    "text": "Choose another player; that player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
     "flavorText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
     "source": "ds"
   },

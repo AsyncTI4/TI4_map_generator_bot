@@ -66,6 +66,7 @@ public class ButtonHelperModifyUnits {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
+        Player mentakHero = activeGame.getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
         if(hits > 0 && unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0){
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -83,6 +84,9 @@ public class ButtonHelperModifyUnits {
                     if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                     && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                         ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
+                    }
+                    if (mentakHero != null) {
+                        ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
                     }
                 }
             }
@@ -342,6 +346,7 @@ public class ButtonHelperModifyUnits {
         int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
         boolean noMechPowers = activeGame.getLaws().containsKey("articles_war");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
+        Player mentakHero = activeGame.getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
         boolean usedDuraniumAlready = true;
         String duraniumMsg = "";
         if(player.hasTech("da")){
@@ -427,6 +432,9 @@ public class ButtonHelperModifyUnits {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
+                        }
                     }else{
                         msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
@@ -449,6 +457,9 @@ public class ButtonHelperModifyUnits {
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
+                        }
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
                         }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }else{
@@ -478,6 +489,9 @@ public class ButtonHelperModifyUnits {
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
+                        }
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
                         }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }else{
@@ -548,6 +562,9 @@ public class ButtonHelperModifyUnits {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
+                        }
                     }else{
                         msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }
@@ -605,6 +622,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
+                        }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }else{
                         msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
@@ -633,6 +653,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
                         }
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
+                        }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }else{
                         msg = msg + "> Would destroy "+min+" "+unitModel.getUnitEmoji()+"\n";
@@ -659,6 +682,9 @@ public class ButtonHelperModifyUnits {
                         if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, min, unitName, event);
+                        }
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, min, unitName, event, tile);
                         }
                         msg = msg + "> Destroyed "+min+" "+unitModel.getUnitEmoji()+"\n";
                     }else{
@@ -1727,6 +1753,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = activeGame.getTileByPosition(pos);
         rest = rest.replace(pos + "_", "");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
+        Player mentakHero = activeGame.getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
         if (rest.contains("All")) {
             String cID = Mapper.getColorID(player.getColor());
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -1751,6 +1778,9 @@ public class ButtonHelperModifyUnits {
                                 && ((!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech)
                                     || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, unitEntry.getValue(), unitName, event);
+                            }
+                            if (mentakHero != null) {
+                                ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, unitEntry.getValue(), unitName, event, tile);
                             }
                             if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2")) && unitName.toLowerCase().contains("inf")) {
                                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);
@@ -1785,6 +1815,9 @@ public class ButtonHelperModifyUnits {
                         if (cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile)
                             && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
+                        }
+                        if (mentakHero != null) {
+                            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, amount, unitName, event, tile);
                         }
                     }
                 }
@@ -1828,6 +1861,9 @@ public class ButtonHelperModifyUnits {
             if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                 && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
+            }
+            if (mentakHero != null) {
+                ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, activeGame, mentakHero, amount, unitName, event, tile);
             }
         } else {
             boolean cabalMech = cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech")
