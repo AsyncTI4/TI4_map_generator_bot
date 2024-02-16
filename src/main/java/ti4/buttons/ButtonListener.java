@@ -2577,7 +2577,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("purgeCeldauriHero_")) {
             ButtonHelperHeroes.purgeCeldauriHero(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("purgeMentakHero_")) {
-            ButtonHelperHeroes.purgeCeldauriHero(player, activeGame, event, buttonID);
+            ButtonHelperHeroes.purgeMentakHero(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("unstableStep2_")) {// "titansConstructionMechDeployStep2_"
