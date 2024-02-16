@@ -144,7 +144,7 @@ public class ButtonHelper {
             if(player2 == player){
                 continue;
             }
-            buttons.add(Button.success("bestowTitleStep2_"+title+"_"+player2.getFaction(),player2.getFactionModel().getFactionName()));
+            buttons.add(Button.success("bestowTitleStep2_"+title+"_"+player2.getFaction(),player2.getFactionModel().getFactionName() + " ("+player2.getUserName()+")"));
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg, buttons);
         event.getMessage().delete().queue();
@@ -1605,6 +1605,18 @@ public class ButtonHelper {
                 "Use buttons to select a planet or tech to ready", buttons);
     }
 
+    public static void sendAbsolX89NukeOptions(Game activeGame,ButtonInteractionEvent event,
+            Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            buttons.add(Button.success("absolX89Nuke_" + planet,
+                    "Nuke " + Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                "Use buttons to select a planet to nuke", buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     public static List<Button> getPsychoTechPlanets(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -2630,8 +2642,12 @@ public class ButtonHelper {
             ButtonInteractionEvent event) {
         mahact.removeMahactCC(target.getColor());
         if (!activeGame.getNaaluAgent()) {
+            if(!activeGame.getFactionsThatReactedToThis("absolLux").isEmpty()){
+                target.setTacticalCC(target.getTacticalCC() + 1);
+            }
             target.setTacticalCC(target.getTacticalCC() - 1);
             AddCC.addCC(event, target.getColor(), tile);
+            
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, activeGame),
                 mahact.getRepresentation(true, true) + " the " + target.getColor()
@@ -2663,6 +2679,9 @@ public class ButtonHelper {
         mahact.exhaustTech("nf");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(mahact, activeGame, event);
         if (!activeGame.getNaaluAgent()) {
+            if(!activeGame.getFactionsThatReactedToThis("absolLux").isEmpty()){
+                target.setTacticalCC(target.getTacticalCC() + 1);
+            }
             target.setTacticalCC(target.getTacticalCC() - 1);
             AddCC.addCC(event, target.getColor(), tile);
         }
@@ -2706,6 +2725,9 @@ public class ButtonHelper {
 
         if (!activeGame.getNaaluAgent()) {
             if (!AddCC.hasCC(target, tile)) {
+                if(!activeGame.getFactionsThatReactedToThis("absolLux").isEmpty()){
+                    target.setTacticalCC(target.getTacticalCC() + 1);
+                }
                 target.setTacticalCC(target.getTacticalCC() - 1);
                 AddCC.addCC(event, target.getColor(), tile);
             }
@@ -4113,6 +4135,11 @@ public class ButtonHelper {
             buttons.add(domButton);
         }
 
+        if (player.hasRelicReady("absol_luxarchtreatise")){
+            Button domButton = Button.secondary("exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise");
+            buttons.add(domButton);
+        }
+
         if (player.hasUnexhaustedLeader("ghostagent")
                 && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem())) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent")
@@ -4179,6 +4206,9 @@ public class ButtonHelper {
 
         if (!activeGame.getNaaluAgent() && !activeGame.getL1Hero() && !AddCC.hasCC(event, player.getColor(), tile)
                 && activeGame.getFactionsThatReactedToThis("vaylerianHeroActive").isEmpty()) {
+                    if(!activeGame.getFactionsThatReactedToThis("absolLux").isEmpty()){
+                        player.setTacticalCC(player.getTacticalCC() + 1);
+                    }
             cc -= 1;
             player.setTacticalCC(cc);
             AddCC.addCC(event, player.getColor(), tile, true);
