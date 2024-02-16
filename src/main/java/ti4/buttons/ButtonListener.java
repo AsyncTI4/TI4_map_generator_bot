@@ -97,6 +97,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -113,6 +114,7 @@ import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.UnitModel;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -747,6 +749,19 @@ public class ButtonListener extends ListenerAdapter {
 
             ButtonHelper.startStatusHomework(event, activeGame);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("exhaustRelic_")) {
+            String relic = buttonID.replace("exhaustRelic_", "");
+            if(player.hasRelicReady(relic)){
+                player.addExhaustedRelic(relic);
+                MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() +" exhausted "+Mapper.getRelic(relic).getName());
+                ButtonHelper.deleteTheOneButton(event);
+                if(relic.equalsIgnoreCase("absol_luxarchtreatise")){
+                    activeGame.setCurrentReacts("absolLux", "true");
+                }
+            }else{
+                MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " doesnt have an unexhausted "+relic);
+            }
+
         } else if (buttonID.startsWith("scepterE_follow_") || buttonID.startsWith("mahactA_follow_")) {
             boolean setstatus = true;
             int scnum = 1;
@@ -1091,7 +1106,7 @@ public class ButtonListener extends ListenerAdapter {
             String groundOrSpace = rest.split("_")[3];
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, pos, event);
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-            List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, pos, p1, p2, groundOrSpace);
+            List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, pos, p1, p2, groundOrSpace, event);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } else if (buttonID.startsWith("getDamageButtons_")) {// "repealLaw_"
             if (buttonID.contains("deleteThis")) {
@@ -1515,6 +1530,19 @@ public class ButtonListener extends ListenerAdapter {
                                     absolPAButtons);
                 }
             }
+        } else if (buttonID.startsWith("absolX89Nuke_")) {
+            event.getMessage().delete().queue();
+            String planet = buttonID.split("_")[1];
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getFaction()+" used absol x-89 to remove all ground forces on "+planet);
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            Map<UnitKey, Integer> units = new HashMap<>();
+            units.putAll(uH.getUnits());
+            for(UnitKey unit : units.keySet()){
+                if(unit.getUnitType() == UnitType.Mech || unit.getUnitType() == UnitType.Infantry){
+                    uH.removeUnit(unit, units.get(unit));
+                }
+            }
+            
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
             TechnologyModel techModel = Mapper.getTech(tech);
@@ -1537,6 +1565,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "absol_bs" -> { // Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
+                }
+                case "absol_x89" -> { // Bio-stims
+                    ButtonHelper.sendAbsolX89NukeOptions(activeGame, event, player);
+                }
+                case "absol_dxa" -> { // Dacxive
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use buttons to drop 2 infantry on a planet", Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                    ButtonHelper.deleteTheOneButton(event);
                 }
                 case "absol_nm" -> { // Absol's Neural Motivator
                     event.getMessage().delete().queue();
@@ -2540,6 +2575,8 @@ public class ButtonListener extends ListenerAdapter {
             }
             ButtonHelperHeroes.offerStealRelicButtons(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("purgeCeldauriHero_")) {
+            ButtonHelperHeroes.purgeCeldauriHero(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("purgeMentakHero_")) {
             ButtonHelperHeroes.purgeCeldauriHero(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
