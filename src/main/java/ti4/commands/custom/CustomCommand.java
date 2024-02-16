@@ -1,5 +1,9 @@
 package ti4.commands.custom;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -11,11 +15,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class CustomCommand implements Command {
 
@@ -111,6 +110,7 @@ public class CustomCommand implements Command {
         subcommands.add(new DiscardSpecificAgenda());
         //subcommands.add(new FixSODeck());
         subcommands.add(new SetThreadName());
+        subcommands.add(new PeakAtObjectiveDeck());
         subcommands.add(new PeakAtStage1());
         subcommands.add(new PeakAtStage2());
         subcommands.add(new SetUpPeakableObjectives());

@@ -173,7 +173,7 @@ public class GameEnd extends GameSubcommandData {
           TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
           TextChannel actionsChannel = activeGame.getMainGameChannel();
           if (inLimboCategory != null && archiveChannels) {
-            if (inLimboCategory.getChannels().size() >= 47) { // HANDLE FULL IN-LIMBO
+            if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
               cleanUpInLimboCategory(event.getGuild(), 3);
             }
 
