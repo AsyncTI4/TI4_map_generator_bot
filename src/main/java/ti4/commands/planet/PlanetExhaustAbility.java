@@ -48,6 +48,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             buttons.add(Button.success("mallice_convert_comm", "Convert Commodities"));
 
         }
+        
         if ("hopesend".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
             MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Hope's End Ability");
             message = "Use buttons to drop a mech on a planet or draw an AC";
@@ -80,6 +81,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Silence's Ability");
             buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild"));
             message = "Use buttons to put 1 cruiser with your ships";
+        }
+        if(ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode() && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList().contains("attachment_nanoforge.png")){
+            MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Nanoforge Ability to ready the planet (technically done right after it was exhausted)");
+            player.refreshPlanet(planet);
         }
         if ("tarrock".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
             if (!activeGame.isFoWMode() && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
