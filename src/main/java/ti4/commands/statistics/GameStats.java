@@ -63,6 +63,7 @@ public class GameStats extends StatisticsSubcommandData {
         }
         switch (stat) {
             case UNLEASH_THE_NAMES -> sendAllNames(event);
+            case HIGHEST_SPENDERS -> calculateSpendToWinCorrellation(event);
             case GAME_LENGTH -> showGameLengths(event, null);
             case GAME_LENGTH_4MO -> showGameLengths(event, 120);
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
@@ -86,6 +87,7 @@ public class GameStats extends StatisticsSubcommandData {
     public enum GameStatistics {
         // Add your new statistic here
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
+        HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on ccs/plastics that bot has"),
         GAME_LENGTH("Game Length", "Show game lengths"),
         GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
@@ -156,6 +158,46 @@ public class GameStats extends StatisticsSubcommandData {
             names.append("\n");
         }
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
+    }
+
+    public static void calculateSpendToWinCorrellation(SlashCommandInteractionEvent event) {
+        StringBuilder names = new StringBuilder();
+        int num = 0;
+        int gamesWhereHighestWon = 0;
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        for (Game game : filteredGames) {
+            if(!game.getWinner().isPresent()){
+                continue;
+            }
+            
+            int highest = 0;
+            Player winner = game.getWinner().get();
+            Player highestP = null;
+            for(Player player : game.getRealPlayers()){
+                if(player.getTotalExpenses() > highest){
+                    highestP = player;
+                    highest = player.getTotalExpenses();
+                }
+                if(player.getTotalExpenses() < 20){
+                    highestP = null;
+                    highest = 0;
+                    break;
+                }
+            }
+            if(highestP != null){
+                num++;
+                names.append(num).append(". ").append(game.getName());
+                if (isNotBlank(game.getCustomName())) {
+                    names.append("Winner was "+winner.getFactionEmoji()+" (").append("Highest was "+highestP.getFactionEmoji()+" at "+highestP.getTotalExpenses()).append(")");
+                }
+                names.append("\n");
+                if(highestP == winner){
+                    gamesWhereHighestWon++;
+                }
+            }
+        }
+        names.append("Total games where highest spender won was "+gamesWhereHighestWon+" out of "+num);
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
     public static boolean hasPlayerFinishedAGame(Player player){

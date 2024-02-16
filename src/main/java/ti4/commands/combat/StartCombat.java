@@ -281,6 +281,10 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.secondary("rollForAmbush_" + tile.getPosition(), "Ambush").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
 
+        if ((p1.hasLeaderUnlocked("mentakhero")) || p2.hasLeaderUnlocked("mentakhero")) {
+            buttons.add(Button.secondary("purgeMentakHero_" + tile.getPosition(), "Purge Mentak Hero").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+        }
+
         if ((p1.hasAbility("facsimile") && p1 != activeGame.getActivePlayer()) || p2.hasAbility("facsimile")&& p2 != activeGame.getActivePlayer() && !activeGame.isFoWMode()) {
             buttons.add(Button.secondary("startFacsimile_" + tile.getPosition(), "Facsimile").withEmoji(Emoji.fromFormatted(Emojis.mortheus)));
         }
@@ -545,6 +549,17 @@ public class StartCombat extends CombatSubcommandData {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Cheiran Commander Block")
                 .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+        if (p1.hasTechReady("absol_x89") && isGroundCombat && p1 != activeGame.getActivePlayer()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.success(finChecker + "exhaustTech_absol_x89", "Absol X-89")
+                .withEmoji(Emoji.fromFormatted(Emojis.BioticTech)));
+        }
+        if (!activeGame.isFoWMode() && p2.hasTechReady("absol_x89") && isGroundCombat
+            && p2 != activeGame.getActivePlayer()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.success(finChecker + "exhaustTech_absol_x89", "Absol X-89")
+                .withEmoji(Emoji.fromFormatted(Emojis.BioticTech)));
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "kortalicommander")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";

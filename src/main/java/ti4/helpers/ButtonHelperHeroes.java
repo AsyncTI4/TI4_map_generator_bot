@@ -835,7 +835,7 @@ public class ButtonHelperHeroes {
                     new RemoveUnits().unitParsing(event, p2.getColor(), tile, "200 ff, 200 inf " + name, activeGame);
 
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                            ButtonHelper.getCorrectChannel(p2, activeGame)
+                           p2.getRepresentation()
                                     + " heads up, a tile with your units in it got hit with a saar hero, removing all fighters and infantry.");
                 }
 
@@ -916,9 +916,33 @@ public class ButtonHelperHeroes {
                     + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
+                message.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(),
                 message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons2);
         event.getMessage().delete().queue();
+    }
+
+    public static void purgeMentakHero(Player player, Game activeGame, ButtonInteractionEvent event,
+            String buttonID) {
+        Leader playerLeader = player.unsafeGetLeader("mentakhero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    message + " - Leader " + "mentakhero" + " has been purged");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Leader was not purged - something went wrong");
+        }
+       
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+                message.toString());
+        activeGame.setCurrentReacts("mentakHero", player.getFaction());
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void purgeTech(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
