@@ -266,7 +266,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
-                                + " use the buttons to build in a system",
+                                + " use the buttons to build in the desired system(s)",
                         buttons);
             }
             case "saarhero" -> {
