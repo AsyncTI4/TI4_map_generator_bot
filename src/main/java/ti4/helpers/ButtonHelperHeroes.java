@@ -1697,7 +1697,6 @@ public class ButtonHelperHeroes {
             String buttonID) {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, activeGame, activeGame.getMainGameChannel(), player, true);
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing()+" reminder that the winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
         event.getMessage().delete().queue();
     }
 
