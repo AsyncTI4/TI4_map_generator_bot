@@ -324,10 +324,6 @@ public class SCPick extends PlayerSubcommandData {
                 }
 
                 activeGame.setCurrentPhase("action");
-                if (!activeGame.isFoWMode()) {
-                    ButtonHelper.updateMap(activeGame, event,
-                        "Start of Action Phase For Round #" + activeGame.getRound());
-                }
             }
         }
        

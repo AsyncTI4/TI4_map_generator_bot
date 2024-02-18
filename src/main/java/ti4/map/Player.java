@@ -2046,7 +2046,7 @@ public class Player {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, activeGame), getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, activeGame), getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet");
         }
     }
 
