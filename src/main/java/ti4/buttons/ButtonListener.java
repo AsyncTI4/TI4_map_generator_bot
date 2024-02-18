@@ -4733,6 +4733,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                 }
+                //kick start
                 case "getDiscardButtonsACs" -> {
                     String msg = trueIdentity + " use buttons to discard";
                     List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, player, false);
