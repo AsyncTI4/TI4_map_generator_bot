@@ -147,7 +147,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         // GET BUTTONS
         ActionRow actionRow = null;
-        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, activeGame));
+        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, activeGame, winnuHero));
         if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToPlay == 7 && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
@@ -288,7 +288,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
-    private List<Button> getSCButtons(int sc, Game activeGame) {
+    private List<Button> getSCButtons(int sc, Game activeGame, boolean winnuHero) {
         boolean isGroupedSCGameWithPoKSCs = "pbd100".equals(activeGame.getName()) || "pbd1000".equals(activeGame.getName());
         if (activeGame.isHomeBrewSCMode() && !isGroupedSCGameWithPoKSCs) {
             return getGenericButtons(sc);
@@ -299,7 +299,7 @@ public class SCPlay extends PlayerSubcommandData {
             sc = Integer.parseInt(StringUtils.left(scId, 1));
         }
         
-        if(sc == 8){
+        if(sc == 8 && !winnuHero){
             Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
             String key = "factionsThatAreNotDiscardingSOs";
             String key2 = "queueToDrawSOs";

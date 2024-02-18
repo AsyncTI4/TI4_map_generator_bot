@@ -563,10 +563,15 @@ public class MapGenerator {
                         if (sc == ButtonHelper.getKyroHeroSC(game)) {
                             graphics.drawString("" + (game.getSCList().size() + 1), x + 90, y + 70 + yDelta);
                         } else {
-                            graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                            if(sc==1){
+                                graphics.drawString(scText, x + 102, y + 70 + yDelta);
+                            }else{
+                                graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                            }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setFont(Storage.getFont40());
                                 graphics.setColor(Color.RED);
+                                
                                 graphics.drawString("X", x + 100, y + 60 + yDelta);
                             }
                             
