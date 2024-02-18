@@ -187,9 +187,7 @@ public class GameStats extends StatisticsSubcommandData {
             if(highestP != null){
                 num++;
                 names.append(num).append(". ").append(game.getName());
-                if (isNotBlank(game.getCustomName())) {
-                    names.append("Winner was "+winner.getFactionEmoji()+" (").append("Highest was "+highestP.getFactionEmoji()+" at "+highestP.getTotalExpenses()).append(")");
-                }
+                names.append(" - Winner was "+winner.getFactionEmoji()+" (").append("Highest was "+highestP.getFactionEmoji()+" at "+highestP.getTotalExpenses()).append(")");
                 names.append("\n");
                 if(highestP == winner){
                     gamesWhereHighestWon++;
