@@ -101,8 +101,8 @@ public class GameSaveLoadManager {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
-            } else if (event instanceof ButtonInteractionEvent button) {
-                if ((event.getMessageChannel() instanceof ThreadChannel && event.getMessageChannel().getName().contains("Cards Info"))|| activeGame.isFoWMode() || button.getButton().getId().contains("anonDeclare")) {
+            } else if (event instanceof ButtonInteractionEvent) {
+                if ((event.getMessageChannel() instanceof ThreadChannel && event.getMessageChannel().getName().contains("Cards Info"))|| activeGame.isFoWMode()) {
                     activeGame.setLatestCommand(username + " pressed button: [CLASSIFIED]");
                 } else {
                     activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- " + ((ButtonInteraction) event).getButton().getLabel());

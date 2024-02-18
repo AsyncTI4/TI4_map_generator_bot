@@ -1040,25 +1040,6 @@ public class Helper {
         return msg;
     }
 
-    public static void refreshPlanetsOnTheRevote(Player player, Game activeGame) {
-        List<String> spentThings = player.getSpentThingsThisWindow();
-        for (String thing : spentThings) {
-            if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + activeGame.getName());
-                continue;
-            }
-            int tg = player.getSpentTgsThisWindow();
-            player.setTg(player.getTg()+tg);
-            String secondHalf = thing.split("_")[1];
-            String flavor = thing.split("_")[0];
-            if (flavor.contains("planet") && player.getExhaustedPlanets().contains(secondHalf)) {
-                player.refreshPlanet(secondHalf);
-            } 
-        }
-        player.resetSpentThings();
-        
-    }
-
     public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = ButtonHelper.getIdent(player) + " exhausted the following: \n";
