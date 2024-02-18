@@ -537,10 +537,7 @@ public class ButtonHelper {
     public static List<Button> getPlaceStatusInfButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
 
-        Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
-        if (tile == null) {
-            tile = getTileOfPlanetWithNoTrait(player, activeGame);
-        }
+        Tile tile = FoWHelper.getPlayerHS(activeGame, player);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
                 if (player.getPlanets().contains(unitHolder.getName())) {
@@ -555,6 +552,15 @@ public class ButtonHelper {
                     }
                 }
 
+            }
+        }
+        if (player.ownsUnit("cymiae_infantry2")) {
+            buttons = new ArrayList<>();
+            for(String planet : player.getPlanets()){
+                if(activeGame.getTileFromPlanet(planet) != null){
+                    buttons.add(Button.success("statusInfRevival_" + planet + "_1",
+                            "Place 1 infantry on " + Helper.getPlanetRepresentation(planet, activeGame)));
+                }
             }
         }
         return buttons;
@@ -1277,15 +1283,30 @@ public class ButtonHelper {
         }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = activeGame.getActionsChannel();
-        if (justChecking) {
-            Player ghostPlayer = Helper.getPlayerFromUnit(activeGame, "ghost_mech");
-            if (ghostPlayer != null && ghostPlayer != player
-                    && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech") > 0
-                    && !activeGame.getLaws().containsKey("articles_war")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                        "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
+        
+        Player ghostPlayer = Helper.getPlayerFromUnit(activeGame, "ghost_mech");
+        if (!activeGame.isFoWMode() && ghostPlayer != null && ghostPlayer != player
+                && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech") > 0
+                && !activeGame.getLaws().containsKey("articles_war")) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
+        }
+        if(!activeGame.isFoWMode() && activeGame.getLaws().keySet().contains("minister_peace")){
+            if(FoWHelper.otherPlayersHaveUnitsInSystem(player, activeSystem, activeGame)){
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if (ButtonHelper.isPlayerElected(activeGame, p2, "minister_peace")) {
+                        if(p2 != player){
+                            List<Button> buttons2 = new ArrayList<>();
+                            Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace").withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+                            buttons2.add(hacanButton);
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "Reminder you can use minister of peace", buttons2);
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Reminder you should really check in with the minister of peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required");
+                        }
+                    }
+                }
             }
         }
+        
         for (Player nonActivePlayer : activeGame.getPlayers().values()) {
 
             if (!nonActivePlayer.isRealPlayer() || nonActivePlayer.isPlayerMemberOfAlliance(player)
@@ -5506,6 +5527,7 @@ public class ButtonHelper {
             }
             x++;
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You have all been set up as franken factions. These have similar zombie emojis as their default faction icon. You should personalize yours with /franken set_faction_icon. You can use any emoji the bot can use");
     }
 
     public static List<Button> getFactionSetupButtons(Game activeGame, String buttonID) {
@@ -6716,6 +6738,10 @@ public class ButtonHelper {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message + pickSCMsg,
                     Helper.getRemainingSCButtons(event, activeGame, speaker));
+        }
+        if (!activeGame.isFoWMode()) {
+            ButtonHelper.updateMap(activeGame, event,
+                "Start of Strategy Phase For Round #" + activeGame.getRound());
         }
         for (Player player2 : activeGame.getRealPlayers()) {
             if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")
