@@ -59,7 +59,6 @@ public class SearchCommand implements Command {
         subcommands.add(new ListUnits());
         subcommands.add(new ListCommands());
         subcommands.add(new ListMyGames());
-        subcommands.add(new ListMyTitles());
         subcommands.add(new ListAgendas());
         subcommands.add(new ListEvents());
         subcommands.add(new ListSecretObjectives());

@@ -213,18 +213,7 @@ public class ButtonListener extends ListenerAdapter {
         String trueIdentity = null;
         String fowIdentity = null;
         String ident = null;
-        if (buttonID.startsWith("anonDeclare_")) {
-            String declaration = buttonID.split("_")[1];
-            String old = activeGame.getFactionsThatReactedToThis(player.getUserID()+"anonDeclare");
-            if(old.isEmpty()){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Someone has expressed their preference for a \""+declaration+"\" environment.");
-            }else{
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Someone has changed their preference from a \""+old+"\" environment to a \""+declaration+"\" environment.");
-            }
-            activeGame.setCurrentReacts(player.getUserID()+"anonDeclare",declaration);
-            GameSaveLoadManager.saveMap(activeGame, event);
-            return;
-        }
+
         if (player != null) {
             trueIdentity = player.getRepresentation(true, true);
             fowIdentity = player.getRepresentation(false, true);
@@ -3357,7 +3346,7 @@ public class ButtonListener extends ListenerAdapter {
                                     trueIdentity + " use buttons to resolve contagion planet #1", buttons2);
                             MessageHelper.sendMessageToChannelWithButtons(
                                         player.getCardsInfoThread(),
-                                        trueIdentity + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)", buttons2);
+                                        trueIdentity + " use buttons to resolve contagion planet #2", buttons2);
                         }
                     }
                 }
@@ -4745,9 +4734,8 @@ public class ButtonListener extends ListenerAdapter {
                     if (activeGame.isFoWMode()) {
                         pfaction = player.getColor();
                     }
-                    Helper.refreshPlanetsOnTheRevote(player, activeGame);
                     AgendaHelper.eraseVotesOfFaction(activeGame, pfaction);
-                    String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji() + " and readied the planets they previously exhausted\n\n"
+                    String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji() + "\n\n"
                             + AgendaHelper.getSummaryOfVotes(activeGame, true);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), eraseMsg);
                     Button vote = Button.success(finsFactionCheckerPrefix + "vote",

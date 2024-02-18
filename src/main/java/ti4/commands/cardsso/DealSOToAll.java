@@ -59,7 +59,6 @@ public class DealSOToAll extends SOCardsSubcommandData {
             // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
             //     activeGame.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
             Helper.setOrder(activeGame);
-            
         }
     }
 }
