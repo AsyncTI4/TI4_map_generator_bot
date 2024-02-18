@@ -632,7 +632,7 @@ public class StartCombat extends CombatSubcommandData {
                     if(p1 == activeGame.getActivePlayer()){
                         nonActive=p2;
                     }
-                    if(new CombatRoll().checkIfUnitsOfType(nonActive, activeGame, event, tile, groundOrSpace, CombatRollType.SpaceCannonDefence)){
+                    if(new CombatRoll().checkIfUnitsOfType(nonActive, activeGame, event, tile, unitH.getName(), CombatRollType.SpaceCannonDefence)){
                         buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence", "Roll Space Cannon Defence for " + nameOfHolder));
                     }
                 }

@@ -18,6 +18,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.search.ListMyTitles;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
@@ -270,6 +271,14 @@ public class Setup extends PlayerSubcommandData {
                         player.setPreferenceForDistanceBasedTacticalActions(true);
                     }
                 }
+            }
+        }
+
+        if(!activeGame.isFoWMode()){
+            StringBuilder sb = new ListMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
+            if(!sb.toString().contains("No titles yet")){
+                String msg = "In previous games, "+player.getUserName()+" has earned the titles of: \n"+sb.toString();
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
             }
         }
 

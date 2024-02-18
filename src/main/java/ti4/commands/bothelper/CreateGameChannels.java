@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
@@ -261,8 +262,21 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // INTRODUCTION TO ACTIONS CHANNEL
         String actionsGetStartedMessage = role.getAsMention() + " - actions channel\n" +
                 "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
-                "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
+                "Generally, you dont want to chat in here once the game starts, as ideally this channel is a clean ledger of what has happened in the game for others to quickly read.\n";
         MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
+
+        String agressionMsg = "Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who dont share that meta."
+        +" Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
+        +". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as aggressive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
+        +"\n- Anything goes -- Is comfortable in a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2. Tournament games would be this by default. "
+        +"\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives dont necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("anonDeclare_Friendly", "Friendly"));
+        buttons.add(Button.primary("anonDeclare_Anything Goes", "Anything Goes"));
+        buttons.add(Button.danger("anonDeclare_Aggressive", "Aggressive"));
+        newGame.setUndoButton(false);
+        MessageHelper.sendMessageToChannel(actionsChannel, agressionMsg, buttons);
+        newGame.setUndoButton(true);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         // INTRODUCTION TO BOT-MAP THREAD
