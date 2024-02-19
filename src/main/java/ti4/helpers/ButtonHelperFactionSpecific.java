@@ -407,7 +407,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                techs.add(Button.success(player.getFinsFactionCheckerPrefix()+"getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
         }
@@ -433,7 +433,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                techs.add(Button.success(player.getFinsFactionCheckerPrefix()+"getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
         }

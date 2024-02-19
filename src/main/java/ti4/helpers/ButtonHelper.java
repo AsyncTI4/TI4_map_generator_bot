@@ -1286,7 +1286,7 @@ public class ButtonHelper {
         
         Player ghostPlayer = Helper.getPlayerFromUnit(activeGame, "ghost_mech");
         if (!activeGame.isFoWMode() && ghostPlayer != null && ghostPlayer != player
-                && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech") > 0
+                && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech",false) > 0
                 && !activeGame.getLaws().containsKey("articles_war")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
@@ -2327,41 +2327,41 @@ public class ButtonHelper {
                 }
             }
             case "mentak" -> {
-                if (getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 3) {
+                if (getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser",false) > 3) {
                     shouldBeUnlocked = true;
                 }
             }
             case "ghemina" -> {
-                if ((getNumberOfUnitsOnTheBoard(activeGame, player, "flagship")
-                        + getNumberOfUnitsOnTheBoard(activeGame, player, "lady")) > 1) {
+                if ((getNumberOfUnitsOnTheBoard(activeGame, player, "flagship",false)
+                        + getNumberOfUnitsOnTheBoard(activeGame, player, "lady",false)) > 1) {
                     shouldBeUnlocked = true;
                 }
             }
             case "tnelis" -> {
-                if (getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer") > 5) {
+                if (getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer",false) > 5) {
                     shouldBeUnlocked = true;
                 }
             }
             case "cymiae" -> {
-                if (getNumberOfUnitsOnTheBoard(activeGame, player, "infantry") > 9) {
+                if (getNumberOfUnitsOnTheBoard(activeGame, player, "infantry",false) > 9) {
                     shouldBeUnlocked = true;
                 }
             }
             case "kyro" -> {
-                if (getNumberOfUnitsOnTheBoard(activeGame, player, "infantry") > 5
-                        && getNumberOfUnitsOnTheBoard(activeGame, player, "fighter") > 5) {
+                if (getNumberOfUnitsOnTheBoard(activeGame, player, "infantry",false) > 5
+                        && getNumberOfUnitsOnTheBoard(activeGame, player, "fighter",false) > 5) {
                     shouldBeUnlocked = true;
                 }
             }
             case "l1z1x" -> {
-                if (getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 3) {
+                if (getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought",false) > 3) {
                     shouldBeUnlocked = true;
                 }
             }
             case "argent" -> {
-                int num = getNumberOfUnitsOnTheBoard(activeGame, player, "pds")
-                        + getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought")
-                        + getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer");
+                int num = getNumberOfUnitsOnTheBoard(activeGame, player, "pds",false)
+                        + getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought",false)
+                        + getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer",false);
                 if (num > 5) {
                     shouldBeUnlocked = true;
                 }
@@ -2511,9 +2511,11 @@ public class ButtonHelper {
         if (!player.hasUnit("titans_flagship")) {
             return planetsWithPDS;
         }
-        for (String planet : getPlanetsWithSpecificUnit(player, activeGame, tile, "pds")) {
-            planetsWithPDS.add(Button.success(finChecker + "replacePDSWithFS_" + planet,
-                    "Replace pds on " + planet + " with your flagship."));
+        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "fs") < 1){
+            for (String planet : getPlanetsWithSpecificUnit(player, activeGame, tile, "pds")) {
+                planetsWithPDS.add(Button.success(finChecker + "replacePDSWithFS_" + planet,
+                        "Replace pds on " + planet + " with your flagship."));
+            }
         }
         planetsWithPDS.add(Button.danger("deleteButtons", "Delete these buttons"));
         return planetsWithPDS;
@@ -3401,7 +3403,7 @@ public class ButtonHelper {
     public static List<Button> getEchoAvailableSystems(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
-            if (tile.getUnitHolders().size() < 2) {
+            if (tile.getPlanetUnitHolders().size() == 0) {
                 buttons.add(Button.success("echoPlaceFrontier_" + tile.getPosition(),
                         tile.getRepresentationForButtons(activeGame, player)));
             }
@@ -7926,7 +7928,11 @@ public class ButtonHelper {
 
     public static int getNumberOfUnitsOnTheBoard(Game activeGame, Player p1, String unit) {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p1.getColor());
-        return getNumberOfUnitsOnTheBoard(activeGame, unitKey);
+        return getNumberOfUnitsOnTheBoard(activeGame, unitKey, true);
+    }
+    public static int getNumberOfUnitsOnTheBoard(Game activeGame, Player p1, String unit, boolean countPrison) {
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p1.getColor());
+        return getNumberOfUnitsOnTheBoard(activeGame, unitKey, countPrison);
     }
 
     public static int getNumberOfUnitsOnTheBoard(Game activeGame, UnitKey unitKey) {
@@ -7934,6 +7940,20 @@ public class ButtonHelper {
                 .flatMap(t -> t.getUnitHolders().values().stream()).toList());
         unitHolders.addAll(activeGame.getRealPlayers().stream()
                 .flatMap(p -> p.getNomboxTile().getUnitHolders().values().stream()).toList());
+
+        return unitHolders.stream()
+                .flatMap(uh -> uh.getUnits().entrySet().stream())
+                .filter(e -> e.getKey().equals(unitKey)).mapToInt(e -> Optional.ofNullable(e.getValue()).orElse(0))
+                .sum();
+    }
+
+    public static int getNumberOfUnitsOnTheBoard(Game activeGame, UnitKey unitKey, boolean countPrison) {
+        List<UnitHolder> unitHolders = new ArrayList<>(activeGame.getTileMap().values().stream()
+                .flatMap(t -> t.getUnitHolders().values().stream()).toList());
+        if(countPrison){
+            unitHolders.addAll(activeGame.getRealPlayers().stream()
+                    .flatMap(p -> p.getNomboxTile().getUnitHolders().values().stream()).toList());
+        }
 
         return unitHolders.stream()
                 .flatMap(uh -> uh.getUnits().entrySet().stream())
