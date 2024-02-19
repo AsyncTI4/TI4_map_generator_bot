@@ -619,12 +619,12 @@ public class AgendaHelper {
             if ("arms_reduction".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player player : activeGame.getRealPlayers()) {
-                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 4) {
+                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser",false) > 4) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation() + " remove excess cruisers", ButtonHelperModifyUnits
                                             .getRemoveThisTypeOfUnitButton(player, activeGame, "cruiser"));
                         }
-                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 2) {
+                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought",false) > 2) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation() + " remove excess dreads", ButtonHelperModifyUnits
                                             .getRemoveThisTypeOfUnitButton(player, activeGame, "dreadnought"));

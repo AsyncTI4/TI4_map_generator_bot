@@ -108,6 +108,13 @@ public class ButtonHelperAgents {
             buttons.add(unitButton2);
         }
 
+        unit2 = "mech";
+        if (maxComms > 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 4) {
+            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
+                    .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+
         unit2 = "cruiser";
         if (maxComms > 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 8) {
             unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)

@@ -174,7 +174,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent", "Use Vaylerian Agent").withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
             acButtons.add(nekroButton);
         }
-        if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0 && !activeGame.getLaws().containsKey("articles_war")) {
+        if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech",false) > 0 && !activeGame.getLaws().containsKey("articles_war")) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             acButtons.add(ghostButton);
         }

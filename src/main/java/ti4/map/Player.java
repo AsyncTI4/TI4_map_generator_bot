@@ -48,6 +48,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
@@ -923,6 +924,17 @@ public class Player {
             }
         }
         secrets.remove(idToRemove);
+    }
+
+    public SecretObjectiveModel getSecret(Integer identifier) {
+        String idToRemove = "";
+        for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(identifier)) {
+                idToRemove = so.getKey();
+                break;
+            }
+        }
+        return Mapper.getSecretObjective(idToRemove);
     }
 
     public Map<String, Integer> getSecretsScored() {
