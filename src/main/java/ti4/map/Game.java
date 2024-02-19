@@ -2446,9 +2446,11 @@ public class Game {
 
     public void shuffleDiscardsIntoExploreDeck(String reqType) {
         List<String> discardsOfType = getExplores(reqType, discardExplore);
-        explore.addAll(discardsOfType);
-        Collections.shuffle(explore);
-        discardExplore.removeAll(discardsOfType);
+        List<String> anotherList = new ArrayList<>();
+        anotherList.addAll(discardsOfType);
+        for(String explore : anotherList){
+            addExplore(explore);
+        }
     }
 
     public void shuffleExplores() {

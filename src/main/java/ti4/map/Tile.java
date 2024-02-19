@@ -312,7 +312,7 @@ public class Tile {
     public List<UnitHolder> getPlanetUnitHolders() {
         List<UnitHolder> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
-            if (uH instanceof Planet) {
+            if (uH instanceof Planet && !uH.getTokenList().contains(Constants.WORLD_DESTROYED_PNG)) {
                 planets.add(uH);
             }
         }

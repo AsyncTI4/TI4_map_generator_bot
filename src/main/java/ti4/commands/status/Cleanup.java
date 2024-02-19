@@ -94,7 +94,6 @@ public class Cleanup extends StatusSubcommandData {
         activeGame.setCurrentReacts("agendaCount", "0");
         activeGame.setCurrentReacts("politicalStabilityFaction", "");
         activeGame.setCurrentReacts("forcedScoringOrder", "");
-        activeGame.setCurrentReacts("factionsThatScored", "");
         activeGame.setCurrentReacts("Public Disgrace", "");
         activeGame.setCurrentReacts("Public Disgrace Only", "");
         activeGame.setCurrentReacts("edynAgentPreset", "");

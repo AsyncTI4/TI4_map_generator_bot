@@ -268,13 +268,13 @@ public class TurnEnd extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you gained "+numScoredSOs+" tg and "+numScoredPos+" commodities due to Vaden Commander");
             }
         }
-        if(maxVP+4 > activeGame.getVp()){
-            String msg = "You can use these buttons to force scoring to go in iniative order";
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.primary("forceACertainScoringOrder", "Force Scoring in Order"));
-            buttons.add(Button.danger("deleteButtons", "Decline to force order"));
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg, buttons);
-        }
+        // if(maxVP+4 > activeGame.getVp()){
+        //     String msg = "You can use these buttons to force scoring to go in iniative order";
+        //     List<Button> buttons = new ArrayList<>();
+        //     buttons.add(Button.primary("forceACertainScoringOrder", "Force Scoring in Order"));
+        //     buttons.add(Button.danger("deleteButtons", "Decline to force order"));
+        //     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg, buttons);
+        // }
         // return beginning of status phase PNs
         Map<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {
@@ -336,6 +336,26 @@ public class TurnEnd extends PlayerSubcommandData {
             }
         }
 
+        String key2 = "queueToScorePOs";
+        String key3 = "potentialScorePOBlockers";
+        String key2b = "queueToScoreSOs";
+        String key3b = "potentialScoreSOBlockers";
+        
+        activeGame.setCurrentReacts(key2,"");
+        activeGame.setCurrentReacts(key3,"");
+        activeGame.setCurrentReacts(key2b,"");
+        activeGame.setCurrentReacts(key3b,"");
+        if(!activeGame.isFoWMode() && activeGame.getHighestScore() + 4 > activeGame.getVp()){
+            activeGame.setCurrentReacts("forcedScoringOrder", "true");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
+                            "Players will be forced to score in order. Any preemptive scores will be queued. You can turn this off at any time by pressing this button", buttons);
+            for(Player player : Helper.getInitativeOrder(activeGame)){
+                activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+                activeGame.setCurrentReacts(key3b, activeGame.getFactionsThatReactedToThis(key3b)+player.getFaction()+"*");
+            }
+        }
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
             String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do mitosis!";
