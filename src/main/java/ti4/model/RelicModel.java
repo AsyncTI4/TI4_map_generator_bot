@@ -51,12 +51,29 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
-        String name = getName() == null ? "" : getName();
-        eb.setTitle(Emojis.Relic + "__" + name + "__" + getSource().emoji(), null);
-        eb.setColor(Color.yellow);
+        StringBuilder title = new StringBuilder();
+        if (!isFakeRelic()) title.append(Emojis.Relic);
+        title.append("__").append(getName()).append("__").append(getSource().emoji());
+        eb.setTitle(title.toString(), null);
+
         eb.setDescription(getText());
         if (includeFlavourText && getFlavourText() != null) eb.addField("", getFlavourText(), false);
-        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+                
+        // Colour
+        if (isFakeRelic()) {
+            eb.setColor(Color.gray);
+        } else {
+            eb.setColor(Color.yellow);
+        }
+
+        // Footer
+        StringBuilder footer = new StringBuilder();
+        if (includeID) {
+            footer.append("ID: " + getAlias() + "  Source: " + getSource());
+        }
+        if (isFakeRelic()) footer.append("\nNOTE: NOT ACTUALLY A RELIC");
+        if (!footer.isEmpty()) eb.setFooter(footer.toString());
+        
         return eb.build();
     }
 
