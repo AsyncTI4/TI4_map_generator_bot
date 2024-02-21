@@ -3,15 +3,15 @@ package ti4.commands.explore;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -47,24 +47,24 @@ public class RelicInfo extends ExploreSubcommandData implements InfoThreadComman
     }
 
     public static void sendRelicInfo(Game activeGame, Player player) {
-        MessageHelper.sendMessageToChannelWithButtons(
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 player.getCardsInfoThread(),
-                getRelicInfoText(player),
+                null,
+                getRelicEmbeds(player),
                 getRelicButtons(player));
     }
 
-    private static String getRelicInfoText(Player player) {
-        List<String> playerRelics = player.getRelics();
-        StringBuilder sb = new StringBuilder("__**Relic Info**__\n");
-        if (playerRelics == null || playerRelics.isEmpty()) {
-            sb.append("> No Relics");
-            return sb.toString();
-        }
-        for (String relicID : playerRelics) {
+    private static List<MessageEmbed> getRelicEmbeds(Player player) {
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        for (String relicID : player.getRelics()) {
             RelicModel relicModel = Mapper.getRelic(relicID);
-            if (relicModel != null) sb.append(Emojis.Relic).append(relicModel.getSimpleRepresentation()).append("\n");
+            if (relicModel != null) {
+                MessageEmbed representationEmbed = relicModel.getRepresentationEmbed();
+                messageEmbeds.add(representationEmbed);
+            }
         }
-        return sb.toString();
+        return messageEmbeds;
+    
     }
 
     private static List<Button> getRelicButtons(Player player) {
