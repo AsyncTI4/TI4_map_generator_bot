@@ -1767,6 +1767,7 @@ public class ButtonHelper {
                                     buttonsWeb.add(linkToWebsite);
                                 }
                                 buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
+                                buttonsWeb.add(Buttons.REFRESH_INFO);
                                 buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                                 buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
 
@@ -1787,6 +1788,7 @@ public class ButtonHelper {
                             buttonsWeb.add(linkToWebsite);
                         }
                         buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
+                        buttonsWeb.add(Buttons.REFRESH_INFO);
                         buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                         buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
 
