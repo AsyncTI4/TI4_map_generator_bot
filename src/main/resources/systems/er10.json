@@ -9,7 +9,7 @@
         "ephi",
         "enu"
     ],
-    "imagePath": "ER10_elokphi.png",
+    "imagePath": "er_10_async.png",
     "planetIds": [
         "elokphi",
         "eloknu"
@@ -40,5 +40,5 @@
         "ephi",
         "enu"
     ],
-    "isAsteroidField": true
+    "isNebula": true
 }
