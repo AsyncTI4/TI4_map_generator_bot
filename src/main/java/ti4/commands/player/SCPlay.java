@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -165,7 +166,13 @@ public class SCPlay extends PlayerSubcommandData {
                 player.addFollowedSC(scToPlay);
             }
             activeGame.setCurrentReacts("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
-
+            activeGame.setCurrentReacts("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
+            activeGame.setCurrentReacts("scPlayMsgTime" + scToPlay, new Date().getTime() +"");
+            for(Player p2 : activeGame.getRealPlayers()){
+                if(!activeGame.getFactionsThatReactedToThis("scPlayPingCount" + scToPlay+p2.getFaction()).isEmpty()){
+                    activeGame.removeMessageIDFromCurrentReacts("scPlayPingCount" + scToPlay+p2.getFaction());
+                }
+            }
             if (activeGame.isFoWMode()) {
                 // in fow, send a message back to the player that includes their emoji
                 String response = "SC played.";

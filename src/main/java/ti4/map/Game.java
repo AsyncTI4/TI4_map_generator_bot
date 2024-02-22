@@ -125,6 +125,8 @@ public class Game {
     @ExportableField
     private boolean undoButtonOffered = true;
     @ExportableField
+    private boolean fastSCFollowMode = false;
+    @ExportableField
     private boolean queueSO = true;
     @ExportableField
     private boolean temporaryPingDisable;
@@ -986,6 +988,9 @@ public class Game {
     public boolean getUndoButton() {
         return undoButtonOffered;
     }
+    public boolean isFastSCFollowMode() {
+        return fastSCFollowMode;
+    }
 
     public boolean getQueueSO() {
         return queueSO;
@@ -1021,6 +1026,10 @@ public class Game {
 
     public void setUndoButton(boolean onStatus) {
         undoButtonOffered = onStatus;
+    }
+
+    public void setFastSCFollowMode(boolean onStatus) {
+        fastSCFollowMode = onStatus;
     }
 
     public void setQueueSO(boolean onStatus) {
