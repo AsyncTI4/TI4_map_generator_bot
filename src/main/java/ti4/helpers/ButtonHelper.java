@@ -8308,6 +8308,20 @@ public class ButtonHelper {
         sendMessageToRightStratThread(player, activeGame, message, stratName, null);
     }
 
+    public static String getStratName(int sc){
+        switch(sc){
+            case 1 -> {return "leadership";}
+            case 2 -> {return "diplomacy";}
+            case 3 -> {return "politics";}
+            case 4 -> {return "construction";}
+            case 5 -> {return "trade";}
+            case 6 -> {return "warfare";}
+            case 7 -> {return "technology";}
+            case 8 -> {return "imperial";}
+            default ->{return "action";}
+        }
+    }
+
     public static void sendMessageToRightStratThread(Player player, Game activeGame, String message, String stratName,
             @Nullable List<Button> buttons) {
         List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
