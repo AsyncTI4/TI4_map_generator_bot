@@ -6,7 +6,7 @@
         "ar",
         "asteroidrift"
     ],
-    "imagePath": "ER17_Rift_Asteroid.png",
+    "imagePath": "er_17_async.png",
     "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
