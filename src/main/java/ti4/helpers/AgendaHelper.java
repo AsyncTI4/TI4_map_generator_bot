@@ -1342,6 +1342,7 @@ public class AgendaHelper {
                     pfaction2 = player.getFaction();
                 }
                 if (pfaction2 != null) {
+                    player.resetSpentThings();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             player.getRepresentation() + " Abstained");
                     event.getMessage().delete().queue();
@@ -1411,6 +1412,7 @@ public class AgendaHelper {
                             + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame
                             .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                            nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
@@ -1882,6 +1884,7 @@ public class AgendaHelper {
                             + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame
                             .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                            nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);

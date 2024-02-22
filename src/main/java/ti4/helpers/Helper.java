@@ -354,7 +354,7 @@ public class Helper {
         return players;
     }
 
-    public static void resolveQueue(Game activeGame, GenericInteractionCreateEvent event) {
+    public static void resolveQueue(Game activeGame) {
 
         Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
         String key = "factionsThatAreNotDiscardingSOs";
@@ -372,7 +372,7 @@ public class Helper {
                     activeGame.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to plausible deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                SOInfo.sendSecretObjectiveInfo(activeGame, player);
                 activeGame.setCurrentReacts(key2,
                         activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
