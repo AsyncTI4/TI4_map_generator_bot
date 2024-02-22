@@ -163,7 +163,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         if (player2 == player) {
                             player2 = players.get(1);
                         }
-                        List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, tile.getPosition(), player, player2, "space");
+                        List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, tile.getPosition(), player, player2, "space", event);
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                         return;
                     } else {
@@ -171,7 +171,7 @@ public class SystemInfo extends SpecialSubcommandData {
                             if (unitHolder instanceof Planet) {
                                 if (ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName()).size() > 1) {
                                     List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName());
-                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, tile.getPosition(), listP.get(0), listP.get(1), "ground");
+                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
                                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                                     return;
                                 }

@@ -125,6 +125,8 @@ public class Game {
     @ExportableField
     private boolean undoButtonOffered = true;
     @ExportableField
+    private boolean fastSCFollowMode = false;
+    @ExportableField
     private boolean queueSO = true;
     @ExportableField
     private boolean temporaryPingDisable;
@@ -986,6 +988,9 @@ public class Game {
     public boolean getUndoButton() {
         return undoButtonOffered;
     }
+    public boolean isFastSCFollowMode() {
+        return fastSCFollowMode;
+    }
 
     public boolean getQueueSO() {
         return queueSO;
@@ -1021,6 +1026,10 @@ public class Game {
 
     public void setUndoButton(boolean onStatus) {
         undoButtonOffered = onStatus;
+    }
+
+    public void setFastSCFollowMode(boolean onStatus) {
+        fastSCFollowMode = onStatus;
     }
 
     public void setQueueSO(boolean onStatus) {
@@ -1708,7 +1717,9 @@ public class Game {
     public boolean removePOFromGame(String id) {
         if (publicObjectives1.remove(id))
             return true;
-        return publicObjectives2.remove(id);
+        if (publicObjectives2.remove(id))
+            return true;
+        return revealedPublicObjectives.remove(id) != null;
     }
 
     public boolean removeACFromGame(String id) {
@@ -1995,7 +2006,7 @@ public class Game {
             }
         }
         if (!id.isEmpty()) {
-            if (id.equalsIgnoreCase("warrant")) {
+            if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
@@ -2138,7 +2149,7 @@ public class Game {
             }
         }
         if (!id.isEmpty()) {
-            if (id.equalsIgnoreCase("warrant")) {
+            if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
@@ -2155,7 +2166,7 @@ public class Game {
 
     public boolean removeLaw(String id) {
         if (!id.isEmpty()) {
-            if (id.equalsIgnoreCase("warrant")) {
+            if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
@@ -2444,9 +2455,11 @@ public class Game {
 
     public void shuffleDiscardsIntoExploreDeck(String reqType) {
         List<String> discardsOfType = getExplores(reqType, discardExplore);
-        explore.addAll(discardsOfType);
-        Collections.shuffle(explore);
-        discardExplore.removeAll(discardsOfType);
+        List<String> anotherList = new ArrayList<>();
+        anotherList.addAll(discardsOfType);
+        for(String explore : anotherList){
+            addExplore(explore);
+        }
     }
 
     public void shuffleExplores() {

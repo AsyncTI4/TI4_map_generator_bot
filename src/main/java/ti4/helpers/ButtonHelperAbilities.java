@@ -1190,7 +1190,7 @@ public class ButtonHelperAbilities {
                                     MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext,
                                             "Picture of system", false);
                                     List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame,
-                                            tile.getPosition(), player, player2, "ground");
+                                            tile.getPosition(), player, player2, "ground", event);
                                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                                 }
                             }

@@ -131,14 +131,18 @@ public class HeroPlay extends LeaderAction {
             }
         } else {
             boolean purged = true;
+            String msg = "Leader " + playerLeader.getId() + " has been purged";
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
+                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
+            }else{
+                msg ="Leader " + playerLeader.getId() + " was used to copy a hero";
             }
 
             if (purged) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                        "Leader " + playerLeader.getId() + " has been purged");
-                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
+                        msg);
+                
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Leader was not purged - something went wrong");
@@ -262,7 +266,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
-                                + " use the buttons to build in a system",
+                                + " use the buttons to build in the desired system(s)",
                         buttons);
             }
             case "saarhero" -> {

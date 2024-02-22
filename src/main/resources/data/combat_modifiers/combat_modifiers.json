@@ -332,7 +332,7 @@
             {
                 "type": "custom",
                 "alias": "custom",
-                "message": "Letnev Agent gives +1 die to best ship"
+                "message": "Sol Agent gives +1 die to best ground force"
             }
         ]
     },

@@ -407,7 +407,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                techs.add(Button.success(player.getFinsFactionCheckerPrefix()+"getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
         }
@@ -433,7 +433,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                techs.add(Button.success(player.getFinsFactionCheckerPrefix()+"getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
         }
@@ -795,8 +795,8 @@ public class ButtonHelperFactionSpecific {
         Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
-            UnitModel unit = player.getUnitFromUnitKey(unitKey);
-            if (player.unitBelongsToPlayer(unitKey) && unit.getIsGroundForce()) {
+            UnitModel unit = saar.getUnitFromUnitKey(unitKey);
+            if (saar.unitBelongsToPlayer(unitKey) && unit.getIsGroundForce()) {
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int amount = unitEntry.getValue();
                 new RemoveUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(origPlanet),
@@ -1388,6 +1388,19 @@ public class ButtonHelperFactionSpecific {
     public static void cabalEatsUnit(Player player, Game activeGame, Player cabal, int amount, String unit,
             GenericInteractionCreateEvent event) {
         cabalEatsUnit(player, activeGame, cabal, amount, unit, event, false);
+    }
+    public static void mentakHeroProducesUnit(Player player, Game activeGame, Player mentak, int amount, String unit,
+            GenericInteractionCreateEvent event, Tile tile) {
+            String unitP = AliasHandler.resolveUnit(unit);
+            if (mentak == player || unitP.contains("sd") || unitP.contains("pd") || (unitP.contains("ws") && !mentak.hasWarsunTech()) || unitP.contains("mf") || unitP.contains("gf")
+                    || (mentak.getAllianceMembers().contains(player.getFaction()))) {
+                return;
+            }
+            String msg = mentak.getRepresentation(true, true) + " placed " + amount + " of the " + unit
+                + "s which "
+                + player.getRepresentation() + " just had destroyed in the active system using Mentak Hero.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            new AddUnits().unitParsing(event, mentak.getColor(), tile, amount+" "+unit, activeGame);
     }
 
     public static void cabalEatsUnit(Player player, Game activeGame, Player cabal, int amount, String unit,

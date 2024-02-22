@@ -173,7 +173,7 @@ public class GameEnd extends GameSubcommandData {
           TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
           TextChannel actionsChannel = activeGame.getMainGameChannel();
           if (inLimboCategory != null && archiveChannels) {
-            if (inLimboCategory.getChannels().size() >= 47) { // HANDLE FULL IN-LIMBO
+            if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
               cleanUpInLimboCategory(event.getGuild(), 3);
             }
 
@@ -267,14 +267,14 @@ public class GameEnd extends GameSubcommandData {
       Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
       int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
       if (gamesWithWinnerCount >= 100) {
-        int winningPathCount = winningPathCounts.get(winningPath) - 1;
+        int winningPathCount = winningPathCounts.get(winningPath);
         double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
         String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
         sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ")
-            .append(winningPathCount)
-            .append(" times before. That's the ").append(winningPathCommonality).append("most common path at ")
+            .append(winningPathCount - 1)
+            .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
             .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
-        if (winningPathCount == 0) {
+        if (winningPathCount == 1) {
           sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
         } else if (winningPathPercent <= .005) {
           sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉").append("\n");

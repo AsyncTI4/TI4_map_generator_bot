@@ -49,11 +49,13 @@ import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.capture.RemoveUnits;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
+import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -352,7 +354,7 @@ public class Helper {
         return players;
     }
 
-    public static void resolveQueue(Game activeGame, GenericInteractionCreateEvent event) {
+    public static void resolveQueue(Game activeGame) {
 
         Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
         String key = "factionsThatAreNotDiscardingSOs";
@@ -370,10 +372,13 @@ public class Helper {
                     activeGame.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to plausible deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                SOInfo.sendSecretObjectiveInfo(activeGame, player);
                 activeGame.setCurrentReacts(key2,
                         activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if(!activeGame.isFoWMode()){
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
+                }
             }
             if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
                     && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
@@ -382,7 +387,83 @@ public class Helper {
                             + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if(!activeGame.isFoWMode()){
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
+                }
                 break;
+            }
+        }
+    }
+
+    public static void resolvePOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
+        String key2 = "queueToScorePOs";
+        String key3 = "potentialScorePOBlockers";
+        String key2b = "queueToScoreSOs";
+        String key3b = "potentialScoreSOBlockers";
+        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2|| activeGame.getHighestScore()+1 > activeGame.getVp()) {
+            return;
+        }
+        for (Player player : Helper.getInitativeOrder(activeGame)) {
+            if (activeGame.getHighestScore()+1 > activeGame.getVp()) {
+                return;
+            }
+            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*") || activeGame.getFactionsThatReactedToThis(key2b).contains(player.getFaction() + "*")) {
+                if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                    int poIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedPOScore"));
+                    ScorePublic.scorePO(event, activeGame.getMainGameChannel(), activeGame, player, poIndex);
+                    activeGame.setCurrentReacts(key2,
+                            activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                    activeGame.setCurrentReacts(key3,activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                }
+                if (activeGame.getHighestScore()+1 > activeGame.getVp()) {
+                    return;
+                }
+                if (activeGame.getFactionsThatReactedToThis(key2b).contains(player.getFaction() + "*")) {
+                    int soIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedSOScore"));
+                    ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
+                    activeGame.setCurrentReacts(key2b,
+                            activeGame.getFactionsThatReactedToThis(key2b).replace(player.getFaction() + "*", ""));
+                    activeGame.setCurrentReacts(key3b,activeGame.getFactionsThatReactedToThis(key3b).replace(player.getFaction() + "*", ""));
+                }
+            }else{
+                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
+                        && activeGame.getFactionsThatReactedToThis(key2).length() > 2 ) {
+                    String message = player.getRepresentation(true, true)
+                            + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    break;
+                }
+                if (activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")
+                        && activeGame.getFactionsThatReactedToThis(key2).length() > 2 ) {
+                    String message = player.getRepresentation(true, true)
+                            + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    break;
+                }
+            }
+        }
+    }
+    public static void resolveSOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
+        String key2 = "queueToScoreSOs";
+        String key3 = "potentialScoreSOBlockers";
+        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2 || activeGame.getHighestScore()+1 > activeGame.getVp()) {
+            return;
+        }
+        for (Player player : Helper.getInitativeOrder(activeGame)) {
+            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                int soIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedSOScore"));
+                ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
+                activeGame.setCurrentReacts(key2,
+                        activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                activeGame.setCurrentReacts(key3,activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+            }else{
+                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
+                        && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
+                    String message = player.getRepresentation(true, true)
+                            + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    break;
+                }
             }
         }
     }
@@ -1032,6 +1113,25 @@ public class Helper {
         }
 
         return msg;
+    }
+
+    public static void refreshPlanetsOnTheRevote(Player player, Game activeGame) {
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        for (String thing : spentThings) {
+            if (!thing.contains("_")) {
+                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + activeGame.getName());
+                continue;
+            }
+            int tg = player.getSpentTgsThisWindow();
+            player.setTg(player.getTg()+tg);
+            String secondHalf = thing.split("_")[1];
+            String flavor = thing.split("_")[0];
+            if (flavor.contains("planet") && player.getExhaustedPlanets().contains(secondHalf)) {
+                player.refreshPlanet(secondHalf);
+            } 
+        }
+        player.resetSpentThings();
+        
     }
 
     public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth) {

@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -43,9 +44,11 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
@@ -921,6 +924,17 @@ public class Player {
             }
         }
         secrets.remove(idToRemove);
+    }
+
+    public SecretObjectiveModel getSecret(Integer identifier) {
+        String idToRemove = "";
+        for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(identifier)) {
+                idToRemove = so.getKey();
+                break;
+            }
+        }
+        return Mapper.getSecretObjective(idToRemove);
     }
 
     public Map<String, Integer> getSecretsScored() {
@@ -2038,6 +2052,13 @@ public class Player {
     public void exhaustPlanet(String planet) {
         if (planets.contains(planet) && !exhaustedPlanets.contains(planet)) {
             exhaustedPlanets.add(planet);
+        }
+        Game activeGame = getGame();
+        if(ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode() && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList().contains("attachment_nanoforge.png") && !getExhaustedPlanetsAbilities().contains(planet)){
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, activeGame), getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
         }
     }
 

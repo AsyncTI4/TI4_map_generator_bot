@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.generator.MapGenerator;
 import ti4.helpers.Constants;
@@ -94,6 +95,7 @@ public class ShowGame implements Command {
                     buttons.add(linkToWebsite);
                 }
                 buttons.add(Button.success("cardsInfo", "Cards Info"));
+                buttons.add(Buttons.REFRESH_INFO);
                 buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
                 buttons.add(Button.secondary("showGameAgain", "Show Game"));
 

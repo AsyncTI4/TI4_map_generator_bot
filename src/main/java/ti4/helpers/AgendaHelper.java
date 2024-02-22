@@ -619,12 +619,12 @@ public class AgendaHelper {
             if ("arms_reduction".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player player : activeGame.getRealPlayers()) {
-                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 4) {
+                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser",false) > 4) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation() + " remove excess cruisers", ButtonHelperModifyUnits
                                             .getRemoveThisTypeOfUnitButton(player, activeGame, "cruiser"));
                         }
-                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 2) {
+                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought",false) > 2) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation() + " remove excess dreads", ButtonHelperModifyUnits
                                             .getRemoveThisTypeOfUnitButton(player, activeGame, "dreadnought"));
@@ -1342,6 +1342,7 @@ public class AgendaHelper {
                     pfaction2 = player.getFaction();
                 }
                 if (pfaction2 != null) {
+                    player.resetSpentThings();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             player.getRepresentation() + " Abstained");
                     event.getMessage().delete().queue();
@@ -1411,6 +1412,7 @@ public class AgendaHelper {
                             + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame
                             .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                            nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
@@ -1882,6 +1884,7 @@ public class AgendaHelper {
                             + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame
                             .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                            nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);

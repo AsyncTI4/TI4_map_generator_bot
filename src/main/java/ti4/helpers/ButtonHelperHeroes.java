@@ -835,7 +835,7 @@ public class ButtonHelperHeroes {
                     new RemoveUnits().unitParsing(event, p2.getColor(), tile, "200 ff, 200 inf " + name, activeGame);
 
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                            ButtonHelper.getCorrectChannel(p2, activeGame)
+                           p2.getRepresentation()
                                     + " heads up, a tile with your units in it got hit with a saar hero, removing all fighters and infantry.");
                 }
 
@@ -881,6 +881,9 @@ public class ButtonHelperHeroes {
     public static void purgeCeldauriHero(Player player, Game activeGame, ButtonInteractionEvent event,
             String buttonID) {
         Leader playerLeader = player.unsafeGetLeader("celdaurihero");
+        if(playerLeader == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(),player.getFactionEmoji()+"You dont have this hero");
+        }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
@@ -916,9 +919,36 @@ public class ButtonHelperHeroes {
                     + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
+                message.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(),
                 message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons2);
         event.getMessage().delete().queue();
+    }
+
+    public static void purgeMentakHero(Player player, Game activeGame, ButtonInteractionEvent event,
+            String buttonID) {
+        Leader playerLeader = player.unsafeGetLeader("mentakhero");
+        if(playerLeader == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(),player.getFactionEmoji()+"You dont have this hero");
+        }
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    message + " - Leader " + "mentakhero" + " has been purged");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Leader was not purged - something went wrong");
+        }
+       
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+                message.toString());
+        activeGame.setCurrentReacts("mentakHero", player.getFaction());
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void purgeTech(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -1389,7 +1419,7 @@ public class ButtonHelperHeroes {
                                     MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext,
                                             "Picture of system", false);
                                     List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame,
-                                            tile.getPosition(), player, player2, "ground");
+                                            tile.getPosition(), player, player2, "ground", event);
                                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                                 }
                             }
@@ -1667,6 +1697,7 @@ public class ButtonHelperHeroes {
             String buttonID) {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, activeGame, activeGame.getMainGameChannel(), player, true);
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing()+" reminder that the winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
         event.getMessage().delete().queue();
     }
 

@@ -563,10 +563,15 @@ public class MapGenerator {
                         if (sc == ButtonHelper.getKyroHeroSC(game)) {
                             graphics.drawString("" + (game.getSCList().size() + 1), x + 90, y + 70 + yDelta);
                         } else {
-                            graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                            if(sc==1){
+                                graphics.drawString(scText, x + 102, y + 70 + yDelta);
+                            }else{
+                                graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                            }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setFont(Storage.getFont40());
                                 graphics.setColor(Color.RED);
+                                
                                 graphics.drawString("X", x + 100, y + 60 + yDelta);
                             }
                             
@@ -634,6 +639,25 @@ public class MapGenerator {
                     graphics.setColor(new Color(50, 230, 80));
                     graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
                 }
+                String needToMsg = "Needs To Follow: ";
+                List<Integer> unfollowedSCs = new ArrayList<>();
+                for (int sc : game.getPlayedSCsInOrder(player)) {
+                    if (!player.hasFollowedSC(sc)) {
+                        unfollowedSCs.add(sc);
+                    }
+                }
+                if(unfollowedSCs.size() > 0){
+                    graphics.setFont(Storage.getFont20());
+                    graphics.setColor(Color.red);
+                    graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
+                    int xSpacer = 20;
+                    for(int sc : unfollowedSCs){
+                        graphics.setColor(getSCColor(sc));
+                        graphics.drawString(""+sc+" ", x + 9+xSpacer+145, y + 125 + yDelta);
+                        xSpacer = xSpacer + 20;
+                    }
+                }
+                
 
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
@@ -705,7 +729,7 @@ public class MapGenerator {
                 y += 85;
                 y += 200;
 
-                int soCount = objectivesSO(yPlayArea + 150, player);
+                int soCount = objectivesSO(yPlayArea + 165, player);
 
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
@@ -2443,6 +2467,7 @@ public class MapGenerator {
                 graphics.setColor(Color.WHITE);
 
             }
+            
             deltaY += PLAYER_STATS_HEIGHT;
         }
     }
@@ -2602,7 +2627,7 @@ public class MapGenerator {
             try {
                 String agendaType = Mapper.getAgendaType(lawID);
 
-                if ("1".equals(agendaType) || optionalText == null || optionalText.isEmpty()) {
+                if (optionalText == null || optionalText.isEmpty() || game.getPlayerFromColorOrFaction(optionalText) == null) {
                     paintAgendaIcon(y, x);
                 } else if ("0".equals(agendaType)) {
                     Player electedPlayer = null;

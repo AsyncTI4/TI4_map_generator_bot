@@ -60,6 +60,7 @@ public class Constants {
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String QUEUE_SO = "queue_so";
     public static final String UNDO_BUTTON = "undo_button";
+    public static final String FAST_SC_FOLLOW = "fast_sc_follow";
     public static final String PURGED_FRAGMENTS = "purged_fragment";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
@@ -154,6 +155,7 @@ public class Constants {
     public static final String SEARCH_EXPLORES = "explores";
     public static final String SEARCH_COMMANDS = "commands";
     public static final String SEARCH_MY_GAMES = "my_games";
+    public static final String SEARCH_MY_TITLES = "my_titles";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";

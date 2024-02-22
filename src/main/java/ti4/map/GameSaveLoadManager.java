@@ -101,8 +101,8 @@ public class GameSaveLoadManager {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
-            } else if (event instanceof ButtonInteractionEvent) {
-                if ((event.getMessageChannel() instanceof ThreadChannel && event.getMessageChannel().getName().contains("Cards Info"))|| activeGame.isFoWMode()) {
+            } else if (event instanceof ButtonInteractionEvent button) {
+                if ((event.getMessageChannel() instanceof ThreadChannel && event.getMessageChannel().getName().contains("Cards Info"))|| activeGame.isFoWMode() || button.getButton().getId().contains("anonDeclare")) {
                     activeGame.setLatestCommand(username + " pressed button: [CLASSIFIED]");
                 } else {
                     activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- " + ((ButtonInteraction) event).getButton().getLabel());
@@ -546,6 +546,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.NOMAD_COIN + " " + activeGame.getNomadCoin());
         writer.write(System.lineSeparator());
         writer.write(Constants.UNDO_BUTTON + " " + activeGame.getUndoButton());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.FAST_SC_FOLLOW + " " + activeGame.isFastSCFollowMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.QUEUE_SO + " " + activeGame.getQueueSO());
         writer.write(System.lineSeparator());
@@ -1708,6 +1710,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setUndoButton(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.FAST_SC_FOLLOW -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setFastSCFollowMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

@@ -35,6 +35,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
+import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
@@ -58,6 +59,7 @@ import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetInfo;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
@@ -97,6 +99,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -113,6 +116,7 @@ import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.UnitModel;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -211,7 +215,18 @@ public class ButtonListener extends ListenerAdapter {
         String trueIdentity = null;
         String fowIdentity = null;
         String ident = null;
-
+        if (buttonID.startsWith("anonDeclare_")) {
+            String declaration = buttonID.split("_")[1];
+            String old = activeGame.getFactionsThatReactedToThis(player.getUserID()+"anonDeclare");
+            if(old.isEmpty()){
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Someone has expressed their preference for a \""+declaration+"\" environment.");
+            }else{
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Someone has changed their preference from a \""+old+"\" environment to a \""+declaration+"\" environment.");
+            }
+            activeGame.setCurrentReacts(player.getUserID()+"anonDeclare",declaration);
+            GameSaveLoadManager.saveMap(activeGame, event);
+            return;
+        }
         if (player != null) {
             trueIdentity = player.getRepresentation(true, true);
             fowIdentity = player.getRepresentation(false, true);
@@ -346,14 +361,52 @@ public class ButtonListener extends ListenerAdapter {
                 channel = actionsChannel;
             }
             if (channel != null) {
-                try {
-                    int soIndex = Integer.parseInt(soID);
-                    ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
-                } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse SO ID: " + soID, e);
-                    event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.")
-                            .queue();
-                    return;
+                int soIndex2 = Integer.parseInt(soID);
+                String phase = "action";
+                if (player.getSecret(soIndex2) != null &&player.getSecret(soIndex2).getPhase().equalsIgnoreCase("status") && "true".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("forcedScoringOrder"))) {
+                    String key2 = "queueToScoreSOs";
+                    String key3 = "potentialScoreSOBlockers";
+                    String key3b = "potentialScorePOBlockers";
+                    String message = "Drew Secret Objective";
+                    for (Player player2 :Helper.getInitativeOrder(activeGame)) {
+                        if (player2 == player) {
+                            if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
+                                activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+                            }
+                            if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
+                                activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
+                                if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
+                                    Helper.resolvePOScoringQueue(activeGame, event);
+                                    //Helper.resolveSOScoringQueue(activeGame, event);
+                                }
+                            }
+                            
+                            break;
+                        }
+                        if (activeGame.getFactionsThatReactedToThis(key3).contains(player2.getFaction() + "*")) {
+                            message = player.getRepresentation()+" Wants to score an SO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
+                            if (!activeGame.isFoWMode()) {
+                                message = message + player2.getRepresentation(true, true)
+                                        + " is the one the game is currently waiting on";
+                            }
+                            MessageHelper.sendMessageToChannel(channel, message);
+                            int soIndex = Integer.parseInt(soID);
+                            activeGame.setCurrentReacts(player.getFaction()+"queuedSOScore",""+soIndex);
+                            activeGame.setCurrentReacts(key2,
+                                    activeGame.getFactionsThatReactedToThis(key2) + player.getFaction() + "*");
+                            break;
+                        }
+                    }
+                }else{
+                    try {
+                        int soIndex = Integer.parseInt(soID);
+                        ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
+                    } catch (Exception e) {
+                        BotLogger.log(event, "Could not parse SO ID: " + soID, e);
+                        event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.")
+                                .queue();
+                        return;
+                    }
                 }
             } else {
                 event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
@@ -681,31 +734,61 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
+            //key2
             if ("true".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("forcedScoringOrder"))) {
-                List<Player> players = Helper.getInitativeOrder(activeGame);
-                String factionsThatHaveResolved = activeGame.getFactionsThatReactedToThis("factionsThatScored");
-                if (!Helper.hasEveryoneResolvedBeforeMe(player, factionsThatHaveResolved, players)) {
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                            ButtonHelper.getIdent(player)
-                                    + " the bot has been told to follow a strict public scoring order, and not everyone before you has resolved");
-                    return;
-                } else {
-                    activeGame.setCurrentReacts("factionsThatScored",
-                            activeGame.getFactionsThatReactedToThis("factionsThatScored") + "_" + player.getFaction());
+                String key2 = "queueToScorePOs";
+                String key3 = "potentialScorePOBlockers";
+                String key3b = "potentialScoreSOBlockers";
+                String message = "Drew Secret Objective";
+                for (Player player2 :Helper.getInitativeOrder(activeGame)) {
+                    if (player2 == player) {
+                        if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
+                            activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+                        }
+                        if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
+                            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
+                            if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
+                                Helper.resolvePOScoringQueue(activeGame, event);
+                               // Helper.resolveSOScoringQueue(activeGame, event);
+                            }
+                        }
+                        String poID = buttonID.replace(Constants.PO_SCORING, "");
+                        int poIndex = Integer.parseInt(poID);
+                        ScorePublic.scorePO(event, privateChannel, activeGame, player, poIndex);
+                        ButtonHelper.addReaction(event, false, false, null, "");
+                        break;
+                    }
+                    if (activeGame.getFactionsThatReactedToThis(key3).contains(player2.getFaction() + "*")) {
+                        message = "Wants to score a PO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their PO when everyone ahead of them is clear. ";
+                        if (!activeGame.isFoWMode()) {
+                            message = message + player2.getRepresentation(true, true)
+                                    + " is the one the game is currently waiting on";
+                        }
+                        String poID = buttonID.replace(Constants.PO_SCORING, "");
+                        try {
+                            int poIndex = Integer.parseInt(poID);
+                            activeGame.setCurrentReacts(player.getFaction()+"queuedPOScore",""+poIndex);
+                        } catch (Exception e) {
+                            BotLogger.log(event, "Could not parse PO ID: " + poID, e);
+                            event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
+                        }
+                        activeGame.setCurrentReacts(key2,
+                                activeGame.getFactionsThatReactedToThis(key2) + player.getFaction() + "*");
+                        ButtonHelper.addReaction(event, false, false, message, "");
+                        break;
+                    }
                 }
-
+                
             } else {
-                activeGame.setCurrentReacts("factionsThatScored",
-                        activeGame.getFactionsThatReactedToThis("factionsThatScored") + "_" + player.getFaction());
-            }
-            String poID = buttonID.replace(Constants.PO_SCORING, "");
-            try {
-                int poIndex = Integer.parseInt(poID);
-                ScorePublic.scorePO(event, privateChannel, activeGame, player, poIndex);
-                ButtonHelper.addReaction(event, false, false, null, "");
-            } catch (Exception e) {
-                BotLogger.log(event, "Could not parse PO ID: " + poID, e);
-                event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
+                String poID = buttonID.replace(Constants.PO_SCORING, "");
+                try {
+                    int poIndex = Integer.parseInt(poID);
+                    ScorePublic.scorePO(event, privateChannel, activeGame, player, poIndex);
+                    ButtonHelper.addReaction(event, false, false, null, "");
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not parse PO ID: " + poID, e);
+                    event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
+                }
             }
         } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
             String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
@@ -747,6 +830,19 @@ public class ButtonListener extends ListenerAdapter {
 
             ButtonHelper.startStatusHomework(event, activeGame);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("exhaustRelic_")) {
+            String relic = buttonID.replace("exhaustRelic_", "");
+            if(player.hasRelicReady(relic)){
+                player.addExhaustedRelic(relic);
+                MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() +" exhausted "+Mapper.getRelic(relic).getName());
+                ButtonHelper.deleteTheOneButton(event);
+                if(relic.equalsIgnoreCase("absol_luxarchtreatise")){
+                    activeGame.setCurrentReacts("absolLux", "true");
+                }
+            }else{
+                MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " doesnt have an unexhausted "+relic);
+            }
+
         } else if (buttonID.startsWith("scepterE_follow_") || buttonID.startsWith("mahactA_follow_")) {
             boolean setstatus = true;
             int scnum = 1;
@@ -880,9 +976,8 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")) {
                     activeGame.setCurrentReacts(key3,
                             activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
-                    Helper.resolveQueue(activeGame, event);
+                    Helper.resolveQueue(activeGame);
                 }
-
             }
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ButtonHelper.addReaction(event, false, false, null, "");
@@ -1091,7 +1186,7 @@ public class ButtonListener extends ListenerAdapter {
             String groundOrSpace = rest.split("_")[3];
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, pos, event);
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-            List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, pos, p1, p2, groundOrSpace);
+            List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, pos, p1, p2, groundOrSpace, event);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } else if (buttonID.startsWith("getDamageButtons_")) {// "repealLaw_"
             if (buttonID.contains("deleteThis")) {
@@ -1515,6 +1610,19 @@ public class ButtonListener extends ListenerAdapter {
                                     absolPAButtons);
                 }
             }
+        } else if (buttonID.startsWith("absolX89Nuke_")) {
+            event.getMessage().delete().queue();
+            String planet = buttonID.split("_")[1];
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getFaction()+" used absol x-89 to remove all ground forces on "+planet);
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            Map<UnitKey, Integer> units = new HashMap<>();
+            units.putAll(uH.getUnits());
+            for(UnitKey unit : units.keySet()){
+                if(unit.getUnitType() == UnitType.Mech || unit.getUnitType() == UnitType.Infantry){
+                    uH.removeUnit(unit, units.get(unit));
+                }
+            }
+            
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
             TechnologyModel techModel = Mapper.getTech(tech);
@@ -1537,6 +1645,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "absol_bs" -> { // Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
+                }
+                case "absol_x89" -> { // Bio-stims
+                    ButtonHelper.sendAbsolX89NukeOptions(activeGame, event, player);
+                }
+                case "absol_dxa" -> { // Dacxive
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use buttons to drop 2 infantry on a planet", Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                    ButtonHelper.deleteTheOneButton(event);
                 }
                 case "absol_nm" -> { // Absol's Neural Motivator
                     event.getMessage().delete().queue();
@@ -2541,6 +2656,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.offerStealRelicButtons(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("purgeCeldauriHero_")) {
             ButtonHelperHeroes.purgeCeldauriHero(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("purgeMentakHero_")) {
+            ButtonHelperHeroes.purgeMentakHero(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("unstableStep2_")) {// "titansConstructionMechDeployStep2_"
@@ -2597,10 +2714,8 @@ public class ButtonListener extends ListenerAdapter {
             if (Mapper.isValidColor(color)) {
                 AddCC.addCC(event, color, tile);
             }
-            // String message = playerRep + " Placed A " + StringUtils.capitalize(color) + "
-            // CC In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system
-            // due to use of Mahact agent";
-            ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
+            String message = player.getRepresentation() + " Placed A " + StringUtils.capitalize(color) + "CC In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system due to use of Mahact agent";
+            ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "construction");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("greyfire_")) {
             ButtonHelperFactionSpecific.resolveGreyfire(player, activeGame, buttonID, event);
@@ -2883,8 +2998,6 @@ public class ButtonListener extends ListenerAdapter {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
                 case Constants.PO_NO_SCORING -> {
-                    activeGame.setCurrentReacts("factionsThatScored",
-                            activeGame.getFactionsThatReactedToThis("factionsThatScored") + "_" + player.getFaction());
                     String message = player.getRepresentation()
                             + " - no Public Objective scored.";
                     if (!activeGame.isFoWMode()) {
@@ -2892,7 +3005,29 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String reply = activeGame.isFoWMode() ? "No public objective scored" : null;
                     ButtonHelper.addReaction(event, false, false, reply, "");
+                    String key2 = "queueToScorePOs";
+                    String key3 = "potentialScorePOBlockers";
+                    if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                        activeGame.setCurrentReacts(key2,
+                                activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                    }
+                    if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")) {
+                        activeGame.setCurrentReacts(key3,
+                                activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                        String key3b = "potentialScoreSOBlockers";
+                        if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
+                            Helper.resolvePOScoringQueue(activeGame, event);
+                           // Helper.resolveSOScoringQueue(activeGame, event);
+                        }
+                    }
+        
+                    
                 }
+                case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
+                case "refreshACInfo" -> ACInfo.sendActionCardInfo(activeGame, player, event);
+                case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
+                case "refreshSOInfo" -> SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(activeGame, player, event);
                 case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(activeGame, player, event);
                 case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
                 case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
@@ -3019,6 +3154,21 @@ public class ButtonListener extends ListenerAdapter {
                             + " - no Secret Objective scored.";
 
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    String key2 = "queueToScoreSOs";
+                    String key3 = "potentialScoreSOBlockers";
+                    if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                        activeGame.setCurrentReacts(key2,
+                                activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                    }
+                    if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")) {
+                        activeGame.setCurrentReacts(key3,
+                                activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                        String key3b = "potentialScorePOBlockers";
+                        if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
+                            Helper.resolvePOScoringQueue(activeGame, event);
+                           // Helper.resolveSOScoringQueue(activeGame, event);
+                        }
+                    }
                 }
                 // AFTER AN ACTION CARD HAS BEEN PLAYED
                 case "no_sabotage" -> {
@@ -3071,8 +3221,14 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "forceACertainScoringOrder" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
-                            "vPlayers will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
+                            "Players will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
                     activeGame.setCurrentReacts("forcedScoringOrder", "true");
+                    event.getMessage().delete().queue();
+                }
+                case "turnOffForcedScoring" -> {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
+                            "Forced scoring order has been turned off. Any queues will not be resolved.");
+                    activeGame.setCurrentReacts("forcedScoringOrder", "");
                     event.getMessage().delete().queue();
                 }
                 case "proceedToFinalizingVote" -> {
@@ -3309,7 +3465,7 @@ public class ButtonListener extends ListenerAdapter {
                                     trueIdentity + " use buttons to resolve contagion planet #1", buttons2);
                             MessageHelper.sendMessageToChannelWithButtons(
                                         player.getCardsInfoThread(),
-                                        trueIdentity + " use buttons to resolve contagion planet #2", buttons2);
+                                        trueIdentity + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)", buttons2);
                         }
                     }
                 }
@@ -4685,6 +4841,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                 }
+                //kick
                 case "getDiscardButtonsACs" -> {
                     String msg = trueIdentity + " use buttons to discard";
                     List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, player, false);
@@ -4696,8 +4853,9 @@ public class ButtonListener extends ListenerAdapter {
                     if (activeGame.isFoWMode()) {
                         pfaction = player.getColor();
                     }
+                    Helper.refreshPlanetsOnTheRevote(player, activeGame);
                     AgendaHelper.eraseVotesOfFaction(activeGame, pfaction);
-                    String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji() + "\n\n"
+                    String eraseMsg = "Erased previous votes made by " + player.getFactionEmoji() + " and readied the planets they previously exhausted\n\n"
                             + AgendaHelper.getSummaryOfVotes(activeGame, true);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), eraseMsg);
                     Button vote = Button.success(finsFactionCheckerPrefix + "vote",
@@ -5265,7 +5423,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(drawStage2);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                event.getMessage().delete().queueAfter(20, TimeUnit.SECONDS);
+                //event.getMessage().delete().queueAfter(20, TimeUnit.SECONDS);
             }
             case "pass_on_abilities" -> {
                 if (activeGame.isCustodiansScored()) {
