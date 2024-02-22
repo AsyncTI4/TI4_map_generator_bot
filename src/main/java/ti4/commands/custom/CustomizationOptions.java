@@ -22,6 +22,7 @@ public class CustomizationOptions extends CustomSubcommandData{
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they dont respond with 24hrs"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
     }
 
@@ -85,6 +86,9 @@ public class CustomizationOptions extends CustomSubcommandData{
 
         Boolean undo = event.getOption(Constants.UNDO_BUTTON, null, OptionMapping::getAsBoolean);
         if (undo != null) activeGame.setUndoButton(undo);
+
+        Boolean fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsBoolean);
+        if (fast != null) activeGame.setFastSCFollowMode(fast);
         
         String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
         if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity)) activeGame.setOutputVerbosity(verbosity);

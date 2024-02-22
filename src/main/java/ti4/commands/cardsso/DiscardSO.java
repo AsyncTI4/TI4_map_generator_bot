@@ -76,7 +76,7 @@ public class DiscardSO extends SOCardsSubcommandData {
         }
         if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
             activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
-            Helper.resolveQueue(activeGame, event);
+            Helper.resolveQueue(activeGame);
         }
         
         

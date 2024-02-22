@@ -547,6 +547,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.UNDO_BUTTON + " " + activeGame.getUndoButton());
         writer.write(System.lineSeparator());
+        writer.write(Constants.FAST_SC_FOLLOW + " " + activeGame.isFastSCFollowMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.QUEUE_SO + " " + activeGame.getQueueSO());
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + activeGame.getNumberOfPurgedFragments());
@@ -1708,6 +1710,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setUndoButton(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.FAST_SC_FOLLOW -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setFastSCFollowMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

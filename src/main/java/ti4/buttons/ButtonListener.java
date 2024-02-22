@@ -974,9 +974,8 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")) {
                     activeGame.setCurrentReacts(key3,
                             activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
-                    Helper.resolveQueue(activeGame, event);
+                    Helper.resolveQueue(activeGame);
                 }
-
             }
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ButtonHelper.addReaction(event, false, false, null, "");
