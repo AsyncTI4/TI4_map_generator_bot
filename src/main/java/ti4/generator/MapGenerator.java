@@ -729,7 +729,7 @@ public class MapGenerator {
                 y += 85;
                 y += 200;
 
-                int soCount = objectivesSO(yPlayArea + 150, player);
+                int soCount = objectivesSO(yPlayArea + 165, player);
 
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
