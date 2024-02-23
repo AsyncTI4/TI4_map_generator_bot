@@ -47,9 +47,7 @@ public class JazzCommand extends BothelperSubcommandData {
                 double contrast = ButtonHelper.colorContrast(c1, c2);
                 sb2.append(String.format("\t%f", contrast));
 
-                if (contrastMap.get(c1) == null) {
-                    contrastMap.put(c1, new HashMap<>());
-                }
+                contrastMap.computeIfAbsent(c1, k -> new HashMap<>());
                 contrastMap.get(c1).put(c2, contrast);
             }
             sb2.append("\n");
