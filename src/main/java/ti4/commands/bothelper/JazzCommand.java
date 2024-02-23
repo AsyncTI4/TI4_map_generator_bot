@@ -41,9 +41,7 @@ public class JazzCommand extends BothelperSubcommandData {
             String c1 = colorsToCheck.get(i);
             sb2.append(c1);
 
-            for (int j = 0; j < colorsToCheck.size(); j++) {
-                String c2 = colorsToCheck.get(j);
-
+            for (String c2 : colorsToCheck) {
                 double contrast = ButtonHelper.colorContrast(c1, c2);
                 sb2.append(String.format("\t%f", contrast));
 
