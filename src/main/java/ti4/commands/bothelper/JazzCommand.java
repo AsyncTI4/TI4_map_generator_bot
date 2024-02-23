@@ -52,22 +52,4 @@ public class JazzCommand extends BothelperSubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb2.toString());
     }
-
-    public static String numToEmoji(int n) {
-        return switch (n) {
-            case 0 -> "0️⃣";
-            case 1 -> "1️⃣";
-            case 2 -> "2️⃣";
-            case 3 -> "3️⃣";
-            case 4 -> "4️⃣";
-            case 5 -> "5️⃣";
-            case 6 -> "6️⃣";
-            case 7 -> "7️⃣";
-            case 8 -> "8️⃣";
-            case 9 -> "9️⃣";
-            case 10 -> "🔟";
-            case 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 -> "✅";
-            default -> "❌";
-        };
-    }
 }
