@@ -234,7 +234,7 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         if (activeGame != null && !"ultimateundo".equalsIgnoreCase(buttonID)
-                && !"showGameAgain".equalsIgnoreCase(buttonID)) {
+                && !"showGameAgain".equalsIgnoreCase(buttonID) && !"no_sabotage".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
@@ -370,6 +370,8 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Drew Secret Objective";
                     for (Player player2 :Helper.getInitativeOrder(activeGame)) {
                         if (player2 == player) {
+                            int soIndex = Integer.parseInt(soID);
+                            ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
                             if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
                                 activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
                             }
@@ -745,6 +747,11 @@ public class ButtonListener extends ListenerAdapter {
                         if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
                             activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
                         }
+                        
+                        String poID = buttonID.replace(Constants.PO_SCORING, "");
+                        int poIndex = Integer.parseInt(poID);
+                        ScorePublic.scorePO(event, privateChannel, activeGame, player, poIndex);
+                        ButtonHelper.addReaction(event, false, false, null, "");
                         if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
                             activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
                             if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
@@ -752,10 +759,6 @@ public class ButtonListener extends ListenerAdapter {
                                // Helper.resolveSOScoringQueue(activeGame, event);
                             }
                         }
-                        String poID = buttonID.replace(Constants.PO_SCORING, "");
-                        int poIndex = Integer.parseInt(poID);
-                        ScorePublic.scorePO(event, privateChannel, activeGame, player, poIndex);
-                        ButtonHelper.addReaction(event, false, false, null, "");
                         break;
                     }
                     if (activeGame.getFactionsThatReactedToThis(key3).contains(player2.getFaction() + "*")) {

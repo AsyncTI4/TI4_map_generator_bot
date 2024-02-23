@@ -1632,7 +1632,7 @@ public class Helper {
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff) && !"mr".equalsIgnoreCase(unitHolder.getName())) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                             && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
-                            && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")
+                            && !player.hasUnit("saar_spacedock") && !player.hasUnit("absol_saar_spacedock") && !player.hasUnit("absol_saar_spacedock2") && !player.hasUnit("saar_spacedock2")
                             && !player.hasUnit("ghoti_flagship")) {
                         continue;
                     }

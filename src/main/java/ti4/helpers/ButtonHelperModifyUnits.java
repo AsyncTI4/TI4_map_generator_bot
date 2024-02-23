@@ -1065,7 +1065,7 @@ public class ButtonHelperModifyUnits {
         String successMessage;
         String playerRep = player.getRepresentation();
         if ("sd".equalsIgnoreCase(unit)) {
-            if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
+            if (player.hasUnit("absol_saar_spacedock") || player.hasUnit("saar_spacedock") || player.hasTech("ffac2") || player.hasTech("absol_ffac2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), unit, activeGame);
                 successMessage = "Placed a space dock in the space area of the "

@@ -1144,7 +1144,7 @@ public class ButtonHelper {
     public static boolean isPlayerElected(Game activeGame, Player player, String lawID) {
         for (String law : activeGame.getLaws().keySet()) {
             if (lawID.equalsIgnoreCase(law)) {
-                if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
+                if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) || activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getColorID())) {
                     return true;
                 }
             }
@@ -1190,16 +1190,11 @@ public class ButtonHelper {
         // }
 
         StringBuilder messageBuilder = new StringBuilder(message);
-        for (String law : activeGame.getLaws().keySet()) {
-            if ("minister_policy".equalsIgnoreCase(law)) {
-                if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
-                        && !player.hasAbility("scheming")) {
-                    messageBuilder.append(
-                            " Minister of Policy has been accounted for. If this AC is political stability, you cannot play it at this time. ");
-                    activeGame.drawActionCard(player.getUserID());
-                    amount = amount + 1;
-                }
-            }
+        if(ButtonHelper.isPlayerElected(activeGame, player, "minister_policy") && !player.hasAbility("scheming")) {
+            messageBuilder.append(
+                    " Minister of Policy has been accounted for. If this AC is political stability, you cannot play it at this time. ");
+            activeGame.drawActionCard(player.getUserID());
+            amount = amount + 1;
         }
         message = messageBuilder.toString();
 
@@ -3198,7 +3193,9 @@ public class ButtonHelper {
                     } else if (player.ownsUnit("cabal_spacedock2")) {
                         fightersIgnored += 12;
                     } else {
-                        fightersIgnored += 3;
+                        if(!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")){
+                            fightersIgnored += 3;
+                        }
 
                     }
                 }
@@ -6456,8 +6453,7 @@ public class ButtonHelper {
                         buttons);
             }
             buttons = new ArrayList<>();
-            if (activeGame.getLaws().containsKey("arbiter")
-                    && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
+            if (ButtonHelper.isPlayerElected(activeGame, p2, "arbiter")) {
                 buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, activeGame),
