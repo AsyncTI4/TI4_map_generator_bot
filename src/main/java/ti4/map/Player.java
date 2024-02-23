@@ -385,7 +385,7 @@ public class Player {
     @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff")
-            || getTechs().contains("dslizhff") || ownsUnit("florzen_fighter");
+            || getTechs().contains("dslizhff") || getTechs().contains("absol_ff2") || ownsUnit("florzen_fighter");
     }
 
     @JsonIgnore
