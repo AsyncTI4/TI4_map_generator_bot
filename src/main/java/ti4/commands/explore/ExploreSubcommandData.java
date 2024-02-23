@@ -391,18 +391,16 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             saarButton);
                 }
 
-                final String ministerOfExploration = "minister_exploration";
-                if (activeGame.getLaws().containsKey(ministerOfExploration)) {
-                    if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction())
-                            && event != null) {
-                        String fac = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg()
-                                        + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
-                        player.setTg(player.getTg() + 1);
-                        ButtonHelperAbilities.pillageCheck(player, activeGame);
-                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-                    }
+                
+                if(ButtonHelper.isPlayerElected(activeGame, player, "minister_exploration") && event != null){
+                    String fac = player.getFactionEmoji();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg()
+                                    + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
+                    player.setTg(player.getTg() + 1);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                    
                 }
 
                 String exploredMessage = player.getRepresentation() + " explored " + Emojis.Cultural +

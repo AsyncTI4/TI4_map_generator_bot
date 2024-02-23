@@ -185,38 +185,16 @@ public class PlanetAdd extends PlanetAddRemove {
 
             }
         }
-        for (String law : activeGame.getLaws().keySet()) {
-            if ("minister_exploration".equalsIgnoreCase(law) && !doubleCheck) {
-                if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null) {
-                    String fac = player.getFactionEmoji();
+        if(ButtonHelper.isPlayerElected(activeGame, player, "minister_exploration") && event != null){
+            String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + ").");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-                }
-            }
         }
-        int numMechs = 0;
-        String colorID = Mapper.getColorID(player.getColor());
-        if (unitHolder.getUnits() != null) {
-            numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-        }
-        // if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech") && !doubleCheck) {
-
-        //     Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
-        //     sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-        //     Button pdsButton = Button.success("winnuStructure_pds_" + planet, "Place a PDS on " + Helper.getPlanetRepresentation(planet, activeGame));
-        //     pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
-        //     Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
-        //     List<Button> buttons = new ArrayList<>();
-        //     buttons.add(sdButton);
-        //     buttons.add(pdsButton);
-        //     buttons.add(tgButton);
-        //     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-        //         player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
-
-        // }
+        
+        
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !activeGame.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
