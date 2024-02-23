@@ -345,7 +345,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     public static String getNextGameName() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
-        if (existingNums.size() == 0) {
+        if (existingNums.isEmpty()) {
             return "pbd1";
         }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
@@ -354,7 +354,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     public static String getLastGameName() {
         List<Integer> existingNums = getAllExistingPBDNumbers();
-        if (existingNums.size() == 0) {
+        if (existingNums.isEmpty()) {
             return "pbd1";
         }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers());
@@ -412,7 +412,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         return pbdNumbers;
-        // return pbdNumbers.stream().filter(num -> num != 1000).toList();
     }
 
     private static Guild getNextAvailableServer() {
@@ -429,35 +428,32 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF SECONDARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildSecondary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId()); // SET
-                                                                                                            // SECONDARY
-                                                                                                            // SERVER AS
-                                                                                                            // DEFAULT
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
             return guild;
         }
 
         // CHECK IF TERTIARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildTertiary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId()); // SET
-                                                                                                            // TERTIARY
-                                                                                                            // SERVER AS
-                                                                                                            // DEFAULT
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
             return guild;
         }
 
         // CHECK IF QUATERNARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildQuaternary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId()); // SET
-                                                                                                            // QUATERNARY
-                                                                                                            // SERVER AS
-                                                                                                            // DEFAULT
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
             return guild;
         }
 
-        BotLogger.log(
-                "`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
+        // CHECK IF QUINARY SERVER HAS ROOM
+        guild = AsyncTI4DiscordBot.guildQuinary;
+        if (serverHasRoomForNewFullCategory(guild)) {
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
+            return guild;
+        }
+
+        BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
         return null;
     }
 
