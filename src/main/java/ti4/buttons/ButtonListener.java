@@ -1580,153 +1580,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             
         } else if (buttonID.startsWith("exhaustTech_")) {
-            String tech = buttonID.replace("exhaustTech_", "");
-            TechnologyModel techModel = Mapper.getTech(tech);
-            String exhaustMessage = player.getRepresentation() + " exhausted tech "
-                    + techModel.getRepresentation(false);
-            if (tech.contains("absol")) {
-                switch (activeGame.getOutputVerbosity()) {
-                    case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(
-                            event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
-                    default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
-                }
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
-            }
-            player.exhaustTech(tech);
-            switch (tech) {
-                case "bs" -> { // Bio-stims
-                    ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
-                    ButtonHelper.deleteTheOneButton(event);
-                }
-                case "absol_bs" -> { // Bio-stims
-                    ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
-                }
-                case "absol_x89" -> { // Bio-stims
-                    ButtonHelper.sendAbsolX89NukeOptions(activeGame, event, player);
-                }
-                case "absol_dxa" -> { // Dacxive
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use buttons to drop 2 infantry on a planet", Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
-                    ButtonHelper.deleteTheOneButton(event);
-                }
-                case "absol_nm" -> { // Absol's Neural Motivator
-                    event.getMessage().delete().queue();
-                    Button draw2ACButton = Button
-                            .secondary(player.getFinsFactionCheckerPrefix() + "sc_ac_drawdeleteThisButton",
-                                    "Draw 2 Action Cards")
-                            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
-                    MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-                case "td" -> { // Transit Diodes
-                    ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
-                }
-                case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
-                    Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
-                }
-                case "aida", "sar", "htp" -> {
-                    ButtonHelper.deleteTheOneButton(event);
-                    if (buttonLabel.contains("(")) {
-                        player.addSpentThing(tech + "_");
-                    } else {
-                        player.addSpentThing(tech);
-                    }
-                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
-                    event.getMessage().editMessage(exhaustedMessage).queue();
-                }
-                case "pi" -> { // Predictive Intelligence
-                    ButtonHelper.deleteTheOneButton(event);
-                    Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons",
-                            "Delete These Buttons");
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            fowIdentity + " use buttons to redistribute",
-                            List.of(Buttons.REDISTRIBUTE_CCs, deleButton));
-                }
-                case "gls" -> { // Graviton Laser System
-                    // Do Nothing
-                }
-                case "mi" -> { // Mageon
-                    event.getMessage().delete().queue();
-                    List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            player.getRepresentation(true, true) + " Select who you would like to Mageon.", buttons);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-                case "vtx", "absol_vtx" -> { // Vortex
-                    event.getMessage().delete().queue();
-                    List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, activeGame,
-                            event);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            player.getRepresentation(true, true) + " Select what unit you would like to capture",
-                            buttons);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-                case "wg" -> { // Wormhole Generator
-                    event.getMessage().delete().queue();
-                    List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                    String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                            message, buttons);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-                case "absol_wg" -> { // Absol's Wormhole Generator
-                    event.getMessage().delete().queue();
-                    List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                    String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                            message, buttons);
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                            message, buttons);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-                case "pm" -> { // Production Biomes
-                    event.getMessage().delete().queue();
-                    ButtonHelperFactionSpecific.resolveProductionBiomesStep1(player, activeGame, event);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-                case "lgf" -> { // Lazax Gate Folding
-                    if (player.getPlanets().contains("mr")) {
-                        event.getMessage().delete().queue();
-                        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet("mr"),
-                                "inf mr", activeGame);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                                player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
-                        ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                    } else {
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                                player.getRepresentation() + " You do not control Mecatol Rex");
-                        player.refreshTech("lgf");
-                    }
-                }
-                case "sr" -> { // Sling Relay
-                    event.getMessage().delete().queue();
-                    List<Button> buttons = new ArrayList<>();
-                    List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player,
-                            UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
-                    if (player.hasUnit("ghoti_flagship")) {
-                        tiles.addAll(
-                                ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship));
-                    }
-                    if (player.hasUnit("ghoti_mech")) {
-                        tiles.addAll(
-                                ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech));
-                    }
-                    List<String> pos2 = new ArrayList<>();
-                    for (Tile tile : tiles) {
-                        if (!pos2.contains(tile.getPosition())) {
-                            Button tileButton = Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling",
-                                    tile.getRepresentationForButtons(activeGame, player));
-                            buttons.add(tileButton);
-                            pos2.add(tile.getPosition());
-                        }
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            "Select which tile you would like to sling in.", buttons);
-                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
-                }
-            }
+            exhaustTech(event, buttonID, buttonLabel, activeGame, player, fowIdentity);
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
             Player planetOwner = activeGame.getPlayerFromColorOrFaction(factionOrColor);
@@ -2131,7 +1985,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (ac != null) {
                     MessageHelper.sendMessageToChannelWithEmbed(
                         yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as", ac.getRepresentationEmbed());
-                    
+
                 }
 
             }
@@ -2980,8 +2834,8 @@ public class ButtonListener extends ListenerAdapter {
                            // Helper.resolveSOScoringQueue(activeGame, event);
                         }
                     }
-        
-                    
+
+
                 }
                 case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
                 case "refreshACInfo" -> ACInfo.sendActionCardInfo(activeGame, player, event);
@@ -3144,7 +2998,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
                         ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
                     }
-                    
+
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
                     if(player.hasTech("absol_aida")){
@@ -3180,13 +3034,13 @@ public class ButtonListener extends ListenerAdapter {
                     // event.getMessage().delete().queue();
                 }
                 case "forceACertainScoringOrder" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+
                             "Players will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
                     activeGame.setCurrentReacts("forcedScoringOrder", "true");
                     event.getMessage().delete().queue();
                 }
                 case "turnOffForcedScoring" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+
                             "Forced scoring order has been turned off. Any queues will not be resolved.");
                     activeGame.setCurrentReacts("forcedScoringOrder", "");
                     event.getMessage().delete().queue();
@@ -4445,7 +4299,7 @@ public class ButtonListener extends ListenerAdapter {
                             buttons.add(Button.danger("deleteButtons","I dont have to pay"));
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()+" reminder that your opponent has the cargo raiders ability, which means you might have to pay 1tg to announce a retreat if they choose.", buttons);
                         }
-                        
+
                     }
                 }
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -4881,6 +4735,156 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
+            }
+        }
+    }
+
+    private static void exhaustTech(ButtonInteractionEvent event, String buttonID, String buttonLabel, Game activeGame, Player player, String fowIdentity) {
+        String tech = buttonID.replace("exhaustTech_", "");
+        TechnologyModel techModel = Mapper.getTech(tech);
+        String exhaustMessage = player.getRepresentation() + " exhausted tech "
+                + techModel.getRepresentation(false);
+        if (tech.contains("absol")) {
+            switch (activeGame.getOutputVerbosity()) {
+                case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(
+                        event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
+                default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+        }
+        player.exhaustTech(tech);
+        switch (tech) {
+            case "bs" -> { // Bio-stims
+                ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
+                ButtonHelper.deleteTheOneButton(event);
+            }
+            case "absol_bs" -> { // Bio-stims
+                ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
+            }
+            case "absol_x89" -> { // Bio-stims
+                ButtonHelper.sendAbsolX89NukeOptions(activeGame, event, player);
+            }
+            case "absol_dxa" -> { // Dacxive
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use buttons to drop 2 infantry on a planet", Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                ButtonHelper.deleteTheOneButton(event);
+            }
+            case "absol_nm" -> { // Absol's Neural Motivator
+                event.getMessage().delete().queue();
+                Button draw2ACButton = Button
+                        .secondary(player.getFinsFactionCheckerPrefix() + "sc_ac_drawdeleteThisButton",
+                                "Draw 2 Action Cards")
+                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+            }
+            case "td" -> { // Transit Diodes
+                ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
+            }
+            case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
+                Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
+            }
+            case "aida", "sar", "htp" -> {
+                ButtonHelper.deleteTheOneButton(event);
+                if (buttonLabel.contains("(")) {
+                    player.addSpentThing(tech + "_");
+                } else {
+                    player.addSpentThing(tech);
+                }
+                String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                event.getMessage().editMessage(exhaustedMessage).queue();
+            }
+            case "pi" -> { // Predictive Intelligence
+                ButtonHelper.deleteTheOneButton(event);
+                Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons",
+                        "Delete These Buttons");
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        fowIdentity + " use buttons to redistribute",
+                        List.of(Buttons.REDISTRIBUTE_CCs, deleButton));
+            }
+            case "gls" -> { // Graviton Laser System
+                // Do Nothing
+            }
+            case "mi" -> { // Mageon
+                event.getMessage().delete().queue();
+                List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, true) + " Select who you would like to Mageon.", buttons);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+            }
+            case "vtx", "absol_vtx" -> { // Vortex
+                event.getMessage().delete().queue();
+                List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, activeGame,
+                        event);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, true) + " Select what unit you would like to capture",
+                        buttons);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+            }
+            case "wg" -> { // Wormhole Generator
+                event.getMessage().delete().queue();
+                List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
+                String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                        message, buttons);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+            }
+            case "absol_wg" -> { // Absol's Wormhole Generator
+                event.getMessage().delete().queue();
+                List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
+                String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                        message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                        message, buttons);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+            }
+            case "pm" -> { // Production Biomes
+                event.getMessage().delete().queue();
+                ButtonHelperFactionSpecific.resolveProductionBiomesStep1(player, activeGame, event);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+            }
+            case "lgf" -> { // Lazax Gate Folding
+                if (player.getPlanets().contains("mr")) {
+                    event.getMessage().delete().queue();
+                    new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet("mr"),
+                            "inf mr", activeGame);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                            player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
+                    ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
+                } else {
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                            player.getRepresentation() + " You do not control Mecatol Rex");
+                    player.refreshTech("lgf");
+                }
+            }
+            case "sr" -> { // Sling Relay
+                event.getMessage().delete().queue();
+                List<Button> buttons = new ArrayList<>();
+                List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player,
+                        UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
+                if (player.hasUnit("ghoti_flagship")) {
+                    tiles.addAll(
+                            ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship));
+                }
+                if (player.hasUnit("ghoti_mech")) {
+                    tiles.addAll(
+                            ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech));
+                }
+                List<String> pos2 = new ArrayList<>();
+                for (Tile tile : tiles) {
+                    if (!pos2.contains(tile.getPosition())) {
+                        Button tileButton = Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling",
+                                tile.getRepresentationForButtons(activeGame, player));
+                        buttons.add(tileButton);
+                        pos2.add(tile.getPosition());
+                    }
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        "Select which tile you would like to sling in.", buttons);
+                ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
             }
         }
     }
