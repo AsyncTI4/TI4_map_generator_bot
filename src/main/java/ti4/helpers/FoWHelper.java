@@ -236,9 +236,7 @@ public class FoWHelper {
 			}
 			if(tile != null){
 				if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition()) && !tile.hasFog(viewingPlayer)) {
-					if(ButtonHelper.isTileHomeSystem(tile)){
-						return true;
-					}
+					return ButtonHelper.isTileHomeSystem(tile);
 				}
 			}
 		}

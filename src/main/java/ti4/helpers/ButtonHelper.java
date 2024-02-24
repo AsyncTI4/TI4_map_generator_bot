@@ -1286,7 +1286,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
         }
-        if(!activeGame.isFoWMode() && activeGame.getLaws().keySet().contains("minister_peace")){
+        if(!activeGame.isFoWMode() && activeGame.getLaws().containsKey("minister_peace")){
             if(FoWHelper.otherPlayersHaveUnitsInSystem(player, activeSystem, activeGame)){
                 for(Player p2 : activeGame.getRealPlayers()){
                     if (ButtonHelper.isPlayerElected(activeGame, p2, "minister_peace")) {
@@ -3065,12 +3065,9 @@ public class ButtonHelper {
         Planet planetHolder = (Planet) unitHolder;
         if (planetHolder == null)
             return false;
-        if ((Mapper.getPlanet(planetName).getTechSpecialties() != null
+        return (Mapper.getPlanet(planetName).getTechSpecialties() != null
                 && Mapper.getPlanet(planetName).getTechSpecialties().size() > 0)
-                || checkForTechSkipAttachments(activeGame, planetName)) {
-            return true;
-        }
-        return false;
+                || checkForTechSkipAttachments(activeGame, planetName);
     }
 
     public static boolean isPlanetLegendaryOrHome(String planetName, Game activeGame, boolean onlyIncludeYourHome,
@@ -3934,14 +3931,14 @@ public class ButtonHelper {
             if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && activeGame.getCurrentPhase().contains("agenda")) {
                 new PlanetRefresh().doAction(player, planetName, activeGame);
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Florzen Commander");
                 ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
             }
             if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                 UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
                 activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Added inf to planet because of Lanefir Commander");
             }
             if (player.hasTech("dslaner")) {
@@ -5627,7 +5624,7 @@ public class ButtonHelper {
                 });
 
         int charValue = name.charAt(name.length() - 1);
-        String present = name.substring(name.length() - 1, name.length());
+        String present = name.substring(name.length() - 1);
         String next = String.valueOf((char) (charValue + 1));
         String newName = "";
         if (isNumeric(present)) {

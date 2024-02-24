@@ -114,10 +114,7 @@ public class CombatRoll extends CombatSubcommandData {
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
                 rollType, activeGame);
-        if (playerUnitsByQuantity.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !playerUnitsByQuantity.isEmpty();
     }
 
     public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile,

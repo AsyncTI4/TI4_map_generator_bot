@@ -24,7 +24,7 @@ public class FrankenItemTest extends BaseTi4Test {
         var cards = generateAllCards(factions);
         for (var card: cards) {
             assert !card.getShortDescription().isEmpty() : card.getAlias();
-        };
+        }
     }
 
     @Test
@@ -39,7 +39,7 @@ public class FrankenItemTest extends BaseTi4Test {
             {
                 Assertions.fail(card.getAlias() + " threw an exception: " + e);
             }
-        };
+        }
     }
 
     @Test
@@ -48,7 +48,7 @@ public class FrankenItemTest extends BaseTi4Test {
         var cards = generateAllCards(factions);
         for (var card: cards) {
             assert !card.getItemEmoji().isEmpty() : card.getAlias();
-        };
+        }
     }
 
     @Test

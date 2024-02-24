@@ -1894,7 +1894,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
             if (median > 0) {
                 if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
-                        || player.getPromissoryNotes().keySet().contains("riderm")
+                        || player.getPromissoryNotes().containsKey("riderm")
                         || player.hasAbility("radiance") || player.hasAbility("galactic_threat") || player.hasAbility("conspirators")
                         || player.ownsPromissoryNote("riderx")
                         || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")
@@ -4708,7 +4708,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                     String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                             + ". Use buttons to gain CCs";
-                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2,
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2,
                             buttons);
                     ButtonHelper.deleteTheOneButton(event);
                     activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
