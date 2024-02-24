@@ -208,44 +208,13 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             soScoreFromHand(event, buttonID, activeGame, player, privateChannel, mainGameChannel, actionsChannel);
         } else if (buttonID.startsWith("SODISCARD_")) {
-            String soID = buttonID.replace("SODISCARD_", "");
-            MessageChannel channel;
-            if (activeGame.isFoWMode()) {
-                channel = privateChannel;
-            } else if (activeGame.isCommunityMode() && activeGame.getMainGameChannel() != null) {
-                channel = mainGameChannel;
-            } else {
-                channel = actionsChannel;
-            }
-
-            if (channel != null) {
-                try {
-                    int soIndex = Integer.parseInt(soID);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                            ident + " discarded an SO");
-                    new DiscardSO().discardSO(event, player, soIndex, activeGame);
-                } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse SO ID: " + soID, e);
-                    event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please discard manually.")
-                            .queue();
-                    return;
-                }
-            } else {
-                event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
-            }
-            event.getMessage().delete().queue();
+            soDiscard(event, buttonID, activeGame, player, privateChannel, mainGameChannel, actionsChannel, ident);
         } else if (buttonID.startsWith("mantleCrack_")) {
             ButtonHelperAbilities.mantleCracking(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("umbatTile_")) {
             ButtonHelperAgents.umbatTile(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("get_so_score_buttons")) {
-            String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
-            List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(activeGame, player);
-            if (soButtons != null && !soButtons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
-            }
+            getSoScoreButtons(event, activeGame, player);
         } else if (buttonID.startsWith("swapToFaction_")) {
             String faction = buttonID.replace("swapToFaction_", "");
             new Swap().secondHalfOfSwap(activeGame, player, activeGame.getPlayerFromColorOrFaction(faction),
@@ -4565,6 +4534,45 @@ public class ButtonListener extends ListenerAdapter {
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
+    }
+
+    private static void getSoScoreButtons(ButtonInteractionEvent event, Game activeGame, Player player) {
+        String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
+        List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(activeGame, player);
+        if (soButtons != null && !soButtons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
+        }
+    }
+
+    private static void soDiscard(ButtonInteractionEvent event, String buttonID, Game activeGame, Player player, MessageChannel privateChannel, MessageChannel mainGameChannel, MessageChannel actionsChannel, String ident) {
+        String soID = buttonID.replace("SODISCARD_", "");
+        MessageChannel channel;
+        if (activeGame.isFoWMode()) {
+            channel = privateChannel;
+        } else if (activeGame.isCommunityMode() && activeGame.getMainGameChannel() != null) {
+            channel = mainGameChannel;
+        } else {
+            channel = actionsChannel;
+        }
+
+        if (channel != null) {
+            try {
+                int soIndex = Integer.parseInt(soID);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        ident + " discarded an SO");
+                new DiscardSO().discardSO(event, player, soIndex, activeGame);
+            } catch (Exception e) {
+                BotLogger.log(event, "Could not parse SO ID: " + soID, e);
+                event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please discard manually.")
+                        .queue();
+                return;
+            }
+        } else {
+            event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
+        }
+        event.getMessage().delete().queue();
     }
 
     private static void soScoreFromHand(ButtonInteractionEvent event, String buttonID, Game activeGame, Player player, MessageChannel privateChannel, MessageChannel mainGameChannel, MessageChannel actionsChannel) {
