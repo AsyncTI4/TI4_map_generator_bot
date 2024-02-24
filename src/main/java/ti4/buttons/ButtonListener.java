@@ -205,74 +205,7 @@ public class ButtonListener extends ListenerAdapter {
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             acPlayFromHand(event, buttonID, activeGame, player, actionsChannel, fowIdentity);
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
-            String acIndex = buttonID.replace("ac_discard_from_hand_", "");
-            boolean stalling = false;
-            if (acIndex.contains("stall")) {
-                acIndex = acIndex.replace("stall", "");
-                stalling = true;
-            }
-
-            MessageChannel channel;
-            if (activeGame.getMainGameChannel() != null) {
-                channel = activeGame.getMainGameChannel();
-            } else {
-                channel = actionsChannel;
-            }
-
-            if (channel != null) {
-                try {
-                    String acID = null;
-                    for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-                        if (so.getValue().equals(Integer.parseInt(acIndex))) {
-                            acID = so.getKey();
-                        }
-                    }
-
-                    boolean removed = activeGame.discardActionCard(player.getUserID(), Integer.parseInt(acIndex));
-                    if (!removed) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(),
-                                "No such Action Card ID found, please retry");
-                        return;
-                    }
-                    String sb = "Player: " + player.getUserName() + " - " +
-                            "Discarded Action Card:" + "\n" +
-                            Mapper.getActionCard(acID).getRepresentation() + "\n";
-                    MessageChannel channel2 = activeGame.getMainGameChannel();
-                    if (activeGame.isFoWMode()) {
-                        channel2 = player.getPrivateChannel();
-                    }
-                    MessageHelper.sendMessageToChannel(channel2, sb);
-                    ACInfo.sendActionCardInfo(activeGame, player);
-                    String message = "Use buttons to end turn or do another action.";
-                    if (stalling) {
-                        String message3 = "Use buttons to drop a mech on a planet or decline";
-                        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame,
-                                "mech", "placeOneNDone_skipbuild"));
-                        buttons.add(Button.danger("deleteButtons", "Decline to drop Mech"));
-                        MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
-                        List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
-                        MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
-                    }
-                    ButtonHelper.checkACLimit(activeGame, event, player);
-                    event.getMessage().delete().queue();
-                    if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
-                        List<Button> buttons2 = new ArrayList<>();
-                        Button hacanButton = Button
-                                .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
-                                .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
-                        buttons2.add(hacanButton);
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                ButtonHelper.getCorrectChannel(player, activeGame),
-                                player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
-                                buttons2);
-                    }
-
-                } catch (Exception e) {
-                    BotLogger.log(event, "Something went wrong discarding", e);
-                }
-            } else {
-                event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
-            }
+            acDiscardFromHand(event, buttonID, activeGame, player, actionsChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
             MessageChannel channel;
@@ -4706,6 +4639,77 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
+        }
+    }
+
+    private static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game activeGame, Player player, MessageChannel actionsChannel) {
+        String acIndex = buttonID.replace("ac_discard_from_hand_", "");
+        boolean stalling = false;
+        if (acIndex.contains("stall")) {
+            acIndex = acIndex.replace("stall", "");
+            stalling = true;
+        }
+
+        MessageChannel channel;
+        if (activeGame.getMainGameChannel() != null) {
+            channel = activeGame.getMainGameChannel();
+        } else {
+            channel = actionsChannel;
+        }
+
+        if (channel != null) {
+            try {
+                String acID = null;
+                for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+                    if (so.getValue().equals(Integer.parseInt(acIndex))) {
+                        acID = so.getKey();
+                    }
+                }
+
+                boolean removed = activeGame.discardActionCard(player.getUserID(), Integer.parseInt(acIndex));
+                if (!removed) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                            "No such Action Card ID found, please retry");
+                    return;
+                }
+                String sb = "Player: " + player.getUserName() + " - " +
+                        "Discarded Action Card:" + "\n" +
+                        Mapper.getActionCard(acID).getRepresentation() + "\n";
+                MessageChannel channel2 = activeGame.getMainGameChannel();
+                if (activeGame.isFoWMode()) {
+                    channel2 = player.getPrivateChannel();
+                }
+                MessageHelper.sendMessageToChannel(channel2, sb);
+                ACInfo.sendActionCardInfo(activeGame, player);
+                String message = "Use buttons to end turn or do another action.";
+                if (stalling) {
+                    String message3 = "Use buttons to drop a mech on a planet or decline";
+                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame,
+                            "mech", "placeOneNDone_skipbuild"));
+                    buttons.add(Button.danger("deleteButtons", "Decline to drop Mech"));
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                }
+                ButtonHelper.checkACLimit(activeGame, event, player);
+                event.getMessage().delete().queue();
+                if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
+                    List<Button> buttons2 = new ArrayList<>();
+                    Button hacanButton = Button
+                            .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
+                            .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                    buttons2.add(hacanButton);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            ButtonHelper.getCorrectChannel(player, activeGame),
+                            player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
+                            buttons2);
+                }
+
+            } catch (Exception e) {
+                BotLogger.log(event, "Something went wrong discarding", e);
+            }
+        } else {
+            event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
         }
     }
 
