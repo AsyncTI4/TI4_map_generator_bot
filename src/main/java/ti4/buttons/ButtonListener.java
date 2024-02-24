@@ -203,37 +203,7 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
-            String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
-            MessageChannel channel;
-            if (activeGame.getMainGameChannel() != null) {
-                channel = activeGame.getMainGameChannel();
-            } else {
-                channel = actionsChannel;
-            }
-            if (acID.contains("reverse_")) {
-                String actionCardTitle = acID.split("_")[2];
-                acID = acID.split("_")[0];
-                List<Button> scButtons = new ArrayList<>();
-                scButtons.add(Button.success("resolveReverse_" + actionCardTitle,
-                        "Pick up " + actionCardTitle + " from the discard"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        fowIdentity + " After checking for sabos, use buttons to resolve reverse engineer.", scButtons);
-            }
-
-            if (channel != null) {
-                try {
-                    String error = PlayAC.playAC(event, activeGame, player, acID, channel, event.getGuild());
-                    if (error != null) {
-                        event.getChannel().sendMessage(error).queue();
-                    }
-                } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse AC ID: " + acID, e);
-                    event.getChannel().asThreadChannel()
-                            .sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
-                }
-            } else {
-                event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
-            }
+            acPlayFromHand(event, buttonID, activeGame, player, actionsChannel, fowIdentity);
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
             String acIndex = buttonID.replace("ac_discard_from_hand_", "");
             boolean stalling = false;
@@ -4736,6 +4706,40 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
+        }
+    }
+
+    private static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game activeGame, Player player, MessageChannel actionsChannel, String fowIdentity) {
+        String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
+        MessageChannel channel;
+        if (activeGame.getMainGameChannel() != null) {
+            channel = activeGame.getMainGameChannel();
+        } else {
+            channel = actionsChannel;
+        }
+        if (acID.contains("reverse_")) {
+            String actionCardTitle = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            List<Button> scButtons = new ArrayList<>();
+            scButtons.add(Button.success("resolveReverse_" + actionCardTitle,
+                    "Pick up " + actionCardTitle + " from the discard"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    fowIdentity + " After checking for sabos, use buttons to resolve reverse engineer.", scButtons);
+        }
+
+        if (channel != null) {
+            try {
+                String error = PlayAC.playAC(event, activeGame, player, acID, channel, event.getGuild());
+                if (error != null) {
+                    event.getChannel().sendMessage(error).queue();
+                }
+            } catch (Exception e) {
+                BotLogger.log(event, "Could not parse AC ID: " + acID, e);
+                event.getChannel().asThreadChannel()
+                        .sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
+            }
+        } else {
+            event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
         }
     }
 
