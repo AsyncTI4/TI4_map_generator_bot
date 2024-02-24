@@ -107,7 +107,6 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
         }
-        // BotLogger.log(event, ""); //TEMPORARY LOG ALL BUTTONS
 
         String messageID = event.getMessage().getId();
 
@@ -247,7 +246,6 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
-            //
         } else if (buttonID.startsWith("swapToFaction_")) {
             String faction = buttonID.replace("swapToFaction_", "");
             new Swap().secondHalfOfSwap(activeGame, player, activeGame.getPlayerFromColorOrFaction(faction),
@@ -1170,14 +1168,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
                 }
             }
-            String exhaustedMessage = event.getMessage().getContentRaw();
-            // if (!exhaustedMessage.contains("Click the names")) {
-            // exhaustedMessage = exhaustedMessage + ", exhausted "
-            // + Helper.getPlanetRepresentation(planetName, activeGame);
-            // } else {
-            // exhaustedMessage = ident + " exhausted "
-            // + Helper.getPlanetRepresentation(planetName, activeGame);
-            // }
+            String exhaustedMessage;
             exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         } else if (buttonID.startsWith("finishTransaction_")) {
@@ -1259,10 +1250,8 @@ public class ButtonListener extends ListenerAdapter {
             if (buttonID.split("_").length > 2) {
                 whatIsItFor = buttonID.split("_")[2];
             }
-            String message = ident + " reduced tgs by " + tgLoss + " (" + player.getTg() + "->"
-                    + (player.getTg() - tgLoss) + ")";
             if (tgLoss > player.getTg()) {
-                message = "You dont have " + tgLoss + " tgs. No change made.";
+                String message = "You dont have " + tgLoss + " tgs. No change made.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             } else {
                 player.setTg(player.getTg() - tgLoss);
@@ -1581,7 +1570,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("resolveWithNoEffect")) {
             String voteMessage = "Resolving agenda with no effect. Click the buttons for next steps.";
             String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
-            int aCount = 0;
+            int aCount;
             if (agendaCount.isEmpty()) {
                 aCount = 1;
             } else {
@@ -1778,7 +1767,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), msg,
                         buttons);
                 event.getMessage().delete().queue();
-            } // "colonialRedTarget_"
+            }
         } else if (buttonID.startsWith("colonialRedTarget_")) {
             AgendaHelper.resolveColonialRedTarget(activeGame, buttonID, event);
         } else if (buttonID.startsWith("ruins_")) {
@@ -2326,7 +2315,6 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("spaceUnits_")) {
             ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("reinforcements_cc_placement_")) {
-            // String playerRep = player.getRepresentation();
             String planet = buttonID.replace("reinforcements_cc_placement_", "");
             String tileID = AliasHandler.resolveTile(planet.toLowerCase());
             Tile tile = activeGame.getTile(tileID);
@@ -2347,7 +2335,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "construction");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("placeHolderOfConInSystem_")) {
-            // String playerRep = player.getRepresentation();
             String planet = buttonID.replace("placeHolderOfConInSystem_", "");
             String tileID = AliasHandler.resolveTile(planet.toLowerCase());
             Tile tile = activeGame.getTile(tileID);
