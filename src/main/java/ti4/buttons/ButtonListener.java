@@ -207,69 +207,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
             acDiscardFromHand(event, buttonID, activeGame, player, actionsChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
-            String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
-            MessageChannel channel;
-            if (activeGame.isFoWMode()) {
-                channel = privateChannel;
-            } else if (activeGame.isCommunityMode() && activeGame.getMainGameChannel() != null) {
-                channel = mainGameChannel;
-            } else {
-                channel = actionsChannel;
-            }
-            if (channel != null) {
-                int soIndex2 = Integer.parseInt(soID);
-                String phase = "action";
-                if (player.getSecret(soIndex2) != null &&player.getSecret(soIndex2).getPhase().equalsIgnoreCase("status") && "true".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("forcedScoringOrder"))) {
-                    String key2 = "queueToScoreSOs";
-                    String key3 = "potentialScoreSOBlockers";
-                    String key3b = "potentialScorePOBlockers";
-                    String message = "Drew Secret Objective";
-                    for (Player player2 :Helper.getInitativeOrder(activeGame)) {
-                        if (player2 == player) {
-                            int soIndex = Integer.parseInt(soID);
-                            ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
-                            if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
-                                activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
-                            }
-                            if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
-                                activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
-                                if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
-                                    Helper.resolvePOScoringQueue(activeGame, event);
-                                    //Helper.resolveSOScoringQueue(activeGame, event);
-                                }
-                            }
-                            
-                            break;
-                        }
-                        if (activeGame.getFactionsThatReactedToThis(key3).contains(player2.getFaction() + "*")) {
-                            message = player.getRepresentation()+" Wants to score an SO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
-                            if (!activeGame.isFoWMode()) {
-                                message = message + player2.getRepresentation(true, true)
-                                        + " is the one the game is currently waiting on";
-                            }
-                            MessageHelper.sendMessageToChannel(channel, message);
-                            int soIndex = Integer.parseInt(soID);
-                            activeGame.setCurrentReacts(player.getFaction()+"queuedSOScore",""+soIndex);
-                            activeGame.setCurrentReacts(key2,
-                                    activeGame.getFactionsThatReactedToThis(key2) + player.getFaction() + "*");
-                            break;
-                        }
-                    }
-                }else{
-                    try {
-                        int soIndex = Integer.parseInt(soID);
-                        ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
-                    } catch (Exception e) {
-                        BotLogger.log(event, "Could not parse SO ID: " + soID, e);
-                        event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.")
-                                .queue();
-                        return;
-                    }
-                }
-            } else {
-                event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
-            }
-            event.getMessage().delete().queue();
+            soScoreFromHand(event, buttonID, activeGame, player, privateChannel, mainGameChannel, actionsChannel);
         } else if (buttonID.startsWith("SODISCARD_")) {
             String soID = buttonID.replace("SODISCARD_", "");
             MessageChannel channel;
@@ -4640,6 +4578,72 @@ public class ButtonListener extends ListenerAdapter {
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
+    }
+
+    private static void soScoreFromHand(ButtonInteractionEvent event, String buttonID, Game activeGame, Player player, MessageChannel privateChannel, MessageChannel mainGameChannel, MessageChannel actionsChannel) {
+        String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
+        MessageChannel channel;
+        if (activeGame.isFoWMode()) {
+            channel = privateChannel;
+        } else if (activeGame.isCommunityMode() && activeGame.getMainGameChannel() != null) {
+            channel = mainGameChannel;
+        } else {
+            channel = actionsChannel;
+        }
+        if (channel != null) {
+            int soIndex2 = Integer.parseInt(soID);
+            String phase = "action";
+            if (player.getSecret(soIndex2) != null && player.getSecret(soIndex2).getPhase().equalsIgnoreCase("status") && "true".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("forcedScoringOrder"))) {
+                String key2 = "queueToScoreSOs";
+                String key3 = "potentialScoreSOBlockers";
+                String key3b = "potentialScorePOBlockers";
+                String message = "Drew Secret Objective";
+                for (Player player2 :Helper.getInitativeOrder(activeGame)) {
+                    if (player2 == player) {
+                        int soIndex = Integer.parseInt(soID);
+                        ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
+                        if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
+                            activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+                        }
+                        if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
+                            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
+                            if(!activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")){
+                                Helper.resolvePOScoringQueue(activeGame, event);
+                                //Helper.resolveSOScoringQueue(activeGame, event);
+                            }
+                        }
+
+                        break;
+                    }
+                    if (activeGame.getFactionsThatReactedToThis(key3).contains(player2.getFaction() + "*")) {
+                        message = player.getRepresentation()+" Wants to score an SO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
+                        if (!activeGame.isFoWMode()) {
+                            message = message + player2.getRepresentation(true, true)
+                                    + " is the one the game is currently waiting on";
+                        }
+                        MessageHelper.sendMessageToChannel(channel, message);
+                        int soIndex = Integer.parseInt(soID);
+                        activeGame.setCurrentReacts(player.getFaction()+"queuedSOScore",""+soIndex);
+                        activeGame.setCurrentReacts(key2,
+                                activeGame.getFactionsThatReactedToThis(key2) + player.getFaction() + "*");
+                        break;
+                    }
+                }
+            }else{
+                try {
+                    int soIndex = Integer.parseInt(soID);
+                    ScoreSO.scoreSO(event, activeGame, player, soIndex, channel);
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not parse SO ID: " + soID, e);
+                    event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.")
+                            .queue();
+                    return;
+                }
+            }
+        } else {
+            event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
+        }
+        event.getMessage().delete().queue();
     }
 
     private static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game activeGame, Player player, MessageChannel actionsChannel) {
