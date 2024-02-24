@@ -3934,14 +3934,14 @@ public class ButtonHelper {
             if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                     && activeGame.getCurrentPhase().contains("agenda")) {
                 new PlanetRefresh().doAction(player, planetName, activeGame);
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Florzen Commander");
                 ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
             }
             if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                 UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
                 activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Added inf to planet because of Lanefir Commander");
             }
             if (player.hasTech("dslaner")) {

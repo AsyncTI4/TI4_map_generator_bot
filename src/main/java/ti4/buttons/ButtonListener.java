@@ -4708,7 +4708,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                     String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                             + ". Use buttons to gain CCs";
-                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2,
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2,
                             buttons);
                     ButtonHelper.deleteTheOneButton(event);
                     activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
