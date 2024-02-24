@@ -855,7 +855,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units",
                         buttons);
-                    
+
             }
         }
         if (player.hasUnexhaustedLeader("zealotsagent")) {
@@ -1241,7 +1241,7 @@ public class ButtonHelper {
         }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = activeGame.getActionsChannel();
-        
+
         Player ghostPlayer = Helper.getPlayerFromUnit(activeGame, "ghost_mech");
         if (!activeGame.isFoWMode() && ghostPlayer != null && ghostPlayer != player
                 && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech",false) > 0
@@ -1264,7 +1264,7 @@ public class ButtonHelper {
                 }
             }
         }
-        
+
         for (Player nonActivePlayer : activeGame.getPlayers().values()) {
 
             if (!nonActivePlayer.isRealPlayer() || nonActivePlayer.isPlayerMemberOfAlliance(player)
@@ -1802,6 +1802,7 @@ public class ButtonHelper {
                 for (Player player : activeGame.getRealPlayers()) {
                     if (player.getPlanets().contains(plan.getName())) {
                         unowned = false;
+                        break;
                     }
                 }
                 if (unowned) {
@@ -2630,7 +2631,7 @@ public class ButtonHelper {
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
             AddCC.addCC(event, target.getColor(), tile);
-            
+
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, activeGame),
                 mahact.getRepresentation(true, true) + " the " + target.getColor()
@@ -3827,7 +3828,7 @@ public class ButtonHelper {
                             List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
                             buttons.addAll(planetButtons);
                         }
-                        
+
                     }
                 }
                 if(buttons.size() > 0){
@@ -6033,7 +6034,7 @@ public class ButtonHelper {
      * <p>
      * This results in a value ranging from 1:1 (no contrast at all) to 21:1 (the
      * highest possible contrast).
-     * 
+     *
      * @param L1 The lighter color (higher luminance)
      * @param L2 the darker color (lower luminance)
      * @return contrast ratio (1:x)
