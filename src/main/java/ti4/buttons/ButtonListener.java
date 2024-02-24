@@ -1894,7 +1894,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
             if (median > 0) {
                 if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
-                        || player.getPromissoryNotes().keySet().contains("riderm")
+                        || player.getPromissoryNotes().containsKey("riderm")
                         || player.hasAbility("radiance") || player.hasAbility("galactic_threat") || player.hasAbility("conspirators")
                         || player.ownsPromissoryNote("riderx")
                         || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")

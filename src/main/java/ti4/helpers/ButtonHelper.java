@@ -1286,7 +1286,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
         }
-        if(!activeGame.isFoWMode() && activeGame.getLaws().keySet().contains("minister_peace")){
+        if(!activeGame.isFoWMode() && activeGame.getLaws().containsKey("minister_peace")){
             if(FoWHelper.otherPlayersHaveUnitsInSystem(player, activeSystem, activeGame)){
                 for(Player p2 : activeGame.getRealPlayers()){
                     if (ButtonHelper.isPlayerElected(activeGame, p2, "minister_peace")) {
