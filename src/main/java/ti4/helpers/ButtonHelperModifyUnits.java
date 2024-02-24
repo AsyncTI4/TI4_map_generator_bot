@@ -372,11 +372,7 @@ public class ButtonHelperModifyUnits {
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
                 UnitKey unitKey = unitEntry.getKey();
-                boolean isNomadMechApplicable = false;
-                if((ButtonHelper.getUnitName(unitKey.asyncID()).equalsIgnoreCase("mech") && player.hasUnit("nomad_mech") && !noMechPowers)){
-                    isNomadMechApplicable = true;
-                }
-                if(!unitModel.getIsShip() && !isNomadMechApplicable){
+                if(!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)){
                     continue;
                 }
                
@@ -745,7 +741,7 @@ public class ButtonHelperModifyUnits {
     }
 
 
-     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game activeGame, String unit) {
+    public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game activeGame, String unit) {
         List<Button> buttons = new ArrayList<>();
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit),player.getColorID()).getUnitType();
         for(Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, type)){
@@ -1983,5 +1979,7 @@ public class ButtonHelperModifyUnits {
             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, activeGame, event);
         }
     }
-
+    private static boolean isNomadMechApplicable(Player player, boolean noMechPowers, UnitKey unitKey) {
+        return ButtonHelper.getUnitName(unitKey.asyncID()).equalsIgnoreCase("mech") && player.hasUnit("nomad_mech") && !noMechPowers;
+    }
 }
