@@ -277,7 +277,7 @@ public class Setup extends PlayerSubcommandData {
         if(!activeGame.isFoWMode()){
             StringBuilder sb = new ListMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
             if(!sb.toString().contains("No titles yet")){
-                String msg = "In previous games, "+player.getUserName()+" has earned the titles of: \n"+sb.toString();
+                String msg = "In previous games, "+player.getUserName()+" has earned the titles of: \n"+ sb;
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
             }
         }

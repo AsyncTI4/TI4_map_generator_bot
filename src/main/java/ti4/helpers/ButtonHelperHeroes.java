@@ -293,7 +293,7 @@ public class ButtonHelperHeroes {
                 + ". Use buttons to gain CCs";
         activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons(
-                (MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
         revealedRelics = getAllRevealedRelics(activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), revealMsg);
 
@@ -305,7 +305,7 @@ public class ButtonHelperHeroes {
         String revealMsg2 = player.getRepresentation()
                 + " use buttons to swap any revealed relic or relic in play area with another relic. No Automated effects of a relic gain or loss will be applied. All relics can only move places once\n";
         MessageHelper.sendMessageToChannelWithButtons(
-                (MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), revealMsg2, relicButtons);
+                ButtonHelper.getCorrectChannel(player, activeGame), revealMsg2, relicButtons);
     }
 
     public static void resolveRelicSwapStep1(Player player, Game activeGame, ButtonInteractionEvent event,
@@ -326,7 +326,7 @@ public class ButtonHelperHeroes {
                     Mapper.getRelic(relic2).getName()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                (MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame), revealMsg, relicButtons);
+                ButtonHelper.getCorrectChannel(player, activeGame), revealMsg, relicButtons);
     }
 
     public static void resolveRelicSwapStep2(Player player, Game activeGame, ButtonInteractionEvent event,
@@ -338,7 +338,7 @@ public class ButtonHelperHeroes {
         String relic2 = buttonID.split(";")[4];
         String revealMsg = player.getRepresentation() + " you chose to swap the relic "
                 + Mapper.getRelic(relic).getName() + " with the relic " + Mapper.getRelic(relic2).getName() + "";
-        MessageHelper.sendMessageToChannel((MessageChannel) ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                 revealMsg);
         if (faction.contains("lanefirRelicReveal")) {
             activeGame.removeMessageIDFromCurrentReacts(faction);
