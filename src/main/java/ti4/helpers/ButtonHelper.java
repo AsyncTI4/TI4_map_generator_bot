@@ -5624,7 +5624,7 @@ public class ButtonHelper {
                 });
 
         int charValue = name.charAt(name.length() - 1);
-        String present = name.substring(name.length() - 1, name.length());
+        String present = name.substring(name.length() - 1);
         String next = String.valueOf((char) (charValue + 1));
         String newName = "";
         if (isNumeric(present)) {
