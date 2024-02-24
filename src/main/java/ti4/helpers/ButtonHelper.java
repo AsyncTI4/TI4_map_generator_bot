@@ -3065,12 +3065,9 @@ public class ButtonHelper {
         Planet planetHolder = (Planet) unitHolder;
         if (planetHolder == null)
             return false;
-        if ((Mapper.getPlanet(planetName).getTechSpecialties() != null
+        return (Mapper.getPlanet(planetName).getTechSpecialties() != null
                 && Mapper.getPlanet(planetName).getTechSpecialties().size() > 0)
-                || checkForTechSkipAttachments(activeGame, planetName)) {
-            return true;
-        }
-        return false;
+                || checkForTechSkipAttachments(activeGame, planetName);
     }
 
     public static boolean isPlanetLegendaryOrHome(String planetName, Game activeGame, boolean onlyIncludeYourHome,

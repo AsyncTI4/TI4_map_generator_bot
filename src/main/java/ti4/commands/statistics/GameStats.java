@@ -212,11 +212,7 @@ public class GameStats extends StatisticsSubcommandData {
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
-        if(games.size() > 0){
-            return true;
-        }
-
-        return false;
+        return games.size() > 0;
     }
     public static int numberOfPlayersUnfinishedGames(String userID){
 
