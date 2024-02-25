@@ -270,7 +270,9 @@ public class GameEnd extends GameSubcommandData {
         int winningPathCount = winningPathCounts.get(winningPath);
         double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
         String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
-        sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ")
+        sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(game.getVp()).append("VP, ")
+            .append(game.getRealPlayers().size()).append("P)")
+            .append(", this path has been seen ")
             .append(winningPathCount - 1)
             .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
             .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");

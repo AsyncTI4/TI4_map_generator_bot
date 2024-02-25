@@ -25,7 +25,7 @@
   },
   {
     "alias": "bestow_a_keleres_fleet_little_omega",
-    "name": "Bestow a Keleres Fleet ω",
+    "name": "Bestow an Imperial Fleet ω",
     "phase": "Status",
     "text": "Remove 1 of each of your carriers, cruisers, and destroyers from the game board.",
     "points": 1,
