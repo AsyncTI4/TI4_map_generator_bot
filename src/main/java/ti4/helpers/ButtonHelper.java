@@ -1,26 +1,7 @@
 package ti4.helpers;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.Role;
+import lombok.Data;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -38,8 +19,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import lombok.Data;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
@@ -53,11 +32,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.ds.DrawBlueBackTile;
-import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExpInfo;
-import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.explore.SendFragments;
-import ti4.commands.explore.ShowRemainingRelics;
+import ti4.commands.explore.*;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
 import ti4.commands.leaders.ExhaustLeader;
@@ -79,36 +54,24 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.ColorModel;
-import ti4.model.ExploreModel;
-import ti4.model.FactionModel;
-import ti4.model.LeaderModel;
-import ti4.model.NamedCombatModifierModel;
-import ti4.model.PlanetModel;
-import ti4.model.PromissoryNoteModel;
-import ti4.model.RelicModel;
-import ti4.model.TechnologyModel;
+import ti4.model.*;
 import ti4.model.TechnologyModel.TechnologyType;
-import ti4.model.TileModel;
-import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
+
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ButtonHelper {
 
@@ -512,11 +475,11 @@ public class ButtonHelper {
             if (unitHolder == null)
                 return types;
             Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
+            boolean oneOfThree = planetReal.getOriginalPlanetType() != null
                     && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                             || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                             || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
-            if (planetReal != null && oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
+            if (oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
                 types.add(planetReal.getOriginalPlanetType());
             }
             if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
@@ -892,7 +855,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units",
                         buttons);
-                    
+
             }
         }
         if (player.hasUnexhaustedLeader("zealotsagent")) {
@@ -1278,7 +1241,7 @@ public class ButtonHelper {
         }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = activeGame.getActionsChannel();
-        
+
         Player ghostPlayer = Helper.getPlayerFromUnit(activeGame, "ghost_mech");
         if (!activeGame.isFoWMode() && ghostPlayer != null && ghostPlayer != player
                 && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech",false) > 0
@@ -1301,7 +1264,7 @@ public class ButtonHelper {
                 }
             }
         }
-        
+
         for (Player nonActivePlayer : activeGame.getPlayers().values()) {
 
             if (!nonActivePlayer.isRealPlayer() || nonActivePlayer.isPlayerMemberOfAlliance(player)
@@ -1839,6 +1802,7 @@ public class ButtonHelper {
                 for (Player player : activeGame.getRealPlayers()) {
                     if (player.getPlanets().contains(plan.getName())) {
                         unowned = false;
+                        break;
                     }
                 }
                 if (unowned) {
@@ -2667,7 +2631,7 @@ public class ButtonHelper {
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
             AddCC.addCC(event, target.getColor(), tile);
-            
+
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, activeGame),
                 mahact.getRepresentation(true, true) + " the " + target.getColor()
@@ -3864,7 +3828,7 @@ public class ButtonHelper {
                             List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
                             buttons.addAll(planetButtons);
                         }
-                        
+
                     }
                 }
                 if(buttons.size() > 0){
@@ -6070,7 +6034,7 @@ public class ButtonHelper {
      * <p>
      * This results in a value ranging from 1:1 (no contrast at all) to 21:1 (the
      * highest possible contrast).
-     * 
+     *
      * @param L1 The lighter color (higher luminance)
      * @param L2 the darker color (lower luminance)
      * @return contrast ratio (1:x)
