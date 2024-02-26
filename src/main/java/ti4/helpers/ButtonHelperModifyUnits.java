@@ -869,7 +869,7 @@ public class ButtonHelperModifyUnits {
                     break;
                 }
             }
-            if (player != player2) {
+            if (player != player2 && players.contains(player)) {
                 String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                 if (!activeGame.isFoWMode()) {
                     StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "ground");

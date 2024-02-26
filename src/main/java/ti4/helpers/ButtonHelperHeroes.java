@@ -28,7 +28,9 @@ import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
+import ti4.commands.player.SendDebt;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -43,6 +45,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PublicObjectiveModel;
@@ -1672,6 +1675,87 @@ public class ButtonHelperHeroes {
                         + tile1.getRepresentationForButtons(activeGame, player),
                 buttons);
         event.getMessage().delete().queue();
+    }
+
+    public static void startVadenHero(Game activeGame, Player vaden){
+        List<Button> buttons = new ArrayList<>();
+
+        for(Player target : activeGame.getRealPlayers()){
+            if(vaden.getDebtTokenCount(target.getColor()) > 0){
+                Button button;
+                String prefix = "vadenHeroClearDebt";
+                Player player = target;
+                String faction = player.getFaction();
+                if (!activeGame.isFoWMode() && !faction.contains("franken")) {
+                    button = Button.secondary(prefix + "_" + faction, " ");
+                    button = button.withEmoji(Emoji.fromFormatted(player.getFactionEmoji()));
+                } else {
+                    button = Button.secondary(prefix + "_" + player.getColor(), player.getColor());
+                }
+               buttons.add(button);
+            }
+        }
+    }
+
+    public static void vadenHeroClearDebt(Game activeGame, Player vaden, ButtonInteractionEvent event, String buttonID){
+        Player target = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<>();
+        if(target.getTg() > 0){
+        buttons.add(Button.success("sendVadenHeroSomething_"+vaden.getFaction()+"_tg", "Send 1 tg"));
+        }
+        if(target.getCommodities() > 1){
+            buttons.add(Button.secondary("sendVadenHeroSomething_"+vaden.getFaction()+"_comms", "Send 2 comms"));
+        }
+        buttons.add(Button.danger("sendVadenHeroSomething_"+vaden.getFaction()+"_pn", "Send 1 PN"));
+        ClearDebt.clearDebt(vaden, target, 1);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, activeGame), vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true) +" using vaden hero. Buttons have been sent to their cards info to resolve");
+        MessageHelper.sendMessageToChannelWithButtons(target.getCardsInfoThread(), target.getRepresentation(true, true) +" se;ect something to given Vaden hero due to them returning one of your tokens", buttons);
+        if( vaden.getDebtTokenCount(target.getColor()) == 0){
+            ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
+     public static void sendVadenHeroSomething(Player player, Game activeGame, String buttonID,
+            ButtonInteractionEvent event) {
+        String tgOrComm = buttonID.split("_")[2];
+        Player vaden = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        event.getMessage().delete().queue();
+        
+        String msg = player.getRepresentation(false, true) + " sent "; 
+        if ("tg".equalsIgnoreCase(tgOrComm)) {
+            msg = msg + " 1 tg to " + vaden.getRepresentation(false, true) +" as a result of Vaden Hero play";
+            if (player.getTg() > 0) {
+               vaden.setTg(vaden.getTg() + 1);
+                player.setTg(player.getTg() - 1);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        player.getRepresentation(true, true) + " you had no tg to send, no tg sent.");
+                return;
+            }
+        } else {
+            if("comms".equalsIgnoreCase(tgOrComm)){
+                msg = msg + " 2 comms to " + vaden.getRepresentation(false, true) +" as a result of Vaden Hero play";
+                if (player.getCommodities() > 1) {
+                    vaden.setTg(vaden.getTg() + 2);
+                    player.setCommodities(player.getCommodities()-2);
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            player.getRepresentation(true, true) + " you didnt have 2 comms to send, no comms sent.");
+                    return;
+                }
+            }else{
+                msg = player.getRepresentation(false, true) + " will send 1 PN as a result of Vaden Hero play";
+                List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, vaden, player);
+                String message = player.getRepresentation(true, true)
+                        + " Please select the PN you would like to send";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
+            }
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, activeGame), msg);
+        }
+
     }
 
     public static void killShipsSardakkHero(Player player, Game activeGame, ButtonInteractionEvent event) {
