@@ -6247,6 +6247,38 @@ public class ButtonHelper {
         return playersWithPds2;
     }
 
+    public static void sendEBSWarning(Player player, Game activeGame, String tilePos) {
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeGame, tilePos, player, false);
+        for (String adjTilePos : adjTiles) {
+            Tile adjTile = activeGame.getTileByPosition(adjTilePos);
+            if (adjTile == null) {
+                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + activeGame.getName() + " Tile: " + tilePos
+                        + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
+                continue;
+            }
+            for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
+                for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
+                    if (unitEntry.getValue() == 0) {
+                        continue;
+                    }
+
+                    UnitKey unitKey = unitEntry.getKey();
+                    Player owningPlayer = activeGame.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                    if (owningPlayer == null || owningPlayer == player) {
+                        continue;
+                    }
+
+                    UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
+                    if (owningPlayer.getActionCards().containsKey("experimental") && model != null && model.getBaseType().equalsIgnoreCase("spacedock")) {
+                        MessageHelper.sendMessageToChannel(owningPlayer.getCardsInfoThread(), owningPlayer.getRepresentation() +" this is a reminder that this is the window to play experimental battle station");
+                        return;
+                    }
+                }
+            }
+        }
+        
+    }
+
     public static void fixRelics(Game activeGame) {
         for (Player player : activeGame.getPlayers().values()) {
             if (player != null && player.getRelics() != null) {
