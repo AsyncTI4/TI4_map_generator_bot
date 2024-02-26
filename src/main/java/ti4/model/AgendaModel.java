@@ -157,8 +157,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         eb.setColor(Color.blue);
 
         // DESCRIPTION
-        StringBuilder text = new StringBuilder("This agenda is in somebody's hand");
-        eb.setDescription(text.toString());
+        eb.setDescription("This agenda is in somebody's hand");
         return eb.build();
     }
 

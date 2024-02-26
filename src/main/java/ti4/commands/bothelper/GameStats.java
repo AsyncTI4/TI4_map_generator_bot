@@ -34,13 +34,13 @@ public class GameStats extends BothelperSubcommandData {
             int channelCount = guild.getChannels().size(); //500
             guildRoomForGames = Math.min(guildRoomForGames, (500 - channelCount)/2);
             long gameCount = GameManager.getInstance().getGameNameToGame().values().stream().filter(g -> g.getGuild() != null && g.getGuild().getId().equals(guild.getId())).count();
-            sb.append("- hosting **").append(gameCount).append("** games  -  ");
+            sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
             hostedGames += gameCount;
             roomForGames += guildRoomForGames;
         }
-        sb.append("**Total**\n");
-        sb.append("- hosting **").append(hostedGames).append("** games  -  ");
+        sb.append("\n**Total**\n");
+        sb.append("> hosting **").append(hostedGames).append("** games  -  ");
         sb.append("space for **").append(roomForGames).append("** more games\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }

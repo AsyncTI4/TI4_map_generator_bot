@@ -149,7 +149,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "text2": "",
-        "mapText": "After you gain CCs from Leadership, explore a planet you control. Before you draw from an exploration deck, you may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
+        "mapText": "After gaining CCs from Leadership, explore a planet. Before you draw from exploration, you may discard this to choose 1 card to place on top and discard the rest.",
         "source": "little_omega"
     },
     {

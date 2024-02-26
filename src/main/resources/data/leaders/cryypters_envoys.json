@@ -5,8 +5,8 @@
         "type": "envoy",
         "name": "Dirzuga Ohao",
         "title": "Treasures Of Nestphar",
-        "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may replenish your commodities.",
+        "abilityWindow": "When an outcome you predicted or cast 5 or more votes for would be resolved:",
+        "abilityText": "You may exhaust a planet you control, then use the PRODUCTION ability of one of your ground forces; you may only spend the resources from the exhausted planet to produce these units.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -16,8 +16,8 @@
         "type": "envoy",
         "name": "Solann Aun Kamaki",
         "title": "Punish Ambivalence",
-        "abilityWindow": "When a player abstains:",
-        "abilityText": "You may force them to remove 1 token from their tactic pool and return it to their reinforcements.",
+        "abilityWindow": "When a player with readied planets abstains:",
+        "abilityText": "You may force that player to remove 1 token from their tactic pool and return it to their reinforcements.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -61,7 +61,7 @@
         "name": "Huldran",
         "title": "Return On Investment",
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
-        "abilityText": "You and each other player that voted for that agenda gains 1 trade good.",
+        "abilityText": "You and each other player that voted for that agenda may gain 1 trade good.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -71,8 +71,8 @@
         "type": "envoy",
         "name": "Yaluga Huin",
         "title": "University Headmaster",
-        "abilityWindow": "When another player votes for the outcome you predicted or voted for:",
-        "abilityText": "That player gains additional votes equal to the number of planets with technology specialties they exhausted.",
+        "abilityWindow": "",
+        "abilityText": "Each player that votes for the outcome you predict or vote for gains additional votes equal to the number of planets with technology specialties they exhausted.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -93,8 +93,8 @@
         "type": "envoy",
         "name": "A6AH3",
         "title": "Calculated Presence",
-        "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may exhaust 1 planet adjacent to 1 or more of your dreadnoughts.",
+        "abilityWindow": "When you exhaust 1 or more planets to cast votes:",
+        "abilityText": "You may exhaust this card. If you do, the number of votes you cast is equal to the resource or influence value of each planet, whichever is greater.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -149,7 +149,7 @@
         "name": "H'eyra",
         "title": "Subtle Whisperer",
         "abilityWindow": "After the speaker abstains or votes on an agenda:",
-        "abilityText": "You may exhaust 1 planet you control and add its influence value to your votes.",
+        "abilityText": "You may exhaust 1 planet you control and cast additional votes equal to its influence value.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -160,7 +160,7 @@
         "name": "Tam And Kurn",
         "title": "Horizon Walkers",
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
-        "abilityText": "You may look at the top card of an exploration deck. if it is a relic fragment, you may exhaust this card to gain it.",
+        "abilityText": "You may look at the top card of an exploration deck. If it is a relic fragment, you may exhaust this card to gain it.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -171,7 +171,7 @@
         "name": "Nekro Incisul",
         "title": "Network Infiltrator",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they gain additional votes equal to the number of technologies that player owns that you also own.",
+        "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they cast additional votes equal to the number of technologies that player owns that you also own.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -236,8 +236,8 @@
         "type": "envoy",
         "name": "Perdin Perdona",
         "title": "Echoes Of The Lazax",
-        "abilityWindow": "When you cast votes:",
-        "abilityText": "You may add the influence value of either your Home Planet or Mecatol Rex (if you control it) to your votes without exhausting it.",
+        "abilityWindow": "When you vote using the influence value of either your home planet or Mecatol Rex:",
+        "abilityText": "Do not exhaust that planet.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -247,8 +247,8 @@
         "type": "envoy",
         "name": "The Brothers Qquiar",
         "title": "Coalition Builders",
-        "abilityWindow": "When another player votes for the outcome you predicted or voted for:",
-        "abilityText": "That player gains 2 additional votes.",
+        "abilityWindow": "",
+        "abilityText": "Each other player that votes for the outcome you predict or vote for gains 2 additional votes.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -258,8 +258,8 @@
         "type": "envoy",
         "name": "Brother Rhal",
         "title": "Evangelist",
-        "abilityWindow": "After a player votes on an agenda:",
-        "abilityText": "You may exhaust this card to exhaust 1 planet controlled by that player and add that planet’s influence value to your votes.",
+        "abilityWindow": "After a player abstains or votes on an agenda:",
+        "abilityText": "You may exhaust this card to exhaust 1 planet controlled by that player and cast additional votes equal to that planet’s influence value.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },

@@ -1,14 +1,6 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import kotlin.Unit;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -20,13 +12,11 @@ import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+
+import java.util.*;
 
 public class ButtonHelperModifyUnits {
 
@@ -46,7 +36,6 @@ public class ButtonHelperModifyUnits {
             UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
             if (unitModel == null) continue;
             UnitKey unitKey = unitEntry.getKey();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
             int damagedUnits = 0;
             if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
                 damagedUnits = unitHolder.getUnitDamage().get(unitKey);
@@ -150,7 +139,6 @@ public class ButtonHelperModifyUnits {
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
                 UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
                     damagedUnits = unitHolder.getUnitDamage().get(unitKey);
@@ -311,31 +299,6 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public static String autoAssignSpaceCombatHits(Player player, Game activeGame, Tile tile, int hits, GenericInteractionCreateEvent event, boolean justSummarizing){
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
         String msg = ButtonHelper.getIdent(player)+" assigned hits in the following way:\n";
@@ -372,11 +335,7 @@ public class ButtonHelperModifyUnits {
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null) continue;
                 UnitKey unitKey = unitEntry.getKey();
-                boolean isNomadMechApplicable = false;
-                if((ButtonHelper.getUnitName(unitKey.asyncID()).equalsIgnoreCase("mech") && player.hasUnit("nomad_mech") && !noMechPowers)){
-                    isNomadMechApplicable = true;
-                }
-                if(!unitModel.getIsShip() && !isNomadMechApplicable){
+                if(!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)){
                     continue;
                 }
                
@@ -745,7 +704,7 @@ public class ButtonHelperModifyUnits {
     }
 
 
-     public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game activeGame, String unit) {
+    public static List<Button> getRemoveThisTypeOfUnitButton(Player player, Game activeGame, String unit) {
         List<Button> buttons = new ArrayList<>();
         UnitType type = Mapper.getUnitKey(AliasHandler.resolveUnit(unit),player.getColorID()).getUnitType();
         for(Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, type)){
@@ -857,7 +816,7 @@ public class ButtonHelperModifyUnits {
                 representation = name;
             }
             UnitHolder unitHolder = entry.getValue();
-            if (unitHolder instanceof Planet planet) {
+            if (unitHolder instanceof Planet) {
                 int limit = unitHolder.getUnitCount(UnitType.Infantry, player.getColor());
                 for (int x = 1; x < limit + 1; x++) {
                     if (x > 2) {
@@ -1987,5 +1946,7 @@ public class ButtonHelperModifyUnits {
             ButtonHelperCommanders.resolveLetnevCommanderCheck(player, activeGame, event);
         }
     }
-
+    private static boolean isNomadMechApplicable(Player player, boolean noMechPowers, UnitKey unitKey) {
+        return ButtonHelper.getUnitName(unitKey.asyncID()).equalsIgnoreCase("mech") && player.hasUnit("nomad_mech") && !noMechPowers;
+    }
 }
