@@ -292,7 +292,7 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
             .filter(entry -> entry.getKey() != null
                 && entry.getKey().getSpaceCannonDieCount() > 0
-                && entry.getKey().getDeepSpaceCannon())
+                && (entry.getKey().getDeepSpaceCannon() || activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (var entry : adjacentOutput.entrySet()) {

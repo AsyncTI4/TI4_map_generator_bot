@@ -6171,7 +6171,7 @@ public class ButtonHelper {
     }
 
     public static List<Player> tileHasPDS2Cover(Player player, Game activeGame, String tilePos) {
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeGame, tilePos, player, false);
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeGame, tilePos, player, false, true);
         List<Player> playersWithPds2 = new ArrayList<>();
         for (String adjTilePos : adjTiles) {
             Tile adjTile = activeGame.getTileByPosition(adjTilePos);
@@ -6193,8 +6193,8 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model != null && (model.getDeepSpaceCannon()
-                            || (tilePos.equalsIgnoreCase(adjTilePos) && model.getSpaceCannonDieCount() > 0))) {
+                    if (model != null && model.getSpaceCannonDieCount() > 0 && (model.getDeepSpaceCannon()
+                            || tilePos.equalsIgnoreCase(adjTilePos) || activeGame.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander")) ) {
                         if (owningPlayer == player) {
                             if (FoWHelper.otherPlayersHaveShipsInSystem(player, activeGame.getTileByPosition(tilePos),
                                     activeGame)) {
