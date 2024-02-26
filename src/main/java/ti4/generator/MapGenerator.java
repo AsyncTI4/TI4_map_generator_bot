@@ -3333,10 +3333,10 @@ public class MapGenerator {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
         }
-        if (unitHolder instanceof Planet && shouldPlanetHaveShield(unitHolder, activeGame)) {
+        if (activeGame.getShowBubbles() && unitHolder instanceof Planet && shouldPlanetHaveShield(unitHolder, activeGame)) {
             String tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
             float scale = 1.2f;
-            if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage")){
+            if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
                 scale = 1.65f;
             }
             if(unitHolder.getName().equalsIgnoreCase("mr")){
