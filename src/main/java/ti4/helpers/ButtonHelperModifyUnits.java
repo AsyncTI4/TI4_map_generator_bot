@@ -862,11 +862,14 @@ public class ButtonHelperModifyUnits {
                 continue;
             }
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName());
-            if (players.size() > 1 && !player.getAllianceMembers().contains(players.get(0).getFaction()) && !player.getAllianceMembers().contains(players.get(1).getFaction())) {
-                Player player2 = players.get(0);
-                if (player2 == player) {
-                    player2 = players.get(1);
+            Player player2 = player;
+            for(Player p2 : players){
+                if(p2 != player && !player.getAllianceMembers().contains(p2.getFaction())){
+                    player2 = p2;
+                    break;
                 }
+            }
+            if (player != player2) {
                 String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                 if (!activeGame.isFoWMode()) {
                     StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "ground");
@@ -1420,6 +1423,14 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
         if(skipbuild.contains("freelancers")){
              buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "freelancers");
+        }
+        if (player.hasTechReady("absol_st")) {
+            Button sarweenButton = Button.danger("useTech_absol_st", "Use Sarween Tools");
+            buttons.add(sarweenButton);
+        }
+        if (player.hasRelic("boon_of_the_cerulean_god")) {
+            Button sarweenButton = Button.danger("useRelic_boon", "Use Boon Of The Cerulean God Relic");
+            buttons.add(sarweenButton);
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
