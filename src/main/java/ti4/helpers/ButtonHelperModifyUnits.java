@@ -1462,6 +1462,10 @@ public class ButtonHelperModifyUnits {
         if(skipbuild.contains("freelancers")){
              buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "freelancers");
         }
+        if (player.hasTechReady("absol_st")) {
+            Button sarweenButton = Button.danger("useTech_absol_st", "Use Sarween Tools");
+            buttons.add(sarweenButton);
+        }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(winnuButton);
