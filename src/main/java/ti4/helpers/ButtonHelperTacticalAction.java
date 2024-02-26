@@ -397,11 +397,14 @@ public class ButtonHelperTacticalAction {
                     continue;
                 }
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
-                if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())) {
-                    Player player2 = players.get(0);
-                    if (player2 == player) {
-                        player2 = players.get(1);
+                Player player2 = player;
+                for(Player p2 : players){
+                    if(p2 != player && !player.getAllianceMembers().contains(p2.getFaction())){
+                        player2 = p2;
+                        break;
                     }
+                }
+                if (player != player2) {
 
                     String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                     if (!activeGame.isFoWMode()) {

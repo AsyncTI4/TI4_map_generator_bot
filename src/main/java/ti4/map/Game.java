@@ -129,6 +129,8 @@ public class Game {
     @ExportableField
     private boolean queueSO = true;
     @ExportableField
+    private boolean showBubbles = true;
+    @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
     private boolean dominusOrb;
@@ -995,6 +997,9 @@ public class Game {
     public boolean getQueueSO() {
         return queueSO;
     }
+    public boolean getShowBubbles() {
+        return showBubbles;
+    }
 
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
@@ -1034,6 +1039,10 @@ public class Game {
 
     public void setQueueSO(boolean onStatus) {
         queueSO = onStatus;
+    }
+
+    public void setShowBubbles(boolean onStatus) {
+        showBubbles = onStatus;
     }
 
     public void setTemporaryPingDisable(boolean onStatus) {
