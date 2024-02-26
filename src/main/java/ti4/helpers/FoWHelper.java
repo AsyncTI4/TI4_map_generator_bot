@@ -179,6 +179,15 @@ public class FoWHelper {
 
 	public static Tile getPlayerHS(Game activeGame, Player player){
 		String faction = player.getFaction();
+		if(player.hasAbility("mobile_command")){
+			if(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).isEmpty()){
+				return null;
+			}
+			return ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).get(0);
+		}
+		if(!player.getFaction().contains("franken")){
+			return activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+	    }
 		for (Tile tile : activeGame.getTileMap().values()) {
 			if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
 				if(ButtonHelper.isTileHomeSystem(tile)){
@@ -189,24 +198,7 @@ public class FoWHelper {
 				return tile;
 			}
 		}
-		if(!player.getFaction().contains("franken")){
-			Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
-			if(player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0){
-				tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).get(0);
-			}
-			if (tile == null) {
-				tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
-			}
-			// if(tile != null){
-			// 	if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
-			// 		if(ButtonHelper.isTileHomeSystem(tile)){
-			// 			return tile;
-			// 		}
-			// 	}
-			// }
-			return tile;
-		}
-		return null;
+		return ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
 	}
 
 	private static boolean hasHomeSystemInView(@NotNull Game activeGame, @NotNull Player player, @NotNull Player viewingPlayer) {
@@ -268,7 +260,7 @@ public class FoWHelper {
 	 * wormholes
 	 */
 	public static Set<String> getAdjacentTiles(Game activeGame, String position, Player player, boolean toShow) {
-		return getAdjacentTiles(activeGame, position, player, toShow, false);
+		return getAdjacentTiles(activeGame, position, player, toShow, true);
 
 	}
 	public static Set<String> getAdjacentTiles(Game activeGame, String position, Player player, boolean toShow, boolean includeTile) {
