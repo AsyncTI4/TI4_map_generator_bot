@@ -240,11 +240,7 @@ public class Helper {
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
             return true;
         }
-        if(player.getAc() > 0){
-            return true;
-        }
-
-        return false;
+        return player.getAc() > 0;
     }
 
     public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID) {
