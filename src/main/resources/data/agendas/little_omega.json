@@ -263,8 +263,8 @@
         "name": "Shared Research ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: When a player's ships move, they may ignore the effect of any anomaly if it does not contain a frontier token.",
-        "text2": "Against: Each player who has ships in an anomaly may research 1 technology. Then, each player destroys all of their ships in anomalies that do not contain their space docks.",
+        "text1": "For: When a player's ships move, they may ignore the effect of any anomaly that does not contain a frontier token.",
+        "text2": "Against: Each player who has ships in a non-home anomaly may research 1 technology. Then, destroy all ships that do not have SUSTAIN DAMAGE in each non-home anomaly.",
         "mapText": "Players may ignore the effects of anomalies that do not contain a frontier token during movement.",
         "source": "little_omega"
     },
@@ -283,7 +283,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: All systems that contain a non-delta wormhole are adjacent to each other.",
-        "text2": "Against: Each player places 1 command token from their reinforcements in each system that contains a non-delta wormhole and their ships. Then, each player may place 1 structure on a planet they control in a system that contains a non-delta wormhole.",
+        "text2": "Against: Each player places 1 command token from their reinforcements in each system that contains a non-delta wormhole and their units. Then, each player may place 1 structure on 1 planet they control in each of those systems.",
         "mapText": "All systems that contain a non-delta wormhole are adjacent to each other.",
         "source": "little_omega"
     },
@@ -292,7 +292,7 @@
         "name": "Wormhole Research ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player who has ships in a system that contains a wormhole may research 1 technology. Then, in each system that contains a non-delta wormhole, damage each ship with SUSTAIN DAMAGE and destroy each ship without SUSTAIN DAMAGE.",
+        "text1": "For: Each player who has ships in a system that contains a non-delta wormhole may research 1 technology. Then, destroy all ships that do not have SUSTAIN DAMAGE in each system that contains a non-delta wormhole.",
         "text2": "Against: Each player may spend 1 strategy token to research 1 technology that has no prerequisites.",
         "source": "little_omega"
     },
