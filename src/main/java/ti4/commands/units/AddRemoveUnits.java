@@ -210,7 +210,7 @@ abstract public class AddRemoveUnits implements Command {
                 numPlayersNew = playersForCombat.size();
             }
             addPlanetToPlayArea(event, tile, planetName, activeGame);
-            if(numPlayersNew == 2 && numPlayersOld == 1){
+            if(numPlayersNew > numPlayersOld && numPlayersOld!=0){
                 List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
                 String combatType = "space";
                 if(!planetName.equalsIgnoreCase("space")){
@@ -222,8 +222,16 @@ abstract public class AddRemoveUnits implements Command {
                 Player player1 = activeGame.getActivePlayer();
                 if (player1 == null) player1 = playersForCombat.get(0);
                 playersForCombat.remove(player1);
-                Player player2 = playersForCombat.get(0);
-                StartCombat.findOrCreateCombatThread(activeGame, event.getMessageChannel(), player1, player2, tile, event, combatType);
+                Player player2 = player1;
+                for(Player p2 : playersForCombat){
+                    if(p2 != player1 && !player1.getAllianceMembers().contains(p2.getFaction())){
+                        player2 = p2;
+                        break;
+                    }
+                }
+                if(player1 != player2){
+                    StartCombat.findOrCreateCombatThread(activeGame, event.getMessageChannel(), player1, player2, tile, event, combatType);
+                }
             }
         }
 

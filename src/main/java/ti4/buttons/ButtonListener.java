@@ -1327,6 +1327,16 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes - 9, votes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("useRelic_")) {
+            String relic = buttonID.replace("useRelic_", "");
+            ButtonHelper.deleteTheOneButton(event);
+            switch (relic) {
+                case "boon" -> { // Sarween Tools
+                    player.addSpentThing("boon");
+                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                    event.getMessage().editMessage(exhaustedMessage).queue();
+                }
+            }
         } else if (buttonID.startsWith("useTech_")) {
             String tech = buttonID.replace("useTech_", "");
             String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
@@ -5003,6 +5013,10 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sarweenButton = Button.danger("useTech_st", "Use Sarween");
+                    buttons.add(sarweenButton);
+                }
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    Button sarweenButton = Button.danger("useRelic_boon", "Use Boon Of The Cerulean God Relic");
                     buttons.add(sarweenButton);
                 }
                 if (player.hasTechReady("absol_st")) {

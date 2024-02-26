@@ -583,9 +583,6 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                         "# Repealed the " + Mapper.getAgendaTitleNoCap(winner)
                                 + " law and will now reveal it for the purposes of revoting. It is technically still in effect");
-                activeGame.removeLaw(winner);
-                activeGame.putAgendaBackIntoDeckOnTop(winner);
-                new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
             }
             if ("cladenstine".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
@@ -943,6 +940,10 @@ public class AgendaHelper {
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+        }else{
+            activeGame.removeLaw(winner);
+            activeGame.putAgendaBackIntoDeckOnTop(winner);
+            new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
         }
 
         event.getMessage().delete().queue();

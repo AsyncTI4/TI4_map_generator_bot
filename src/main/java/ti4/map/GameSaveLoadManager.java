@@ -551,6 +551,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.QUEUE_SO + " " + activeGame.getQueueSO());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_BUBBLES + " " + activeGame.getShowBubbles());
+        writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + activeGame.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
@@ -1726,6 +1728,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setQueueSO(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.SHOW_BUBBLES -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setShowBubbles(value);;
                     } catch (Exception e) {
                         //Do nothing
                     }

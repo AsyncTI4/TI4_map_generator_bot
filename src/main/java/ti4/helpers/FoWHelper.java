@@ -268,6 +268,10 @@ public class FoWHelper {
 	 * wormholes
 	 */
 	public static Set<String> getAdjacentTiles(Game activeGame, String position, Player player, boolean toShow) {
+		return getAdjacentTiles(activeGame, position, player, toShow, false);
+
+	}
+	public static Set<String> getAdjacentTiles(Game activeGame, String position, Player player, boolean toShow, boolean includeTile) {
 		Set<String> adjacentPositions = traverseAdjacencies(activeGame, false, position);
 
 		List<String> adjacentCustomTiles = activeGame.getCustomAdjacentTiles().get(position);
@@ -295,40 +299,20 @@ public class FoWHelper {
 
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeGame, position, player);
 		adjacentPositions.addAll(wormholeAdjacencies);
+		if(includeTile){
+			if(!adjacentPositions.contains(position)){
+				adjacentPositions.add(position);
+			}
+		}else{
+			adjacentPositions.remove(position);
+		}
 
 		return adjacentPositions;
 	}
 
 	public static Set<String> getAdjacentTilesAndNotThisTile(Game activeGame, String position, Player player, boolean toShow) {
-		Set<String> adjacentPositions = traverseAdjacencies(activeGame, false, position);
-
-		List<String> adjacentCustomTiles = activeGame.getCustomAdjacentTiles().get(position);
-
-		List<String> adjacentCustomTiles2 = new ArrayList<>();
-		if (adjacentCustomTiles != null) {
-			if (!toShow) {
-				for (String t : adjacentCustomTiles) {
-					if (activeGame.getCustomAdjacentTiles().get(t) != null && activeGame.getCustomAdjacentTiles().get(t).contains(position)) {
-						adjacentCustomTiles2.add(t);
-					}
-				}
-				adjacentPositions.addAll(adjacentCustomTiles2);
-			} else {
-				adjacentPositions.addAll(adjacentCustomTiles);
-			}
-		}
-		if (!toShow) {
-			for (String primaryTile : activeGame.getCustomAdjacentTiles().keySet()) {
-				if (activeGame.getCustomAdjacentTiles().get(primaryTile).contains(position)) {
-					adjacentPositions.add(primaryTile);
-				}
-			}
-		}
-
-		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeGame, position, player);
-		adjacentPositions.addAll(wormholeAdjacencies);
-		adjacentPositions.remove(position);
-		return adjacentPositions;
+		
+		return getAdjacentTiles(activeGame, position, player, toShow, false);
 	}
 
 	/**
