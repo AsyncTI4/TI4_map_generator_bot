@@ -340,6 +340,10 @@ public class ButtonListener extends ListenerAdapter {
                     trueIdentity + " choose the target of your agent", buttons);
         } else if (buttonID.startsWith("step2axisagent_")) {
             ButtonHelperAgents.resolveStep2OfAxisAgent(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("vadenHeroClearDebt")) {
+            ButtonHelperHeroes.vadenHeroClearDebt(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("sendVadenHeroSomething_")) {
+            ButtonHelperHeroes.sendVadenHeroSomething(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
             ButtonHelperAgents.hacanAgentRefresh(buttonID, event, activeGame, player, ident, trueIdentity);
         } else if (buttonID.startsWith("vaylerianAgent_")) {

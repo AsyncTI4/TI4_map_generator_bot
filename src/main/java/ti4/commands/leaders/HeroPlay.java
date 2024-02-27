@@ -333,6 +333,9 @@ public class HeroPlay extends LeaderAction {
             case "freesystemshero" -> {
                 ButtonHelperHeroes.offerFreeSystemsButtons(player, activeGame, event);
             }
+            case "vadenhero" -> {
+                ButtonHelperHeroes.startVadenHero(activeGame, player);
+            }
             case "veldyrhero" -> {
                 activeGame.setComponentAction(true);
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(activeGame, player)) {
