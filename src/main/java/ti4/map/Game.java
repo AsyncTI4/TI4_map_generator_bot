@@ -200,6 +200,8 @@ public class Game {
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
+    @Getter @Setter
+    private boolean showFullComponentTextEmbeds = false;
     private boolean hasEnded;
     private long endedDate;
     @Getter
