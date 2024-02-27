@@ -1574,9 +1574,13 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("useTech_")) {
             String tech = buttonID.replace("useTech_", "");
-            String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    (player.getRepresentation() + " used tech: " + techRepresentation));
+            TechnologyModel techModel = Mapper.getTech(tech);
+            String useMessage = player.getRepresentation() + " used tech: " + techModel.getRepresentation(false);
+            if (activeGame.isShowFullComponentTextEmbeds()) {
+                MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), useMessage, techModel.getRepresentationEmbed());
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), useMessage);
+            }
             switch (tech) {
                 case "st" -> { // Sarween Tools
                     player.addSpentThing("sarween");
@@ -1622,18 +1626,12 @@ public class ButtonListener extends ListenerAdapter {
                     uH.removeUnit(unit, units.get(unit));
                 }
             }
-            
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
             TechnologyModel techModel = Mapper.getTech(tech);
-            String exhaustMessage = player.getRepresentation() + " exhausted tech "
-                    + techModel.getRepresentation(false);
-            if (tech.contains("absol")) {
-                switch (activeGame.getOutputVerbosity()) {
-                    case Constants.VERBOSITY_VERBOSE -> MessageHelper.sendMessageToChannelWithEmbed(
-                            event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
-                    default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
-                }
+            String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
+            if (activeGame.isShowFullComponentTextEmbeds()) {
+                MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), exhaustMessage, techModel.getRepresentationEmbed());
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
             }
@@ -1646,7 +1644,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "absol_bs" -> { // Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
                 }
-                case "absol_x89" -> { // Bio-stims
+                case "absol_x89" -> { // Absol X-89
                     ButtonHelper.sendAbsolX89NukeOptions(activeGame, event, player);
                 }
                 case "absol_dxa" -> { // Dacxive
