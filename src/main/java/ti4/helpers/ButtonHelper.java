@@ -1626,16 +1626,12 @@ public class ButtonHelper {
                 "Use buttons to select a planet or tech to ready", buttons);
     }
 
-    public static void sendAbsolX89NukeOptions(Game activeGame,ButtonInteractionEvent event,
-            Player player) {
+    public static void sendAbsolX89NukeOptions(Game activeGame, GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            buttons.add(Button.success("absolX89Nuke_" + planet,
-                    "Nuke " + Helper.getPlanetRepresentation(planet, activeGame)));
+            buttons.add(Button.success("absolX89Nuke_" + planet, "Nuke " + Helper.getPlanetRepresentation(planet, activeGame)));
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to select a planet to nuke", buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select a planet to nuke", buttons);
     }
 
     public static List<Button> getPsychoTechPlanets(Game activeGame, Player player) {
