@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -37,7 +35,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -1151,13 +1148,13 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos, player, false)) {
             Tile tile = activeGame.getTileByPosition(tilePos);
-            if (!ButtonHelper.isTileHomeSystem(tile)) {
+            if (!tile.isHomeSystem()) {
                 buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(activeGame, player)));
             }
         }
         Tile tile = activeGame.getTileByPosition(pos);
-        if (!ButtonHelper.isTileHomeSystem(tile)) {
+        if (!tile.isHomeSystem()) {
             buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(activeGame, player)));
         }
@@ -1193,7 +1190,7 @@ public class ButtonHelperActionCards {
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
             if (uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0
                     || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                if (!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet))) {
+                if (!activeGame.getTileFromPlanet(planet).isHomeSystem()) {
                     Tile tile = activeGame.getTileFromPlanet(planet);
                     buttons.add(Button.secondary(
                             "reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_" + planet,
@@ -1201,7 +1198,7 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (p2.hasUnit("saar_spacedock") || p2.hasTech("ffac2")) {
+        if (p2.hasUnit("absol_saar_spacedock") || p2.hasUnit("saar_spacedock") || p2.hasTech("ffac2") || p2.hasTech("absol_ffac2")) {
             for (Tile tile : activeGame.getTileMap().values()) {
                 if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                     buttons.add(Button.secondary(

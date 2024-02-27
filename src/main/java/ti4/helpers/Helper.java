@@ -47,7 +47,6 @@ import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
-import ti4.commands.capture.RemoveUnits;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
@@ -240,11 +239,7 @@ public class Helper {
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
             return true;
         }
-        if(player.getAc() > 0){
-            return true;
-        }
-
-        return false;
+        return player.getAc() > 0;
     }
 
     public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID) {
@@ -356,7 +351,7 @@ public class Helper {
 
     public static void resolveQueue(Game activeGame) {
 
-        Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+        Player imperialHolder = getPlayerWithThisSC(activeGame, 8);
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
@@ -364,7 +359,7 @@ public class Helper {
             return;
         }
 
-        for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
+        for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
             String message = player.getRepresentation(true, true) + " Drew Queued Secret Objective From Imperial. ";
             if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
                 activeGame.drawSecretObjective(player.getUserID());
@@ -403,7 +398,7 @@ public class Helper {
         if (activeGame.getFactionsThatReactedToThis(key2).length() < 2|| activeGame.getHighestScore()+1 > activeGame.getVp()) {
             return;
         }
-        for (Player player : Helper.getInitativeOrder(activeGame)) {
+        for (Player player : getInitativeOrder(activeGame)) {
             if (activeGame.getHighestScore()+1 > activeGame.getVp()) {
                 return;
             }
@@ -449,7 +444,7 @@ public class Helper {
         if (activeGame.getFactionsThatReactedToThis(key2).length() < 2 || activeGame.getHighestScore()+1 > activeGame.getVp()) {
             return;
         }
-        for (Player player : Helper.getInitativeOrder(activeGame)) {
+        for (Player player : getInitativeOrder(activeGame)) {
             if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
                 int soIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedSOScore"));
                 ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
@@ -533,7 +528,7 @@ public class Helper {
                     }
                 }
             }
-            if (activeGame.getCurrentPhase().equals("agendawaiting")) {
+            if ("agendawaiting".equals(activeGame.getCurrentPhase())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
                 int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
                 boolean shouldDoIt2 = result2 == highNum2;
@@ -1149,7 +1144,7 @@ public class Helper {
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
-            if (!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("absol_sarween")
+            if (!thing.contains("tg_") &&!thing.contains("boon") && !thing.contains("sarween") && !thing.contains("absol_sarween")
                     && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida")
                     && !thing.contains("commander") && !thing.contains("Agent")) {
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
@@ -1163,7 +1158,7 @@ public class Helper {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
-                    if (!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet.getName()))) {
+                    if (!activeGame.getTileFromPlanet(planet.getName()).isHomeSystem()) {
                         if (planet.getResources() > bestRes) {
                             bestRes = planet.getResources();
                         }
@@ -1213,6 +1208,10 @@ public class Helper {
                     int sarweenVal = 1 + calculateCostOfProducedUnits(player, activeGame, true) / 5;
                     msg = msg + "> Used Sarween Tools " + Emojis.CyberneticTech + " for " + sarweenVal + " resources\n";
                     res = res + sarweenVal;
+                }
+                if(thing.contains("boon")){
+                    msg = msg + "> Used Boon Relic " + Emojis.Relic + "\n";
+                    res = res + 1;
                 }
                 if (thing.contains("warmachine")) {
                     msg = msg + "> Used War Machine " + Emojis.ActionCard + "\n";
@@ -1495,7 +1494,7 @@ public class Helper {
             } else {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
-                if (removedUnit.getBaseType().equalsIgnoreCase("flagship")
+                if ("flagship".equalsIgnoreCase(removedUnit.getBaseType())
                         && activeGame.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
                     cost = cost; // nomad alliance
                 } else {
@@ -1632,7 +1631,7 @@ public class Helper {
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff) && !"mr".equalsIgnoreCase(unitHolder.getName())) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                             && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
-                            && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")
+                            && !player.hasUnit("saar_spacedock") && !player.hasUnit("absol_saar_spacedock") && !player.hasUnit("absol_saar_spacedock2") && !player.hasUnit("saar_spacedock2")
                             && !player.hasUnit("ghoti_flagship")) {
                         continue;
                     }
@@ -1732,7 +1731,7 @@ public class Helper {
             }
         } else {
             for (Tile tile : activeGame.getTileMap().values()) {
-                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile)) {
+                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem()) {
                     Button button = Button.secondary(finsFactionCheckerPrefix + "diplo_" + tile.getPosition() + "_"
                             + "mahact" + mahact.getColor(), tile.getRepresentation() + " System");
                     planetButtons.add(button);

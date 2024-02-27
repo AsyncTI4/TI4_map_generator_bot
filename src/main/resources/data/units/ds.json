@@ -1231,9 +1231,10 @@
         "source": "ds",
         "faction": "Mykomentori",
         "productionValue": "+2",
-        "capacityValue": 3,
+        "capacityValue": 0,
         "isStructure": true,
-        "ability": "DEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock."
+        "planetaryShield": true,
+        "ability": "DEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock. Planetary Shield"
     },
     {
         "id": "mykomentori_spacedock2",
@@ -1246,7 +1247,8 @@
         "faction": "Mykomentori",
         "productionValue": "+5",
         "isStructure": true,
-        "ability": "DEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock."
+        "planetaryShield": true,
+        "ability": "DEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock. Planetary Shield"
     },
     {
         "id": "nivyn_flagship",

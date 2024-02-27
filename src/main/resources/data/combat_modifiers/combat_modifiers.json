@@ -749,6 +749,26 @@
         "forCombatAbility": "SpaceCannonOffence"
     },
     {
+        "alias": "plus_0_always_space_cannon_offense",
+        "type": "mods",
+        "value": "+0",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "mirvedacommander"
+            },
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Mirveda commander only partially in the bot. Please only consider the first relevant rolls from adjacent units without deep space cannon."
+            }
+        ],
+        
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
         "alias": "plus_1_always_bombardment",
         "type": "mods",
         "value": "+1",

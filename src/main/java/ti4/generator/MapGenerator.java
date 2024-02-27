@@ -49,6 +49,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
+import ti4.generator.MapGenerator.TileStep;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -1676,6 +1677,7 @@ public class MapGenerator {
                     BufferedImage image = ImageHelper.readScaled(tokenPath, 0.25f);
                     graphics.drawImage(image, x + deltaX + 15, y + 112, null);
                 }
+                
 
                 boolean hasAttachment = planetHolder.hasAttachment();
                 if (hasAttachment) {
@@ -3088,13 +3090,13 @@ public class MapGenerator {
                 UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
 
                 if (spaceUnitHolder != null) {
-                    addSleeperToken(tile, tileGraphics, spaceUnitHolder, MapGenerator::isValidCustodianToken);
+                    addSleeperToken(tile, tileGraphics, spaceUnitHolder, MapGenerator::isValidCustodianToken, game);
                     addToken(tile, tileGraphics, spaceUnitHolder);
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
                 }
                 for (UnitHolder unitHolder : unitHolders) {
-                    addSleeperToken(tile, tileGraphics, unitHolder, MapGenerator::isValidToken);
+                    addSleeperToken(tile, tileGraphics, unitHolder, MapGenerator::isValidToken, game);
                     addControl(tile, tileGraphics, unitHolder, rectangles, frogPlayer, isFrogPrivate);
                 }
                 if (spaceUnitHolder != null) {
@@ -3289,7 +3291,7 @@ public class MapGenerator {
         }
     }
 
-    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Function<String, Boolean> isValid) {
+    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Function<String, Boolean> isValid, Game activeGame) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
@@ -3331,7 +3333,51 @@ public class MapGenerator {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
         }
+        if (activeGame.getShowBubbles() && unitHolder instanceof Planet && shouldPlanetHaveShield(unitHolder, activeGame)) {
+            String tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+            float scale = 1.2f;
+            if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
+                scale = 1.65f;
+            }
+            if(unitHolder.getName().equalsIgnoreCase("mr")){
+                scale = 1.9f;
+            }
+            tokenImage = ImageHelper.readScaled(tokenPath, scale);
+            Point position = new Point(centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
+            position = new Point(position.x , position.y + 10);
+            tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
+        }
     }
+
+    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game activeGame){
+
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+        
+        if(activeGame.getLaws().containsKey("conventions")){
+            Planet p = (Planet) unitHolder;
+            if (p != null && ("cultural".equalsIgnoreCase(p.getOriginalPlanetType())
+                    || p.getTokenList().contains("attachment_titanspn.png"))) {
+                return true;
+            }
+        }
+        Map<UnitKey, Integer> planetUnits = new HashMap<>(units);
+        for(Player player : activeGame.getRealPlayers()){
+            for (Map.Entry<UnitKey, Integer> unitEntry : planetUnits.entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (!player.unitBelongsToPlayer(unitKey))
+                    continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                if(unitModel == null){
+                    continue;
+                }
+                if(unitModel.getPlanetaryShield()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
 
     private static boolean isValidToken(String tokenID) {
         return tokenID.contains(Constants.SLEEPER) ||

@@ -125,9 +125,11 @@ public class Game {
     @ExportableField
     private boolean undoButtonOffered = true;
     @ExportableField
-    private boolean fastSCFollowMode = false;
+    private boolean fastSCFollowMode;
     @ExportableField
     private boolean queueSO = true;
+    @ExportableField
+    private boolean showBubbles = true;
     @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
@@ -526,7 +528,7 @@ public class Game {
     @JsonIgnore
     public Optional<Player> getWinner() {
         Player winner = null;
-        for (Player player : getRealPlayers()) {
+        for (Player player : getRealPlayersNDummies()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
@@ -997,6 +999,9 @@ public class Game {
     public boolean getQueueSO() {
         return queueSO;
     }
+    public boolean getShowBubbles() {
+        return showBubbles;
+    }
 
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
@@ -1036,6 +1041,10 @@ public class Game {
 
     public void setQueueSO(boolean onStatus) {
         queueSO = onStatus;
+    }
+
+    public void setShowBubbles(boolean onStatus) {
+        showBubbles = onStatus;
     }
 
     public void setTemporaryPingDisable(boolean onStatus) {
@@ -3164,6 +3173,18 @@ public class Game {
     }
 
     @JsonIgnore
+    public List<Player> getRealAndEliminatedPlayers() {
+        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated()))
+            .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getRealAndEliminatedAndDummyPlayers() {
+        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
+            .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public List<Player> getDummies() {
         return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
     }
@@ -3175,7 +3196,7 @@ public class Game {
 
     @JsonIgnore
     public Set<String> getFactions() {
-        return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
+        return getRealAndEliminatedAndDummyPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
 
     public void setPlayers(Map<String, Player> players) {
@@ -3900,6 +3921,7 @@ public class Game {
 
     @JsonIgnore
     public boolean hasHomebrew() {
+        // needs to check for homebrew tiles still
         return isExtraSecretMode()
                 || isFoWMode()
                 || isLightFogMode()
@@ -3940,8 +3962,9 @@ public class Game {
                 || getRealPlayers().stream()
                         .anyMatch(player -> player.getSecretVictoryPoints() > 3
                                 && !player.getRelics().contains("obsidian"))
-                || getRealPlayers().size() < 3
-                || getRealPlayers().size() > 8
-                || getTileMap().values().stream().map(Tile::getTileID).distinct().count() != getTileMap().size();
+                || playerCountForMap < 3
+                || getRealAndEliminatedAndDummyPlayers().size() < 3
+                || playerCountForMap > 8
+                || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 }
