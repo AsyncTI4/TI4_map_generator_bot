@@ -13,6 +13,7 @@ public class CustomizationOptions extends CustomSubcommandData{
         super(Constants.CUSTOMIZATION, "Small Customization Options");
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT, "Show full text of components when using/exhausting"));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
@@ -73,6 +74,9 @@ public class CustomizationOptions extends CustomSubcommandData{
         String textSize = event.getOption(Constants.TEXT_SIZE, null, OptionMapping::getAsString);
         if (textSize != null) getActiveGame().setTextSize(textSize);
         
+        Boolean showFullTextComponents = event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null, OptionMapping::getAsBoolean);
+        if (showFullTextComponents != null) activeGame.setShowFullComponentTextEmbeds(showFullTextComponents);
+
         Boolean showUnitTags = event.getOption(Constants.SHOW_UNIT_TAGS, null, OptionMapping::getAsBoolean);
         if (showUnitTags != null) activeGame.setShowUnitTags(showUnitTags);
 
