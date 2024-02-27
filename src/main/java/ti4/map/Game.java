@@ -526,7 +526,7 @@ public class Game {
     @JsonIgnore
     public Optional<Player> getWinner() {
         Player winner = null;
-        for (Player player : getPlayers().values()) {
+        for (Player player : getRealPlayersNDummies()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
@@ -3194,7 +3194,7 @@ public class Game {
 
     @JsonIgnore
     public Set<String> getFactions() {
-        return getPlayers().values().stream().map(Player::getFaction).collect(Collectors.toSet());
+        return getRealAndEliminatedAndDummyPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
 
     public void setPlayers(Map<String, Player> players) {
@@ -3961,8 +3961,8 @@ public class Game {
                         .anyMatch(player -> player.getSecretVictoryPoints() > 3
                                 && !player.getRelics().contains("obsidian"))
                 || playerCountForMap < 3
-                || getRealAndEliminatedPlayers().size() < 3
+                || getRealAndEliminatedAndDummyPlayers().size() < 3
                 || playerCountForMap > 8
-                || getRealAndEliminatedPlayers().size() > 8;
+                || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 }
