@@ -57,7 +57,7 @@ public class ButtonHelperCommanders {
         List<Button> buttons = new ArrayList<>();
         for(String planet : player.getReadiedPlanets()){
             Tile tile = activeGame.getTileFromPlanet(planet);
-            if(planet.equalsIgnoreCase("mr") || tile == null || ButtonHelper.isTileHomeSystem(tile)){
+            if("mr".equalsIgnoreCase(planet) || tile == null || tile.isHomeSystem()){
                 continue;
             }
             buttons.add(Button.success("olradinCommanderStep2_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));

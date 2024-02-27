@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -18,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
@@ -475,7 +473,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
         String messageText = player.getRepresentation() +
                 " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
-        if (playerLeader.getId().equalsIgnoreCase("yssarilagent")) {
+        if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())) {
             messageText = messageText + "\n" + "Yssaril agent was used as a "
                     + StringUtils.capitalize(agent.replace("agent", "")) + " agent";
         }
@@ -1250,12 +1248,11 @@ public class ButtonHelperAgents {
     public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game activeGame, Player player,
             Tile tile) {
         List<String> legendaries = new ArrayList<>();
-        List<String> adjTiles = new ArrayList<>();
-        adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
+        List<String> adjTiles = new ArrayList<>(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
         adjTiles.add(tile.getPosition());
         for (String adjTilePos : adjTiles) {
             Tile adjTile = activeGame.getTileByPosition(adjTilePos);
-            if (ButtonHelper.isTileHomeSystem(adjTile)) {
+            if (adjTile.isHomeSystem()) {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getPlanetUnitHolders()) {
@@ -1462,7 +1459,7 @@ public class ButtonHelperAgents {
         int fTG = cTG + 1;
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, activeGame);
-        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+        resolveArtunoCheck(player, activeGame, 1);
         String msg = "Used Ghoti Agent to gain a tg (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         event.getMessage().delete().queue();
@@ -1559,7 +1556,7 @@ public class ButtonHelperAgents {
                     && (Mapper.getPlanet(planet).getTechSpecialties() != null
                             && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
                     || ButtonHelper.checkForTechSkipAttachments(activeGame, planet)
-                    || ButtonHelper.isTileHomeSystem(tile)) {
+                    || tile.isHomeSystem()) {
                 buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                         tile.getRepresentationForButtons(activeGame, player)));
             }
@@ -1774,7 +1771,7 @@ public class ButtonHelperAgents {
         }
         if (tgGain > 0) {
             ButtonHelperAbilities.pillageCheck(player, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgGain);
+            resolveArtunoCheck(player, activeGame, tgGain);
         }
         if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1 && commGain > 0) {

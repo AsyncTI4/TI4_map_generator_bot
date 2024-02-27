@@ -14,7 +14,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -150,7 +149,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
         Tile tile = activeGame.getTileFromPlanet(planet);
-        if(tile != null && activeGame.getActivePlayer() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !ButtonHelper.isTileHomeSystem(tile) && FoWHelper.playerHasShipsInSystem(player, tile)){
+        if(tile != null && activeGame.getActivePlayer() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !tile.isHomeSystem() && FoWHelper.playerHasShipsInSystem(player, tile)){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship").withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
