@@ -130,13 +130,14 @@ public class Eliminate extends AddRemovePlayer {
 
                 acs = new LinkedHashMap<>(player.getSecrets());
                 for (int so : acs.values()) {
-                    boolean removed = activeGame.discardSecretObjective(player.getUserID(), so);
+                    activeGame.discardSecretObjective(player.getUserID(), so);
                 }
                 //return SCs
                 Set<Integer> scs = new HashSet<>(player.getSCs());
                 for (int sc : scs) {
                     player.removeSC(sc);
                 }
+                player.setEliminated(true);
                 player.setDummy(true);
             }else{
                 activeGame.removePlayer(player.getUserID());

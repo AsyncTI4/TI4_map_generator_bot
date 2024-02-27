@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
@@ -38,7 +37,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
-import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
@@ -108,7 +106,7 @@ public class ButtonHelperFactionSpecific {
             // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
-            if (unitName.equalsIgnoreCase("fighter")) {
+            if ("fighter".equalsIgnoreCase(unitName)) {
                 continue;
             }
 
@@ -279,7 +277,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
             if (!tile.getPosition().equalsIgnoreCase(activeGame.getActiveSystem())
-                    && !ButtonHelper.isTileHomeSystem(tile) && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
+                    && !tile.isHomeSystem() && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
                 buttons.add(Button.success("stymiePlayerStep2_" + activePlayer.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(activeGame, player)));
             }
@@ -536,8 +534,8 @@ public class ButtonHelperFactionSpecific {
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
-            if (unit.getBaseType().equalsIgnoreCase("cruiser") || unit.getBaseType().equalsIgnoreCase("destroyer")) {
-                if (unit.getBaseType().equalsIgnoreCase("cruiser")) {
+            if ("cruiser".equalsIgnoreCase(unit.getBaseType()) || "destroyer".equalsIgnoreCase(unit.getBaseType())) {
+                if ("cruiser".equalsIgnoreCase(unit.getBaseType())) {
                     numOfUnit = numCruisers;
                 } else {
                     numOfUnit = numDestroyers;

@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -15,9 +14,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.combat.StartCombat;
@@ -117,7 +114,7 @@ public class ButtonHelperAbilities {
     public static List<Button> getTilesToRallyToTheCause(Game activeGame, Player player){
         List<Button> buttons = new ArrayList<>();
         for(Tile tile : activeGame.getTileMap().values()){
-            if(FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, activeGame) || ButtonHelper.isTileHomeSystem(tile) || ButtonHelper.isTileLegendary(tile, activeGame) || tile.getTileID().equals("18")){
+            if(FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, activeGame) || tile.isHomeSystem() || ButtonHelper.isTileLegendary(tile, activeGame) || "18".equals(tile.getTileID())){
                 continue;
             }
             buttons.add(Button.success("rallyToTheCauseStep2_"+tile.getPosition(),tile.getRepresentationForButtons(activeGame, player)));
@@ -687,7 +684,7 @@ public class ButtonHelperAbilities {
                 
                 if (numInf > 0) {
                     String buttonID = finChecker + "mitoMechPlacement_" + tile.getPosition()+"_"+unitHolder.getName();
-                    if(unitHolder.getName().equalsIgnoreCase("space")){
+                    if("space".equalsIgnoreCase(unitHolder.getName())){
                         planetButtons.add(Button.success(buttonID, "Space Area of "+tile.getRepresentationForButtons(activeGame, player)));
                     }else{
                         planetButtons.add(Button.success(buttonID, Helper.getPlanetRepresentation(unitHolder.getName(), activeGame)));
@@ -744,7 +741,7 @@ public class ButtonHelperAbilities {
             if (tile == null) {
                 continue;
             }
-            if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG) && !"mr".equalsIgnoreCase(planetName) && !ButtonHelper.isTileHomeSystem(tile)) {
+            if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG) && !"mr".equalsIgnoreCase(planetName) && !tile.isHomeSystem()) {
                 buttons.add(Button.secondary("mantleCrack_" + planetName, Helper.getPlanetRepresentation(planetName, activeGame)));
             } else {
                 if (planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
@@ -1061,7 +1058,7 @@ public class ButtonHelperAbilities {
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
         String uH = buttonID.split("_")[2];
         String successMessage = "";
-        if(uH.equalsIgnoreCase("space")){
+        if("space".equalsIgnoreCase(uH)){
             successMessage= ident + " Replaced an infantry with a mech in the space area of " + tile.getRepresentationForButtons(activeGame,player) + ".";
         }else{
             successMessage= ident + " Replaced an infantry with a mech on " + Helper.getPlanetRepresentation(uH, activeGame) + ".";

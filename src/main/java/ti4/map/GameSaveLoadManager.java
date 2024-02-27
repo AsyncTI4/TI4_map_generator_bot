@@ -1735,7 +1735,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_BUBBLES -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        activeGame.setShowBubbles(value);;
+                        activeGame.setShowBubbles(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
