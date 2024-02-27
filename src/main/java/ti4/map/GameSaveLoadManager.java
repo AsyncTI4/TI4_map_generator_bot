@@ -711,6 +711,9 @@ public class GameSaveLoadManager {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.ELIMINATED + " " + player.isEliminated());
+            writer.write(System.lineSeparator());
+
             //BENTOR Ancient Blueprints
             writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.hasFoundCulFrag());
             writer.write(System.lineSeparator());
@@ -2228,6 +2231,7 @@ public class GameSaveLoadManager {
                         player.addTempCombatMod(new TemporaryCombatModifierModel(mods.nextToken()));
                     }
                 }
+                case Constants.ELIMINATED -> player.setEliminated(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }

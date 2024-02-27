@@ -1050,4 +1050,5 @@ public class Constants {
     public static final String SERVER_GAME_STATS = "server_game_stats";
     public static final String START_COMBAT = "start_combat";
     public static final String COMBAT_TYPE = "combat_type";
+    public static final String ELIMINATED = "eliminated";
 }

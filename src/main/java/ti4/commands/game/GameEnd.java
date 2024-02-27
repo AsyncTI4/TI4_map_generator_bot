@@ -268,7 +268,8 @@ public class GameEnd extends GameSubcommandData {
     if (winner.isPresent() && !game.hasHomebrew()) {
       String winningPath = GameStats.getWinningPath(game, winner.get());
       sb.append("**Winning Path:** ").append(winningPath).append("\n");
-      List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getPlayerCountForMap(), game.getVp());
+      int playerCount = game.getRealAndEliminatedAndDummyPlayers().size();
+      List<Game> games = GameStatisticFilterer.getNormalFinishedGames(playerCount, game.getVp());
       Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
       int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
       if (gamesWithWinnerCount >= 100) {
@@ -276,7 +277,7 @@ public class GameEnd extends GameSubcommandData {
         double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
         String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
         sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(game.getVp()).append("VP, ")
-            .append(game.getPlayerCountForMap()).append("P)")
+            .append(playerCount).append("P)")
             .append(", this path has been seen ")
             .append(winningPathCount - 1)
             .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
