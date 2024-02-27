@@ -643,7 +643,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveProductionBiomesStep1(Player hacan, Game activeGame, ButtonInteractionEvent event) {
+    public static void resolveProductionBiomesStep1(Player hacan, Game activeGame, GenericInteractionCreateEvent event) {
         int oldStratCC = hacan.getStrategicCC();
         if (oldStratCC < 1) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
