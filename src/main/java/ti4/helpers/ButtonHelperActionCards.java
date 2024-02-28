@@ -730,6 +730,9 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                 ButtonHelper.getIdent(player) + " put a destroyer in " + tile.getRepresentation());
+        if (player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "empyrean", event);
+        }
     }
 
     public static void resolveProbeStep2(Player player, Game activeGame, ButtonInteractionEvent event,
