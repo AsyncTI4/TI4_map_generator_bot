@@ -1488,7 +1488,7 @@ public class ButtonHelper {
                         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
                         MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
                         if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
-                            player.setCommoditiesTotal(player.getCommodities() - 1);
+                            player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                         }
                     }
 
@@ -7272,7 +7272,7 @@ public class ButtonHelper {
                     } else {
                         sendAlliance = true;
                         if (activeGame.getPNOwner(id).hasLeaderUnlocked("bentorcommander")) {
-                            p2.setCommoditiesTotal(p2.getCommodities() + 1);
+                            p2.setCommoditiesTotal(p2.getCommoditiesTotal() + 1);
                         }
                     }
                 }

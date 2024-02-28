@@ -256,15 +256,15 @@ public class ButtonHelperCommanders {
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
             ShowAllAC.showAll(enemy, player, activeGame);
-            message = "Yssaril commander used to look at ACs";
+            message = "#Yssaril commander used to look at ACs";
         }
         if ("so".equalsIgnoreCase(type)) {
             new ShowAllSO().showAll(enemy, player, activeGame);
-            message = "Yssaril commander used to look at SOs";
+            message = "#Yssaril commander used to look at SOs";
         }
         if ("pn".equalsIgnoreCase(type)) {
             new ShowAllPN().showAll(enemy, player, activeGame, false);
-            message = "Yssaril commander used to look at PNs";
+            message = "#Yssaril commander used to look at PNs";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         if (activeGame.isFoWMode()) {
