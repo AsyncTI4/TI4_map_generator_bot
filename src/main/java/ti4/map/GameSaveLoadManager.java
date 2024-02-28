@@ -583,6 +583,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + activeGame.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + activeGame.isShowFullComponentTextEmbeds());
+        writer.write(System.lineSeparator());
         writer.write(Constants.HACK_ELECTION_STATUS + " " + activeGame.getHackElectionStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + activeGame.getCCNPlasticLimit());
@@ -709,6 +711,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DUMMY + " " + player.isDummy());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.ELIMINATED + " " + player.isEliminated());
             writer.write(System.lineSeparator());
 
             //BENTOR Ancient Blueprints
@@ -1735,7 +1740,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_BUBBLES -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        activeGame.setShowBubbles(value);;
+                        activeGame.setShowBubbles(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1870,6 +1875,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setTestBetaFeaturesMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.SHOW_FULL_COMPONENT_TEXT -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setShowFullComponentTextEmbeds(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -2228,6 +2241,7 @@ public class GameSaveLoadManager {
                         player.addTempCombatMod(new TemporaryCombatModifierModel(mods.nextToken()));
                     }
                 }
+                case Constants.ELIMINATED -> player.setEliminated(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }
