@@ -214,6 +214,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.mantleCracking(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("umbatTile_")) {
             ButtonHelperAgents.umbatTile(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("spendStratNReadyAgent_")) {
+            ButtonHelperAgents.resolveAbsolHyperAgentReady(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("get_so_score_buttons")) {
             getSoScoreButtons(event, activeGame, player);
         } else if (buttonID.startsWith("swapToFaction_")) {
@@ -3497,6 +3499,9 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
+                case "munitionsReserves" -> {
+                    ButtonHelperAbilities.munitionsReserves(event, activeGame, player);
+                }
                 case "deal2SOToAll" -> {
                     new DealSOToAll().dealSOToAll(event, 2, activeGame);
                     event.getMessage().delete().queue();
@@ -4711,16 +4716,42 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 ButtonHelper.checkACLimit(activeGame, event, player);
                 event.getMessage().delete().queue();
-                if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
-                    List<Button> buttons2 = new ArrayList<>();
-                    Button hacanButton = Button
-                            .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
-                            .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
-                    buttons2.add(hacanButton);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            ButtonHelper.getCorrectChannel(player, activeGame),
-                            player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
-                            buttons2);
+                for (Player p2 : activeGame.getRealPlayers()) {
+                    if (p2.hasUnexhaustedLeader("cymiaeagent")) {
+                        List<Button> buttons2 = new ArrayList<>();
+                        Button hacanButton = Button
+                                .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
+                                .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                        buttons2.add(hacanButton);
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                ButtonHelper.getCorrectChannel(p2, activeGame),
+                                p2.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
+                                buttons2);
+                    }
+                }
+                if ("Action".equalsIgnoreCase(Mapper.getActionCard(acID).getWindow())) {
+                    
+                    for (Player p2 : activeGame.getRealPlayers()) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if (p2.getActionCards().containsKey("reverse_engineer")
+                                && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
+                                && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
+                            List<Button> reverseButtons = new ArrayList<>();
+                            String key = "reverse_engineer";
+                            String ac_name = Mapper.getActionCard(key).getName();
+                            if (ac_name != null) {
+                                reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key)
+                                        + "_reverse_" + Mapper.getActionCard(acID).getName(), "Reverse engineer " + Mapper.getActionCard(acID).getName()));
+                            }
+                            reverseButtons.add(Button.danger("deleteButtons", "Decline"));
+                            String cyberMessage = "" + p2.getRepresentation(true, true)
+                                    + " reminder that you can use reverse engineer on " + Mapper.getActionCard(acID).getName();
+                            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+                                    cyberMessage, reverseButtons);
+                        }
+                    }
                 }
 
             } catch (Exception e) {

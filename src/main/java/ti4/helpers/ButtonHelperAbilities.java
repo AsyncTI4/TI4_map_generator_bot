@@ -1138,6 +1138,18 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
 
     }
+
+    public static void munitionsReserves(ButtonInteractionEvent event, Game activeGame, Player player){
+
+        if(player.getTg() < 2){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),player.getRepresentation()+" you dont have 2tg, and thus cant use munitions reserve");
+            return;
+        }
+        String msg = player.getFactionEmoji() + " used munitions reserves (tg went from "+player.getTg()+" -> "+(player.getTg()-2)+"). Their next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls. ";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg);
+        player.setTg(player.getTg()-2);
+        activeGame.setCurrentReacts("munitionsReserves",player.getFaction());
+    }
     public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         String planet = buttonID.split("_")[1];
         String amount = "1";

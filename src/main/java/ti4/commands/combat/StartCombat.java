@@ -461,6 +461,15 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Myko Commander").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
+        if (isSpaceCombat && p2.hasAbility("munitions") && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "munitionsReserves", "Use Munitions Reserves").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
+        }
+        if (isSpaceCombat && p1.hasAbility("munitions")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "munitionsReserves", "Use Munitions Reserves").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
+        }
+
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
