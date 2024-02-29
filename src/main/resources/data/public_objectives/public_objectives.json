@@ -315,7 +315,7 @@
     "alias": "distant_lands",
     "name": "Rule Distant Lands",
     "phase": "Status",
-    "text": "Control 2 planets that are each in or adjacent to a different, other player's home system.",
+    "text": "Control 2 planets that are each in or adjacent to a different, other player's home system. [Note: The two planets need to be next to or in two seperate players home systems. You cant score this by just getting 2 planets next to 1 playrs HS]",
     "points": 2,
     "source": "pok"
   }

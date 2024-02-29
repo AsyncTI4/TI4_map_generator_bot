@@ -20,6 +20,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -53,6 +54,7 @@ public class TechExhaust extends TechAddRemove {
             }
             case "absol_bs" -> { // Bio-stims
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, true);
+                deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_x89" -> { // Absol X-89
                 ButtonHelper.sendAbsolX89NukeOptions(activeGame, event, player);
@@ -74,6 +76,23 @@ public class TechExhaust extends TechAddRemove {
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
+            }
+            case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC"));
+                if(player.getStrategicCC() > 0){
+                    for(Leader leader : player.getLeaders()){
+                        if(leader.isExhausted() && leader.getId().contains("agent")){
+                            buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_"+leader.getId(), "Ready "+leader.getId()));
+                        }
+                    }
+                    for(String relic : player.getExhaustedRelics()){
+                        if("titanprototype".equalsIgnoreCase("relic") || "absol_jr".equalsIgnoreCase(relic)){
+                            buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_"+relic, "Ready JR"));
+                        }
+                    }
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor() + " use button to gain a CC or spend a strat CC to ready your agent", buttons);
             }
             case "aida", "sar", "htp" -> {
                 if (event instanceof ButtonInteractionEvent) {
