@@ -201,37 +201,10 @@ public class FoWHelper {
 	}
 
 	private static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player, @NotNull Player viewingPlayer) {
-		String faction = player.getFaction();
-		if (faction == null) {
-			return false;
+		Tile tile = getPlayerHS(game, player);
+		if (tile != null && !tile.hasFog(viewingPlayer)) {
+			return true;
 		}
-
-
-		for (Tile tile : game.getTileMap().values()) {
-			if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition()) && !tile.hasFog(viewingPlayer)) {
-				if(tile.isHomeSystem()){
-					return true;
-				}
-			}
-			if(player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null && (faction.contains("ghost") || faction.contains("franken")) &&!tile.hasFog(viewingPlayer)){
-				return true;
-			}
-		}
-		if(!player.getFaction().contains("franken")){
-			Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
-			if(player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).size() > 0){
-				tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
-			}
-			if (tile == null) {
-				tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, game);
-			}
-			if(tile != null){
-				if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition()) && !tile.hasFog(viewingPlayer)) {
-					return tile.isHomeSystem();
-				}
-			}
-		}
-
 		return false;
 	}
 
