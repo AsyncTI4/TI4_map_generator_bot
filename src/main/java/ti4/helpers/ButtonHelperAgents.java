@@ -23,6 +23,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.explore.ExploreSubcommandData;
+import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.TurnStart;
@@ -250,6 +251,33 @@ public class ButtonHelperAgents {
         }
 
         return buttons;
+    }
+
+    public static void resolveAbsolHyperAgentReady(String buttonID, ButtonInteractionEvent event, Game activeGame,
+            Player player) {
+        buttonID = buttonID.replace("absol_jr", "absoljr");
+        String agent = buttonID.split("_")[1];
+        player.setStrategicCC(player.getStrategicCC()-1);
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+        event.getMessage().delete().queue();
+        Leader playerLeader = player.getLeader(agent).orElse(null);
+        if (playerLeader == null) {
+            if (agent.contains("titanprototype")) {
+                player.removeExhaustedRelic("titanprototype");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        ButtonHelper.getIdent(player) + " spent a strat CC and readied " + agent);
+            }
+            if (agent.contains("absol")) {
+                player.removeExhaustedRelic("absol_jr");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        ButtonHelper.getIdent(player) + "  spent a strat CC and readied " + agent);
+            }
+            return;
+        }
+        RefreshLeader.refreshLeader(player, playerLeader, activeGame);
+
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                ButtonHelper.getIdent(player) + " used absol hypermetabolism to spend a strat CC and ready " + agent);
     }
 
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,

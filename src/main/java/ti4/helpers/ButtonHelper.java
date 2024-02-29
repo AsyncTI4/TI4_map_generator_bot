@@ -46,6 +46,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.ds.DrawBlueBackTile;
@@ -1079,6 +1080,8 @@ public class ButtonHelper {
         buttons.add(Button.secondary("showDeck_all", "All Explores"));
         buttons.add(Button.secondary("showDeck_ac", "AC Discards")
                 .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
+        buttons.add(Button.secondary("showDeck_unplayedAC", "Unplayed ACs")
+                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
         buttons.add(Button.secondary("showDeck_agenda", "Agenda Discards")
                 .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("agenda"))));
         buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
@@ -1110,6 +1113,8 @@ public class ButtonHelper {
             new ShowRemainingRelics().showRemaining(event, false, game, player);
         } else if ("unscoredSO".equalsIgnoreCase(type)) {
             new ShowUnScoredSOs().showUnscored(game, event);
+        } else if ("unplayedAC".equalsIgnoreCase(type)) {
+            showUnplayedACs(game, event);
         } else {
             types.add(type);
             new ExpInfo().secondHalfOfExpInfo(types, event, player, game, false);
@@ -1519,7 +1524,7 @@ public class ButtonHelper {
                         PNInfo.sendPromissoryNoteInfo(game, player, false);
                         MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
                         if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
-                            player.setCommoditiesTotal(player.getCommodities() - 1);
+                            player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                         }
                     }
 
@@ -1645,7 +1650,7 @@ public class ButtonHelper {
         player.exhaustPlanet(planet);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 getIdent(player) + " exhausted " + Helper.getPlanetRepresentation(planet, game)
-                        + " and gained 1tg (" + oldTg + "->" + player.getTg() + ")");
+                        + " and gained 1tg (" + oldTg + "->" + player.getTg() + ") using the psychoarcheology tech");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         deleteTheOneButton(event);
@@ -3455,6 +3460,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("miltymod_hm") && !player.getExhaustedTechs().contains("miltymod_hm")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_miltymod_hm", "Exhaust Hyper Metabolism"));
         }
+        if (player.getTechs().contains("absol_hm") && !player.getExhaustedTechs().contains("absol_hm")) {
+            endButtons.add(Button.success(finChecker + "exhaustTech_absol_hm", "Exhaust Hyper Metabolism"));
+        }
         if (player.getTechs().contains("absol_pa") && !player.getReadiedPlanets().isEmpty()
                 && !player.getActionCards().isEmpty()) {
             endButtons.add(Button.success(finChecker + "useTech_absol_pa", "Use Psychoarchaeology"));
@@ -4192,13 +4200,14 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return buttons;
         }
-        int cc = player.getTacticalCC();
+        
 
         if (!game.getNaaluAgent() && !game.getL1Hero() && !AddCC.hasCC(event, player.getColor(), tile)
                 && game.getFactionsThatReactedToThis("vaylerianHeroActive").isEmpty()) {
                     if(!game.getFactionsThatReactedToThis("absolLux").isEmpty()){
                         player.setTacticalCC(player.getTacticalCC() + 1);
                     }
+            int cc = player.getTacticalCC();
             cc -= 1;
             player.setTacticalCC(cc);
             AddCC.addCC(event, player.getColor(), tile, true);
@@ -8815,6 +8824,39 @@ public class ButtonHelper {
             }
         }
         return assignSpeakerButtons;
+    }
+
+    public static void showUnplayedACs(Game activeGame, GenericInteractionCreateEvent event){
+        List<String> unplayedACs =  new ArrayList<>(activeGame.getActionCards());
+        for(Player player : activeGame.getRealPlayers()){
+            unplayedACs.addAll(player.getActionCards().keySet());   
+        }
+        List<String> unplayedACNames =  new ArrayList<>();
+        for(String acID : unplayedACs){
+            unplayedACNames.add(Mapper.getActionCard(acID).getName());
+        }
+        Collections.sort(unplayedACNames);
+        Map<String, Integer> namesNValues = new HashMap<String, Integer>();
+        for(String acName : unplayedACNames){
+            if(namesNValues.containsKey(acName)){
+                namesNValues.put(acName, namesNValues.get(acName)+1);
+            }else{
+                namesNValues.put(acName, 1);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
+        sb.append("Unplayed Action Cards: ").append("\n");
+        int x = 1;
+        List<String> sortedNamed = new ArrayList<>();
+        sortedNamed.addAll(namesNValues.keySet());
+        Collections.sort(sortedNamed);
+        for (String id : sortedNamed) {
+            sb.append(x).append(". "+id +" x"+namesNValues.get(id)+"\n");
+            x++;
+        }
+        
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game,
