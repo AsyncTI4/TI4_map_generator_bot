@@ -5471,7 +5471,9 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
             String userId = player.getUserID();
-            buttons.add(Button.success("setupStep1_" + userId, player.getUserName()));
+            if(player.isNotRealPlayer() || player.getSo() < 1){
+                buttons.add(Button.success("setupStep1_" + userId, player.getUserName()));
+            }
         }
         return buttons;
     }
@@ -5879,8 +5881,11 @@ public class ButtonHelper {
                     newButtons.add(buttons.get(x));
                 }
             }
-            newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!",
-                    "Get more color"));
+            int additionalMax = Math.min(buttons.size(), maxBefore+22);
+            if(additionalMax != buttons.size()){
+                newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!",
+                        "Get more colors"));
+            }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired color",
                     newButtons);
             return;

@@ -1680,8 +1680,19 @@ public class ButtonHelperActionCards {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
-                        Mapper.getTech(tech).getName()));
+                if ("unitupgrade".equalsIgnoreCase(Mapper.getTech(tech).getType().toString())) {
+                    for (String factionTech : player.getNotResearchedFactionTechs()) {
+                        TechnologyModel fTech = Mapper.getTech(factionTech);
+                        if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                                && "unitupgrade".equalsIgnoreCase(fTech.getType().toString())
+                                && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                        }else{
+                            techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
+                        }
+                    }
+                }else{
+                    techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
+                }
             }
         }
         return techs;
