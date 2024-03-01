@@ -1095,6 +1095,7 @@ public class ButtonListener extends ListenerAdapter {
             Tile tile = activeGame.getTileByPosition(buttonID.replace("getRiftButtons_", ""));
             MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
             String msg = ident + " use buttons to rift units";
+            MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + " is rifting some units");
             MessageHelper.sendMessageToChannelWithButtons(channel, msg,
                     ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeGame, tile));
         } else if (buttonID.startsWith("riftAllUnits_")) {

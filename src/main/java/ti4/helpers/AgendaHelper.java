@@ -1247,10 +1247,10 @@ public class AgendaHelper {
                         continue;
                     }
                     if (!activeGame.isFoWMode()) {
-                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination_" + p2.getFaction(),
+                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination "+player.getFaction()+"_" + p2.getFaction(),
                                 p2.getFaction()));
                     } else {
-                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination_" + p2.getFaction(),
+                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination "+player.getFaction()+"_" + p2.getFaction(),
                                 p2.getColor()));
                     }
                 }
