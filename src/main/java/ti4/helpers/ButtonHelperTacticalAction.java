@@ -388,6 +388,15 @@ public class ButtonHelperTacticalAction {
                                 + " gained 1 commodity due to ghoti planet card. Your commodities are now "
                                 + player.getCommodities());
             }
+            if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
+                    && (tile.getUnitHolders().values().size() ==1) && activeGame.getMovedUnitsFromCurrentActivation().containsKey("flagship")
+                    && player.hasUnit("dihmohn_flagship")) {
+                List<Button> produce = new ArrayList<>();
+                produce.add(Button.primary("dihmohnfs_" + activeGame.getActiveSystem(),"Produce (2) Units"));
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation()
+                        + " Your Dih-Mohn Flahship moved into the active system and you can produce 2 units with a combined cost of 4.", produce);        
+                    }
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             ButtonHelperFactionSpecific.checkForStymie(activeGame, player, tile);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

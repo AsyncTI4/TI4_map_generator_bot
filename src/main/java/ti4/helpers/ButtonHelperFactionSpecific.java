@@ -1018,6 +1018,18 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
+            String ident) {
+        String pos = buttonID.replace("dihmohnfs_", "");
+        List<Button> buttons;
+        // Muaat agent works here as it's similar so no need to add more fluff
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
+                activeGame.getTileByPosition(pos), "muaatagent", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    
     public static void resolveVadenSCDebt(Player player, int sc, Game activeGame, GenericInteractionCreateEvent event) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
