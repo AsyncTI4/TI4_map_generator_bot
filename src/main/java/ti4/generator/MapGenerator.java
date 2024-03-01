@@ -3339,6 +3339,9 @@ public class MapGenerator {
             if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
                 scale = 1.65f;
             }
+            if(unitHolder.getName().equalsIgnoreCase("elysium")){
+                scale = 1.65f;
+            }
             if(unitHolder.getName().equalsIgnoreCase("mr")){
                 scale = 1.9f;
             }
