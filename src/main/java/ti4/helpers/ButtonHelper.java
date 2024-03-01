@@ -1661,6 +1661,7 @@ public class ButtonHelper {
         buttonID = buttonID.replace("biostimsReady_", "");
         String last = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         if (buttonID.contains("tech_")) {
+            last = buttonID.replace("tech_","");
             player.refreshTech(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
