@@ -389,8 +389,8 @@ public class ButtonHelperTacticalAction {
                                 + player.getCommodities());
             }
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
-                    && (tile.getUnitHolders().values().size() ==1) && activeGame.getMovedUnitsFromCurrentActivation().containsKey("flagship")
-                    && player.hasUnit("dihmohn_flagship")) {
+                    && (activeGame.getMovedUnitsFromCurrentActivation().containsKey("flagship")
+                    || activeGame.getMovedUnitsFromCurrentActivation().containsKey("flagshipdamaged")) && player.hasUnit("dihmohn_flagship")) {
                 List<Button> produce = new ArrayList<>();
                 produce.add(Button.primary("dihmohnfs_" + activeGame.getActiveSystem(),"Produce (2) Units"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),

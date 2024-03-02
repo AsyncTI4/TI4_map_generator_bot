@@ -1020,6 +1020,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
             String ident) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + " Dih-Mohn Flagship is producing units. They can produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
