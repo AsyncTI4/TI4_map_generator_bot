@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -52,8 +53,7 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
             .map(planetID -> getPlanetEmbed(player, planetID))
             .toList();
 
-        Button refreshPlanets = Button.secondary(Constants.REFRESH_PLANET_INFO, "Refresh Planets Info");
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), "__**Planets:**__", planetEmbeds, List.of(refreshPlanets));
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), "__**Planets:**__", planetEmbeds, List.of(Buttons.REFRESH_PLANET_INFO));
     }
 
     private static MessageEmbed getPlanetEmbed(Player player, String planetID) {

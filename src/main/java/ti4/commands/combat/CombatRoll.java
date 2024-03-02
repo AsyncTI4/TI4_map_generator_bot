@@ -110,6 +110,13 @@ public class CombatRoll extends CombatSubcommandData {
         secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, rollType);
     }
 
+    public boolean checkIfUnitsOfType(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, CombatRollType rollType){
+        UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
+        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
+                rollType, activeGame);
+        return !playerUnitsByQuantity.isEmpty();
+    }
+
     public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile,
             String unitHolderName,
             CombatRollType rollType) {

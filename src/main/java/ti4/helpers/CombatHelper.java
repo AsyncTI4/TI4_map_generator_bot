@@ -292,7 +292,7 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
             .filter(entry -> entry.getKey() != null
                 && entry.getKey().getSpaceCannonDieCount() > 0
-                && entry.getKey().getDeepSpaceCannon())
+                && (entry.getKey().getDeepSpaceCannon() || activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (var entry : adjacentOutput.entrySet()) {
@@ -462,7 +462,17 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("\nRerolling " + numMisses + " misses due to Jol-Nar Commander:\n " + unitRoll2);
+                resultBuilder.append("Rerolling " + numMisses + " misses due to Jol-Nar Commander:\n " + unitRoll2);
+            }
+
+            if (activeGame.getFactionsThatReactedToThis("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {
+                int numRolls2 = numMisses;
+                resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numRolls2);
+                player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls2 * (11 - toHit + modifierToHit)));
+                int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                totalHits += hitRolls2;
+                String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
+                resultBuilder.append("Munitions rerolling " + numMisses + " misses: " + unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -495,6 +505,9 @@ public class CombatHelper {
         }
         if(!extra.isEmpty()){
             result = result + "\n\n"+extra;
+        }
+        if (activeGame.getFactionsThatReactedToThis("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround){
+            activeGame.setCurrentReacts("munitionsReserves", "");
         }
         return result;
     }

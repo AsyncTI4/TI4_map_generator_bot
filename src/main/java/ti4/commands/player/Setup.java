@@ -18,7 +18,9 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.search.ListMyTitles;
 import ti4.commands.tech.TechInfo;
+import ti4.commands.tokens.AddToken;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
@@ -92,6 +94,10 @@ public class Setup extends PlayerSubcommandData {
                 }
             }
         }
+        if(player.isRealPlayer() && player.getSo() > 0){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You have SOs that would get lost to the void if you were setup again. If you wish to change color, use /player change_color. If you want to setup as another faction, discard your SOs first");
+            return;
+        }
 
         player.setColor(color);
         player.setFaction(faction);
@@ -153,6 +159,18 @@ public class Setup extends PlayerSubcommandData {
                 continue;
             }
             player.addTech(tech);
+        }
+        if(activeGame.getTechnologyDeckID().contains("absol")){
+            List<String> techs = new ArrayList<>();
+            techs.addAll(player.getTechs());
+            for(String tech : techs){
+                if(!tech.contains("absol") && Mapper.getTech("absol_"+tech) != null){
+                    if(!player.hasTech("absol_"+tech)){
+                        player.addTech("absol_"+tech);
+                    }
+                    player.removeTech(tech);
+                }
+            }
         }
 
         for (String tech : setupInfo.getFactionTech()) {
@@ -271,6 +289,17 @@ public class Setup extends PlayerSubcommandData {
                     }
                 }
             }
+        }
+
+        if(!activeGame.isFoWMode()){
+            StringBuilder sb = new ListMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
+            if(!sb.toString().contains("No titles yet")){
+                String msg = "In previous games, "+player.getUserName()+" has earned the titles of: \n"+ sb;
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+            }
+        }
+        if(hsTile.equalsIgnoreCase("d11")){
+            AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
 
     }

@@ -110,7 +110,7 @@ public final class GameStatisticFilterer {
   }
 
   private static boolean filterOnPlayerCount(Integer playerCount, Game game) {
-    return playerCount == null || playerCount == game.getPlayerCountForMap();
+    return playerCount == null || playerCount == game.getRealAndEliminatedAndDummyPlayers().size();
   }
 
 }

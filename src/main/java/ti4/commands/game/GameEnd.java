@@ -173,7 +173,7 @@ public class GameEnd extends GameSubcommandData {
           TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
           TextChannel actionsChannel = activeGame.getMainGameChannel();
           if (inLimboCategory != null && archiveChannels) {
-            if (inLimboCategory.getChannels().size() >= 47) { // HANDLE FULL IN-LIMBO
+            if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
               cleanUpInLimboCategory(event.getGuild(), 3);
             }
 
@@ -234,18 +234,23 @@ public class GameEnd extends GameSubcommandData {
     sb.append("**Players:**").append("\n");
     int index = 1;
     Optional<Player> winner = game.getWinner();
-    for (Player player : game.getRealPlayers()) {
-      Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
-      int playerVP = player.getTotalVictoryPoints();
+    for (Player player : game.getRealAndEliminatedPlayers()) {
       sb.append("> `").append(index).append(".` ");
       sb.append(player.getFactionEmoji());
       sb.append(Emojis.getColorEmojiWithName(player.getColor())).append(" ");
+      Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
       if (user.isPresent()) {
         sb.append(user.get().getAsMention());
       } else {
         sb.append(player.getUserName());
       }
-      sb.append(" - *").append(playerVP).append("VP* ");
+      sb.append(" - *");
+      if (player.isEliminated()) {
+        sb.append("ELIMINATED*");
+      } else {
+        int playerVP = player.getTotalVictoryPoints();
+        sb.append(playerVP).append("VP* ");
+      }
       if (winner.isPresent() && winner.get() == player)
         sb.append(" - **WINNER**");
       sb.append("\n");
@@ -263,18 +268,21 @@ public class GameEnd extends GameSubcommandData {
     if (winner.isPresent() && !game.hasHomebrew()) {
       String winningPath = GameStats.getWinningPath(game, winner.get());
       sb.append("**Winning Path:** ").append(winningPath).append("\n");
-      List<Game> games = GameStatisticFilterer.getNormalFinishedGames(game.getRealPlayers().size(), game.getVp());
+      int playerCount = game.getRealAndEliminatedAndDummyPlayers().size();
+      List<Game> games = GameStatisticFilterer.getNormalFinishedGames(playerCount, game.getVp());
       Map<String, Integer> winningPathCounts = GameStats.getAllWinningPathCounts(games);
       int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
       if (gamesWithWinnerCount >= 100) {
-        int winningPathCount = winningPathCounts.get(winningPath) - 1;
+        int winningPathCount = winningPathCounts.get(winningPath);
         double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
         String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
-        sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games, this path has been seen ")
-            .append(winningPathCount)
-            .append(" times before. That's the ").append(winningPathCommonality).append("most common path at ")
+        sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(game.getVp()).append("VP, ")
+            .append(playerCount).append("P)")
+            .append(", this path has been seen ")
+            .append(winningPathCount - 1)
+            .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
             .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
-        if (winningPathCount == 0) {
+        if (winningPathCount == 1) {
           sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
         } else if (winningPathPercent <= .005) {
           sb.append("🎉__**Few have traveled your path! We celebrate your boldness!**__🎉").append("\n");

@@ -57,7 +57,7 @@ public class ButtonHelperCommanders {
         List<Button> buttons = new ArrayList<>();
         for(String planet : player.getReadiedPlanets()){
             Tile tile = activeGame.getTileFromPlanet(planet);
-            if(planet.equalsIgnoreCase("mr") || tile == null || ButtonHelper.isTileHomeSystem(tile)){
+            if("mr".equalsIgnoreCase(planet) || tile == null || tile.isHomeSystem()){
                 continue;
             }
             buttons.add(Button.success("olradinCommanderStep2_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
@@ -256,15 +256,15 @@ public class ButtonHelperCommanders {
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
             ShowAllAC.showAll(enemy, player, activeGame);
-            message = "Yssaril commander used to look at ACs";
+            message = "# Yssaril commander used to look at ACs";
         }
         if ("so".equalsIgnoreCase(type)) {
             new ShowAllSO().showAll(enemy, player, activeGame);
-            message = "Yssaril commander used to look at SOs";
+            message = "# Yssaril commander used to look at SOs";
         }
         if ("pn".equalsIgnoreCase(type)) {
             new ShowAllPN().showAll(enemy, player, activeGame, false);
-            message = "Yssaril commander used to look at PNs";
+            message = "# Yssaril commander used to look at PNs";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         if (activeGame.isFoWMode()) {
@@ -333,9 +333,10 @@ public class ButtonHelperCommanders {
             Planet planetReal = (Planet) planetUnit;
             String planetId = planetReal.getName();
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
-            for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
+            
+            for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false, true)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
-                if (AddCC.hasCC(event, player.getColor(), tile2) && !activeGame.getDominusOrbStatus()) {
+                if (AddCC.hasCC(event, player.getColor(), tile2) && !activeGame.getDominusOrbStatus() && tile2 != tile) {
                     continue;
                 }
                 for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {
@@ -352,11 +353,11 @@ public class ButtonHelperCommanders {
                     }
                     String planetId2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planetId2, activeGame);
-                    if (numInf > 0) {
+                    if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         buttons.add(Button.success("sardakkcommander_infantry_" + planetId + "_" + planetId2, "Commit 1 infantry from " + planetRepresentation2 + " to " + planetRepresentation)
                             .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
                     }
-                    if (numMechs > 0) {
+                    if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         buttons.add(Button.primary("sardakkcommander_mech_" + planetId + "_" + planetId2, "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation)
                             .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
                     }

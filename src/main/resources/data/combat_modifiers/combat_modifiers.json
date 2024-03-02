@@ -332,7 +332,7 @@
             {
                 "type": "custom",
                 "alias": "custom",
-                "message": "Letnev Agent gives +1 die to best ship"
+                "message": "Sol Agent gives +1 die to best ground force"
             }
         ]
     },
@@ -746,6 +746,26 @@
                 "alias": "starfall_array"
             }
         ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_0_always_space_cannon_offense",
+        "type": "mods",
+        "value": "+0",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "mirvedacommander"
+            },
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Mirveda commander only partially in the bot. Please only consider the first relevant rolls from adjacent units without deep space cannon."
+            }
+        ],
+        
         "forCombatAbility": "SpaceCannonOffence"
     },
     {

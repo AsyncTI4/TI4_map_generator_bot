@@ -681,7 +681,7 @@
         "alias": "absol_ah",
         "name": "Aerie Hololattice",
         "type": "CYBERNETIC",
-        "requirements": "YR",
+        "requirements": "Y",
         "faction": "argent",
         "source": "absol",
         "text": "Other players cannot move ships through systems that contain your structures.\n \n Each planet that contains 1 or more of your structures gains the PRODUCTION X ability as if it were a unit, where X is the number of structures on that planet.",

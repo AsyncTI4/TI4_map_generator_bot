@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -193,11 +195,83 @@ public class MessageListener extends ListenerAdapter {
                 } else {
                     continue;
                 }
+                if(activeGame.isFastSCFollowMode()){
+                    for(Player player : activeGame.getRealPlayers()){
+                        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
+                            if (!player.hasFollowedSC(sc)) {
+                                long twelveHrs = 12*60 * 60 * multiplier;
+                                long twentyFourhrs =  24*60 * 60 * multiplier;
+                                String scTime = activeGame.getFactionsThatReactedToThis("scPlayMsgTime" + sc);
+                                if(!scTime.isEmpty()){
+                                    long scPlayTime = Long.parseLong(scTime);
+                                    long timeDifference = (new Date().getTime()) - scPlayTime;
+                                    String timesPinged = activeGame.getFactionsThatReactedToThis("scPlayPingCount" + sc+player.getFaction());
+                                    if(timeDifference > twelveHrs && timeDifference < twentyFourhrs){
+                                        
+                                        if(!timesPinged.equalsIgnoreCase("1")){
+                                            StringBuilder sb = new StringBuilder();
+                                            Player p2 = player;
+                                            sb.append(p2.getRepresentation(true, true));
+                                            sb.append(" You are getting this ping because SC #").append(sc)
+                                                .append(
+                                                    " has been played and now it has been 12 hrs and you havent reacted. Please do so, or after another 12 hrs you will be marked as not following. \nTIP: Double check that you paid the command counter to follow\n");
+                                            if (!activeGame.getFactionsThatReactedToThis("scPlay" + sc).isEmpty()) {
+                                                sb.append("Message link is: ").append(activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":")).append("\n");
+                                            }
+                                            sb.append("You currently have ").append(p2.getStrategicCC()).append(" CC in your strategy pool.");
+                                            if (!p2.hasFollowedSC(sc)) {
+                                                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+                                            }
+                                            activeGame.setCurrentReacts("scPlayPingCount" + sc+player.getFaction(),"1");
+                                        }
+                                    }
+                                    if(timeDifference > twentyFourhrs){
+                                        if(!timesPinged.equalsIgnoreCase("2")){
+                                            StringBuilder sb = new StringBuilder();
+                                            Player p2 = player;
+                                            sb.append(p2.getRepresentation(true, true));
+                                            sb.append(" SC #").append(sc)
+                                                .append(
+                                                    " has been played and now it has been 24 hrs and they havent reacted, so they have been marked as not following\n");
+                                            
+                                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), sb.toString());
+                                            ButtonHelper.sendMessageToRightStratThread(player, activeGame, sb.toString(), ButtonHelper.getStratName(sc));
+                                            player.addFollowedSC(sc);
+                                            activeGame.setCurrentReacts("scPlayPingCount" + sc+player.getFaction(),"2");
+                                            String messageID =  activeGame.getFactionsThatReactedToThis("scPlayMsgID" + sc);
+                                            ButtonHelper.addReaction(player, false, true, "Not following","", messageID, activeGame);
+                                            
+                                            if (sc == 8 && !activeGame.isHomeBrewSCMode()) {
+                                                String key = "factionsThatAreNotDiscardingSOs";
+                                                String key2 = "queueToDrawSOs";
+                                                String key3 = "potentialBlockers";
+                                                if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                                                    activeGame.setCurrentReacts(key2,
+                                                            activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                                                }
+                                                if (!activeGame.getFactionsThatReactedToThis(key).contains(player.getFaction() + "*")) {
+                                                    activeGame.setCurrentReacts(key,
+                                                            activeGame.getFactionsThatReactedToThis(key) + player.getFaction() + "*");
+                                                }
+                                                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")) {
+                                                    activeGame.setCurrentReacts(key3,
+                                                            activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                                                    Helper.resolveQueue(activeGame);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 long spacer = activeGame.getAutoPingSpacer();
                 String playerID = activeGame.getActivePlayerID();
                 Player player = null;
                 if (playerID != null) {
                     player = activeGame.getPlayer(playerID);
+                    
                     if (player != null && player.getPersonalPingInterval() > 0) {
                         spacer = player.getPersonalPingInterval();
                     }

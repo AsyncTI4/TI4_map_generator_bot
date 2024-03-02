@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -50,7 +51,7 @@ public class UnitInfo extends PlayerSubcommandData {
 
     private static List<Button> getUnitInfoButtons() {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.primary(Constants.REFRESH_UNIT_INFO, "Refresh Unit Info"));
+        buttons.add(Buttons.REFRESH_UNIT_INFO);
         return buttons;
     }
 

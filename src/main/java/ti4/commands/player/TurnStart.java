@@ -62,6 +62,8 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.setCurrentReacts("vaylerianHeroActive", "");
         activeGame.setCurrentReacts("tnelisCommanderTracker", "");
         activeGame.setCurrentReacts("planetsTakenThisRound", "");
+        activeGame.setCurrentReacts("absolLux", "");
+        activeGame.setCurrentReacts("mentakHero", "");
         boolean goingToPass = false;
         if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
             && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
@@ -243,12 +245,8 @@ public class TurnStart extends PlayerSubcommandData {
                 startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, activeGame).size() - 1) + ")"));
             }
             startButtons.add(Button.danger(finChecker + "turnEnd", "End Turn"));
-            for (String law : activeGame.getLaws().keySet()) {
-                if ("minister_war".equalsIgnoreCase(law)) {
-                    if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
-                        startButtons.add(Button.secondary(finChecker + "ministerOfWar", "Use Minister of War"));
-                    }
-                }
+            if(ButtonHelper.isPlayerElected(activeGame, player, "minister_war")){
+                startButtons.add(Button.secondary(finChecker + "ministerOfWar", "Use Minister of War"));
             }
             if (!activeGame.getJustPlayedComponentAC()) {
                 player.setWhetherPlayerShouldBeTenMinReminded(true);

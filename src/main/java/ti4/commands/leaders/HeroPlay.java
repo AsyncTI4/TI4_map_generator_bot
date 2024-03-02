@@ -131,14 +131,18 @@ public class HeroPlay extends LeaderAction {
             }
         } else {
             boolean purged = true;
+            String msg = "Leader " + playerLeader.getId() + " has been purged";
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
+                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
+            }else{
+                msg ="Leader " + playerLeader.getId() + " was used to copy a hero";
             }
 
             if (purged) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                        "Leader " + playerLeader.getId() + " has been purged");
-                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
+                        msg);
+                
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Leader was not purged - something went wrong");
@@ -226,6 +230,9 @@ public class HeroPlay extends LeaderAction {
                 new RiseOfMessiah().doRise(player, event, activeGame);
                 ButtonHelperHeroes.offerOlradinHeroFlips(activeGame, player);
             }
+            case "argenthero" -> {
+                ButtonHelperHeroes.argentHeroStep1(activeGame, player, event);
+            }
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
                         + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical cc from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
@@ -259,7 +266,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
-                                + " use the buttons to build in a system",
+                                + " use the buttons to build in the desired system(s)",
                         buttons);
             }
             case "saarhero" -> {
@@ -325,6 +332,9 @@ public class HeroPlay extends LeaderAction {
             }
             case "freesystemshero" -> {
                 ButtonHelperHeroes.offerFreeSystemsButtons(player, activeGame, event);
+            }
+            case "vadenhero" -> {
+                ButtonHelperHeroes.startVadenHero(activeGame, player);
             }
             case "veldyrhero" -> {
                 activeGame.setComponentAction(true);

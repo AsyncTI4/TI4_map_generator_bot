@@ -47,13 +47,14 @@ import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
-import ti4.commands.capture.RemoveUnits;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
+import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -238,11 +239,7 @@ public class Helper {
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
             return true;
         }
-        if(player.getAc() > 0){
-            return true;
-        }
-
-        return false;
+        return player.getAc() > 0;
     }
 
     public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID) {
@@ -352,9 +349,9 @@ public class Helper {
         return players;
     }
 
-    public static void resolveQueue(Game activeGame, GenericInteractionCreateEvent event) {
+    public static void resolveQueue(Game activeGame) {
 
-        Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+        Player imperialHolder = getPlayerWithThisSC(activeGame, 8);
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
@@ -362,7 +359,7 @@ public class Helper {
             return;
         }
 
-        for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
+        for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
             String message = player.getRepresentation(true, true) + " Drew Queued Secret Objective From Imperial. ";
             if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
                 activeGame.drawSecretObjective(player.getUserID());
@@ -370,10 +367,13 @@ public class Helper {
                     activeGame.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to plausible deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                SOInfo.sendSecretObjectiveInfo(activeGame, player);
                 activeGame.setCurrentReacts(key2,
                         activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if(!activeGame.isFoWMode()){
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
+                }
             }
             if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
                     && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
@@ -382,7 +382,83 @@ public class Helper {
                             + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if(!activeGame.isFoWMode()){
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
+                }
                 break;
+            }
+        }
+    }
+
+    public static void resolvePOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
+        String key2 = "queueToScorePOs";
+        String key3 = "potentialScorePOBlockers";
+        String key2b = "queueToScoreSOs";
+        String key3b = "potentialScoreSOBlockers";
+        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2|| activeGame.getHighestScore()+1 > activeGame.getVp()) {
+            return;
+        }
+        for (Player player : getInitativeOrder(activeGame)) {
+            if (activeGame.getHighestScore()+1 > activeGame.getVp()) {
+                return;
+            }
+            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*") || activeGame.getFactionsThatReactedToThis(key2b).contains(player.getFaction() + "*")) {
+                if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                    int poIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedPOScore"));
+                    ScorePublic.scorePO(event, activeGame.getMainGameChannel(), activeGame, player, poIndex);
+                    activeGame.setCurrentReacts(key2,
+                            activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                    activeGame.setCurrentReacts(key3,activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                }
+                if (activeGame.getHighestScore()+1 > activeGame.getVp()) {
+                    return;
+                }
+                if (activeGame.getFactionsThatReactedToThis(key2b).contains(player.getFaction() + "*")) {
+                    int soIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedSOScore"));
+                    ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
+                    activeGame.setCurrentReacts(key2b,
+                            activeGame.getFactionsThatReactedToThis(key2b).replace(player.getFaction() + "*", ""));
+                    activeGame.setCurrentReacts(key3b,activeGame.getFactionsThatReactedToThis(key3b).replace(player.getFaction() + "*", ""));
+                }
+            }else{
+                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
+                        && activeGame.getFactionsThatReactedToThis(key2).length() > 2 ) {
+                    String message = player.getRepresentation(true, true)
+                            + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    break;
+                }
+                if (activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")
+                        && activeGame.getFactionsThatReactedToThis(key2).length() > 2 ) {
+                    String message = player.getRepresentation(true, true)
+                            + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    break;
+                }
+            }
+        }
+    }
+    public static void resolveSOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
+        String key2 = "queueToScoreSOs";
+        String key3 = "potentialScoreSOBlockers";
+        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2 || activeGame.getHighestScore()+1 > activeGame.getVp()) {
+            return;
+        }
+        for (Player player : getInitativeOrder(activeGame)) {
+            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+                int soIndex = Integer.parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction()+"queuedSOScore"));
+                ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
+                activeGame.setCurrentReacts(key2,
+                        activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                activeGame.setCurrentReacts(key3,activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+            }else{
+                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
+                        && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
+                    String message = player.getRepresentation(true, true)
+                            + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    break;
+                }
             }
         }
     }
@@ -452,7 +528,7 @@ public class Helper {
                     }
                 }
             }
-            if (activeGame.getCurrentPhase().equals("agendawaiting")) {
+            if ("agendawaiting".equals(activeGame.getCurrentPhase())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
                 int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
                 boolean shouldDoIt2 = result2 == highNum2;
@@ -1034,6 +1110,25 @@ public class Helper {
         return msg;
     }
 
+    public static void refreshPlanetsOnTheRevote(Player player, Game activeGame) {
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        for (String thing : spentThings) {
+            if (!thing.contains("_")) {
+                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + activeGame.getName());
+                continue;
+            }
+            int tg = player.getSpentTgsThisWindow();
+            player.setTg(player.getTg()+tg);
+            String secondHalf = thing.split("_")[1];
+            String flavor = thing.split("_")[0];
+            if (flavor.contains("planet") && player.getExhaustedPlanets().contains(secondHalf)) {
+                player.refreshPlanet(secondHalf);
+            } 
+        }
+        player.resetSpentThings();
+        
+    }
+
     public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = ButtonHelper.getIdent(player) + " exhausted the following: \n";
@@ -1049,7 +1144,7 @@ public class Helper {
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
-            if (!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("absol_sarween")
+            if (!thing.contains("tg_") &&!thing.contains("boon") && !thing.contains("sarween") && !thing.contains("absol_sarween")
                     && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida")
                     && !thing.contains("commander") && !thing.contains("Agent")) {
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
@@ -1063,7 +1158,7 @@ public class Helper {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
-                    if (!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet.getName()))) {
+                    if (!activeGame.getTileFromPlanet(planet.getName()).isHomeSystem()) {
                         if (planet.getResources() > bestRes) {
                             bestRes = planet.getResources();
                         }
@@ -1113,6 +1208,10 @@ public class Helper {
                     int sarweenVal = 1 + calculateCostOfProducedUnits(player, activeGame, true) / 5;
                     msg = msg + "> Used Sarween Tools " + Emojis.CyberneticTech + " for " + sarweenVal + " resources\n";
                     res = res + sarweenVal;
+                }
+                if(thing.contains("boon")){
+                    msg = msg + "> Used Boon Relic " + Emojis.Relic + "\n";
+                    res = res + 1;
                 }
                 if (thing.contains("warmachine")) {
                     msg = msg + "> Used War Machine " + Emojis.ActionCard + "\n";
@@ -1395,7 +1494,7 @@ public class Helper {
             } else {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
-                if (removedUnit.getBaseType().equalsIgnoreCase("flagship")
+                if ("flagship".equalsIgnoreCase(removedUnit.getBaseType())
                         && activeGame.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
                     cost = cost; // nomad alliance
                 } else {
@@ -1532,7 +1631,7 @@ public class Helper {
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff) && !"mr".equalsIgnoreCase(unitHolder.getName())) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                             && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
-                            && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")
+                            && !player.hasUnit("saar_spacedock") && !player.hasUnit("absol_saar_spacedock") && !player.hasUnit("absol_saar_spacedock2") && !player.hasUnit("saar_spacedock2")
                             && !player.hasUnit("ghoti_flagship")) {
                         continue;
                     }
@@ -1632,7 +1731,7 @@ public class Helper {
             }
         } else {
             for (Tile tile : activeGame.getTileMap().values()) {
-                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile)) {
+                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem()) {
                     Button button = Button.secondary(finsFactionCheckerPrefix + "diplo_" + tile.getPosition() + "_"
                             + "mahact" + mahact.getColor(), tile.getRepresentation() + " System");
                     planetButtons.add(button);

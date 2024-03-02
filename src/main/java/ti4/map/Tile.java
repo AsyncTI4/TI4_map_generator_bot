@@ -312,7 +312,7 @@ public class Tile {
     public List<UnitHolder> getPlanetUnitHolders() {
         List<UnitHolder> planets = new ArrayList<>();
         for (UnitHolder uH : unitHolders.values()) {
-            if (uH instanceof Planet) {
+            if (uH instanceof Planet && !uH.getTokenList().contains(Constants.WORLD_DESTROYED_PNG)) {
                 planets.add(uH);
             }
         }
@@ -503,4 +503,26 @@ public class Tile {
             getPosition().contains(searchString) ||
             getTileModel().search(searchString);
     }
+
+    @JsonIgnore
+    public boolean isHomeSystem() {
+        boolean isHome = false;
+        if ("0g".equalsIgnoreCase(tileID) || "17".equalsIgnoreCase(tileID)) {
+            return true;
+        }
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if (unitHolder instanceof Planet planetHolder) {
+                boolean oneOfThree = planetHolder.getOriginalPlanetType() != null
+                    && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                    || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                    || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
+                if (!planetHolder.getName().toLowerCase().contains("rex")
+                    && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree) {
+                    isHome = true;
+                }
+            }
+        }
+        return isHome;
+    }
+
 }

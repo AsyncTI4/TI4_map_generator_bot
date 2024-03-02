@@ -583,9 +583,6 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                         "# Repealed the " + Mapper.getAgendaTitleNoCap(winner)
                                 + " law and will now reveal it for the purposes of revoting. It is technically still in effect");
-                activeGame.removeLaw(winner);
-                activeGame.putAgendaBackIntoDeckOnTop(winner);
-                new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
             }
             if ("cladenstine".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
@@ -619,12 +616,12 @@ public class AgendaHelper {
             if ("arms_reduction".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player player : activeGame.getRealPlayers()) {
-                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 4) {
+                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser",false) > 4) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation() + " remove excess cruisers", ButtonHelperModifyUnits
                                             .getRemoveThisTypeOfUnitButton(player, activeGame, "cruiser"));
                         }
-                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 2) {
+                        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought",false) > 2) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     player.getRepresentation() + " remove excess dreads", ButtonHelperModifyUnits
                                             .getRemoveThisTypeOfUnitButton(player, activeGame, "dreadnought"));
@@ -943,6 +940,10 @@ public class AgendaHelper {
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+        }else{
+            activeGame.removeLaw(winner);
+            activeGame.putAgendaBackIntoDeckOnTop(winner);
+            new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
         }
 
         event.getMessage().delete().queue();
@@ -1000,7 +1001,7 @@ public class AgendaHelper {
             return true;
         }
         if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
-                || player.getPromissoryNotes().keySet().contains("riderm")
+                || player.getPromissoryNotes().containsKey("riderm")
                 || player.hasAbility("radiance") || player.hasAbility("galactic_threat") || player.hasAbility("conspirators")
                 || player.ownsPromissoryNote("riderx")
                 || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")) {
@@ -1246,10 +1247,10 @@ public class AgendaHelper {
                         continue;
                     }
                     if (!activeGame.isFoWMode()) {
-                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination_" + p2.getFaction(),
+                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination "+player.getFaction()+"_" + p2.getFaction(),
                                 p2.getFaction()));
                     } else {
-                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination_" + p2.getFaction(),
+                        buttons2.add(Button.secondary("resolvePreassignment_Genetic Recomination "+player.getFaction()+"_" + p2.getFaction(),
                                 p2.getColor()));
                     }
                 }
@@ -1342,6 +1343,7 @@ public class AgendaHelper {
                     pfaction2 = player.getFaction();
                 }
                 if (pfaction2 != null) {
+                    player.resetSpentThings();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             player.getRepresentation() + " Abstained");
                     event.getMessage().delete().queue();
@@ -1411,6 +1413,7 @@ public class AgendaHelper {
                             + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame
                             .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                            nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
@@ -1882,6 +1885,7 @@ public class AgendaHelper {
                             + "You are being skipped because you told the bot you wanted to preset an abstain";
                     activeGame.setCurrentReacts("Abstain On Agenda", activeGame
                             .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                            nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.player.TurnStart;
 import ti4.commands.special.CheckDistance;
+import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
@@ -369,6 +370,7 @@ public class ButtonHelperTacticalAction {
         } else {
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()) {
                 ButtonHelper.resolveEmpyCommanderCheck(player, activeGame, tile, event);
+                ButtonHelper.sendEBSWarning(player, activeGame, tile.getPosition());
             }
             List<Button> empyButtons = new ArrayList<>();
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
@@ -404,11 +406,14 @@ public class ButtonHelperTacticalAction {
                     continue;
                 }
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
-                if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())) {
-                    Player player2 = players.get(0);
-                    if (player2 == player) {
-                        player2 = players.get(1);
+                Player player2 = player;
+                for(Player p2 : players){
+                    if(p2 != player && !player.getAllianceMembers().contains(p2.getFaction())){
+                        player2 = p2;
+                        break;
                     }
+                }
+                if (player != player2) {
 
                     String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                     if (!activeGame.isFoWMode()) {
@@ -623,6 +628,12 @@ public class ButtonHelperTacticalAction {
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !activeGame.getL1Hero()) {
             String msg = player.getRepresentation(true, true) + " You can use buttons to resolve L1 Agent if you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
+        }
+        Tile tile =activeGame.getTileByPosition(pos);
+        if(tile.getPlanetUnitHolders().isEmpty() && ButtonHelper.doesPlayerHaveFSHere("mortheus_flagship",player, tile) && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))){
+            String msg = player.getRepresentation(true, true) + " automatically added 1 frontier token to the system due to Mortheus Flagship";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
                 && !activeGame.getL1Hero()) {
