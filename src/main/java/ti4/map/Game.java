@@ -3773,6 +3773,20 @@ public class Game {
         return player;
     }
 
+    @Nullable
+    public Player getPlayerFromLeader(String leader) {
+        Player player = null;
+        if(leader != null) {
+            for(Player player_ : getPlayers().values()) {
+                if(player_.getLeaderIDs().contains(leader)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+
     @Deprecated
     public UnitModel getUnitFromImageName(String imageName) {
         String colorID = StringUtils.substringBefore(imageName, "_");
