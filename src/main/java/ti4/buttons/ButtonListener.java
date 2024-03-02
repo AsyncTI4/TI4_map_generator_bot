@@ -214,6 +214,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.mantleCracking(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("umbatTile_")) {
             ButtonHelperAgents.umbatTile(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("dihmohnfs_")) {
+            ButtonHelperFactionSpecific.resolveDihmohnFlagship(buttonID, event, activeGame, player, ident);    
         } else if (buttonID.startsWith("spendStratNReadyAgent_")) {
             ButtonHelperAgents.resolveAbsolHyperAgentReady(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("get_so_score_buttons")) {
