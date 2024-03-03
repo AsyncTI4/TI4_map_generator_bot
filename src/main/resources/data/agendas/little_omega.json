@@ -14,8 +14,8 @@
         "name": "Arms Reduction ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player destroys half of their dreadnoughts and half of their cruisers, rounded down, and gains trade goods equal to half of the combined cost of those ships.",
-        "text2": "Against: The player who cast the most votes \"Against\" researches a unit upgrade technology; the speaker breaks ties. At the start of the next strategy phase, exhaust each planet that has a technology specialty.",
+        "text1": "For: Each player destroys 1 of their dreadnoughts, cruisers, or destroyers in each system and gains trade goods equal to the combined cost of those ships.",
+        "text2": "Against: The player who cast the most votes \"Against\" may research a unit upgrade technology; the speaker breaks ties. At the start of the next strategy phase, exhaust each planet that has a technology specialty.",
         "source": "little_omega"
     },
     {
@@ -33,7 +33,7 @@
         "name": "Colonial Redistribution ω",
         "type": "Directive",
         "target": "Elect Non-Home Planet",
-        "text1": "Remove each unit on the elected planet. The player who controls the elected planet places each of those units on a planet they control in their home system, if able; otherwise, they return that unit to their reinforcements. Then, the player who controls the elected planet chooses another player with the fewest victory points; that player gains control of the elected planet and places 3 infantry from their reinforcements on it. [Note: You always choose another player, even if you are the only one with the fewest victory points.]",
+        "text1": "Remove each unit on the elected planet. The player who controls that planet places those units on 1 or more planets they control, if able; otherwise, they return that unit to their reinforcements. Then, that player chooses another player with the fewest victory points; the chosen player gains control of the elected planet and places 3 infantry from their reinforcements on it. [Note: You always choose another player, even if you are the only one with the fewest victory points.]",
         "text2": "",
         "source": "little_omega"
     },
@@ -61,7 +61,7 @@
         "alias": "little_omega_covert_legislation",
         "name": "Covert Legislation ω",
         "type": "Directive",
-        "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect player, etc.); the other players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects. The speaker votes first on this agenda, and must cast at least 1 vote if able.",
+        "target": "When this agenda is revealed, the speaker looks at the top card of the agenda deck and reads the eligible outcomes aloud (for, against, elect player, etc.), but not the effects; treat those outcomes as if they were outcomes of this agenda and discard that agenda when this agenda is discarded. The speaker votes first on this agenda and, if able, must cast at least 1 vote.",
         "text1": "",
         "text2": "",
         "source": "little_omega"
@@ -120,7 +120,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units on Mecatol Rex; then, each player with units in systems adjacent to Mecatol Rex destroys 3 of their units in each of those systems.",
-        "text2": "Against: Attach this card to the Mecatol Rex planet card. The player who controls Mecatol Rex gains 1 victory point, and loses 1 victory point if they lose control of Mecatol Rex.",
+        "text2": "Against: Each player draws 1 secret objective.",
         "source": "little_omega"
     },
     {
@@ -147,9 +147,9 @@
         "name": "Minister of Exploration ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
+        "text1": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore 1 of their planets. When the owner of this card explores, they may discard this card to draw any number of additional cards; they choose 1 to resolve and discard the rest.",
         "text2": "",
-        "mapText": "After gaining CCs from Leadership, explore a planet. Before you draw from exploration, you may discard this to choose 1 card to place on top and discard the rest.",
+        "mapText": "After gaining CCs from Leadership, explore a planet. Before you draw from exploration, you may discard this to draw any number of cards and resolve 1.",
         "source": "little_omega"
     },
     {
@@ -157,9 +157,9 @@
         "name": "Minister of Industry ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may use the Production ability of 1 of their space docks. When the owner of this card resolves 1 of their Production abilities, they may discard this card to resolve an additional 1 of their Production abilities.",
+        "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may place 1 structure on a planet they control. When the owner of this card ends their turn, they may discard this card to choose 1 system; they use the PRODUCTION abilities of each of their units in that system.",
         "text2": "",
-        "mapText": "After resolving Construction, use the Production ability of 1 of your space docks. When you resolve 1 of your Production abilities, you may discard this card to resolve an additional 1 of your Production abilities.",
+        "mapText": "After resolving Construction, place 1 structure. At the end of your turn, you may discard this to resolve PRODUCTION in 1 system.",
         "source": "little_omega"
     },
     {
@@ -311,7 +311,7 @@
         "name": "Checks and Balances ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The order that players choose strategy cards during the strategy phase is instead from the player with the fewest victory points to the player with the most; on a tie, the order for those players starts with the speaker and proceeds clockwise.",
+        "text1": "For: Players choose strategy cards during the strategy phase in order from the player with the fewest victory points to the player with the most; on a tie, the order for those players starts with the speaker and proceeds clockwise.",
         "text2": "Against: During the next strategy phase, when a player chooses a strategy card, they give that strategy card to another player who does not have 1.",
         "mapText": "Players choose strategy cards during the strategy phase from fewest to most victory points; on a tie, start with the speaker and proceed clockwise.",
         "source": "little_omega"
