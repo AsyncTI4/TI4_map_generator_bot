@@ -197,9 +197,9 @@
         "name": "Minister of War ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they may move 1 of their ships to any system that contains their ships. The owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and perform a tactical action.",
+        "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they gain 1 command token. The owner of this card may discard this card after they perform an action to remove 1 of their command tokens from the game board and perform a tactical action.",
         "text2": "",
-        "mapText": "After you resolve Warfare, you may move 1 ship to a system that contains your ships. You may discard this card after performing an action to remove 1 CC from the game board and perform a tactical action.",
+        "mapText": "After you resolve Warfare, gain 1 CC. You may discard this card after performing an action to remove 1 CC from the game board and perform a tactical action.",
         "source": "little_omega"
     },
     {
@@ -216,8 +216,8 @@
         "name": "New Constitution ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, discard all laws from play and reveal an agenda from the top of the agenda deck.",
-        "text2": "Against: The speaker must give 1 promissory note from their hand to each other player who cast 5 or more votes \"Against\". During the next strategy phase, players may not choose the \"Politics\" strategy card if another choice is available.",
+        "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, discard all laws from play and reveal the top card of the agenda deck.",
+        "text2": "Against: Each player who cast 5 or more votes \"Against\" draws 2 action cards. During the next strategy phase, players cannot choose the \"Politics\" strategy card, if they have another choice.",
         "source": "little_omega"
     },
     {
@@ -322,7 +322,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: The player who cast the most votes \"For\" gains the speaker token; the speaker breaks ties. Then, each other player returns 1 command token from their command sheet to their reinforcements.",
-        "text2": "Against: Each player destroys 1 of their space docks in a non-home system, if able; otherwise, that player must destroy 2 of their non-fighter ships.",
+        "text2": "Against: Each player destroys 1 of their space docks in a non-home system, if able; otherwise, that player destroys 2 of their non-fighter ships.",
         "source": "little_omega"
     },
     {
@@ -351,7 +351,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: Each player with the fewest victory points places 1 infantry from their reinforcements on each planet they control.",
-        "text2": "Against: Each player who cast votes \"Against\" or abstained must give 1 promissory note from their hand to a player who cast votes \"For\".",
+        "text2": "Against: Each player who cast votes \"Against\" or abstained gives 1 promissory note from their hand to a player with the fewest victory.",
         "source": "little_omega"
     },
     {
