@@ -355,7 +355,7 @@ public class CombatHelper {
         List<NamedCombatModifierModel> extraRolls,
         List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
         Player opponent,
-        Game activeGame, CombatRollType rollType, GenericInteractionCreateEvent event) {
+        Game activeGame, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
 
         String result = "";
 
@@ -373,7 +373,7 @@ public class CombatHelper {
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
         List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
         int totalMisses = 0;
-        UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space");
+        UnitHolder space = activeSystem.getUnitHolders().get("space");
         String extra = "";
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
