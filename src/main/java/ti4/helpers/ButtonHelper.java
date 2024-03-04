@@ -1991,12 +1991,12 @@ public class ButtonHelper {
                 }
                 UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 float hitChance = 0;
-                if (removedUnit.getAfbDieCount() > 0) {
-                    hitChance = (((float) 11.0 - removedUnit.getAfbHitsOn()) / 10);
+                if (removedUnit.getAfbDieCount(player, game) > 0) {
+                    hitChance = (((float) 11.0 - removedUnit.getAfbHitsOn(player, game)) / 10);
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
-                    count = count + removedUnit.getAfbDieCount() * hitChance * uh.getUnits().get(unit);
+                    count = count + removedUnit.getAfbDieCount(player, game) * hitChance * uh.getUnits().get(unit);
                 }
                 if (removedUnit.getSpaceCannonDieCount() > 0) {
                     hitChance = (((float) 11.0 - removedUnit.getSpaceCannonHitsOn()) / 10);
@@ -2841,6 +2841,7 @@ public class ButtonHelper {
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
         int buttons = 0;
+        String id = "br";
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
@@ -2849,6 +2850,9 @@ public class ButtonHelper {
             }
             if (buttonRow.size() > 0) {
                 buttons = buttons + buttonRow.size();
+                if(buttonRow.get(0) instanceof Button butt){
+                    id = butt.getId();
+                }
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
@@ -2856,7 +2860,11 @@ public class ButtonHelper {
             if(exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1){
                 event.getMessage().delete().queue();
             }else{
-                event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                if(buttons == 1 && id.equalsIgnoreCase("deleteButtons")){
+                    event.getMessage().delete().queue();
+                }else{
+                    event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                }
             }
         } else {
             event.getMessage().delete().queue();
@@ -3528,7 +3536,7 @@ public class ButtonHelper {
         }
         if (player.getTacticalCC() == 0 && !hadAnyUnplayedSCs && !player.isPassed()) {
             String msg = player.getRepresentation()
-                    + " you have the option to pre-pass, which means on your next turn, the bot automatically passes for you. This is entirely optional";
+                    + " you have the option to pre-pass, which means on your next turn, the bot automatically passes for you, no matter what happens. This is entirely optional and reversable";
             List<Button> scButtons = new ArrayList<>();
             scButtons.add(Button.success("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
             scButtons.add(Button.danger("deleteButtons", "Decline"));
@@ -6272,7 +6280,7 @@ public class ButtonHelper {
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
                     if (owningPlayer.getActionCards().containsKey("experimental") && model != null && "spacedock".equalsIgnoreCase(model.getBaseType())) {
-                        MessageHelper.sendMessageToChannel(owningPlayer.getCardsInfoThread(), owningPlayer.getRepresentation() +" this is a reminder that this is the window to play experimental battle station");
+                        MessageHelper.sendMessageToChannel(owningPlayer.getCardsInfoThread(), owningPlayer.getRepresentation() +" this is a reminder that this is the window to play experimental battlestation");
                         return;
                     }
                 }

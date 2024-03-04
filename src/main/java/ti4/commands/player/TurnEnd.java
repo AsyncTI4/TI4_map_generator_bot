@@ -91,6 +91,7 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setTemporaryPingDisable(false);
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         activeGame.setCurrentReacts("mahactHeroTarget","");
+        activeGame.setActiveSystem("");
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
