@@ -361,7 +361,6 @@ public class StartCombat extends CombatSubcommandData {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent", "Sol Agent").withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
-
         Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "kyroagent");
         if (!activeGame.isFoWMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
             String finChecker = "FFCC_" + kyro.getFaction() + "_";

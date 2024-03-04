@@ -2616,7 +2616,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), msg);
             }
             player = game.getPlayerFromColorOrFaction(faction);
-            msg = player.getRepresentation(true, true) + " " + msg + " using Mahact agent";
+            msg = player.getRepresentation(true, true) + " this is a notice that " + msg + " using Mahact agent";
         }
 
         if (player == null)
@@ -6106,6 +6106,21 @@ public class ButtonHelper {
         return tilesWithProduction;
     }
 
+    public static void increasePingCounter(Game reference, String playerID){
+        int count = 0;
+        if(reference.getFactionsThatReactedToThis("pingsFor"+playerID).isEmpty()){
+            count = 1;
+        }else{
+            count = Integer.parseInt(reference.getFactionsThatReactedToThis("pingsFor"+playerID))+1;
+        }
+        reference.setCurrentReacts("pingsFor"+playerID, ""+count);
+    }
+
+    public static void issueSecretCombatReminders(Game activeGame, Tile tile, List<Player> playersInCombat){
+        for(Player player : playersInCombat){
+
+        }
+    }
     public static List<Tile> getTilesOfUnitsWithBombard(Player player, Game game) {
         return game.getTileMap().values().stream()
                 .filter(tile -> tile.containsPlayersUnitsWithModelCondition(player,
@@ -6194,6 +6209,9 @@ public class ButtonHelper {
 
     public static List<Player> tileHasPDS2Cover(Player player, Game game, String tilePos) {
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, player, false, true);
+        for(Player p2 : game.getRealPlayers()){
+            adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
+        }
         List<Player> playersWithPds2 = new ArrayList<>();
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
@@ -6215,8 +6233,7 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model != null && model.getSpaceCannonDieCount() > 0 && (model.getDeepSpaceCannon()
-                            || tilePos.equalsIgnoreCase(adjTilePos) || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander")) ) {
+                    if (model != null && model.getSpaceCannonDieCount() > 0 && FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true).contains(adjTilePos) &&(model.getDeepSpaceCannon() || tilePos.equalsIgnoreCase(adjTilePos) || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander")) ) {
                         if (owningPlayer == player) {
                             if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos),
                                     game)) {
@@ -8605,6 +8622,9 @@ public class ButtonHelper {
         }
         if ("terraform".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
+        }
+        if("dspngled".equalsIgnoreCase("id")){
+            ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);
         }
         if ("iff".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
