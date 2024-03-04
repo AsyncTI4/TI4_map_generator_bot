@@ -471,6 +471,7 @@ public class MessageListener extends ListenerAdapter {
                                             }
                                         }
                                     }
+                                    ButtonHelper.increasePingCounter(mapreference, player.getUserID());
                                 }
                                 if (player != null) {
                                     player.setWhetherPlayerShouldBeTenMinReminded(false);

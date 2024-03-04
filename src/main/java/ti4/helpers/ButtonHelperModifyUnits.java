@@ -1184,7 +1184,7 @@ public class ButtonHelperModifyUnits {
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             } else {
-                if (!player.getSCs().contains(Integer.parseInt("4")) && "action".equalsIgnoreCase(activeGame.getCurrentPhase())) {
+                if (!player.getSCs().contains(Integer.parseInt("4")) && ("action".equalsIgnoreCase(activeGame.getCurrentPhase()) || activeGame.getCurrentAgendaInfo().contains("Strategy")) && !ButtonHelper.isPlayerElected(activeGame, player, "absol_minsindus")){
                     String color = player.getColor();
                     String tileID = AliasHandler.resolveTile(planetName.toLowerCase());
                     Tile tile = activeGame.getTile(tileID);
@@ -1588,8 +1588,9 @@ public class ButtonHelperModifyUnits {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), amount + " " + unitName + " " + planet, activeGame);
         if (buttonLabel.toLowerCase().contains("damaged")) {
-            activeGame.getTileByPosition(pos).addUnitDamage(planet, unitKey, amount);
             activeGame.getTileByPosition(pos).removeUnitDamage("space", unitKey, amount);
+            activeGame.getTileByPosition(pos).addUnitDamage(ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getName(), unitKey, amount);
+            
         }
          if (buttonLabel.toLowerCase().contains("damaged")) {
             unitName = "damaged "+unitName;

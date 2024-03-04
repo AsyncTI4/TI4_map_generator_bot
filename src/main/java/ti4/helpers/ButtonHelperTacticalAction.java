@@ -358,7 +358,10 @@ public class ButtonHelperTacticalAction {
 
     public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
         String message = "Moved all units to the space area.";
+        
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, tile.getPosition());
+       
         List<Button> systemButtons;
         boolean needPDSCheck = false;
         if (activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
@@ -449,7 +452,7 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.fullCommanderUnlockCheck(p2, activeGame, "empyrean", event);
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        if (needPDSCheck && !activeGame.getL1Hero()) {
+        if (needPDSCheck && !activeGame.getL1Hero() && playersWithPds2.size() > 0) {
             StartCombat.sendSpaceCannonButtonsToThread(ButtonHelper.getCorrectChannel(player, activeGame), activeGame,
                     player, tile);
         }

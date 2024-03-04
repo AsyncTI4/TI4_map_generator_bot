@@ -112,15 +112,11 @@ public class RevealAgenda extends AgendaSubcommandData {
                         speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
                     }
                     if (speaker != null) {
-                        Map.Entry<String, Integer> entry = activeGame.drawAgenda();
-                        if (entry == null) {
-                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "It appears there are no cards left in the agenda deck. Ping Fin or Jazz.");
-                        } else {
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(speaker.getRepresentation(true, true)).append(" this is the top agenda for Covert Legislation:");
-                            List<MessageEmbed> embeds = List.of(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
-                            MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, speaker, sb.toString(), embeds);
-                        }
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(speaker.getRepresentation(true, true)).append(" this is the top agenda for Covert Legislation:");
+                        List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
+                        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, speaker, sb.toString(), embeds);
+                        
                     }
                 }
             }

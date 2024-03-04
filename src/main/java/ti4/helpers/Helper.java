@@ -1360,6 +1360,9 @@ public class Helper {
                     if (uH instanceof Planet planet) {
                         productionValue = planet.getResources() + productionValue;
                     }
+                    if(ButtonHelper.isPlayerElected(activeGame, player, "absol_minsindus")){
+                        productionValue = productionValue+4;
+                    }
                 }
                 if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValue++;
