@@ -5200,7 +5200,7 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     String msg2 = "All players have indicated 'No Sabotage'";
                     if (activeGame.getMessageIDsForSabo().contains(messageId)) {
-                        String faction = "bob" + activeGame.getFactionsThatReactedToThis(messageId);
+                        String faction = "bob_" + activeGame.getFactionsThatReactedToThis(messageId)+"_";
                         faction = faction.split("_")[1];
                         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
                         if (p2 != null && !activeGame.isFoWMode()) {
@@ -5287,9 +5287,8 @@ public class ButtonListener extends ListenerAdapter {
             case "no_sabotage" -> {
                 String msg = "All players have indicated 'No Sabotage'";
                 if (activeGame.getMessageIDsForSabo().contains(event.getMessageId())) {
-                    String faction = activeGame.getFactionsThatReactedToThis(event.getMessageId());
-                    System.err.println(faction);
-                    faction = faction.split("_")[0];
+                    String faction = "bob_" + activeGame.getFactionsThatReactedToThis(event.getMessageId())+"_";
+                    faction = faction.split("_")[1];
                     Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
                     if (p2 != null && !activeGame.isFoWMode()) {
                         msg = p2.getRepresentation() + " " + msg;
