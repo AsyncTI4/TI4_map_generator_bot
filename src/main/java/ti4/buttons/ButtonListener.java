@@ -2251,13 +2251,15 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("probeStep2_")) {
             ButtonHelperActionCards.resolveProbeStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("salvageStep2_")) {
-            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);// "salvageOps_"
+            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("salvageOps_")) {
             ButtonHelperFactionSpecific.resolveSalvageOps(player, event, buttonID, activeGame);
         } else if (buttonID.startsWith("psStep2_")) {
             ButtonHelperActionCards.resolvePSStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep2_")) {
             ButtonHelperActionCards.resolvePlagueStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("micrometeoroidStormStep2_")) {
+            ButtonHelperActionCards.resolveMicrometeoroidStormStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep2_")) {
             ButtonHelperActionCards.resolveCrippleStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("infiltrateStep2_")) {
@@ -2266,6 +2268,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveSpyStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep3_")) {
             ButtonHelperActionCards.resolvePlagueStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("micrometeoroidStormStep3_")) {
+            ButtonHelperActionCards.resolveMicrometeoroidStormStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep3_")) {
             ButtonHelperActionCards.resolveCrippleStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("infiltrateStep3_")) {
@@ -2470,6 +2474,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame);
+        } else if (buttonID.startsWith("gledgeBasePlanet_")) {
+            ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("veldyrAttach_")) {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
@@ -3963,6 +3969,8 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
                 case "resolvePlagueStep1" ->
                     ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
+                case "resolveMicrometeoroidStormStep1" ->
+                    ButtonHelperActionCards.resolveMicrometeoroidStormStep1(player, activeGame, event, buttonID);
                 case "resolveCrippleDefensesStep1" ->
                     ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
                 case "resolveInfiltrateStep1" ->

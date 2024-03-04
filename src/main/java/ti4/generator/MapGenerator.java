@@ -3436,6 +3436,16 @@ public class MapGenerator {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 70, TILE_PADDING + 45, null);
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
+                    boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
+                
+                    if (isMirage) {
+                        if (position == null) {
+                            position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);
+                        } else {
+                            position.x += Constants.MIRAGE_POSITION.x;
+                            position.y += Constants.MIRAGE_POSITION.y;
+                        }
+                    }
                     if (position != null) {
                         tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y, null);
                         rectangles.add(new Rectangle(TILE_PADDING + position.x, TILE_PADDING + position.y, tokenImage.getWidth(), tokenImage.getHeight()));

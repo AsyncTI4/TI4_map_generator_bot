@@ -99,8 +99,10 @@ public class PlanetAdd extends PlanetAddRemove {
                         activeGame.scorePublicObjective(player.getUserID(), shardID);
                         Helper.checkEndGame(activeGame, player);
                     }
-                    String msg = player_.getRepresentation() + " has a window to play reparations for the taking of " + planet;
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    if(Mapper.getPlanet(planet) != null){
+                        String msg = player_.getRepresentation() + " has a window to play reparations for the taking of " + Mapper.getPlanet(planet).getName();
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    }
                     if (moveTitanPN) {
                         if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)) {
                             player_.removePromissoryNote(Constants.TERRAFORM);
@@ -118,6 +120,14 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
+            if(alreadyOwned && "mirage".equalsIgnoreCase(planet)){
+                Planet planetReal = (Planet) unitHolder;
+                List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
+                if (event != null && buttons != null && !buttons.isEmpty()) {
+                    String message = ButtonHelper.getIdent(player)+" Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+                }
+            }
             alreadyOwned = false;
         }
         if(!activeGame.getCurrentPhase().contains("agenda")){
