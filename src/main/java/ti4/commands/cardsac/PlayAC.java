@@ -315,6 +315,12 @@ public class PlayAC extends ACCardsSubcommandData {
                         "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
+            codedName = "Micrometeoroid Storm";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveMicrometeoroidStormStep1",
+                        "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
             codedName = "Upgrade";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(
