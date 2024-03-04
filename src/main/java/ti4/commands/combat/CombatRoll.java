@@ -205,7 +205,7 @@ public class CombatRoll extends CombatSubcommandData {
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player,
                 opponent,
-                activeGame, rollType, event);
+                activeGame, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*","");
         int h = Integer.parseInt(hits);
