@@ -1452,7 +1452,7 @@
     "alias": "secured_trove",
     "name": "Secured Trove",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Purge any 2 of your relic fragments to gain 1 relic.",
     "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
     "source": "ds"
@@ -1461,7 +1461,7 @@
     "alias": "secured_trove2",
     "name": "Secured Trove",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Purge any 2 of your relic fragments to gain 1 relic.",
     "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
     "source": "ds"
@@ -1470,7 +1470,7 @@
     "alias": "free_trade_network",
     "name": "Free Trade Initiative",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "For each planet trait, if you control a planet of that trait, gain 2 commodities or convert 2 of your commodities to trade goods.",
     "flavorText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
     "source": "ds"
@@ -1488,7 +1488,7 @@
     "alias": "psionic_hammer",
     "name": "Neural Hammer",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Choose 1 player with the most victory points. Look at up to 1 of their unscored secret objectives, at random.",
     "flavorText": "The Cymiaen locked eyes with the diplomat. It didn't move again until the screams had stopped.",
     "source": "ds"
@@ -1551,7 +1551,7 @@
     "alias": "planetary_rigs",
     "name": "Planetary Rigs",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet's corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
     "flavorText": "Gledge dig deep, and certainly greedily, but they're the best at it.",
     "source": "ds"
@@ -1560,7 +1560,7 @@
     "alias": "planetary_rigs2",
     "name": "Planetary Rigs",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet's corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
     "flavorText": "Gledge dig deep, and certainly greedily, but they're the best at it.",
     "source": "ds"
@@ -1623,7 +1623,7 @@
     "alias": "remnant_collection",
     "name": "Remnant Collection",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Purge any number of your relic fragments to draw an equal number of action cards.",
     "flavorText": "Vassa Hagi wasn't entirely certain what would happen next, but the relics would be lost forever, and that was enough.",
     "source": "ds"
@@ -1758,7 +1758,7 @@
     "alias": "micrometeoroid_storm_ds",
     "name": "Micrometeoroid Storm",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Choose 1 system that contains another player's ships. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
     "flavorText": "“Invaders. Destruction. Pain.” The stone churned angrily. “Hatred. Judgment. Fear.”",
     "source": "ds"
@@ -1767,7 +1767,7 @@
     "alias": "professional_archeologists",
     "name": "Professional Archeologists",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
@@ -1776,7 +1776,7 @@
     "alias": "professional_archeologists2",
     "name": "Professional Archeologists",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
@@ -1785,7 +1785,7 @@
     "alias": "professional_archeologists3",
     "name": "Professional Archeologists",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
@@ -1794,7 +1794,7 @@
     "alias": "professional_archeologists4",
     "name": "Professional Archeologists",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
@@ -1821,7 +1821,7 @@
     "alias": "personnel_writ",
     "name": "Personnel Writ",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Ready your agent or spend 1 command token from your strategy pool to unlock your commander.",
     "flavorText": "\"Come,\" Allant's voice softly carried like distant thunder, \"you have been chosen.\"",
     "source": "ds"
@@ -1830,7 +1830,7 @@
     "alias": "preparation",
     "name": "Preparation",
     "phase": "Action",
-    "window": "ACTION:",
+    "window": "Action",
     "text": "Draw 1 action card.",
     "flavorText": "The choice was an illusion, the game decided from the first move.",
     "source": "ds"

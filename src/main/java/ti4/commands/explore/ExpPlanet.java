@@ -26,6 +26,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -125,6 +126,20 @@ public class ExpPlanet extends ExploreSubcommandData {
                     MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
                     return;
                 }
+            }
+        }
+        if (player.hasAbility("deep_mining")) {
+            
+            UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+            if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0  || unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0 ) {
+                if (!NRACheck) {
+                    String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain tg instead of explore) ability.";
+                    Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain Tg instead of exploring");
+                    Button resolveExplore2 = Button.danger("deep_mining_decline_" + planetName + "_" + drawColor, "Choose to Explore");
+                    List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    return;
+                } 
             }
         }
 
