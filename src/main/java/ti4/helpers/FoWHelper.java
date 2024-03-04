@@ -265,7 +265,7 @@ public class FoWHelper {
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
 		adjacentPositions.addAll(wormholeAdjacencies);
 		
-		if(game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander") && player == game.getActivePlayer() && !game.getActiveSystem().isEmpty() && game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0){
+		if(player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander") && player == game.getActivePlayer() && !game.getActiveSystem().isEmpty() && game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0){
 			Collection<Tile> tileList = game.getTileMap().values();
 			List<String> frontierTileList = Mapper.getFrontierTileIds();
 			for (Tile tile : tileList) {
