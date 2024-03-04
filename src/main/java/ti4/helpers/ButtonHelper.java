@@ -5325,7 +5325,7 @@ public class ButtonHelper {
         message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers,
                 tempMods, player,
                 opponent,
-                game, rollType, event);
+                game, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
