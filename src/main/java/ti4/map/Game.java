@@ -2957,20 +2957,37 @@ public class Game {
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        if (getDiscardActionCards().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **"
-                    + deck.getName() + "** while there are action cards in the discard pile.");
-            return false;
-        }
-        for (Player player : getPlayers().values()) {
-            if (player.getActionCards().size() > 0) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **"
-                        + deck.getName() + "** while there are action cards in player hands.");
-                return false;
+        boolean shuffledExtrasIn = false;
+        List<String> oldDeck = new ArrayList<>();
+        oldDeck.addAll(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
+        List<String> newDeck = new ArrayList<>();
+        setAcDeckID(deck.getAlias());
+        newDeck.addAll(deck.getNewShuffledDeck());
+        for(String ac : oldDeck){
+            if(newDeck.contains(ac)){
+                newDeck.remove(ac);
             }
         }
-        setAcDeckID(deck.getAlias());
-        setActionCards(deck.getNewShuffledDeck());
+        if (getDiscardActionCards().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
+            shuffledExtrasIn = true;
+        }else{
+            for (Player player : getPlayers().values()) {
+                if (player.getActionCards().size() > 0) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
+                    shuffledExtrasIn = true;
+                    break;
+                }
+            }
+        }
+        if(!shuffledExtrasIn){
+            setActionCards(deck.getNewShuffledDeck());
+        }else{
+            for(String acID : newDeck){
+                actionCards.add(acID);
+            }
+            Collections.shuffle(actionCards);
+        }
         return true;
     }
 

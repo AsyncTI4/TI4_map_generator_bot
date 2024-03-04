@@ -347,6 +347,26 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
+    public static void resolveFreeTrade(Game activeGame, Player player, ButtonInteractionEvent event) {
+        Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG")
+        .withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities")
+                .withEmoji(Emoji.fromFormatted(Emojis.comm));
+        List<Button> buttons = List.of(convert2CommButton, get2CommButton, Button.danger("deleteButtons", "Done resolving"));
+        String message = "Use buttons to gain or convert comms as appropriate. You can trade in this window/in between gaining comms";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolvePreparation(Game activeGame, Player player, ButtonInteractionEvent event){
+        String message = "Use button to draw an AC";
+        List<Button> buttons = new ArrayList<>();
+        if (player.hasAbility("scheming")) {
+            buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+        } else {
+            buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),message, buttons);
+    }
 
     public static void resolveHarnessEnergy(Game activeGame, Player player, ButtonInteractionEvent event) {
         String message = ButtonHelper.getIdent(player) + " Replenished Commodities (" + player.getCommodities() + "->"
@@ -703,6 +723,11 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " tell the bot who's planet you want to plague",
                 buttons);
+    }
+    public static void resolveEBSStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
+        activeGame.setCurrentReacts("EBSFaction", player.getFaction());
+        ButtonHelper.resolveCombatRoll(player, activeGame, event, "combatRoll_" + activeGame.getActiveSystem() + "_space_spacecannonoffence");
+        event.getMessage().delete().queue();
     }
     public static void resolveMicrometeoroidStormStep1(Player player, Game activeGame, ButtonInteractionEvent event,
             String buttonID) {

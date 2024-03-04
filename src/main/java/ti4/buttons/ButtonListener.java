@@ -836,6 +836,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("deep_mining_")) {
+            ButtonHelperAbilities.deepMining(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {// "autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1],
                     Integer.parseInt(buttonID.split("_")[2]), event);
@@ -3557,8 +3559,10 @@ public class ButtonListener extends ListenerAdapter {
                             && !player.hasLeaderUnlocked("mykomentoricommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
                     }
-                    ButtonHelper.addReaction(event, false, false, message, "");
-                    event.getMessage().delete().queue();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    if(event.getMessage().getContentRaw().contains("explore")){
+                        event.getMessage().delete().queue();
+                    }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
@@ -3586,9 +3590,10 @@ public class ButtonListener extends ListenerAdapter {
                         player.setCommodities(0);
                         message = "Converted all remaining commodies (less than 2) into tg";
                     }
-                    ButtonHelper.addReaction(event, false, false, message, "");
-
-                    event.getMessage().delete().queue();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    if(event.getMessage().getContentRaw().contains("explore")){
+                        event.getMessage().delete().queue();
+                    }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
@@ -3967,6 +3972,8 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
                 case "resolvePlagueStep1" ->
                     ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
+                case "resolveEBSStep1" ->
+                    ButtonHelperActionCards.resolveEBSStep1(player, activeGame, event);
                 case "resolveMicrometeoroidStormStep1" ->
                     ButtonHelperActionCards.resolveMicrometeoroidStormStep1(player, activeGame, event, buttonID);
                 case "resolveCrippleDefensesStep1" ->
@@ -3986,6 +3993,8 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);
                 case "resolveABSStep1" -> ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
                 case "resolveWarEffort" -> ButtonHelperActionCards.resolveWarEffort(activeGame, player, event);
+                case "resolveFreeTrade" -> ButtonHelperActionCards.resolveFreeTrade(activeGame, player, event);
+                case "resolvePreparation" -> ButtonHelperActionCards.resolvePreparation(activeGame, player, event);
                 case "resolveInsiderInformation" ->
                     ButtonHelperActionCards.resolveInsiderInformation(player, activeGame, event);
                 case "resolveEmergencyMeeting" ->
