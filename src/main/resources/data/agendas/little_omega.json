@@ -351,7 +351,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: Each player with the fewest victory points places 1 infantry from their reinforcements on each planet they control.",
-        "text2": "Against: Each player who cast votes \"Against\" or abstained gives 1 promissory note from their hand to a player with the fewest victory.",
+        "text2": "Against: Each player who cast votes \"Against\" or abstained gives 1 promissory note from their hand to another player with the fewest victory.",
         "source": "little_omega"
     },
     {
