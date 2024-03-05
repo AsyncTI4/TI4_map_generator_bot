@@ -1277,5 +1277,24 @@ public class ButtonHelperAbilities {
 
         event.getMessage().delete().queue();
     }
+    public static void deepMining(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String bID = buttonID.replace("deep_mining_", "");
+        String[] info = bID.split("_");
+        String message;
+        if ("decline".equalsIgnoreCase(info[0])) {
+            message = player.getFactionEmoji() + " declined to use their Deep Mining ability";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
+                player, true, activeGame, 1, false);
+        } else {
+            message = player.getFactionEmoji() + " used their Deep Mining ability to gain a tg (tg went from "+player.getTg()+"-> "+(player.getTg()+1)+")";
+            player.setTg(player.getTg()+1);
+            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+            ButtonHelperAbilities.pillageCheck(player, activeGame);
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        }
+
+        event.getMessage().delete().queue();
+    }
 
 }

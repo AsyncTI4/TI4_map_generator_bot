@@ -1991,12 +1991,12 @@ public class ButtonHelper {
                 }
                 UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 float hitChance = 0;
-                if (removedUnit.getAfbDieCount() > 0) {
-                    hitChance = (((float) 11.0 - removedUnit.getAfbHitsOn()) / 10);
+                if (removedUnit.getAfbDieCount(player, game) > 0) {
+                    hitChance = (((float) 11.0 - removedUnit.getAfbHitsOn(player, game)) / 10);
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
-                    count = count + removedUnit.getAfbDieCount() * hitChance * uh.getUnits().get(unit);
+                    count = count + removedUnit.getAfbDieCount(player, game) * hitChance * uh.getUnits().get(unit);
                 }
                 if (removedUnit.getSpaceCannonDieCount() > 0) {
                     hitChance = (((float) 11.0 - removedUnit.getSpaceCannonHitsOn()) / 10);
@@ -2616,7 +2616,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), msg);
             }
             player = game.getPlayerFromColorOrFaction(faction);
-            msg = player.getRepresentation(true, true) + " " + msg + " using Mahact agent";
+            msg = player.getRepresentation(true, true) + " this is a notice that " + msg + " using Mahact agent";
         }
 
         if (player == null)
@@ -2841,6 +2841,7 @@ public class ButtonHelper {
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
         int buttons = 0;
+        String id = "br";
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
@@ -2849,6 +2850,9 @@ public class ButtonHelper {
             }
             if (buttonRow.size() > 0) {
                 buttons = buttons + buttonRow.size();
+                if(buttonRow.get(0) instanceof Button butt){
+                    id = butt.getId();
+                }
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
@@ -2856,7 +2860,11 @@ public class ButtonHelper {
             if(exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1){
                 event.getMessage().delete().queue();
             }else{
-                event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                if(buttons == 1 && id.equalsIgnoreCase("deleteButtons")){
+                    event.getMessage().delete().queue();
+                }else{
+                    event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                }
             }
         } else {
             event.getMessage().delete().queue();
@@ -3528,7 +3536,7 @@ public class ButtonHelper {
         }
         if (player.getTacticalCC() == 0 && !hadAnyUnplayedSCs && !player.isPassed()) {
             String msg = player.getRepresentation()
-                    + " you have the option to pre-pass, which means on your next turn, the bot automatically passes for you. This is entirely optional";
+                    + " you have the option to pre-pass, which means on your next turn, the bot automatically passes for you, no matter what happens. This is entirely optional and reversable";
             List<Button> scButtons = new ArrayList<>();
             scButtons.add(Button.success("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
             scButtons.add(Button.danger("deleteButtons", "Decline"));
@@ -5317,7 +5325,7 @@ public class ButtonHelper {
         message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers,
                 tempMods, player,
                 opponent,
-                game, rollType, event);
+                game, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
@@ -6106,6 +6114,21 @@ public class ButtonHelper {
         return tilesWithProduction;
     }
 
+    public static void increasePingCounter(Game reference, String playerID){
+        int count = 0;
+        if(reference.getFactionsThatReactedToThis("pingsFor"+playerID).isEmpty()){
+            count = 1;
+        }else{
+            count = Integer.parseInt(reference.getFactionsThatReactedToThis("pingsFor"+playerID))+1;
+        }
+        reference.setCurrentReacts("pingsFor"+playerID, ""+count);
+    }
+
+    public static void issueSecretCombatReminders(Game activeGame, Tile tile, List<Player> playersInCombat){
+        for(Player player : playersInCombat){
+
+        }
+    }
     public static List<Tile> getTilesOfUnitsWithBombard(Player player, Game game) {
         return game.getTileMap().values().stream()
                 .filter(tile -> tile.containsPlayersUnitsWithModelCondition(player,
@@ -6194,6 +6217,9 @@ public class ButtonHelper {
 
     public static List<Player> tileHasPDS2Cover(Player player, Game game, String tilePos) {
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, player, false, true);
+        for(Player p2 : game.getRealPlayers()){
+            adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
+        }
         List<Player> playersWithPds2 = new ArrayList<>();
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
@@ -6215,8 +6241,7 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model != null && model.getSpaceCannonDieCount() > 0 && (model.getDeepSpaceCannon()
-                            || tilePos.equalsIgnoreCase(adjTilePos) || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander")) ) {
+                    if (model != null && model.getSpaceCannonDieCount() > 0 && FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true).contains(adjTilePos) &&(model.getDeepSpaceCannon() || tilePos.equalsIgnoreCase(adjTilePos) || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander")) ) {
                         if (owningPlayer == player) {
                             if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos),
                                     game)) {
@@ -6255,7 +6280,7 @@ public class ButtonHelper {
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
                     if (owningPlayer.getActionCards().containsKey("experimental") && model != null && "spacedock".equalsIgnoreCase(model.getBaseType())) {
-                        MessageHelper.sendMessageToChannel(owningPlayer.getCardsInfoThread(), owningPlayer.getRepresentation() +" this is a reminder that this is the window to play experimental battle station");
+                        MessageHelper.sendMessageToChannel(owningPlayer.getCardsInfoThread(), owningPlayer.getRepresentation() +" this is a reminder that this is the window to play experimental battlestation");
                         return;
                     }
                 }
@@ -8605,6 +8630,9 @@ public class ButtonHelper {
         }
         if ("terraform".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
+        }
+        if("dspngled".equalsIgnoreCase("id")){
+            ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);
         }
         if ("iff".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
