@@ -138,8 +138,8 @@
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
-    "window": "At the end of a round of space combat",
-    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities.",
+    "window": "At the start of a round of space combat",
+    "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
     "source": "action_deck_2"
   },
@@ -148,7 +148,7 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player who voted for the resolved outcome gain 2 trade goods.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player that voted for the resolved outcome gain 2 trade goods.",
     "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },
@@ -229,7 +229,7 @@
     "name": "Diverse Strategies",
     "phase": "Any",
     "window": "When you would perform the primary ability of a strategy card",
-    "text": "Perform the secondary ability of any 2 strategy cards instead; while performing these abilities, spend command tokens from your reinforcements instead of your strategy pool. [Note: You cannot choose the same strategy card twice.]",
+    "text": "Perform the secondary ability of any 2 strategy cards instead; while performing those abilities, spend command tokens from your reinforcements instead of your strategy pool. [Note: You cannot choose the same strategy card twice.]",
     "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
     "source": "action_deck_2"
   },
@@ -273,9 +273,9 @@
     "alias": "escape_route",
     "name": "Escape Route",
     "phase": "Action",
-    "window": "Before you assign hits to your ships during a space combat",
-    "text": "If you announced a retreat, cancel up to 2 hits. During this combat, treat each system that contains 1 of your space docks as adjacent to this system.",
-    "flavorText": "These were ancient routes, forgotten by time and kept secret by the Argent for use during their migration protocols. However, the Mahact remembered them well.",
+    "window": "At the start of the \"Announce Retreats\" step",
+    "text": "During this combat, you treat each system that contains 1 of your space docks as adjacent to this system when you announce or resolve a retreat. If you announce a retreat, you may reroll any die your opponent rolls.",
+    "flavorText": "These were ancient routes, forgotten by time and kept secret by the Argent for use during their migration protocols.",
     "source": "action_deck_2"
   },
   {
@@ -409,7 +409,7 @@
     "name": "Kickbacks",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for that outcome must give you 1 promissory note from their hand.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome must give you 1 promissory note from their hand.",
     "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
@@ -463,7 +463,7 @@
     "name": "Patronage",
     "phase": "Status",
     "window": "After the speaker reveals a public objective",
-    "text": "Look at the top 2 cards of the matching public objective deck; you may reveal 1 of these cards and purge the objective the speaker revealed.",
+    "text": "Look at the top 2 cards of the matching public objective deck; you may reveal 1 of those cards and purge the objective the speaker revealed.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of tradition.",
     "source": "action_deck_2"
   },
@@ -661,7 +661,7 @@
     "name": "Spatial Collapse",
     "phase": "Action",
     "window": "Action",
-    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex system and the Wormhole Nexus; one of the systems must contain your ships.",
+    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex system and the Wormhole Nexus; one of the chosen systems must contain your ships.",
     "flavorText": "The reports were so unbelievable that Rin had chosen to witness the event firsthand. Defying all she knew, the spatial dimension had twisted into a mockery of itself, leaving the nearby galaxies nearly perfectly mirrored in position.",
     "source": "action_deck_2"
   },
@@ -725,7 +725,7 @@
     "phase": "Action",
     "window": "After 1 of your non-fighter ships is destroyed during a space combat",
     "text": "Place 3 fighters in the active system.",
-    "flavorText": "Many researchers questioned why the Naalu's prescience had not guided them toward a path of excessive caution. Ta Zern postulated that it is linked to their excessive confidence.",
+    "flavorText": "Many researchers have questioned why the Naalu's prescience did not lead them toward a path of excessive caution. Ta Zern postulated that it was linked to their excessive confidence.",
     "source": "action_deck_2"
   },
   {
