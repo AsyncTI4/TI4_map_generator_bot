@@ -499,7 +499,7 @@
     "name": "Proxy War",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "During this turn, until you activate another player's home system, players treat all promissory notes in play areas as blank.",
+    "text": "During this turn, until you activate another player's home system, players treat all promissory notes as blank.",
     "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as an entire fleet of unmarked ships poured forth from the wormhole, raining destruction upon the unsuspecting convoy. Reports be damned, these were no mere pirates.",
     "source": "action_deck_2"
   },
