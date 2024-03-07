@@ -270,7 +270,7 @@
         "name": "Ne Ruk",
         "title": "Secret Keeper",
         "abilityWindow": "Before a player votes on an agenda:",
-        "abilityText": "You may exhaust this card. that player must give you an action card from their hand or abstain.",
+        "abilityText": "Exhaust this card. If you do and that player does not abstain, they must give you an action card from their hand.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     }
