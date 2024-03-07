@@ -2830,6 +2830,54 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static List<Button> getButtonsToExploreReadiedPlanets(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String plan : player.getPlanetsAllianceMode()) {
+            UnitHolder planetUnit = game.getPlanetsInfo().get(plan);
+            Planet planetReal = (Planet) planetUnit;
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && !player.getExhaustedPlanets().contains(planetReal.getName())) {  
+                String planetType = planetReal.getOriginalPlanetType();
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
+                Set<String> explorationTraits = new HashSet<>();
+                if (("industrial".equalsIgnoreCase(planetType) || "cultural".equalsIgnoreCase(planetType)
+                        || "hazardous".equalsIgnoreCase(planetType))) {
+                    explorationTraits.add(planetType);
+                }
+                if (planetReal.getTokenList().contains("attachment_titanspn.png")) {
+                    explorationTraits.add("cultural");
+                    explorationTraits.add("industrial");
+                    explorationTraits.add("hazardous");
+                }
+                if (planetReal.getTokenList().contains("attachment_industrialboom.png")) {
+                    explorationTraits.add("industrial");
+                }
+                if (player.hasAbility("black_markets") && explorationTraits.size() > 0) {
+                    String traits = ButtonHelperFactionSpecific.getAllOwnedPlanetTypes(player, game);
+                    if (traits.contains("industrial")) {
+                        explorationTraits.add("industrial");
+                    }
+                    if (traits.contains("cultural")) {
+                        explorationTraits.add("cultural");
+                    }
+                    if (traits.contains("hazardous")) {
+                        explorationTraits.add("hazardous");
+                    }
+                }
+
+                for (String trait : explorationTraits) {
+                    String buttonId = "movedNExplored_dsdihmy_filler_" + planetId + "_" + trait;
+                    String buttonMessage = "Explore " + planetRepresentation
+                            + (explorationTraits.size() > 1 ? " as " + trait : "");
+                    Emoji emoji = Emoji.fromFormatted(Emojis.getEmojiFromDiscord(trait));
+                    Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
+                    buttons.add(button);
+                }
+            }
+        }
+        return buttons;
+    }
+
     public static List<Button> getButtonsForAgentSelection(Game game, String agent) {
         return AgendaHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
     }
@@ -7431,7 +7479,7 @@ public class ButtonHelper {
             TechnologyType techType = techRep.getType();
             String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
             String techText = techRep.getText();
-
+            
             if (techText.contains("ACTION")) {
                 if ("lgf".equals(tech) && !p1.getPlanets().contains("mr")) {
                     continue;
