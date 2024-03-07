@@ -177,6 +177,11 @@ public class TechExhaust extends TechAddRemove {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to Sling a ship into.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
+            case "dsdihmy" -> { // Impressment Programs
+                List<Button> buttons = ButtonHelper.getButtonsToExploreReadiedPlanets(player, activeGame);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select a planet to explore", buttons);
+                sendNextActionButtonsIfButtonEvent(event, activeGame, player);
+            }
             default -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This tech is not automated. Please resolve manually.");
             }

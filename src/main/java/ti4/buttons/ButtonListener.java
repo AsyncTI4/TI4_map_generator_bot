@@ -215,7 +215,10 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("umbatTile_")) {
             ButtonHelperAgents.umbatTile(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("dihmohnfs_")) {
-            ButtonHelperFactionSpecific.resolveDihmohnFlagship(buttonID, event, activeGame, player, ident);    
+            ButtonHelperFactionSpecific.resolveDihmohnFlagship(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("dsdihmy_")) {
+            event.getMessage().delete().queue();
+            ButtonHelperFactionSpecific.resolveImpressmentPrograms(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("spendStratNReadyAgent_")) {
             ButtonHelperAgents.resolveAbsolHyperAgentReady(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("get_so_score_buttons")) {
@@ -756,9 +759,26 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, false, false, null, "");
         } else if (buttonID.startsWith("movedNExplored_")) {
             String bID = buttonID.replace("movedNExplored_", "");
+            boolean dsdihmy = false;
+            if(bID.startsWith("dsdihmy_")) {
+                bID = bID.replace("dsdihmy_", "");
+                dsdihmy = true;
+            }
             String[] info = bID.split("_");
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2], player, false,
                     activeGame, 1, false);
+            if(dsdihmy) {
+                player.exhaustPlanet(info[1]);
+                MessageHelper.sendMessageToChannel(actionsChannel, info[1] + " was exhausted by Impressment Programs!");    
+            }
+            if(player.getTechs().contains("dsdihmy")) {
+                List<Button> produce = new ArrayList<>();
+                String pos = activeGame.getTileFromPlanet(info[1]).getPosition();
+                produce.add(Button.primary("dsdihmy_" + pos,"Produce (1) Units"));
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation()
+                        + " You explored a planet and due to Impressment Programs you may produce 1 ship in the system.", produce); 
+            }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveExp_Look_")) {
             String deckType = buttonID.replace("resolveExp_Look_", "");

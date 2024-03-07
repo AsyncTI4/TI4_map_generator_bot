@@ -401,7 +401,7 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation()
                         + " Your Dih-Mohn Flagship moved into the active system and you can produce 2 units with a combined cost of 4.", produce);        
-                    }
+            }
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             ButtonHelperFactionSpecific.checkForStymie(activeGame, player, tile);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
