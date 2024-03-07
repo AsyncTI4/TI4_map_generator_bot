@@ -849,6 +849,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+   
     public static void finishLanding(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         if (!event.getMessage().getContentRaw().contains("Moved all units to the space area.")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
@@ -856,7 +857,12 @@ public class ButtonHelperModifyUnits {
 
         String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, activeGame, event);
-        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        Tile tile = null;
+        if(buttonID.contains("_")){
+            tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        }else{
+            activeGame.getTileByPosition(activeGame.getActiveSystem());
+        }
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if ("space".equalsIgnoreCase(unitHolder.getName())) {
                 continue;
