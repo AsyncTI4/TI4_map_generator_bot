@@ -1321,6 +1321,8 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.exhaustForVotes(event, player, activeGame, buttonID);
         } else if (buttonID.startsWith("diplo_")) {
             ButtonHelper.resolveDiploPrimary(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("doneLanding_")) {
+            ButtonHelperModifyUnits.finishLanding(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("doneWithOneSystem_")) {
             ButtonHelperTacticalAction.finishMovingFromOneTile(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("cavStep2_")) {
@@ -2578,6 +2580,8 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Put " + agenda.getName() + " on the top of the agenda deck.");
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("resolveCounterStroke_")) {
+            ButtonHelperActionCards.resolveCounterStroke(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("primaryOfWarfare")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "warfare");
             MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);

@@ -330,6 +330,15 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         event.getMessage().delete().queue();
     }
+    public static void resolveCounterStroke(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(buttonID.split("_")[1]),
+                activeGame);
+        String message = ButtonHelper.getIdent(player) + " removed their CC from tile " + buttonID.split("_")[1]
+                + " using counterstroke and gained it to their tactics";
+        player.setTacticalCC(player.getTacticalCC() + 1);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveSummit(Game activeGame, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
@@ -1781,14 +1790,17 @@ public class ButtonHelperActionCards {
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
                 if ("unitupgrade".equalsIgnoreCase(Mapper.getTech(tech).getType().toString())) {
+                    boolean hasSpecialUpgrade = false;
                     for (String factionTech : player.getNotResearchedFactionTechs()) {
                         TechnologyModel fTech = Mapper.getTech(factionTech);
                         if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
                                 && "unitupgrade".equalsIgnoreCase(fTech.getType().toString())
                                 && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
-                        }else{
-                            techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
+                                    hasSpecialUpgrade = true;
                         }
+                    }
+                    if(!hasSpecialUpgrade){
+                        techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
                     }
                 }else{
                     techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));

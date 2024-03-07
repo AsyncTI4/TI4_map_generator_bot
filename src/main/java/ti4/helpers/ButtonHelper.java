@@ -3994,6 +3994,36 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    public static List<Button> getAbsolOrbitalButtons(Game activeGame, Player player) {
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        List<Button> buttons = new ArrayList<>();
+        for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
+            if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                continue;
+            }
+            Planet planetReal = (Planet) planetUnit;
+            String planet = planetReal.getName();
+            if (player.getPlanetsAllianceMode().contains(planet)
+                    && planetUnit.getUnitCount(UnitType.Spacedock, player.getColor()) < 1) {
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
+                buttons.add(Button
+                        .success("addAbsolOrbital_" + activeGame.getActiveSystem() + "_" + planetId,
+                                 planetRepresentation)
+                        .withEmoji(Emoji.fromFormatted(Emojis.Absol)));
+            }
+        }
+        return buttons;
+    }
+    public static void addAbsolOrbital(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        UnitHolder uH = tile.getUnitHolders().get(buttonID.split("_")[2]);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "plenaryorbital "+uH.getName(), activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()+" added an absol plenary orbital to "+Mapper.getPlanet(uH.getName()).getName());
+        player.addOwnedUnitByID("plenaryorbital");
+        event.getMessage().delete().queue();
+
+    }
     public static List<Button> scanlinkResolution(Player player, Game game, ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
@@ -4545,7 +4575,7 @@ public class ButtonHelper {
             }
 
         }
-        Button concludeMove = Button.secondary(finChecker + "doneLanding", "Done landing troops");
+        Button concludeMove = Button.secondary(finChecker + "doneLanding_"+tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
         if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
             commanderUnlockCheck(player, game, "naaz", event);
