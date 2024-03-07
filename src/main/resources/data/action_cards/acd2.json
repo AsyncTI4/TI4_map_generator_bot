@@ -156,9 +156,9 @@
     "alias": "crisis_management",
     "name": "Crisis Management",
     "phase": "Action",
-    "window": "Action",
-    "text": "Pass. Then, perform the secondary ability of 1 readied or unchosen strategy card; if that card is readied, spend command tokens from your reinforcements instead of your strategy pool when performing that ability. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
-    "flavorText": "\"They've stretched themselves to the brink of destruction. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Elder Junn shook his head. \"We must remain focused. Steady.\"",
+    "window": "After you pass",
+    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that card is readied, spend command tokens from your reinforcements instead of your strategy pool when performing that ability.",
+    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Elder Junn sighed. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
   {
