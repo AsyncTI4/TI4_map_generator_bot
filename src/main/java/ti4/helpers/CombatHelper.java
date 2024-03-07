@@ -291,8 +291,8 @@ public class CombatHelper {
 
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
             .filter(entry -> entry.getKey() != null
-                && entry.getKey().getSpaceCannonDieCount() > 0
-                && (entry.getKey().getDeepSpaceCannon() || activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")))
+                && entry.getKey().getSpaceCannonDieCount(player, activeGame) > 0
+                && (entry.getKey().getDeepSpaceCannon() || activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander") || (entry.getKey().getBaseType().equalsIgnoreCase("spacedock"))))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (var entry : adjacentOutput.entrySet()) {
@@ -355,7 +355,7 @@ public class CombatHelper {
         List<NamedCombatModifierModel> extraRolls,
         List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
         Player opponent,
-        Game activeGame, CombatRollType rollType, GenericInteractionCreateEvent event) {
+        Game activeGame, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
 
         String result = "";
 
@@ -373,27 +373,30 @@ public class CombatHelper {
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
         List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
         int totalMisses = 0;
-        UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space");
+        UnitHolder space = activeSystem.getUnitHolders().get("space");
         String extra = "";
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
-            int toHit = unit.getCombatDieHitsOnForAbility(rollType);
+            int toHit = unit.getCombatDieHitsOnForAbility(rollType, player, activeGame);
             int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, mods, player, opponent,
                 activeGame,
                 playerUnitsList, opponentUnitsList, rollType);
             int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, extraRolls, player,
                 opponent,
                 activeGame, playerUnitsList, opponentUnitsList, rollType);
-            int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
+            int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType, player, activeGame);
             boolean extraRollsCount = false;
             if((numRollsPerUnit > 1 || extraRollsForUnit > 0) && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
                 extraRollsCount = true;
                 numRollsPerUnit = 1;
                 extraRollsForUnit = 0;
             }
-
+            if(rollType == CombatRollType.SpaceCannonOffence && numRollsPerUnit == 3 && unit.getBaseType().equalsIgnoreCase("spacedock")){
+                numOfUnit = 1;
+                activeGame.setCurrentReacts("EBSFaction", "");
+            }
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));

@@ -858,6 +858,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("deep_mining_")) {
+            ButtonHelperAbilities.deepMining(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {// "autoAssignGroundHits_"
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, activeGame, buttonID.split("_")[1],
                     Integer.parseInt(buttonID.split("_")[2]), event);
@@ -2271,13 +2273,15 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("probeStep2_")) {
             ButtonHelperActionCards.resolveProbeStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("salvageStep2_")) {
-            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);// "salvageOps_"
+            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("salvageOps_")) {
             ButtonHelperFactionSpecific.resolveSalvageOps(player, event, buttonID, activeGame);
         } else if (buttonID.startsWith("psStep2_")) {
             ButtonHelperActionCards.resolvePSStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep2_")) {
             ButtonHelperActionCards.resolvePlagueStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("micrometeoroidStormStep2_")) {
+            ButtonHelperActionCards.resolveMicrometeoroidStormStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep2_")) {
             ButtonHelperActionCards.resolveCrippleStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("infiltrateStep2_")) {
@@ -2286,6 +2290,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveSpyStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep3_")) {
             ButtonHelperActionCards.resolvePlagueStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("micrometeoroidStormStep3_")) {
+            ButtonHelperActionCards.resolveMicrometeoroidStormStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep3_")) {
             ButtonHelperActionCards.resolveCrippleStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("infiltrateStep3_")) {
@@ -2490,6 +2496,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame);
+        } else if (buttonID.startsWith("gledgeBasePlanet_")) {
+            ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("veldyrAttach_")) {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
@@ -3573,8 +3581,10 @@ public class ButtonListener extends ListenerAdapter {
                             && !player.hasLeaderUnlocked("mykomentoricommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
                     }
-                    ButtonHelper.addReaction(event, false, false, message, "");
-                    event.getMessage().delete().queue();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    if(event.getMessage().getContentRaw().contains("explore")){
+                        event.getMessage().delete().queue();
+                    }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
@@ -3602,9 +3612,10 @@ public class ButtonListener extends ListenerAdapter {
                         player.setCommodities(0);
                         message = "Converted all remaining commodies (less than 2) into tg";
                     }
-                    ButtonHelper.addReaction(event, false, false, message, "");
-
-                    event.getMessage().delete().queue();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    if(event.getMessage().getContentRaw().contains("explore")){
+                        event.getMessage().delete().queue();
+                    }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
@@ -3983,6 +3994,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
                 case "resolvePlagueStep1" ->
                     ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
+                case "resolveEBSStep1" ->
+                    ButtonHelperActionCards.resolveEBSStep1(player, activeGame, event);
+                case "resolveMicrometeoroidStormStep1" ->
+                    ButtonHelperActionCards.resolveMicrometeoroidStormStep1(player, activeGame, event, buttonID);
                 case "resolveCrippleDefensesStep1" ->
                     ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
                 case "resolveInfiltrateStep1" ->
@@ -4000,6 +4015,8 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);
                 case "resolveABSStep1" -> ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
                 case "resolveWarEffort" -> ButtonHelperActionCards.resolveWarEffort(activeGame, player, event);
+                case "resolveFreeTrade" -> ButtonHelperActionCards.resolveFreeTrade(activeGame, player, event);
+                case "resolvePreparation" -> ButtonHelperActionCards.resolvePreparation(activeGame, player, event);
                 case "resolveInsiderInformation" ->
                     ButtonHelperActionCards.resolveInsiderInformation(player, activeGame, event);
                 case "resolveEmergencyMeeting" ->
@@ -5205,7 +5222,7 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     String msg2 = "All players have indicated 'No Sabotage'";
                     if (activeGame.getMessageIDsForSabo().contains(messageId)) {
-                        String faction = "bob" + activeGame.getFactionsThatReactedToThis(messageId);
+                        String faction = "bob_" + activeGame.getFactionsThatReactedToThis(messageId)+"_";
                         faction = faction.split("_")[1];
                         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
                         if (p2 != null && !activeGame.isFoWMode()) {
@@ -5292,9 +5309,8 @@ public class ButtonListener extends ListenerAdapter {
             case "no_sabotage" -> {
                 String msg = "All players have indicated 'No Sabotage'";
                 if (activeGame.getMessageIDsForSabo().contains(event.getMessageId())) {
-                    String faction = activeGame.getFactionsThatReactedToThis(event.getMessageId());
-                    System.err.println(faction);
-                    faction = faction.split("_")[0];
+                    String faction = "bob_" + activeGame.getFactionsThatReactedToThis(event.getMessageId())+"_";
+                    faction = faction.split("_")[1];
                     Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
                     if (p2 != null && !activeGame.isFoWMode()) {
                         msg = p2.getRepresentation() + " " + msg;

@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -263,12 +264,21 @@ public class FoWHelper {
 
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
 		adjacentPositions.addAll(wormholeAdjacencies);
+		
+		if(player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander") && player == game.getActivePlayer() && !game.getActiveSystem().isEmpty() && game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0){
+			Collection<Tile> tileList = game.getTileMap().values();
+			List<String> frontierTileList = Mapper.getFrontierTileIds();
+			for (Tile tile : tileList) {
+				if ((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size()==2) || frontierTileList.contains(tile.getTileID())) {
+					adjacentPositions.add(tile.getPosition());
+				}
+			}
+		}
 		if(includeTile){
 			adjacentPositions.add(position);
 		}else{
 			adjacentPositions.remove(position);
 		}
-
 		return adjacentPositions;
 	}
 

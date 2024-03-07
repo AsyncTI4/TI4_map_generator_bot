@@ -347,6 +347,26 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
+    public static void resolveFreeTrade(Game activeGame, Player player, ButtonInteractionEvent event) {
+        Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG")
+        .withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities")
+                .withEmoji(Emoji.fromFormatted(Emojis.comm));
+        List<Button> buttons = List.of(convert2CommButton, get2CommButton, Button.danger("deleteButtons", "Done resolving"));
+        String message = "Use buttons to gain or convert comms as appropriate. You can trade in this window/in between gaining comms";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolvePreparation(Game activeGame, Player player, ButtonInteractionEvent event){
+        String message = "Use button to draw an AC";
+        List<Button> buttons = new ArrayList<>();
+        if (player.hasAbility("scheming")) {
+            buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+        } else {
+            buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),message, buttons);
+    }
 
     public static void resolveHarnessEnergy(Game activeGame, Player player, ButtonInteractionEvent event) {
         String message = ButtonHelper.getIdent(player) + " Replenished Commodities (" + player.getCommodities() + "->"
@@ -702,6 +722,32 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " tell the bot who's planet you want to plague",
+                buttons);
+    }
+    public static void resolveEBSStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
+        activeGame.setCurrentReacts("EBSFaction", player.getFaction());
+        ButtonHelper.resolveCombatRoll(player, activeGame, event, "combatRoll_" + activeGame.getActiveSystem() + "_space_spacecannonoffence");
+        event.getMessage().delete().queue();
+    }
+    public static void resolveMicrometeoroidStormStep1(Player player, Game activeGame, ButtonInteractionEvent event,
+            String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("micrometeoroidStormStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("micrometeoroidStormStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation(true, true) + " tell the bot who's fighters you want to hit",
                 buttons);
     }
 
@@ -1248,6 +1294,19 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " select the planet you want to plague", buttons);
     }
+    public static void resolveMicrometeoroidStormStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : activeGame.getTileMap().values()) {
+            if(FoWHelper.playerHasFightersInSystem(p2, tile)){
+            buttons.add(Button.secondary("micrometeoroidStormStep3_" + p2.getFaction() + "_" + tile.getPosition(),
+                   tile.getRepresentationForButtons(activeGame, p2)));
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation(true, true) + " select the tile you want to hit with the AC", buttons);
+    }
 
     public static void resolveRefitTroops(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID,
             String finChecker) {
@@ -1598,6 +1657,39 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
                 p2.getRepresentation(true, true) + " your planet " + planetRep + " was plagued and you lost " + hits
                         + " infantry.");
+    }
+    public static void resolveMicrometeoroidStormStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String tilePos = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(tilePos);
+        event.getMessage().delete().queue();
+        UnitHolder uH = tile.getUnitHolders().get("space");
+        int amount = uH.getUnitCount(UnitType.Fighter, p2.getColor());
+        int hits = 0;
+        if (amount > 0) {
+            StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
+            for (int x = 0; x < amount; x++) {
+                Die d1 = new Die(6);
+                msg.append(d1.getResult()).append(", ");
+                if (d1.isSuccess()) {
+                    hits++;
+                }
+            }
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+            UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("fighter"), p2.getColor());
+            new RemoveUnits().removeStuff(event, tile, hits, "space", key, p2.getColor(),
+                    false, activeGame);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg.toString());
+            
+            if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
+                ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, hits, "fighter", event);
+            }
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation(true, true) + " you stormed " + tile.getRepresentationForButtons(activeGame, player) + " and got " + hits + " hits");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                p2.getRepresentation(true, true) + " your fighters in " + tile.getRepresentationForButtons(activeGame, player) + " were hit by a storm and you lost " + hits
+                        + " fighters.");
     }
 
     public static void resolveCrippleStep3(Player player, Game activeGame, ButtonInteractionEvent event,

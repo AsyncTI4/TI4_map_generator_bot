@@ -420,7 +420,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
                 if (player.getCommodities() > 0) {
-                    message = "Resolve using the buttons";
+                    message = "Resolve explore using the buttons";
                     Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG")
                             .withEmoji(Emoji.fromFormatted(Emojis.Wash));
                     Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities")

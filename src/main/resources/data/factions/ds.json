@@ -316,7 +316,7 @@
         "factionName": "Li-Zho Dynasty",
         "shortTag": "LZH",
         "homeSystem": "d14",
-        "startingFleet": "2 cv,dd,3 ff, inf k,2 inf p,inf v,sd v,pds k",
+        "startingFleet": "2 cv,dd,3 ff, inf k,2 inf p,inf v,sd k,pds k",
         "commodities": 3,
         "factionTech": ["dslizhb", "dslizhff"],
         "startingTech": ["pa", "amd"],
