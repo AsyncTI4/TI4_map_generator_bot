@@ -73,6 +73,7 @@ import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -7354,7 +7355,9 @@ public class ButtonHelper {
                     }
                 }
                 PNInfo.sendPromissoryNoteInfo(game, p1, false);
+                CardsInfo.sendVariousAdditionalButtons(game,p1);
                 PNInfo.sendPromissoryNoteInfo(game, p2, false);
+                CardsInfo.sendVariousAdditionalButtons(game,p2);
                 String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
                 message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
                 Helper.checkEndGame(game, p2);

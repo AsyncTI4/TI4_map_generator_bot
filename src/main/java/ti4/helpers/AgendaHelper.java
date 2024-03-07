@@ -1189,6 +1189,10 @@ public class AgendaHelper {
                 || activeGame.getLaws().containsKey("absol_government"))) {
             minVotes = 1;
             maxVotes = 1;
+            if (activeGame.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+                minVotes = 2;
+                maxVotes = 2;
+            }
         }
         if (maxVotes - minVotes > 20) {
             voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
@@ -2411,6 +2415,9 @@ public class AgendaHelper {
         if (activeGame.getLaws() != null && (activeGame.getLaws().containsKey("rep_govt")
                 || activeGame.getLaws().containsKey("absol_government"))) {
             voteCount = 1;
+            if (activeGame.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+                voteCount = 2;
+            }
         }
 
         if ("nekro".equals(player.getFaction()) && hasXxchaAlliance == 0) {
@@ -3066,7 +3073,12 @@ public class AgendaHelper {
             sb.append("**");
         if (activeGame.getLaws().containsKey("rep_govt") || activeGame.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
-            sb.append(" vote count (Rep Gov): **" + " ").append("1");
+            if (activeGame.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+                sb.append(" vote count (Rep Gov while controlling rex): **" + " ").append("2");
+            }else{
+                sb.append(" vote count (Rep Gov): **" + " ").append("1");
+            }
+
         }
         return sb.toString();
     }
