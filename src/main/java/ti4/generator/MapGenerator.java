@@ -3335,7 +3335,7 @@ public class MapGenerator {
         }
         if (activeGame.getShowBubbles() && unitHolder instanceof Planet && shouldPlanetHaveShield(unitHolder, activeGame)) {
             String tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
-            float scale = 1.2f;
+            float scale = .95f;
             if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
                 scale = 1.65f;
             }

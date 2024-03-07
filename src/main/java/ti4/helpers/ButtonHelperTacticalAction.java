@@ -654,6 +654,13 @@ public class ButtonHelperTacticalAction {
                         "Use buttons to select which unit to recycle", buttons);
             }
         }
+        if(player.hasRelic("absol_plenaryorbital") && !tile.isHomeSystem() && !tile.getUnitHolders().containsKey("mr") && !player.hasUnit("plenaryorbital")){
+            List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(activeGame, player);
+            if(buttons4.size() > 0){
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "You can place down the plenary orbital",
+                buttons4);
+            }
+        }
         if (!activeGame.isFoWMode()) {
             int abilities = 0;
             if (!activeGame.getL1Hero()) {

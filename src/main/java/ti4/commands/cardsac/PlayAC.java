@@ -522,7 +522,7 @@ public class PlayAC extends ACCardsSubcommandData {
             // "resolveCounterStroke"
             codedName = "Counterstroke";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveCounterStroke",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveCounterStroke_"+game.getActiveSystem(),
                         "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
