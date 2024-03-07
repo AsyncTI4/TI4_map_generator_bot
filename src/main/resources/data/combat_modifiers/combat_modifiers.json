@@ -778,11 +778,6 @@
             {
                 "type": "leader",
                 "alias": "mirvedacommander"
-            },
-            {
-                "type": "custom",
-                "alias": "custom",
-                "message": "Mirveda commander only partially in the bot. Please only consider the first relevant rolls from adjacent units without deep space cannon."
             }
         ],
         
