@@ -2873,7 +2873,7 @@ public class AgendaHelper {
                 String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
                 String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                 if (vote.contains("Rider") || vote.contains("Sanction") || vote.contains("Radiance")
-                        || vote.contains("Unity Algorithm") || vote.contains("Hero")) {
+                        || vote.contains("Unity Algorithm") || vote.contains("Tarrock") || vote.contains("Hero")) {
                     voteSummBuilder.append(";").append(specificVote);
                 } else if (faction2.equals(faction)) {
                 } else {
@@ -2900,7 +2900,7 @@ public class AgendaHelper {
                 String specificVote = vote_info.nextToken();
                 String vote = specificVote.split("_")[1];
                 if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                        && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")) {
+                        && !vote.contains("Radiance") && !vote.contains("Unity Algorithm") && !vote.contains("Tarrock")) {
                     totalVotes += Integer.parseInt(vote);
                 }
             }
@@ -2970,14 +2970,14 @@ public class AgendaHelper {
                         }
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")) {
+                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm") && !vote.contains("Tarrock")) {
                             totalVotes += Integer.parseInt(vote);
                         }
                         outcomeSummaryBuilder.append(faction).append("-").append(vote).append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")) {
+                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm") && !vote.contains("Tarrock")) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder.append(faction).append(" voted ").append(vote).append(" votes. ");
                         } else {

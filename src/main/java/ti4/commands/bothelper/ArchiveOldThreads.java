@@ -35,7 +35,7 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
 
         threadChannels = threadChannels.stream()
             .filter(ListOldThreads.filter)
-            .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
+            .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates") && !threadChannel.getName().contains("cards-info"))
             .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
             .limit(threadCount)
             .toList();
