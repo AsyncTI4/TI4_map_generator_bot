@@ -1029,6 +1029,19 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
     
+    public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
+    String ident) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + player.getFactionEmoji() + player.getFaction() + " May produce 1 ship in the explored planet system.");
+        String pos = buttonID.replace("dsdihmy_", "");
+        List<Button> buttons;
+        // Sling relay works for this 
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
+                activeGame.getTileByPosition(pos), "sling", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce 1 ship. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+
     public static void resolveVadenSCDebt(Player player, int sc, Game activeGame, GenericInteractionCreateEvent event) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
