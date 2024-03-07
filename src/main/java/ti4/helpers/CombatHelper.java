@@ -294,12 +294,23 @@ public class CombatHelper {
                 && entry.getKey().getSpaceCannonDieCount(player, activeGame) > 0
                 && (entry.getKey().getDeepSpaceCannon() || activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander") || (entry.getKey().getBaseType().equalsIgnoreCase("spacedock"))))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-
+        int limit = 0;
         for (var entry : adjacentOutput.entrySet()) {
-            if (output.containsKey(entry.getKey())) {
-                output.put(entry.getKey(), entry.getValue() + output.get(entry.getKey()));
-            } else {
-                output.put(entry.getKey(), entry.getValue());
+            if(entry.getKey().getDeepSpaceCannon()){
+                if (output.containsKey(entry.getKey())) {
+                    output.put(entry.getKey(), entry.getValue() + output.get(entry.getKey()));
+                } else {
+                    output.put(entry.getKey(), entry.getValue());
+                }
+            }else{
+                if(limit < 1){
+                    limit = 1;
+                    if (output.containsKey(entry.getKey())) {
+                        output.put(entry.getKey(), 1 + output.get(entry.getKey()));
+                    } else {
+                        output.put(entry.getKey(), 1);
+                    }
+                }
             }
         }
 
