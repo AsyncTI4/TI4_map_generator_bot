@@ -1016,6 +1016,32 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
+            String ident) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + " Dih-Mohn Flagship is producing units. They can produce up to 2 units with a combined cost of 4.");
+        String pos = buttonID.replace("dihmohnfs_", "");
+        List<Button> buttons;
+        // Muaat agent works here as it's similar so no need to add more fluff
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
+                activeGame.getTileByPosition(pos), "muaatagent", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    
+    public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
+    String ident) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + player.getFactionEmoji() + player.getFaction() + " May produce 1 ship in the explored planet system.");
+        String pos = buttonID.replace("dsdihmy_", "");
+        List<Button> buttons;
+        // Sling relay works for this 
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
+                activeGame.getTileByPosition(pos), "sling", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce 1 ship. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+
     public static void resolveVadenSCDebt(Player player, int sc, Game activeGame, GenericInteractionCreateEvent event) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
