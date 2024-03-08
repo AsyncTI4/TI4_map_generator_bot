@@ -38,6 +38,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonDieCount;
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
+    private String contrastColor = "";
 
     public boolean isValid() {
         return getId() != null
@@ -160,5 +161,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (!getTechSpecialtyStringRepresentation().isBlank()) sb.append(" ").append(getTechSpecialtyStringRepresentation());
         sb.append(")");
         return sb.toString();
+    }
+
+    public String getContrastColor() {
+        return contrastColor;
     }
 }
