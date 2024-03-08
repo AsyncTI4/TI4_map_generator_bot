@@ -4747,7 +4747,7 @@ public class ButtonHelper {
     }
 
     public static UnitHolder getUnitHolderFromPlanetName(String planetName, Game game) {
-        Tile tile = game.getTileFromPlanet(AliasHandler.resolvePlanet(planetName));
+        Tile tile = game.getTileFromPlanet(AliasHandler.resolvePlanet(planetName.toLowerCase()));
         if (tile == null) {
             return null;
         }
@@ -5696,6 +5696,12 @@ public class ButtonHelper {
             game.getActionsChannel().getManager().setName(newName + "-actions").queue();
         }
         Member gameOwner = guild.getMemberById(game.getOwnerID());
+        if(gameOwner == null){
+            for (Player player : game.getPlayers().values()) {
+                gameOwner = guild.getMemberById(player.getUserID());
+                break;
+            }
+        }
         Game newGame = GameCreate.createNewGame(event, newName, gameOwner);
 
         // ADD PLAYERS
@@ -7647,7 +7653,7 @@ public class ButtonHelper {
         // PNs
         for (String pn : p1.getPromissoryNotes().keySet()) {
             PromissoryNoteModel prom = Mapper.getPromissoryNote(pn);
-            if (pn != null && prom.getOwner() != null && !prom.getOwner().equalsIgnoreCase(p1.getFaction())
+            if (pn != null  && prom != null&& prom.getOwner() != null && !prom.getOwner().equalsIgnoreCase(p1.getFaction())
                     && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
                 if (pnText.contains("Action:") && !"bmf".equalsIgnoreCase(pn)) {
@@ -7657,7 +7663,7 @@ public class ButtonHelper {
                     compButtons.add(pnButton);
                 }
             }
-            if (prom.getText() == null) {
+            if (prom == null) {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(p1, game), p1.getRepresentation(true, true)
                         + " you have a null PN. Please use /pn purge after reporting it " + pn);
                 PNInfo.sendPromissoryNoteInfo(game, p1, false);
