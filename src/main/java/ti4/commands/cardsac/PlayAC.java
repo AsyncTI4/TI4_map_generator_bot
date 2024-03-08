@@ -348,7 +348,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success(
                         player.getFinsFactionCheckerPrefix() + "resolveEmergencyRepairs_" + game.getActiveSystem(),
                         "Resolve " + codedName));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                if(game.getActiveSystem().isEmpty()){
+                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
+                }else{
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                }
             }
             codedName = "Insider Information";
             if (actionCardTitle.contains(codedName)) {
@@ -468,7 +472,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success(
                         player.getFinsFactionCheckerPrefix() + "resolveDecoyOperationStep1_" + game.getActiveSystem(),
                         "Resolve " + codedName));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                if(game.getActiveSystem().isEmpty()){
+                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
+                }else{
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                }
             }
             codedName = "Reactor Meltdown";
             if (actionCardTitle.contains(codedName)) {
@@ -524,7 +532,11 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveCounterStroke_"+game.getActiveSystem(),
                         "Resolve " + codedName));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                if(game.getActiveSystem().isEmpty()){
+                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
+                }else{
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                }
             }
             codedName = "Divert Funding";
             if (actionCardTitle.contains(codedName)) {
