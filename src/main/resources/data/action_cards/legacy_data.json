@@ -520,5 +520,50 @@
     "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, draw 2 action cards. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
     "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "terraforming_initiative",
+    "name": "Terraforming Initiative",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Ready 1 or 2 hazardous planets that any players control.",
+    "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "political_upheaval",
+    "name": "Political Upheaval",
+    "phase": "Strategy",
+    "window": "At the start of the strategy phase",
+    "text": "During this strategy phase, strategy card choices start with the speaker and proceed counterclockwise.",
+    "flavorText": "In the distance, a huge explosion illuminated the sky. Brother Milor gripped the rails of his balcony as he watched the chaos unfolding in the streets below. The people demanded a revolution, and he would grant them one.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "foreign_policy",
+    "name": "Foreign Policy",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Give 1 of those action cards to each other player and take the remaining card.",
+    "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "recusal",
+    "name": "Recusal",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "During this agenda, voting begins with the player to your left and continues clockwise.",
+    "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "collaborative_planning",
+    "name": "Collaboration",
+    "phase": "Action",
+    "window": "After another player performs an action",
+    "text": "That player must perform an additional action this turn or pass.",
+    "flavorText": "Mathis pursed his lips with disdain, \"You will see to our agreements with the correct expedience.\" When Ssruu did not respond, his anger broke through, \"Perhaps our massive fleets could provide you with motivation, should you continue to test us!\"",
+    "source": "action_deck_2"
   }
 ]

@@ -15,6 +15,7 @@
 3. Record the Server's ID (right click Server Name -> "Copy Server ID")
 4. Setup a Test Bot - see [Step 1 from here](https://discord.com/developers/docs/getting-started#step-1-creating-an-app)
 5. Invite your Test Bot to your server
+6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/AsyncTI4DiscordBot.java`
 
 # Setup a Test Bot
 

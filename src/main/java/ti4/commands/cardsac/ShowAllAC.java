@@ -39,16 +39,21 @@ public class ShowAllAC extends ACCardsSubcommandData {
 
     public static void showAll(Player player, Player player_, Game activeGame) {
         StringBuilder sb = new StringBuilder();
+        StringBuilder sa = new StringBuilder();
+        sa.append("You have shown your cards to player: ").append(player_.getUserName()).append("\n");
+        sa.append("Your cards were presented in the order below. You may reference the number listed when discussing the cards:\n");
         sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Action Cards:").append("\n");
+        sb.append("Showed Action Cards, they were also presented the cards in the order you see them so you can reference the number when talking to them:").append("\n");
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
         Collections.shuffle(actionCards);
         int index = 1;
         for (String id : actionCards) {
+            sa.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sa.toString());
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb.toString());
     }
 }
