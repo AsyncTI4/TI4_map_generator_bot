@@ -83,6 +83,9 @@ public class FoWHelper {
 
 	/** Method to determine of a viewing player should be able to see the stats of a particular player */
 	public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
+		if(!player.isRealPlayer() || !viewingPlayer.isRealPlayer()){
+			return false;
+		}
 		if (player == viewingPlayer) {
 			return true;
 		}
