@@ -241,7 +241,7 @@ public class ButtonHelperCommanders {
 
     public static void resolveSolCommander(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        Tile tile = activeGame.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             ButtonHelper.getIdent(player) + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, activeGame) + " using Sol Commander");

@@ -13,6 +13,7 @@ import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
@@ -118,6 +119,26 @@ public class TechExhaust extends TechAddRemove {
                 List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
                 String message = player.getRepresentation(true, true) + " Select who you would like to Mageon.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                sendNextActionButtonsIfButtonEvent(event, activeGame, player);
+            }
+            case "dsaxisy"->{
+                deleteIfButtonEvent(event);
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, "sd","placeOneNDone_skipbuild");
+                String message = player.getRepresentation(true, true) + " select the planet you would like to place or move a spacedock to.";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                sendNextActionButtonsIfButtonEvent(event, activeGame, player);
+            }
+            case "dskolug"->{
+                deleteIfButtonEvent(event);
+                if(event instanceof ButtonInteractionEvent bevent){
+                    ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, bevent, "yes");
+                }
+                sendNextActionButtonsIfButtonEvent(event, activeGame, player);
+            }
+            case "dskolly"->{
+                deleteIfButtonEvent(event);
+                String message = player.getRepresentation(true, true) + " stalled using the Applied Biothermics tech.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
             case "vtx", "absol_vtx" -> { // Vortex
