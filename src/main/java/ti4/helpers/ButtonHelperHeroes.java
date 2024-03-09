@@ -277,6 +277,54 @@ public class ButtonHelperHeroes {
         return relicsTotal;
     }
 
+    public static void cheiranHeroResolution(Player player, Game activeGame, GenericInteractionCreateEvent event){
+        List<Button> buttons = new ArrayList<>();
+        //"dn,cv,dd,2 ff,mech a,2 inf g,sd a"
+        buttons.addAll(Helper.getTileForCheiranHeroPlaceUnitButtons(player, activeGame, "dreadnought", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 dreadnough", buttons);
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "destroyer", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 destroyer", buttons);
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "carrier", "placeOneNDone_skipbuild"));
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "ff", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 fighter", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 fighter", buttons);
+        
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "gf", "placeOneNDone_skipbuild"));
+        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "gf", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 infantry", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 infantry", buttons);
+
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "sd", "placeOneNDone_skipbuild"));
+        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "sd", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 spacedock", buttons);
+
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
+        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 mech", buttons);
+        
+    }
+
+    public static void lizhoHeroFighterDistribution(Player player, Game activeGame, ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "2ff", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 2 fighters", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 2 fighters", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 2 fighters", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 2 fighters", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 2 fighters", buttons);
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, activeGame, "ff", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 fighter", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 fighter", buttons);
+    }
+
     public static void resolveLanefirHeroStep1(Player player, Game game) {
         List<String> revealedRelics = getAllRevealedRelics(game);
         String key = "lanefirRelicReveal";

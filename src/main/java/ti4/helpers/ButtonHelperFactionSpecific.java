@@ -506,7 +506,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getRaghsCallButtons(Player player, Game activeGame, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         Player saar = activeGame.getPNOwner("ragh");
-        if (saar == player) {
+        if (saar == player || tile == null) {
             return buttons;
         }
         for (UnitHolder uH : tile.getUnitHolders().values()) {

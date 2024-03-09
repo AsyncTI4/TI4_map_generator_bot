@@ -306,22 +306,26 @@ public class SCPlay extends PlayerSubcommandData {
             sc = Integer.parseInt(StringUtils.left(scId, 1));
         }
         
-        if(sc == 8 && !winnuHero){
-            Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
-            String key = "factionsThatAreNotDiscardingSOs";
-            String key2 = "queueToDrawSOs";
-            String key3 = "potentialBlockers";
-            activeGame.setCurrentReacts(key,"");
-            activeGame.setCurrentReacts(key2,"");
-            activeGame.setCurrentReacts(key3,"");
-            if(activeGame.getQueueSO()){
-                for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
-                    if(player.getSoScored()+player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount() || (player == imperialHolder && player.getPlanets().contains("mr"))){
-                        activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
-                    }else{
-                        activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+        if(sc == 8){
+            if(!winnuHero){
+                Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+                String key = "factionsThatAreNotDiscardingSOs";
+                String key2 = "queueToDrawSOs";
+                String key3 = "potentialBlockers";
+                activeGame.setCurrentReacts(key,"");
+                activeGame.setCurrentReacts(key2,"");
+                activeGame.setCurrentReacts(key3,"");
+                if(activeGame.getQueueSO()){
+                    for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
+                        if(player.getSoScored()+player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount() || (player == imperialHolder && player.getPlanets().contains("mr"))){
+                            activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
+                        }else{
+                            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+                        }
                     }
                 }
+            }else{
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Since this is a winnu hero play, SO draws will not be queued or resolved in a particular order");
             }
         }
 

@@ -215,6 +215,11 @@ public class HeroPlay extends LeaderAction {
             case "lanefirhero" -> {
                 ButtonHelperHeroes.resolveLanefirHeroStep1(player, activeGame);
             }
+            case "lizhohero" -> {
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
+                        "You can use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters",
+                        Button.success("lizhoHeroFighterResolution", "Distrubute 12 fighters"));
+            }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         player.getRepresentation(true, true) + " removed all of your ccs from the board");
@@ -223,6 +228,9 @@ public class HeroPlay extends LeaderAction {
                         RemoveCC.removeCC(event, player.getColor(), t, activeGame);
                     }
                 }
+            }
+            case "cheiranhero"->{
+                ButtonHelperHeroes.cheiranHeroResolution(player, activeGame, event);
             }
             case "olradinhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),

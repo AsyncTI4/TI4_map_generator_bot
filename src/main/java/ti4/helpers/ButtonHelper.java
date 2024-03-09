@@ -4116,6 +4116,32 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static List<Tile> getTilesWithTrapsInTheSystem(Game game) {
+        List<Tile> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            for(UnitHolder planet : tile.getPlanetUnitHolders()){
+                for(String id: planet.getTokenList()){
+                    if(id.contains("attachment_lizhotrap") && !buttons.contains(tile)){
+                        buttons.add(tile);
+                        break;
+                    }
+                }
+            }
+        }
+        return buttons;
+    }
+    public static List<Tile> getTilesForCheiranHero(Player player, Game game) {
+        List<Tile> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            for(UnitHolder planet : tile.getPlanetUnitHolders()){
+                if(planet.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 || planet.getUnitCount(UnitType.Pds, player.getColor()) > 0 || (planet.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasAbility("byssus"))){
+                    buttons.add(tile);
+                    break;
+                }
+            }
+        }
+        return buttons;
+    }
 
     public static List<Button> getTilesToModify(Player player, Game game, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";

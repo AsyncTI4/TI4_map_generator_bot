@@ -67,7 +67,7 @@
         "shortTag": "CHR",
         "homeSystem": "d08",
         "startingFleet": "dn,cv,dd,2 ff,mech a,2 inf g,sd a",
-        "commodities": 3,
+        "commodities": 2,
         "factionTech": ["dscheir", "dscheidn"],
         "startingTech": [],
         "homePlanets": ["arche", "gghurntheta"],
