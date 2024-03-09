@@ -275,7 +275,7 @@
         "requirements": "YY",
         "faction": "kollecc",
         "source": "ds",
-        "text": "ACTION: Exhaust this card to choose 1 of your neighbors that has 1 or more relic fragments. That player gains 2 trade goods and must give you 1 of those relic fragments of your choice."
+        "text": "ACTION: Exhaust this card to choose 1 of your neighbors that has 1 or more relic fragments. That player gains 2 trade goods and must give you 1 of those relic fragments of your choice. [Note the neighbor requirement]"
     },
     {
         "alias": "dskolug",

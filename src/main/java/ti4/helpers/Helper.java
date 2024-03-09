@@ -1015,6 +1015,35 @@ public class Helper {
         return planetButtons;
     }
 
+    public static List<Button> getTileWithTrapsPlaceUnitButtons(Player player, Game activeGame, String unit,
+            String prefix) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(activeGame);
+        for (Tile tile : tiles) {
+            if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)){
+                Button button = Button.danger(
+                        "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(activeGame, player));
+                planetButtons.add(button);
+            }
+        }
+        return planetButtons;
+    }
+    public static List<Button> getTileForCheiranHeroPlaceUnitButtons(Player player, Game activeGame, String unit,
+            String prefix) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, activeGame);
+        for (Tile tile : tiles) {
+            if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)){
+                Button button = Button.danger(
+                        "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(activeGame, player));
+                planetButtons.add(button);
+            }
+        }
+        return planetButtons;
+    }
+
     public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game activeGame, String unit,
             String prefix, @Nullable ButtonInteractionEvent event) {
         List<Button> planetButtons = new ArrayList<>();
