@@ -3163,12 +3163,12 @@ public class MapGenerator {
 
         BufferedImage borderDecorationImage;
         try {
-            borderDecorationImage = ImageHelper.read(decorationType.getImageFilePath());
+            BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
+            borderDecorationImage = new BufferedImage(cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
             BotLogger.log("Could not find border decoration image! Decoration was " + decorationType.toString());
             return;
         }
-        if (borderDecorationImage == null) return;
 
         int imageCenterX = borderDecorationImage.getWidth() / 2;
         int imageCenterY = borderDecorationImage.getHeight() / 2;
@@ -3180,10 +3180,10 @@ public class MapGenerator {
         int centerY = 150;
 
         if (decorationType == BorderAnomalyModel.BorderAnomalyType.ARROW) {
-            int textOffsetX = 11;
+            int textOffsetX = 12;
             int textOffsetY = 40;
-            Graphics2D arrow = (Graphics2D) borderDecorationImage.getGraphics();
-            AffineTransform arrowTextTransform = arrow.getFont().getTransform();
+            Graphics2D arrow = borderDecorationImage.createGraphics();
+            AffineTransform arrowTextTransform = arrow.getTransform();
 
             arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
             arrow.setColor(Color.BLACK);
