@@ -2870,6 +2870,21 @@ public class ButtonListener extends ListenerAdapter {
                             activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                         }
                     }
+                    if(player.hasTech("dskolug")){
+                        int oldComm = player.getCommodities();
+                        for(Player p2 : activeGame.getRealPlayers()){
+                            if(p2 == player){
+                                continue;
+                            }
+                            if(p2.isPassed()){
+                                player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities()+1));
+                            }
+                        }
+                        if(player.getCommodities() > oldComm){
+                            String msg = player.getRepresentation()+" since you have Applied Biothermics, you gained 1 comm for each passed player (Comms went from "+oldComm+" -> "+player.getCommodities()+")";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                        }
+                    }
                     TurnEnd.pingNextPlayer(event, activeGame, player, true);
                     event.getMessage().delete().queue();
                     ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round "
@@ -3978,10 +3993,12 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "focusedResearch" ->
                     ButtonHelperActionCards.resolveFocusedResearch(activeGame, player, buttonID, event);
+                case "lizhoHeroFighterResolution" ->
+                    ButtonHelperHeroes.lizhoHeroFighterDistribution(player, activeGame, event);
                 case "resolveReparationsStep1" ->
                     ButtonHelperActionCards.resolveReparationsStep1(player, activeGame, event, buttonID);
                 case "resolveSeizeArtifactStep1" ->
-                    ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, event, buttonID);
+                    ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, event, "no");
                 case "resolveDiplomaticPressureStep1" ->
                     ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, activeGame, event, buttonID);
                 case "resolveImpersonation" ->

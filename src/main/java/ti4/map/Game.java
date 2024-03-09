@@ -3484,6 +3484,9 @@ public class Game {
                 if (player_.equals(player))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
+                    if(isAllianceMode() && player.getFaction().equalsIgnoreCase("mahact")){
+                        return leaderID.contains(player_.getFaction());
+                    }
                     return true;
                 }
             }

@@ -947,7 +947,7 @@
         "title": "Grandmaster of the Order",
         "abilityName": "Coil Overcharge - Streaks in the Night",
         "abilityWindow": "ACTION:",
-        "abilityText": "Place this card near the game board. During this game round, after you perform a component action, you may use 1 of your unit's SPACE CANNON against ships in or adjacent to that unit's system, without rolling additional dice. At the end of this game round, purge this card.",
+        "abilityText": "Place this card near the game board. During this game round, at the end of a component action you perform, you may use 1 of your unit's SPACE CANNON against ships in or adjacent to that unit's system, without rolling additional dice. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
