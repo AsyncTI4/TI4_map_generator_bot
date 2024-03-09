@@ -1991,6 +1991,10 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 event.getMessage().delete().queue();
             }
+        } else if (buttonID.startsWith("garboziaAbilityExhaust_")) {
+            String planet = "garbozia";
+            player.exhaustPlanetAbility(planet);
+            new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, activeGame, 1, false);
         } else if (buttonID.startsWith("checksNBalancesPt2_")) {// "freeSystemsHeroPlanet_"
             new SCPick().resolvePt2ChecksNBalances(event, player, activeGame, buttonID);
         } else if (buttonID.startsWith("freeSystemsHeroPlanet_")) {// "freeSystemsHeroPlanet_"
