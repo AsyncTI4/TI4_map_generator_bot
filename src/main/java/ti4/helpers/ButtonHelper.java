@@ -3492,6 +3492,10 @@ public class ButtonHelper {
         if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Primor Ability"));
         }
+        planet = "garbozia";
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+            endButtons.add(Button.success(finChecker + "garboziaAbilityExhaust_" + planet, "Use Garbozia Ability"));
+        }
         planet = "mr";
         if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)
                 && game.getPlanetsInfo().get("mr").getTokenList().contains("attachment_legendary.png")) {
