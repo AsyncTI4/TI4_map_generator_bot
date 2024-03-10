@@ -228,8 +228,8 @@
     "alias": "diverse_strategies",
     "name": "Diverse Strategies",
     "phase": "Any",
-    "window": "When you would perform the primary ability of a strategy card",
-    "text": "Perform the secondary ability of any 2 strategy cards instead; while performing those abilities, spend command tokens from your reinforcements instead of your strategy pool. [Note: You cannot choose the same strategy card twice.]",
+    "window": "When you would perform the primary ability of your strategy card",
+    "text": "Perform the secondary ability of up to 2 other different strategy cards instead; when you perform those abilities, spend command tokens from your reinforcements instead of your strategy pool.",
     "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
     "source": "action_deck_2"
   },
@@ -309,8 +309,8 @@
     "alias": "flawless_strategy",
     "name": "Flawless Strategy",
     "phase": "Action",
-    "window": "After you exhaust a strategy card",
-    "text": "Perform the secondary ability of that strategy card; while performing that ability, spend command tokens from your reinforcements instead of your strategy pool.",
+    "window": "After you exhaust your strategy card",
+    "text": "Perform the secondary ability of that strategy card; when you perform that ability, spend command tokens from your reinforcements instead of your strategy pool.",
     "flavorText": "PROTOCOL SUCCESSFUL >> [NULL ID] FATE SEALED << DEFEAT INEVITABLE >> PEERLESS MANY << INFINITE ONE >> [ID:NIITAKA] << QUEUED1 << QUEUED2 << QUEUED3...",
     "source": "action_deck_2"
   },
