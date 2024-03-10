@@ -32,6 +32,7 @@ public class Planet extends UnitHolder {
     private boolean hasAbility;
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
+    private String contrastColor = "";
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -39,6 +40,7 @@ public class Planet extends UnitHolder {
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             originalPlanetType = planetInfo.getPlanetType().toString();
+            contrastColor = planetInfo.getContrastColor();
             if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
                 originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); //TODO: Make this support multiple specialties
             if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
@@ -218,5 +220,9 @@ public class Planet extends UnitHolder {
 
     public void setSpaceCannonHitsOn(int hitsOn) {
         spaceCannonHitsOn = hitsOn;
+    }
+
+    public String getContrastColor() {
+        return contrastColor;
     }
 }

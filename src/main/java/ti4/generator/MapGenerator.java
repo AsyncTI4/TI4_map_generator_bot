@@ -3333,8 +3333,17 @@ public class MapGenerator {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
         }
-        if (activeGame.getShowBubbles() && unitHolder instanceof Planet && shouldPlanetHaveShield(unitHolder, activeGame)) {
-            String tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+        if (activeGame.getShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, activeGame)) {
+            String tokenPath;
+            switch (planetHolder.getContrastColor()) {
+                case "orange":
+                    tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+                    break;
+                case "blue":
+                default:
+                    tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+                    break;
+            }
             float scale = .95f;
             if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
                 scale = 1.65f;
