@@ -3163,12 +3163,12 @@ public class MapGenerator {
 
         BufferedImage borderDecorationImage;
         try {
-            borderDecorationImage = ImageHelper.read(decorationType.getImageFilePath());
+            BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
+            borderDecorationImage = new BufferedImage(cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
             BotLogger.log("Could not find border decoration image! Decoration was " + decorationType.toString());
             return;
         }
-        if (borderDecorationImage == null) return;
 
         int imageCenterX = borderDecorationImage.getWidth() / 2;
         int imageCenterY = borderDecorationImage.getHeight() / 2;
@@ -3180,10 +3180,10 @@ public class MapGenerator {
         int centerY = 150;
 
         if (decorationType == BorderAnomalyModel.BorderAnomalyType.ARROW) {
-            int textOffsetX = 11;
+            int textOffsetX = 12;
             int textOffsetY = 40;
-            Graphics2D arrow = (Graphics2D) borderDecorationImage.getGraphics();
-            AffineTransform arrowTextTransform = arrow.getFont().getTransform();
+            Graphics2D arrow = borderDecorationImage.createGraphics();
+            AffineTransform arrowTextTransform = arrow.getTransform();
 
             arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
             arrow.setColor(Color.BLACK);
@@ -3333,9 +3333,18 @@ public class MapGenerator {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
         }
-        if (activeGame.getShowBubbles() && unitHolder instanceof Planet && shouldPlanetHaveShield(unitHolder, activeGame)) {
-            String tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
-            float scale = 1.2f;
+        if (activeGame.getShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, activeGame)) {
+            String tokenPath;
+            switch (planetHolder.getContrastColor()) {
+                case "orange":
+                    tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+                    break;
+                case "blue":
+                default:
+                    tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+                    break;
+            }
+            float scale = .95f;
             if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
                 scale = 1.65f;
             }

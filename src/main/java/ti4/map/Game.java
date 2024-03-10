@@ -581,8 +581,12 @@ public class Game {
         boolean isInDiscard = false;
         for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
 
-            if (Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
+            if (Mapper.getActionCard(ac.getKey()) != null && Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
                 return true;
+            }else{
+                if(Mapper.getActionCard(ac.getKey()) == null){
+                    BotLogger.log(ac.getKey() + " is returning a null AC when sent to Mapper in game "+getName());
+                }
             }
         }
         return isInDiscard;
@@ -3480,6 +3484,9 @@ public class Game {
                 if (player_.equals(player))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
+                    if(isAllianceMode() && player.getFaction().equalsIgnoreCase("mahact")){
+                        return leaderID.contains(player_.getFaction());
+                    }
                     return true;
                 }
             }

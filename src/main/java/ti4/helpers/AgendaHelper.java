@@ -1189,6 +1189,10 @@ public class AgendaHelper {
                 || activeGame.getLaws().containsKey("absol_government"))) {
             minVotes = 1;
             maxVotes = 1;
+            if (activeGame.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+                minVotes = 2;
+                maxVotes = 2;
+            }
         }
         if (maxVotes - minVotes > 20) {
             voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
@@ -2411,6 +2415,9 @@ public class AgendaHelper {
         if (activeGame.getLaws() != null && (activeGame.getLaws().containsKey("rep_govt")
                 || activeGame.getLaws().containsKey("absol_government"))) {
             voteCount = 1;
+            if (activeGame.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+                voteCount = 2;
+            }
         }
 
         if ("nekro".equals(player.getFaction()) && hasXxchaAlliance == 0) {
@@ -2873,7 +2880,7 @@ public class AgendaHelper {
                 String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
                 String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                 if (vote.contains("Rider") || vote.contains("Sanction") || vote.contains("Radiance")
-                        || vote.contains("Unity Algorithm") || vote.contains("Hero")) {
+                        || vote.contains("Unity Algorithm") || vote.contains("Tarrock") || vote.contains("Hero")) {
                     voteSummBuilder.append(";").append(specificVote);
                 } else if (faction2.equals(faction)) {
                 } else {
@@ -2900,7 +2907,7 @@ public class AgendaHelper {
                 String specificVote = vote_info.nextToken();
                 String vote = specificVote.split("_")[1];
                 if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                        && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")) {
+                        && !vote.contains("Radiance") && !vote.contains("Unity Algorithm") && !vote.contains("Tarrock")) {
                     totalVotes += Integer.parseInt(vote);
                 }
             }
@@ -2970,14 +2977,14 @@ public class AgendaHelper {
                         }
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")) {
+                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm") && !vote.contains("Tarrock")) {
                             totalVotes += Integer.parseInt(vote);
                         }
                         outcomeSummaryBuilder.append(faction).append("-").append(vote).append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")) {
+                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm") && !vote.contains("Tarrock")) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder.append(faction).append(" voted ").append(vote).append(" votes. ");
                         } else {
@@ -3066,7 +3073,12 @@ public class AgendaHelper {
             sb.append("**");
         if (activeGame.getLaws().containsKey("rep_govt") || activeGame.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
-            sb.append(" vote count (Rep Gov): **" + " ").append("1");
+            if (activeGame.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+                sb.append(" vote count (Rep Gov while controlling rex): **" + " ").append("2");
+            }else{
+                sb.append(" vote count (Rep Gov): **" + " ").append("1");
+            }
+
         }
         return sb.toString();
     }

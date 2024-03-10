@@ -401,7 +401,7 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation()
                         + " Your Dih-Mohn Flagship moved into the active system and you can produce 2 units with a combined cost of 4.", produce);        
-                    }
+            }
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             ButtonHelperFactionSpecific.checkForStymie(activeGame, player, tile);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -661,6 +661,13 @@ public class ButtonHelperTacticalAction {
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         "Use buttons to select which unit to recycle", buttons);
+            }
+        }
+        if(player.hasRelic("absol_plenaryorbital") && !tile.isHomeSystem() && !tile.getUnitHolders().containsKey("mr") && !player.hasUnit("plenaryorbital")){
+            List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(activeGame, player);
+            if(buttons4.size() > 0){
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "You can place down the plenary orbital",
+                buttons4);
             }
         }
         if (!activeGame.isFoWMode()) {

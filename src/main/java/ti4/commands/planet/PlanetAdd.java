@@ -2,6 +2,9 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -68,7 +71,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (activeGame.isFoWMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, "# "+player.getRepresentation() + " scored custodians!");
                 String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
@@ -88,16 +91,23 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_) && !doubleCheck) {
-                        String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
-                            + " gained shard and a victory point.";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
-                        player_.removeRelic("shard");
-                        player.addRelic("shard");
-                        int shardID = activeGame.getRevealedPublicObjectives().get("Shard of the Throne");
-                        activeGame.unscorePublicObjective(player_.getUserID(), shardID);
-                        activeGame.scorePublicObjective(player.getUserID(), shardID);
-                        Helper.checkEndGame(activeGame, player);
+                    for(String relic : player_.getRelics()){
+                        if (relic.contains("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_) && !doubleCheck) {
+                            String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
+                                + " gained shard and a victory point.";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+                            player_.removeRelic(relic);
+                            player.addRelic(relic);
+                            String customPOName = "Shard of the Throne";
+                            if(relic.contains("absol_")){
+                                int absolShardNum = Integer.parseInt(StringUtils.right(relic, 1));
+                                customPOName = "Shard of the Throne (" + absolShardNum + ")";
+                            }
+                            int shardID = activeGame.getRevealedPublicObjectives().get(customPOName);
+                            activeGame.unscorePublicObjective(player_.getUserID(), shardID);
+                            activeGame.scorePublicObjective(player.getUserID(), shardID);
+                            Helper.checkEndGame(activeGame, player);
+                        }
                     }
                     if(Mapper.getPlanet(planet) != null){
                         String msg = player_.getRepresentation() + " has a window to play reparations for the taking of " + Mapper.getPlanet(planet).getName();

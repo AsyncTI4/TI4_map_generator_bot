@@ -87,6 +87,42 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         activeGame.setCurrentReacts(player.getFaction()+"planetsExplored",activeGame.getFactionsThatReactedToThis(player.getFaction()+"planetsExplored")+planetName+"*");
 
+        if (planetName.equalsIgnoreCase("garbozia")) {
+            if (player.hasAbility("distant_suns")) {
+                String reportMessage = "Garbozia exploration with Distant Suns is not implemented.\nPlease use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\n(NB: Player chooses a trait, reveals two of that trait and one of each other; reveal four cards total.)";
+                if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
+                    MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), reportMessage);
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
+                }
+                return;
+            }
+            String cardIDC = activeGame.drawExplore("CULTURAL");
+            String cardIDH = activeGame.drawExplore("INDUSTRIAL");
+            String cardIDI = activeGame.drawExplore("HAZARDOUS");
+            
+            ExploreModel exploreModelC = Mapper.getExplore(cardIDC);
+            ExploreModel exploreModelH = Mapper.getExplore(cardIDH);
+            ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
+            
+            String reportMessage = player.getFactionEmoji() + " explored " + Emojis.LegendaryPlanet + "**Garbozia** ability and found a **" + exploreModelC.getName() + "**, **" + exploreModelH.getName() + "** and a **" + exploreModelI.getName() + "**";
+            if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
+                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), reportMessage);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
+            }
+            
+            Button resolveExploreC = Button.success("resolve_explore_" + cardIDC + "_" + planetName + "_distantSuns", exploreModelC.getName());
+            Button resolveExploreH = Button.success("resolve_explore_" + cardIDH + "_" + planetName + "_distantSuns", exploreModelH.getName());
+            Button resolveExploreI = Button.success("resolve_explore_" + cardIDI + "_" + planetName + "_distantSuns", exploreModelI.getName());
+            List<Button> buttons = List.of(resolveExploreC, resolveExploreH, resolveExploreI);
+            List<MessageEmbed> embeds = List.of(exploreModelC.getRepresentationEmbed(), exploreModelH.getRepresentationEmbed(), exploreModelI.getRepresentationEmbed());
+            String message = player.getRepresentation() + " please choose 1 Explore card to resolve.";
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
+            return;
+            
+        }
+
         if (player.hasAbility("distant_suns")) {
             if (Helper.mechCheck(planetName, activeGame, player)) {
                 if (!NRACheck) {

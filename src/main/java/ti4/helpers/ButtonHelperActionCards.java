@@ -330,6 +330,15 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         event.getMessage().delete().queue();
     }
+    public static void resolveCounterStroke(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(buttonID.split("_")[1]),
+                activeGame);
+        String message = ButtonHelper.getIdent(player) + " removed their CC from tile " + buttonID.split("_")[1]
+                + " using counterstroke and gained it to their tactics";
+        player.setTacticalCC(player.getTacticalCC() + 1);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveSummit(Game activeGame, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
@@ -682,16 +691,16 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveSeizeArtifactStep1(Player player, Game activeGame, ButtonInteractionEvent event,
-            String buttonID) {
+            String kolleccTech) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
                 continue;
             }
             if (activeGame.isFoWMode()) {
-                buttons.add(Button.secondary("seizeArtifactStep2_" + p2.getFaction(), p2.getColor()));
+                buttons.add(Button.secondary("seizeArtifactStep2_" + p2.getFaction()+"_"+kolleccTech, p2.getColor()));
             } else {
-                Button button = Button.secondary("seizeArtifactStep2_" + p2.getFaction(), " ");
+                Button button = Button.secondary("seizeArtifactStep2_" + p2.getFaction()+"_"+kolleccTech, " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1143,6 +1152,12 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " select the relic frag you want to grab", buttons);
+        if(buttonID.split("_").length > 2 && buttonID.split("_")[2].contains("yes")){
+            p2.setTg(p2.getTg()+2);
+            ButtonHelperAbilities.pillageCheck(p2, activeGame);
+            ButtonHelperAgents.resolveArtunoCheck(p2, activeGame, 2);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation()+" you gained 2tg due to being hit by the tech Seeker Drones");
+        }
     }
 
     public static void resolveUprisingStep2(Player player, Game activeGame, ButtonInteractionEvent event,
@@ -1781,14 +1796,17 @@ public class ButtonHelperActionCards {
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
                 if ("unitupgrade".equalsIgnoreCase(Mapper.getTech(tech).getType().toString())) {
+                    boolean hasSpecialUpgrade = false;
                     for (String factionTech : player.getNotResearchedFactionTechs()) {
                         TechnologyModel fTech = Mapper.getTech(factionTech);
                         if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
                                 && "unitupgrade".equalsIgnoreCase(fTech.getType().toString())
                                 && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
-                        }else{
-                            techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
+                                    hasSpecialUpgrade = true;
                         }
+                    }
+                    if(!hasSpecialUpgrade){
+                        techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
                     }
                 }else{
                     techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",Mapper.getTech(tech).getName()));
