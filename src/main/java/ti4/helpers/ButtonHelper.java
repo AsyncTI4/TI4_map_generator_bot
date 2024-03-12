@@ -2671,7 +2671,7 @@ public class ButtonHelper {
                 mahact.getRepresentation(true, true) + " the " + target.getColor()
                         + " cc has been removed from your fleet pool");
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Button.danger("turnEnd", "End Turn");
+        Button endTurn = Button.danger(target.getFinsFactionCheckerPrefix()+"turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
         if (getEndOfTurnAbilities(target, game).size() > 1) {
             conclusionButtons.add(Button.primary("endOfTurnAbilities",
@@ -2706,7 +2706,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, game),
                 mahact.getRepresentation(true, true) + " you have spent a strat cc");
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Button.danger("turnEnd", "End Turn");
+        Button endTurn = Button.danger(target.getFinsFactionCheckerPrefix()+"turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
         if (getEndOfTurnAbilities(target, game).size() > 1) {
             conclusionButtons.add(Button.primary("endOfTurnAbilities",
@@ -2753,7 +2753,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(getCorrectChannel(minister, game),
                 minister.getRepresentation(true, true) + " you have used the Minister of Peace agenda");
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Button.danger("turnEnd", "End Turn");
+        Button endTurn = Button.danger(target.getFinsFactionCheckerPrefix()+"turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
         if (getEndOfTurnAbilities(target, game).size() > 1) {
             conclusionButtons.add(Button.primary("endOfTurnAbilities",
@@ -2891,6 +2891,7 @@ public class ButtonHelper {
         List<ActionRow> actionRow2 = new ArrayList<>();
         int buttons = 0;
         String id = "br";
+        String id2 = "br";
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
@@ -2901,6 +2902,12 @@ public class ButtonHelper {
                 buttons = buttons + buttonRow.size();
                 if(buttonRow.get(0) instanceof Button butt){
                     id = butt.getId();
+                    if(buttonRow.size() == 2){
+                        if(buttonRow.get(1) instanceof Button butt2){
+                            id2 = butt2.getId();
+                        }
+                        
+                    }
                 }
                 actionRow2.add(ActionRow.of(buttonRow));
             }
@@ -2909,7 +2916,7 @@ public class ButtonHelper {
             if(exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1){
                 event.getMessage().delete().queue();
             }else{
-                if(buttons == 1 && id.equalsIgnoreCase("deleteButtons")){
+                if((buttons == 1 && id.equalsIgnoreCase("deleteButtons")) ||(buttons == 2 && id.equalsIgnoreCase("deleteButtons") && id2.equalsIgnoreCase("ultimateUndo"))){
                     event.getMessage().delete().queue();
                 }else{
                     event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
@@ -4656,14 +4663,13 @@ public class ButtonHelper {
 
     }
 
-    public static List<Button> landAndGetBuildButtons(Player player, Game game, ButtonInteractionEvent event) {
+    public static List<Button> landAndGetBuildButtons(Player player, Game game, ButtonInteractionEvent event, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         // Map<String, Integer> displacedUnits =
         // game.getCurrentMovedUnitsFrom1System();
         // Map<String, String> planetRepresentations =
         // Mapper.getPlanetRepresentations();
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
 
         // for(String unit :displacedUnits.keySet()){
         // int amount = displacedUnits.get(unit);
@@ -4829,7 +4835,7 @@ public class ButtonHelper {
         if (tile == null) {
             return null;
         }
-        return tile.getUnitHolders().get(planetName);
+        return tile.getUnitHolders().get(AliasHandler.resolvePlanet(planetName.toLowerCase()));
     }
 
     /**
@@ -6267,7 +6273,7 @@ public class ButtonHelper {
                 if (unitHolder instanceof Planet planet) {
                     if (!player.getPlanetsAllianceMode().contains(planet.getName())
                             && !isPlanetLegendaryOrHome(unitHolder.getName(), game, false, player)
-                            && !planet.getName().toLowerCase().contains("rex")) {
+                            && !planet.getName().equalsIgnoreCase("mr")) {
                         buttons.add(Button.success(finChecker + "stellarConvert_" + planet.getName(),
                                 "Stellar Convert " + Helper.getPlanetRepresentation(planet.getName(), game)));
                     }
@@ -6663,6 +6669,18 @@ public class ButtonHelper {
                                 + " You can use these buttons to resolve Maw Of Worlds",
                         getMawButtons());
             }
+            if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + " Reminder this is the window to do Twilight Mirror");
+                List<Button> playerButtons = new ArrayList<>();
+                playerButtons.add(Button.success("resolveTwilightMirror", "Purge Twilight Mirror"));
+                playerButtons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + " You can use these buttons to resolve Twilight Mirror",
+                        playerButtons);
+            }
             if (player.getRelics() != null && player.hasRelic("emphidia")) {
                 for (String pl : player.getPlanets()) {
                     Tile tile = game.getTile(AliasHandler.resolveTile(pl));
@@ -6953,6 +6971,20 @@ public class ButtonHelper {
                 player.getRepresentation() + " purged Maw Of Worlds.");
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                 player.getRepresentation() + " Use the button to get a tech", Buttons.GET_A_FREE_TECH);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
+        player.removeRelic("twilight_mirror");
+        player.removeExhaustedRelic("twilight_mirror");
+        for (String planet : player.getPlanets()) {
+            player.exhaustPlanet(planet);
+        }
+        game.setComponentAction(true);
+
+        MessageHelper.sendMessageToChannel(getCorrectChannel(player, game),
+                player.getRepresentation() + " purged Twilight Mirror to take one action.");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                player.getRepresentation() + " Use the button to do an action. It is advised you avoid the end turn button at the end of it, and just delete it. ", TurnStart.getStartOfTurnButtons(player, game, false, event));
         event.getMessage().delete().queue();
     }
 
@@ -8245,11 +8277,21 @@ public class ButtonHelper {
                     if (buttonID.contains("decrypted_cartoglyph")) {
                         new DrawBlueBackTile().drawBlueBackTiles(event, game, p1, 3, false);
                     }
+                    if ("throne_of_the_false_emperor".equals(buttonID)){
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Button.success("drawRelic", "Draw a relic"));
+                        buttons.add(Button.primary("thronePoint", "Score a secret someone else scored"));
+                        buttons.add(Button.danger("deleteButtons", "Score one of your unscored secrets"));
+                        MessageHelper.sendMessageToChannel(event.getChannel(), p1.getRepresentation() + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button");
+
+                    }
                     if ("dynamiscore".equals(buttonID) || "absol_dynamiscore".equals(buttonID)) {
                         int oldTg = p1.getTg();
                         p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
                         if ("absol_dynamiscore".equals(buttonID)) {
-                            p1.setTg(p1.getTg() + 2);
+                            p1.setTg(oldTg + Math.min(p1.getCommoditiesTotal() * 2,10));
+                        }else{
+                            p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
                         }
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getRepresentation(true, true)
                                 + " Your tgs increased from " + oldTg + " -> " + p1.getTg());

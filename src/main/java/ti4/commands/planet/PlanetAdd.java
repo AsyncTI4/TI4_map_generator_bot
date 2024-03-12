@@ -91,7 +91,9 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    for(String relic : player_.getRelics()){
+                    List<String> relics = new ArrayList<>();
+                    relics.addAll(player_.getRelics());
+                    for(String relic : relics){
                         if (relic.contains("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_) && !doubleCheck) {
                             String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
                                 + " gained shard and a victory point.";

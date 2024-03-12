@@ -69,6 +69,9 @@ public class Setup extends GameSubcommandData {
             activeGame.setCurrentReacts(key,"");
             activeGame.setCurrentReacts(key2,"");
             activeGame.setCurrentReacts(key3,"");
+            if(activeGame.getRound() > 1){
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
+            }
             
         }
 
