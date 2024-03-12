@@ -1325,6 +1325,26 @@ public class ButtonHelperHeroes {
         }
         event.getMessage().delete().queue();
     }
+    public static void resolveKyroHeroInitiation(Player player, Game game, ButtonInteractionEvent event) {
+        Leader playerLeader = player.unsafeGetLeader("kyrohero");
+        StringBuilder message2 = new StringBuilder(player.getRepresentation()).append(" played ")
+                .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
+                    message2 + " - Leader " + "kyrohero"
+                            + " has been purged. \n\n");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Leader was not purged - something went wrong");
+        }
+        int dieResult = player.getLowestSC();
+        game.setCurrentReacts("kyroHeroSC", dieResult + "");
+        game.setCurrentReacts("kyroHeroPlayer", player.getFaction());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), "Marked the Blex Hero Target as SC #"
+                + dieResult + " and the faction that played the hero as " + player.getFaction());
+        event.getMessage().delete().queue();
+    }
 
     public static void offerOlradinHeroFlips(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();

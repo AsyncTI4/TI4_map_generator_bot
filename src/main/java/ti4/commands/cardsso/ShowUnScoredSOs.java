@@ -2,6 +2,9 @@ package ti4.commands.cardsso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
@@ -37,6 +40,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
                 currentSecrets.removeAll(player.getSecretsScored().keySet());
            }
         }
+        currentSecrets.removeAll(activeGame.getSoToPoList());   
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Unscored Action Phase Secrets: ").append("\n");

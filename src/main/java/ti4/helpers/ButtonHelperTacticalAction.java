@@ -105,7 +105,9 @@ public class ButtonHelperTacticalAction {
                                 }
                                 if (damagedUnits > 0) {
                                     amount = damagedUnits;
-                                    rest = unitName.toLowerCase() + "damaged_" + unitHolder.getName().toLowerCase();
+                                    unitName = unitName.toLowerCase()+"damaged";
+                                    rest = unitName+"_" + unitHolder.getName().toLowerCase();
+                                    
                                     if (currentSystem.containsKey(rest)) {
                                         activeGame.setSpecificCurrentMovedUnitsFrom1System(rest,
                                                 currentSystem.get(rest) + amount);
@@ -369,7 +371,7 @@ public class ButtonHelperTacticalAction {
             message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             needPDSCheck = true;
-            systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
+            systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event, tile);
         } else {
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()) {
                 ButtonHelper.resolveEmpyCommanderCheck(player, activeGame, tile, event);
@@ -444,7 +446,7 @@ public class ButtonHelperTacticalAction {
             }
         }
         if (systemButtons.size() == 2 || activeGame.getL1Hero()) {
-            systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
+            systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event, tile);
         }
         if (player.getLeaderIDs().contains("nivyncommander") && !player.hasLeaderUnlocked("nivyncommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "nivyn", event);
