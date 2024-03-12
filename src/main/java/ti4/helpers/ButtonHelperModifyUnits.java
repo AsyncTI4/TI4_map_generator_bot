@@ -908,7 +908,7 @@ public class ButtonHelperModifyUnits {
                     + " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.", b2s);
             }
         }
-        List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
+        List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         event.getMessage().delete().queue();
@@ -1336,11 +1336,6 @@ public class ButtonHelperModifyUnits {
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), unit, activeGame);
                 successMessage = "Placed a space dock in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + " system.";
-            } else if (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) {
-                new AddUnits().unitParsing(event, player.getColor(),
-                    activeGame.getTile(AliasHandler.resolveTile(planetName)), "sd " + planetName, activeGame);
-                successMessage = "Placed a space dock on "
-                    + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             } else {
                 new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,
@@ -1349,11 +1344,18 @@ public class ButtonHelperModifyUnits {
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
-            new AddUnits().unitParsing(event, player.getColor(),
-                activeGame.getTile(AliasHandler.resolveTile(planetName)), unitLong + " " + planetName,
-                activeGame);
-            successMessage = "Placed a " + Emojis.pds + " on "
-                + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+            if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
+                new AddUnits().unitParsing(event, player.getColor(),
+                    activeGame.getTile(AliasHandler.resolveTile(planetName)), unit, activeGame);
+                successMessage = "Placed a " + Emojis.pds + " in the space area of the "
+                    + Helper.getPlanetRepresentation(planetName, activeGame) + " system.";
+            }else{
+                new AddUnits().unitParsing(event, player.getColor(),
+                    activeGame.getTile(AliasHandler.resolveTile(planetName)), unitLong + " " + planetName,
+                    activeGame);
+                successMessage = "Placed a " + Emojis.pds + " on "
+                    + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+            }
         } else {
             Tile tile;
             if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || ((unitLong.contains("gf") && unitLong.length() > 2))) {

@@ -865,7 +865,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " tell the bot who you want to resolve spy on",
+                player.getRepresentation(true, true) + " tell the bot who to steal a random AC from",
                 buttons);
     }
 
@@ -1074,14 +1074,14 @@ public class ButtonHelperActionCards {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true)
-                        + " since spy is such a frequently sabod card, and it contains secret info, extra precaution has been taken with its resolution. A button has been sent to "
+                        + " since stealing an AC reveals secret info, extra precaution has been taken and a button has been sent to "
                         + ButtonHelper.getIdentOrColor(p2, activeGame)
                         + " cards info thread, they can press this button to send a random AC to you.");
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("spyStep3_" + player.getFaction(), "Send random AC"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentation(true, true)
-                        + " you have been hit with the Spy AC. Press the button to send a random AC to the person.",
+                        + " you have been hit with an ability which forces you to send a random AC. Press the button to send a random AC to the person.",
                 buttons);
         event.getMessage().delete().queue();
     }
@@ -1171,6 +1171,9 @@ public class ButtonHelperActionCards {
         }
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getReadiedPlanets()) {
+            if(activeGame.getTileFromPlanet(planet).isHomeSystem()){
+                continue;
+            }
             buttons.add(Button.secondary("uprisingStep3_" + p2.getFaction() + "_" + planet,
                     Helper.getPlanetRepresentation(planet, activeGame)));
         }

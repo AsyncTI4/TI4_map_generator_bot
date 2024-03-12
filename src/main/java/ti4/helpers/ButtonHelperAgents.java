@@ -880,7 +880,7 @@ public class ButtonHelperAgents {
                     "1 inf " + planet, activeGame);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                     ButtonHelper.getIdent(player) + " landed an extra infantry on "
-                            + Helper.getPlanetRepresentation(planet, activeGame) + " using Dihmohn agent");
+                            + Helper.getPlanetRepresentation(planet, activeGame) + " using Dihmohn agent [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent]");
         }
         if ("vadenagent".equalsIgnoreCase(agent)) {
             resolveVadenAgentStep2(player, activeGame, event, rest);
@@ -888,9 +888,9 @@ public class ButtonHelperAgents {
         if ("celdauriagent".equalsIgnoreCase(agent)) {
             resolveCeldauriAgentStep2(player, activeGame, event, rest);
         }
-        if ("celdauriagent".equalsIgnoreCase(agent)) {
-            resolveCeldauriAgentStep2(player, activeGame, event, rest);
-        }
+        // if ("celdauriagent".equalsIgnoreCase(agent)) {
+        //     resolveCeldauriAgentStep2(player, activeGame, event, rest);
+        // }
         if ("zealotsagent".equalsIgnoreCase(agent)) {
             resolveZealotsAgentStep2(player, activeGame, event, rest);
         }
@@ -1748,10 +1748,10 @@ public class ButtonHelperAgents {
                 activeGame);
         if (player.getCommodities() > 1) {
             player.setCommodities(player.getCommodities() - 2);
-            msg = msg + "\n Paid 2 commodities";
+            msg = msg + "\n"+player.getFactionEmoji()+"Paid 2 commodities";
         } else {
             player.setTg(player.getTg() - 2);
-            msg = msg + "\n Paid 2 tg";
+            msg = msg + "\n"+player.getFactionEmoji()+"Paid 2 tg";
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
