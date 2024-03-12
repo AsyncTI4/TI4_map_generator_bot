@@ -38,7 +38,7 @@
     {
         "alias": "twilight_mirror",
         "name": "Twilight Mirror",
-        "text": "At the start of the agenda phase, you may purge this card to resolve 1 action.",
+        "text": "At the start of the agenda phase, you may purge this card to resolve 1 non-strategic action.",
         "source": "ds"
     }
 ]

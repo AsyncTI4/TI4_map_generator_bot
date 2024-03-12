@@ -2530,7 +2530,7 @@ public class Helper {
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
                 if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey())
                         || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())
-                        || activeGame.getSoToPoList().contains(scoredPublic.getKey())) {
+                        || activeGame.getSoToPoList().contains(scoredPublic.getKey()) || scoredPublic.getKey().contains("Throne of the False Emperor")) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
                         scoredPOCount++;
                     }
