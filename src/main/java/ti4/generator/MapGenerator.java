@@ -1682,6 +1682,9 @@ public class MapGenerator {
                 boolean hasAttachment = planetHolder.hasAttachment();
                 if (hasAttachment) {
                     String planetTypeName = "pc_upgrade.png";
+                    if(planetHolder.getTokenList().contains("attachment_tombofemphidia.png")){
+                        planetTypeName = "pc_upgrade_tomb.png";
+                    }
                     drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName, planet);
                 }
 
