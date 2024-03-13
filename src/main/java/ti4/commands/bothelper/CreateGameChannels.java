@@ -420,8 +420,17 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 .getGuildById(GlobalSettings.getSetting(
                         GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
                         AsyncTI4DiscordBot.guildPrimary.getId()));
-
+        // CHECK IF QUINARY SERVER HAS ROOM
+        guild = AsyncTI4DiscordBot.guildQuinary;
+        if (guild != null && serverHasRoomForNewFullCategory(guild)) {
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
+            return guild;
+        }
         // CURRENT SET GUILD HAS ROOM
+        guild = AsyncTI4DiscordBot.jda
+                .getGuildById(GlobalSettings.getSetting(
+                        GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
+                        AsyncTI4DiscordBot.guildPrimary.getId()));
         if (serverHasRoomForNewFullCategory(guild))
             return guild;
 
@@ -446,12 +455,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return guild;
         }
 
-        // CHECK IF QUINARY SERVER HAS ROOM
-        guild = AsyncTI4DiscordBot.guildQuinary;
-        if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-            return guild;
-        }
+        
 
         BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
         return null;
