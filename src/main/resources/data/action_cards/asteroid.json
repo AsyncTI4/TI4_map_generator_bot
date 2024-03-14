@@ -1,0 +1,362 @@
+[
+    {
+        "alias": "assassin2",
+        "name": "Assassinate Representative",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose 1 player. That player cannot vote on this agenda.",
+        "flavorText": "With a sickening crunch of bone and metal, unit.desgn.FLAYESH extracted its stinger from the blood-drenched skull of the Jol-Nar councilor.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "assassin3",
+        "name": "Assassinate Representative",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose 1 player. That player cannot vote on this agenda.",
+        "flavorText": "With a sickening crunch of bone and metal, unit.desgn.FLAYESH extracted its stinger from the blood-drenched skull of the Jol-Nar councilor.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "assassin4",
+        "name": "Assassinate Representative",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose 1 player. That player cannot vote on this agenda.",
+        "flavorText": "With a sickening crunch of bone and metal, unit.desgn.FLAYESH extracted its stinger from the blood-drenched skull of the Jol-Nar councilor.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "bribery2",
+        "name": "Bribery",
+        "phase": "Agenda",
+        "window": "After the speaker votes on an agenda",
+        "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
+        "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "bribery3",
+        "name": "Bribery",
+        "phase": "Agenda",
+        "window": "After the speaker votes on an agenda",
+        "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
+        "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "bribery4",
+        "name": "Bribery",
+        "phase": "Agenda",
+        "window": "After the speaker votes on an agenda",
+        "text": "Spend any number of trade goods. For each trade good spent, cast 1 additional vote for the outcome on which you voted.",
+        "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "disable2",
+        "name": "Disable",
+        "phase": "Action",
+        "window": "At the start of an invasion in a system that contains 1 or more of your opponents' PDS units",
+        "text": "Your opponents' PDS units lose Planetary Shield and Space Cannon during this invasion.",
+        "flavorText": "Ssruu has met their systems and fixed them. Ssruu dropped a handful of ripped wires and broken circuitry on the pedestal before Q'uesh Sish. \"He will await his next task aboard his ship.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "distinguished2",
+        "name": "Distinguished Councilor",
+        "phase": "Agenda",
+        "window": "After you cast votes on an outcome of an agenda",
+        "text": "Cast 5 additional votes for that outcome.",
+        "flavorText": "Elder Junn was a wonder to behold. He knew the name of every senator, made small talk effortlessly, and commanded attention when he spoke. Magmus hated everything about him.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "experimental2",
+        "name": "Experimental Battlestation",
+        "phase": "Action",
+        "window": "After another player moves ships into a system during a tactical action",
+        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses Space Cannon 5 (x3) against ships in the active system.",
+        "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "f_researched2",
+        "name": "Focused Research",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 4 trade goods to research 1 technology",
+        "flavorText": "Stunned, Rin looked over the data, scarcely able to believe what he was seeing. It was nothing short of a major breakthrough. The Headmaster would be pleased.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "f_researched3",
+        "name": "Focused Research",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 4 trade goods to research 1 technology",
+        "flavorText": "Stunned, Rin looked over the data, scarcely able to believe what he was seeing. It was nothing short of a major breakthrough. The Headmaster would be pleased.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "f_researched4",
+        "name": "Focused Research",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 4 trade goods to research 1 technology",
+        "flavorText": "Stunned, Rin looked over the data, scarcely able to believe what he was seeing. It was nothing short of a major breakthrough. The Headmaster would be pleased.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "f_deployment2",
+        "name": "Frontline Deployment",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 3 infantry from your reinforcements on 1 planet you control.",
+        "flavorText": "The soldiers poured fire on the writhing mass, but as each tendril vaporized, two more took its place. Panic wormed into the troopers' minds; was the creature growing?",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "ghost_ship2",
+        "name": "Ghost Ship",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Place 1 destroyer from your reinforcements in a non-home system that contains a wormhole and does not contain other players' ships.",
+        "flavorText": "Reports of Creuss vessels sighted in the area had surely been exaggerated. After all, the Creuss had no business this far from the Shaleri passage, and usually kept to themselves.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "silence_space2",
+        "name": "In The Silence Of Space",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Choose 1 system. During this tactical action, your ships in the chosen system can move through systems that contain other players' ships.",
+        "flavorText": "The Barony ships seemed to defy reality, bending light around them at impossible angles - naught but inky-black contours could be seen.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "infiltrate2",
+        "name": "Infiltrate",
+        "phase": "Action",
+        "window": "When you gain control of a planet",
+        "text": "Replace each PDS and space dock that is on that planet with a matching unit from your reinforcements.",
+        "flavorText": "The 1X had scarcely interfaced with the mainframe before it belonged to them completely.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "asteroid_lost_star_1",
+        "name": "Lost Star Chart",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "During this tactical action, systems that contain non-delta wormholes are adjacent to each other.",
+        "flavorText": "The ship's sensors showed that the ancient star-map had somehow led them beyond the Mahact plateau.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "asteroid_lost_star_2",
+        "name": "Lost Star Chart",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "During this tactical action, systems that contain non-delta wormholes are adjacent to each other.",
+        "flavorText": "The ship's sensors showed that the ancient star-map had somehow led them beyond the Mahact plateau.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "disgrace2",
+        "name": "Public Disgrace",
+        "phase": "Strategy",
+        "window": "When another player chooses a strategy card during the strategy phase",
+        "text": "That player must choose a different strategy card instead, if able.",
+        "flavorText": "In the months that followed the report, the Council was quick to censure the Jol-Nar for their unethical practices.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "unexpected2",
+        "name": "Unexpected Action",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Remove 1 of your command tokens from the game board and return it to your reinforcements.",
+        "flavorText": "M'aban's voice was barely a whisper, cracking as hundreds of flashing lights appeared on her scanner. \"We've been tricked.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "veto2",
+        "name": "Veto",
+        "phase": "Agenda",
+        "window": "When an agenda is revealed",
+        "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
+        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "veto3",
+        "name": "Veto",
+        "phase": "Agenda",
+        "window": "When an agenda is revealed",
+        "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
+        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "veto4",
+        "name": "Veto",
+        "phase": "Agenda",
+        "window": "When an agenda is revealed",
+        "text": "Discard that agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead.",
+        "flavorText": "Magmus batted the now charred corpse aside with the back of his golden gauntlet. \"The Muuat reject your proposal.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "counterstroke2",
+        "name": "Counterstroke",
+        "phase": "Action",
+        "window": "After a player activates a system that contains 1 of your command tokens",
+        "text": "Return that command token to your tactic pool.",
+        "flavorText": "That's the thing about loyalty -  Viktor mused, turning one of the pieces backward, facing its own side. \"It can be bought.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "insider2",
+        "name": "Insider Information",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Look at the top card of the agenda deck.",
+        "flavorText": "M'aban yawned. Another filibuster. Politics could be so flavorless at times. Besides, she already knew how this one was going to turn out. Not well. Not well at all...",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "master_plan2",
+        "name": "Master Plan",
+        "phase": "Action",
+        "window": "After you perform an action",
+        "text": "You may perform an additional action this turn.",
+        "flavorText": "Viktor laced his long fingers with a wicked smile. Unlenn would be proud. The tactician's reputation was well-earned; even pawns could unseat kings.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "plagiarize2",
+        "name": "Plagiarize",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 5 influence and choose a non-faction technology owned by 1 of your neighbors. Gain that technology.",
+        "flavorText": "The Yssaril spies handed over their prize to Connor, who in turn passed it to the Sol engineers with a grim smile. \"Now then, boys,\" he said, one hand on his rifle, \"about those loose ends...\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "arch_expedition2",
+        "name": "Archaeological Expedition",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "flavorText": "Hiari pressed the activation flyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "arch_expedition3",
+        "name": "Archaeological Expedition",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "flavorText": "Hiari pressed the activation flyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "arch_expedition4",
+        "name": "Archaeological Expedition",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Reveal the top 3 cards of an exploration deck that matches a planet you control. gain any relic fragments that you reveal and discard the rest.",
+        "flavorText": "Hiari pressed the activation flyphs, and the ancient door hissed open. As she stepped into the pitch-black interior of the Mahact tomb, she felt a shiver of anticipation. Perhaps, finally, she would find the Codex.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "decoy2",
+        "name": "Decoy Operation",
+        "phase": "Action",
+        "window": "After another player activates a system that contains 1 or more of your structures",
+        "text": "Remove up to 2 of your ground forces from the game board and place them on a planet you control in the active system.",
+        "flavorText": "Enemy fire lashed the abandoned positions on the ridgeline as Trilossa's flock slipped unseen around their flanks.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "divert_funding2",
+        "name": "Divert Funding",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Return a non-unit upgrade, non-faction technology that you own to your technology deck. Then, research another technology.",
+        "flavorText": "I am sorry, Academician, Arbiter Berekon shrugged. \"I am sure psychoarchaeology is an interesting subject, but the supreme leader feels your budget would be better spent on more militaristic research.\"",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "probe2",
+        "name": "Exploration Probe",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
+        "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "probe3",
+        "name": "Exploration Probe",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
+        "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "probe4",
+        "name": "Exploration Probe",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
+        "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "nav_suite2",
+        "name": "Nav Suite",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "During the 'Movement' step of this tactical action, ignore the effect of anomalies.",
+        "flavorText": "The field is too thick! Sikosk gasped. Trrakan's plume flared. \"Not for me, and not for Iruth.\" A flick of his talon, and the destroyer flipped and dove for the asteroid field.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "reveal_prototype2",
+        "name": "Reveal Prototype",
+        "phase": "Action",
+        "window": "At the start of a combat",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the pre-reqs of the tech before you can research it.]",
+        "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "reveal_prototype3",
+        "name": "Reveal Prototype",
+        "phase": "Action",
+        "window": "At the start of a combat",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the pre-reqs of the tech before you can research it.]",
+        "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "reveal_prototype4",
+        "name": "Reveal Prototype",
+        "phase": "Action",
+        "window": "At the start of a combat",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the pre-reqs of the tech before you can research it.]",
+        "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
+        "source": "Asteroid Fun Deck"
+    },
+    {
+        "alias": "rout2",
+        "name": "Rout",
+        "phase": "Action",
+        "window": "At the start of the 'Announce Retreats' step of space combat, if you are the defender",
+        "text": "Your opponent must announce a retreat, if able.",
+        "flavorText": "Vuil'raith fleshships swarmed the weary defenders, sending unease and sweeping through the telepathic links. But Z'eu projected a powerful feeling of calm, and the Naalu fighters began to drive the Cabal back toward the rift.",
+        "source": "Asteroid Fun Deck"
+    }
+]
