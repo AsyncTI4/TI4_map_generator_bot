@@ -342,13 +342,12 @@ public class FoWHelper {
 
 		// for each adjacent tile...
 		for (int i = 0; i < 6; i++) {
+			int dirFrom = (i + 3) % 6;
 			String position_ = directlyAdjacentTiles.get(i);
 			boolean borderBlocked = false;
 			for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
-				if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency()) {
-					borderBlocked = true;
-					break;
-				}
+				if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency()) borderBlocked = true;
+				if (b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacency()) borderBlocked = true;
 			}
 			if (borderBlocked && !naturalMapOnly) continue;
 
@@ -364,7 +363,7 @@ public class FoWHelper {
 			}
 
 			// explore that tile now!
-			int direcetionFrom = naturalMapOnly ? -2 : (i + 3) % 6;
+			int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
 			Set<String> newTiles = traverseAdjacencies(game, naturalMapOnly, position_, direcetionFrom, exploredSet, position + sourceDirection);
 			tiles.addAll(newTiles);
 		}
