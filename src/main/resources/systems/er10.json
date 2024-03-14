@@ -10,7 +10,7 @@
         "enu"
     ],
     "imagePath": "ER10_elokphi.png",
-    "planetIds": [
+    "planets": [
         "elokphi",
         "eloknu"
     ],
@@ -35,10 +35,6 @@
     ],
     "wormholes": [
         null
-    ],
-    "planets": [
-        "ephi",
-        "enu"
     ],
     "isAsteroidField": true
 }

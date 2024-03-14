@@ -12,14 +12,15 @@ import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
+import ti4.model.Source.ComponentSource;
 
 @Data
-public class TileModel {
+public class TileModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private List<String> aliases;
     private String imagePath;
-    private List<String> planetIds;
+    private List<String> planets;
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
@@ -27,18 +28,16 @@ public class TileModel {
     private Boolean isSupernova;
     private Boolean isNebula;
     private Boolean isGravityRift;
+    private ComponentSource source;
+
+    @Override
+    public boolean isValid() {
+        return id != null && imagePath != null;
+    }
 
     @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
-    }
-
-    public List<String> getPlanets() {
-        return planetIds;
-    }
-
-    public void setPlanets(List<String> planetIds) {
-        this.planetIds = planetIds;
     }
 
     public MessageEmbed getHelpMessageEmbed(boolean includeAliases) {
@@ -121,5 +120,15 @@ public class TileModel {
         return getId().toLowerCase().contains(searchString) ||
             getNameNullSafe().toLowerCase().contains(searchString) ||
             (getAliases() != null && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
+    }
+
+    @JsonIgnore
+    public MessageEmbed getRepresentationEmbed() {
+        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+    }
+
+    @JsonIgnore
+    public String getAlias() {
+        return getId();
     }
 }
