@@ -33,9 +33,5 @@
             "y": 170.0
         }
     ],
-    "wormholes": null,
-    "planets": [
-        "dorvok",
-        "debrae"
-    ]
+    "wormholes": null
 }

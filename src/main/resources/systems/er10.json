@@ -36,9 +36,5 @@
     "wormholes": [
         null
     ],
-    "planets": [
-        "ephi",
-        "enu"
-    ],
     "isAsteroidField": true
 }
