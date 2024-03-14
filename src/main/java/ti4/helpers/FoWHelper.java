@@ -465,7 +465,9 @@ public class FoWHelper {
 
 		boolean wh_recon = game.getLaws().containsKey("wormhole_recon");
 		boolean absol_recon = game.getLaws().containsKey("absol_recon");
-
+		if(tile == null || tile.getTileID() == null){
+			return adjacentPositions;
+		}
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			Set<String> tokenList = unitHolder.getTokenList();
