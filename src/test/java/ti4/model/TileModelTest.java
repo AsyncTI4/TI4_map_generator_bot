@@ -12,8 +12,15 @@ public class TileModelTest extends BaseTi4Test {
     public void testTiles() {
         for (TileModel model : TileHelper.getAllTiles().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
-            // assertTrue(validateFaction(model), model.getAlias() + ": invalid FactionID");
-            // assertTrue(validateHomebrewReplacesID(model), model.getAlias() + ": invalid HomebrewReplacesID");
+            assertTrue(validatePlanetIDs(model), model.getAlias() + ": invalid Planet IDs: " + model.getPlanets());
         }
+    }
+
+    private boolean validatePlanetIDs(TileModel model) {
+        if (model.getPlanets() == null) return true;
+        for (String planetId : model.getPlanets()) {
+            if (!TileHelper.getAllPlanets().containsKey(planetId)) return false;
+        }
+        return true;
     }
 }

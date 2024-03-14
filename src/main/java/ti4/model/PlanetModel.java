@@ -39,7 +39,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonDieCount;
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
-    private String contrastColor = "";
+    private String contrastColor;
     private ComponentSource source;
 
     public boolean isValid() {
@@ -47,6 +47,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             && name != null;
     }
 
+    @JsonIgnore
     public String getAlias() {
         return getId();
     }
@@ -56,6 +57,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }
@@ -94,10 +96,12 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    @JsonIgnore
     private String getInfResEmojis() {
         return Emojis.getResourceEmoji(resources) + Emojis.getInfluenceEmoji(influence);
     }
 
+    @JsonIgnore
     private String getPlanetTypeEmoji() {
         return switch (getPlanetType()) {
             case HAZARDOUS -> Emojis.Hazardous;
@@ -107,6 +111,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         };
     }
 
+    @JsonIgnore
     private String getTechSpecialtyEmoji() {
         if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
@@ -123,6 +128,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    @JsonIgnore
     private String getTechSpecialtyStringRepresentation() {
         if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
@@ -137,14 +143,17 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    @JsonIgnore
     public boolean isLegendary() {
         return getLegendaryAbilityName() != null;
     }
 
+    @JsonIgnore
     public String getEmoji() {
         return Emojis.getPlanetEmoji(getId());
     }
 
+    @JsonIgnore
     public String getEmojiURL() {
         Emoji emoji = Emoji.fromFormatted(getEmoji());
         if (emoji instanceof CustomEmoji customEmoji) {
@@ -157,6 +166,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
+    @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getName()).append(" (").append(getResources()).append("/").append(getInfluence());
@@ -165,7 +175,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
-    public String getContrastColor() {
-        return contrastColor;
+    public Optional<String> getContrastColor() {
+        return Optional.ofNullable(contrastColor);
     }
 }
