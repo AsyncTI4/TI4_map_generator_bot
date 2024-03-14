@@ -49,6 +49,7 @@ public class GameStats extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setAutoComplete(true));
     }
 
     @Override
@@ -73,6 +74,7 @@ public class GameStats extends StatisticsSubcommandData {
             case GAME_COUNT -> showGameCount(event);
             case WINNING_PATH -> showWinningPath(event);
             case SUPPORT_WIN_COUNT -> showWinsWithSupport(event);
+            
             // case WINNING_PATH_NAMES
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }

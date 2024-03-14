@@ -3066,6 +3066,27 @@ public class MapGenerator {
                     tileGraphics.drawString(tile.getFogLabel(frogPlayer), TILE_PADDING + labelPositionPoint.x, TILE_PADDING + labelPositionPoint.y);
                 }
                 tileGraphics.drawString(tile.getPosition(), TILE_PADDING + tilePositionPoint.x - textOffset, TILE_PADDING + tilePositionPoint.y);
+                int prodInSystem = 0;
+                for(Player player : game.getRealPlayers()){
+                    prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
+                }
+                if(prodInSystem > 0){
+                    
+                    if(tile.getPlanetUnitHolders().size() != 3){
+                        BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x-195 - textOffset, TILE_PADDING + tilePositionPoint.y-170, null);
+                        tileGraphics.setFont(Storage.getFont35());
+                        //tileGraphics.setColor(Color.getHSBColor(0.76f, 1.0f, 1.0f));
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x-180 - textOffset, TILE_PADDING + tilePositionPoint.y-130);
+                    }else{
+                        BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x+75 - textOffset, TILE_PADDING + tilePositionPoint.y-170, null);
+                        tileGraphics.setFont(Storage.getFont35());
+                        //tileGraphics.setColor(Color.BLACK);
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x+90 - textOffset, TILE_PADDING + tilePositionPoint.y-130);
+                    }
+                }
+                //pa_unitimage.png
             }
             case Extras -> {
                 if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer))
