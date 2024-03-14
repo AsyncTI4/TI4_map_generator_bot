@@ -12,9 +12,10 @@ import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
+import ti4.model.Source.ComponentSource;
 
 @Data
-public class TileModel {
+public class TileModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private List<String> aliases;
@@ -27,6 +28,12 @@ public class TileModel {
     private Boolean isSupernova;
     private Boolean isNebula;
     private Boolean isGravityRift;
+    private ComponentSource source;
+
+    @Override
+    public boolean isValid() {
+        return id != null;
+    }
 
     @JsonIgnore
     public String getNameNullSafe() {
@@ -121,5 +128,15 @@ public class TileModel {
         return getId().toLowerCase().contains(searchString) ||
             getNameNullSafe().toLowerCase().contains(searchString) ||
             (getAliases() != null && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
+    }
+
+    @Override
+    public MessageEmbed getRepresentationEmbed() {
+        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+    }
+
+    @Override
+    public String getAlias() {
+        return getId();
     }
 }

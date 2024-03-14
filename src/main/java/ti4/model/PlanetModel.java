@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 
 @Data
@@ -39,6 +40,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
     private String contrastColor = "";
+    private ComponentSource source;
 
     public boolean isValid() {
         return getId() != null
