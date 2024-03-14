@@ -5,9 +5,6 @@
         "char"
     ],
     "imagePath": "er90_char.png",
-    "planetIds": [
-        "char"
-    ],
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {

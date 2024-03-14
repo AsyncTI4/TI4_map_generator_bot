@@ -10,7 +10,7 @@
         "enu"
     ],
     "imagePath": "ER10_elokphi.png",
-    "planetIds": [
+    "planets": [
         "elokphi",
         "eloknu"
     ],

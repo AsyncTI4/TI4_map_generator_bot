@@ -10,10 +10,6 @@
         "dorvak"
     ],
     "imagePath": "d111.png",
-    "planetIds": [
-        "dorvok",
-        "debrbrae"
-    ],
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {
