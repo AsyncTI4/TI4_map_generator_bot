@@ -35,16 +35,18 @@ public class CreateTile extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_SUPERNOVA, "Has a Supernova?"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_NEBULA, "Has a Nebula?"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_GRAVITY_RIFT, "Has a Gravity Rift?"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "The source of the planet - generally the ID of the expansion or module it comes from").setAutoComplete(true));
         //addOptions(new OptionData(OptionType.STRING, Constants.TILE_TOKEN_LOCATIONS, "The location of space tokens in the tile. Use only to override").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         sendMessage("Creating tile " + event.getOption(Constants.TILE_NAME).getAsString());
+        String tileID = event.getOption(Constants.TILE_ID).getAsString().toLowerCase();
         TileModel tile = null;
         try {
             tile = createNewTile(
-                    event.getOption(Constants.TILE_ID).getAsString().toLowerCase(),
+                    tileID,
                     event.getOption(Constants.TILE_NAME).getAsString(),
                     event.getOption(Constants.TILE_ALIASES).getAsString(),
                     event.getOption(Constants.TILE_IMAGE).getAsString(),
@@ -54,25 +56,26 @@ public class CreateTile extends BothelperSubcommandData {
                     event.getOption(Constants.IS_ASTEROID_FIELD, false, OptionMapping::getAsBoolean),
                     event.getOption(Constants.IS_SUPERNOVA, false, OptionMapping::getAsBoolean),
                     event.getOption(Constants.IS_NEBULA, false, OptionMapping::getAsBoolean),
-                    event.getOption(Constants.IS_GRAVITY_RIFT, false, OptionMapping::getAsBoolean)
+                    event.getOption(Constants.IS_GRAVITY_RIFT, false, OptionMapping::getAsBoolean),
+                    event.getOption(Constants.SOURCE, null, OptionMapping::getAsString)
             );
         } catch (Exception e) {
-            sendMessage("Something went wrong creating the tile: " + tile.getId());
-            BotLogger.log("Something went wrong creating the tile: " + tile.getId(), e);                    
+            sendMessage("Something went wrong creating the tile: " + tileID);
+            BotLogger.log("Something went wrong creating the tile: " + tileID, e);                    
         }
         if (Optional.ofNullable(tile).isPresent()) {
             try {
                 exportTileModelToJson(tile);
             } catch (Exception e) {
-                sendMessage("Something went wrong creating the tile: " + tile.getId());
-                BotLogger.log("Something went wrong exporting the tile to json: " + tile.getId(), e);                        
+                sendMessage("Something went wrong creating the tile: " + tileID);
+                BotLogger.log("Something went wrong exporting the tile to json: " + tileID, e);                        
             }
             try {
                 TileHelper.addNewTileToList(tile);
                 AliasHandler.addNewTileAliases(tile);
             } catch (Exception e) {
-                sendMessage("Something went wrong creating the tile: " + tile.getId());
-                BotLogger.log("Something went wrong adding the tile to the active tiles list: " + tile.getId(), e);
+                sendMessage("Something went wrong creating the tile: " + tileID);
+                BotLogger.log("Something went wrong adding the tile to the active tiles list: " + tileID, e);
             }
         }
         String message = "Created new tile! Please check and make sure everything generated properly. This is the model:\n" +
@@ -90,7 +93,8 @@ public class CreateTile extends BothelperSubcommandData {
                                            boolean isAsteroidField,
                                            boolean isSupernova,
                                            boolean isNebula,
-                                           boolean isGravityRift) {
+                                           boolean isGravityRift,
+                                           String source) {
         ShipPositionModel shipPositionModel = new ShipPositionModel();
 
         TileModel tile = new TileModel();
@@ -107,6 +111,7 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setIsSupernova(isSupernova);
         tile.setIsNebula(isNebula);
         tile.setIsGravityRift(isGravityRift);
+        if (source != null) tile.setSource(Source.ComponentSource.valueOf(source));
         return tile;
     }
 

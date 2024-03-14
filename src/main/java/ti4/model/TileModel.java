@@ -122,12 +122,12 @@ public class TileModel implements ModelInterface, EmbeddableModel {
             (getAliases() != null && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
     }
 
-    @Override
+    @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
     }
 
-    @Override
+    @JsonIgnore
     public String getAlias() {
         return getId();
     }

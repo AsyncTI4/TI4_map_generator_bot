@@ -14,6 +14,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
+import ti4.model.Source;
 import ti4.model.TechSpecialtyModel;
 
 import java.awt.*;
@@ -41,14 +42,16 @@ public class CreatePlanet extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_FACTION_HOMEWORLD, "If this planet is in a faction's home system, put that faction's ID here"));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_SHORT_NAME, "A shortened name to display on the planet \"card\". MAX 10 CHARACTERS, INCLUDING SPACES"));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_FLAVOUR_TEXT, "Flavour text for the planet - must include Discord Markdown"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "The source of the planet - generally the ID of the expansion or module it comes from").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         sendMessage("Creating planet " + event.getOption(Constants.PLANET_NAME).getAsString());
+        String planetID = event.getOption(Constants.PLANET_ID).getAsString().toLowerCase();
         PlanetModel planet = null;
         try {
-            planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString().toLowerCase(),
+            planet = createPlanetModel(planetID,
                     event.getOption(Constants.PLANET_TILE_ID).getAsString().toLowerCase(),
                     event.getOption(Constants.PLANET_NAME).getAsString(),
                     event.getOption(Constants.PLANET_ALIASES).getAsString(),
@@ -62,24 +65,25 @@ public class CreatePlanet extends BothelperSubcommandData {
                     event.getOption(Constants.PLANET_LEGENDARY_TEXT, null, OptionMapping::getAsString),
                     event.getOption(Constants.PLANET_FACTION_HOMEWORLD, null, OptionMapping::getAsString),
                     event.getOption(Constants.PLANET_SHORT_NAME, null, OptionMapping::getAsString),
-                    event.getOption(Constants.PLANET_FLAVOUR_TEXT, null, OptionMapping::getAsString)
+                    event.getOption(Constants.PLANET_FLAVOUR_TEXT, null, OptionMapping::getAsString),
+                    event.getOption(Constants.SOURCE, null, OptionMapping::getAsString)
             );
         } catch (Exception e) {
-            sendMessage("Something went wrong creating the planet: " + planet.getId());
-            BotLogger.log("Something went wrong creating the planet: " + planet.getId(), e);
+            sendMessage("Something went wrong creating the planet: " + planetID);
+            BotLogger.log("Something went wrong creating the planet: " + planetID, e);
         }
         try {
             exportPlanetModelToJson(planet);
         } catch (Exception e) {
-            sendMessage("Something went wrong creating the planet: " + planet.getId());
-            BotLogger.log("Something went wrong exporting the planet to json: " + planet.getId(), e);
+            sendMessage("Something went wrong creating the planet: " + planetID);
+            BotLogger.log("Something went wrong exporting the planet to json: " + planetID, e);
         }
         try {
             TileHelper.addNewPlanetToList(planet);
             AliasHandler.addNewPlanetAliases(planet);
         } catch (Exception e) {
-            sendMessage("Something went wrong adding the planet to the active planets list: " + planet.getId());
-            BotLogger.log("Something went wrong adding the planet to the active planets list: " + planet.getId(), e);
+            sendMessage("Something went wrong adding the planet to the active planets list: " + planetID);
+            BotLogger.log("Something went wrong adding the planet to the active planets list: " + planetID, e);
         }
         
         String message = "Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
@@ -101,7 +105,8 @@ public class CreatePlanet extends BothelperSubcommandData {
                                                 String legendaryText,
                                                 String factionHomeworld,
                                                 String shortName,
-                                                String flavourText) {
+                                                String flavourText,
+                                                String source) {
         PlanetTypeModel typeModel = new PlanetTypeModel();
 
         PlanetModel planet = new PlanetModel();
@@ -125,6 +130,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         }
         if (flavourText != null) planet.setFlavourText(flavourText);
         planet.setUnitPositions(createDefaultUnitTokenPosition(planet));
+        if (source != null) planet.setSource(Source.ComponentSource.valueOf(source));
 
         return planet;
     }

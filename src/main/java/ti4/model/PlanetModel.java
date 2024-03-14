@@ -42,6 +42,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String contrastColor;
     private ComponentSource source;
 
+    @JsonIgnore
     public boolean isValid() {
         return getId() != null
             && name != null;

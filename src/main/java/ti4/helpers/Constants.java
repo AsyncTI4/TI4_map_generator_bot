@@ -1054,4 +1054,5 @@ public class Constants {
     public static final String SHOW_FULL_COMPONENT_TEXT = "show_full_component_text";
     public static final String ELIMINATED = "eliminated";
     public static final String PLANET_FLAVOUR_TEXT = "planet_flavour_text";
+    public static final String SOURCE = "source";
 }
