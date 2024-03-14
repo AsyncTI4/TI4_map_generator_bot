@@ -11,4 +11,11 @@ public class BorderAnomalyHolder {
     private String tile;
     private int direction;
     private BorderAnomalyModel.BorderAnomalyType type;
+
+    public boolean blocksAdjacency() {
+        return switch (type) {
+            case SPATIAL_TEAR -> true;
+            default -> false;
+        };
+    }
 }

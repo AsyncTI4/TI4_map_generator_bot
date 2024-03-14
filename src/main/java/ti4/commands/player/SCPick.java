@@ -103,7 +103,8 @@ public class SCPick extends PlayerSubcommandData {
     public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = new ArrayList<>();
         List<Player> activePlayers = activeGame.getRealPlayers();
-        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
+        
+        int maxSCsPerPlayer = activeGame.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer < 1) {
             maxSCsPerPlayer = 1;
         }
@@ -120,7 +121,7 @@ public class SCPick extends PlayerSubcommandData {
             if (p2 == player) {
                 continue;
             }
-            if (p2.getSCs().size() == minNumOfSCs) {
+            if (p2.getSCs().size() < maxSCsPerPlayer) {
                 if (activeGame.isFoWMode()) {
                     buttons.add(Button.secondary("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
                 } else {

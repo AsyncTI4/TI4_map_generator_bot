@@ -1737,6 +1737,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.yinAgent(buttonID, event, activeGame, player, ident, trueIdentity);
         } else if (buttonID.startsWith("resolveMaw")) {
             ButtonHelper.resolveMaw(activeGame, player, event);
+        } else if (buttonID.startsWith("resolveTwilightMirror")) {
+            ButtonHelper.resolveTwilightMirror(activeGame, player, event);
         } else if (buttonID.startsWith("playerPref_")) {
             ButtonHelper.resolvePlayerPref(player, event, buttonID, activeGame);
         } else if (buttonID.startsWith("riskDirectHit_")) {
@@ -2143,6 +2145,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, activeGame, player, buttonLabel);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
             ButtonHelperHeroes.resolveNaaluHeroInitiation(player, activeGame, event);
+        } else if (buttonID.startsWith("kyroHeroInitiation")) {
+            ButtonHelperHeroes.resolveKyroHeroInitiation(player, activeGame, event);
         } else if (buttonID.startsWith("naaluHeroSend")) {
             ButtonHelperHeroes.resolveNaaluHeroSend(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("landUnits_")) {
@@ -2163,6 +2167,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("addAbsolOrbital_")) {
+            ButtonHelper.addAbsolOrbital(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("bestowTitleStep1_")) {
             ButtonHelper.resolveBestowTitleStep1(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("bestowTitleStep2_")) {
@@ -4158,6 +4164,18 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
+                case "drawRelic" -> {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
+                    DrawRelic.drawRelicAndNotify(player, event, activeGame);
+                    event.getMessage().delete().queue();
+                }
+                case "thronePoint" -> {
+                    Integer poIndex = activeGame.addCustomPO("Throne of the False Emperor", 1);
+                    activeGame.scorePublicObjective(player.getUserID(), poIndex);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),player.getRepresentation() + " scored a Secret (they'll specify which one)");
+                    Helper.checkEndGame(activeGame, player);
+                    event.getMessage().delete().queue();
+                }
                 case "startArbiter" -> ButtonHelper.resolveImperialArbiter(event, activeGame, player);
                 case "pay1tgforKeleres" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, activeGame, event);
                 case "pay1tg"->{
@@ -4536,8 +4554,24 @@ public class ButtonListener extends ListenerAdapter {
 
                     if ("action".equalsIgnoreCase(activeGame.getCurrentPhase())
                             || "agendaVoting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
-                        if (!event.getMessage().getContentRaw().contains(finsFactionCheckerPrefix)) {
-                            event.getMessage().delete().queue();
+                        if (!event.getMessage().getContentRaw().contains(finsFactionCheckerPrefix)) { 
+                            List<ActionRow> actionRow2 = new ArrayList<>();
+                            boolean dontDelete = false;
+                            for (ActionRow row : event.getMessage().getActionRows()) {
+                                List<ItemComponent> buttonRow = row.getComponents();
+                                for(ItemComponent item : buttonRow) {
+                                    if(item instanceof Button butt){
+                                        if(butt.getId().contains("doneLanding") || butt.getId().contains("concludeMove")){
+                                           dontDelete = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            if(!dontDelete){
+                                event.getMessage().delete().queue();
+                            }
                         }
                     }
                 }
@@ -4790,7 +4824,7 @@ public class ButtonListener extends ListenerAdapter {
                         buttons2.add(hacanButton);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 ButtonHelper.getCorrectChannel(p2, activeGame),
-                                p2.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
+                                p2.getRepresentation(true, true) + " you can use Cymiae agent to make "+ButtonHelper.getIdentOrColor(player, activeGame)+"draw an AC",
                                 buttons2);
                     }
                 }
