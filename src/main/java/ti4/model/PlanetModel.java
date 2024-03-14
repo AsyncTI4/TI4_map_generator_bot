@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 
 @Data
@@ -38,12 +39,16 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonDieCount;
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
+    private String contrastColor;
+    private ComponentSource source;
 
+    @JsonIgnore
     public boolean isValid() {
         return getId() != null
             && name != null;
     }
 
+    @JsonIgnore
     public String getAlias() {
         return getId();
     }
@@ -53,6 +58,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }
@@ -91,10 +97,12 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    @JsonIgnore
     private String getInfResEmojis() {
         return Emojis.getResourceEmoji(resources) + Emojis.getInfluenceEmoji(influence);
     }
 
+    @JsonIgnore
     private String getPlanetTypeEmoji() {
         return switch (getPlanetType()) {
             case HAZARDOUS -> Emojis.Hazardous;
@@ -104,6 +112,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         };
     }
 
+    @JsonIgnore
     private String getTechSpecialtyEmoji() {
         if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
@@ -120,6 +129,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    @JsonIgnore
     private String getTechSpecialtyStringRepresentation() {
         if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
@@ -134,14 +144,17 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    @JsonIgnore
     public boolean isLegendary() {
         return getLegendaryAbilityName() != null;
     }
 
+    @JsonIgnore
     public String getEmoji() {
         return Emojis.getPlanetEmoji(getId());
     }
 
+    @JsonIgnore
     public String getEmojiURL() {
         Emoji emoji = Emoji.fromFormatted(getEmoji());
         if (emoji instanceof CustomEmoji customEmoji) {
@@ -154,11 +167,17 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
+    @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getName()).append(" (").append(getResources()).append("/").append(getInfluence());
         if (!getTechSpecialtyStringRepresentation().isBlank()) sb.append(" ").append(getTechSpecialtyStringRepresentation());
         sb.append(")");
         return sb.toString();
+    }
+
+    @JsonIgnore
+    public Optional<String> getContrastColor() {
+        return Optional.ofNullable(contrastColor);
     }
 }

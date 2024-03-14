@@ -66,7 +66,7 @@ public class TileHelper {
                         PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
                         allPlanets.put(planet.getId(), planet);
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        BotLogger.log("Error reading planet from file: " + file.getName(), e);
                     }
                 });
 
@@ -77,7 +77,7 @@ public class TileHelper {
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "systems" + File.separator;
         List<File> files = new ArrayList<>();
-        File[] storedFiles = new File(storagePath).listFiles();
+       File[] storedFiles = new File(storagePath).listFiles();
 
         if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
@@ -92,7 +92,7 @@ public class TileHelper {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                BotLogger.log("Error reading tile from file: " + file.getName(), e);
             }
         });
     }

@@ -97,6 +97,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildSecondary;
     public static Guild guildTertiary;
     public static Guild guildQuaternary;
+    public static Guild guildQuinary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -257,6 +258,18 @@ public class AsyncTI4DiscordBot {
             }
         }
 
+        // Async: Fighter Club
+        if (args.length >= 9) {
+            guildQuinary = jda.getGuildById(args[8]);
+            if (guildQuinary != null) {
+                CommandListUpdateAction commandsD = guildQuinary.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+                commandsD.queue();
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildQuinary.getName());
+                guilds.add(guildQuinary);
+            }
+        }
+
         // LOAD DATA
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
@@ -323,6 +336,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary (Stroter's Paradise)
         adminRoles.add(jda.getRoleById("1146511484264906814")); // Async Tertiary (Dreadn't)
         adminRoles.add(jda.getRoleById("1176104225978204167")); // Async Quaternary (War Sun Tzu)
+        adminRoles.add(jda.getRoleById("1209956332380229678")); // Async Quinary (Fighter Club)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
@@ -333,6 +347,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
         adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
         adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
+        adminRoles.add(jda.getRoleById("1215451631622164610")); // Sigma's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -341,7 +356,9 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
         developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)
         developerRoles.add(jda.getRoleById("1176104225978204166")); // Async Quaternary (War Sun Tzu)
+        developerRoles.add(jda.getRoleById("1209956332380229677")); // Async Quinary (Fighter Club)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
+        developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
@@ -350,9 +367,11 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
         bothelperRoles.add(jda.getRoleById("1176104225978204164")); // Async Quaternary (War Sun Tzu)
+        bothelperRoles.add(jda.getRoleById("1209956332380229675")); // Async Quinary (Fighter Club)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
+        bothelperRoles.add(jda.getRoleById("1215450829096624129")); //Sigma's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 

@@ -391,18 +391,16 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             saarButton);
                 }
 
-                final String ministerOfExploration = "minister_exploration";
-                if (activeGame.getLaws().containsKey(ministerOfExploration)) {
-                    if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction())
-                            && event != null) {
-                        String fac = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg()
-                                        + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
-                        player.setTg(player.getTg() + 1);
-                        ButtonHelperAbilities.pillageCheck(player, activeGame);
-                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-                    }
+                
+                if(ButtonHelper.isPlayerElected(activeGame, player, "minister_exploration") && event != null){
+                    String fac = player.getFactionEmoji();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg()
+                                    + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
+                    player.setTg(player.getTg() + 1);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                    
                 }
 
                 String exploredMessage = player.getRepresentation() + " explored " + Emojis.Cultural +
@@ -422,7 +420,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
                 if (player.getCommodities() > 0) {
-                    message = "Resolve using the buttons";
+                    message = "Resolve explore using the buttons";
                     Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG")
                             .withEmoji(Emoji.fromFormatted(Emojis.Wash));
                     Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities")

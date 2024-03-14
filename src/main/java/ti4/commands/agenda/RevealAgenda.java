@@ -89,7 +89,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
-                if (agendaTarget.toLowerCase().contains("elect law") && activeGame.getLaws().size() < 1) {
+                if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution")) && activeGame.getLaws().size() < 1) {
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel,
                         activeGame.getPing() + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
@@ -112,15 +112,11 @@ public class RevealAgenda extends AgendaSubcommandData {
                         speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
                     }
                     if (speaker != null) {
-                        Map.Entry<String, Integer> entry = activeGame.drawAgenda();
-                        if (entry == null) {
-                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "It appears there are no cards left in the agenda deck. Ping Fin or Jazz.");
-                        } else {
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(speaker.getRepresentation(true, true)).append(" this is the top agenda for Covert Legislation:");
-                            List<MessageEmbed> embeds = List.of(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
-                            MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, speaker, sb.toString(), embeds);
-                        }
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(speaker.getRepresentation(true, true)).append(" this is the top agenda for Covert Legislation:");
+                        List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
+                        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, speaker, sb.toString(), embeds);
+                        
                     }
                 }
             }

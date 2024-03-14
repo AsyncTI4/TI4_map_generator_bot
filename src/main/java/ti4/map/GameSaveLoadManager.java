@@ -547,7 +547,11 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.UNDO_BUTTON + " " + activeGame.getUndoButton());
         writer.write(System.lineSeparator());
+        writer.write(Constants.FAST_SC_FOLLOW + " " + activeGame.isFastSCFollowMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.QUEUE_SO + " " + activeGame.getQueueSO());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_BUBBLES + " " + activeGame.getShowBubbles());
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + activeGame.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
@@ -578,6 +582,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.VERBOSITY + " " + activeGame.getOutputVerbosity());
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + activeGame.isTestBetaFeaturesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + activeGame.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
         writer.write(Constants.HACK_ELECTION_STATUS + " " + activeGame.getHackElectionStatus());
         writer.write(System.lineSeparator());
@@ -705,6 +711,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DUMMY + " " + player.isDummy());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.ELIMINATED + " " + player.isEliminated());
             writer.write(System.lineSeparator());
 
             //BENTOR Ancient Blueprints
@@ -1712,10 +1721,26 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.FAST_SC_FOLLOW -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setFastSCFollowMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.QUEUE_SO -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setQueueSO(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.SHOW_BUBBLES -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setShowBubbles(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1850,6 +1875,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setTestBetaFeaturesMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.SHOW_FULL_COMPONENT_TEXT -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setShowFullComponentTextEmbeds(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -2208,6 +2241,7 @@ public class GameSaveLoadManager {
                         player.addTempCombatMod(new TemporaryCombatModifierModel(mods.nextToken()));
                     }
                 }
+                case Constants.ELIMINATED -> player.setEliminated(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }

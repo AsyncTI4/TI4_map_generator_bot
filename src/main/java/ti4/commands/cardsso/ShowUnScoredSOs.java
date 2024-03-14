@@ -2,6 +2,8 @@ package ti4.commands.cardsso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -28,7 +30,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
             return;
         }
-        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
+        List<String> defaultSecrets = Mapper.getDecks().get(activeGame.getSoDeckID()).getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(defaultSecrets);
         for(Player player : activeGame.getPlayers().values()){
             if(player == null){
@@ -38,29 +40,29 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
                 currentSecrets.removeAll(player.getSecretsScored().keySet());
            }
         }
+        currentSecrets.removeAll(activeGame.getSoToPoList());   
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Unscored Action Phase Secrets: ").append("\n");
-        int x= 1;
+        int x = 1;
         for (String id : currentSecrets) {
-            
-            if(SOInfo.getSecretObjectiveRepresentation(id).contains("Action Phase")){
+            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Action Phase")){
                 sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                 x++;
             }   
         }
-        x=1;
+        x = 1;
         sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if(SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")){
+            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")){
                 sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                 x++;
             }   
         }
-        x=1;
+        x = 1;
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if(SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")){
+            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")){
                 sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                 x++;
             }   

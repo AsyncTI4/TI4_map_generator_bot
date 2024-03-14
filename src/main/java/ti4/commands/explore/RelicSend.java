@@ -82,12 +82,12 @@ public class RelicSend extends GenericRelicAction {
         switch (relicID) {
             case "shard" -> {
                 shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = activeGame.getCustomPublicVP().get(shardCustomPOName);
+                shardPublicObjectiveID = activeGame.getRevealedPublicObjectives().get("Shard of the Throne");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
-                shardPublicObjectiveID = activeGame.getCustomPublicVP().get(shardCustomPOName);
+                shardPublicObjectiveID = activeGame.getRevealedPublicObjectives().get(shardCustomPOName);
             }
         }
         if (shardCustomPOName != null && shardPublicObjectiveID != null && activeGame.getCustomPublicVP().containsKey(shardCustomPOName) && activeGame.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {

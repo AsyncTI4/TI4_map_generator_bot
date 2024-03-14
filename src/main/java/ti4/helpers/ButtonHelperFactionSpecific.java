@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
@@ -38,7 +37,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
-import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
@@ -108,7 +106,7 @@ public class ButtonHelperFactionSpecific {
             // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
-            if (unitName.equalsIgnoreCase("fighter")) {
+            if ("fighter".equalsIgnoreCase(unitName)) {
                 continue;
             }
 
@@ -279,7 +277,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
             if (!tile.getPosition().equalsIgnoreCase(activeGame.getActiveSystem())
-                    && !ButtonHelper.isTileHomeSystem(tile) && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
+                    && !tile.isHomeSystem() && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
                 buttons.add(Button.success("stymiePlayerStep2_" + activePlayer.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(activeGame, player)));
             }
@@ -508,7 +506,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getRaghsCallButtons(Player player, Game activeGame, Tile tile) {
         List<Button> buttons = new ArrayList<>();
         Player saar = activeGame.getPNOwner("ragh");
-        if (saar == player) {
+        if (saar == player || tile == null) {
             return buttons;
         }
         for (UnitHolder uH : tile.getUnitHolders().values()) {
@@ -536,8 +534,8 @@ public class ButtonHelperFactionSpecific {
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
-            if (unit.getBaseType().equalsIgnoreCase("cruiser") || unit.getBaseType().equalsIgnoreCase("destroyer")) {
-                if (unit.getBaseType().equalsIgnoreCase("cruiser")) {
+            if ("cruiser".equalsIgnoreCase(unit.getBaseType()) || "destroyer".equalsIgnoreCase(unit.getBaseType())) {
+                if ("cruiser".equalsIgnoreCase(unit.getBaseType())) {
                     numOfUnit = numCruisers;
                 } else {
                     numOfUnit = numDestroyers;
@@ -645,7 +643,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveProductionBiomesStep1(Player hacan, Game activeGame, ButtonInteractionEvent event) {
+    public static void resolveProductionBiomesStep1(Player hacan, Game activeGame, GenericInteractionCreateEvent event) {
         int oldStratCC = hacan.getStrategicCC();
         if (oldStratCC < 1) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
@@ -1016,6 +1014,32 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         }
+    }
+
+    public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
+            String ident) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + " Dih-Mohn Flagship is producing units. They can produce up to 2 units with a combined cost of 4.");
+        String pos = buttonID.replace("dihmohnfs_", "");
+        List<Button> buttons;
+        // Muaat agent works here as it's similar so no need to add more fluff
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
+                activeGame.getTileByPosition(pos), "muaatagent", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    
+    public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
+    String ident) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + player.getFactionEmoji() + player.getFaction() + " May produce 1 ship in the explored planet system.");
+        String pos = buttonID.replace("dsdihmy_", "");
+        List<Button> buttons;
+        // Sling relay works for this 
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
+                activeGame.getTileByPosition(pos), "sling", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce 1 ship. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
     }
 
     public static void resolveVadenSCDebt(Player player, int sc, Game activeGame, GenericInteractionCreateEvent event) {
@@ -1564,6 +1588,24 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
+    public static void offerGledgeBaseButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
+                    && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                            || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                            || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
+            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
+                buttons.add(Button.success("gledgeBasePlanet_" + planet,
+                        Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = "Use buttons to select which planet to put a gledge base on";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
     public static void resolveScour(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String msg = ButtonHelper.getIdent(player) + " used the Scour ability to discard an AC and ready "
@@ -1662,6 +1704,15 @@ public class ButtonHelperFactionSpecific {
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+    public static void gledgeBasePlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
+        String planet = buttonID.replace("gledgeBasePlanet_", "");
+        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        planetReal.addToken("attachment_gledgebase.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Attached gledge base to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 

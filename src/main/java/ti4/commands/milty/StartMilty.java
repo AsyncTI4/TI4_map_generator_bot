@@ -31,7 +31,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.ImageHelper;
@@ -439,7 +438,7 @@ public class StartMilty extends MiltySubcommandData {
                 continue;
             }
 
-            if (ButtonHelper.isTileHomeSystem(tile) || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres")) {
+            if (tile.isHomeSystem() || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres")) {
                 continue;
             }
             draftTile.setTile(tile);

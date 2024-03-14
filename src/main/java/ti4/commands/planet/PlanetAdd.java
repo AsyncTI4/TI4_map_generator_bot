@@ -2,6 +2,9 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,7 +17,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -69,7 +71,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (activeGame.isFoWMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, "# "+player.getRepresentation() + " scored custodians!");
                 String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
@@ -89,19 +91,30 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_) && !doubleCheck) {
-                        String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
-                            + " gained shard and a victory point.";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
-                        player_.removeRelic("shard");
-                        player.addRelic("shard");
-                        int shardID = activeGame.getRevealedPublicObjectives().get("Shard of the Throne");
-                        activeGame.unscorePublicObjective(player_.getUserID(), shardID);
-                        activeGame.scorePublicObjective(player.getUserID(), shardID);
-                        Helper.checkEndGame(activeGame, player);
+                    List<String> relics = new ArrayList<>();
+                    relics.addAll(player_.getRelics());
+                    for(String relic : relics){
+                        if (relic.contains("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_) && !doubleCheck) {
+                            String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
+                                + " gained shard and a victory point.";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+                            player_.removeRelic(relic);
+                            player.addRelic(relic);
+                            String customPOName = "Shard of the Throne";
+                            if(relic.contains("absol_")){
+                                int absolShardNum = Integer.parseInt(StringUtils.right(relic, 1));
+                                customPOName = "Shard of the Throne (" + absolShardNum + ")";
+                            }
+                            int shardID = activeGame.getRevealedPublicObjectives().get(customPOName);
+                            activeGame.unscorePublicObjective(player_.getUserID(), shardID);
+                            activeGame.scorePublicObjective(player.getUserID(), shardID);
+                            Helper.checkEndGame(activeGame, player);
+                        }
                     }
-                    String msg = player_.getRepresentation() + " has a window to play reparations for the taking of " + planet;
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    if(Mapper.getPlanet(planet) != null){
+                        String msg = player_.getRepresentation() + " has a window to play reparations for the taking of " + Mapper.getPlanet(planet).getName();
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    }
                     if (moveTitanPN) {
                         if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)) {
                             player_.removePromissoryNote(Constants.TERRAFORM);
@@ -119,6 +132,14 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
+            if(alreadyOwned && "mirage".equalsIgnoreCase(planet)){
+                Planet planetReal = (Planet) unitHolder;
+                List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
+                if (event != null && buttons != null && !buttons.isEmpty()) {
+                    String message = ButtonHelper.getIdent(player)+" Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+                }
+            }
             alreadyOwned = false;
         }
         if(!activeGame.getCurrentPhase().contains("agenda")){
@@ -150,7 +171,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
         Tile tile = activeGame.getTileFromPlanet(planet);
-        if(tile != null && activeGame.getActivePlayer() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !ButtonHelper.isTileHomeSystem(tile) && FoWHelper.playerHasShipsInSystem(player, tile)){
+        if(tile != null && activeGame.getActivePlayer() == player  && activeGame.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !tile.isHomeSystem() && FoWHelper.playerHasShipsInSystem(player, tile)){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship").withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -185,38 +206,16 @@ public class PlanetAdd extends PlanetAddRemove {
 
             }
         }
-        for (String law : activeGame.getLaws().keySet()) {
-            if ("minister_exploration".equalsIgnoreCase(law) && !doubleCheck) {
-                if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null) {
-                    String fac = player.getFactionEmoji();
+        if(ButtonHelper.isPlayerElected(activeGame, player, "minister_exploration") && event != null){
+            String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + ").");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-                }
-            }
         }
-        int numMechs = 0;
-        String colorID = Mapper.getColorID(player.getColor());
-        if (unitHolder.getUnits() != null) {
-            numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-        }
-        // if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech") && !doubleCheck) {
-
-        //     Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
-        //     sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-        //     Button pdsButton = Button.success("winnuStructure_pds_" + planet, "Place a PDS on " + Helper.getPlanetRepresentation(planet, activeGame));
-        //     pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
-        //     Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
-        //     List<Button> buttons = new ArrayList<>();
-        //     buttons.add(sdButton);
-        //     buttons.add(pdsButton);
-        //     buttons.add(tgButton);
-        //     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-        //         player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
-
-        // }
+        
+        
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !activeGame.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);

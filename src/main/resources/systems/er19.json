@@ -5,7 +5,6 @@
         "abrift"
     ],
     "imagePath": "er_19_async.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -30,7 +29,8 @@
         }
     ],
     "wormholes": [
-        "ALPHA", "BETA"
+        "ALPHA",
+        "BETA"
     ],
     "planets": [],
     "isGravityRift": true

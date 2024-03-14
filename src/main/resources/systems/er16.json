@@ -8,7 +8,6 @@
         "er1supernova_1"
     ],
     "imagePath": "er_16_async.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -32,7 +31,7 @@
             "y": 130.0
         }
     ],
-   "wormholes": [],
+    "wormholes": [],
     "planets": [],
     "isSupernova": true
 }

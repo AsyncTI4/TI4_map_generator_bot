@@ -10,6 +10,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardModel;
@@ -111,6 +112,20 @@ public class SetDeck extends GameSubcommandData {
                 }
                 case Constants.TECHNOLOGY_DECK -> {
                     activeGame.setTechnologyDeckID(deckModel.getAlias());
+                    if(deckModel.getAlias().contains("absol")){
+                        for(Player player : activeGame.getRealPlayers()){
+                            List<String> techs = new ArrayList<>();
+                            techs.addAll(player.getTechs());
+                            for(String tech : techs){
+                                if(!tech.contains("absol") && Mapper.getTech("absol_"+tech) != null){
+                                    if(!player.hasTech("absol_"+tech)){
+                                        player.addTech("absol_"+tech);
+                                    }
+                                    player.removeTech(tech);
+                                }
+                            }
+                        }
+                    }
                     return true;
                 }
             }

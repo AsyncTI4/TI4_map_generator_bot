@@ -125,7 +125,11 @@ public class Game {
     @ExportableField
     private boolean undoButtonOffered = true;
     @ExportableField
+    private boolean fastSCFollowMode;
+    @ExportableField
     private boolean queueSO = true;
+    @ExportableField
+    private boolean showBubbles = true;
     @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
@@ -198,6 +202,8 @@ public class Game {
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
+    @Getter @Setter
+    private boolean showFullComponentTextEmbeds = false;
     private boolean hasEnded;
     private long endedDate;
     @Getter
@@ -522,7 +528,7 @@ public class Game {
     @JsonIgnore
     public Optional<Player> getWinner() {
         Player winner = null;
-        for (Player player : getRealPlayers()) {
+        for (Player player : getRealPlayersNDummies()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
@@ -575,8 +581,12 @@ public class Game {
         boolean isInDiscard = false;
         for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
 
-            if (Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
+            if (Mapper.getActionCard(ac.getKey()) != null && Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
                 return true;
+            }else{
+                if(Mapper.getActionCard(ac.getKey()) == null){
+                    BotLogger.log(ac.getKey() + " is returning a null AC when sent to Mapper in game "+getName());
+                }
             }
         }
         return isInDiscard;
@@ -986,9 +996,15 @@ public class Game {
     public boolean getUndoButton() {
         return undoButtonOffered;
     }
+    public boolean isFastSCFollowMode() {
+        return fastSCFollowMode;
+    }
 
     public boolean getQueueSO() {
         return queueSO;
+    }
+    public boolean getShowBubbles() {
+        return showBubbles;
     }
 
     public boolean getTemporaryPingDisable() {
@@ -1023,8 +1039,16 @@ public class Game {
         undoButtonOffered = onStatus;
     }
 
+    public void setFastSCFollowMode(boolean onStatus) {
+        fastSCFollowMode = onStatus;
+    }
+
     public void setQueueSO(boolean onStatus) {
         queueSO = onStatus;
+    }
+
+    public void setShowBubbles(boolean onStatus) {
+        showBubbles = onStatus;
     }
 
     public void setTemporaryPingDisable(boolean onStatus) {
@@ -2937,20 +2961,37 @@ public class Game {
     }
 
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        if (getDiscardActionCards().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **"
-                    + deck.getName() + "** while there are action cards in the discard pile.");
-            return false;
-        }
-        for (Player player : getPlayers().values()) {
-            if (player.getActionCards().size() > 0) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **"
-                        + deck.getName() + "** while there are action cards in player hands.");
-                return false;
+        boolean shuffledExtrasIn = false;
+        List<String> oldDeck = new ArrayList<>();
+        oldDeck.addAll(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
+        List<String> newDeck = new ArrayList<>();
+        setAcDeckID(deck.getAlias());
+        newDeck.addAll(deck.getNewShuffledDeck());
+        for(String ac : oldDeck){
+            if(newDeck.contains(ac)){
+                newDeck.remove(ac);
             }
         }
-        setAcDeckID(deck.getAlias());
-        setActionCards(deck.getNewShuffledDeck());
+        if (getDiscardActionCards().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
+            shuffledExtrasIn = true;
+        }else{
+            for (Player player : getPlayers().values()) {
+                if (player.getActionCards().size() > 0) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
+                    shuffledExtrasIn = true;
+                    break;
+                }
+            }
+        }
+        if(!shuffledExtrasIn){
+            setActionCards(deck.getNewShuffledDeck());
+        }else{
+            for(String acID : newDeck){
+                actionCards.add(acID);
+            }
+            Collections.shuffle(actionCards);
+        }
         return true;
     }
 
@@ -3153,6 +3194,18 @@ public class Game {
     }
 
     @JsonIgnore
+    public List<Player> getRealAndEliminatedPlayers() {
+        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated()))
+            .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getRealAndEliminatedAndDummyPlayers() {
+        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
+            .collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public List<Player> getDummies() {
         return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
     }
@@ -3164,7 +3217,7 @@ public class Game {
 
     @JsonIgnore
     public Set<String> getFactions() {
-        return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
+        return getRealAndEliminatedAndDummyPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
 
     public void setPlayers(Map<String, Player> players) {
@@ -3431,6 +3484,9 @@ public class Game {
                 if (player_.equals(player))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
+                    if(isAllianceMode() && player.getFaction().equalsIgnoreCase("mahact")){
+                        return leaderID.contains(player_.getFaction());
+                    }
                     return true;
                 }
             }
@@ -3741,6 +3797,20 @@ public class Game {
         return player;
     }
 
+    @Nullable
+    public Player getPlayerFromLeader(String leader) {
+        Player player = null;
+        if(leader != null) {
+            for(Player player_ : getPlayers().values()) {
+                if(player_.getLeaderIDs().contains(leader)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+
     @Deprecated
     public UnitModel getUnitFromImageName(String imageName) {
         String colorID = StringUtils.substringBefore(imageName, "_");
@@ -3889,6 +3959,7 @@ public class Game {
 
     @JsonIgnore
     public boolean hasHomebrew() {
+        // needs to check for homebrew tiles still
         return isExtraSecretMode()
                 || isFoWMode()
                 || isLightFogMode()
@@ -3929,8 +4000,9 @@ public class Game {
                 || getRealPlayers().stream()
                         .anyMatch(player -> player.getSecretVictoryPoints() > 3
                                 && !player.getRelics().contains("obsidian"))
-                || getRealPlayers().size() < 3
-                || getRealPlayers().size() > 8
-                || getTileMap().values().stream().map(Tile::getTileID).distinct().count() != getTileMap().size();
+                || playerCountForMap < 3
+                || getRealAndEliminatedAndDummyPlayers().size() < 3
+                || playerCountForMap > 8
+                || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 }

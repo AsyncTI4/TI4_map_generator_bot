@@ -7,10 +7,6 @@
         "deathsgate"
     ],
     "imagePath": "er_03_async.png",
-    "planetIds": [
-        "hellsmaw",
-        "deathsgate"
-    ],
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {

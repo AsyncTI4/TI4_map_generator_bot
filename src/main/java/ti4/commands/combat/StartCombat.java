@@ -173,6 +173,7 @@ public class StartCombat extends CombatSubcommandData {
         if (isSpaceCombat) {
             sendSpaceCannonButtonsToThread(threadChannel, activeGame, player1, tile);
         }
+        sendStartOfCombatSecretMessages(activeGame, player1, player2, tile, spaceOrGround);
 
         // Start of Space Combat Buttons
         if (isSpaceCombat) {
@@ -220,6 +221,27 @@ public class StartCombat extends CombatSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for Start of Space Combat:",
                     startOfSpaceCombatButtons);
         }
+    }
+
+    private static void sendStartOfCombatSecretMessages(Game activeGame, Player p1, Player p2, Tile tile, String type) {
+        List<Player> combatPlayers = new ArrayList<>();
+        combatPlayers.add(p1);
+        combatPlayers.add(p2);
+        List<Button> buttons = new ArrayList<>();
+       
+        for(Player player : combatPlayers){
+            Player otherPlayer = p1;
+            if(otherPlayer == player){
+                otherPlayer = p2;
+            }
+            String msg = player.getRepresentation() +" ";
+            if(ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)){
+                buttons.add(Button.success("resolveSpyStep1", "Resolve Cymiae Flagship Ability"));
+                buttons.add(Button.danger("deleteButtons", "Delete These"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + "if you win the combat, you have the opportuntiy to use the cymiae FS to force the other player to send you a random action card. It will send buttons to the other player to confirm");
+            }
+        }
+
     }
 
     private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game activeGame, List<Player> combatPlayers, Tile tile) {
@@ -361,7 +383,6 @@ public class StartCombat extends CombatSubcommandData {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent", "Sol Agent").withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
-
         Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "kyroagent");
         if (!activeGame.isFoWMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
             String finChecker = "FFCC_" + kyro.getFaction() + "_";
@@ -459,6 +480,15 @@ public class StartCombat extends CombatSubcommandData {
         if (isSpaceCombat && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mykomentoricommander")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Myko Commander").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+        if (isSpaceCombat && p2.hasAbility("munitions") && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "munitionsReserves", "Use Munitions Reserves").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
+        }
+        if (isSpaceCombat && p1.hasAbility("munitions")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "munitionsReserves", "Use Munitions Reserves").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !activeGame.isFoWMode()) {

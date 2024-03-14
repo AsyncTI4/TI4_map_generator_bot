@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -18,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
@@ -25,6 +23,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.explore.ExploreSubcommandData;
+import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.TurnStart;
@@ -254,6 +253,33 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
+    public static void resolveAbsolHyperAgentReady(String buttonID, ButtonInteractionEvent event, Game activeGame,
+            Player player) {
+        buttonID = buttonID.replace("absol_jr", "absoljr");
+        String agent = buttonID.split("_")[1];
+        player.setStrategicCC(player.getStrategicCC()-1);
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+        event.getMessage().delete().queue();
+        Leader playerLeader = player.getLeader(agent).orElse(null);
+        if (playerLeader == null) {
+            if (agent.contains("titanprototype")) {
+                player.removeExhaustedRelic("titanprototype");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        ButtonHelper.getIdent(player) + " spent a strat CC and readied " + agent);
+            }
+            if (agent.contains("absol")) {
+                player.removeExhaustedRelic("absol_jr");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        ButtonHelper.getIdent(player) + "  spent a strat CC and readied " + agent);
+            }
+            return;
+        }
+        RefreshLeader.refreshLeader(player, playerLeader, activeGame);
+
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                ButtonHelper.getIdent(player) + " used absol hypermetabolism to spend a strat CC and ready " + agent);
+    }
+
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
             String ident) {
         String pos = buttonID.replace("umbatTile_", "");
@@ -475,7 +501,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
         String messageText = player.getRepresentation() +
                 " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
-        if (playerLeader.getId().equalsIgnoreCase("yssarilagent")) {
+        if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())) {
             messageText = messageText + "\n" + "Yssaril agent was used as a "
                     + StringUtils.capitalize(agent.replace("agent", "")) + " agent";
         }
@@ -854,7 +880,7 @@ public class ButtonHelperAgents {
                     "1 inf " + planet, activeGame);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                     ButtonHelper.getIdent(player) + " landed an extra infantry on "
-                            + Helper.getPlanetRepresentation(planet, activeGame) + " using Dihmohn agent");
+                            + Helper.getPlanetRepresentation(planet, activeGame) + " using Dihmohn agent [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent]");
         }
         if ("vadenagent".equalsIgnoreCase(agent)) {
             resolveVadenAgentStep2(player, activeGame, event, rest);
@@ -862,9 +888,9 @@ public class ButtonHelperAgents {
         if ("celdauriagent".equalsIgnoreCase(agent)) {
             resolveCeldauriAgentStep2(player, activeGame, event, rest);
         }
-        if ("celdauriagent".equalsIgnoreCase(agent)) {
-            resolveCeldauriAgentStep2(player, activeGame, event, rest);
-        }
+        // if ("celdauriagent".equalsIgnoreCase(agent)) {
+        //     resolveCeldauriAgentStep2(player, activeGame, event, rest);
+        // }
         if ("zealotsagent".equalsIgnoreCase(agent)) {
             resolveZealotsAgentStep2(player, activeGame, event, rest);
         }
@@ -1152,14 +1178,14 @@ public class ButtonHelperAgents {
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                         && activeGame.getCurrentPhase().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, activeGame);
-                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Planet has been refreshed because of Florzen Commander");
                     ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
                 }
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
                     activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
-                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Added inf to planet because of Lanefir Commander");
                 }
                 if (player.hasTech("dslaner")) {
@@ -1192,14 +1218,14 @@ public class ButtonHelperAgents {
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                         && activeGame.getCurrentPhase().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, activeGame);
-                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Planet has been refreshed because of Florzen Commander");
                     ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
                 }
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
                     activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
-                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Added inf to planet because of Lanefir Commander");
                 }
                 if (player.hasTech("dslaner")) {
@@ -1250,12 +1276,11 @@ public class ButtonHelperAgents {
     public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game activeGame, Player player,
             Tile tile) {
         List<String> legendaries = new ArrayList<>();
-        List<String> adjTiles = new ArrayList<>();
-        adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
+        List<String> adjTiles = new ArrayList<>(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
         adjTiles.add(tile.getPosition());
         for (String adjTilePos : adjTiles) {
             Tile adjTile = activeGame.getTileByPosition(adjTilePos);
-            if (ButtonHelper.isTileHomeSystem(adjTile)) {
+            if (adjTile.isHomeSystem()) {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getPlanetUnitHolders()) {
@@ -1462,7 +1487,7 @@ public class ButtonHelperAgents {
         int fTG = cTG + 1;
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, activeGame);
-        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+        resolveArtunoCheck(player, activeGame, 1);
         String msg = "Used Ghoti Agent to gain a tg (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         event.getMessage().delete().queue();
@@ -1559,7 +1584,7 @@ public class ButtonHelperAgents {
                     && (Mapper.getPlanet(planet).getTechSpecialties() != null
                             && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
                     || ButtonHelper.checkForTechSkipAttachments(activeGame, planet)
-                    || ButtonHelper.isTileHomeSystem(tile)) {
+                    || tile.isHomeSystem()) {
                 buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                         tile.getRepresentationForButtons(activeGame, player)));
             }
@@ -1723,10 +1748,10 @@ public class ButtonHelperAgents {
                 activeGame);
         if (player.getCommodities() > 1) {
             player.setCommodities(player.getCommodities() - 2);
-            msg = msg + "\n Paid 2 commodities";
+            msg = msg + "\n"+player.getFactionEmoji()+"Paid 2 commodities";
         } else {
             player.setTg(player.getTg() - 2);
-            msg = msg + "\n Paid 2 tg";
+            msg = msg + "\n"+player.getFactionEmoji()+"Paid 2 tg";
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
@@ -1774,7 +1799,7 @@ public class ButtonHelperAgents {
         }
         if (tgGain > 0) {
             ButtonHelperAbilities.pillageCheck(player, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgGain);
+            resolveArtunoCheck(player, activeGame, tgGain);
         }
         if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1 && commGain > 0) {

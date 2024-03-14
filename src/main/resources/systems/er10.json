@@ -10,7 +10,8 @@
         "enu"
     ],
     "imagePath": "er_10_async.png",
-    "planetIds": [
+    "planets": [
+
         "elokphi",
         "eloknu"
     ],
@@ -36,9 +37,6 @@
     "wormholes": [
         null
     ],
-    "planets": [
-        "ephi",
-        "enu"
-    ],
     "isNebula": true
 }
+

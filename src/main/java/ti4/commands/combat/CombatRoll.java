@@ -114,10 +114,7 @@ public class CombatRoll extends CombatSubcommandData {
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
                 rollType, activeGame);
-        if (playerUnitsByQuantity.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !playerUnitsByQuantity.isEmpty();
     }
 
     public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile,
@@ -208,7 +205,7 @@ public class CombatRoll extends CombatSubcommandData {
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player,
                 opponent,
-                activeGame, rollType, event);
+                activeGame, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*","");
         int h = Integer.parseInt(hits);

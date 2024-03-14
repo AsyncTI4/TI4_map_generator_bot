@@ -62,6 +62,17 @@ public class Setup extends GameSubcommandData {
         Integer maxSOCount = event.getOption(Constants.MAX_SO_COUNT, null, OptionMapping::getAsInt);
         if (maxSOCount != null && maxSOCount >= 0) {
             activeGame.setMaxSOCountPerPlayer(maxSOCount);
+            
+            String key = "factionsThatAreNotDiscardingSOs";
+            String key2 = "queueToDrawSOs";
+            String key3 = "potentialBlockers";
+            activeGame.setCurrentReacts(key,"");
+            activeGame.setCurrentReacts(key2,"");
+            activeGame.setCurrentReacts(key3,"");
+            if(activeGame.getRound() > 1){
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
+            }
+            
         }
 
         Integer scCountPerPlayer = event.getOption(Constants.SC_COUNT_FOR_MAP, null, OptionMapping::getAsInt);

@@ -12,8 +12,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -51,6 +49,7 @@ public class GameStats extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setAutoComplete(true));
     }
 
     @Override
@@ -75,6 +74,7 @@ public class GameStats extends StatisticsSubcommandData {
             case GAME_COUNT -> showGameCount(event);
             case WINNING_PATH -> showWinningPath(event);
             case SUPPORT_WIN_COUNT -> showWinsWithSupport(event);
+            
             // case WINNING_PATH_NAMES
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
@@ -166,40 +166,38 @@ public class GameStats extends StatisticsSubcommandData {
         int gamesWhereHighestWon = 0;
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
-            if(!game.getWinner().isPresent()){
+            if(game.getWinner().isEmpty()){
                 continue;
             }
             
             int highest = 0;
             Player winner = game.getWinner().get();
             Player highestP = null;
-            for(Player player : game.getRealPlayers()){
+            for(Player player : game.getRealAndEliminatedAndDummyPlayers()){
                 if(player.getTotalExpenses() > highest){
                     highestP = player;
                     highest = player.getTotalExpenses();
                 }
                 if(player.getTotalExpenses() < 20){
                     highestP = null;
-                    highest = 0;
                     break;
                 }
             }
             if(highestP != null){
                 num++;
                 names.append(num).append(". ").append(game.getName());
-                names.append(" - Winner was "+winner.getFactionEmoji()+" (").append("Highest was "+highestP.getFactionEmoji()+" at "+highestP.getTotalExpenses()).append(")");
+                names.append(" - Winner was ").append(winner.getFactionEmoji()).append(" (").append("Highest was ").append(highestP.getFactionEmoji()).append(" at ").append(highestP.getTotalExpenses()).append(")");
                 names.append("\n");
                 if(highestP == winner){
                     gamesWhereHighestWon++;
                 }
             }
         }
-        names.append("Total games where highest spender won was "+gamesWhereHighestWon+" out of "+num);
+        names.append("Total games where highest spender won was ").append(gamesWhereHighestWon).append(" out of ").append(num);
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
     public static boolean hasPlayerFinishedAGame(Player player){
-        
         String userID = player.getUserID();
 
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
@@ -212,16 +210,12 @@ public class GameStats extends StatisticsSubcommandData {
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
-        if(games.size() > 0){
-            return true;
-        }
-
-        return false;
+        return games.size() > 0;
     }
-    public static int numberOfPlayersUnfinishedGames(String userID){
 
+    public static int numberOfPlayersUnfinishedGames(String userID){
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && !game.getWinner().isPresent() && game.getHighestScore() > 0;
+        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && game.getWinner().isEmpty() && game.getHighestScore() > 0;
         Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
@@ -236,8 +230,7 @@ public class GameStats extends StatisticsSubcommandData {
     public static void findHowManyUnfinishedGamesAreDueToNewPlayers(SlashCommandInteractionEvent event) {
         StringBuilder names = new StringBuilder();
         int num = 0;
-        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && !game.getWinner().isPresent() && game.getHighestScore() > 0;
-        Predicate<Game> allFilterPredicates = endedGamesFilter;
+        Predicate<Game> allFilterPredicates = game1 -> game1.isHasEnded() && game1.getWinner().isEmpty() && game1.getHighestScore() > 0;
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
@@ -251,9 +244,9 @@ public class GameStats extends StatisticsSubcommandData {
             if (isNotBlank(game.getCustomName())) {
                 names.append(" (").append(game.getCustomName()).append(")");
             }
-            for(Player player : game.getRealPlayers()){
+            for(Player player : game.getRealAndEliminatedAndDummyPlayers()){
                 if(!hasPlayerFinishedAGame(player)){
-                    names.append(" "+player.getUserName() +" had not finished any games and had "+ numberOfPlayersUnfinishedGames(player.getUserID()) + " unfinished games. ");
+                    names.append(" ").append(player.getUserName()).append(" had not finished any games and had ").append(numberOfPlayersUnfinishedGames(player.getUserID())).append(" unfinished games. ");
                 }
             }
             names.append("\n");
@@ -268,11 +261,11 @@ public class GameStats extends StatisticsSubcommandData {
         int total = 0;
         Map<String, Integer> endedGames = new HashMap<>();
         for (Game activeGame : filteredGames) {
-            if (activeGame.isHasEnded() && activeGame.getWinner().isPresent() && activeGame.getRealPlayers().size() > 2
+            if (activeGame.isHasEnded() && activeGame.getWinner().isPresent() && activeGame.getPlayerCountForMap() > 2
                 && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
-                endedGames.put(activeGame.getName() + " ("+activeGame.getRealPlayers().size()+"p, "+activeGame.getVp()+"pt)", dif);
+                endedGames.put(activeGame.getName() + " ("+activeGame.getPlayerCountForMap()+"p, "+activeGame.getVp()+"pt)", dif);
                 total = total + dif;
             }
         }
@@ -293,7 +286,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
-            for (Player player : game.getRealPlayers()) {
+            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 factionCount.put(faction,
                     1 + factionCount.getOrDefault(faction, 0));
@@ -363,7 +356,7 @@ public class GameStats extends StatisticsSubcommandData {
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
 
-            game.getRealPlayers().forEach(player -> {
+            game.getRealAndEliminatedAndDummyPlayers().forEach(player -> {
                 String faction = player.getFaction();
                 factionGameCount.put(faction,
                     1 + factionGameCount.getOrDefault(faction, 0));

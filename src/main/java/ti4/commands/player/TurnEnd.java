@@ -33,6 +33,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -90,7 +91,19 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setComponentAction(false);
         activeGame.setTemporaryPingDisable(false);
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
+        for(Player player : activeGame.getRealPlayers()){
+            for(Player player_ : activeGame.getRealPlayers()){
+                if(player_ == player){
+                    continue;
+                }
+                String key = player.getFaction()+"whisperHistoryTo"+player_.getFaction();
+                if(!activeGame.getFactionsThatReactedToThis(key).isEmpty()){
+                    activeGame.setCurrentReacts(key, "");
+                }
+            }
+        }
         activeGame.setCurrentReacts("mahactHeroTarget","");
+        activeGame.setActiveSystem("");
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
@@ -297,6 +310,17 @@ public class TurnEnd extends PlayerSubcommandData {
                 activeGame.setComponentAction(true);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
+            }
+            Leader playerLeader = player.getLeader("kyrohero").orElse(null);
+            if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
+                    && playerLeader != null && !playerLeader.isLocked()) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("kyroHeroInitiation", "Play Kyro Hero"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + " Reminder this is the window to do Kyro Hero. You can use the buttons to start the process",
+                        buttons);
             }
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {

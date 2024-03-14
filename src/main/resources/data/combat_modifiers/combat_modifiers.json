@@ -179,6 +179,10 @@
             {
                 "type": "opponent_tech",
                 "alias": "amd"
+            },
+            {
+                "type": "opponent_tech",
+                "alias": "absol_amd"
             }
         ]
     },
@@ -207,6 +211,10 @@
             {
                 "type": "tech",
                 "alias": "ps"
+            },
+            {
+                "type": "tech",
+                "alias": "absol_ps"
             }
         ],
         "forCombatAbility": "SpaceCannonOffence"
@@ -222,6 +230,10 @@
             {
                 "type": "opponent_tech",
                 "alias": "amd"
+            },
+            {
+                "type": "opponent_tech",
+                "alias": "absol_amd"
             }
         ]
     },
@@ -235,6 +247,10 @@
             {
                 "type": "tech",
                 "alias": "ps"
+            },
+            {
+                "type": "tech",
+                "alias": "absol_ps"
             }
         ],
         "forCombatAbility": "SpaceCannonDefence"
@@ -418,6 +434,10 @@
             {
                 "type": "tech",
                 "alias": "ps"
+            },
+            {
+                "type": "tech",
+                "alias": "absol_ps"
             }
         ],
         "forCombatAbility": "bombardment"
@@ -746,6 +766,21 @@
                 "alias": "starfall_array"
             }
         ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_0_always_space_cannon_offense",
+        "type": "mods",
+        "value": "+0",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "mirvedacommander"
+            }
+        ],
+        
         "forCombatAbility": "SpaceCannonOffence"
     },
     {

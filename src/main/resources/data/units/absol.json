@@ -410,7 +410,7 @@
         "moveValue": 3,
         "capacityValue": 6,
         "capacityUsed": 1,
-        "cost": 10,
+        "cost": 8,
         "combatHitsOn": 3,
         "combatDieCount": 3,
         "bombardHitsOn": 3,
@@ -419,7 +419,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.This unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "muaat_warsun2"
     },
     {
@@ -433,9 +433,9 @@
         "faction": "saar",
         "moveValue": 2,
         "productionValue": 7,
-        "capacityValue": 5,
+        "capacityValue": 6,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "saar_spacedock2"
     },
     {

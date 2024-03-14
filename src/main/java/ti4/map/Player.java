@@ -68,6 +68,7 @@ public class Player {
     private boolean isDummy;
     private boolean prefersDistanceBasedTacticalActions;
     private boolean autoPassOnWhensAfters;
+    private boolean eliminated;
 
     private String faction;
     private String factionEmoji;
@@ -385,7 +386,7 @@ public class Player {
     @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff")
-            || getTechs().contains("dslizhff") || ownsUnit("florzen_fighter");
+            || getTechs().contains("dslizhff") || getTechs().contains("absol_ff2") || ownsUnit("florzen_fighter");
     }
 
     @JsonIgnore
@@ -2530,5 +2531,13 @@ public class Player {
             count = count + ButtonHelper.checkUnitAbilityValuesOfUnits(this, getGame(), tile);
         }
         return Math.round(count * 10) / (float) 10.0;
+    }
+
+    public boolean isEliminated() {
+        return eliminated;
+    }
+
+    public void setEliminated(boolean eliminated) {
+        this.eliminated = eliminated;
     }
 }
