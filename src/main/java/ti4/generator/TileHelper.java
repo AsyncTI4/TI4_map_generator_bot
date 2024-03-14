@@ -66,7 +66,7 @@ public class TileHelper {
                         PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
                         allPlanets.put(planet.getId(), planet);
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        BotLogger.log("Error reading planet from file: " + file.getName(), e);
                     }
                 });
 
@@ -92,7 +92,7 @@ public class TileHelper {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                BotLogger.log("Error reading tile from file: " + file.getName(), e);
             }
         });
     }

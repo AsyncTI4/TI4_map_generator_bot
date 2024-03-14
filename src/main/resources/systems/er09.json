@@ -9,10 +9,6 @@
 
     ],
     "imagePath": "er_09_async.png",
-    "planetIds": [
-        "ugamma",
-        "urho"
-    ],
     "shipPositionsType": "TYPE02",
     "spaceTokenLocations": [
         {

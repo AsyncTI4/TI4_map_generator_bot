@@ -255,7 +255,7 @@ public class Mapper {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
-            .filter(tileModel -> tileModel.getPlanetIds().isEmpty())
+            .filter(tileModel -> tileModel.getPlanets().isEmpty())
             .map(TileModel::getId)
             .toList();
     }
