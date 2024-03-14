@@ -1,1 +1,33 @@
-{"id":"er20","name":"Erodius","aliases":["erodius"],"imagePath":"ER20_erodius.png","shipPositionsType":"TYPE05","spaceTokenLocations":[{"x":180.0,"y":0.0},{"x":220.0,"y":60.0},{"x":45.0,"y":120.0},{"x":95.0,"y":170.0}],"wormholes":["EPSILON"],"planets":["erodius"]}
+{
+    "id": "er20",
+    "name": "Erodius",
+    "aliases": [
+        "erodius"
+    ],
+    "imagePath": "er_20_async.png",
+    "shipPositionsType": "TYPE05",
+    "spaceTokenLocations": [
+        {
+            "x": 180.0,
+            "y": 0.0
+        },
+        {
+            "x": 220.0,
+            "y": 60.0
+        },
+        {
+            "x": 45.0,
+            "y": 120.0
+        },
+        {
+            "x": 95.0,
+            "y": 170.0
+        }
+    ],
+    "wormholes": [
+        "EPSILON"
+    ],
+    "planets": [
+        "erodius"
+    ]
+}

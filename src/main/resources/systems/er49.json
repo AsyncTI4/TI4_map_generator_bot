@@ -1,12 +1,14 @@
 {
-    "id": "er07",
-    "name": "Khjan Shul",
+    "id": "er49",
+    "name": "Myrwater",
     "aliases": [
-        "khjan",
-        "khjanshul",
-        "shul"
+        "myr",
+        "myrwater"
     ],
-    "imagePath": "er_07_async.png",
+    "imagePath": "er_49_async.png",
+    "planets": [
+        "myrwater"
+    ],
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {
@@ -26,11 +28,10 @@
             "y": 170.0
         }
     ],
-    "wormholes": [
-        null
-    ],
-    "planets": [
-        "khjan",
-        "shul"
-    ]
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
 }

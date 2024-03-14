@@ -1,13 +1,13 @@
 {
     "id": "er16",
-    "name": "Iota Asteroid Nebula",
+    "name": "Supernova_1",
     "aliases": [
-        "iodaslowandrocky",
-        "iodaan",
-        "iotaan",
-        "iotaslowandrocky"
+        "er_super",
+        "e1supper",
+        "er1nova",
+        "er1supernova_1"
     ],
-    "imagePath": "ER16_Ioda_WH_Nebula_Asteroid.png",
+    "imagePath": "er_16_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -31,10 +31,7 @@
             "y": 130.0
         }
     ],
-    "wormholes": [
-        "IOTA"
-    ],
+    "wormholes": [],
     "planets": [],
-    "isAsteroidField": true,
-    "isNebula": true
+    "isSupernova": true
 }
