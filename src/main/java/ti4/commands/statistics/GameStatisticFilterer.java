@@ -28,7 +28,7 @@ public final class GameStatisticFilterer {
     return getFilteredGames(playerCountFilter, victoryPointGoalFilter, gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter);
   }
 
-  private static List<Game> getFilteredGames(Integer playerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter,
+  public static List<Game> getFilteredGames(Integer playerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter,
       Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
     return GameManager.getInstance().getGameNameToGame().values().stream()
         .filter(GameStatisticFilterer::filterAbortedGames)
