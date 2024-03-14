@@ -739,7 +739,7 @@ public class Mapper {
     }
 
     public static boolean isValidTech(String id) {
-        return technologies.get(id) != null;
+        return technologies.containsKey(id);
     }
 
     public static boolean isValidPlanet(String id) {
