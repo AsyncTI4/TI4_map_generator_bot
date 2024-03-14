@@ -40,10 +40,12 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    @Deprecated // Use getPlanetIds instead
     public List<String> getPlanets() {
         return planetIds;
     }
 
+    @Deprecated // Use setPlanetIds instead
     public void setPlanets(List<String> planetIds) {
         this.planetIds = planetIds;
     }
@@ -62,7 +64,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         if (isSupernova()) sb.append(Emojis.Supernova);
         if (isNebula()) sb.append(Emojis.Nebula);
         if (isGravityRift()) sb.append(Emojis.GravityRift);
-        if (hasPlanets()) sb.append("\nPlanets: ").append(getPlanets().toString());
+        if (hasPlanets()) sb.append("\nPlanets: ").append(getPlanetIds().toString());
         eb.setDescription(sb.toString());
 
         eb.setThumbnail("attachment://" + getImagePath());
@@ -87,7 +89,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean hasPlanets() {
-        return getPlanets() != null && !getPlanets().isEmpty();
+        return getPlanetIds() != null && !getPlanetIds().isEmpty();
     }
 
     @JsonIgnore

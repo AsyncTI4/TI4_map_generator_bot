@@ -794,14 +794,14 @@ public class Helper {
 
     public static String getBasicTileRep(String tileID) {
         StringBuilder name = new StringBuilder(TileHelper.getTile(tileID).getName());
-        if (TileHelper.getTile(tileID).getPlanets().size() > 0) {
+        if (TileHelper.getTile(tileID).getPlanetIds().size() > 0) {
             name.append(" (");
         }
-        for (String planet : TileHelper.getTile(tileID).getPlanets()) {
+        for (String planet : TileHelper.getTile(tileID).getPlanetIds()) {
             name.append(Mapper.getPlanet(planet).getResources()).append("/")
                     .append(Mapper.getPlanet(planet).getInfluence()).append(", ");
         }
-        if (TileHelper.getTile(tileID).getPlanets().size() > 0) {
+        if (TileHelper.getTile(tileID).getPlanetIds().size() > 0) {
             name = new StringBuilder(name.substring(0, name.length() - 2) + ")");
         }
         return name.toString();

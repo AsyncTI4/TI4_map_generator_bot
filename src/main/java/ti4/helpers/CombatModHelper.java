@@ -224,11 +224,11 @@ public class CombatModHelper {
                 if (onTile.getId().equals(player.getFactionSetupInfo().getHomeSystem())) {
                     meetsCondition = true;
                 }
-                if (onTile.getPlanets().stream().anyMatch(
+                if (onTile.getPlanetIds().stream().anyMatch(
                     planetId -> StringUtils.isNotBlank(Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
-                if (onTile.getPlanets().contains(Constants.MR)) {
+                if (onTile.getPlanetIds().contains(Constants.MR)) {
                     meetsCondition = true;
                 }
                 if (game.getTile(onTile.getId()) != null) {
