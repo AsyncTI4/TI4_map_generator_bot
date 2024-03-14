@@ -320,7 +320,7 @@ public class FoWHelper {
 		}
 
 		List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
-		if (hyperlaneData != null && hyperlaneData.isEmpty()) {
+		if (hyperlaneData != null && hyperlaneData.isEmpty() && !naturalMapOnly) {
 			// We could not load the hyperlane data correctly, quit
 			return tiles;
 		}
@@ -342,6 +342,14 @@ public class FoWHelper {
 		// for each adjacent tile...
 		for (int i = 0; i < 6; i++) {
 			String position_ = directlyAdjacentTiles.get(i);
+			boolean borderBlocked = false;
+			for (BorderAnomalyHolder b : activeGame.getBorderAnomalies()) {
+				if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency()) {
+					borderBlocked = true;
+					break;
+				}
+			}
+			if (borderBlocked && !naturalMapOnly) continue;
 
 			String override = game.getAdjacentTileOverride(position, i);
 			if (override != null) {
