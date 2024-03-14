@@ -344,7 +344,7 @@ public class FoWHelper {
 		for (int i = 0; i < 6; i++) {
 			String position_ = directlyAdjacentTiles.get(i);
 			boolean borderBlocked = false;
-			for (BorderAnomalyHolder b : activeGame.getBorderAnomalies()) {
+			for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
 				if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency()) {
 					borderBlocked = true;
 					break;
