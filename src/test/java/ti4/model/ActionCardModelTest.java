@@ -59,7 +59,7 @@ public class ActionCardModelTest extends BaseTi4Test {
     public void testFlavorText() {
         String flavorText = "testFlavorText";
         actionCardModel.setFlavorText(flavorText);
-        assertEquals(flavorText, actionCardModel.getFlavorText());
+        assertEquals(flavorText, actionCardModel.getFlavorText().get());
     }
 
     @Test
