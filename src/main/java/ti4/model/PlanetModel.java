@@ -175,6 +175,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    @JsonIgnore
     public Optional<String> getContrastColor() {
         return Optional.ofNullable(contrastColor);
     }
