@@ -3074,16 +3074,16 @@ public class MapGenerator {
                     
                     if(tile.getPlanetUnitHolders().size() != 3){
                         BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x-195 - textOffset, TILE_PADDING + tilePositionPoint.y-170, null);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x-225 , TILE_PADDING + tilePositionPoint.y-170, null);
                         tileGraphics.setFont(Storage.getFont35());
                         //tileGraphics.setColor(Color.getHSBColor(0.76f, 1.0f, 1.0f));
-                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x-180 - textOffset, TILE_PADDING + tilePositionPoint.y-130);
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x-210, TILE_PADDING + tilePositionPoint.y-130);
                     }else{
                         BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x+75 - textOffset, TILE_PADDING + tilePositionPoint.y-170, null);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x+45, TILE_PADDING + tilePositionPoint.y-170, null);
                         tileGraphics.setFont(Storage.getFont35());
                         //tileGraphics.setColor(Color.BLACK);
-                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x+90 - textOffset, TILE_PADDING + tilePositionPoint.y-130);
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x+60, TILE_PADDING + tilePositionPoint.y-130);
                     }
                 }
                 //pa_unitimage.png
