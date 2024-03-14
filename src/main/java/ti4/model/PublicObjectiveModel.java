@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -19,6 +21,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private String text;
     private Integer points;
     private ComponentSource source;
+    private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
@@ -79,5 +82,9 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
 
     public String getAutoCompleteName() {
         return getName() + " (" + getSource() + ")";
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 }

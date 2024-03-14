@@ -3,6 +3,8 @@ package ti4.model;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -27,7 +29,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
             && phase != null
             && window != null
             && text != null
-            && flavorText != null
+            // && flavorText != null
             && source != null;
     }
 
@@ -51,7 +53,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         eb.setDescription("***" + getWindow() + ":***\n" + getText());
 
         //FLAVOUR TEXT
-        if (includeFlavourText && getFlavorText() != null) eb.addField("", "*" + getFlavorText() + "*", true);
+        if (includeFlavourText && getFlavorText().isPresent()) eb.addField("", "*" + getFlavorText() + "*", true);
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
@@ -68,5 +70,9 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
     public String getAutoCompleteName() {
         return getName() + " (" + getSource() + ")";
+    }
+
+    public Optional<String> getFlavorText() {
+        return Optional.ofNullable(flavorText);
     }
 }
