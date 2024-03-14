@@ -9,6 +9,10 @@
         "derbrae",
         "dorvak"
     ],
+    "planets":[
+        "dorvok",
+        "debrbrae"
+    ],
     "imagePath": "d111.png",
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
