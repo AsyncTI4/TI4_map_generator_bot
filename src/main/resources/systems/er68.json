@@ -1,11 +1,11 @@
 {
     "id": "er68",
-    "name": "Nebula2e",
+    "name": "Supernova2e",
     "aliases": [
-        "nebula2e",
-        "n2e"
+        "supernova2e",
+        "sn2e"
     ],
-    "imagePath": "er68_nebula2.png",
+    "imagePath": "er_68_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -33,5 +33,5 @@
         null
     ],
     "planets": [],
-    "isNebula": true
+    "isSupernova": true
 }

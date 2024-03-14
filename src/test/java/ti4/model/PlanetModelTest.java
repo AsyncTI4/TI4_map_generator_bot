@@ -14,6 +14,7 @@ public class PlanetModelTest extends BaseTi4Test {
         for (PlanetModel model : TileHelper.getAllPlanets().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateTileId(model), model.getAlias() + ": invalid TileID: " + model.getTileId());
+            assertTrue(validateFactionHomeworld(model), model.getAlias() + ": invalid Faction Homeworld: " + model.getTileId());
         }
     }
 

@@ -4,7 +4,7 @@
     "aliases": [
         "abrift"
     ],
-    "imagePath": "ER19_A_B_Rift.png",
+    "imagePath": "er_19_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -29,7 +29,8 @@
         }
     ],
     "wormholes": [
-        "ALPHA", "BETA"
+        "ALPHA",
+        "BETA"
     ],
     "planets": [],
     "isGravityRift": true

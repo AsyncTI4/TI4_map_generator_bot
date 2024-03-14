@@ -5,7 +5,7 @@
         "asteroidbeta",
         "asteroidbwh"
     ],
-    "imagePath": "ER11_betaasteroid.png",
+    "imagePath": "er_11_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
