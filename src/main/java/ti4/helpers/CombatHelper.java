@@ -286,7 +286,7 @@ public class CombatHelper {
         }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
+            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player, activeGame) > 0)
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()

@@ -164,6 +164,11 @@ abstract public class UnitHolder {
     }
 
     @NotNull
+    public Integer getUnitCount(UnitType unitType, Player player) {
+        return getUnitCount(unitType, player.getColor());
+    }
+
+    @NotNull
     public Integer getUnitCount(UnitType unitType, String color) {
         if (unitType == null || color == null) return 0;
         String colorIDofUnit = Mapper.getColorID(color);

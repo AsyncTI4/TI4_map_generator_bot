@@ -21,6 +21,7 @@ import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.TurnStart;
@@ -39,6 +40,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 
 public class ButtonHelperAbilities {
 
@@ -892,6 +894,88 @@ public class ButtonHelperAbilities {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    public static List<Button> offerOlradinConnectButtons(Player player, Game activeGame, String planetName){
+        List<Button> buttons = new ArrayList<>();
+        for(String planet : player.getPlanetsAllianceMode()){
+            if(planet.equalsIgnoreCase(planetName)){
+                continue;
+            }
+            buttons.add(Button.success("olradinConnectStep2_"+planetName+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        buttons.add(Button.danger("deleteButtons", "Decline"));
+        return buttons;
+    }
+    public static void resolveOlradinConnectStep2(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String planet1 = buttonID.split("_")[1];
+        String planet2 = buttonID.split("_")[2];
+        player.setHasUsedPeopleConnectAbility(true);
+        new RemoveUnits().unitParsing(event,player.getColor(), activeGame.getTileFromPlanet(planet1), "inf "+planet1, activeGame);
+        new AddUnits().unitParsing(event,player.getColor(), activeGame.getTileFromPlanet(planet2), "inf "+planet2, activeGame);
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji()+ " moved 1 infantry from "+Helper.getPlanetRepresentation(planet1, activeGame)+" to "+Helper.getPlanetRepresentation(planet2, activeGame)+" using their connect policy");
+        event.getMessage().delete().queue();
+    }
+    public static void resolveOlradinPreserveStep2(String buttonID, ButtonInteractionEvent event, Game activeGame,
+            Player player) {
+        String type = buttonID.split("_")[1];
+        player.setHasUsedEnvironmentPreserveAbility(true);
+        StringBuilder sb = new StringBuilder();
+        String cardID = activeGame.drawExplore(type);
+        sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
+        ExploreModel card = Mapper.getExplore(cardID);
+        String cardType = card.getResolution();
+        if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+            sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
+            player.addFragment(cardID);
+            activeGame.purgeExplore(cardID);
+        }
+        
+        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
+        }
+        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
+        MessageHelper.sendMessageToChannel(channel, sb.toString());
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getOlradinPreserveButtons(Game activeGame, Player player, String planet) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> types = ButtonHelper.getTypeOfPlanet(activeGame, planet);
+        for (String type : types) {
+            if ("industrial".equals(type)) {
+                buttons.add(Button.success("olradinPreserveStep2_industrial", "Explore Industrial"));
+            }
+            if ("cultural".equals(type)) {
+                buttons.add(Button.primary("olradinPreserveStep2_cultural", "Explore Cultural"));
+            }
+            if ("hazardous".equals(type)) {
+                buttons.add(Button.danger("olradinPreserveStep2_hazardous", "Explore Hazardous"));
+            }
+        }
+        return buttons;
+    }
+
+    public static void offerOrladinPlunderButtons(Player player, Game activeGame, String planet){
+        if (!player.getHasUsedEnvironmentPlunderAbility() && player.hasAbility("policy_the_environment_plunder") && ButtonHelper.getTypeOfPlanet(activeGame, planet).contains("hazardous")) {
+            UnitHolder planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            Planet planetReal = (Planet) planetUnit;
+            List<Button> buttons = new ArrayList<>();
+            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
+                    && FoWHelper.playerHasUnitsOnPlanet(player, activeGame.getTileFromPlanet(planet), planet)) {
+                List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
+                
+                String msg = player.getRepresentation() +" Due to your exhausting of "+Helper.getPlanetRepresentation(planet, activeGame) +" you can resolve the following ability: **The Environment - Plunder (-)**: Once per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition(),"Remove units in " +  activeGame.getTileFromPlanet(planet).getRepresentationForButtons(activeGame, player));
+                buttons.add(remove);
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                planetButtons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve remove", buttons);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve explore", planetButtons);
+                player.setHasUsedEnvironmentPlunderAbility(true);
+            }
+        }
+    }
+
     public static void pillageCheck(Player player, Game activeGame) {
         if (player.getPromissoryNotesInPlayArea().contains("pop")) {
             return;
@@ -1129,14 +1213,14 @@ public class ButtonHelperAbilities {
         ButtonHelper.deleteTheOneButton(event);
         String pos = buttonID.split("_")[1];
         String generalMsg = player.getFactionEmoji()+" is resolving moult (after winning the space combat) to build 1 ship, reducing the cost by 1 for each of their non-fighter ships destroyed in the combat";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), generalMsg);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), generalMsg);
         String type = "sling";
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
         "placeOneNDone_dontskip");
         String message = player.getRepresentation() + " Use the buttons to produce a ship. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void munitionsReserves(ButtonInteractionEvent event, Game activeGame, Player player){
