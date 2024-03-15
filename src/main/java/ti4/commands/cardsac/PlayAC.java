@@ -532,16 +532,16 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
             // "resolveCounterStroke"
-            codedName = "Counterstroke";
-            if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveCounterStroke_"+game.getActiveSystem(),
-                        "Resolve " + codedName));
-                if(game.getActiveSystem().isEmpty()){
-                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
-                }else{
-                    MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
-                }
-            }
+            // codedName = "Counterstroke";
+            // if (actionCardTitle.contains(codedName)) {
+            //     codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveCounterStroke_"+game.getActiveSystem(),
+            //             "Resolve " + codedName));
+            //     if(game.getActiveSystem().isEmpty()){
+            //         MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
+            //     }else{
+            //         MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            //     }
+            // }
             codedName = "Divert Funding";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "getDivertFundingButtons",

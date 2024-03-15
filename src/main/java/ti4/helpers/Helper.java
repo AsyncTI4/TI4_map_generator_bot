@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -511,6 +512,30 @@ public class Helper {
         return true;
     }
 
+    public static void startOfTurnSaboWindowReminders(Game activeGame, Player player) {
+        List<String> messageIDs = new ArrayList<>(activeGame.getMessageIDsForSabo());
+        for (String messageID : messageIDs) {
+            if (!ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)) {
+                activeGame.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+                    Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+                    if (activeGame.isFoWMode()) {
+                        int index = 0;
+                        for (Player player_ : activeGame.getPlayers().values()) {
+                            if (player_ == player)
+                                break;
+                            index++;
+                        }
+                        reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageID));
+                    }
+                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                    if (reaction == null) {
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Please react to this sabo window: "+mainMessage.getJumpUrl());
+                    }
+                }); 
+            }
+        }
+    }
+
     public static void checkAllSaboWindows(Game activeGame) {
         List<String> messageIDs = new ArrayList<>(activeGame.getMessageIDsForSabo());
         for (Player player : activeGame.getRealPlayers()) {
@@ -954,6 +979,7 @@ public class Helper {
 
     public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame, String whatIsItFor) {
         player.resetSpentThings();
+        player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
@@ -1462,10 +1488,10 @@ public class Helper {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal = productionValueTotal + getProductionValueOfUnitHolder(player, activeGame, tile, uH);
             }
-            if (tile.isSupernova() && player.hasTech("mr")) {
+            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 productionValueTotal = productionValueTotal + 5;
             }
-            if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")) {
+            if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty") && FoWHelper.playerHasShipsInSystem(player, tile)) {
                 productionValueTotal = productionValueTotal + 2;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;

@@ -115,6 +115,8 @@ public class Game {
     @ExportableField
     private boolean allianceMode;
     @ExportableField
+    private boolean homeBrew;
+    @ExportableField
     private boolean fowMode;
     @ExportableField
     private boolean naaluAgent;
@@ -130,6 +132,8 @@ public class Game {
     private boolean queueSO = true;
     @ExportableField
     private boolean showBubbles = true;
+    @ExportableField
+    private boolean showGears = true;
     @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
@@ -641,8 +645,16 @@ public class Game {
         return allianceMode;
     }
 
+    public boolean isHomeBrew() {
+        return homeBrew;
+    }
+
     public void setAllianceMode(boolean allianceMode) {
         this.allianceMode = allianceMode;
+    }
+
+    public void setHomeBrew(boolean homebrew) {
+        this.homeBrew = homebrew;
     }
 
     public boolean isFoWMode() {
@@ -1006,6 +1018,9 @@ public class Game {
     public boolean getShowBubbles() {
         return showBubbles;
     }
+    public boolean getShowGears() {
+        return showGears;
+    }
 
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
@@ -1049,6 +1064,9 @@ public class Game {
 
     public void setShowBubbles(boolean onStatus) {
         showBubbles = onStatus;
+    }
+    public void setShowGears(boolean onStatus) {
+        showGears = onStatus;
     }
 
     public void setTemporaryPingDisable(boolean onStatus) {
@@ -3961,6 +3979,7 @@ public class Game {
     public boolean hasHomebrew() {
         // needs to check for homebrew tiles still
         return isExtraSecretMode()
+                || isHomeBrew()
                 || isFoWMode()
                 || isLightFogMode()
                 || isDiscordantStarsMode()

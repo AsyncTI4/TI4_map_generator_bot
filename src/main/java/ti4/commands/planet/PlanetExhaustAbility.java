@@ -89,7 +89,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         if ("tarrock".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
             if (!activeGame.isFoWMode() && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
                 String riderName = "Tarrock Ability";
-                List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, "");
+                List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, player.getFinsFactionCheckerPrefix());
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
                 MessageHelper.sendMessageToChannelWithFactionReact(ButtonHelper.getCorrectChannel(player, activeGame), "Please select your target", activeGame, player, riderButtons);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getActionsChannel(), "Please indicate no afters again.", activeGame, afterButtons, "after");

@@ -266,6 +266,16 @@ public class ButtonHelper {
                     player.getRepresentation(true, true)
                             + " this is a friendly reminder that you are not neighbors with " + player2.getColor());
         }
+        if(player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getCurrentPhase())){
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, game),
+                    player.getRepresentation(true, true)
+                            + " this is a friendly reminder that you cannot transact during the agenda phase due to the control policy");
+        }
+        if(player2.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getCurrentPhase())){
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, game),
+                    player.getRepresentation(true, true)
+                            + " this is a friendly reminder that "+ player2.getColor()+" cannot transact during the agenda phase due to their control policy");
+        }
     }
 
     public static void riftUnitButton(String buttonID, ButtonInteractionEvent event, Game game, Player player,
@@ -945,6 +955,7 @@ public class ButtonHelper {
         }
         if (paymentRequired) {
             payForTech(game, player, event, techID);
+
         } else {
             if (player.hasLeader("zealotshero") && player.getLeader("zealotshero").get().isActive()) {
                 if (game.getFactionsThatReactedToThis("zealotsHeroTechs").isEmpty()) {
@@ -1008,6 +1019,9 @@ public class ButtonHelper {
         buttons.add(doneExhausting);
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+        }
+        if(game.getLaws().keySet().contains("revolution")){
+            MessageHelper.sendMessageToChannelWithButton(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation()+" Due to the anti-intellectual revolution law, you now have to kill a non-fighter ship if you researched the tech you just acquired",Button.secondary("getModifyTiles", "Modify Units"));
         }
     }
 
@@ -1401,6 +1415,24 @@ public class ButtonHelper {
                             stuffToTransButtons);
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " you owe the defender one PN");
                 }
+            }
+            if(AddCC.hasCC(nonActivePlayer, activeSystem)){
+                if (nonActivePlayer.getActionCards().containsKey("counterstroke")
+                            && !ButtonHelper.isPlayerElected(game, player, "censure")
+                            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+                        List<Button> reverseButtons = new ArrayList<>();
+                        String key = "counterstroke";
+                        String ac_name = Mapper.getActionCard(key).getName();
+                        if (ac_name != null) {
+                            reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + nonActivePlayer.getActionCards().get(key)
+                                    + "_counterstroke_"+activeSystem.getPosition(), "Counterstroke in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
+                        }
+                        reverseButtons.add(Button.danger("deleteButtons", "Decline"));
+                        String cyberMessage = nonActivePlayer.getRepresentation(true, true)
+                                + " reminder that you can use counterstroke in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer);
+                        MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCardsInfoThread(),
+                                cyberMessage, reverseButtons);
+                    }
             }
             if (game.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander")
                     && nonActivePlayer.hasProductionUnitInSystem(activeSystem)) {
@@ -4183,6 +4215,35 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static List<String> getTypeOfPlanet(Game activeGame, String planet){
+        List<String> types = new ArrayList<>();
+        if (planet.contains("custodia") || planet.contains("ghoti")) {
+            return types;
+        }
+        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        if (unitHolder == null)
+            return types;
+        Planet planetReal = (Planet) unitHolder;
+        boolean oneOfThree = planetReal.getOriginalPlanetType() != null
+                && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                        || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                        || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
+        if (oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
+            types.add(planetReal.getOriginalPlanetType());
+        }
+        if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
+            if (!types.contains("hazardous")) {
+                types.add("hazardous");
+            }
+            if (!types.contains("industrial")) {
+                types.add("industrial");
+            }
+            if (!types.contains("cultural")) {
+                types.add("cultural");
+            }
+        }
+        return types;
+    }
 
     public static void offerBuildOrRemove(Player player, Game game, GenericInteractionCreateEvent event,
             Tile tile) {
@@ -4302,7 +4363,7 @@ public class ButtonHelper {
                     "Use Eko's Ability To Ignore Anomalies"));
         }
 
-        Button validTile = Button.danger(finChecker + "concludeMove", "Done moving");
+        Button validTile = Button.danger(finChecker + "concludeMove_"+game.getActiveSystem(), "Done moving");
         buttons.add(validTile);
         Button validTile2 = Button.primary(finChecker + "ChooseDifferentDestination", "Activate a different system");
         buttons.add(validTile2);
@@ -6245,11 +6306,7 @@ public class ButtonHelper {
         reference.setCurrentReacts("pingsFor"+playerID, ""+count);
     }
 
-    public static void issueSecretCombatReminders(Game activeGame, Tile tile, List<Player> playersInCombat){
-        for(Player player : playersInCombat){
-
-        }
-    }
+    
     public static List<Tile> getTilesOfUnitsWithBombard(Player player, Game game) {
         return game.getTileMap().values().stream()
                 .filter(tile -> tile.containsPlayersUnitsWithModelCondition(player,
@@ -7353,6 +7410,12 @@ public class ButtonHelper {
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
+                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
+                    int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
+                    ClearDebt.clearDebt(p2, p1, amount);
+                    message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
+                }
+                
             }
             case "WashComms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);

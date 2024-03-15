@@ -1,6 +1,12 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -94,69 +100,82 @@ public class DiscordantStarsHelper {
         if (activeGame == null || !activeGame.isDiscordantStarsMode() || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player == null || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
-        StringBuilder sb = new StringBuilder();
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        Planet planetHolder = (Planet) unitHolder;
+        if (planetHolder == null)
+            return;
 
-        if (planetModel.isLegendary()) {
-            sb.append("You exhausted ").append(Emojis.LegendaryPlanet).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-            resolveEnvironmentPreserveAbility(player, planetModel, sb);
-            resolveEconomyEmpowerAbility(player, sb);
-            resolvePeopleConnectAbility(player, planetModel, sb);
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-            sb.append(
-                "Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
+        boolean hasAbility = planetHolder.isHasAbility()
+                || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge")
+                        || token.contains("legendary") || token.contains("consulate"));
+        if (hasAbility) {
+            resolveEnvironmentPreserveAbility(player, planetModel, activeGame);
+            resolveEconomyEmpowerAbility(player, activeGame, planetModel);
+            resolvePeopleConnectAbility(player, planetModel, activeGame);
             return;
         }
 
-        switch (planetModel.getPlanetType()) {
-            case HAZARDOUS -> {
-                sb.append("You exhausted ").append(Emojis.Hazardous).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-                resolveEnvironmentPreserveAbility(player, planetModel, sb);
-            }
-            case INDUSTRIAL -> {
-                sb.append("You exhausted ").append(Emojis.Industrial).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-                resolveEconomyEmpowerAbility(player, sb);
-                resolveEconomyExploitAbility(player, sb);
-            }
-            case CULTURAL -> {
-                sb.append("You exhausted ").append(Emojis.Cultural).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-                resolvePeopleConnectAbility(player, planetModel, sb);
-            }
-            default -> {
-                return;
+        for(String type : ButtonHelper.getTypeOfPlanet(activeGame, planet)){
+            switch (type) {
+                case "hazardous" -> {
+                    resolveEnvironmentPreserveAbility(player, planetModel, activeGame);
+                }
+                case "industrial" -> {
+                    resolveEconomyEmpowerAbility(player, activeGame, planetModel);
+                    resolveEconomyExploitAbility(player,  planetModel, activeGame);
+                }
+                case "cultural" -> {
+                    resolvePeopleConnectAbility(player, planetModel, activeGame);
+                }
+                default -> {
+                    return;
+                }
             }
         }
-        sb.append(
-            "Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+
     }
 
-    private static void resolveEconomyExploitAbility(Player player, StringBuilder sb) {
+    private static void resolveEconomyExploitAbility(Player player, PlanetModel planetModel,Game activeGame) {
         if (!player.getHasUsedEconomyExploitAbility() && player.hasAbility("policy_the_economy_exploit")) { //add a fighter with ships
             player.setHasUsedEconomyExploitAbility(true);
-            sb.append("**The Economy - Exploit (+)**: You may place 1 " + Emojis.fighter + "Fighter from your reinforcements in a system that contains 1 or more of your ships.\n");
+            String msg = player.getRepresentation() +" Due to your exhausting of "+planetModel.getAutoCompleteName() +" you can resolve the following ability: **The Economy - Exploit (+)**: You may place 1 " + Emojis.fighter + "Fighter from your reinforcements in a system that contains 1 or more of your ships.";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            List<Button> buttons = new ArrayList<>(); 
+            buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "ff", "placeOneNDone_skipbuild"));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", buttons);
         }
     }
 
-    private static void resolvePeopleConnectAbility(Player player, PlanetModel planetModel, StringBuilder sb) {
-        if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect")) {
-            player.setHasUsedPeopleConnectAbility(true);
-            sb.append("> **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on ").append(planetModel.getName()).append(" to another planet you control.\n");
+    private static void resolvePeopleConnectAbility(Player player, PlanetModel planetModel, Game activeGame) {
+        UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planetModel.getId(), activeGame);
+        
+        if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+            String msg = player.getRepresentation() +" Due to your exhausting of "+planetModel.getAutoCompleteName() +" you can resolve the following ability: **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on "+ planetModel.getName()+" to another planet you control.";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, activeGame, planetModel.getId());
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", buttons);
         }
     }
 
-    private static void resolveEconomyEmpowerAbility(Player player, StringBuilder sb) {
+    private static void resolveEconomyEmpowerAbility(Player player,Game activeGame, PlanetModel planetModel) {
         if (!player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
-            sb.append("> **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n");
+            String msg = player.getRepresentation() +" Due to your exhausting of "+planetModel.getAutoCompleteName() +" you can resolve the following ability: **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
+                        .withEmoji(Emoji.fromFormatted(Emojis.comm));
+            MessageHelper.sendMessageToChannelWithButton(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", getCommButton);
         }
     }
 
-    private static void resolveEnvironmentPreserveAbility(Player player, PlanetModel planetModel, StringBuilder sb) {
+    private static void resolveEnvironmentPreserveAbility(Player player, PlanetModel planetModel, Game activeGame) {
         if (!player.getHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
-            player.setHasUsedEnvironmentPreserveAbility(true);
-            String planetType = planetModel.getPlanetType().toString();
-            String fragmentType = Emojis.getEmojiFromDiscord(StringUtils.left(planetType, 1) + "frag");
-            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the ").append(Emojis.getEmojiFromDiscord(planetType)).append(planetType).append(" deck; if it is a ").append(fragmentType).append(" relic fragment, gain it, otherwise discard that card.\n");
+            List<Button> buttons = ButtonHelperAbilities.getOlradinPreserveButtons(activeGame, player, planetModel.getId());
+            if(buttons.size() > 0){
+                String msg = player.getRepresentation() +" Due to your exhausting of "+planetModel.getAutoCompleteName() +" you can resolve the following ability: **The Environment - Preserve (+)**: You may reveal the top card of the planets types exploration deck; if it is a relic fragment, gain it, otherwise discard that card.";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", buttons);
+            }
         }
     }
 }

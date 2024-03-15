@@ -178,6 +178,8 @@ public class Player {
     @Setter
     private boolean hasUsedEnvironmentPreserveAbility;
     @Setter
+    private boolean hasUsedEnvironmentPlunderAbility;
+    @Setter
     private boolean hasUsedPeopleConnectAbility;
 
     // Statistics
@@ -2347,6 +2349,7 @@ public class Player {
         setHasUsedEconomyEmpowerAbility(false);
         setHasUsedEconomyExploitAbility(false);
         setHasUsedEnvironmentPreserveAbility(false);
+        setHasUsedEnvironmentPlunderAbility(false);
         setHasUsedPeopleConnectAbility(false);
     }
 
@@ -2360,6 +2363,10 @@ public class Player {
 
     public boolean getHasUsedEnvironmentPreserveAbility() {
         return hasUsedEnvironmentPreserveAbility;
+    }
+
+    public boolean getHasUsedEnvironmentPlunderAbility() {
+        return hasUsedEnvironmentPlunderAbility;
     }
 
     public boolean getHasUsedPeopleConnectAbility() {
