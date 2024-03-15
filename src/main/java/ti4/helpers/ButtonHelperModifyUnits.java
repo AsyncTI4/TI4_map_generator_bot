@@ -753,12 +753,16 @@ public class ButtonHelperModifyUnits {
             }
         }
         if (pdsAmount > 0) {
-            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds " + uH.getName(), activeGame);
+            if (player.hasUnit("mirveda_pds") || player.hasUnit("mirveda_pds2")) {
+                new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds", activeGame);
+            }else{
+                new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds " + uH.getName(), activeGame);
+            }
         }
-        if (player.hasUnit("cabal_spacedock") && sdAmount > 0) {
-            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd " + uH.getName(), activeGame);
-        } else {
-            if (sdAmount > 0) {
+        if (sdAmount > 0) {
+            if (player.hasUnit("saar_spacedock") || player.hasUnit("saar_spacedock2")) {
+                new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd", activeGame);
+            } else {
                 new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd " + uH.getName(), activeGame);
             }
         }

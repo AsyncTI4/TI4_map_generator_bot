@@ -3070,7 +3070,7 @@ public class MapGenerator {
                 for(Player player : game.getRealPlayers()){
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                 }
-                if(prodInSystem > 0){
+                if(prodInSystem > 0 && game.getShowGears()){
                     
                     if(tile.getPlanetUnitHolders().size() != 3){
                         BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);

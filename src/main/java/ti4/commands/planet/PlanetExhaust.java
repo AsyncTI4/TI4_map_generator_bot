@@ -13,11 +13,17 @@ public class PlanetExhaust extends PlanetAddRemove {
 
     @Override
     public void doAction(Player player, String planet, Game activeGame) {
+        doAction(player, planet, activeGame, true);
+    }
+    public void doAction(Player player, String planet, Game activeGame, boolean triggerOlradin) {
         if(!player.getPlanets().contains(planet)){
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" the bot doesnt think you have planet by the name of "+planet);
         }
         if (!player.hasPlanetReady(planet)) return;
-        DiscordantStarsHelper.handleOlradinPoliciesWhenExhaustingPlanets(activeGame, player, planet);
+        if(triggerOlradin){
+            DiscordantStarsHelper.handleOlradinPoliciesWhenExhaustingPlanets(activeGame, player, planet);
+        }
         player.exhaustPlanet(planet);
     }
+    
 }

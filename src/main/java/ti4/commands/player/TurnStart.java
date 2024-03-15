@@ -80,7 +80,7 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.updateActivePlayer(player);
         activeGame.setCurrentPhase("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);
-
+        Helper.startOfTurnSaboWindowReminders(activeGame, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
 
         if (isFowPrivateGame) {
@@ -120,6 +120,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
+
         }
         if(!activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).isEmpty()){
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true)+ " you left yourself the following message: \n"+activeGame.getFactionsThatReactedToThis("futureMessageFor"+player.getFaction()).replace("666fin", ":"));

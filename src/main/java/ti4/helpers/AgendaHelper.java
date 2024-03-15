@@ -130,6 +130,7 @@ public class AgendaHelper {
                         message.append(player2.getRepresentation()).append(" scored 'Political Censure'\n");
                     }
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
+                    Helper.checkEndGame(activeGame, player2);
                 }
                 if ("warrant".equalsIgnoreCase(agID)) {
                     player2.setSearchWarrant();
@@ -710,6 +711,11 @@ public class AgendaHelper {
                     if (!activeGame.isFoWMode()) {
                         message.append(playerWL.getRepresentation()).append(" scored 'Mutiny'\n");
                     }
+                    Helper.checkEndGame(activeGame, playerWL);
+                    if (playerWL.getTotalVictoryPoints() >= activeGame.getVp()){
+                        break;
+                    }
+
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
@@ -764,6 +770,10 @@ public class AgendaHelper {
                 for (Player playerWL : winOrLose) {
                     activeGame.scorePublicObjective(playerWL.getUserID(), poIndex);
                     message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
+                    Helper.checkEndGame(activeGame, playerWL);
+                    if (playerWL.getTotalVictoryPoints() >= activeGame.getVp()){
+                        break;
+                    }
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
@@ -1270,7 +1280,7 @@ public class AgendaHelper {
         String votes = StringUtils.substringBetween(buttonLabel, "(", ")");
         if (!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")
                 && !buttonID.contains("everything")) {
-            new PlanetExhaust().doAction(player, planetName, activeGame);
+            new PlanetExhaust().doAction(player, planetName, activeGame, false);
         }
         if (buttonID.contains("everything")) {
             for (String planet : player.getPlanets()) {
@@ -2110,7 +2120,7 @@ public class AgendaHelper {
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
-                            || specificVote.contains("Radiance"))) {
+                            || specificVote.contains("Radiance") || specificVote.contains("Tarrock Ability"))) {
 
                         MessageChannel channel = ButtonHelper.getCorrectChannel(winningR, activeGame);
                         String identity = winningR.getRepresentation(true, true);
@@ -2232,6 +2242,17 @@ public class AgendaHelper {
                                     UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, activeGame, tiles);
                         }
+                        if(specificVote.contains("Tarrock Ability")){
+                            Player player = winningR;
+                            String message = player.getFactionEmoji() + " Drew Secret Objective";
+                            activeGame.drawSecretObjective(player.getUserID());
+                            if (player.hasAbility("plausible_deniability")) {
+                                activeGame.drawSecretObjective(player.getUserID());
+                                message = message + ". Drew a second SO due to plausible deniability.";
+                            }
+                            SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                        }
                         if (specificVote.contains("Kyro Rider")) {
                             Player player = winningR;
                             String message = player.getRepresentation(true, true)
@@ -2258,6 +2279,8 @@ public class AgendaHelper {
                             activeGame.scorePublicObjective(winningR.getUserID(), poIndex);
                             msg = msg + winningR.getRepresentation() + " scored 'Imperial Rider'\n";
                             MessageHelper.sendMessageToChannel(channel, msg);
+                            Helper.checkEndGame(activeGame, winningR);
+                   
                         }
                         if (!winningRs.contains(winningR)) {
                             winningRs.add(winningR);
@@ -2970,8 +2993,11 @@ public class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     if (capitalize) {
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
                         faction = Emojis.getFactionIconFromDiscord(faction);
-
+                        if(p2 != null){
+                            faction = p2.getFactionEmoji();
+                        }
                         if (activeGame.isFoWMode()) {
                             faction = "Someone";
                         }
