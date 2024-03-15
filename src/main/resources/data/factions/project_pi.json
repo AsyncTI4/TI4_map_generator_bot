@@ -13,6 +13,7 @@
       "promissoryNotes": ["pi_stymie"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_arborec_flagship", "arborec_infantry", "pi_arborec_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "arborec"
 	},
 	{
       "alias": "pi_ghost",
@@ -29,6 +30,7 @@
       "promissoryNotes": ["pi_iff"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_ghost_flagship", "infantry", "pi_ghost_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "ghosts"
 	},
 	{
       "alias": "pi_hacan",
@@ -44,6 +46,7 @@
       "promissoryNotes": ["convoys"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_hacan_flagship", "infantry", "pi_hacan_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "hacan"
 	},
 	{
       "alias": "pi_jolnar",
@@ -60,6 +63,7 @@
       "promissoryNotes": ["ra"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_jolnar_flagship", "infantry", "pi_jolnar_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "jolnar"
 	},
 	{
       "alias": "pi_l1z1x",
@@ -76,6 +80,7 @@
       "promissoryNotes": ["ce"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "l1z1x_dreadnought", "l1z1x_flagship", "infantry", "pi_l1z1x_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "l1z1x"
 	},
 	{
       "alias": "pi_letnev",
@@ -91,6 +96,7 @@
       "promissoryNotes": ["pi_war_funding"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "letnev_flagship", "infantry", "pi_letnev_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "letnev"
 	},
 	{
       "alias": "pi_mentak",
@@ -107,6 +113,7 @@
       "promissoryNotes": ["pop"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_mentak_flagship", "infantry", "pi_mentak_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "mentak"
 	},
 	{
       "alias": "pi_muaat",
@@ -122,6 +129,7 @@
       "promissoryNotes": ["fires"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "muaat_flagship", "pi_muaat_warsun", "infantry", "pi_muaat_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "muaat"
 	},
 	{
       "alias": "pi_naalu",
@@ -137,6 +145,7 @@
       "promissoryNotes": ["gift"],
       "units": ["naalu_fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "naalu_flagship", "infantry", "pi_naalu_mech_omega", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "naalu"
 	},
 	{
       "alias": "pi_nekro",
@@ -153,6 +162,7 @@
       "promissoryNotes": ["pi_antivirus"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "nekro_flagship", "infantry", "pi_nekro_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "nekro"
 	},
 	{
       "alias": "pi_saar",
@@ -168,6 +178,7 @@
       "promissoryNotes": ["ragh"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "saar_flagship", "infantry", "pi_saar_mech", "pds", "pi_saar_spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "saar"
 	},
 	{
       "alias": "pi_sardakk",
@@ -184,6 +195,7 @@
       "promissoryNotes": ["pi_tekklar"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "sardakk_dreadnought", "pi_sardakk_flagship", "infantry", "pi_sardakk_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "sardakk"
 	},
 	{
       "alias": "pi_sol",
@@ -199,6 +211,7 @@
       "promissoryNotes": ["pi_ms"],
       "units": ["fighter", "pi_destroyer", "cruiser", "sol_carrier", "dreadnought", "pi_sol_flagship", "sol_infantry", "pi_sol_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "sol"
 	},
 	{
       "alias": "pi_winnu",
@@ -214,6 +227,7 @@
       "promissoryNotes": ["acq"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_winnu_flagship", "infantry", "pi_winnu_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "winnu"
 	},
 	{
       "alias": "pi_xxcha",
@@ -229,6 +243,7 @@
       "promissoryNotes": ["pi_polfav"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_xxcha_flagship", "infantry", "pi_xxcha_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "xxcha"
 	},
 	{
       "alias": "pi_yin",
@@ -245,6 +260,7 @@
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_yin_flagship", "infantry", "pi_yin_mech", "pds", "spacedock"],
       "factionSheetURL" : "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/14/Yin1.jpg",
       "source": "project_pi"
+      "homebrewReplacesID": "yin"
 	},
 	{
       "alias": "pi_yssaril",
@@ -260,6 +276,7 @@
       "promissoryNotes": ["spynet"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_yssaril_flagship", "infantry", "pi_yssaril_mech", "pds", "spacedock"],
       "source": "project_pi"
+      "homebrewReplacesID": "yssaril"
 	},
 	{
         "alias": "pi_argent",
@@ -275,6 +292,7 @@
         "promissoryNotes": ["ambuscade"],
         "units": ["fighter", "argent_destroyer", "cruiser", "carrier", "dreadnought", "pi_argent_flagship", "infantry", "pi_argent_mech", "pds", "spacedock"],
         "source": "project_pi"
+        "homebrewReplacesID": "argent"
 	},
 	{
         "alias": "pi_cabal",
@@ -291,6 +309,7 @@
         "promissoryNotes": ["crucible"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "cabal_flagship", "infantry", "pi_cabal_mech", "pds", "cabal_spacedock"],
         "source": "project_pi"
+        "homebrewReplacesID": "cabal"
 	},
 	{
         "alias": "pi_empyrean",
@@ -306,6 +325,7 @@
         "promissoryNotes": ["dark_pact", "blood_pact"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "empyrean_flagship", "infantry", "pi_empyrean_mech", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "empyrean"
 	},
 	{
         "alias": "pi_mahact",
@@ -322,6 +342,7 @@
         "promissoryNotes": ["scepter"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "mahact_flagship", "mahact_infantry", "pi_mahact_mech", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "mahact"
 	},
 	{
         "alias": "pi_nomad",
@@ -338,6 +359,7 @@
         "promissoryNotes": ["cavalry"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "nomad_flagship", "infantry", "pi_nomad_mech", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "nomad"
 	},
 	{
         "alias": "pi_naaz",
@@ -354,6 +376,7 @@
         "promissoryNotes": ["bmf"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "naaz_flagship", "infantry", "pi_naaz_mech", "pi_naaz_mech_space", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "naaz"
 	},
 	{
         "alias": "pi_titans",
@@ -370,6 +393,7 @@
         "promissoryNotes": ["terraform"],
         "units": ["fighter", "pi_destroyer", "titans_cruiser", "carrier", "dreadnought", "pi_titans_flagship", "infantry", "pi_titans_mech", "titans_pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "titans"
   	},
 	{
         "alias": "pi_keleresm",
@@ -385,6 +409,7 @@
         "promissoryNotes": ["riderm"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_keleres_flagship", "infantry", "pi_keleres_mech", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "keleresm"
 	},
 	{
         "alias": "pi_keleresx",
@@ -400,6 +425,7 @@
         "promissoryNotes": ["riderx"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_keleres_flagship", "infantry", "pi_keleres_mech", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "keleresx"
 	},
 	{
         "alias": "pi_keleresa",
@@ -415,6 +441,7 @@
         "promissoryNotes": ["ridera"],
         "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_keleres_flagship", "infantry", "pi_keleres_mech", "pds", "spacedock"],
         "source": "project_pi"
+	"homebrewReplacesID": "keleresa"
 	}
 ]
 
