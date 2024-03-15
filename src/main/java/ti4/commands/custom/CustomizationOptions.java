@@ -23,6 +23,8 @@ public class CustomizationOptions extends CustomSubcommandData{
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they dont respond with 24hrs"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
@@ -88,6 +90,12 @@ public class CustomizationOptions extends CustomSubcommandData{
 
         Boolean showB = event.getOption(Constants.SHOW_BUBBLES, null, OptionMapping::getAsBoolean);
         if (showB != null) activeGame.setShowBubbles(showB);
+
+        Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
+        if (showG != null) activeGame.setShowGears(showG);
+
+        Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
+        if (homebrew != null) activeGame.setHomeBrew(homebrew);
 
         Boolean queueSO = event.getOption(Constants.QUEUE_SO, null, OptionMapping::getAsBoolean);
         if (queueSO != null) {

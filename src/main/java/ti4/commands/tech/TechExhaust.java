@@ -179,7 +179,7 @@ public class TechExhaust extends TechAddRemove {
                     player.refreshTech("lgf");
                 }
             }
-            case "sr" -> { // Sling Relay
+            case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
                 List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
@@ -195,7 +195,7 @@ public class TechExhaust extends TechAddRemove {
                         pos2.add(tile.getPosition());
                     }
                 }
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to Sling a ship into.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to produce a ship in ", buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
             case "dsdihmy" -> { // Impressment Programs

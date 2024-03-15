@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
+import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.fow.Whisper;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -60,12 +61,13 @@ public class MessageListener extends ListenerAdapter {
         long startTime = new Date().getTime();
 
         String userID = event.getUser().getId();
-
+        
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS)
             && (event.getInteraction().getSubcommandName() == null || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && !event.getInteraction().getName().equals(Constants.SEARCH)
             && event.getOption(Constants.GAME_NAME) == null) { //SKIP /help COMMANDS
+                
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
                 event
@@ -78,6 +80,7 @@ public class MessageListener extends ListenerAdapter {
                 if (userActiveGame != null) {
                     userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
+                
             }
         }
 
@@ -86,7 +89,29 @@ public class MessageListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-            event.getChannel().sendMessage(commandText).queue(m -> BotLogger.logSlashCommand(event, m));
+            event.getChannel().sendMessage(commandText).queue(m -> {
+                BotLogger.logSlashCommand(event, m);
+                Game userActiveGame = GameManager.getInstance().getUserActiveGame(userID);
+                boolean harmless = false;
+                if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS)
+                    && (event.getInteraction().getSubcommandName() == null || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
+                    && !event.getInteraction().getName().equals(Constants.SEARCH) & !event.getInteraction().getName().equals(Constants.SHOW_GAME) && event.getOption(Constants.GAME_NAME) == null) {
+
+                }else{
+                    harmless = true;
+                }
+                if(userActiveGame != null && !userActiveGame.isFoWMode() && !harmless){
+                    if(event.getMessageChannel() instanceof ThreadChannel thread){
+                        if(!thread.isPublic()){
+                            reportSusSlashCommand(event, m);
+                        }
+                    }else{
+                        if(event.getMessageChannel() != userActiveGame.getActionsChannel() && event.getMessageChannel() != userActiveGame.getTableTalkChannel() && !event.getMessageChannel().getName().contains("bot-map-updates")){
+                            reportSusSlashCommand(event, m);
+                        }
+                    }
+                }
+            });
         }
 
         CommandManager commandManager = CommandManager.getInstance();
@@ -106,6 +131,28 @@ public class MessageListener extends ListenerAdapter {
         long endTime = new Date().getTime();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This slash command took longer than 3000 ms (" + (endTime - startTime) + ")");
+        }
+    }
+
+    public static void reportSusSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage){
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
+                .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
+        if (bothelperLoungeChannel == null)
+            return;
+        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+        if (threadChannels.isEmpty())
+            return;
+        String threadName = "sus-slash-commands";
+        // SEARCH FOR EXISTING OPEN THREAD
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(event.getUser().getEffectiveName()).append(" ");
+                sb.append("`").append(event.getCommandString()).append("` ");
+                sb.append(commandResponseMessage.getJumpUrl());
+                MessageHelper.sendMessageToChannel(threadChannel_, sb.toString());
+                break;
+            }
         }
     }
 

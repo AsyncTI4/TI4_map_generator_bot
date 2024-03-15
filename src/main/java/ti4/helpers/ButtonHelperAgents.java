@@ -40,6 +40,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
@@ -1107,19 +1108,23 @@ public class ButtonHelperAgents {
         if (edyn != null && edyn.hasUnexhaustedLeader("edynagent")) {
             String preset = activeGame.getFactionsThatReactedToThis("edynAgentPreset");
             if (!preset.isEmpty()) {
-                if (preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
-                    Player edyn2 = activeGame.getPlayerFromColorOrFaction(preset.split("_")[2]);
-                    Player newActivePlayer = activeGame.getPlayerFromColorOrFaction(preset.split("_")[0]);
-                    exhaustAgent("exhaustAgent_edynagent", event, activeGame, edyn2, ButtonHelper.getIdent(edyn2));
-                    activeGame.setCurrentReacts("edynAgentPreset", "");
-                    activeGame.setCurrentReacts("edynAgentInAction",
-                            newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
-                    List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, activeGame, true, event);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(newActivePlayer, activeGame),
-                            newActivePlayer.getRepresentation(true, true)
-                                    + " you can take 1 action now due to Edyn Agent",
-                            buttons);
-                    return true;
+                if(preset.contains("_")){
+                    if (preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
+                        Player edyn2 = activeGame.getPlayerFromColorOrFaction(preset.split("_")[2]);
+                        Player newActivePlayer = activeGame.getPlayerFromColorOrFaction(preset.split("_")[0]);
+                        exhaustAgent("exhaustAgent_edynagent", event, activeGame, edyn2, ButtonHelper.getIdent(edyn2));
+                        activeGame.setCurrentReacts("edynAgentPreset", "");
+                        activeGame.setCurrentReacts("edynAgentInAction",
+                                newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
+                        List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, activeGame, true, event);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(newActivePlayer, activeGame),
+                                newActivePlayer.getRepresentation(true, true)
+                                        + " you can take 1 action now due to Edyn Agent",
+                                buttons);
+                        return true;
+                    }
+                }else{
+                    BotLogger.log("Edyn agent had this as its preset in game "+activeGame.getName()+": "+preset);
                 }
             }
         }
