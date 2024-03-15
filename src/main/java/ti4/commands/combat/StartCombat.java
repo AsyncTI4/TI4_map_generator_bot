@@ -238,7 +238,51 @@ public class StartCombat extends CombatSubcommandData {
             if(ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)){
                 buttons.add(Button.success("resolveSpyStep1", "Resolve Cymiae Flagship Ability"));
                 buttons.add(Button.danger("deleteButtons", "Delete These"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + "if you win the combat, you have the opportuntiy to use the cymiae FS to force the other player to send you a random action card. It will send buttons to the other player to confirm");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + "if you win the combat, you have the opportuntiy to use the cymiae FS to force the other player to send you a random action card. It will send buttons to the other player to confirm", buttons);
+            }
+            if(type.equalsIgnoreCase("space") && player.getSecretsUnscored().keySet().contains("uf") && tile.getUnitHolders().get("space").getUnitCount(UnitType.Flagship, player.getColor()) > 0){
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, you can score unveil");
+            }
+            if(type.equalsIgnoreCase("space") && player.getSecretsUnscored().keySet().contains("dtgs") && (tile.getUnitHolders().get("space").getUnitCount(UnitType.Flagship, otherPlayer.getColor()) > 0 || tile.getUnitHolders().get("space").getUnitCount(UnitType.Warsun, otherPlayer.getColor()) > 0)){
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that you could potentially score destroy their greatest in this combat");
+            }
+            if(player.getSecretsUnscored().keySet().contains("sar") && otherPlayer.getTotalVictoryPoints() == activeGame.getHighestScore()){
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that you could potentially score spark in this combat");
+            }
+            if(player.getSecretsUnscored().keySet().contains("btv") && tile.isAnomaly(activeGame)){
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that you could potentially score brave the void in this combat");
+            }
+            
+            if ((player.hasAbility("edict") || player.hasAbility("imperia")) && !player.getMahactCC().contains(otherPlayer.getColor())) {
+                buttons = new ArrayList<>();
+                String finChecker = "FFCC_" + player.getFaction() + "_";
+                buttons.add(Button.secondary(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win this combat, you can add the opponents CC to your fleet pool", buttons);
+            }
+            if (player.hasAbility("technological_singularity")) {
+                buttons = new ArrayList<>();
+                String finChecker = "FFCC_" + player.getFaction() + "_";
+                buttons.add(Button.secondary(finChecker + "nekroStealTech_" + otherPlayer.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that when you first kill an opponent unit this combat, you can use the button to steal a tech", buttons);
+            }
+
+            
+            if (type.equalsIgnoreCase("space") && player.hasTech("so")) {
+                buttons = new ArrayList<>();
+                buttons.add(Button.secondary("salvageOps_" + tile.getPosition(), "Salvage Ops").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if the combat does not end in a draw, you can use the button to resolve salvage ops", buttons);
+            }
+            if (type.equalsIgnoreCase("space") && activeGame.playerHasLeaderUnlockedOrAlliance(player, "mentakcommander")) {
+                String finChecker = "FFCC_" + player.getFaction() + "_";
+                buttons = new ArrayList<>();
+                buttons.add(Button.secondary(finChecker + "mentakCommander_" + otherPlayer.getColor(), "Mentak Commander on " + otherPlayer.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, you can use the button to resolve mentak commander", buttons);
+            }
+            if (player.hasAbility("moult") && player != activeGame.getActivePlayer() && "space".equalsIgnoreCase(type)) {
+                String finChecker = "FFCC_" + player.getFaction() + "_";
+                buttons = new ArrayList<>();
+                buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, you can use the button to resolve moult and produce one ship, reducing the cost by 1 for each non-fighter ship you lost in the combat", buttons);
             }
         }
 
@@ -407,23 +451,23 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.secondary(finChecker + "yinagent_" + pos, "Yin Agent").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
         }
 
-        if (p1.hasAbility("technological_singularity")) {
-            String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p2.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
-        }
-        if (p2.hasAbility("technological_singularity") && !activeGame.isFoWMode()) {
-            String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
-        }
+        // if (p1.hasAbility("technological_singularity")) {
+        //     String finChecker = "FFCC_" + p1.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p2.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
+        // }
+        // if (p2.hasAbility("technological_singularity") && !activeGame.isFoWMode()) {
+        //     String finChecker = "FFCC_" + p2.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
+        // }
 
-        if (p1.hasAbility("moult") && p1 != activeGame.getActivePlayer() && "space".equalsIgnoreCase(groundOrSpace)) {
-            String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
-        }
-        if (p2.hasAbility("moult") && !activeGame.isFoWMode() && p2 != activeGame.getActivePlayer() && "space".equalsIgnoreCase(groundOrSpace)) {
-            String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
-        }
+        // if (p1.hasAbility("moult") && p1 != activeGame.getActivePlayer() && "space".equalsIgnoreCase(groundOrSpace)) {
+        //     String finChecker = "FFCC_" + p1.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        // }
+        // if (p2.hasAbility("moult") && !activeGame.isFoWMode() && p2 != activeGame.getActivePlayer() && "space".equalsIgnoreCase(groundOrSpace)) {
+        //     String finChecker = "FFCC_" + p2.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "moult_" +tile.getPosition(), "Moult").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        // }
 
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !activeGame.isFoWMode() && isGroundCombat && p1.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
@@ -434,14 +478,14 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(), "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
 
-        if ((p2.hasAbility("edict") || p2.hasAbility("imperia")) && !activeGame.isFoWMode()) {
-            String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p1.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
-        }
-        if (p1.hasAbility("edict") || p1.hasAbility("imperia")) {
-            String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
-        }
+        // if ((p2.hasAbility("edict") || p2.hasAbility("imperia")) && !activeGame.isFoWMode()) {
+        //     String finChecker = "FFCC_" + p2.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p1.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
+        // }
+        // if (p1.hasAbility("edict") || p1.hasAbility("imperia")) {
+        //     String finChecker = "FFCC_" + p1.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
+        // }
         if ((p2.hasAbility("for_glory")) && !activeGame.isFoWMode() && ButtonHelperAgents.getGloryTokenTiles(activeGame).size() < 3) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory (Upon Win)").withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
@@ -460,18 +504,17 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Button.secondary(finChecker + "offerNecrophage", "Necrophage").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
-        if (isSpaceCombat && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mentakcommander") && !activeGame.isFoWMode()) {
-            String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "mentakCommander_" + p1.getColor(), "Mentak Commander on " + p1.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
-        }
-        if (isSpaceCombat && ((p1.hasTech("so")) || (!activeGame.isFoWMode() && p2.hasTech("so")))) {
-
-            buttons.add(Button.secondary("salvageOps_" + tile.getPosition(), "Salvage Ops").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
-        }
-        if (isSpaceCombat && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mentakcommander")) {
-            String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "mentakCommander_" + p2.getColor(), "Mentak Commander on " + p2.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
-        }
+        // if (isSpaceCombat && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mentakcommander") && !activeGame.isFoWMode()) {
+        //     String finChecker = "FFCC_" + p2.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "mentakCommander_" + p1.getColor(), "Mentak Commander on " + p1.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+        // }
+        // if (isSpaceCombat && ((p1.hasTech("so")) || (!activeGame.isFoWMode() && p2.hasTech("so")))) {
+        //     buttons.add(Button.secondary("salvageOps_" + tile.getPosition(), "Salvage Ops").withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+        // }
+        // if (isSpaceCombat && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mentakcommander")) {
+        //     String finChecker = "FFCC_" + p1.getFaction() + "_";
+        //     buttons.add(Button.secondary(finChecker + "mentakCommander_" + p2.getColor(), "Mentak Commander on " + p2.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+        // }
 
         if (isSpaceCombat && activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mykomentoricommander") && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";

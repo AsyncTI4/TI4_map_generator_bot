@@ -93,7 +93,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Techs Researched (From "+gamesThatHadThem+" Games)**__\n");
+        sb.append("## __**Techs Researched By "+factionM.getFactionName()+" (From "+gamesThatHadThem+" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Integer>>  comparator = (o1, o2) -> {

@@ -358,10 +358,16 @@ public class ButtonHelperTacticalAction {
         event.getMessage().delete().queue();
     }
 
-    public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event) {
+    public static void finishMovingForTacticalAction(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String message = "Moved all units to the space area.";
         
-        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        Tile tile = null;
+        
+        if(buttonID.contains("_")){
+            tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        }else{
+            tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, tile.getPosition());
        
         List<Button> systemButtons;
