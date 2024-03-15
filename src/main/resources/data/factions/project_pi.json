@@ -30,7 +30,7 @@
       "promissoryNotes": ["pi_iff"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_ghost_flagship", "infantry", "pi_ghost_mech", "pds", "spacedock"],
       "source": "project_pi",
-      "homebrewReplacesID": "ghosts"
+      "homebrewReplacesID": "ghost"
 	},
 	{
       "alias": "pi_hacan",
