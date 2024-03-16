@@ -147,9 +147,9 @@
         "name": "Minister of Exploration ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore 1 of their planets. When the owner of this card explores, they may discard this card to draw any number of additional cards; they choose 1 to resolve and discard the rest.",
+        "text1": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore 1 of their planets. When the owner of this card explores, they may discard this card to draw 3 additional cards; they choose 1 to resolve and discard the rest.",
         "text2": "",
-        "mapText": "After gaining CCs from Leadership, explore a planet. Before you draw from exploration, you may discard this to draw any number of cards and resolve 1.",
+        "mapText": "After gaining CCs from Leadership, explore a planet. Before you draw from exploration, you may discard this to draw 3 additional cards and resolve 1.",
         "source": "little_omega"
     },
     {
