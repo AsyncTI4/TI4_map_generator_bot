@@ -207,9 +207,7 @@ public class Helper {
         MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
         new StartMilty().initDraftTiles(draftManager);
         List<MiltyDraftTile> allTiles;
-        allTiles = draftManager.getHigh();
-        allTiles.addAll(draftManager.getMid());
-        allTiles.addAll(draftManager.getLow());
+        allTiles = draftManager.getBlue();
         boolean inMap = true;
         int counter = 1;
         while (inMap && counter < 1000) {

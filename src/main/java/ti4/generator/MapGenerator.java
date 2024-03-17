@@ -1644,15 +1644,16 @@ public class MapGenerator {
                     drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
                 } else {
                     String originalPlanetType = planetHolder.getOriginalPlanetType();
-                    if ("none".equals(originalPlanetType) && "mr".equals(planet))
+                    if ("none".equals(originalPlanetType) && ("mr".equals(planet) || "mrte".equals(planet)))
                         originalPlanetType = "mr";
                     if ("none".equals(originalPlanetType))
                         originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     if (Optional.ofNullable(originalPlanetType).isEmpty()) {
                         originalPlanetType = "none";
                     }
-                    if ("none".equals(originalPlanetType))
+                    if ("faction".equals(originalPlanetType)) {
                         originalPlanetType = player.getFaction();
+                    }
 
                     if (!originalPlanetType.isEmpty()) {
                         if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
@@ -3069,7 +3070,6 @@ public class MapGenerator {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                 }
                 if (prodInSystem > 0 && game.getShowGears()) {
-
                     if (tile.getPlanetUnitHolders().size() != 3) {
                         BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
                         tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x - 225, TILE_PADDING + tilePositionPoint.y - 170, null);
