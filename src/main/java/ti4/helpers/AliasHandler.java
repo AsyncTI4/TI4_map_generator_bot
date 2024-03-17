@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.generator.TileHelper;
@@ -68,7 +67,9 @@ public class AliasHandler {
         initAliases();
     }
 
-    /** Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
+    /**
+     * Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
+     * 
      * @param fileName file with lines like: key=value1,value2,value3
      * @param map map to load with key and values like: [key],[value1,value2,value3]
      */
@@ -85,10 +86,12 @@ public class AliasHandler {
         }
     }
 
-    /** Loads just the key or value for aliases - use the list for simple ifExists / contains checks
+    /**
+     * Loads just the key or value for aliases - use the list for simple ifExists / contains checks
+     * 
      * @param fileName file with lines like: key=value1,value2,value3
      * @param list list to load
-     * @param keys true ->  load [key] into the list
+     * @param keys true -> load [key] into the list
      * @param keys false -> load [value1,value2,value3] into the list
      */
     private static void readAliasFile(String fileName, List<String> list, boolean keys) {
@@ -97,7 +100,7 @@ public class AliasHandler {
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 aliasProperties.load(input);
-                if (keys){
+                if (keys) {
                     for (Object key : aliasProperties.keySet()) {
                         if (key instanceof String valueString) {
                             list.add(valueString);
@@ -116,7 +119,9 @@ public class AliasHandler {
         }
     }
 
-    /** Load aliases for actually resolving aliases
+    /**
+     * Load aliases for actually resolving aliases
+     * 
      * @param fileName file with lines like: key=value1,value2,value3
      * @param aliasList map to load aliases like: (value1=key),(value2=key),(value=key)
      * @param errorMessage error message provided
@@ -127,7 +132,7 @@ public class AliasHandler {
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 aliasProperties.load(input);
-                for (String id: aliasProperties.stringPropertyNames()) {
+                for (String id : aliasProperties.stringPropertyNames()) {
                     StringTokenizer tokenizer = new StringTokenizer(aliasProperties.getProperty(id), ",");
                     while (tokenizer.hasMoreTokens()) {
                         String aliasToken = tokenizer.nextToken();
@@ -149,17 +154,16 @@ public class AliasHandler {
 
     public static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
-                .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+            .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
     }
 
     public static void addNewTileAliases(TileModel tileModel) {
         Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
-                .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
+            .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
     }
 
     public static String resolveTile(String name) {
-        if("mirage".equalsIgnoreCase(name))
-        {
+        if ("mirage".equalsIgnoreCase(name)) {
             return name;
         }
         String tileId = allTileAliases.get(name.toLowerCase());
@@ -171,7 +175,9 @@ public class AliasHandler {
         }
     }
 
-    /** For resolving a TileID specific to this Async bot to a "Standard" TileID used by all other TI4 map tools, including TTPG/TTS
+    /**
+     * For resolving a TileID specific to this Async bot to a "Standard" TileID used by all other TI4 map tools, including TTPG/TTS
+     * 
      * @param name - Async specific Tile ID
      * @return Standard TI4 Tile ID number
      */
@@ -209,8 +215,8 @@ public class AliasHandler {
 
     public static List<String> getPlanetKeyList() {
         return TileHelper.getAllPlanets().values().stream()
-                .map(PlanetModel::getId)
-                .toList();
+            .map(PlanetModel::getId)
+            .toList();
     }
 
     public static String resolvePlanet(String name) {
@@ -229,7 +235,7 @@ public class AliasHandler {
 
     public static String resolveAttachment(String name) {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
-        if("gamma".equalsIgnoreCase(name)){
+        if ("gamma".equalsIgnoreCase(name)) {
             return name;
         }
         //System.out.println("Could not find an alias for Attachment: " + name);
@@ -306,7 +312,9 @@ public class AliasHandler {
         }
     }
 
-    /** Given a Position parameter like [+-][0-9][+-][0-9], will return Async position like [0-9][a-z]
+    /**
+     * Given a Position parameter like [+-][0-9][+-][0-9], will return Async position like [0-9][a-z]
+     * 
      * @param position TTPG like [+-][0-9][+-][0-9] Eg. +0+0, +2-2, +0+8
      * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
      */
@@ -317,14 +325,14 @@ public class AliasHandler {
 
     public static Map<String, String> getPlanetAliasEntryList() {
         return TileHelper.getAllPlanets().values().stream()
-                .collect(Collectors.toMap(PlanetModel::getId,
-                        planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
+            .collect(Collectors.toMap(PlanetModel::getId,
+                planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static Map<String, String> getTileAliasEntryList() {
         return TileHelper.getAllTiles().values().stream()
-                .collect(Collectors.toMap(TileModel::getId,
-                        tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
+            .collect(Collectors.toMap(TileModel::getId,
+                tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static String getFactionAliasEntryList(String faction) {

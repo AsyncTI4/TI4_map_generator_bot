@@ -167,10 +167,10 @@ public class SCPlay extends PlayerSubcommandData {
             }
             activeGame.setCurrentReacts("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
             activeGame.setCurrentReacts("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
-            activeGame.setCurrentReacts("scPlayMsgTime" + scToPlay, new Date().getTime() +"");
-            for(Player p2 : activeGame.getRealPlayers()){
-                if(!activeGame.getFactionsThatReactedToThis("scPlayPingCount" + scToPlay+p2.getFaction()).isEmpty()){
-                    activeGame.removeMessageIDFromCurrentReacts("scPlayPingCount" + scToPlay+p2.getFaction());
+            activeGame.setCurrentReacts("scPlayMsgTime" + scToPlay, new Date().getTime() + "");
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if (!activeGame.getFactionsThatReactedToThis("scPlayPingCount" + scToPlay + p2.getFaction()).isEmpty()) {
+                    activeGame.removeMessageIDFromCurrentReacts("scPlayPingCount" + scToPlay + p2.getFaction());
                 }
             }
             if (activeGame.isFoWMode()) {
@@ -197,7 +197,7 @@ public class SCPlay extends PlayerSubcommandData {
                                 scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
-                            
+
                         }
                     }
                 });
@@ -212,8 +212,9 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), assignSpeakerMessage, assignSpeakerActionRow);
         }
-        if(scToPlay == ButtonHelper.getKyroHeroSC(activeGame) && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))){
-             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
+        if (scToPlay == ButtonHelper.getKyroHeroSC(activeGame) && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation() + " this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
 
         }
 
@@ -305,26 +306,27 @@ public class SCPlay extends PlayerSubcommandData {
             String scId = String.valueOf(sc);
             sc = Integer.parseInt(StringUtils.left(scId, 1));
         }
-        
-        if(sc == 8){
-            if(!winnuHero){
+
+        if (sc == 8) {
+            if (!winnuHero) {
                 Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
                 String key = "factionsThatAreNotDiscardingSOs";
                 String key2 = "queueToDrawSOs";
                 String key3 = "potentialBlockers";
-                activeGame.setCurrentReacts(key,"");
-                activeGame.setCurrentReacts(key2,"");
-                activeGame.setCurrentReacts(key3,"");
-                if(activeGame.getQueueSO()){
-                    for(Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)){
-                        if(player.getSoScored()+player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount() || (player == imperialHolder && player.getPlanets().contains("mr"))){
-                            activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
-                        }else{
-                            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
+                activeGame.setCurrentReacts(key, "");
+                activeGame.setCurrentReacts(key2, "");
+                activeGame.setCurrentReacts(key3, "");
+                if (activeGame.getQueueSO()) {
+                    for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
+                        if (player.getSoScored() + player.getSo() < player.getMaxSOCount() || player.getSoScored() == player.getMaxSOCount()
+                            || (player == imperialHolder && player.getPlanets().contains("mr"))) {
+                            activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key) + player.getFaction() + "*");
+                        } else {
+                            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3) + player.getFaction() + "*");
                         }
                     }
                 }
-            }else{
+            } else {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Since this is a winnu hero play, SO draws will not be queued or resolved in a particular order");
             }
         }

@@ -55,7 +55,8 @@ public class SetDeck extends GameSubcommandData {
                     if (setDeck(event, activeGame, deckType, deckModel)) {
                         changedDecks.put(deckModel.getType(), deckModel);
                     } else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the deck ***" + value + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
+                            "Something went wrong and the deck ***" + value + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
                 }
                 if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
@@ -65,9 +66,9 @@ public class SetDeck extends GameSubcommandData {
             }
         });
 
-        if(CollectionUtils.isNotEmpty(changedDecks.keySet())) {
+        if (CollectionUtils.isNotEmpty(changedDecks.keySet())) {
             List<String> changeMessage = new ArrayList<>();
-            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n>>> " + deck.getDescription()));
+            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() + "`: " + deck.getName() + "\n>>> " + deck.getDescription()));
             MessageHelper.sendMessageToChannel(event.getChannel(), String.join("\n", changeMessage));
         }
     }
@@ -112,14 +113,14 @@ public class SetDeck extends GameSubcommandData {
                 }
                 case Constants.TECHNOLOGY_DECK -> {
                     activeGame.setTechnologyDeckID(deckModel.getAlias());
-                    if(deckModel.getAlias().contains("absol")){
-                        for(Player player : activeGame.getRealPlayers()){
+                    if (deckModel.getAlias().contains("absol")) {
+                        for (Player player : activeGame.getRealPlayers()) {
                             List<String> techs = new ArrayList<>();
                             techs.addAll(player.getTechs());
-                            for(String tech : techs){
-                                if(!tech.contains("absol") && Mapper.getTech("absol_"+tech) != null){
-                                    if(!player.hasTech("absol_"+tech)){
-                                        player.addTech("absol_"+tech);
+                            for (String tech : techs) {
+                                if (!tech.contains("absol") && Mapper.getTech("absol_" + tech) != null) {
+                                    if (!player.hasTech("absol_" + tech)) {
+                                        player.addTech("absol_" + tech);
                                     }
                                     player.removeTech(tech);
                                 }

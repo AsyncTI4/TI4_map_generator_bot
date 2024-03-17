@@ -80,20 +80,19 @@ public class BlueTileDraftItem extends DraftItem {
         return Emojis.SemLor;
     }
 
-
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getHigh()) {
             allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE,
-                    tile.getTile().getTileID()));
+                tile.getTile().getTileID()));
         }
         for (MiltyDraftTile tile : draftManager.getMid()) {
             allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE,
-                    tile.getTile().getTileID()));
+                tile.getTile().getTileID()));
         }
         for (MiltyDraftTile tile : draftManager.getLow()) {
             allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE,
-                    tile.getTile().getTileID()));
+                tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);
         return allItems;

@@ -333,7 +333,6 @@ public class StartMilty extends MiltySubcommandData {
 
             boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
 
-            
         } catch (IOException e) {
             BotLogger.log("Could not save jpg file", e);
         }

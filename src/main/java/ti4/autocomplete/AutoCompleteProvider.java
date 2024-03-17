@@ -504,7 +504,10 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = Undo.getAllUndoSavedGames(activeGame).entrySet().stream()
                     .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
                     .limit(25)
-                    .map(entry -> new Command.Choice(StringUtils.left(entry.getKey() + " (" + Helper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) +  " ago):  " + entry.getValue().getLatestCommand(), 100), entry.getKey()))
+                    .map(entry -> new Command.Choice(
+                        StringUtils.left(
+                            entry.getKey() + " (" + Helper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
+                        entry.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
