@@ -1151,7 +1151,7 @@ public class ButtonListener extends ListenerAdapter {
             if (whatIsItFor.contains("tech") && player.hasAbility("ancient_knowledge")) {
                 String planet = planetName;
                 if ((Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
-                    || ButtonHelper.checkForTechSkipAttachments(activeGame, planet)) {
+                    || ButtonHelper.checkForTechSkips(activeGame, planet)) {
                     String msg = player.getRepresentation() + " due to your ancient knowledge ability, you may be eligible to receive a tech here if you exhausted this planet (" + planet
                         + ") for its tech skip";
                     List<Button> buttons = new ArrayList<>();

@@ -456,7 +456,7 @@ public class StartMilty extends MiltySubcommandData {
                         draftTile.addMilty_influence((double) influence / 2);
                     }
 
-                    if (planet.isHasAbility()) {
+                    if (planet.isLegendary()) {
                         draftTile.setLegendary(true);
                     }
                 }

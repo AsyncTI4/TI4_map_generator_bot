@@ -13,8 +13,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import lombok.Data;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -34,10 +38,6 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
@@ -205,7 +205,7 @@ public class ButtonHelper {
     }
 
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile) {
-        if (!player.hasUnit(flagshipID)) {
+        if (!player.hasUnit(flagshipID) || tile == null) {
             return false;
         }
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -504,31 +504,15 @@ public class ButtonHelper {
         return getCorrectChannel(player, game);
     }
 
-    public static List<String> getTypesOfPlanetPlayerHas(Game game, Player player) {
-        List<String> types = new ArrayList<>();
+    public static Set<String> getTypesOfPlanetPlayerHas(Game game, Player player) {
+        Set<String> types = new HashSet<>();
         for (String planet : player.getPlanets()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
             UnitHolder unitHolder = game.getPlanetsInfo().get(planet);
             if (unitHolder == null)
-                return types;
+                continue;
+
             Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = planetReal != null && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
-            if (planetReal != null && oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
-                types.add(planetReal.getOriginalPlanetType());
-            }
-            if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
-                if (!types.contains("hazardous")) {
-                    types.add("hazardous");
-                }
-                if (!types.contains("industrial")) {
-                    types.add("industrial");
-                }
-                if (!types.contains("cultural")) {
-                    types.add("cultural");
-                }
-            }
+            types.addAll(planetReal.getPlanetTypes());
         }
         return types;
     }
@@ -1543,16 +1527,10 @@ public class ButtonHelper {
         return numberOfAbilities;
     }
 
-    public static boolean checkForTechSkipAttachments(Game game, String planetName) {
+    public static boolean checkForTechSkips(Game game, String planetName) {
         boolean techPresent = false;
-        List<String> fakePlanets = List.of("custodiavigilia", "ghoti");
-        if (fakePlanets.contains(planetName.toLowerCase())) {
-            return false;
-        }
-        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        Set<String> tokenList = unitHolder.getTokenList();
-        if (CollectionUtils.containsAny(tokenList, "attachment_warfare.png", "attachment_cybernetic.png", "attachment_biotic.png", "attachment_propulsion.png")) {
+        Planet planet = (Planet) game.getPlanetsInfo().get(planetName);
+        if (planet.getTechSpecialities().size() > 0) {
             techPresent = true;
         }
         return techPresent;
@@ -1615,12 +1593,8 @@ public class ButtonHelper {
             buttons.add(Button.success("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
         }
         for (String planet : player.getExhaustedPlanets()) {
-            if (absol
-                || (Mapper.getPlanet(planet).getTechSpecialties() != null
-                    && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
-                || checkForTechSkipAttachments(game, planet)) {
-                buttons.add(Button.success("biostimsReady_planet_" + planet,
-                    "Ready " + Helper.getPlanetRepresentation(planet, game)));
+            if (absol || checkForTechSkips(game, planet)) {
+                buttons.add(Button.success("biostimsReady_planet_" + planet, "Ready " + Helper.getPlanetRepresentation(planet, game)));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -1638,11 +1612,8 @@ public class ButtonHelper {
     public static List<Button> getPsychoTechPlanets(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
-            if ((Mapper.getPlanet(planet).getTechSpecialties() != null
-                && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
-                || checkForTechSkipAttachments(game, planet)) {
-                buttons.add(Button.success("psychoExhaust_" + planet,
-                    "Exhaust " + Helper.getPlanetRepresentation(planet, game)));
+            if (checkForTechSkips(game, planet)) {
+                buttons.add(Button.success("psychoExhaust_" + planet, "Exhaust " + Helper.getPlanetRepresentation(planet, game)));
             }
         }
         buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
@@ -1829,7 +1800,7 @@ public class ButtonHelper {
                     continue;
                 }
                 Planet planet = (Planet) plan;
-                if (planet.isHasAbility()) {
+                if (planet.isLegendary()) {
                     continue;
                 }
                 boolean unowned = true;
@@ -1882,12 +1853,8 @@ public class ButtonHelper {
     public static int getNumberOfXTypePlanets(Player player, Game game, String type) {
         int count = 0;
         for (String planet : player.getPlanetsAllianceMode()) {
-            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
-            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
-            if (p != null && (type.equalsIgnoreCase(p.getOriginalPlanetType())
-                || p.getTokenList().contains("attachment_titanspn.png"))) {
+            Planet p = (Planet) game.getPlanetsInfo().get(planet);
+            if (p != null && p.getPlanetTypes().contains(type)) {
                 count++;
             }
         }
@@ -2809,46 +2776,10 @@ public class ButtonHelper {
     public static List<Button> getButtonsToExploreReadiedPlanets(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String plan : player.getPlanetsAllianceMode()) {
-            UnitHolder planetUnit = game.getPlanetsInfo().get(plan);
-            Planet planetReal = (Planet) planetUnit;
+            Planet planetReal = (Planet) game.getPlanetsInfo().get(plan);
             if (planetReal != null && planetReal.getOriginalPlanetType() != null && !player.getExhaustedPlanets().contains(planetReal.getName())) {
-                String planetType = planetReal.getOriginalPlanetType();
-                String planetId = planetReal.getName();
-                String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
-                Set<String> explorationTraits = new HashSet<>();
-                if (("industrial".equalsIgnoreCase(planetType) || "cultural".equalsIgnoreCase(planetType)
-                    || "hazardous".equalsIgnoreCase(planetType))) {
-                    explorationTraits.add(planetType);
-                }
-                if (planetReal.getTokenList().contains("attachment_titanspn.png")) {
-                    explorationTraits.add("cultural");
-                    explorationTraits.add("industrial");
-                    explorationTraits.add("hazardous");
-                }
-                if (planetReal.getTokenList().contains("attachment_industrialboom.png")) {
-                    explorationTraits.add("industrial");
-                }
-                if (player.hasAbility("black_markets") && explorationTraits.size() > 0) {
-                    String traits = ButtonHelperFactionSpecific.getAllOwnedPlanetTypes(player, game);
-                    if (traits.contains("industrial")) {
-                        explorationTraits.add("industrial");
-                    }
-                    if (traits.contains("cultural")) {
-                        explorationTraits.add("cultural");
-                    }
-                    if (traits.contains("hazardous")) {
-                        explorationTraits.add("hazardous");
-                    }
-                }
-
-                for (String trait : explorationTraits) {
-                    String buttonId = "movedNExplored_dsdihmy_filler_" + planetId + "_" + trait;
-                    String buttonMessage = "Explore " + planetRepresentation
-                        + (explorationTraits.size() > 1 ? " as " + trait : "");
-                    Emoji emoji = Emoji.fromFormatted(Emojis.getEmojiFromDiscord(trait));
-                    Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
-                    buttons.add(button);
-                }
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                buttons.addAll(planetButtons);
             }
         }
         return buttons;
@@ -3065,14 +2996,10 @@ public class ButtonHelper {
     public static boolean isTileLegendary(Tile tile, Game game) {
         for (UnitHolder planet : tile.getUnitHolders().values()) {
             if (planet instanceof Planet planetHolder) {
-                boolean hasAbility = planetHolder.isHasAbility()
-                    || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge")
-                        || token.contains("legendary") || token.contains("consulate"));
-                if (hasAbility) {
+                if (planetHolder.isLegendary()) {
                     return true;
                 }
             }
-
         }
         return false;
     }
@@ -3082,15 +3009,7 @@ public class ButtonHelper {
         Planet planetHolder = (Planet) unitHolder;
         if (planetHolder == null)
             return false;
-        boolean hasAbility = planetHolder.isHasAbility()
-            || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge")
-                || token.contains("legendary") || token.contains("consulate"));
-        if ((Mapper.getPlanet(planetName).getTechSpecialties() != null
-            && Mapper.getPlanet(planetName).getTechSpecialties().size() > 0)
-            || checkForTechSkipAttachments(game, planetName)) {
-            return true;
-        }
-        return hasAbility;
+        return planetHolder.isLegendary() || checkForTechSkips(game, planetName);
     }
 
     public static boolean isPlanetTechSkip(String planetName, Game game) {
@@ -3098,35 +3017,27 @@ public class ButtonHelper {
         Planet planetHolder = (Planet) unitHolder;
         if (planetHolder == null)
             return false;
-        return (Mapper.getPlanet(planetName).getTechSpecialties() != null
-            && Mapper.getPlanet(planetName).getTechSpecialties().size() > 0)
-            || checkForTechSkipAttachments(game, planetName);
+        return checkForTechSkips(game, planetName);
     }
 
     public static boolean isPlanetLegendaryOrHome(String planetName, Game game, boolean onlyIncludeYourHome, Player p1) {
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
         Planet planetHolder = (Planet) unitHolder;
-        if (planetHolder == null)
+        Tile tile = game.getTileFromPlanet(planetName);
+        if (planetHolder == null || tile == null)
             return false;
 
-        boolean hasAbility = planetHolder.isHasAbility()
-            || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge")
-                || token.contains("legendary") || token.contains("consulate"));
-
-        String originalType = planetHolder.getOriginalPlanetType();
-        boolean oneOfThree = List.of("industrial", "cultural", "hazardous").contains(originalType);
-        if (!planetHolder.getName().toLowerCase().contains("rex")
-            && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree) {
+        boolean hasAbility = planetHolder.isLegendary();
+        if (tile.isHomeSystem()) {
             if (onlyIncludeYourHome && p1 != null && p1.getPlayerStatsAnchorPosition() != null) {
-                if (game.getTileFromPlanet(planetName).getPosition()
-                    .equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())) {
-                    hasAbility = true;
+                if (game.getTileFromPlanet(planetName).getPosition().equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())) {
+                    return true;
                 }
                 if ("ghost".equalsIgnoreCase(p1.getFaction()) && "creuss".equalsIgnoreCase(planetName)) {
-                    hasAbility = true;
+                    return true;
                 }
             } else {
-                hasAbility = true;
+                return true;
             }
         }
         return hasAbility;
@@ -4027,43 +3938,24 @@ public class ButtonHelper {
         if (planet == null || game == null)
             return null;
 
-        String planetType = planet.getOriginalPlanetType();
         String planetId = planet.getName();
         String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
         List<Button> buttons = new ArrayList<>();
-        Set<String> explorationTraits = new HashSet<>();
-        if (("industrial".equalsIgnoreCase(planetType) || "cultural".equalsIgnoreCase(planetType)
-            || "hazardous".equalsIgnoreCase(planetType))) {
-            explorationTraits.add(planetType);
-        }
-        if (planet.getTokenList().contains("attachment_titanspn.png")) {
-            explorationTraits.add("cultural");
-            explorationTraits.add("industrial");
-            explorationTraits.add("hazardous");
-        }
-        if (planet.getTokenList().contains("attachment_industrialboom.png")) {
-            explorationTraits.add("industrial");
-        }
+        Set<String> explorationTraits = new HashSet<>(planet.getPlanetTypes());
+
         if (player.hasAbility("black_markets") && explorationTraits.size() > 0) {
-            String traits = ButtonHelperFactionSpecific.getAllOwnedPlanetTypes(player, game);
-            if (traits.contains("industrial")) {
-                explorationTraits.add("industrial");
-            }
-            if (traits.contains("cultural")) {
-                explorationTraits.add("cultural");
-            }
-            if (traits.contains("hazardous")) {
-                explorationTraits.add("hazardous");
-            }
+            Set<String> traits = getTypesOfPlanetPlayerHas(game, player);
+            explorationTraits.addAll(traits);
         }
 
         for (String trait : explorationTraits) {
-            String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
-            String buttonMessage = "Explore " + planetRepresentation
-                + (explorationTraits.size() > 1 ? " as " + trait : "");
-            Emoji emoji = Emoji.fromFormatted(Emojis.getEmojiFromDiscord(trait));
-            Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
-            buttons.add(button);
+            if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
+                String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
+                String buttonMessage = "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
+                Emoji emoji = Emoji.fromFormatted(Emojis.getEmojiFromDiscord(trait));
+                Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
+                buttons.add(button);
+            }
         }
         return buttons;
     }
@@ -4168,34 +4060,11 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static List<String> getTypeOfPlanet(Game activeGame, String planet) {
-        List<String> types = new ArrayList<>();
-        if (planet.contains("custodia") || planet.contains("ghoti")) {
-            return types;
-        }
+    public static Set<String> getTypeOfPlanet(Game activeGame, String planet) {
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
-        if (unitHolder == null)
-            return types;
+        if (unitHolder == null) return new HashSet<>();
         Planet planetReal = (Planet) unitHolder;
-        boolean oneOfThree = planetReal.getOriginalPlanetType() != null
-            && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
-        if (oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
-            types.add(planetReal.getOriginalPlanetType());
-        }
-        if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
-            if (!types.contains("hazardous")) {
-                types.add("hazardous");
-            }
-            if (!types.contains("industrial")) {
-                types.add("industrial");
-            }
-            if (!types.contains("cultural")) {
-                types.add("cultural");
-            }
-        }
-        return types;
+        return planetReal.getPlanetTypes();
     }
 
     public static void offerBuildOrRemove(Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
@@ -6758,12 +6627,8 @@ public class ButtonHelper {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getFactionsThatReactedToThis("agendaRepGov").contains(p2.getFaction())) {
                     for (String planet : p2.getPlanets()) {
-                        if (planet.contains("custodia") || planet.contains("ghoti")) {
-                            continue;
-                        }
-                        Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
-                        if (p != null && ("cultural".equalsIgnoreCase(p.getOriginalPlanetType())
-                            || p.getTokenList().contains("attachment_titanspn.png"))) {
+                        Planet p = (Planet) game.getPlanetsInfo().get(planet);
+                        if (p != null && p.getPlanetTypes().contains("cultural")) {
                             p2.exhaustPlanet(planet);
                         }
                     }
