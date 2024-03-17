@@ -223,7 +223,7 @@ public class PlanetAdd extends PlanetAddRemove {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
-                String message = ButtonHelper.getIdent(player) + " Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
+                String message = player.getFactionEmoji() + " Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
             }
         }

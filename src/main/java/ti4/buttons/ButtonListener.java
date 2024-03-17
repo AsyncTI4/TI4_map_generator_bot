@@ -186,8 +186,7 @@ public class ButtonListener extends ListenerAdapter {
             ident = player.getFactionEmoji();
         }
 
-        if (activeGame != null && !"ultimateundo".equalsIgnoreCase(buttonID)
-            && !"showGameAgain".equalsIgnoreCase(buttonID) && !"no_sabotage".equalsIgnoreCase(buttonID)) {
+        if (activeGame != null && !"ultimateundo".equalsIgnoreCase(buttonID) && !"showGameAgain".equalsIgnoreCase(buttonID) && !"no_sabotage".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
@@ -776,9 +775,7 @@ public class ButtonListener extends ListenerAdapter {
                 String pos = activeGame.getTileFromPlanet(info[1]).getPosition();
                 produce.add(Button.primary("dsdihmy_" + pos, "Produce (1) Units"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    player.getRepresentation()
-                        + " You explored a planet and due to Impressment Programs you may produce 1 ship in the system.",
-                    produce);
+                    player.getRepresentation() + " You explored a planet and due to Impressment Programs you may produce 1 ship in the system.", produce);
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveExp_Look_")) {
@@ -877,27 +874,22 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
-            buttons.add(Button.success(finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
-                "Auto-assign Hits"));
+            buttons.add(Button.success(finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hits"));
             buttons.add(Button.danger("getDamageButtons_" + tile.getPosition(), "Manually Assign Hits"));
             buttons.add(Button.secondary("cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
             String msg2 = "You can automatically assign hits. The hits would be assigned in the following way:\n\n"
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, activeGame, tile, h, event, true);
             // MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
-            event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+            event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons)).queue();
         } else if (buttonID.startsWith("autoAssignAFBHits_")) {// "autoAssignGroundHits_"
-            ButtonHelperModifyUnits.autoAssignAntiFighterBarrageHits(player, activeGame, buttonID.split("_")[1],
-                Integer.parseInt(buttonID.split("_")[2]), event);
+            ButtonHelperModifyUnits.autoAssignAntiFighterBarrageHits(player, activeGame, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
             activeGame.setComponentAction(true);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want",
-                ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
             Button doneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(doneExhausting);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                "Click the names of the planets you wish to exhaust to pay the 5 influence", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 5 influence", buttons);
             event.getMessage().delete().queue();
             // "saarHeroResolution_"
         } else if (buttonID.startsWith("forceARefresh_")) {
@@ -990,10 +982,8 @@ public class ButtonListener extends ListenerAdapter {
                 event.getMessage().delete().queue();
             }
             String pos = buttonID.replace("getDamageButtons_", "");
-            List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame,
-                activeGame.getTileByPosition(pos));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                trueIdentity + " Use buttons to resolve", buttons);
+            List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame, activeGame.getTileByPosition(pos));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);
         } else if (buttonID.startsWith("repealLaw_")) {// "repealLaw_"
             ButtonHelperActionCards.repealLaw(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("getRepairButtons_")) {
@@ -1020,7 +1010,6 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
             }
         } else if (buttonID.startsWith("assignHits_")) {
-
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("seedySpace_")) {
             ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
@@ -1679,8 +1668,7 @@ public class ButtonListener extends ListenerAdapter {
             // player.addFollowedSC(4);
             ButtonHelper.addReaction(event, false, false, "", "");
             String unit = buttonID.replace("construction_", "");
-            String message = trueIdentity
-                + " Click the name of the planet you wish to put your unit on for construction";
+            String message = trueIdentity + " Click the name of the planet you wish to put your unit on for construction";
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, unit, "place");
             if (!activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
@@ -1854,8 +1842,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("sendTradeHolder_")) {
             ButtonHelper.sendTradeHolderSomething(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("place_")) {
-            ButtonHelperModifyUnits.genericPlaceUnit(buttonID, event, activeGame, player, ident, trueIdentity,
-                finsFactionCheckerPrefix);
+            ButtonHelperModifyUnits.genericPlaceUnit(buttonID, event, activeGame, player, ident, trueIdentity, finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("yssarilcommander_")) {
             ButtonHelperCommanders.yssarilCommander(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("exploreFront_")) {
@@ -1955,7 +1942,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("tacticalActionBuild_")) {
             ButtonHelperTacticalAction.buildWithTacticalAction(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("getModifyTiles")) {
-            List<Button> buttons = ButtonHelper.getTilesToModify(player, activeGame, event);
+            List<Button> buttons = ButtonHelper.getTilesToModify(player, activeGame);
             String message = player.getRepresentation()
                 + " Use the buttons to select the tile in which you wish to modify units. ";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message,
@@ -2130,8 +2117,8 @@ public class ButtonListener extends ListenerAdapter {
                 activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
             }
 
-            Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
-                p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander"))
+            Player lanefirPlayer = activeGame.getPlayers().values().stream()
+                .filter(p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander"))
                 .findFirst().orElse(null);
 
             if (lanefirPlayer != null) {
@@ -2923,14 +2910,13 @@ public class ButtonListener extends ListenerAdapter {
                     // event.getMessage().delete().queue();
                 }
                 case "forceACertainScoringOrder" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing() +
-                        "Players will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()
+                        + "Players will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
                     activeGame.setCurrentReacts("forcedScoringOrder", "true");
                     event.getMessage().delete().queue();
                 }
                 case "turnOffForcedScoring" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing() +
-                        "Forced scoring order has been turned off. Any queues will not be resolved.");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing() + "Forced scoring order has been turned off. Any queues will not be resolved.");
                     activeGame.setCurrentReacts("forcedScoringOrder", "");
                     event.getMessage().delete().queue();
                 }
@@ -4402,10 +4388,8 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         player.getFactionEmoji() + " can gain 1 CC");
                     List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                    String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-                        + ". Use buttons to gain CCs";
-                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2,
-                        buttons);
+                    String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                     ButtonHelper.deleteTheOneButton(event);
                     activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 }
@@ -4531,8 +4515,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     GameSaveLoadManager.undo(activeGame, event);
 
-                    if ("action".equalsIgnoreCase(activeGame.getCurrentPhase())
-                        || "agendaVoting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
+                    if ("action".equalsIgnoreCase(activeGame.getCurrentPhase()) || "agendaVoting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                         if (!event.getMessage().getContentRaw().contains(finsFactionCheckerPrefix)) {
                             List<ActionRow> actionRow2 = new ArrayList<>();
                             boolean dontDelete = false;

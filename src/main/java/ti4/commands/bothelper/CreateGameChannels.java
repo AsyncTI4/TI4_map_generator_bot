@@ -243,14 +243,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // INTRODUCTION TO TABLETALK CHANNEL
         String tabletalkGetStartedMessage = role.getAsMention() + " - table talk channel\n" +
-            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"
-            +
-            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n"
-            +
-            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n"
-            +
-            role.getAsMention()
-            + " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy "
+            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n" +
+            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n" +
+            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n" +
+            role.getAsMention() +
+            " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy "
             +
             "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you want to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n"
             +
@@ -292,8 +289,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
-        MessageHelper.sendMessageToChannelAndPin(botThread,
-            "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
             "> " + chatChannel.getAsMention() + "\n" +
@@ -382,7 +378,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
+        List<Guild> guilds = new ArrayList<>(AsyncTI4DiscordBot.guilds);
         List<Integer> pbdNumbers = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -528,9 +524,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     public static List<Category> getAllAvailablePBDCategories() {
-        return AsyncTI4DiscordBot.jda.getCategories().stream()
-            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-            .toList();
+        return AsyncTI4DiscordBot.getAvailablePBDCategories();
     }
 
     public static Category createNewCategory(String categoryName) {

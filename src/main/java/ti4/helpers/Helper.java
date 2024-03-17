@@ -207,9 +207,7 @@ public class Helper {
         MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
         new StartMilty().initDraftTiles(draftManager);
         List<MiltyDraftTile> allTiles;
-        allTiles = draftManager.getHigh();
-        allTiles.addAll(draftManager.getMid());
-        allTiles.addAll(draftManager.getLow());
+        allTiles = draftManager.getBlue();
         boolean inMap = true;
         int counter = 1;
         while (inMap && counter < 1000) {
@@ -637,8 +635,7 @@ public class Helper {
 
     @Nullable
     public static String getDamagePath() {
-        String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", "marker_damage.png",
-            "Could not find damage token file");
+        String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", "marker_damage.png", "Could not find damage token file");
         if (tokenPath == null) {
             BotLogger.log("Could not find token: marker_damage");
             return null;
@@ -1022,8 +1019,8 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
         for (String planet : planets) {
-            Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
-                getPlanetRepresentation(planet, activeGame));
+            Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, activeGame));
+            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -1553,8 +1550,7 @@ public class Helper {
             } else {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
-                if ("flagship".equalsIgnoreCase(removedUnit.getBaseType())
-                    && activeGame.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
+                if ("flagship".equalsIgnoreCase(removedUnit.getBaseType()) && activeGame.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
                     cost = cost; // nomad alliance
                 } else {
                     cost = cost + (int) removedUnit.getCost() * producedUnits.get(unit);

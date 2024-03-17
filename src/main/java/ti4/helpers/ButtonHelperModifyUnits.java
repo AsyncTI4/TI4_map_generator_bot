@@ -1185,12 +1185,9 @@ public class ButtonHelperModifyUnits {
                 Button placeCCInSystem = Button.success(
                     finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
                     "Place A CC From Reinforcements In The System.");
-                Button placeConstructionCCInSystem = Button.secondary(
-                    finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
-
+                Button placeConstructionCCInSystem = Button.secondary(finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
                     "Place A CC Of The Construction Holder's because you used Mahact Agent");
-                Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
-                    "Don't Place A CC In The System.");
+                Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons", "Don't Place A CC In The System.");
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             } else {
@@ -1919,8 +1916,7 @@ public class ButtonHelperModifyUnits {
         String message = event.getMessage().getContentRaw();
         String message2 = ident + " Repaired " + amount + " " + unitName + " from " + planetName + " in tile " + tile.getRepresentationForButtons(activeGame, player);
         List<Button> systemButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeGame, tile);
-        event.getMessage().editMessage(message)
-            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+        event.getMessage().editMessage(message).setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
     }
 

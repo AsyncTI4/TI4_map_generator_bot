@@ -334,8 +334,8 @@ public class Game {
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
         addCustomPO(Constants.CUSTODIAN, 1);
         // Default SC initialization
-        for (int i = 0; i < 8; i++) {
-            scTradeGoods.put(i + 1, 0);
+        for (int i = 1; i <= 8; i++) {
+            scTradeGoods.put(i, 0);
         }
     }
 
@@ -789,8 +789,7 @@ public class Game {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getMainGameChannelID());
         } catch (Exception e) {
-            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda
-                .getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.get(0);
                 setMainGameChannelID(mainGameChannel.getId());
