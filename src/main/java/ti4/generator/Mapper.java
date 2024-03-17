@@ -62,7 +62,6 @@ public class Mapper {
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
     private static final Properties general = new Properties();
-    private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
 
@@ -103,7 +102,6 @@ public class Mapper {
         readData("tokens.properties", tokens);
         readData("special_case.properties", special_case);
         readData("general.properties", general);
-        readData("milty_draft.properties", miltyDraft);
         readData("hyperlanes.properties", hyperlaneAdjacencies);
         readData("DS_handcards.properties", ds_handcards);
         importJsonObjectsFromFolder("explores", explore, ExploreModel.class);

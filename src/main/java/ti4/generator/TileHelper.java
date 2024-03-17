@@ -1,4 +1,5 @@
 package ti4.generator;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Map;
@@ -52,24 +53,23 @@ public class TileHelper {
         List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
-        if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
+        if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
 
         files.forEach(file -> {
-                    try {
-                        PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
-                        allPlanets.put(planet.getId(), planet);
-                    } catch (Exception e) {
-                        BotLogger.log("Error reading planet from file:\n> " + file.getPath(), e);
-                    }
-                });
-
+            try {
+                PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
+                allPlanets.put(planet.getId(), planet);
+            } catch (Exception e) {
+                BotLogger.log("Error reading planet from file:\n> " + file.getPath(), e);
+            }
+        });
     }
 
     public static void initTilesFromJson() {
@@ -77,16 +77,16 @@ public class TileHelper {
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "systems" + File.separator;
         List<File> files = new ArrayList<>();
-       File[] storedFiles = new File(storagePath).listFiles();
+        File[] storedFiles = new File(storagePath).listFiles();
 
-        if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
+        if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);

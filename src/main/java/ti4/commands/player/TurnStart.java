@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -123,14 +124,12 @@ public class TurnStart extends PlayerSubcommandData {
 
         }
         if (!activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " you left yourself the following message: \n"
-                + activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()).replace("666fin", ":"));
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " you left yourself the following message: \n" + activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()).replace("666fin", ":"));
             activeGame.setCurrentReacts("futureMessageFor" + player.getFaction(), "");
         }
         for (Player p2 : activeGame.getRealPlayers()) {
             if (!activeGame.getFactionsThatReactedToThis("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction()).isEmpty()) {
-                String msg2 = "This is a message sent from the past:\n"
-                    + activeGame.getFactionsThatReactedToThis("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction()).replace("666fin", ":");
+                String msg2 = "This is a message sent from the past:\n" + activeGame.getFactionsThatReactedToThis("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction()).replace("666fin", ":");
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + " your future message got delivered");
                 Whisper.sendWhisper(activeGame, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 activeGame.setCurrentReacts("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
@@ -304,8 +303,7 @@ public class TurnStart extends PlayerSubcommandData {
         }
 
         if (activeGame.getLatestTransactionMsg() != null && !"".equalsIgnoreCase(activeGame.getLatestTransactionMsg())) {
-            activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue(null, error -> {
-            });
+            activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queueAfter(1, TimeUnit.SECONDS);
             activeGame.setLatestTransactionMsg("");
         }
         // if (activeGame.getActionCards().size() > 130 && getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {

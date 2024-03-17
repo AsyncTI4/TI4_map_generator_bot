@@ -24,33 +24,32 @@ import ti4.message.BotLogger;
 
 public class ImageHelper {
 
-    private static final int FILE_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(
-        GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
-    private static final int FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(
-        GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
+    private static final int FILE_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
+    private static final int FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
     private static final Cache<String, BufferedImage> fileImageCache = Caffeine.newBuilder()
         .maximumSize(FILE_IMAGE_CACHE_SIZE)
         .expireAfterAccess(FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
         .recordStats()
         .build();
 
-    private static final int URL_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(
-        GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
-    private static final int URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(
-        GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
+    private static final int URL_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
+    private static final int URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
     private static final Cache<String, BufferedImage> urlImageCache = Caffeine.newBuilder()
         .maximumSize(URL_IMAGE_CACHE_SIZE)
         .expireAfterWrite(URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
         .recordStats()
         .build();
 
-    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(
-        GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 60 * 4);
+    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 60 * 4);
     private static final AtomicReference<Instant> logStatsScheduledTime = new AtomicReference<>();
-
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
     private ImageHelper() {
+    }
+
+    public static void resetCache() {
+        fileImageCache.invalidateAll();
+        urlImageCache.invalidateAll();
     }
 
     @Nullable
@@ -183,8 +182,7 @@ public class ImageHelper {
         if (logStatsScheduledTime.get().equals(oldValue)) {
             return Optional.empty();
         }
-        return Optional.of(cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " +
-            cacheStatsToString("urlImageCache", urlImageCache));
+        return Optional.of(cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " + cacheStatsToString("urlImageCache", urlImageCache));
     }
 
     private static String cacheStatsToString(String name, Cache<String, BufferedImage> cache) {
@@ -195,8 +193,7 @@ public class ImageHelper {
             .add("hitRate", formatPercent(stats.hitRate()))
             .add("loadCount", stats.loadCount())
             .add("loadFailureCount", stats.loadFailureCount())
-            .add("averageLoadPenaltyMilliseconds",
-                TimeUnit.MILLISECONDS.convert((long) stats.averageLoadPenalty(), TimeUnit.NANOSECONDS))
+            .add("averageLoadPenaltyMilliseconds", TimeUnit.MILLISECONDS.convert((long) stats.averageLoadPenalty(), TimeUnit.NANOSECONDS))
             .add("evictionCount", stats.evictionCount())
             .add("currentSize", cache.estimatedSize())
             .toString();
