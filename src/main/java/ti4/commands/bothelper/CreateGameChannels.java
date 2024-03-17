@@ -43,9 +43,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
     public CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME,
-                "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
+            "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1,
-                "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
+            "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4 @playerName"));
@@ -54,9 +54,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME,
-                "Override default game/role name (next pbd###)"));
+            "Override default game/role name (next pbd###)"));
         addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY,
-                "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
+            "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
         if (gameOrRoleAlreadyExists(gameName)) {
             sendMessage("Role or Game: **" + gameName
-                    + "** already exists accross all supported servers. Try again with a new name.");
+                + "** already exists accross all supported servers. Try again with a new name.");
             return;
         }
 
@@ -93,7 +93,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             categoryChannelName = getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
                 sendMessage(
-                        "Category could not be automatically determined. Please provide a category name for this game.");
+                    "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
             List<Category> categories = getAllAvailablePBDCategories();
@@ -107,7 +107,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 categoryChannel = createNewCategory(categoryChannelName);
             if (categoryChannel == null) {
                 sendMessage("Could not automatically find a category that begins with **" + categoryChannelName
-                        + "** - Please create this category.");
+                    + "** - Please create this category.");
                 return;
             }
         }
@@ -115,7 +115,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF CATEGORY EXISTS
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
             sendMessage("Category: **" + categoryChannelName
-                    + "** does not exist. Create the category or pick a different category, then try again.");
+                + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         }
 
@@ -129,7 +129,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
             sendMessage(
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -137,7 +137,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
             sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName()
-                    + "**. Create a new category then try again.");
+                + "**. Create a new category then try again.");
             return;
         }
 
@@ -161,7 +161,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     public static void createGameChannels(List<Member> members, GenericInteractionCreateEvent event, String gameFunName,
-            String gameName, Member gameOwner, Category categoryChannel) {
+        String gameName, Member gameOwner, Category categoryChannel) {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
         if (guild == null) {
@@ -172,7 +172,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -180,7 +180,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Category: **" + category.getName()
-                    + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
+                + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         }
 
@@ -189,9 +189,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CREATE ROLE
         Role role = guild.createRole()
-                .setName(gameName)
-                .setMentionable(true)
-                .complete();
+            .setName(gameName)
+            .setMentionable(true)
+            .complete();
 
         // ADD PLAYERS TO ROLE
         for (Member member : members) {
@@ -223,53 +223,53 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
-                .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleID, permission, 0)
-                .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newGame.setTableTalkChannelID(chatChannel.getId());
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-                .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleID, permission, 0)
-                .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newGame.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-                .complete();
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
         String tabletalkGetStartedMessage = role.getAsMention() + " - table talk channel\n" +
-                "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"
-                +
-                "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n"
-                +
-                "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n"
-                +
-                role.getAsMention()
-                + " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy "
-                +
-                "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you want to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n"
-                +
-                "Regarding disputes, playing a diplomatic game with strangers online, with no tone to go off of or human face to empathize with, can often lead to harsh words and hurt feelings. No matter what happens mechanically in the game, you should always "
-                +
-                "strive to treat the other people with respect, patience, and hopefully kindness. If you cannot, you should step away, and if you ever feel the need to leave a game permanently, we do have a replacement system that gets a fair amount of use (ping or dm a bothelper for specifics)";
+            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"
+            +
+            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n"
+            +
+            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n"
+            +
+            role.getAsMention()
+            + " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy "
+            +
+            "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you want to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n"
+            +
+            "Regarding disputes, playing a diplomatic game with strangers online, with no tone to go off of or human face to empathize with, can often lead to harsh words and hurt feelings. No matter what happens mechanically in the game, you should always "
+            +
+            "strive to treat the other people with respect, patience, and hopefully kindness. If you cannot, you should step away, and if you ever feel the need to leave a game permanently, we do have a replacement system that gets a fair amount of use (ping or dm a bothelper for specifics)";
         MessageHelper.sendMessageToChannelAndPin(chatChannel, tabletalkGetStartedMessage);
 
         // INTRODUCTION TO ACTIONS CHANNEL
         String actionsGetStartedMessage = role.getAsMention() + " - actions channel\n" +
-                "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
-                "Generally, you dont want to chat in here once the game starts, as ideally this channel is a clean ledger of what has happened in the game for others to quickly read.\n";
+            "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
+            "Generally, you dont want to chat in here once the game starts, as ideally this channel is a clean ledger of what has happened in the game for others to quickly read.\n";
         MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
 
         String agressionMsg = "Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who dont share that meta."
-        +" Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
-        +". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as aggressive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
-        +"\n- Anything goes -- Is comfortable in a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2. Tournament games would be this by default. "
-        +"\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives dont necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
+            + " Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
+            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as aggressive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
+            + "\n- Anything goes -- Is comfortable in a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2. Tournament games would be this by default. "
+            + "\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives dont necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("anonDeclare_Friendly", "Friendly"));
         buttons.add(Button.primary("anonDeclare_Anything Goes", "Anything Goes"));
@@ -281,24 +281,24 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = role.getAsMention() + " - bot/map channel\n" +
-                "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
-                +
-                "### __Use the following commands to get started:__\n" +
-                "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
-                "> `/player setup` to set player faction and color\n" +
-                "> `/game setup` to set player count and additional options\n" +
-                "> `/game set_order` to set the starting speaker order\n" +
-                "\n" +
-                "### __Other helpful commands:__\n" +
-                "> `/game replace` to replace a player in the game with a new one\n";
+            "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
+            +
+            "### __Use the following commands to get started:__\n" +
+            "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
+            "> `/player setup` to set player faction and color\n" +
+            "> `/game setup` to set player count and additional options\n" +
+            "> `/game set_order` to set the starting speaker order\n" +
+            "\n" +
+            "### __Other helpful commands:__\n" +
+            "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread,
-                "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+            "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
-                "> " + chatChannel.getAsMention() + "\n" +
-                "> " + actionsChannel.getAsMention() + "\n" +
-                "> " + botThread.getAsMention() + "\n";
+            "> " + chatChannel.getAsMention() + "\n" +
+            "> " + actionsChannel.getAsMention() + "\n" +
+            "> " + botThread.getAsMention() + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         GameSaveLoadManager.saveMap(newGame, event);
@@ -307,14 +307,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
             thread.getManager()
-                    .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
-                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                    .queue();
+                .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
+                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                .queue();
         }
     }
 
     /**
-     * @param guild   guild to invite users to
+     * @param guild guild to invite users to
      * @param members list of users
      * @param channel channel to post message to
      * @return the list of missing members
@@ -330,7 +330,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (missingMembers.size() > 0) {
             StringBuilder sb = new StringBuilder();
             sb.append(
-                    "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
+                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
             sb.append(Helper.getGuildInviteURL(guild)).append("\n");
             sb.append("The following players need to join the server:\n");
@@ -388,8 +388,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // GET ALL PBD ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {
             List<Role> pbdRoles = guild.getRoles().stream()
-                    .filter(r -> r.getName().startsWith("pbd"))
-                    .toList();
+                .filter(r -> r.getName().startsWith("pbd"))
+                .toList();
 
             // EXISTING ROLE NAMES
             for (Role role : pbdRoles) {
@@ -402,8 +402,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // GET ALL EXISTING PBD MAP NAMES
         List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
-                .filter(mapName -> mapName.startsWith("pbd"))
-                .toList();
+            .filter(mapName -> mapName.startsWith("pbd"))
+            .toList();
         for (String mapName : mapNames) {
             String pbdNum = mapName.replace("pbd", "");
             if (Helper.isInteger(pbdNum)) {
@@ -417,9 +417,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
     private static Guild getNextAvailableServer() {
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
         Guild guild = AsyncTI4DiscordBot.jda
-                .getGuildById(GlobalSettings.getSetting(
-                        GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
-                        AsyncTI4DiscordBot.guildPrimary.getId()));
+            .getGuildById(GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
+                AsyncTI4DiscordBot.guildPrimary.getId()));
         // CHECK IF QUINARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildQuinary;
         if (guild != null && serverHasRoomForNewFullCategory(guild)) {
@@ -428,9 +428,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
         // CURRENT SET GUILD HAS ROOM
         guild = AsyncTI4DiscordBot.jda
-                .getGuildById(GlobalSettings.getSetting(
-                        GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
-                        AsyncTI4DiscordBot.guildPrimary.getId()));
+            .getGuildById(GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
+                AsyncTI4DiscordBot.guildPrimary.getId()));
         if (serverHasRoomForNewFullCategory(guild))
             return guild;
 
@@ -455,22 +455,20 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return guild;
         }
 
-        
-
         BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
         return null;
     }
 
     private static boolean serverCanHostNewGame(Guild guild) {
         return guild != null && serverHasRoomForNewRole(guild)
-                && serverHasRoomForNewChannels(guild);
+            && serverHasRoomForNewChannels(guild);
     }
 
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewRole` Cannot create a new role. Server **"
-                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -484,7 +482,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int roleCount = guild.getRoles().size();
         if (roleCount > 225) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
 
@@ -494,7 +492,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int channelsCountRequiredForNewCategory = 50;
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-                    + guild.getName() + "** currently has " + channelCount + " channels.");
+                + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
 
@@ -507,7 +505,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewChannels` Cannot create new channels. Server **"
-                    + guild.getName() + "** currently has " + channelCount + " channels.");
+                + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;
@@ -531,8 +529,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     public static List<Category> getAllAvailablePBDCategories() {
         return AsyncTI4DiscordBot.jda.getCategories().stream()
-                .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-                .toList();
+            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+            .toList();
     }
 
     public static Category createNewCategory(String categoryName) {
@@ -558,8 +556,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     public static Role getRole(String name, Guild guild) {
         return guild.getRoles().stream()
-                .filter(role -> role.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+            .filter(role -> role.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElse(null);
     }
 }

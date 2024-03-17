@@ -38,11 +38,11 @@ public class MiltyDraftManager {
         }
     }
 
-    public Player getDraftOrderPlayer(){
+    public Player getDraftOrderPlayer() {
         return draftOrder.get(draftIndex);
     }
 
-    public void setNextPlayerInDraft(){
+    public void setNextPlayerInDraft() {
         draftIndex++;
     }
 
@@ -74,11 +74,11 @@ public class MiltyDraftManager {
         slices.add(slice);
     }
 
-    public void setDraftOrder(List<Player> draftOrder){
+    public void setDraftOrder(List<Player> draftOrder) {
         this.draftOrder = draftOrder;
     }
 
-    public void setDraftRandomOrder(List<Player> draftOrder){
+    public void setDraftRandomOrder(List<Player> draftOrder) {
         draftRandomOrder = draftOrder;
 
         for (Player player : draftOrder) {
@@ -90,7 +90,7 @@ public class MiltyDraftManager {
         return draftRandomOrder;
     }
 
-    public PlayerDraft getPlayerDraft(Player player){
+    public PlayerDraft getPlayerDraft(Player player) {
         return draft.get(player);
     }
 
@@ -98,7 +98,7 @@ public class MiltyDraftManager {
         return slices;
     }
 
-    public void clearSlices(){
+    public void clearSlices() {
         slices.clear();
     }
 

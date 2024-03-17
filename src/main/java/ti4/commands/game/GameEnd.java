@@ -47,11 +47,11 @@ public class GameEnd extends GameSubcommandData {
   public GameEnd() {
     super(Constants.GAME_END, "Declare the game has ended");
     addOptions(
-        new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
+      new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
     addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH,
-        "True to publish results to #pbd-chronicles. (Default: True)"));
+      "True to publish results to #pbd-chronicles. (Default: True)"));
     addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS,
-        "True to archive the channels and delete the game role (Default: True)"));
+      "True to archive the channels and delete the game role (Default: True)"));
   }
 
   public void execute(SlashCommandInteractionEvent event) {
@@ -78,15 +78,15 @@ public class GameEnd extends GameSubcommandData {
   }
 
   public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame, boolean publish,
-      boolean archiveChannels) {
+    boolean archiveChannels) {
     String gameName = activeGame.getName();
     List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
     boolean deleteRole = true;
     if (gameRoles.size() > 1) {
       MessageHelper.replyToMessage(event,
-          "There are multiple roles that match this game name (" + gameName + "): " + gameRoles);
+        "There are multiple roles that match this game name (" + gameName + "): " + gameRoles);
       MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-          "Please call a @Bothelper to fix this before using `/game end`");
+        "Please call a @Bothelper to fix this before using `/game end`");
       return;
     } else if (gameRoles.isEmpty()) {
       MessageHelper.replyToMessage(event, "No roles match the game name (" + gameName + ") - no role will be deleted.");
@@ -96,13 +96,13 @@ public class GameEnd extends GameSubcommandData {
     // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
     Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), activeGame);
     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-        "This game's channels' permissions have been updated.");
+      "This game's channels' permissions have been updated.");
 
     // DELETE THE ROLE
     if (deleteRole && archiveChannels) {
       Role gameRole = gameRoles.get(0);
       MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-          "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
+        "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
       gameRole.delete().queue();
     }
 
@@ -118,111 +118,110 @@ public class GameEnd extends GameSubcommandData {
 
     // SEND THE MAP IMAGE
     MapGenerator.saveImage(activeGame, DisplayType.all, event)
-        .thenAccept(fileUpload -> {
-          MessageHelper.replyToMessage(event, fileUpload);
-          StringBuilder message = new StringBuilder();
-          for (String playerID : activeGame.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
-            Member member = event.getGuild().getMemberById(playerID);
-            if (member != null)
-              message.append(member.getAsMention());
-          }
-          message.append(
-              "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
+      .thenAccept(fileUpload -> {
+        MessageHelper.replyToMessage(event, fileUpload);
+        StringBuilder message = new StringBuilder();
+        for (String playerID : activeGame.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
+          Member member = event.getGuild().getMemberById(playerID);
+          if (member != null)
+            message.append(member.getAsMention());
+        }
+        message.append(
+          "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
 
-          Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-          // CREATE POST IN #THE-PBD-CHRONICLES
-          if (publish && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).isEmpty()) {
-            TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary
-                .getTextChannelsByName("the-pbd-chronicles", true).get(0);
-            String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles"
-                : pbdChroniclesChannel.getAsMention();
-            if (pbdChroniclesChannel == null) {
-              BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
-              return;
-            }
-            if (!activeGame.isFoWMode()) {
-              // INFORM PLAYERS
-              pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
-                m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
-                m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                    t -> t.sendMessage(message.toString()).queue(null,
-                        (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName()
-                            + "** in PBD Chronicles:\n> " + error.getMessage()))); // CREATE THREAD AND POST FOLLOW UP
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
-              });
-            }
-          }
-
-          // TIGL Extras
-          if (activeGame.isCompetitiveTIGLGame() && activeGame.getWinner().isPresent()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                getTIGLFormattedGameEndText(activeGame, event));
-          }
-
-          // GET BOTHELPER LOUNGE
-          TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-              .getTextChannelsByName("staff-lounge", true).get(0);
-          if (bothelperLoungeChannel == null) {
-            BotLogger.log(event, "`#staff-lounge` channel not found - `/game end` cannot continue");
+        Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+        // CREATE POST IN #THE-PBD-CHRONICLES
+        if (publish && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).isEmpty()) {
+          TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary
+            .getTextChannelsByName("the-pbd-chronicles", true).get(0);
+          String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles"
+            : pbdChroniclesChannel.getAsMention();
+          if (pbdChroniclesChannel == null) {
+            BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
             return;
           }
+          if (!activeGame.isFoWMode()) {
+            // INFORM PLAYERS
+            pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
+              m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
+              m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
+                t -> t.sendMessage(message.toString()).queue(null,
+                  (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName()
+                    + "** in PBD Chronicles:\n> " + error.getMessage()))); // CREATE THREAD AND POST FOLLOW UP
+              MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
+            });
+          }
+        }
 
-          // MOVE CHANNELS TO IN-LIMBO
-          Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
-          TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
-          TextChannel actionsChannel = activeGame.getMainGameChannel();
-          if (inLimboCategory != null && archiveChannels) {
-            if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
-              cleanUpInLimboCategory(event.getGuild(), 3);
-            }
+        // TIGL Extras
+        if (activeGame.isCompetitiveTIGLGame() && activeGame.getWinner().isPresent()) {
+          MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            getTIGLFormattedGameEndText(activeGame, event));
+        }
 
-            String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName()
-                + "** and will be automatically cleaned up shortly.";
-            if (tableTalkChannel != null) { // MOVE TABLETALK CHANNEL
-              tableTalkChannel.getManager().setParent(inLimboCategory).queue();
-              MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
-            }
-            if (actionsChannel != null) { // MOVE ACTIONS CHANNEL
-              actionsChannel.getManager().setParent(inLimboCategory).queue();
-              MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
-            }
+        // GET BOTHELPER LOUNGE
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
+          .getTextChannelsByName("staff-lounge", true).get(0);
+        if (bothelperLoungeChannel == null) {
+          BotLogger.log(event, "`#staff-lounge` channel not found - `/game end` cannot continue");
+          return;
+        }
+
+        // MOVE CHANNELS TO IN-LIMBO
+        Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
+        TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
+        TextChannel actionsChannel = activeGame.getMainGameChannel();
+        if (inLimboCategory != null && archiveChannels) {
+          if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
+            cleanUpInLimboCategory(event.getGuild(), 3);
           }
 
-          // CLOSE THREADS IN CHANNELS
-          if (tableTalkChannel != null) {
-            for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
-              threadChannel.getManager().setArchived(true).queue();
-            }
+          String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName()
+            + "** and will be automatically cleaned up shortly.";
+          if (tableTalkChannel != null) { // MOVE TABLETALK CHANNEL
+            tableTalkChannel.getManager().setParent(inLimboCategory).queue();
+            MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
           }
-          if (actionsChannel != null) {
-            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-              if(threadChannel.getName().contains("Cards Info")){
-                continue;
-              }
-              threadChannel.getManager().setArchived(true).queue();
-            }
+          if (actionsChannel != null) { // MOVE ACTIONS CHANNEL
+            actionsChannel.getManager().setParent(inLimboCategory).queue();
+            MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
           }
+        }
 
-          // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
-          List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-          String threadName = "game-starts-and-ends";
-          for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
-              MessageHelper.sendMessageToChannel(threadChannel_,
-                  "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
+        // CLOSE THREADS IN CHANNELS
+        if (tableTalkChannel != null) {
+          for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
+            threadChannel.getManager().setArchived(true).queue();
+          }
+        }
+        if (actionsChannel != null) {
+          for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+            if (threadChannel.getName().contains("Cards Info")) {
+              continue;
             }
+            threadChannel.getManager().setArchived(true).queue();
           }
-          
+        }
 
-          // send game json file to s3
-          File jsonGameFile = Storage.getMapsJSONStorage(activeGame.getName() + ".json");
-          boolean isWon = activeGame.getWinner().isPresent() && activeGame.isHasEnded();
-          if (isWon) {
-            WebHelper.putFile(activeGame.getName(), jsonGameFile);
+        // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
+        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+        String threadName = "game-starts-and-ends";
+        for (ThreadChannel threadChannel_ : threadChannels) {
+          if (threadChannel_.getName().equals(threadName)) {
+            MessageHelper.sendMessageToChannel(threadChannel_,
+              "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
           }
-        });
-        ButtonHelper.offerEveryoneTitlePossibilities(activeGame);
+        }
+
+        // send game json file to s3
+        File jsonGameFile = Storage.getMapsJSONStorage(activeGame.getName() + ".json");
+        boolean isWon = activeGame.getWinner().isPresent() && activeGame.isHasEnded();
+        if (isWon) {
+          WebHelper.putFile(activeGame.getName(), jsonGameFile);
+        }
+      });
+    ButtonHelper.offerEveryoneTitlePossibilities(activeGame);
   }
 
   public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
@@ -262,8 +261,8 @@ public class GameEnd extends GameSubcommandData {
     if (gameModesText.isEmpty())
       gameModesText = "None";
     sb.append("**Game Modes:** ").append(gameModesText).append(", ")
-        .append(game.getVp()).append(" victory points")
-        .append("\n");
+      .append(game.getVp()).append(" victory points")
+      .append("\n");
 
     if (winner.isPresent() && !game.hasHomebrew()) {
       String winningPath = GameStats.getWinningPath(game, winner.get());
@@ -277,11 +276,11 @@ public class GameEnd extends GameSubcommandData {
         double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
         String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
         sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(game.getVp()).append("VP, ")
-            .append(playerCount).append("P)")
-            .append(", this path has been seen ")
-            .append(winningPathCount - 1)
-            .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
-            .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
+          .append(playerCount).append("P)")
+          .append(", this path has been seen ")
+          .append(winningPathCount - 1)
+          .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
+          .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
         if (winningPathCount == 1) {
           sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
         } else if (winningPathPercent <= .005) {
@@ -315,9 +314,9 @@ public class GameEnd extends GameSubcommandData {
     StringBuilder sb = new StringBuilder();
     sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
     sb.append("This was a TIGL game! 👑").append(activeGame.getWinner().get().getPing())
-        .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
+      .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
     sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentationTIGL(activeGame.getEndedDate()))
-        .append(" (TIGL wants Game End Date for Async)\n");
+      .append(" (TIGL wants Game End Date for Async)\n");
     sb.append("Match Start Time: 00:00\n\n");
     sb.append("Players:").append("\n");
     int index = 1;
@@ -349,13 +348,13 @@ public class GameEnd extends GameSubcommandData {
     Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).get(0);
     if (inLimboCategory == null) {
       BotLogger.log(
-          "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
-              + guild.getName());
+        "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
+          + guild.getName());
       return;
     }
     inLimboCategory.getTextChannels().stream()
-        .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-        .limit(channelCountToDelete)
-        .forEach(channel -> channel.delete().queue());
+      .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+      .limit(channelCountToDelete)
+      .forEach(channel -> channel.delete().queue());
   }
 }

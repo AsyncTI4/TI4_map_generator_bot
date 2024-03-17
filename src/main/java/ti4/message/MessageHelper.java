@@ -76,11 +76,12 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
 		String gameName = channel.getName();
-        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-        gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
-        gameName = StringUtils.substringBefore(gameName, "-");
-        Game activeGame = GameManager.getInstance().getGame(gameName);
-		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions") && !messageText.contains("end of turn ability") && activeGame != null && activeGame.getUndoButton()) {
+		gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
+		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
+		gameName = StringUtils.substringBefore(gameName, "-");
+		Game activeGame = GameManager.getInstance().getGame(gameName);
+		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions") && !messageText.contains("end of turn ability") && activeGame != null
+			&& activeGame.getUndoButton()) {
 			buttons.add(Button.secondary("ultimateUndo", "UNDO"));
 		}
 		splitAndSent(messageText, channel, embeds, buttons);

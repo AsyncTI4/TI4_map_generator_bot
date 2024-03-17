@@ -514,8 +514,8 @@ public class Tile {
             if (unitHolder instanceof Planet planetHolder) {
                 boolean oneOfThree = planetHolder.getOriginalPlanetType() != null
                     && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                    || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                    || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
+                        || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
                 if (!planetHolder.getName().toLowerCase().contains("rex")
                     && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree) {
                     isHome = true;

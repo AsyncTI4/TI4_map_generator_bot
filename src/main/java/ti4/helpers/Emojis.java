@@ -649,7 +649,6 @@ public class Emojis {
     public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
 
-
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
@@ -1174,7 +1173,7 @@ public class Emojis {
             case "destroyer" -> destroyer;
             case "carrier" -> carrier;
             case "cruiser" -> cruiser;
-            case "plenaryorbital"-> spacedock;
+            case "plenaryorbital" -> spacedock;
 
             // LEADERS - AGENTS
             case "arborecagent" -> ArborecAgent;

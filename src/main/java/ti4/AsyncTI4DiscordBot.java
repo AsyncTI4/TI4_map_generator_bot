@@ -120,8 +120,7 @@ public class AsyncTI4DiscordBot {
             new ButtonListener(),
             new UserJoinServerListener(),
             new AutoCompleteListener(),
-            new SelectionMenuListener()
-        );
+            new SelectionMenuListener());
 
         try {
             jda.awaitReady();
@@ -323,7 +322,7 @@ public class AsyncTI4DiscordBot {
     /**
      * Initializes the whitelisted roles for the bot, including admin, developer, and bothelper roles.
      * <ul>
-     * <li>Admins     can execute /admin, /developer, and /bothelper commands</li>
+     * <li>Admins can execute /admin, /developer, and /bothelper commands</li>
      * <li>Developers can execute /developer and /bothelper commands</li>
      * <li>Bothelpers can execute /bothelper commands</li>
      * </ul>

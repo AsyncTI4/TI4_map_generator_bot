@@ -101,7 +101,7 @@ public class AddToken extends AddRemoveToken {
                         planetUnitHolder.removeAllUnits(color);
                     }
                     Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) { 
                         UnitKey key = unitEntry.getKey();
                         if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
                             Integer count = spaceUnits.get(key);
