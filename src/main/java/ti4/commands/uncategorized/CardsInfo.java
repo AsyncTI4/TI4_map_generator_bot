@@ -77,9 +77,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
         ACInfo.sendActionCardInfo(activeGame, player);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         sendVariousAdditionalButtons(activeGame, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "As a reminder, you can whisper to people from this channel by starting a message with to[color] or to[faction]."+
-        "\nYou can send a message to yourself, that will be delivered at the start of your next turn, by starting a message with tofutureme"+
-        "\nYou can send a message to others, that will be delivered at the start of their next turn, by starting a message with tofuture[color] or tofuture[faction]");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "As a reminder, you can whisper to people from this channel by starting a message with to[color] or to[faction]." +
+            "\nYou can send a message to yourself, that will be delivered at the start of your next turn, by starting a message with tofutureme" +
+            "\nYou can send a message to others, that will be delivered at the start of their next turn, by starting a message with tofuture[color] or tofuture[faction]");
 
     }
 
@@ -121,7 +121,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         if (player.hasUnexhaustedLeader("vadenagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_vadenagent", "Use Vaden Agent").withEmoji(Emoji.fromFormatted(Emojis.vaden));
             buttons.add(hacanButton);
-        }//olradinagent
+        } //olradinagent
         if (player.hasUnexhaustedLeader("olradinagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_olradinagent", "Use Olradin Agent").withEmoji(Emoji.fromFormatted(Emojis.olradin));
             buttons.add(hacanButton);
@@ -162,11 +162,11 @@ public class CardsInfo implements Command, InfoThreadCommand {
             Button hacanButton = Button.secondary("getAgentSelection_cymiaeagent", "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons.add(hacanButton);
         }
-         if (player.hasUnexhaustedLeader("mortheusagent")) {
+        if (player.hasUnexhaustedLeader("mortheusagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_mortheusagent", "Use Mortheus Agent").withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(hacanButton);
         }
-         if (player.hasUnexhaustedLeader("zealotsagent")) {
+        if (player.hasUnexhaustedLeader("zealotsagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_zealotsagent", "Use Zealots Agent").withEmoji(Emoji.fromFormatted(Emojis.zealots));
             buttons.add(hacanButton);
         }
@@ -214,7 +214,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
                 hadAnyUnplayedSCs = true;
             }
         }
-        if(!hadAnyUnplayedSCs){
+        if (!hadAnyUnplayedSCs) {
             buttons.add(Button.danger("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
         }
         buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));

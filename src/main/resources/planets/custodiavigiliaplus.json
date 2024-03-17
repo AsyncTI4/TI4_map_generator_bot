@@ -14,7 +14,7 @@
     "resources": 1,
     "influence": 2,
     "factionHomeworld": null,
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Custodian's Favour",

@@ -13,7 +13,7 @@
     "resources": 2,
     "influence": 1,
     "factionHomeworld": "qulane",
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,

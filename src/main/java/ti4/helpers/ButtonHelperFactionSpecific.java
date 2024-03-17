@@ -276,8 +276,7 @@ public class ButtonHelperFactionSpecific {
         String msg = player.getRepresentation(true, true) + " choose the system in which you wish to stymie";
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
-            if (!tile.getPosition().equalsIgnoreCase(activeGame.getActiveSystem())
-                && !tile.isHomeSystem() && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
+            if (!tile.getPosition().equalsIgnoreCase(activeGame.getActiveSystem()) && !tile.isHomeSystem() && !AddCC.hasCC(event, activePlayer.getColor(), tile)) {
                 buttons.add(Button.success("stymiePlayerStep2_" + activePlayer.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(activeGame, player)));
             }
@@ -1572,17 +1571,14 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void offerTerraformButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
-                && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
-            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
-                buttons.add(Button.success("terraformPlanet_" + planet,
-                    Helper.getPlanetRepresentation(planet, activeGame)));
+            boolean oneOfThree = planetReal != null && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+                buttons.add(Button.success("terraformPlanet_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
             }
         }
         String message = "Use buttons to select which planet to terraform";
@@ -1620,23 +1616,19 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void offerVeldyrButtons(Player player, Game activeGame, String pnID) {
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
-                && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
-            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
+            boolean oneOfThree = planetReal != null && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Button.success("veldyrAttach_" + planet + "_" + pnID,
                     Helper.getPlanetRepresentation(planet, activeGame)));
             }
         }
-        String message = player.getRepresentation(true, true)
-            + " Use buttons to select which planet to put the attachment on";
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message,
-            buttons);
+        String message = player.getRepresentation(true, true) + " Use buttons to select which planet to put the attachment on";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static List<Button> getButtonsToTakeSomeonesAC(Game activeGame, Player thief, Player victim) {

@@ -9,9 +9,7 @@ import java.util.Map;
 
 public class MiltyDraftManager {
 
-    private final List<MiltyDraftTile> high = new ArrayList<>();
-    private final List<MiltyDraftTile> mid = new ArrayList<>();
-    private final List<MiltyDraftTile> low = new ArrayList<>();
+    private final List<MiltyDraftTile> blue = new ArrayList<>();
     private final List<MiltyDraftTile> red = new ArrayList<>();
 
     private final List<MiltyDraftSlice> slices = new ArrayList<>();
@@ -25,16 +23,9 @@ public class MiltyDraftManager {
 
     public void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
-        if (draftTileTier == TierList.high) {
-            high.add(draftTile);
-        } else if (draftTileTier == TierList.mid) {
-            mid.add(draftTile);
-        } else if (draftTileTier == TierList.low) {
-            low.add(draftTile);
-        } else if (draftTileTier == TierList.red) {
-            red.add(draftTile);
-        } else if (draftTileTier == TierList.anomaly) {
-            red.add(draftTile);
+        switch (draftTileTier) {
+            case high, mid, low -> blue.add(draftTile);
+            case red, anomaly -> red.add(draftTile);
         }
     }
 
@@ -46,10 +37,6 @@ public class MiltyDraftManager {
         draftIndex++;
     }
 
-    public List<MiltyDraftTile> getHigh() {
-        return new ArrayList<>(high);
-    }
-
     public List<String> getFactionDraft() {
         return factionDraft;
     }
@@ -58,12 +45,8 @@ public class MiltyDraftManager {
         this.factionDraft = factionDraft;
     }
 
-    public List<MiltyDraftTile> getMid() {
-        return new ArrayList<>(mid);
-    }
-
-    public List<MiltyDraftTile> getLow() {
-        return new ArrayList<>(low);
+    public List<MiltyDraftTile> getBlue() {
+        return new ArrayList<>(blue);
     }
 
     public List<MiltyDraftTile> getRed() {
@@ -104,9 +87,7 @@ public class MiltyDraftManager {
 
     public void clear() {
         clearSlices();
-        high.clear();
-        mid.clear();
-        low.clear();
+        blue.clear();
         red.clear();
     }
 

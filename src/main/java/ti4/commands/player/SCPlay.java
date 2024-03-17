@@ -113,8 +113,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         scMessageBuilder.append(" played");
         if (!activeGame.isFoWMode()) {
-            scMessageBuilder.append(" by ")
-                .append(player.getRepresentation());
+            scMessageBuilder.append(" by ").append(player.getRepresentation());
         }
         scMessageBuilder.append(".\n\n");
         String message = scMessageBuilder.toString();
@@ -197,7 +196,6 @@ public class SCPlay extends PlayerSubcommandData {
                                 scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
-
                         }
                     }
                 });
@@ -215,7 +213,6 @@ public class SCPlay extends PlayerSubcommandData {
         if (scToPlay == ButtonHelper.getKyroHeroSC(activeGame) && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation() + " this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
-
         }
 
         if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {

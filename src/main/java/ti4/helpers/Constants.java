@@ -93,6 +93,7 @@ public class Constants {
     public static final String TILE_TOKEN_LOCATIONS = "tile_token_locations";
     public static final String TILE_WORMHOLES = "tile_wormholes";
     public static final String RESET_EMOJI_CACHE = "reset_emoji_cache";
+    public static final String RESET_IMAGE_CACHE = "reset_image_cache";
     public static final String STATISTICS = "statistics";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";

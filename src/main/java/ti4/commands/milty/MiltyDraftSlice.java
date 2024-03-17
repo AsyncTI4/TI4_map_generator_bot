@@ -10,6 +10,16 @@ public class MiltyDraftSlice {
     private MiltyDraftTile front;
     private MiltyDraftTile farFront;
 
+    public Integer getOptimalTotalValue() {
+        int total = 0;
+        total += left.getMilty_influence() + left.getMilty_resources();
+        total += equadistant.getMilty_influence() + equadistant.getMilty_resources();
+        total += right.getMilty_influence() + right.getMilty_resources();
+        total += front.getMilty_influence() + front.getMilty_resources();
+        total += farFront.getMilty_influence() + farFront.getMilty_resources();
+        return total;
+    }
+
     public String getName() {
         return name;
     }

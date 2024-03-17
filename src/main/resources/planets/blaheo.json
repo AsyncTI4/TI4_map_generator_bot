@@ -15,7 +15,7 @@
     "resources": 3,
     "influence": 0,
     "factionHomeworld": "mortheus",
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
