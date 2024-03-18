@@ -282,7 +282,7 @@ public class ButtonHelperFactionSpecific {
                     tile.getRepresentationForButtons(activeGame, player)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
         event.getMessage().delete().queue();
         ButtonHelper.resolvePNPlay("stymie", player, activeGame, event);
     }
