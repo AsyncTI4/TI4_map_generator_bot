@@ -5,10 +5,7 @@
         "eshonia",
         "esh"
     ],
-    "imagePath": "ER02_eshonia.png",
-    "planetIds": [
-        "eshonia"
-    ],
+    "imagePath": "er_02_async.png",
     "shipPositionsType": "TYPE10",
     "spaceTokenLocations": [
         {

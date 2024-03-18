@@ -4,10 +4,7 @@
     "aliases": [
         "dognui"
     ],
-    "imagePath": "er91_dognui.png",
-    "planetIds": [
-        "dognui"
-    ],
+    "imagePath": "er_91_async.png",
     "shipPositionsType": "TYPE10",
     "spaceTokenLocations": [
         {

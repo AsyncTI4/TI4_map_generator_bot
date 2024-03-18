@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import ti4.ResourceHelper;
-
+ 
 public class BorderAnomalyModel {
 
     public enum BorderAnomalyType {

@@ -29,7 +29,7 @@ public class HomeSystemDraftItem extends DraftItem {
         FactionModel faction = Mapper.getFaction(ItemId);
         TileModel tile = TileHelper.getTile(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
-        List<String> planetIds = tile.getPlanetIds();
+        List<String> planetIds = tile.getPlanets();
         for (int i = 0; i < planetIds.size() - 1; i++) {
             buildPlanetString(Mapper.getPlanet(planetIds.get(i)), sb);
             sb.append(", ");

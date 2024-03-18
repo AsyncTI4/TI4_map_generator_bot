@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -47,7 +48,6 @@ import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
-import ti4.commands.planet.PlanetInfo;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.search.SearchCommand;
 import ti4.commands.special.SpecialCommand;
@@ -120,8 +120,7 @@ public class AsyncTI4DiscordBot {
             new ButtonListener(),
             new UserJoinServerListener(),
             new AutoCompleteListener(),
-            new SelectionMenuListener()
-        );
+            new SelectionMenuListener());
 
         try {
             jda.awaitReady();
@@ -323,7 +322,7 @@ public class AsyncTI4DiscordBot {
     /**
      * Initializes the whitelisted roles for the bot, including admin, developer, and bothelper roles.
      * <ul>
-     * <li>Admins     can execute /admin, /developer, and /bothelper commands</li>
+     * <li>Admins can execute /admin, /developer, and /bothelper commands</li>
      * <li>Developers can execute /developer and /bothelper commands</li>
      * <li>Bothelpers can execute /bothelper commands</li>
      * </ul>
@@ -389,4 +388,12 @@ public class AsyncTI4DiscordBot {
                 return result;
             });
     }
+
+    public static List<Category> getAvailablePBDCategories() {
+        return guilds.stream()
+            .flatMap(guild -> guild.getCategories().stream())
+            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+            .toList();
+    }
+
 }

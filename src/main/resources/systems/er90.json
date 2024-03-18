@@ -4,10 +4,7 @@
     "aliases": [
         "char"
     ],
-    "imagePath": "er90_char.png",
-    "planetIds": [
-        "char"
-    ],
+    "imagePath": "er_90_async.png",
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {

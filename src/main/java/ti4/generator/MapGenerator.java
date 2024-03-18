@@ -564,18 +564,18 @@ public class MapGenerator {
                         if (sc == ButtonHelper.getKyroHeroSC(game)) {
                             graphics.drawString("" + (game.getSCList().size() + 1), x + 90, y + 70 + yDelta);
                         } else {
-                            if(sc==1){
+                            if (sc == 1) {
                                 graphics.drawString(scText, x + 102, y + 70 + yDelta);
-                            }else{
+                            } else {
                                 graphics.drawString(scText, x + 90, y + 70 + yDelta);
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setFont(Storage.getFont40());
                                 graphics.setColor(Color.RED);
-                                
+
                                 graphics.drawString("X", x + 100, y + 60 + yDelta);
                             }
-                            
+
                         }
                     }
                 } else { // if (playerSCs.size() <= 4) {
@@ -647,18 +647,17 @@ public class MapGenerator {
                         unfollowedSCs.add(sc);
                     }
                 }
-                if(unfollowedSCs.size() > 0){
+                if (unfollowedSCs.size() > 0) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.red);
                     graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
                     int xSpacer = 20;
-                    for(int sc : unfollowedSCs){
+                    for (int sc : unfollowedSCs) {
                         graphics.setColor(getSCColor(sc));
-                        graphics.drawString(""+sc+" ", x + 9+xSpacer+145, y + 125 + yDelta);
+                        graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
                         xSpacer = xSpacer + 20;
                     }
                 }
-                
 
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
@@ -1645,15 +1644,16 @@ public class MapGenerator {
                     drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
                 } else {
                     String originalPlanetType = planetHolder.getOriginalPlanetType();
-                    if ("none".equals(originalPlanetType) && "mr".equals(planet))
+                    if ("none".equals(originalPlanetType) && ("mr".equals(planet) || "mrte".equals(planet)))
                         originalPlanetType = "mr";
                     if ("none".equals(originalPlanetType))
                         originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     if (Optional.ofNullable(originalPlanetType).isEmpty()) {
                         originalPlanetType = "none";
                     }
-                    if ("none".equals(originalPlanetType))
+                    if ("faction".equals(originalPlanetType)) {
                         originalPlanetType = player.getFaction();
+                    }
 
                     if (!originalPlanetType.isEmpty()) {
                         if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
@@ -1677,12 +1677,11 @@ public class MapGenerator {
                     BufferedImage image = ImageHelper.readScaled(tokenPath, 0.25f);
                     graphics.drawImage(image, x + deltaX + 15, y + 112, null);
                 }
-                
 
                 boolean hasAttachment = planetHolder.hasAttachment();
                 if (hasAttachment) {
                     String planetTypeName = "pc_upgrade.png";
-                    if(planetHolder.getTokenList().contains("attachment_tombofemphidia.png")){
+                    if (planetHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         planetTypeName = "pc_upgrade_tomb.png";
                     }
                     drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName, planet);
@@ -1693,9 +1692,7 @@ public class MapGenerator {
                     drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planet);
                 }
 
-                boolean hasAbility = planetHolder.isHasAbility() ||
-                    planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary") || token.contains("consulate"));
-                if (hasAbility) {
+                if (planetHolder.isLegendary()) {
                     String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                     String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
                     drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planet);
@@ -2472,7 +2469,7 @@ public class MapGenerator {
                 graphics.setColor(Color.WHITE);
 
             }
-            
+
             deltaY += PLAYER_STATS_HEIGHT;
         }
     }
@@ -3067,23 +3064,22 @@ public class MapGenerator {
                 }
                 tileGraphics.drawString(tile.getPosition(), TILE_PADDING + tilePositionPoint.x - textOffset, TILE_PADDING + tilePositionPoint.y);
                 int prodInSystem = 0;
-                for(Player player : game.getRealPlayers()){
+                for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                 }
-                if(prodInSystem > 0 && game.getShowGears()){
-                    
-                    if(tile.getPlanetUnitHolders().size() != 3){
+                if (prodInSystem > 0 && game.getShowGears()) {
+                    if (tile.getPlanetUnitHolders().size() != 3) {
                         BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x-225 , TILE_PADDING + tilePositionPoint.y-170, null);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x - 225, TILE_PADDING + tilePositionPoint.y - 170, null);
                         tileGraphics.setFont(Storage.getFont35());
                         //tileGraphics.setColor(Color.getHSBColor(0.76f, 1.0f, 1.0f));
-                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x-210, TILE_PADDING + tilePositionPoint.y-130);
-                    }else{
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x - 210, TILE_PADDING + tilePositionPoint.y - 130);
+                    } else {
                         BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x+45, TILE_PADDING + tilePositionPoint.y-170, null);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + 45, TILE_PADDING + tilePositionPoint.y - 170, null);
                         tileGraphics.setFont(Storage.getFont35());
                         //tileGraphics.setColor(Color.BLACK);
-                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x+60, TILE_PADDING + tilePositionPoint.y-130);
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + 60, TILE_PADDING + tilePositionPoint.y - 130);
                     }
                 }
                 //pa_unitimage.png
@@ -3369,51 +3365,50 @@ public class MapGenerator {
                     break;
             }
             float scale = .95f;
-            if(Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko") && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")){
+            if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko")
+                && !unitHolder.getName().equalsIgnoreCase("mallice") && !unitHolder.getName().equalsIgnoreCase("domna")) {
                 scale = 1.65f;
             }
-            if(unitHolder.getName().equalsIgnoreCase("elysium")){
+            if (unitHolder.getName().equalsIgnoreCase("elysium")) {
                 scale = 1.65f;
             }
-            if(unitHolder.getName().equalsIgnoreCase("mr")){
+            if (unitHolder.getName().equalsIgnoreCase("mr")) {
                 scale = 1.9f;
             }
             tokenImage = ImageHelper.readScaled(tokenPath, scale);
             Point position = new Point(centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
-            position = new Point(position.x , position.y + 10);
+            position = new Point(position.x, position.y + 10);
             tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
         }
     }
 
-    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game activeGame){
+    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game activeGame) {
 
         Map<UnitKey, Integer> units = unitHolder.getUnits();
-        
-        if(activeGame.getLaws().containsKey("conventions")){
+
+        if (activeGame.getLaws().containsKey("conventions")) {
             Planet p = (Planet) unitHolder;
-            if (p != null && ("cultural".equalsIgnoreCase(p.getOriginalPlanetType())
-                    || p.getTokenList().contains("attachment_titanspn.png"))) {
+            if (p != null && p.getPlanetType().contains("cultural")) {
                 return true;
             }
         }
         Map<UnitKey, Integer> planetUnits = new HashMap<>(units);
-        for(Player player : activeGame.getRealPlayers()){
+        for (Player player : activeGame.getRealPlayers()) {
             for (Map.Entry<UnitKey, Integer> unitEntry : planetUnits.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey))
                     continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                if(unitModel == null){
+                if (unitModel == null) {
                     continue;
                 }
-                if(unitModel.getPlanetaryShield()){
+                if (unitModel.getPlanetaryShield()) {
                     return true;
                 }
             }
         }
         return false;
     }
-    
 
     private static boolean isValidToken(String tokenID) {
         return tokenID.contains(Constants.SLEEPER) ||
@@ -3470,7 +3465,7 @@ public class MapGenerator {
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
                     boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
-                
+
                     if (isMirage) {
                         if (position == null) {
                             position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);

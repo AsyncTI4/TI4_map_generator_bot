@@ -85,7 +85,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
-        activeGame.setCurrentReacts(player.getFaction()+"planetsExplored",activeGame.getFactionsThatReactedToThis(player.getFaction()+"planetsExplored")+planetName+"*");
+        activeGame.setCurrentReacts(player.getFaction() + "planetsExplored", activeGame.getFactionsThatReactedToThis(player.getFaction() + "planetsExplored") + planetName + "*");
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
@@ -100,18 +100,18 @@ public class ExpPlanet extends ExploreSubcommandData {
             String cardIDC = activeGame.drawExplore("CULTURAL");
             String cardIDH = activeGame.drawExplore("INDUSTRIAL");
             String cardIDI = activeGame.drawExplore("HAZARDOUS");
-            
+
             ExploreModel exploreModelC = Mapper.getExplore(cardIDC);
             ExploreModel exploreModelH = Mapper.getExplore(cardIDH);
             ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
-            
+
             String reportMessage = player.getFactionEmoji() + " explored " + Emojis.LegendaryPlanet + "**Garbozia** ability and found a **" + exploreModelC.getName() + "**, **" + exploreModelH.getName() + "** and a **" + exploreModelI.getName() + "**";
             if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), reportMessage);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
             }
-            
+
             Button resolveExploreC = Button.success("resolve_explore_" + cardIDC + "_" + planetName + "_distantSuns", exploreModelC.getName());
             Button resolveExploreH = Button.success("resolve_explore_" + cardIDH + "_" + planetName + "_distantSuns", exploreModelH.getName());
             Button resolveExploreI = Button.success("resolve_explore_" + cardIDI + "_" + planetName + "_distantSuns", exploreModelI.getName());
@@ -120,7 +120,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             String message = player.getRepresentation() + " please choose 1 Explore card to resolve.";
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
-            
+
         }
 
         if (player.hasAbility("distant_suns")) {
@@ -153,7 +153,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                     } else {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
                     }
-                    
+
                     Button resolveExplore1 = Button.success("resolve_explore_" + cardID1 + "_" + planetName + "_distantSuns", exploreModel1.getName());
                     Button resolveExplore2 = Button.success("resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
@@ -164,10 +164,9 @@ public class ExpPlanet extends ExploreSubcommandData {
                 }
             }
         }
-        if (player.hasAbility("deep_mining")) {
-            
+        if (player.hasAbility("deep_mining") && tile != null) {
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-            if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0  || unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0 ) {
+            if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                 if (!NRACheck) {
                     String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain tg instead of explore) ability.";
                     Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain Tg instead of exploring");
@@ -175,7 +174,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;
-                } 
+                }
             }
         }
 
@@ -184,8 +183,9 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored");
             return;
         }
+        String position_ = tile == null ? "none" : tile.getPosition();
         String messageText = player.getRepresentation() + " explored " + Emojis.getEmojiFromDiscord(drawColor) +
-            "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:";
+            "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + position_ + ")*:";
         if (player.hasUnexhaustedLeader("lanefiragent")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
@@ -204,7 +204,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
-        if(player.hasTech("absol_sdn")){
+        if (player.hasTech("absol_sdn")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
             Button resolveExplore1 = Button.success("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);

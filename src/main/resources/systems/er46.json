@@ -4,8 +4,7 @@
     "aliases": [
         "kapparocks"
     ],
-    "imagePath": "er46_kappa_asteroid.png",
-    "planetIds": [],
+    "imagePath": "er_46_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
