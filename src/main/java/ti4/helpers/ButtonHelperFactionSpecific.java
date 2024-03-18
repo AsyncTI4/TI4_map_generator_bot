@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1059,29 +1060,6 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static String getAllOwnedPlanetTypes(Player player, Game activeGame) {
-
-        StringBuilder types = new StringBuilder();
-        for (String planetName : player.getPlanetsAllianceMode()) {
-            if (planetName.contains("custodia") || planetName.contains("ghoti")) {
-                continue;
-            }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
-            String planetType = planet.getOriginalPlanetType();
-            if (("industrial".equalsIgnoreCase(planetType) || "cultural".equalsIgnoreCase(planetType)
-                || "hazardous".equalsIgnoreCase(planetType)) && !types.toString().contains(planetType)) {
-                types.append(planetType);
-            }
-            if (planet.getTokenList().contains("attachment_titanspn.png")) {
-                types.append("cultural");
-                types.append("industrial");
-                types.append("hazardous");
-            }
-        }
-
-        return types.toString();
-    }
-
     public static void increaseMykoMech(Game activeGame) {
         int amount;
         if (!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()) {
@@ -1695,8 +1673,7 @@ public class ButtonHelperFactionSpecific {
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 
@@ -1705,8 +1682,7 @@ public class ButtonHelperFactionSpecific {
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         planetReal.addToken("attachment_gledgebase.png");
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Attached gledge base to " + Helper.getPlanetRepresentation(planet, activeGame));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached gledge base to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 

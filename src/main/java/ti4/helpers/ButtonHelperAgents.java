@@ -312,7 +312,7 @@ public class ButtonHelperAgents {
 
     public static List<Button> getKolleccAgentButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
-        List<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(activeGame, player);
+        Set<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(activeGame, player);
         for (String type : types) {
             if ("industrial".equals(type)) {
                 buttons.add(Button.success("kolleccAgentResStep2_industrial", "Explore Industrials X 2"));
@@ -1022,48 +1022,6 @@ public class ButtonHelperAgents {
         }
     }
 
-    public static List<String> getExhaustedPlanetsOfASeperateTrait(Game activeGame, Player player, String planetOrig) {
-        List<String> types = new ArrayList<>();
-        List<String> planets = new ArrayList<>();
-        if (planetOrig.contains("custodia") || planetOrig.contains("ghoti")) {
-            return planets;
-        }
-        UnitHolder unitHolder2 = activeGame.getPlanetsInfo().get(planetOrig);
-        Planet planetReal2 = (Planet) unitHolder2;
-        boolean oneOfThree2 = planetReal2 != null && planetReal2.getOriginalPlanetType() != null
-            && ("industrial".equalsIgnoreCase(planetReal2.getOriginalPlanetType())
-                || "cultural".equalsIgnoreCase(planetReal2.getOriginalPlanetType())
-                || "hazardous".equalsIgnoreCase(planetReal2.getOriginalPlanetType()));
-        if (planetReal2 != null && oneOfThree2 && !types.contains(planetReal2.getOriginalPlanetType())) {
-            types.add(planetReal2.getOriginalPlanetType());
-        }
-        if (unitHolder2.getTokenList().contains("attachment_titanspn.png")) {
-            return planets;
-        }
-        if (types.isEmpty()) {
-            return planets;
-        }
-        for (String planet : player.getExhaustedPlanets()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
-                continue;
-            }
-            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
-            if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
-                continue;
-            }
-            Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
-                && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
-                    || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
-            if (planetReal != null && oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
-                planets.add(planet);
-            }
-
-        }
-        return planets;
-    }
-
     public static void presetEdynAgentStep1(Game activeGame, Player player) {
         List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "presetEdynAgentStep2", null);
         String msg = player.getRepresentation(true, true)
@@ -1569,9 +1527,7 @@ public class ButtonHelperAgents {
             Tile tile = activeGame.getTileFromPlanet(p.getName());
             if (tile != null && !tiles.contains(tile)
                 && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)
-                && (Mapper.getPlanet(planet).getTechSpecialties() != null
-                    && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
-                || ButtonHelper.checkForTechSkipAttachments(activeGame, planet)
+                && ButtonHelper.checkForTechSkips(activeGame, planet)
                 || tile.isHomeSystem()) {
                 buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                     tile.getRepresentationForButtons(activeGame, player)));
