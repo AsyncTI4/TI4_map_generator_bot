@@ -112,6 +112,13 @@
         "homebrewReplacesID": "st"
     },
     {
+        "alias": "absol_techquantumcore",
+        "name": "Quantumcore",
+        "type": "CYBERNETIC",
+        "source": "absol",
+        "text": "After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10. [Note, this synergizes with absol plasma scoring]."
+    },
+    {
         "alias": "absol_sdn",
         "name": "Scanlink Drone Network",
         "type": "CYBERNETIC",
