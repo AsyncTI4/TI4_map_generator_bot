@@ -1692,9 +1692,7 @@ public class MapGenerator {
                     drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planet);
                 }
 
-                boolean hasAbility = planetHolder.isHasAbility() ||
-                    planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary") || token.contains("consulate"));
-                if (hasAbility) {
+                if (planetHolder.isLegendary()) {
                     String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                     String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
                     drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planet);
@@ -3390,8 +3388,7 @@ public class MapGenerator {
 
         if (activeGame.getLaws().containsKey("conventions")) {
             Planet p = (Planet) unitHolder;
-            if (p != null && ("cultural".equalsIgnoreCase(p.getOriginalPlanetType())
-                || p.getTokenList().contains("attachment_titanspn.png"))) {
+            if (p != null && p.getPlanetType().contains("cultural")) {
                 return true;
             }
         }
