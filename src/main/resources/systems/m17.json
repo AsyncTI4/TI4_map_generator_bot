@@ -6,9 +6,6 @@
         "lazax"
     ],
     "imagePath": "m17_origin.png",
-    "planetIds": [
-        "origin"
-    ],
     "shipPositionsType": "TYPE01",
     "spaceTokenLocations": [
         {

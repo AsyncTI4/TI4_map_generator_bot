@@ -4,8 +4,7 @@
     "aliases": [
         "epsilonrift"
     ],
-    "imagePath": "er26_epsilonrift.png",
-    "planetIds": [],
+    "imagePath": "er_26_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

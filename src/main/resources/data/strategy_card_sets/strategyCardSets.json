@@ -256,5 +256,20 @@
       "13": "Imperial"
     },
     "description": "Normal Strategy Cards except with five extra Techs"
+  },
+   {
+    "name": "Pi Strategy Cards",
+    "alias": "pi",
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Imperial"
+    },
+    "description": "The Project_Pi set of strategy cards"
   }
 ]

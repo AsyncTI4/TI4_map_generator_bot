@@ -4,8 +4,7 @@
     "aliases": [
         "zetarocks"
     ],
-    "imagePath": "er32_zetaasteroid.png",
-    "planetIds": [],
+    "imagePath": "er_32_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

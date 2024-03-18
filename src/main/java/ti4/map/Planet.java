@@ -6,9 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -40,7 +43,7 @@ public class Planet extends UnitHolder {
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             originalPlanetType = planetInfo.getPlanetType().toString();
-            contrastColor = planetInfo.getContrastColor();
+            contrastColor = planetInfo.getContrastColor().orElse("");
             if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
                 originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); //TODO: Make this support multiple specialties
             if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
@@ -198,11 +201,37 @@ public class Planet extends UnitHolder {
         return planetType;
     }
 
+    @JsonIgnore
+    public Set<String> getPlanetTypes() {
+        Set<String> types = new HashSet<String>();
+        types.add(originalPlanetType);
+        types.addAll(planetType);
+        return types;
+    }
+
     public List<String> getTechSpeciality() {
         return techSpeciality;
     }
 
+    @JsonIgnore
+    public Set<String> getTechSpecialities() {
+        Set<String> specialties = new HashSet<>();
+        specialties.add(originalTechSpeciality);
+        specialties.addAll(techSpeciality);
+        return specialties;
+    }
+
     public boolean isHasAbility() {
+        return hasAbility;
+    }
+
+    @JsonIgnore
+    public boolean isLegendary() {
+        for (String token : tokenList) {
+            AttachmentModel attachment = Mapper.getAttachmentInfo(token);
+            if (attachment == null) continue;
+            if (attachment.isLegendary()) return true;
+        }
         return hasAbility;
     }
 

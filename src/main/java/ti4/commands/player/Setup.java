@@ -94,8 +94,9 @@ public class Setup extends PlayerSubcommandData {
                 }
             }
         }
-        if(player.isRealPlayer() && player.getSo() > 0){
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You have SOs that would get lost to the void if you were setup again. If you wish to change color, use /player change_color. If you want to setup as another faction, discard your SOs first");
+        if (player.isRealPlayer() && player.getSo() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "You have SOs that would get lost to the void if you were setup again. If you wish to change color, use /player change_color. If you want to setup as another faction, discard your SOs first");
             return;
         }
 
@@ -160,13 +161,13 @@ public class Setup extends PlayerSubcommandData {
             }
             player.addTech(tech);
         }
-        if(activeGame.getTechnologyDeckID().contains("absol")){
+        if (activeGame.getTechnologyDeckID().contains("absol")) {
             List<String> techs = new ArrayList<>();
             techs.addAll(player.getTechs());
-            for(String tech : techs){
-                if(!tech.contains("absol") && Mapper.getTech("absol_"+tech) != null){
-                    if(!player.hasTech("absol_"+tech)){
-                        player.addTech("absol_"+tech);
+            for (String tech : techs) {
+                if (!tech.contains("absol") && Mapper.getTech("absol_" + tech) != null) {
+                    if (!player.hasTech("absol_" + tech)) {
+                        player.addTech("absol_" + tech);
                     }
                     player.removeTech(tech);
                 }
@@ -218,7 +219,7 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
-        
+
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
                 Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
@@ -258,7 +259,8 @@ public class Setup extends PlayerSubcommandData {
             player.setUnitCap(unitID, 7);
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
         }
         if (player.hasAbility("necrophage")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
@@ -284,21 +286,21 @@ public class Setup extends PlayerSubcommandData {
                     if (player2.getPersonalPingInterval() > 0) {
                         player.setPersonalPingInterval(player2.getPersonalPingInterval());
                     }
-                    if(player2.doesPlayerPreferDistanceBasedTacticalActions()){
+                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
                         player.setPreferenceForDistanceBasedTacticalActions(true);
                     }
                 }
             }
         }
 
-        if(!activeGame.isFoWMode()){
+        if (!activeGame.isFoWMode()) {
             StringBuilder sb = new ListMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
-            if(!sb.toString().contains("No titles yet")){
-                String msg = "In previous games, "+player.getUserName()+" has earned the titles of: \n"+ sb;
+            if (!sb.toString().contains("No titles yet")) {
+                String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
             }
         }
-        if(hsTile.equalsIgnoreCase("d11")){
+        if (hsTile.equalsIgnoreCase("d11")) {
             AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
 

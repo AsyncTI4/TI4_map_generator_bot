@@ -230,5 +230,157 @@
         "playArea": "false",
         "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the ethereal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the ethereal player."
+    },
+    {
+        "alias": "absol_splitgold_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitgold",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitgold player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitgold player."
+    },
+    {
+        "alias": "absol_splitlime_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitlime",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitlime player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitlime player."
+    },
+    {
+        "alias": "absol_splittan_ps",
+        "name": "Absol's Political Secret",
+        "color": "splittan",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splittan player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splittan player."
+    },
+    {
+        "alias": "absol_splitteal_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitteal",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitteal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitteal player."
+    },
+    {
+        "alias": "absol_splitturquoise_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitturquoise",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitturquoise player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitturquoise player."
+    },
+    {
+        "alias": "absol_splitbloodred_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitbloodred",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitbloodred player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitbloodred player."
+    },
+    {
+        "alias": "absol_splitchocolate_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitchocolate",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitchocolate player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitchocolate player."
+    },
+    {
+        "alias": "absol_splitemerald_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitemerald",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitemerald player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitemerald player."
+    },
+    {
+        "alias": "absol_splitnavy_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitnavy",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitnavy player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitnavy player."
+    },
+    {
+        "alias": "absol_splitpetrol_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitpetrol",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitpetrol player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitpetrol player."
+    },
+    {
+        "alias": "absol_splitrainbow_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitrainbow",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitrainbow player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitrainbow player."
+    },
+    {
+        "alias": "absol_splitred_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitred",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitred player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitred player."
+    },
+    {
+        "alias": "absol_splitblue_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitblue",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitblue player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitblue player."
+    },
+    {
+        "alias": "absol_splitgreen_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitgreen",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitgreen player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitgreen player."
+    },
+    {
+        "alias": "absol_splityellow_ps",
+        "name": "Absol's Political Secret",
+        "color": "splityellow",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splityellow player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splityellow player."
+    },
+    {
+        "alias": "absol_splitorange_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitorange",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitorange player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitorange player."
+    },
+    {
+        "alias": "absol_splitpurple_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitpurple",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitpurple player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitpurple player."
+    },
+    {
+        "alias": "absol_splitpink_ps",
+        "name": "Absol's Political Secret",
+        "color": "splitpink",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the splitpink player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the splitpink player."
+    },
+    {
+        "alias": "absol_orca_ps",
+        "name": "Absol's Political Secret",
+        "color": "orca",
+        "playArea": "false",
+        "source": "absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the orca player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the orca player."
     }
 ]

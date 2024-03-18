@@ -4,8 +4,7 @@
     "aliases": [
         "etarocks"
     ],
-    "imagePath": "er37_etaasteroid.png",
-    "planetIds": [],
+    "imagePath": "er_37_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

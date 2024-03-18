@@ -9,9 +9,7 @@ import java.util.Map;
 
 public class MiltyDraftManager {
 
-    private final List<MiltyDraftTile> high = new ArrayList<>();
-    private final List<MiltyDraftTile> mid = new ArrayList<>();
-    private final List<MiltyDraftTile> low = new ArrayList<>();
+    private final List<MiltyDraftTile> blue = new ArrayList<>();
     private final List<MiltyDraftTile> red = new ArrayList<>();
 
     private final List<MiltyDraftSlice> slices = new ArrayList<>();
@@ -25,29 +23,18 @@ public class MiltyDraftManager {
 
     public void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
-        if (draftTileTier == TierList.high) {
-            high.add(draftTile);
-        } else if (draftTileTier == TierList.mid) {
-            mid.add(draftTile);
-        } else if (draftTileTier == TierList.low) {
-            low.add(draftTile);
-        } else if (draftTileTier == TierList.red) {
-            red.add(draftTile);
-        } else if (draftTileTier == TierList.anomaly) {
-            red.add(draftTile);
+        switch (draftTileTier) {
+            case high, mid, low -> blue.add(draftTile);
+            case red, anomaly -> red.add(draftTile);
         }
     }
 
-    public Player getDraftOrderPlayer(){
+    public Player getDraftOrderPlayer() {
         return draftOrder.get(draftIndex);
     }
 
-    public void setNextPlayerInDraft(){
+    public void setNextPlayerInDraft() {
         draftIndex++;
-    }
-
-    public List<MiltyDraftTile> getHigh() {
-        return new ArrayList<>(high);
     }
 
     public List<String> getFactionDraft() {
@@ -58,12 +45,8 @@ public class MiltyDraftManager {
         this.factionDraft = factionDraft;
     }
 
-    public List<MiltyDraftTile> getMid() {
-        return new ArrayList<>(mid);
-    }
-
-    public List<MiltyDraftTile> getLow() {
-        return new ArrayList<>(low);
+    public List<MiltyDraftTile> getBlue() {
+        return new ArrayList<>(blue);
     }
 
     public List<MiltyDraftTile> getRed() {
@@ -74,11 +57,11 @@ public class MiltyDraftManager {
         slices.add(slice);
     }
 
-    public void setDraftOrder(List<Player> draftOrder){
+    public void setDraftOrder(List<Player> draftOrder) {
         this.draftOrder = draftOrder;
     }
 
-    public void setDraftRandomOrder(List<Player> draftOrder){
+    public void setDraftRandomOrder(List<Player> draftOrder) {
         draftRandomOrder = draftOrder;
 
         for (Player player : draftOrder) {
@@ -90,7 +73,7 @@ public class MiltyDraftManager {
         return draftRandomOrder;
     }
 
-    public PlayerDraft getPlayerDraft(Player player){
+    public PlayerDraft getPlayerDraft(Player player) {
         return draft.get(player);
     }
 
@@ -98,15 +81,13 @@ public class MiltyDraftManager {
         return slices;
     }
 
-    public void clearSlices(){
+    public void clearSlices() {
         slices.clear();
     }
 
     public void clear() {
         clearSlices();
-        high.clear();
-        mid.clear();
-        low.clear();
+        blue.clear();
         red.clear();
     }
 

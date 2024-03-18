@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -66,8 +68,8 @@ public class TurnEnd extends PlayerSubcommandData {
         //in a normal game, 8 is the maximum number, so we modulo on 9
         List<Player> unpassedPlayers = activeGame.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
         int maxSC = Collections.max(activeGame.getSCList()) + 1;
-        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
-            maxSC = maxSC+1;
+        if (ButtonHelper.getKyroHeroSC(activeGame) != 1000) {
+            maxSC = maxSC + 1;
         }
         for (int i = 1; i <= maxSC; i++) {
             int scCheck = (startingInitiative + i) % maxSC;
@@ -83,6 +85,7 @@ public class TurnEnd extends PlayerSubcommandData {
             return unpassedPlayers.get(0);
         }
     }
+
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
         pingNextPlayer(event, activeGame, mainPlayer, false);
     }
@@ -91,18 +94,18 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setComponentAction(false);
         activeGame.setTemporaryPingDisable(false);
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        for(Player player : activeGame.getRealPlayers()){
-            for(Player player_ : activeGame.getRealPlayers()){
-                if(player_ == player){
+        for (Player player : activeGame.getRealPlayers()) {
+            for (Player player_ : activeGame.getRealPlayers()) {
+                if (player_ == player) {
                     continue;
                 }
-                String key = player.getFaction()+"whisperHistoryTo"+player_.getFaction();
-                if(!activeGame.getFactionsThatReactedToThis(key).isEmpty()){
+                String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
+                if (!activeGame.getFactionsThatReactedToThis(key).isEmpty()) {
                     activeGame.setCurrentReacts(key, "");
                 }
             }
         }
-        activeGame.setCurrentReacts("mahactHeroTarget","");
+        activeGame.setCurrentReacts("mahactHeroTarget", "");
         activeGame.setActiveSystem("");
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
@@ -127,9 +130,10 @@ public class TurnEnd extends PlayerSubcommandData {
 
         Player nextPlayer = findNextUnpassedPlayer(activeGame, mainPlayer);
         if (!activeGame.isFoWMode()) {
+            String lastTransaction = activeGame.getLatestTransactionMsg();
             try {
-                if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
-                    activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
+                if (lastTransaction != null && !"".equals(lastTransaction)) {
+                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queueAfter(1, TimeUnit.SECONDS);
                     activeGame.setLatestTransactionMsg("");
                 }
             } catch (Exception e) {
@@ -141,19 +145,19 @@ public class TurnEnd extends PlayerSubcommandData {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
         ButtonHelper.checkFleetInEveryTile(mainPlayer, activeGame, event);
-        if(mainPlayer != nextPlayer){
+        if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
         }
-        if(justPassed){
-            if(!ButtonHelperAgents.checkForEdynAgentPreset(activeGame, mainPlayer, nextPlayer, event)){
+        if (justPassed) {
+            if (!ButtonHelperAgents.checkForEdynAgentPreset(activeGame, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, activeGame, nextPlayer);
             }
-        }else{
-            if(!ButtonHelperAgents.checkForEdynAgentActive(activeGame, event)){
+        } else {
+            if (!ButtonHelperAgents.checkForEdynAgentActive(activeGame, event)) {
                 TurnStart.turnStart(event, activeGame, nextPlayer);
             }
         }
-        
+
     }
 
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
@@ -205,8 +209,8 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtons1);
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
-        for(Player player : activeGame.getRealPlayers()){
-            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !activeGame.isFoWMode()){
+        for (Player player : activeGame.getRealPlayers()) {
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !activeGame.isFoWMode()) {
                 poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
                 break;
             }
@@ -229,13 +233,13 @@ public class TurnEnd extends PlayerSubcommandData {
             }
         }
         Player vaden = Helper.getPlayerFromAbility(activeGame, "binding_debts");
-        if(vaden != null){
-            for(Player p2 : vaden.getNeighbouringPlayers()){
-                if(p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0){
-                    String msg = p2.getRepresentation(true, true) +" you have the opportunity to pay off binding debts here. You can pay 1tg to get 2 debt tokens forgiven. ";
+        if (vaden != null) {
+            for (Player p2 : vaden.getNeighbouringPlayers()) {
+                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You can pay 1tg to get 2 debt tokens forgiven. ";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("bindingDebtsRes_"+vaden.getFaction(),"Pay 1 tg"));
-                    buttons.add(Button.danger("deleteButtons","Decline"));
+                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 tg"));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
@@ -262,23 +266,24 @@ public class TurnEnd extends PlayerSubcommandData {
         gameChannel.sendMessage(messageObject).queue();
 
         int maxVP = 0;
-        for(Player player : activeGame.getRealPlayers()){
-            if(player.getTotalVictoryPoints() > maxVP){
+        for (Player player : activeGame.getRealPlayers()) {
+            if (player.getTotalVictoryPoints() > maxVP) {
                 maxVP = player.getTotalVictoryPoints();
             }
-            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")){
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
                 int numScoredPos = player.getPublicVictoryPoints(false);
-                if(numScoredPos +player.getCommodities()> player.getCommoditiesTotal()){
+                if (numScoredPos + player.getCommodities() > player.getCommoditiesTotal()) {
                     numScoredPos = player.getCommoditiesTotal() - player.getCommodities();
                 }
-                player.setTg(player.getTg()+numScoredSOs);
-                if(numScoredSOs > 0){
+                player.setTg(player.getTg() + numScoredSOs);
+                if (numScoredSOs > 0) {
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, numScoredSOs);
                 }
-                player.setCommodities(player.getCommodities()+numScoredPos);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you gained "+numScoredSOs+" tg and "+numScoredPos+" commodities due to Vaden Commander");
+                player.setCommodities(player.getCommodities() + numScoredPos);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " tg and " + numScoredPos + " commodities due to Vaden Commander");
             }
         }
         // if(maxVP+4 > activeGame.getVp()){
@@ -313,14 +318,14 @@ public class TurnEnd extends PlayerSubcommandData {
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
-                    && playerLeader != null && !playerLeader.isLocked()) {
+                && playerLeader != null && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("kyroHeroInitiation", "Play Kyro Hero"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + " Reminder this is the window to do Kyro Hero. You can use the buttons to start the process",
-                        buttons);
+                    player.getRepresentation()
+                        + " Reminder this is the window to do Kyro Hero. You can use the buttons to start the process",
+                    buttons);
             }
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
@@ -364,20 +369,20 @@ public class TurnEnd extends PlayerSubcommandData {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        
-        activeGame.setCurrentReacts(key2,"");
-        activeGame.setCurrentReacts(key3,"");
-        activeGame.setCurrentReacts(key2b,"");
-        activeGame.setCurrentReacts(key3b,"");
-        if(!activeGame.isFoWMode() && activeGame.getHighestScore() + 4 > activeGame.getVp()){
+
+        activeGame.setCurrentReacts(key2, "");
+        activeGame.setCurrentReacts(key3, "");
+        activeGame.setCurrentReacts(key2b, "");
+        activeGame.setCurrentReacts(key3b, "");
+        if (!activeGame.isFoWMode() && activeGame.getHighestScore() + 4 > activeGame.getVp()) {
             activeGame.setCurrentReacts("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing()+ 
-                            "Players will be forced to score in order. Any preemptive scores will be queued. You can turn this off at any time by pressing this button", buttons);
-            for(Player player : Helper.getInitativeOrder(activeGame)){
-                activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3)+player.getFaction()+"*");
-                activeGame.setCurrentReacts(key3b, activeGame.getFactionsThatReactedToThis(key3b)+player.getFaction()+"*");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing() +
+                "Players will be forced to score in order. Any preemptive scores will be queued. You can turn this off at any time by pressing this button", buttons);
+            for (Player player : Helper.getInitativeOrder(activeGame)) {
+                activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3) + player.getFaction() + "*");
+                activeGame.setCurrentReacts(key3b, activeGame.getFactionsThatReactedToThis(key3b) + player.getFaction() + "*");
             }
         }
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");

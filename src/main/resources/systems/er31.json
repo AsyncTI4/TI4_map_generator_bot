@@ -4,8 +4,7 @@
     "aliases": [
         "zetanebula"
     ],
-    "imagePath": "er31_zetanebula.png",
-    "planetIds": [],
+    "imagePath": "er_31_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

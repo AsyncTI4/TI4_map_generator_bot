@@ -6,8 +6,7 @@
         "na",
         "nebulaasteroid"
     ],
-    "imagePath": "ER18_Nebula_Asteroid.png",
-    "planetIds": [],
+    "imagePath": "er_18_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

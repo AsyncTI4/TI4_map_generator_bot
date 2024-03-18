@@ -4,8 +4,7 @@
     "aliases": [
         "allinone"
     ],
-    "imagePath": "ER21_All_in_One.png",
-    "planetIds": [],
+    "imagePath": "er_21_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

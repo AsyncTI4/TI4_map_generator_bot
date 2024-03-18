@@ -5,8 +5,7 @@
         "iodarift",
         "iotarift"
     ],
-    "imagePath": "ER14_Ioda_WH_GR.png",
-    "planetIds": [],
+    "imagePath": "er_14_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

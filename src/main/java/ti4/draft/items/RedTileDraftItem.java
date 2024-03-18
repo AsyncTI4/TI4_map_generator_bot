@@ -28,7 +28,7 @@ public class RedTileDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         TileModel tile = TileHelper.getTile(ItemId);
         StringBuilder sb = new StringBuilder();
-        List<String> planetIds = tile.getPlanetIds();
+        List<String> planetIds = tile.getPlanets();
         if (planetIds.isEmpty()) {
             return tile.getName();
         }

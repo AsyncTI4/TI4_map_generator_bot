@@ -1,12 +1,11 @@
 {
     "id": "er69",
-    "name": "Nebula3e",
+    "name": "Rift1e",
     "aliases": [
-        "nebula3e",
-        "n3e"
+        "rift1e",
+        "gr1e"
     ],
-    "imagePath": "er69_nebula3.png",
-    "planetIds": [],
+    "imagePath": "er_69_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -34,5 +33,5 @@
         null
     ],
     "planets": [],
-    "isNebula": true
+    "isGravityRift": true
 }

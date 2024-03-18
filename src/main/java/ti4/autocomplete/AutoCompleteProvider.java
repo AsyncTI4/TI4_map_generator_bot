@@ -44,6 +44,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.ShipPositionModel;
+import ti4.model.Source;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
@@ -503,7 +504,10 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = Undo.getAllUndoSavedGames(activeGame).entrySet().stream()
                     .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
                     .limit(25)
-                    .map(entry -> new Command.Choice(StringUtils.left(entry.getKey() + " (" + Helper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) +  " ago):  " + entry.getValue().getLatestCommand(), 100), entry.getKey()))
+                    .map(entry -> new Command.Choice(
+                        StringUtils.left(
+                            entry.getKey() + " (" + Helper.getTimeRepresentationToSeconds(datetime - entry.getValue().getLastModifiedDate()) + " ago):  " + entry.getValue().getLatestCommand(), 100),
+                        entry.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
@@ -706,6 +710,15 @@ public class AutoCompleteProvider {
                     .filter(token -> token.contains(enteredValue))
                     .limit(25)
                     .map(token -> new Command.Choice(token, token))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.SOURCE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of(Source.ComponentSource.values())
+                    .filter(token -> token.toString().contains(enteredValue))
+                    .limit(25)
+                    .map(token -> new Command.Choice(token.toString(), token.toString()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

@@ -12,32 +12,32 @@ import ti4.map.Leader;
 
 public class Emojis {
     // FACTIONS
-    public static final String Arborec = "<:Arborec:946891797567799356>";
-    public static final String Argent = "<:Argent:946891797366472725>";
-    public static final String Cabal = "<:cabal:946891797236441089>";
-    public static final String Empyrean = "<:Empyrean:946891797257404466>";
-    public static final String Ghost = "<:Creuss:946891797609721866>";
-    public static final String Hacan = "<:Hacan:946891797228060684>";
-    public static final String Jolnar = "<:JolNar:946891797114789918>";
-    public static final String L1Z1X = "<:L1Z1X:946891797219647559>";
-    public static final String Letnev = "<:Letnev:946891797458714704>";
-    public static final String Yssaril = "<:Yssaril:946891798138196008>";
-    public static final String Mahact = "<:Mahact:946891797274165248>";
-    public static final String Mentak = "<:Mentak:946891797395800084>";
-    public static final String Muaat = "<:Muaat:946891797177716777>";
-    public static final String Naalu = "<:Naalu:946891797412601926>";
-    public static final String Naaz = "<:Naaz:946891797437747200>";
-    public static final String Nekro = "<:Nekro:946891797681025054>";
-    public static final String Nomad = "<:Nomad:946891797400002561>";
-    public static final String Saar = "<:Saar:946891797366472735>";
-    public static final String Sardakk = "<:Sardakk:946891797307748436>";
-    public static final String Sol = "<:Sol:946891797706194995>";
-    public static final String Titans = "<:Titans:946891798062694400>";
-    public static final String Winnu = "<:Winnu:946891798050136095>";
-    public static final String Xxcha = "<:Xxcha:946891797639086090>";
-    public static final String Yin = "<:Yin:946891797475491892>";
+    public static final String Arborec = "<:Arborec:1156670455856513175>";
+    public static final String Argent = "<:Argent:1156670457123192873>";
+    public static final String Cabal = "<:Cabal:1156670460638015600>";
+    public static final String Empyrean = "<:Empyrean:1156670516623577268>";
+    public static final String Ghost = "<:Creuss:1156670489771651324>";
+    public static final String Hacan = "<:Hacan:1156670539688054794>";
+    public static final String Jolnar = "<:JolNar:1156670564342181908>";
+    public static final String L1Z1X = "<:L1Z1X:1156670567198507208>";
+    public static final String Letnev = "<:Letnev:1156670569471803422>";
+    public static final String Yssaril = "<:Yssaril:1156670725495726150>";
+    public static final String Mahact = "<:Mahact:1156670571552190484>";
+    public static final String Mentak = "<:Mentak:1156670601851846757>";
+    public static final String Muaat = "<:Muaat:1156670603110129704>";
+    public static final String Naalu = "<:Naalu:1156670604393590784>";
+    public static final String Naaz = "<:Naaz:1156670606532677782>";
+    public static final String Nekro = "<:Nekro:1156670630700257310>";
+    public static final String Nomad = "<:Nomad:1156670632705130526>";
+    public static final String Saar = "<:Saar:1156670637226590228>";
+    public static final String Sardakk = "<:Sardakk:1156670656570740827>";
+    public static final String Sol = "<:Sol:1156670659804532736>";
+    public static final String Titans = "<:Titans:1156670697515532350>";
+    public static final String Winnu = "<:Winnu:1156670722039611524>";
+    public static final String Xxcha = "<:Xxcha:1156670723541180547>";
+    public static final String Yin = "<:Yin:1156670724438769754>";
     public static final String Lazax = "<:Lazax:946891797639073884>";
-    public static final String Keleres = "<:Keleres:968233661654765578>";
+    public static final String Keleres = "<:Keleres:1156670565793398875>";
 
     // FACTIONS - DISCORDANT STARS
     public static final String augers = "<:augurs:1082705489722363904>";
@@ -81,15 +81,15 @@ public class Emojis {
     public static final String Qulane = "<:qulane:1165445638096420895>";
 
     // EXPLORATION
-    public static final String HFrag = "<:HFrag:1053857012766752788>";
-    public static final String CFrag = "<:CFrag:1053856733849722880>";
-    public static final String IFrag = "<:IFrag:1053857037131460648>";
-    public static final String UFrag = "<:UFrag:1053857056991490119>";
+    public static final String HFrag = "<:HFrag:1156670541382553733>";
+    public static final String CFrag = "<:CFrag:1156670486823055400>";
+    public static final String IFrag = "<:IFrag:1156670542733115512>";
+    public static final String UFrag = "<:UFrag:1156670699314880584>";
     public static final String Relic = "<:Relic:1054075788711964784>";
-    public static final String Cultural = "<:Cultural:947250123333836801>";
-    public static final String Industrial = "<:Industrial:946892033031819305>";
-    public static final String Hazardous = "<:Hazardous:946892033006645318>";
-    public static final String Frontier = "<:Frontier:966025493805678632>";
+    public static final String Cultural = "<:Cultural:1159118849698963466>";
+    public static final String Industrial = "<:Industrial:1159118817029533706>";
+    public static final String Hazardous = "<:Hazardous:1159118854987976734>";
+    public static final String Frontier = "<:Frontier:1156670537699971082>";
 
     // CARDS
     public static final String SC1 = "<:SC1:1056594715673366548>";
@@ -108,13 +108,13 @@ public class Emojis {
     public static final String SC7Back = "<:SC7Back:1065285634299809863>";
     public static final String SC8 = "<:SC8:1056594882141098055>";
     public static final String SC8Back = "<:SC8Back:1065285658207330354>";
-    public static final String ActionCard = "<:Actioncard:1054660449515352114>";
+    public static final String ActionCard = "<:ActionCard:1156670454354939924>";
     public static final String ActionCardAlt = "<:ActionCardAlt:1064838264520986655>";
     public static final String Agenda = "<:Agenda:1054660476874792990>";
     public static final String AgendaAlt = "<:AgendaAlt:1064838239690698812>";
     public static final String AgendaWhite = "<:Agendawhite:1060073913423495258>";
     public static final String AgendaBlack = "<:Agendablack:1060073912442036336>";
-    public static final String PN = "<:PN:1054660504175521882>";
+    public static final String PN = "<:PN:1159118823446806538>";
     public static final String PNALt = "<:PNALt:1064838292467613766>";
     public static final String RelicCard = "<:RelicCard:1147194759903989912>";
     public static final String CulturalCard = "<:CulturalCard:1147194826647928932>";
@@ -124,32 +124,32 @@ public class Emojis {
     public static final String EventCard = "";
 
     // OBJECTIVES
-    public static final String SecretObjective = "<:Secretobjective:1054660535544729670>";
-    public static final String Public1 = "<:Public1:1054075764510826539>";
-    public static final String Public2 = "<:Public2:1054075738602622986>";
+    public static final String SecretObjective = "<:Secretobjective:1159118787572940891>";
+    public static final String Public1 = "<:Public1:1159118826026303528>";
+    public static final String Public2 = "<:Public2:1159118827544662106>";
     public static final String Public1alt = "<:Public1Alt:1058978029243728022>";
     public static final String Public2alt = "<:Public2Alt:1058977929725493398>";
     public static final String SecretObjectiveAlt = "<:SecretobjectiveAlt:1058977803728584734>";
 
     // COMPONENTS
-    public static final String tg = "<:tg:1053857635570553024>";
+    public static final String tg = "<:tg:1156670696332726353>";
     public static final String nomadcoin = "<:nomadcoin:1107100093791879178>";
-    public static final String comm = "<:comm:1053857614028607538>";
+    public static final String comm = "<:comm:1156670488232345620>";
     public static final String Sleeper = "<:Sleeper:1047871121451663371>";
     public static final String SleeperB = "<:SleeperB:1047871220831506484>";
 
     // UNITS
-    public static final String warsun = "<:warsun:993064568626614375>";
-    public static final String spacedock = "<:spacedock:993064508828418159>";
-    public static final String pds = "<:pds:993064415639384064>";
-    public static final String mech = "<:mech:993064350988390430>";
-    public static final String infantry = "<:infantry:993064251994407004>";
-    public static final String flagship = "<:flagship:993064196264710204>";
-    public static final String fighter = "<:fighter:993064145907892284>";
-    public static final String dreadnought = "<:dreadnought:993064090589216828>";
-    public static final String destroyer = "<:destroyer:993063959840182323>";
-    public static final String carrier = "<:carrier:993063885168967700>";
-    public static final String cruiser = "<:cruiser:993063818844459098>";
+    public static final String warsun = "<:warsun:1156670701042942103>";
+    public static final String spacedock = "<:spacedock:1156670661062836364>";
+    public static final String pds = "<:pds:1156670635393695815>";
+    public static final String mech = "<:mech:1156670600329314395>";
+    public static final String infantry = "<:infantry:1156670544658309121>";
+    public static final String flagship = "<:flagship:1156670518754300044>";
+    public static final String fighter = "<:fighter:1156670517542146189>";
+    public static final String dreadnought = "<:dreadnought:1156670515214291055>";
+    public static final String destroyer = "<:destroyer:1156670514077634601>";
+    public static final String carrier = "<:carrier:1156670484788805633>";
+    public static final String cruiser = "<:cruiser:1156670491159973888>";
 
     // EMOJI FARM 4
     public static final String ArborecAgent = "<:ArborecAgent:1159149650465525760>";
@@ -584,7 +584,7 @@ public class Emojis {
     public static final String WarfareDisabled = "<:warfareDisabled:1120031828384956446>";
     public static final String Warfare2 = "<:warfare2:1120031824891093113>";
     public static final String Warfare3 = "<:warfare3:1120031825851584523>";
-    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>";
+    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1159118790966116362>";
     public static final String UnitTechSkip = "<:UnitTechSkip:1151926553488412702>";
     public static final String NonUnitTechSkip = "<:NonUnitTechSkip:1151926572278874162>";
 
@@ -649,15 +649,14 @@ public class Emojis {
     public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
 
-
     // OTHER
-    public static final String WHalpha = "<:WHalpha:1056593618250518529>";
-    public static final String WHbeta = "<:WHbeta:1056593596012302366>";
-    public static final String WHgamma = "<:WHgamma:1056593568766111814>";
+    public static final String WHalpha = "<:WHalpha:1159118794334146570>";
+    public static final String WHbeta = "<:WHbeta:1159118795508547625>";
+    public static final String WHgamma = "<:WHgamma:1159118797765103686>";
     public static final String CreussAlpha = "<:CreussAlpha:1163507874065031313>";
     public static final String CreussBeta = "<:CreussBeta:1163507875818242209>";
     public static final String CreussGamma = "<:CreussGamma:1163507872404090960>";
-    public static final String LegendaryPlanet = "<:Legendaryplanet:947250386375426108>";
+    public static final String LegendaryPlanet = "<:Legendaryplanet:1159118819554500738>";
     public static final String SpeakerToken = "<:Speakertoken:965363466821050389>";
     public static final String Sabotage = "<:sabotage:962784058159546388>";
     public static final String NoSabotage = "<:nosabo:962783456541171712>";
@@ -682,7 +681,7 @@ public class Emojis {
     public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff https://discord.com/channels/743629929484386395/1096820095470272582
     public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff
     public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus https://discord.com/channels/743629929484386395/1027385712821149706
-    public static final String ProjectPi = "";
+    public static final String ProjectPi = "<:ProjectPie:1128504084811481219>";
     public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; //Symbol for Milty's mod https://discord.com/channels/743629929484386395/1087435266249207869
 
     // LIST OF SYMBOLS FOR FOG STUFF
@@ -1174,7 +1173,7 @@ public class Emojis {
             case "destroyer" -> destroyer;
             case "carrier" -> carrier;
             case "cruiser" -> cruiser;
-            case "plenaryorbital"-> spacedock;
+            case "plenaryorbital" -> spacedock;
 
             // LEADERS - AGENTS
             case "arborecagent" -> ArborecAgent;

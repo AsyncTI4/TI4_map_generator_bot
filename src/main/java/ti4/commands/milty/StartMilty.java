@@ -86,7 +86,9 @@ public class StartMilty extends MiltySubcommandData {
             factionCount = 25;
         }
 
-        List<String> factions = new ArrayList<>(Mapper.getFactionIDs());
+        List<String> factions = new ArrayList<>(Mapper.getFactions().stream()
+            .filter(f -> f.getSource().isPok())
+            .map(f -> f.getAlias()).toList());
         List<String> factionDraft = createFactionDraft(factionCount, factions);
 
         OptionMapping anomaliesCanTouchOption = event.getOption(Constants.ANOMALIES_CAN_TOUCH);
@@ -221,8 +223,6 @@ public class StartMilty extends MiltySubcommandData {
     private List<String> createFactionDraft(int factionCount, List<String> factions) {
         factions.remove("lazax");
         Collections.shuffle(factions);
-        Collections.shuffle(factions);
-        Collections.shuffle(factions);
         List<String> factionDraft = new ArrayList<>();
         for (int i = 0; i < factionCount; i++) {
             factionDraft.add(factions.get(i));
@@ -239,8 +239,6 @@ public class StartMilty extends MiltySubcommandData {
         int height = scaled * (sliceCount > 5 ? sliceCount > 10 ? 3 : 2 : 1);
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics graphicsMain = mainImage.getGraphics();
-        BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = sliceImage.getGraphics();
 
         Point equadistant = new Point(0, 150);
         Point left = new Point(0, 450);
@@ -255,6 +253,9 @@ public class StartMilty extends MiltySubcommandData {
             int deltaX = 0;
             int deltaY = 0;
             for (MiltyDraftSlice slice : slices) {
+                BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
+                Graphics graphics = sliceImage.getGraphics();
+
                 MiltyDraftTile leftSlice = slice.getLeft();
                 BufferedImage image = ImageIO.read(new File(leftSlice.getTile().getTilePath()));
                 graphics.drawImage(image, left.x, left.y, null);
@@ -333,7 +334,6 @@ public class StartMilty extends MiltySubcommandData {
 
             boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
 
-            
         } catch (IOException e) {
             BotLogger.log("Could not save jpg file", e);
         }
@@ -349,58 +349,54 @@ public class StartMilty extends MiltySubcommandData {
         boolean slicesCreated = false;
         int i = 0;
         while (!slicesCreated && i < 100) {
-
             draftManager.clearSlices();
 
-            List<MiltyDraftTile> high = draftManager.getHigh();
-            List<MiltyDraftTile> mid = draftManager.getMid();
-            List<MiltyDraftTile> low = draftManager.getLow();
+            List<MiltyDraftTile> blue = draftManager.getBlue();
             List<MiltyDraftTile> red = draftManager.getRed();
 
-            Collections.shuffle(high);
-            Collections.shuffle(mid);
-            Collections.shuffle(low);
+            Collections.shuffle(blue);
             Collections.shuffle(red);
 
             for (int j = 0; j < sliceCount; j++) {
 
                 MiltyDraftSlice miltyDraftSlice = new MiltyDraftSlice();
                 List<MiltyDraftTile> tiles = new ArrayList<>();
-                tiles.add(high.remove(0));
-                tiles.add(mid.remove(0));
-                tiles.add(low.remove(0));
+                tiles.add(blue.remove(0));
+                tiles.add(blue.remove(0));
+                tiles.add(blue.remove(0));
                 MiltyDraftTile red1 = red.remove(0);
                 MiltyDraftTile red2 = red.remove(0);
                 tiles.add(red1);
                 tiles.add(red2);
                 boolean needToCheckAnomalies = red1.getTierList() == TierList.anomaly && red2.getTierList() == TierList.anomaly;
                 Collections.shuffle(tiles);
-                Collections.shuffle(tiles);
-                Collections.shuffle(tiles);
+
                 if (!anomalies_can_touch && needToCheckAnomalies) {
                     int emergencyIndex = 0;
                     while (emergencyIndex < 100) {
 
-                        MiltyDraftTile draftLeft = tiles.get(0);
-                        MiltyDraftTile draftFront = tiles.get(1);
-                        MiltyDraftTile draftRight = tiles.get(2);
-                        MiltyDraftTile draftEquadistant = tiles.get(3);
-                        MiltyDraftTile draftFarFront = tiles.get(4);
-                        if (draftLeft.getTierList() == TierList.anomaly && (draftFarFront.getTierList() == TierList.anomaly || draftRight.getTierList() == TierList.anomaly) ||
-                            draftRight.getTierList() == TierList.anomaly && (draftFarFront.getTierList() == TierList.anomaly || draftEquadistant.getTierList() == TierList.anomaly)) {
+                        boolean left = tiles.get(0).getTile().isAnomaly();
+                        boolean front = tiles.get(1).getTile().isAnomaly();
+                        boolean right = tiles.get(2).getTile().isAnomaly();
+                        boolean equi = tiles.get(3).getTile().isAnomaly();
+                        boolean meca = tiles.get(4).getTile().isAnomaly();
+                        if (!((front && (left || right || equi || meca)) || (equi && (meca || left)))) {
                             break;
                         }
                         Collections.shuffle(tiles);
                         emergencyIndex++;
                     }
                 }
-                miltyDraftSlice.setLeft(tiles.remove(0));
-                miltyDraftSlice.setFront(tiles.remove(0));
-                miltyDraftSlice.setRight(tiles.remove(0));
-                miltyDraftSlice.setEquadistant(tiles.remove(0));
-                miltyDraftSlice.setFarFront(tiles.remove(0));
+                miltyDraftSlice.setLeft(tiles.get(0));
+                miltyDraftSlice.setFront(tiles.get(1));
+                miltyDraftSlice.setRight(tiles.get(2));
+                miltyDraftSlice.setEquadistant(tiles.get(3));
+                miltyDraftSlice.setFarFront(tiles.get(4));
 
                 //CHECK IF SLICES ARE OK HERE -------------------------------
+                if (miltyDraftSlice.getOptimalTotalValue() < 8 || miltyDraftSlice.getOptimalTotalValue() > 14) {
+                    break;
+                }
                 miltyDraftSlice.setName(Integer.toString(j));
                 draftManager.addSlice(miltyDraftSlice);
             }
@@ -441,6 +437,7 @@ public class StartMilty extends MiltySubcommandData {
             if (tile.isHomeSystem() || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres")) {
                 continue;
             }
+
             draftTile.setTile(tile);
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
@@ -452,37 +449,25 @@ public class StartMilty extends MiltySubcommandData {
                     draftTile.addInfluence(influence);
                     if (resources > influence) {
                         draftTile.addMilty_resources(resources);
-                    }
-                    if (influence > resources) {
+                    } else if (influence > resources) {
                         draftTile.addMilty_influence(influence);
-                    }
-                    if (resources == influence) {
+                    } else if (resources == influence) {
                         draftTile.addMilty_resources((double) resources / 2);
                         draftTile.addMilty_influence((double) influence / 2);
                     }
 
-                    if (planet.isHasAbility()) {
+                    if (planet.isLegendary()) {
                         draftTile.setLegendary(true);
                     }
                 }
             }
-            int resources = draftTile.getResources();
-            int influence = draftTile.getInfluence();
-            int combinedResources = resources + influence;
-            if (combinedResources == 0 || tile.isAnomaly()) {
+
+            if (tile.isAnomaly()) {
+                draftTile.setTierList(TierList.anomaly);
+            } else if (tile.getPlanetUnitHolders().size() == 0) {
                 draftTile.setTierList(TierList.red);
-            } else if (combinedResources < 4) {
-                draftTile.setTierList(TierList.low);
-            } else if (combinedResources < 8) {
-                draftTile.setTierList(TierList.mid);
             } else {
                 draftTile.setTierList(TierList.high);
-            }
-
-            String tileName = tileModel.getName();
-            tileName = tileName == null ? tileModel.getImagePath() : tileName.toLowerCase();
-            if (tileName.contains("asteroid") || tileName.contains("nova") || tileName.contains("gravity") || tileName.contains("nebula")) {
-                draftTile.setTierList(TierList.anomaly);
             }
 
             draftManager.addDraftTile(draftTile);
@@ -490,27 +475,29 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private static boolean isValid(TileModel tileModel, String tileID) {
-        return tileID.contains("corner") || tileModel.getImagePath().contains("corner") ||
-            tileID.contains("lane") || tileModel.getImagePath().contains("lane") ||
-            tileID.contains("mecatol") || tileModel.getImagePath().contains("mecatol") ||
-            tileID.contains("blank") || tileModel.getImagePath().contains("blank") ||
-            tileID.contains("border") || tileModel.getImagePath().contains("border") ||
-            tileID.contains("FOW") || tileModel.getImagePath().contains("FOW") ||
-            tileID.contains("anomaly") || tileModel.getImagePath().contains("anomaly") ||
-            tileID.contains("DeltaWH") || tileModel.getImagePath().contains("DeltaWH") ||
-            tileID.contains("Seed") || tileModel.getImagePath().contains("Seed") ||
-            tileID.contains("MR") || tileModel.getImagePath().contains("MR") ||
-            tileID.contains("Mallice") || tileModel.getImagePath().contains("Mallice") ||
-            tileID.contains("Ethan") || tileModel.getImagePath().contains("Ethan") ||
-            tileID.contains("prison") || tileModel.getImagePath().contains("prison") ||
-            tileID.contains("Kwon") || tileModel.getImagePath().contains("Kwon") ||
-            tileID.contains("home") || tileModel.getImagePath().contains("home") ||
-            tileID.contains("hs") || tileModel.getImagePath().contains("hs") ||
-            tileID.contains("red") || tileModel.getImagePath().contains("red") ||
-            tileID.contains("blue") || tileModel.getImagePath().contains("blue") ||
-            tileID.contains("green") || tileModel.getImagePath().contains("green") ||
-            tileID.contains("gray") || tileModel.getImagePath().contains("gray") ||
-            tileID.contains("gate") || tileModel.getImagePath().contains("gate") ||
-            tileID.contains("setup") || tileModel.getImagePath().contains("setup");
+        String id = tileID.toLowerCase();
+        String path = tileModel.getTilePath().toLowerCase();
+        return id.contains("corner") || path.contains("corner") ||
+            id.contains("lane") || path.contains("lane") ||
+            id.contains("mecatol") || path.toLowerCase().contains("mecatol") ||
+            id.contains("blank") || path.contains("blank") ||
+            id.contains("border") || path.contains("border") ||
+            id.contains("FOW") || path.contains("FOW") ||
+            id.contains("anomaly") || path.contains("anomaly") ||
+            id.contains("DeltaWH") || path.contains("DeltaWH") ||
+            id.contains("Seed") || path.contains("Seed") ||
+            id.contains("MR") || path.contains("MR") ||
+            id.contains("Mallice") || path.contains("Mallice") ||
+            id.contains("Ethan") || path.contains("Ethan") ||
+            id.contains("prison") || path.contains("prison") ||
+            id.contains("Kwon") || path.contains("Kwon") ||
+            id.contains("home") || path.contains("home") ||
+            id.contains("hs") || path.contains("hs") ||
+            id.contains("red") || path.contains("red") ||
+            id.contains("blue") || path.contains("blue") ||
+            id.contains("green") || path.contains("green") ||
+            id.contains("gray") || path.contains("gray") ||
+            id.contains("gate") || path.contains("gate") ||
+            id.contains("setup") || path.contains("setup");
     }
 }

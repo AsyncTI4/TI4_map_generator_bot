@@ -4,8 +4,7 @@
     "aliases": [
         "asteroidioda"
     ],
-    "imagePath": "ER12_Ioda_Asteroid.png",
-    "planetIds": [],
+    "imagePath": "er_12_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {

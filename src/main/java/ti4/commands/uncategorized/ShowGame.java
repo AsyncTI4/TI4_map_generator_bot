@@ -40,7 +40,7 @@ public class ShowGame implements Command {
             }
         } else {
             Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-            if (userActiveGame == null){
+            if (userActiveGame == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return false;
             }
@@ -73,7 +73,7 @@ public class ShowGame implements Command {
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapGenerator.saveImage(activeGame, displayType, event)
-                        .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                    .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.system.getValue())) {
                 displayType = DisplayType.system;
@@ -108,8 +108,8 @@ public class ShowGame implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
+            Commands.slash(getActionID(), "Shows selected map")
+                .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }

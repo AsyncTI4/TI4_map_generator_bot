@@ -393,15 +393,14 @@ public class Player {
 
     @JsonIgnore
     public boolean hasUpgradedUnit(String baseUpgradeID) {
-        for(String tech : techs){
+        for (String tech : techs) {
             TechnologyModel model = Mapper.getTech(tech);
-            if(tech.equalsIgnoreCase(baseUpgradeID) || model.getBaseUpgrade().orElse("Bah").equalsIgnoreCase(baseUpgradeID)){
+            if (tech.equalsIgnoreCase(baseUpgradeID) || model.getBaseUpgrade().orElse("Bah").equalsIgnoreCase(baseUpgradeID)) {
                 return true;
             }
         }
         return false;
     }
-
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
@@ -970,7 +969,7 @@ public class Player {
         int maxSOCount = getGame().getMaxSOCountPerPlayer();
         if (hasRelic("obsidian")) maxSOCount++;
         if (hasRelic("absol_obsidian")) maxSOCount++;
-        if(hasAbility("information_brokers")) maxSOCount++;
+        if (hasAbility("information_brokers")) maxSOCount++;
         return maxSOCount;
     }
 
@@ -2131,7 +2130,8 @@ public class Player {
             exhaustedPlanets.add(planet);
         }
         Game activeGame = getGame();
-        if(ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode() && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList().contains("attachment_nanoforge.png") && !getExhaustedPlanetsAbilities().contains(planet)){
+        if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode()
+            && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList().contains("attachment_nanoforge.png") && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
