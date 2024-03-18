@@ -2,9 +2,11 @@ package ti4.message;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +35,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -81,7 +84,31 @@ public class MessageHelper {
         gameName = StringUtils.substringBefore(gameName, "-");
         Game activeGame = GameManager.getInstance().getGame(gameName);
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions") && !messageText.contains("end of turn ability") && activeGame != null && activeGame.getUndoButton()) {
-			buttons.add(Button.secondary("ultimateUndo", "UNDO"));
+			File mapUndoDirectory = Storage.getMapUndoDirectory();
+            if (mapUndoDirectory == null) {
+                return;
+            }
+            if (!mapUndoDirectory.exists()) {
+                return;
+            }
+
+            String mapName = activeGame.getName();
+            String mapNameForUndoStart = mapName + "_";
+            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+            if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+                try {
+                    List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                        .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                        .map(fileName -> fileName.replace(Constants.TXT, ""))
+                        .map(Integer::parseInt).toList();
+                    int maxNumber = numbers.isEmpty() ? 0
+                        : numbers.stream().mapToInt(value -> value)
+                            .max().orElseThrow(NoSuchElementException::new);
+					buttons.add(Button.secondary("ultimateUndo_"+maxNumber, "UNDO"));
+				}catch (Exception e) {
+                    BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+                }
+			}
 		}
 		splitAndSent(messageText, channel, embeds, buttons);
 	}

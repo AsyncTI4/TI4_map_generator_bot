@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Game;
@@ -87,7 +88,12 @@ public class Undo extends GameSubcommandData{
                 undoFileToBeDeleted.delete();
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        }else{
+            ButtonHelper.findOrCreateThreadWithMessage(activeGame, activeGame.getName()+"-undo-log", sb.toString());
+        }
+        //MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
         GameManager.getInstance().deleteGame(activeGame.getName());
         GameManager.getInstance().addGame(gameToRestore);

@@ -109,7 +109,7 @@ public class ButtonHelperHeroes {
                 
             }
          }
-         buttons.add(Button.danger("deleteButtons", "Done moving to "+destination.getRepresentationForButtons(game,player)+" from "+origin.getRepresentationForButtons(game,player)));
+         buttons.add(Button.danger("deleteButtons", "Done moving to "+destination.getPosition()+" from "+origin.getPosition()));
          return buttons;
     }
 

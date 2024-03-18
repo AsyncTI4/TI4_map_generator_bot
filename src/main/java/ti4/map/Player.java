@@ -518,6 +518,80 @@ public class Player {
         return threadChannel;
     }
 
+    @JsonIgnore
+    public ThreadChannel getCardsInfoThreadWithoutCompletes() {
+        Game activeGame = getGame();
+        TextChannel actionsChannel = activeGame.getMainGameChannel();
+        if (activeGame.isFoWMode() || activeGame.isCommunityMode())
+            actionsChannel = (TextChannel) getPrivateChannel();
+        if (actionsChannel == null) {
+            actionsChannel = activeGame.getMainGameChannel();
+        }
+        if (actionsChannel == null) {
+            BotLogger.log(
+                "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
+                    + activeGame.getName());
+            return null;
+        }
+
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeGame.getName() + "-"
+            + getUserName().replaceAll("/", "");
+        if (activeGame.isFoWMode()) {
+            threadName = activeGame.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+        }
+
+        // ATTEMPT TO FIND BY ID
+        String cardsInfoThreadID = getCardsInfoThreadID();
+        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank()
+            && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
+        try {
+            if (hasCardsInfoThreadId) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
+                if (threadChannel != null)
+                    return threadChannel;
+
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: "
+                + cardsInfoThreadID + " for potential thread name: " + threadName, e);
+        }
+
+        // ATTEMPT TO FIND BY NAME
+        try {
+            if (hasCardsInfoThreadId) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
+                if (threadChannel != null)
+                    return threadChannel;
+
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log(
+                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName,
+                e);
+        }
+
+        return null;
+    }
+
     public void setUserID(String userID) {
         this.userID = userID;
     }

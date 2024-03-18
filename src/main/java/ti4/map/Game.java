@@ -115,7 +115,7 @@ public class Game {
     @ExportableField
     private boolean allianceMode;
     @ExportableField
-    private boolean homeBrew;
+    private boolean homeBrew = false;
     @ExportableField
     private boolean fowMode;
     @ExportableField
@@ -1639,8 +1639,13 @@ public class Game {
             }
         }
 
-        if (round > 1 && discardAgendas.size() > 1) {
+        if (round > 1 && discardAgendas.size() > 0) {
             custodiansTaken = true;
+        }
+        for(Player p : getRealPlayers()){
+            if(p.getPlanets().contains("mr")){
+                return true;
+            }
         }
         return custodiansTaken;
     }
