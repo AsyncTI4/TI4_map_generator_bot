@@ -1029,6 +1029,10 @@ public class MapGenerator {
                 drawPAImage(x + deltaX, y, "pa_relics_icon.png");
             }
 
+            // drawPAImage(x + deltaX, y, relicFileName);
+            if (relicID.contains("quantumcore")) {
+                drawPAImage(x + deltaX, y, "pa_tech_techicons_multicolorry" + relicStatus + ".png");
+            }
             drawPAImage(x + deltaX, y, relicFileName);
             deltaX += 48 + extraAxisOrderWidth;
         }
