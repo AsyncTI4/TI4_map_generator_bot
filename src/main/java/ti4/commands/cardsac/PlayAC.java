@@ -476,9 +476,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success(
                         player.getFinsFactionCheckerPrefix() + "resolveDecoyOperationStep1_" + game.getActiveSystem(),
                         "Resolve " + codedName));
-                if(game.getActiveSystem().isEmpty()){
+                if (game.getActiveSystem().isEmpty()) {
                     MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
-                }else{
+                } else{
                     MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
                 }
             }
@@ -600,7 +600,6 @@ public class PlayAC extends ACCardsSubcommandData {
             }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
-
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
                         "Please indicate no afters again.", game, afterButtons, "after");
@@ -608,10 +607,10 @@ public class PlayAC extends ACCardsSubcommandData {
                 game.setLastActivePlayerPing(newTime);
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
-                if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction")) {
+                if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
-                            "Please select your rider target", game, player, riderButtons);
+                            "Please select your prediction target", game, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election")) {
                     game.setHackElectionStatus(true);
