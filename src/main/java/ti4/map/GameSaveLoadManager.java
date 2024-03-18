@@ -212,7 +212,11 @@ public class GameSaveLoadManager {
                     } else {
                         sb.append(loadedGame.getLatestCommand());
                     }
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                    if(activeGame.isFoWMode()){
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                    }else{
+                        ButtonHelper.findOrCreateThreadWithMessage(activeGame, mapName+"-undo-log", sb.toString());
+                    }
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
                             // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting to regenerate buttons:");

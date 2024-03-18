@@ -32,6 +32,8 @@ import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -77,6 +79,7 @@ import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -2948,7 +2951,7 @@ public class ButtonHelper {
             if(exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1){
                 event.getMessage().delete().queue();
             }else{
-                if((buttons == 1 && id.equalsIgnoreCase("deleteButtons")) ||(buttons == 2 && id.equalsIgnoreCase("deleteButtons") && id2.equalsIgnoreCase("ultimateUndo"))){
+                if((buttons == 1 && id.contains("deleteButtons")) ||(buttons == 2 && id.contains("deleteButtons") && id2.contains("ultimateUndo"))){
                     event.getMessage().delete().queue();
                 }else{
                     event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
@@ -2957,6 +2960,32 @@ public class ButtonHelper {
         } else {
             event.getMessage().delete().queue();
         }
+    }
+
+    public static void findOrCreateThreadWithMessage(Game activeGame, String threadName, String message){
+        MessageChannel channel = activeGame.getMainGameChannel();
+        Helper.checkThreadLimitAndArchive(activeGame.getGuild());
+        TextChannel textChannel = (TextChannel)channel;
+        // Use existing thread, if it exists
+        for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
+            if (threadChannel_.getName().equals(threadName)) {
+                MessageHelper.sendMessageToChannel(threadChannel_, message);
+                return;
+            }
+        }
+        final String finalThreadName = threadName;
+        List<ThreadChannel> hiddenThreadChannels = textChannel.retrieveArchivedPublicThreadChannels().complete();
+        for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+                MessageHelper.sendMessageToChannel(threadChannel_, message);
+                return;
+            }
+        }
+        channel.sendMessage("New Thread for "+threadName).queue(m -> {
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message));
+        });
     }
 
     public static void saveButtons(ButtonInteractionEvent event, Game game, Player player) {
@@ -2979,7 +3008,7 @@ public class ButtonHelper {
         }
 
         for (Button button : buttons) {
-            if (button.getId() == null || "ultimateUndo".equalsIgnoreCase(button.getId())) {
+            if (button.getId() == null || button.getId().contains("ultimateUndo")) {
                 continue;
             }
             String builder = player.getFaction() + ";" + button.getId() + ";" + button.getLabel() + ";"
@@ -5377,7 +5406,6 @@ public class ButtonHelper {
         }
         buttons.add(Button.primary("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
         buttons.add(Button.danger("deleteButtons", "Dont roll anything"));
-        buttons.add(Button.secondary("ultimateUndo", "UNDO"));
         deleteTheOneButton(event);
         String message = player.getRepresentation()
                 + " select the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed";
@@ -5401,7 +5429,6 @@ public class ButtonHelper {
         }
         buttons.add(Button.primary("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
         buttons.add(Button.danger("deleteButtons", "Dont roll anything"));
-        buttons.add(Button.secondary("ultimateUndo", "UNDO"));
         String id = buttonID.replace("setForThalnos_", "");
         game.setSpecificThalnosUnit(id, game.getSpecificThalnosUnit(id) + 1);
 

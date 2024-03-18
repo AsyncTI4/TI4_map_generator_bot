@@ -69,6 +69,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.*;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -186,7 +187,7 @@ public class ButtonListener extends ListenerAdapter {
             ident = player.getFactionEmoji();
         }
 
-        if (activeGame != null && !"ultimateundo".equalsIgnoreCase(buttonID)
+        if (activeGame != null && !buttonID.contains("ultimateUndo")
                 && !"showGameAgain".equalsIgnoreCase(buttonID) && !"no_sabotage".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
@@ -1767,6 +1768,22 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveSARMechStep1(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("sarMechStep2_")) {
             ButtonHelper.resolveSARMechStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("integratedBuild_")) {
+            String planet = buttonID.split("_")[1];
+            Tile tile = activeGame.getTileFromPlanet(planet);
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            int resources = 0;
+            if(uH instanceof Planet plan){
+                resources = plan.getResources();
+            }
+            List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "integrated"+planet, "place");
+            String message = player.getRepresentation()
+                    + " Using Integrated Economy on "+Helper.getPlanetRepresentation(planet, activeGame)+". Use the buttons to produce units with a combined cost up to the planet ("+resources+") resources.\n"
+                    + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units",
+                    buttons);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("deployMykoSD_")) {
             ButtonHelperFactionSpecific.deployMykoSD(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("jrResolution_")) {
@@ -2497,6 +2514,45 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("componentActionRes_")) {
             ButtonHelper.resolvePressedCompButton(activeGame, player, event, buttonID);
             event.getMessage().delete().queue();
+
+        } else if (buttonID.startsWith("ultimateUndo_")) {
+            if (activeGame.getSavedButtons().size() > 0) {
+                String buttonString = activeGame.getSavedButtons().get(0);
+                if (activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
+                    if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0])) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
+                                "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
+                                        + activeGame.getLatestCommand());
+                        return;
+                    }
+                }
+            }
+            String highestNumBefore = buttonID.split("_")[1];
+            File mapUndoDirectory = Storage.getMapUndoDirectory();
+            if (mapUndoDirectory == null) {
+                return;
+            }
+            if (!mapUndoDirectory.exists()) {
+                return;
+            }
+            String mapName = activeGame.getName();
+            String mapNameForUndoStart = mapName + "_";
+            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+            if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+                List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                    .map(fileName -> fileName.replace(Constants.TXT, ""))
+                    .map(Integer::parseInt).toList();
+                int maxNumber = numbers.isEmpty() ? 0
+                    : numbers.stream().mapToInt(value -> value)
+                        .max().orElseThrow(NoSuchElementException::new);
+                if(highestNumBefore.equalsIgnoreCase((maxNumber)+"")){
+                    event.getMessage().delete().queue();
+                }
+            }
+            
+            GameSaveLoadManager.undo(activeGame, event);
+            
         } else if (buttonID.startsWith("addIonStorm_")) {
             String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
             Tile tile = activeGame.getTileByPosition(pos);
@@ -4557,9 +4613,7 @@ public class ButtonListener extends ListenerAdapter {
                             }
                         }
                     }
-
                     GameSaveLoadManager.undo(activeGame, event);
-
                     if ("action".equalsIgnoreCase(activeGame.getCurrentPhase())
                             || "agendaVoting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                         if (!event.getMessage().getContentRaw().contains(finsFactionCheckerPrefix)) { 
@@ -4823,19 +4877,18 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 ButtonHelper.checkACLimit(activeGame, event, player);
                 event.getMessage().delete().queue();
-                for (Player p2 : activeGame.getRealPlayers()) {
-                    if (p2.hasUnexhaustedLeader("cymiaeagent")) {
-                        List<Button> buttons2 = new ArrayList<>();
-                        Button hacanButton = Button
-                                .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
-                                .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
-                        buttons2.add(hacanButton);
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                ButtonHelper.getCorrectChannel(p2, activeGame),
-                                p2.getRepresentation(true, true) + " you can use Cymiae agent to make "+ButtonHelper.getIdentOrColor(player, activeGame)+"draw an AC",
-                                buttons2);
-                    }
+                if (player.hasUnexhaustedLeader("cymiaeagent")) {
+                    List<Button> buttons2 = new ArrayList<>();
+                    Button hacanButton = Button
+                            .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
+                            .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                    buttons2.add(hacanButton);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            ButtonHelper.getCorrectChannel(player, activeGame),
+                            player.getRepresentation(true, true) + " you can use Cymiae agent to make yourself draw an AC",
+                            buttons2);
                 }
+                
                 if ("Action".equalsIgnoreCase(Mapper.getActionCard(acID).getWindow())) {
                     
                     for (Player p2 : activeGame.getRealPlayers()) {
@@ -4996,7 +5049,7 @@ public class ButtonListener extends ListenerAdapter {
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
                     buttons.add(sar);
                 }
@@ -5006,18 +5059,18 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(sar);
                 }
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
-                        && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander To Gain a TG");
                     buttons.add(sar2);
                 }
                 if (ButtonHelper.getNumberOfUnitUpgrades(player) > 0 && player.hasTechReady("aida")
-                        && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button aiDEVButton = Button.danger("exhaustTech_aida",
                             "Exhaust AIDEV (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)");
                     buttons.add(aiDEVButton);
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button sarweenButton = Button.danger("useTech_st", "Use Sarween");
                     buttons.add(sarweenButton);
                 }
@@ -5030,13 +5083,13 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(sarweenButton);
                 }
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent")
                             .withEmoji(Emoji.fromFormatted(Emojis.Winnu));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button
                             .danger("exhaustAgent_gledgeagent_" + player.getFaction(), "Use Gledge Agent")
                             .withEmoji(Emoji.fromFormatted(Emojis.gledge));
@@ -5062,7 +5115,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(winnuButton);
                 }
                 if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button hacanButton = Button.danger("purgeHacanHero", "Purge Hacan Hero")
                             .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
                     buttons.add(hacanButton);

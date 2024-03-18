@@ -178,14 +178,7 @@ public class PlanetAdd extends PlanetAddRemove {
             String msg2 = player.getRepresentation(true, true) + " you can produce 1 ship in the system due to Free Systems Commander";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
-        if (((activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
-            && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
-            List<Button> saarButton = new ArrayList<>();
-            saarButton.add(Button.success("saarMechRes_" + planet, "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
-            saarButton.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
-        }
+       
         if (activeGame.getActivePlayer() == player && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("cymiaeCommanderRes_" + planet, "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
@@ -222,6 +215,23 @@ public class PlanetAdd extends PlanetAddRemove {
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = ButtonHelper.getIdent(player)+" Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+            }
+        }
+        if (((activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+        && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
+            List<Button> saarButton = new ArrayList<>();
+            saarButton.add(Button.success("saarMechRes_" + planet, "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
+            saarButton.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
+        }
+        if(player.hasTech("ie") && unitHolder instanceof Planet plan){
+            if(plan.getResources() > 0) {
+                String message = ButtonHelper.getIdent(player)+" Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, activeGame);
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.primary("integratedBuild_"+planet, "Integrated on "+Helper.getPlanetRepresentation(planet, activeGame)));
+                buttons.add(Button.danger("deleteButtons","Decline"));
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
             }
         }
         if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
