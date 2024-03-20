@@ -8487,7 +8487,7 @@ public class ButtonHelper {
             }
         }
 
-        if (!firstPart.contains("ability") && !firstPart.contains("getRelic")) {
+        if (!firstPart.contains("ability") && !firstPart.contains("getRelic") && !firstPart.contains("pn")) {
             serveNextComponentActionButtons(event, game, p1);
         }
     }
@@ -8985,6 +8985,10 @@ public class ButtonHelper {
                         purgeFragButtons);
             }
         }
+        if (pnText.contains("Action:")) {
+            serveNextComponentActionButtons(event, game, player);
+        }
+
     }
 
     public static void offerSpeakerButtons(Game game, Player player) {
