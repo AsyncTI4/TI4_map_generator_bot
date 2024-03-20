@@ -354,6 +354,9 @@ public class TurnStart extends PlayerSubcommandData {
         // startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, activeGame,
         // false));
         // }
+        if (!doneActionThisTurn && activeGame.isFoWMode()) {
+            startButtons.add(Button.secondary("showGameAgain", "Show Game"));
+        }
 
         return startButtons;
     }
