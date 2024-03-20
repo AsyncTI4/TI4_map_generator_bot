@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -45,6 +46,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -531,6 +533,21 @@ public class ButtonHelperHeroes {
         event.getMessage().delete().queue();
         String planet = buttonID.split("_")[1];
         String attachment = buttonID.replace("attachAttachment_" + planet + "_", "");
+        String planetID = planet;
+        Tile tile = game.getTileFromPlanet(planet);
+        PlanetModel planetInfo = Mapper.getPlanet(planetID);
+        if (Optional.ofNullable(planetInfo).isPresent()) {
+            if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0
+                    || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
+                if ((attachment.equals(Constants.WARFARE) ||
+                        attachment.equals(Constants.PROPULSION) ||
+                        attachment.equals(Constants.CYBERNETIC) ||
+                        attachment.equals(Constants.BIOTIC) ||
+                        attachment.equals(Constants.WEAPON))) {
+                    attachment = attachment + "stat";
+                }
+            }
+        }
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         uH.addToken("attachment_" + attachment + ".png");
         String msg = player.getRepresentation(true, true) + " put " + attachment + " on "
@@ -1476,13 +1493,13 @@ public class ButtonHelperHeroes {
 
     public static void resolveCymiaeHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event,
             String buttonID) {
-        String acID = buttonID.split("_")[1];
+        String acID = buttonID.replace("cymiaeHeroStep2_", "");
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             if (activeGame.isFoWMode()) {
-                buttons.add(Button.secondary("cymiaeHeroStep3_" + acID + "_" + p2.getFaction(), p2.getColor()));
+                buttons.add(Button.secondary("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, p2.getColor()));
             } else {
-                Button button = Button.secondary("cymiaeHeroStep3_" + acID + "_" + p2.getFaction(), " ");
+                Button button = Button.secondary("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1497,8 +1514,8 @@ public class ButtonHelperHeroes {
 
     public static void resolveCymiaeHeroStep3(Player player, Game activeGame, ButtonInteractionEvent event,
             String buttonID) {
-        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
-        String acID = buttonID.split("_")[1];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String acID = buttonID.replace("cymiaeHeroStep3_" + p2.getFaction() + "_", "");
         boolean picked = activeGame.pickActionCard(p2.getUserID(), activeGame.getDiscardActionCards().get(acID));
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
