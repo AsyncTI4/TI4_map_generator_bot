@@ -3364,6 +3364,9 @@ public class MapGenerator {
             BorderAnomalyModel.BorderAnomalyType decorationType) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
+        if (decorationType == null) {
+            return;
+        }
         BufferedImage borderDecorationImage;
         try {
             BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
