@@ -55,12 +55,12 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                .filter(file -> !file.isDirectory())
-                .toList());
+                    .filter(file -> !file.isDirectory())
+                    .toList());
         }
         files.addAll(Stream.of(new File(resourcePath).listFiles())
-            .filter(file -> !file.isDirectory())
-            .toList());
+                .filter(file -> !file.isDirectory())
+                .toList());
 
         files.forEach(file -> {
             try {
@@ -81,18 +81,18 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                .filter(file -> !file.isDirectory())
-                .toList());
+                    .filter(file -> !file.isDirectory())
+                    .toList());
         }
         files.addAll(Stream.of(new File(resourcePath).listFiles())
-            .filter(file -> !file.isDirectory())
-            .toList());
+                .filter(file -> !file.isDirectory())
+                .toList());
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
             } catch (Exception e) {
-                BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
     }
