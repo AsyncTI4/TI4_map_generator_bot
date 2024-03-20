@@ -1303,7 +1303,7 @@ public class ButtonHelperModifyUnits {
             } else {
                 spaceOrPlanet = "space";
                 tile = activeGame.getTileByPosition(planetName);
-                String producedInput = unit.replace("2", "") + "_" + activeGame.getTile(tile.getPosition()) + "_"
+                String producedInput = unit.replace("2", "") + "_" + tile.getPosition() + "_"
                         + spaceOrPlanet;
                 player.produceUnit(producedInput);
                 if ("2ff".equalsIgnoreCase(unitLong)) {
@@ -1343,10 +1343,9 @@ public class ButtonHelperModifyUnits {
                             unit, activeGame);
                     successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
-                    Tile tile2 = activeGame.getTileByPosition(planetName);
                     if (player.hasAbility("cloaked_fleets")) {
                         List<Button> shroadedFleets = new ArrayList<>();
-                        shroadedFleets.add(Button.success("cloakedFleets_" + tile2.getPosition() + "_" + unit + "",
+                        shroadedFleets.add(Button.success("cloakedFleets_" + tile.getPosition() + "_" + unit + "",
                                 "Capture 1 " + ButtonHelper.getUnitName(unit)));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
