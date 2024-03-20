@@ -535,7 +535,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // Derive a category name logically
-        int maxGamesPerCategory = GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
+        int maxGamesPerCategory = Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
