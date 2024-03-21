@@ -1,6 +1,7 @@
 package ti4.commands.bothelper;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,17 +24,21 @@ public class GameStats extends BothelperSubcommandData {
         int hostedGames = 0;
         int roomForGames = 0;
         
+        List<Guild> guilds = AsyncTI4DiscordBot.guilds.stream()
+                .filter(g -> !skipGuilds.contains(g.getId()))
+                .sorted(Comparator.comparing(Guild::getIdLong)) // Sort by creation date
+                .toList();
+        
         StringBuilder sb = new StringBuilder();
         sb.append("## __Server Game Statistics__\n");
-        for (Guild guild : AsyncTI4DiscordBot.guilds) {
-            if (skipGuilds.contains(guild.getId())) continue;
-
+        for (Guild guild : guilds) {
             sb.append("**").append(guild.getName()).append("**\n");
             int roleCount = guild.getRoles().size(); //250
             int guildRoomForGames = 250 - roleCount;
             int channelCount = guild.getChannels().size(); //500
             guildRoomForGames = Math.min(guildRoomForGames, (500 - channelCount)/2);
-            long gameCount = GameManager.getInstance().getGameNameToGame().values().stream().filter(g -> g.getGuild() != null && g.getGuild().getId().equals(guild.getId())).count();
+            long gameCount = GameManager.getInstance().getGameNameToGame().values().stream()
+                    .filter(g -> g.getGuild() != null && g.getGuild().getId().equals(guild.getId())).count();
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
             hostedGames += gameCount;
