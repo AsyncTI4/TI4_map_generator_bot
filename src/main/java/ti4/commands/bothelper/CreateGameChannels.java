@@ -554,9 +554,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // ADD LEADER NAME TO CATEGORY NAME FOR FUN
-        List<LeaderModel> leaders = new ArrayList<>(Mapper.getLeaders().values());
-        Collections.shuffle(leaders);
-        if (!leaders.isEmpty()) categoryName = categoryName + " - " + leaders.get(0).getName();
+        // List<LeaderModel> leaders = new ArrayList<>(Mapper.getLeaders().values());
+        // Collections.shuffle(leaders);
+        // if (!leaders.isEmpty()) categoryName = categoryName + " - " + leaders.get(0).getName();
 
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
         EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
