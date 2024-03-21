@@ -7,7 +7,10 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
 
 public class ChangeUnitDecal extends PlayerSubcommandData {
     public ChangeUnitDecal() {
@@ -39,9 +42,20 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
             player.setDecalSet(null);
             return;
         }
+        if (!userMayUseDecal(player.getUserID(), newDecalSet)) {
+            sendMessage("This decal set may only be used by specific players.");
+            return;
+        }
 
         player.setDecalSet(newDecalSet);
         sendMessage(player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
+    }
+
+    public static boolean userMayUseDecal(String userID, String decalID) {
+        return switch (decalID) {
+            case "cb_10" -> userID.equals("228999251328368640");
+            default -> true;
+        };
     }
 
     @Override
