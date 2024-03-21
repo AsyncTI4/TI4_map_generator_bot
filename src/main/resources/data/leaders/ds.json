@@ -645,7 +645,7 @@
         "title": "High Inquisitor",
         "abilityWindow": "During combat:",
         "abilityText": "When 1 or more of your damaged units make a combat roll, up to 2 of those units may roll an additional combat die.",
-        "unlockCondition": "Have units in 2 different non-home anomalies.",
+        "unlockCondition": "Have units in 2 different non-home anomalies. [Note, different means different types of anomaly, i.e. cannot be unlockeed via 2 asteroid fields]",
         "source": "ds"
     },
     {

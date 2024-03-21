@@ -51,7 +51,7 @@
     {
         "alias": "absol_quantumcore",
         "name": "Quantumcore",
-        "text": "[Cybernetic][Warfare] After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10.",
+        "text": "Gain the following tech immediately: [Cybernetic][Warfare] After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10. [Note, this synergizes with absol plasma scoring]",
         "source": "absol",
         "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*"
     },

@@ -135,14 +135,14 @@ public class HeroPlay extends LeaderAction {
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);
                 ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
-            }else{
-                msg ="Leader " + playerLeader.getId() + " was used to copy a hero";
+            } else {
+                msg = "Leader " + playerLeader.getId() + " was used to copy a hero";
             }
 
             if (purged) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         msg);
-                
+
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Leader was not purged - something went wrong");
@@ -215,6 +215,16 @@ public class HeroPlay extends LeaderAction {
             case "lanefirhero" -> {
                 ButtonHelperHeroes.resolveLanefirHeroStep1(player, activeGame);
             }
+            case "cymiaehero" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(
+                        Button.success("cymiaeHeroStep1_" + (activeGame.getRealPlayers().size() + 1), "Resolve Hero"));
+                buttons.add(Button.primary("cymiaeHeroAutonetic", "Resolve Autonetic Memory first"));
+
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        player.getRepresentation() + " choose whether to resolve autonetic memory or not", buttons);
+
+            }
             case "lizhohero" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                         "You can use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters",
@@ -229,7 +239,7 @@ public class HeroPlay extends LeaderAction {
                     }
                 }
             }
-            case "cheiranhero"->{
+            case "cheiranhero" -> {
                 ButtonHelperHeroes.cheiranHeroResolution(player, activeGame, event);
             }
             case "olradinhero" -> {

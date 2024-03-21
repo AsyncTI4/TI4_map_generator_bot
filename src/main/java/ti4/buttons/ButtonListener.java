@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -161,7 +163,7 @@ public class ButtonListener extends ListenerAdapter {
             if (player != null && !player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton)
                     && !buttonLabel.toLowerCase().contains(factionWhoIsUp)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "To " + player.getFactionEmoji()
-                        + ": you are not the faction who these buttons are meant for.");
+                        + ": these buttons are for someone else");
                 return;
             }
         }
@@ -279,8 +281,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.executeCabalHero(buttonID, player, activeGame, event);
         } else if (buttonID.startsWith("creussMechStep1_")) {
             ButtonHelperFactionSpecific.creussMechStep1(activeGame, player);
+        } else if (buttonID.startsWith("nivynMechStep1_")) {
+            ButtonHelperFactionSpecific.nivynMechStep1(activeGame, player);
         } else if (buttonID.startsWith("creussMechStep2_")) {
             ButtonHelperFactionSpecific.creussMechStep2(activeGame, player, buttonID, event);
+        } else if (buttonID.startsWith("nivynMechStep2_")) {
+            ButtonHelperFactionSpecific.nivynMechStep2(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("creussMechStep3_")) {
             ButtonHelperFactionSpecific.creussMechStep3(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("creussIFFStart_")) {
@@ -1011,13 +1017,33 @@ public class ButtonListener extends ListenerAdapter {
                     activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     trueIdentity + " Use buttons to resolve", buttons);
-            // ("autoneticMemoryStep2
         } else if (buttonID.startsWith("codexCardPick_")) {
             ButtonHelper.deleteTheOneButton(event);
             ButtonHelper.pickACardFromDiscardStep1(activeGame, player);
 
         } else if (buttonID.startsWith("pickFromDiscard_")) {
             ButtonHelper.pickACardFromDiscardStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("cymiaeHeroStep2_")) {
+            ButtonHelperHeroes.resolveCymiaeHeroStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("cymiaeHeroStep3_")) {
+            ButtonHelperHeroes.resolveCymiaeHeroStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("cymiaeHeroAutonetic")) {
+            List<Button> buttons = new ArrayList<>();
+            String msg2 = ButtonHelper.getIdent(player) + " is choosing to resolve their Autonetic Memory ability";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+            buttons.add(Button.success("autoneticMemoryStep3a", "Pick A Card From the Discard"));
+            buttons.add(Button.primary("autoneticMemoryStep3b", "Drop an infantry"));
+            String msg = player.getRepresentation(true, true)
+                    + " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+            buttons = new ArrayList<>();
+            buttons.add(
+                    Button.success("cymiaeHeroStep1_" + (activeGame.getRealPlayers().size()), "Resolve Hero"));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    player.getRepresentation() + " resolve hero after doing autonetic memory steps", buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("cymiaeHeroStep1_")) {
+            ButtonHelperHeroes.resolveCymiaeHeroStart(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("autoneticMemoryStep2_")) {
             ButtonHelperAbilities.autoneticMemoryStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("autoneticMemoryDecline_")) {
@@ -1249,8 +1275,9 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     message = "Tried to play a sabo but found none in hand.";
                     sendReact = false;
-                    MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(),
-                            "Someone clicked the AC sabo button but did not have a sabo in hand.");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                            player.getRepresentation()
+                                    + " You clicked the AC sabo button but did not have a sabo in hand.");
                 }
             }
 
@@ -1356,6 +1383,9 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         } else if (buttonID.startsWith("combatRoll_")) {
             ButtonHelper.resolveCombatRoll(player, activeGame, event, buttonID);
+            if (buttonID.contains("bombard")) {
+                ButtonHelper.deleteTheOneButton(event);
+            }
         } else if (buttonID.startsWith("transitDiodes_")) {
             ButtonHelper.resolveTransitDiodesStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("novaSeed_")) {
@@ -1805,7 +1835,8 @@ public class ButtonListener extends ListenerAdapter {
                     + ") resources.\n"
                     + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units",
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    "Produce Units",
                     buttons);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("deployMykoSD_")) {
@@ -2263,6 +2294,9 @@ public class ButtonListener extends ListenerAdapter {
             new PlanetExhaustAbility().resolvePrismStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("showDeck_")) {
             ButtonHelper.resolveDeckChoice(activeGame, event, buttonID, player);
+        } else if (buttonID.startsWith("unlockCommander_")) {
+            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, buttonID.split("_")[1], event);
         } else if (buttonID.startsWith("setForThalnos_")) {
             ButtonHelper.resolveSetForThalnos(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("rollThalnos_")) {
@@ -2826,7 +2860,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = player.getRepresentation()
                             + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system. "
                             + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame) + "\n"
-                            + "The bot believes you have " + val + " PRODUCTION value in this system";
+                            + "You have " + val + " PRODUCTION value in this system";
                     if (val > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                         message = message
                                 + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit";
@@ -5105,7 +5139,13 @@ public class ButtonListener extends ListenerAdapter {
             }
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
-
+                MessageHistory mHistory = event.getChannel().getHistory();
+                RestAction<List<Message>> lis = mHistory.retrievePast(3);
+                Message previousM = lis.complete().get(1);
+                System.out.println(previousM.getContentRaw());
+                if (previousM.getContentRaw().contains("You have available to you")) {
+                    previousM.delete().queue();
+                }
                 player.setTotalExpenses(
                         player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, activeGame, true));
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";

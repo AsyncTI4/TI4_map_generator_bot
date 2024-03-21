@@ -45,7 +45,8 @@ public class Planet extends UnitHolder {
             originalPlanetType = planetInfo.getPlanetType().toString();
             contrastColor = planetInfo.getContrastColor().orElse("");
             if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
-                originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); //TODO: Make this support multiple specialties
+                originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); // TODO: Make this support
+                                                                                            // multiple specialties
             if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
                 hasAbility = true;
         }
@@ -70,16 +71,17 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean hasAttachment() {
-        return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
+        return tokenList.stream().anyMatch(
+                token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
     }
 
     @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-            .map(UnitKey::asyncID)
-            .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
-            .filter(Objects::nonNull)
-            .anyMatch(UnitModel::getIsGroundForce);
+                .map(UnitKey::asyncID)
+                .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+                .filter(Objects::nonNull)
+                .anyMatch(UnitModel::getIsGroundForce);
     }
 
     @Override
@@ -216,7 +218,9 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public Set<String> getTechSpecialities() {
         Set<String> specialties = new HashSet<>();
-        specialties.add(originalTechSpeciality);
+        if (originalTechSpeciality != null && !originalTechSpeciality.isEmpty()) {
+            specialties.add(originalTechSpeciality);
+        }
         specialties.addAll(techSpeciality);
         return specialties;
     }
@@ -229,8 +233,10 @@ public class Planet extends UnitHolder {
     public boolean isLegendary() {
         for (String token : tokenList) {
             AttachmentModel attachment = Mapper.getAttachmentInfo(token);
-            if (attachment == null) continue;
-            if (attachment.isLegendary()) return true;
+            if (attachment == null)
+                continue;
+            if (attachment.isLegendary())
+                return true;
         }
         return hasAbility;
     }

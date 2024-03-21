@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.custom.PeakAtStage1;
@@ -44,6 +46,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -530,6 +533,21 @@ public class ButtonHelperHeroes {
         event.getMessage().delete().queue();
         String planet = buttonID.split("_")[1];
         String attachment = buttonID.replace("attachAttachment_" + planet + "_", "");
+        String planetID = planet;
+        Tile tile = game.getTileFromPlanet(planet);
+        PlanetModel planetInfo = Mapper.getPlanet(planetID);
+        if (Optional.ofNullable(planetInfo).isPresent()) {
+            if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0
+                    || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
+                if ((attachment.equals(Constants.WARFARE) ||
+                        attachment.equals(Constants.PROPULSION) ||
+                        attachment.equals(Constants.CYBERNETIC) ||
+                        attachment.equals(Constants.BIOTIC) ||
+                        attachment.equals(Constants.WEAPON))) {
+                    attachment = attachment + "stat";
+                }
+            }
+        }
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         uH.addToken("attachment_" + attachment + ".png");
         String msg = player.getRepresentation(true, true) + " put " + attachment + " on "
@@ -640,7 +658,8 @@ public class ButtonHelperHeroes {
         }
         Integer poIndex = game
                 .addCustomPO("Tnelis Hero (" + Mapper.getSecretObjectivesJustNames().get(soID) + ")", 1);
-        String sb = "Attached Tnelis Hero to an SO (" + Mapper.getSecretObjectivesJustNames().get(soID)
+        String sb = tnelis.getRepresentation() + " Attached Tnelis Hero to an SO ("
+                + Mapper.getSecretObjectivesJustNames().get(soID)
                 + "). This is represented in the bot as a custom PO (" + poIndex
                 + ") and should only be scored by them. This PO will be removed/changed automatically if the hero is attached to another SO via button.";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(tnelis, game), sb);
@@ -978,7 +997,7 @@ public class ButtonHelperHeroes {
                 player.getRepresentation(true, true) + " Use buttons to place a SD on a planet you control", buttons);
         List<Button> buttons2 = Helper.getPlaceUnitButtons(event, player, game, tile, "celdauriHero", "place");
         String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
-        String message3 = "The bot believes you have " + Helper.getProductionValue(player, game, tile, false)
+        String message3 = "You have " + Helper.getProductionValue(player, game, tile, false)
                 + " PRODUCTION value in this system\n";
         if (Helper.getProductionValue(player, game, tile, false) > 0
                 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
@@ -1454,6 +1473,67 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
         DiscordantStarsHelper.checkOlradinMech(game);
         event.getMessage().delete().queue();
+    }
+
+    public static void resolveCymiaeHeroStart(String buttonID, ButtonInteractionEvent event, Game activeGame,
+            Player player) {
+        String num = buttonID.split("_")[1];
+        int n = Integer.parseInt(num);
+        List<Button> buttons = new ArrayList<>();
+        for (int x = 0; x < n; x++) {
+            String acID = activeGame.drawActionCardAndDiscard();
+            String sb = Mapper.getActionCard(acID).getRepresentation() + "\n";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
+            buttons.add(Button.success("cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation() + " use the buttons to give out ACs to players", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveCymiaeHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event,
+            String buttonID) {
+        String acID = buttonID.replace("cymiaeHeroStep2_", "");
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, p2.getColor()));
+            } else {
+                Button button = Button.secondary("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation(true, true) + " tell the bot who you want to give "
+                        + Mapper.getActionCard(acID).getName(),
+                buttons);
+    }
+
+    public static void resolveCymiaeHeroStep3(Player player, Game activeGame, ButtonInteractionEvent event,
+            String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String acID = buttonID.replace("cymiaeHeroStep3_" + p2.getFaction() + "_", "");
+        boolean picked = activeGame.pickActionCard(p2.getUserID(), activeGame.getDiscardActionCards().get(acID));
+        if (!picked) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            return;
+        }
+        ACInfo.sendActionCardInfo(activeGame, p2, event);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                player.getRepresentation() + " gave " + Mapper.getActionCard(acID).getName() + " to "
+                        + p2.getRepresentation());
+        event.getMessage().delete().queue();
+        if (p2 != player) {
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                    "Cymiae hero gave " + Mapper.getActionCard(acID).getName()
+                            + " to you and you now have to discard an AC");
+            String msg = p2.getRepresentation(true, true) + " use buttons to discard";
+            List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, player, false);
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game game, Player player,

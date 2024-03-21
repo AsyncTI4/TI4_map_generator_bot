@@ -878,7 +878,7 @@ public class ButtonHelper {
                 buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "obsessivedesigns", "place");
                 int val = Helper.getProductionValue(player, game, tile, true);
                 String message2 = msg + getListOfStuffAvailableToSpend(player, game) + "\n"
-                        + "The bot believes you have " + val + " PRODUCTION value in this system";
+                        + "You have " + val + " PRODUCTION value in this system";
                 if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                     message2 = message2
                             + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit";
@@ -1433,6 +1433,15 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCardsInfoThread(),
                             cyberMessage, reverseButtons);
                 }
+            }
+            if (nonActivePlayer.ownsUnit("nivyn_mech")
+                    && getTilesOfPlayersSpecificUnits(game, nonActivePlayer, UnitType.Mech).contains(activeSystem)) {
+                Button nivynButton = Button.secondary("nivynMechStep1_", "Use Nivyn Mech")
+                        .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
+                Button decline = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Wound");
+                List<Button> buttons = List.of(nivynButton, decline);
+                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, game),
+                        ident + " use buttons to resolve potential wound ", buttons);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander")
                     && nonActivePlayer.hasProductionUnitInSystem(activeSystem)) {
@@ -2298,6 +2307,8 @@ public class ButtonHelper {
             case "yin" -> shouldBeUnlocked = true;
             case "florzen" -> shouldBeUnlocked = true;
             case "letnev" -> shouldBeUnlocked = true;
+            case "kortali" -> shouldBeUnlocked = true;
+            case "augers" -> shouldBeUnlocked = true;
             case "hacan" -> {
                 if (player.getTg() > 9) {
                     shouldBeUnlocked = true;
@@ -2893,7 +2904,7 @@ public class ButtonHelper {
             if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
                 event.getMessage().delete().queue();
             } else {
-                if ((buttons == 1 && id.contains("deleteButtons"))
+                if ((buttons == 1 && id.contains("deleteButtons")) || (buttons == 1 && id.contains("ultimateUndo"))
                         || (buttons == 2 && id.contains("deleteButtons") && id2.contains("ultimateUndo"))) {
                     event.getMessage().delete().queue();
                 } else {
@@ -3218,6 +3229,30 @@ public class ButtonHelper {
                     }
                 }
             }
+            for (Player p2 : game.getRealPlayers()) {
+                if (player.getAllianceMembers().contains(p2.getFaction())) {
+                    Map<UnitModel, Integer> unitsByQuantity2 = CombatHelper.GetAllUnits(capChecker, p2);
+                    for (UnitModel unit : unitsByQuantity2.keySet()) {
+                        if ("space".equalsIgnoreCase(capChecker.getName())) {
+                            capacity += unit.getCapacityValue() * unitsByQuantity2.get(unit);
+                        }
+                        // System.out.println(unit.getBaseType());
+                        if ("spacedock".equalsIgnoreCase(unit.getBaseType())
+                                && !"space".equalsIgnoreCase(capChecker.getName())) {
+                            if (p2.ownsUnit("cabal_spacedock")) {
+                                fightersIgnored += 6;
+                            } else if (p2.ownsUnit("cabal_spacedock2")) {
+                                fightersIgnored += 12;
+                            } else {
+                                if (!p2.hasUnit("mykomentori_spacedock") && !p2.hasUnit("mykomentori_spacedock2")) {
+                                    fightersIgnored += 3;
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
             if (capChecker.getUnitCount(UnitType.PlenaryOrbital, player.getColor()) > 0) {
                 fightersIgnored += 8;
                 fleetCap = fleetCap + 4;
@@ -3298,13 +3333,13 @@ public class ButtonHelper {
         String message = player.getRepresentation(true, true);
         if (fleetSupplyViolated) {
             message += " You are violating fleet supply in tile " + tile.getRepresentation()
-                    + ". Specifically, the bot believes you have " + fleetCap / 2
+                    + ". Specifically, you have " + fleetCap / 2
                     + " fleet supply, and that you currently are filling " + (numFighter2sFleet + numOfCapitalShips) / 2
                     + " of that. ";
         }
         if (capacityViolated) {
             message += " You are violating carrying capacity in tile " + tile.getRepresentation()
-                    + ". Specifically, the bot believes you have " + capacity
+                    + ". Specifically, you have " + capacity
                     + " capacity, and you are trying to carry "
                     + (numInfNFightersNMechs - numFighter2s) + " things";
         }
@@ -3875,8 +3910,9 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(),
                             pF + " found a " + name1 + " in " + tile.getRepresentation());
                 } else {
+                    String pF = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Found a " + name1 + " and in " + tile.getRepresentation());
+                            pF + "Found a " + name1 + " and in " + tile.getRepresentation());
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 String msg2 = "As a reminder of the text, the card reads as: \n";
@@ -4285,6 +4321,12 @@ public class ButtonHelper {
         if (player.ownsUnit("ghost_mech") && getNumberOfUnitsOnTheBoard(game, player, "mech") > 0) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech")
                     .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            buttons.add(ghostButton);
+        }
+        if ((player.ownsUnit("nivyn_mech") && getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
+                .contains(game.getTileByPosition(game.getActiveSystem()))) || player.ownsUnit("nivyn_mech2")) {
+            Button ghostButton = Button.secondary("nivynMechStep1_", "Use Nivyn Mech")
+                    .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
             buttons.add(ghostButton);
         }
         if (player.hasTech("dslihb") && !game.getTileByPosition(game.getActiveSystem()).isHomeSystem()) {
@@ -8018,8 +8060,11 @@ public class ButtonHelper {
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
-        List<String> fakePlanets = List.of("custodiavigilia", "ghoti");
-        List<String> ignoredPlanets = List.of("mr");
+        List<String> fakePlanets = new ArrayList<>();
+        fakePlanets.add("custodiavigilia");
+        fakePlanets.add("ghoti");
+        List<String> ignoredPlanets = new ArrayList<>();
+        ignoredPlanets.add("mr");
         ignoredPlanets.addAll(fakePlanets);
 
         for (String planet : player.getPlanets()) {
@@ -8229,7 +8274,8 @@ public class ButtonHelper {
                         buttons.add(Button.primary("thronePoint", "Score a secret someone else scored"));
                         buttons.add(Button.danger("deleteButtons", "Score one of your unscored secrets"));
                         MessageHelper.sendMessageToChannel(event.getChannel(), p1.getRepresentation()
-                                + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button");
+                                + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button",
+                                buttons);
 
                     }
                     if ("dynamiscore".equals(buttonID) || "absol_dynamiscore".equals(buttonID)) {
@@ -8441,7 +8487,7 @@ public class ButtonHelper {
             }
         }
 
-        if (!firstPart.contains("ability") && !firstPart.contains("getRelic")) {
+        if (!firstPart.contains("ability") && !firstPart.contains("getRelic") && !firstPart.contains("pn")) {
             serveNextComponentActionButtons(event, game, p1);
         }
     }
@@ -8730,6 +8776,9 @@ public class ButtonHelper {
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);
         }
+        if (id.equalsIgnoreCase("dspnolra")) {
+            ButtonHelperFactionSpecific.resolveOlradinPN(player, game, event);
+        }
         if ("terraform".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
         }
@@ -8936,6 +8985,10 @@ public class ButtonHelper {
                         purgeFragButtons);
             }
         }
+        if (pnText.contains("Action:")) {
+            serveNextComponentActionButtons(event, game, player);
+        }
+
     }
 
     public static void offerSpeakerButtons(Game game, Player player) {
