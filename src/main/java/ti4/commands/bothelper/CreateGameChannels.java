@@ -489,7 +489,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
         int channelMax = 500;
-        int channelsCountRequiredForNewCategory = 50;
+        int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                     + guild.getName() + "** currently has " + channelCount + " channels.");
