@@ -21,6 +21,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
+import ti4.commands.player.ChangeUnitDecal;
 import ti4.commands.statistics.GameStats.GameStatistics;
 import ti4.commands.statistics.PlayerStats;
 import ti4.generator.Mapper;
@@ -360,6 +361,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getDecals().stream()
                     .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
+                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userID, decalID))
                     .limit(25)
                     .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
                     .collect(Collectors.toList());

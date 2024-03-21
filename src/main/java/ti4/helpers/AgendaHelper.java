@@ -937,7 +937,7 @@ public class AgendaHelper {
         String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
         String voteMessage = "Click the buttons for next steps after you're done resolving riders.";
         String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
-        int aCount = 0;
+        int aCount;
         if (agendaCount.isEmpty()) {
             aCount = 1;
         } else {
@@ -950,10 +950,14 @@ public class AgendaHelper {
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+            if ("action_deck_2".equals(activeGame.getAcDeckID())) {
+                String acd2Shenanigans = "This is the window for *Last Minute Deliberations* and *Data Archive*! " + activeGame.getPing();
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), acd2Shenanigans);
+            }
         } else {
             activeGame.removeLaw(winner);
             activeGame.putAgendaBackIntoDeckOnTop(winner);
-            new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
+            RevealAgenda.revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
         }
 
         event.getMessage().delete().queue();
@@ -1516,21 +1520,34 @@ public class AgendaHelper {
         if (winner == null) {
             winner = getWinner(activeGame);
         }
-        List<Player> losers = getLosers(winner, activeGame);
         String summary2 = getSummaryOfVotes(activeGame, true);
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), summary2 + "\n \n");
         activeGame.setCurrentPhase("agendaEnd");
         activeGame.setActivePlayer(null);
+        String resMessage3 = "Current winner is " + StringUtils.capitalize(winner) + ". " + activeGame.getPing();
+        if (!"action_deck_2".equals(activeGame.getAcDeckID())) {
+            handleShenanigans(event, activeGame, winner);
+            resMessage3 += "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.";
+        }
+        Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with current winner");
+        Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
+        List<Button> resolutions = List.of(autoResolve, manualResolve);
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), resMessage3);
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Resolve", resolutions);
+    }
+
+    private static void handleShenanigans(GenericInteractionCreateEvent event, Game activeGame, String winner) {
+        List<Player> losers = getLosers(winner, activeGame);
         String resMessage = "You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans -- "
                 + losers.size()
                 + " players have the opportunity to play deadly plot.";
         if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot"))
-                && (losers.size() > 0 || activeGame.isAbsolMode())) {
+            && (losers.size() > 0 || activeGame.isAbsolMode())) {
             Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
             MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage,
-                    activeGame, deadlyActionRow, "shenanigans");
+                activeGame, deadlyActionRow, "shenanigans");
             // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
             // resMessage, deadlyActionRow);
             if (!activeGame.isFoWMode()) {
@@ -1541,51 +1558,38 @@ public class AgendaHelper {
                     }
                 }
                 event.getMessageChannel().sendMessage(loseMessage + " Please respond to bribery/deadly plot window")
-                        .queue();
+                    .queue();
             } else {
                 MessageHelper.privatelyPingPlayerList(losers, activeGame,
-                        "Please respond to bribery/deadly plot window");
+                    "Please respond to bribery/deadly plot window");
             }
         } else {
             String messageShen = "Either both bribery and deadly plot were in the discard or noone could legally play them.";
 
-            if (activeGame.getCurrentAgendaInfo().contains("Elect Player")
-                    && (!activeGame.isACInDiscard("Confounding") || !activeGame.isACInDiscard("Confusing"))) {
-
-            } else {
+            if (!activeGame.getCurrentAgendaInfo().contains("Elect Player") ||
+                (activeGame.isACInDiscard("Confounding") && activeGame.isACInDiscard("Confusing"))) {
                 messageShen = messageShen + " There are no shenanigans possible. Please resolve the agenda. ";
             }
             activeGame.getMainGameChannel().sendMessage(messageShen).queue();
         }
         if (activeGame.getCurrentAgendaInfo().contains("Elect Player")
-                && (!activeGame.isACInDiscard("Confounding") || !activeGame.isACInDiscard("Confusing"))) {
+            && (!activeGame.isACInDiscard("Confounding") || !activeGame.isACInDiscard("Confusing"))) {
             String resMessage2 = activeGame.getPing()
-                    + " please react to no confusing/confounding";
+                + " please react to no confusing/confounding";
             Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
             Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
             List<Button> buttons = List.of(noConfounding, noConfusing);
             // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
             // resMessage2, buttons);
             MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage2,
-                    activeGame, buttons, "shenanigans");
-
+                activeGame, buttons, "shenanigans");
         } else {
             if (activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
                 activeGame.getMainGameChannel()
-                        .sendMessage("Both confounding and confusing are in the discard pile. ").queue();
+                    .sendMessage("Both confounding and confusing are in the discard pile. ").queue();
 
             }
         }
-
-        String resMessage3 = "Current winner is " + StringUtils.capitalize(winner) + ". "
-                + activeGame.getPing()
-                + "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.";
-        Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with current winner");
-        Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
-        List<Button> deadlyActionRow3 = List.of(autoResolve, manualResolve);
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), resMessage3);
-        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Resolve", deadlyActionRow3);
-
     }
 
     public static void reverseRider(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
@@ -1939,7 +1943,7 @@ public class AgendaHelper {
                 }
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        (MessageChannel) ButtonHelper.getCorrectChannel(nextInLine, activeGame), message, buttons);
+                    ButtonHelper.getCorrectChannel(nextInLine, activeGame), message, buttons);
             }
             ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, activeGame);
         } else {
@@ -2695,7 +2699,7 @@ public class AgendaHelper {
             }
         }
         String editedMessage = Helper.buildSpentThingsMessageForVoting(player, activeGame, false);
-        editedMessage = AgendaHelper.getSummaryOfVotes(activeGame, true) + "\n\n" + editedMessage;
+        editedMessage = getSummaryOfVotes(activeGame, true) + "\n\n" + editedMessage;
         event.getMessage().editMessage(editedMessage).queue();
 
     }
