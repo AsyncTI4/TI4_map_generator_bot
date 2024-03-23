@@ -1585,7 +1585,9 @@ public class MapGenerator {
                 position.y -= (countOfUnits * 7);
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
-                    graphics.drawImage(decal, position.x, position.y + deltaY, null);
+                    if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                        graphics.drawImage(decal, position.x, position.y + deltaY, null);
+                    }
                     if (spoopy != null) {
                         graphics.drawImage(spoopy, position.x, position.y + deltaY, null);
                     }
@@ -3971,7 +3973,9 @@ public class MapGenerator {
                 }
 
                 tileGraphics.drawImage(unitImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
-                tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                    tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                }
                 if (spoopy != null) {
                     tileGraphics.drawImage(spoopy, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }

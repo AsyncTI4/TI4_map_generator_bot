@@ -478,7 +478,7 @@ public class PlayAC extends ACCardsSubcommandData {
                         "Resolve " + codedName));
                 if (game.getActiveSystem().isEmpty()) {
                     MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
-                } else{
+                } else {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
                 }
             }
