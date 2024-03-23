@@ -94,7 +94,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
-                sendMessage("Category could not be automatically determined. Please provide a category name for this game.");
+                sendMessage(
+                        "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
             List<Category> categories = getAllAvailablePBDCategories();
@@ -237,9 +238,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-                .complete();
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName).complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
@@ -455,7 +454,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return guild;
         }
 
-        BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
+        BotLogger.log(
+                "`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
         return null;
     }
 
@@ -489,7 +489,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
         int channelMax = 500;
-        int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+        int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25,
+                GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                     + guild.getName() + "** currently has " + channelCount + " channels.");
@@ -525,7 +526,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         for (Category category : getAllAvailablePBDCategories()) {
             try {
                 int lowerBound = Integer.parseInt(StringUtils.substringBetween(category.getName(), "PBD #", "-"));
-                int upperBound = Integer.parseInt(StringUtils.substringBefore(StringUtils.substringAfter(category.getName(), "-"), " "));
+                int upperBound = Integer.parseInt(
+                        StringUtils.substringBefore(StringUtils.substringAfter(category.getName(), "-"), " "));
                 if (lowerBound <= gameNumber && gameNumber <= upperBound) {
                     return category.getName();
                 }
@@ -535,7 +537,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // Derive a category name logically
-        int maxGamesPerCategory = Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+        int maxGamesPerCategory = Math.max(1, Math.min(25,
+                GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
@@ -556,7 +559,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // ADD LEADER NAME TO CATEGORY NAME FOR FUN
         // List<LeaderModel> leaders = new ArrayList<>(Mapper.getLeaders().values());
         // Collections.shuffle(leaders);
-        // if (!leaders.isEmpty()) categoryName = categoryName + " - " + leaders.get(0).getName();
+        // if (!leaders.isEmpty()) categoryName = categoryName + " - " +
+        // leaders.get(0).getName();
 
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
         EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
