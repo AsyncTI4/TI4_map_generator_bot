@@ -3765,9 +3765,25 @@ public class ButtonHelper {
 
     public static int getNumberOfUnitUpgrades(Player player) {
         int count = 0;
+        List<String> types = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
             if ("unitupgrade".equalsIgnoreCase(techM.getType().toString())) {
+                if (!types.contains(techM.getBaseUpgrade().orElse("bleh"))) {
+                    count++;
+                    types.add(tech);
+                }
+
+            }
+        }
+        return count;
+    }
+
+    public static int getNumberOfCertainTypeOfTech(Player player, String type) {
+        int count = 0;
+        for (String tech : player.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (type.equalsIgnoreCase(techM.getType().toString())) {
                 count++;
             }
         }
@@ -4719,7 +4735,7 @@ public class ButtonHelper {
                     .withEmoji(Emoji.fromFormatted(Emojis.kollecc)));
         }
         Button concludeMove = Button.danger(finChecker + "doneWithTacticalAction",
-                "Conclude tactical action (will DET if applicable)");
+                "Conclude tactical action");
         buttons.add(concludeMove);
         return buttons;
     }

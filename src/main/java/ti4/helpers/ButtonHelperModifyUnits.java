@@ -1061,7 +1061,7 @@ public class ButtonHelperModifyUnits {
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Button.success("returnFFToSpace_" + tile.getPosition(), "Return Fighters to Space"));
-                b2s.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                b2s.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                         true)
                         + " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.",
