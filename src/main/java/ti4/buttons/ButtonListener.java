@@ -1721,10 +1721,16 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("winnuHero_")) {
             ButtonHelperHeroes.resolveWinnuHeroSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("construction_")) {
-            if (!player.getFollowedSCs().contains(4)) {
+            boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+            if (!used && !player.getFollowedSCs().contains(4) && !activeGame.isHomeBrewSCMode()) {
+                player.addFollowedSC(4);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 4, activeGame, event);
+                if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                }
+                String message = deductCC(player, event);
+                ButtonHelper.addReaction(event, false, false, message, "");
             }
-            // player.addFollowedSC(4);
             ButtonHelper.addReaction(event, false, false, "", "");
             String unit = buttonID.replace("construction_", "");
             String message = trueIdentity
@@ -2424,6 +2430,16 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("titansConstructionMechDeployStep2_")) {
             ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("titansConstructionMechDeployStep1")) {
+            boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+            if (!used && !player.getFollowedSCs().contains(4) && !activeGame.isHomeBrewSCMode()) {
+                player.addFollowedSC(4);
+                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 4, activeGame, event);
+                if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                }
+                String message = deductCC(player, event);
+                ButtonHelper.addReaction(event, false, false, message, "");
+            }
             ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep1(activeGame, player);
         } else if (buttonID.startsWith("unstableStep3_")) {
             ButtonHelperActionCards.resolveUnstableStep3(player, activeGame, event, buttonID);
@@ -2842,6 +2858,17 @@ public class ButtonListener extends ListenerAdapter {
                 case Constants.REFRESH_PLANET_INFO -> PlanetInfo.sendPlanetInfo(player);
                 case "warfareBuild" -> {
                     List<Button> buttons;
+                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+                    int scNum = 6;
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                        player.addFollowedSC(scNum);
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                        if (player.getStrategicCC() > 0) {
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        }
+                        String message = deductCC(player, event);
+                        ButtonHelper.addReaction(event, false, false, message, "");
+                    }
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
                     if (player.hasAbility("mobile_command") && ButtonHelper
                             .getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0) {
@@ -2926,7 +2953,17 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "acquireATech" -> { // Buttons.GET_A_TECH
                     List<Button> buttons = new ArrayList<>();
-
+                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+                    int scNum = 7;
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                        player.addFollowedSC(scNum);
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                        if (player.getStrategicCC() > 0) {
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        }
+                        String message = deductCC(player, event);
+                        ButtonHelper.addReaction(event, false, false, message, "");
+                    }
                     Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion",
                             "Get a Blue Tech");
                     propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
@@ -3069,6 +3106,17 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "nekroFollowTech" -> {
+                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+                    int scNum = 7;
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                        player.addFollowedSC(scNum);
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                        if (player.getStrategicCC() > 0) {
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        }
+                        String message = deductCC(player, event);
+                        ButtonHelper.addReaction(event, false, false, message, "");
+                    }
                     Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                     Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                     Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
@@ -3091,6 +3139,17 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "diploRefresh2" -> {
+                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+                    int scNum = 2;
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                        player.addFollowedSC(scNum);
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                        if (player.getStrategicCC() > 0) {
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        }
+                        String message = deductCC(player, event);
+                        ButtonHelper.addReaction(event, false, false, message, "");
+                    }
                     if (!player.getFollowedSCs().contains(2)) {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 2, activeGame, event);
                     }
@@ -3255,9 +3314,20 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "diplomacy", buttons);
                 }
                 case "sc_ac_draw" -> {
-                    boolean used = addUsedSCPlayer(messageID + "ac", activeGame, player, event, "");
-                    if (used) {
+                    boolean used2 = addUsedSCPlayer(messageID + "ac", activeGame, player, event, "");
+                    if (used2) {
                         break;
+                    }
+                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+                    int scNum = 3;
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                        player.addFollowedSC(scNum);
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                        if (player.getStrategicCC() > 0) {
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        }
+                        String message = deductCC(player, event);
+                        ButtonHelper.addReaction(event, false, false, message, "");
                     }
                     boolean hasSchemingAbility = player.hasAbility("scheming");
                     String message = hasSchemingAbility
@@ -3307,9 +3377,20 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveMykoCommander" -> ButtonHelperCommanders.mykoCommanderUsage(player, activeGame, event);
                 case "checkForAllACAssignments" -> ButtonHelperActionCards.checkForAllAssignmentACs(activeGame, player);
                 case "sc_draw_so" -> {
-                    boolean used = addUsedSCPlayer(messageID + "so", activeGame, player, event,
+                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
+                    int scNum = 8;
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                        player.addFollowedSC(scNum);
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                        if (player.getStrategicCC() > 0) {
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        }
+                        String message = deductCC(player, event);
+                        ButtonHelper.addReaction(event, false, false, message, "");
+                    }
+                    boolean used2 = addUsedSCPlayer(messageID + "so", activeGame, player, event,
                             " Drew a " + Emojis.SecretObjective);
-                    if (used) {
+                    if (used2) {
                         break;
                     }
                     if (!player.getFollowedSCs().contains(8)) {
@@ -5341,15 +5422,17 @@ public class ButtonListener extends ListenerAdapter {
         boolean contains = players.contains(player);
         players.add(player);
         playerUsedSC.put(messageID, players);
-        if (contains) {
-            String alreadyUsedMessage = defaultText.isEmpty() ? "used Secondary of Strategy Card" : defaultText;
-            String message = player.getRepresentation() + " already " + alreadyUsedMessage;
-            if (activeGame.isFoWMode()) {
-                MessageHelper.sendPrivateMessageToPlayer(player, activeGame, message);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            }
-        }
+        // if (contains) {
+        // String alreadyUsedMessage = defaultText.isEmpty() ? "used Secondary of
+        // Strategy Card" : defaultText;
+        // String message = player.getRepresentation() + " already " +
+        // alreadyUsedMessage;
+        // if (activeGame.isFoWMode()) {
+        // MessageHelper.sendPrivateMessageToPlayer(player, activeGame, message);
+        // } else {
+        // MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        // }
+        // }
         return contains;
     }
 
