@@ -158,8 +158,13 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
 
         }
-
         return 1;
+    }
+
+    public static String representScoring(Game activeGame, String objID) {
+        String representation = "";
+        PublicObjectiveModel model = Mapper.getPublicObjective(objID);
+        return representation;
     }
 
     public static int getPlayerProgressOnObjective(String objID, Game activeGame, Player player) {
