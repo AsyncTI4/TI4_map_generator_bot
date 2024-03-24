@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.player.TurnEnd;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -32,6 +33,8 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
             case "voting" -> AgendaHelper.startTheVoting(activeGame);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
+            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(activeGame, true, event, "both");
+            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(activeGame, false, event, "1");
             // case "unleashTheNames" -> OtherStats.sendAllNames(event);
             // case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
             // case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);

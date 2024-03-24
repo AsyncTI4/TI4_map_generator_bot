@@ -1787,9 +1787,9 @@ public class ButtonHelper {
                                             "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
                                             "Website View");
                                     buttonsWeb.add(linkToWebsite);
+                                    buttonsWeb.add(Button.success("gameInfoButtons", "Other Player Info"));
                                 }
                                 buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
-                                buttonsWeb.add(Buttons.REFRESH_INFO);
                                 buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                                 buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
 
@@ -1808,9 +1808,9 @@ public class ButtonHelper {
                                     "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
                                     "Website View");
                             buttonsWeb.add(linkToWebsite);
+                            buttonsWeb.add(Button.success("gameInfoButtons", "Other Player Info"));
                         }
                         buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
-                        buttonsWeb.add(Buttons.REFRESH_INFO);
                         buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                         buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
 
@@ -5813,7 +5813,6 @@ public class ButtonHelper {
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
                 .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
 
@@ -9001,7 +9000,7 @@ public class ButtonHelper {
                         purgeFragButtons);
             }
         }
-        if (pnText.contains("Action:")) {
+        if (pn.getText().toLowerCase().contains("action:")) {
             serveNextComponentActionButtons(event, game, player);
         }
 
