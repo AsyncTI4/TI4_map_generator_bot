@@ -73,7 +73,8 @@ public class ShowGame implements Command {
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapGenerator.saveImage(activeGame, displayType, event)
-                    .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                        .thenAccept(
+                                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.system.getValue())) {
                 displayType = DisplayType.system;
@@ -88,19 +89,21 @@ public class ShowGame implements Command {
 
     private static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapGenerator.saveImage(activeGame, displayType, event)
-            .thenAccept(fileUpload -> {
-                List<Button> buttons = new ArrayList<>();
-                if (!activeGame.isFoWMode()) {
-                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
-                    buttons.add(linkToWebsite);
-                }
-                buttons.add(Button.success("cardsInfo", "Cards Info"));
-                buttons.add(Buttons.REFRESH_INFO);
-                buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
-                buttons.add(Button.secondary("showGameAgain", "Show Game"));
+                .thenAccept(fileUpload -> {
+                    List<Button> buttons = new ArrayList<>();
+                    if (!activeGame.isFoWMode()) {
+                        Button linkToWebsite = Button.link(
+                                "https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(),
+                                "Website View");
+                        buttons.add(linkToWebsite);
+                        buttons.add(Button.success("gameInfoButtons", "Other Player Info"));
+                    }
+                    buttons.add(Button.success("cardsInfo", "Cards Info"));
+                    buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
+                    buttons.add(Button.secondary("showGameAgain", "Show Game"));
 
-                MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, "", buttons);
-            });
+                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, "", buttons);
+                });
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -108,8 +111,10 @@ public class ShowGame implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows selected map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
+                Commands.slash(getActionID(), "Shows selected map")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown")
+                                .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE,
+                                "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }

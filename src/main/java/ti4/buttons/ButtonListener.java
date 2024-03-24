@@ -51,6 +51,7 @@ import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.Cleanup;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
@@ -1762,6 +1763,12 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();// "resolveReverse_"
         } else if (buttonID.startsWith("resolveReverse_")) {
             ButtonHelperActionCards.resolveReverse(activeGame, player, buttonID, event);
+        } else if (buttonID.startsWith("showObjInfo_")) {
+            ListPlayerInfoButton.showObjInfo(event, buttonID, activeGame);
+        } else if (buttonID.startsWith("offerInfoButtonStep2_")) {
+            ListPlayerInfoButton.resolveOfferInfoButtonStep2(event, buttonID, activeGame);
+        } else if (buttonID.startsWith("offerInfoButtonStep3_")) {
+            ListPlayerInfoButton.resolveOfferInfoButtonStep3(event, buttonID, activeGame, player);
         } else if (buttonID.startsWith("removeAllStructures_")) {
             event.getMessage().delete().queue();
             String planet = buttonID.split("_")[1];
@@ -2847,6 +2854,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null,
                         Buttons.REFRESH_INFO_BUTTONS);
+                case "gameInfoButtons" -> ListPlayerInfoButton.offerInfoButtons(event);
                 case "refreshACInfo" -> ACInfo.sendActionCardInfo(activeGame, player, event);
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
                 case "refreshSOInfo" -> SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
@@ -3479,6 +3487,19 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "flip_agenda" -> {
+                    new RevealAgenda().revealAgenda(event, false, activeGame, event.getChannel());
+                    event.getMessage().delete().queue();
+
+                }
+                case "resolveVeto" -> {
+                    String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
+                    int aCount = 0;
+                    if (agendaCount.isEmpty()) {
+                        aCount = 0;
+                    } else {
+                        aCount = Integer.parseInt(agendaCount) - 1;
+                    }
+                    activeGame.setCurrentReacts("agendaCount", aCount + "");
                     new RevealAgenda().revealAgenda(event, false, activeGame, event.getChannel());
                     event.getMessage().delete().queue();
 
@@ -5108,6 +5129,12 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             channel = actionsChannel;
         }
+        if (acID.contains("sabo")) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    fowIdentity + " please play sabo by clicking the sabo button on the AC you wish to sabo");
+            return;
+        }
+
         if (acID.contains("reverse_")) {
             String actionCardTitle = acID.split("_")[2];
             acID = acID.split("_")[0];

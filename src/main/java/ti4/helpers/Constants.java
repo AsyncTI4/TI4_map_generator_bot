@@ -17,6 +17,7 @@ public class Constants {
     public static final String FOWGM = "fowgm";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
+    public static final String REMOVE_ALLIANCE_MEMBER = "remove_alliance_member";
     public static final String ADD_TEAMMATE = "add_teammate";
     public static final String REMOVE_TEAMMATE = "remove_teammate";
     public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";

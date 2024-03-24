@@ -43,9 +43,9 @@ public class GameCommand implements Command {
         User user = event.getUser();
         String userName = user.getName();
         String commandExecuted = "User: " + userName + " executed command.\n" +
-            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
+                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+                        .map(option -> option.getName() + ":" + getOptionValue(option))
+                        .collect(Collectors.joining(" "));
 
         MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
     }
@@ -72,21 +72,24 @@ public class GameCommand implements Command {
         }
         String userID = event.getUser().getId();
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        if (activeGame == null) return;
+        if (activeGame == null)
+            return;
         if (!undoCommand) {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
         CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(activeGame, event);
         if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
-            && !Constants.SET_DECK.equalsIgnoreCase(subcommandName) && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
+                && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
+                && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
             fileFuture.thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
                 if (!activeGame.isFoWMode()) {
-                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
+                    Button linkToWebsite = Button.link(
+                            "https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
                     buttons.add(linkToWebsite);
+                    buttons.add(Button.success("gameInfoButtons", "Other Player Info"));
                 }
                 buttons.add(Button.success("cardsInfo", "Cards Info"));
-                buttons.add(Buttons.REFRESH_INFO);
                 buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
                 buttons.add(Button.secondary("showGameAgain", "Show Game"));
                 MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, "", buttons);
@@ -116,17 +119,17 @@ public class GameCommand implements Command {
         subcommands.add(new SetUnitCap());
         subcommands.add(new StartPhase());
         subcommands.add(new SetDeck());
-        //subcommands.add(new GameCreate());
+        // subcommands.add(new GameCreate());
         subcommands.add(new CreateGameButton());
         subcommands.add(new Swap());
-        //subcommands.add(new ReverseSpeakerOrder());
+        // subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+                Commands.slash(getActionID(), getActionDescription())
+                        .addSubcommands(getSubcommands()));
     }
 }
