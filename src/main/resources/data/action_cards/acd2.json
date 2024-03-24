@@ -31,7 +31,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "End that player's turn and return their command token in the active system to their tactic pool. [Note: They do not have to have a token in the system to play this card.]",
+    "text": "End that player's turn and return their command token in the active system to their tactic pool.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
     "source": "action_deck_2"
   },
@@ -76,7 +76,7 @@
     "name": "Boarding Torpedoes",
     "phase": "Action",
     "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
-    "text": "Replace that ship with a matching unit from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure, that the other player is treating as a ship, you cannot place that unit.]",
+    "text": "Replace that ship with a matching unit from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the Admiral said. \"Our ships are breaking up. If we retreat now...\" Milor glared at him. \"No! Have them launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
     "source": "action_deck_2"
   },
@@ -86,7 +86,7 @@
     "phase": "Action",
     "window": "At the start of your turn",
     "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your tactic pool.",
-    "flavorText": "Suffi An watched from a safe distance as the payload fell, the glow from the bombardment illuminating her cockpit. Eventually, it would become too dangerous to remain, but for now... for now she would observe.",
+    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. Even he had his limits. The magnum opus Lazax war theory at his fingertips, and yet... it was the single most boring piece of literature he'd ever had the displeasure to read.",
     "source": "action_deck_2"
   },
   {
@@ -102,8 +102,8 @@
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
-    "window": "After you destroy 1 of your opponent's non-fighter ships",
-    "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
+    "window": "After you destroy another player's non-fighter ship in the active system",
+    "text": "Produce 1 hit against that player's ships in that system. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
     "flavorText": "Jace smiled at the rookie pilot's disbelief. The ship the youngster's ordnance connected with had transformed into a deadlier weapon than any in their fleet.",
     "source": "action_deck_2"
   },
@@ -130,7 +130,7 @@
     "name": "Concise Legal Text",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Players cannot resolve abilities until this agenda is being resolved.",
+    "text": "Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
   },
@@ -148,7 +148,7 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player that voted for the resolved outcome gain 2 trade goods.",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that cast 5 or more votes for that outcome gains 2 trade goods.",
     "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },
@@ -256,7 +256,7 @@
     "name": "Early Voting",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player. That player votes first on this agenda. After this agenda is resolved, if that player cast votes on the resolved outcome, they place up to 2 command tokens from their reinforcements in their strategy pool. [Note: Voting continues in the normal order. They do not vote again.]",
+    "text": "Choose 1 player. That player votes first on this agenda. After this agenda is resolved, if that player cast votes for the resolved outcome, they place up to 2 command tokens from their reinforcements in their strategy pool. [Note: Voting continues in the normal order. They do not vote again.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -301,7 +301,7 @@
     "name": "Field Test",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Gain 1 technology. Return that technology to your technology deck at the end of this turn.",
+    "text": "Choose 1 technology in your technology deck. During this turn, treat that technology as if you own it.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
   },
@@ -364,7 +364,7 @@
     "name": "Hidden Initiatives",
     "phase": "Action",
     "window": "Action",
-    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
+    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may return/shuffle the card you drew.]",
     "flavorText": "M'aban sighed at the man's pleas. How many others could mask their intentions so well? The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
     "source": "action_deck_2"
   },
@@ -391,7 +391,7 @@
     "name": "Ixthian Gift",
     "phase": "Action",
     "window": "At the end of a turn during which you resolved a transaction with a player",
-    "text": "Commit 1 infantry from your reinforcements to a planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
+    "text": "Commit 1 infantry from your reinforcements to a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
     "flavorText": "As the last of the extorted goods were lifted into the ship, the Mahact emissary turned to its smug captain, who had been eyeing her, waiting for a reaction. She smiled.",
     "source": "action_deck_2"
   },
@@ -402,15 +402,6 @@
     "window": "After you research a non-faction technology",
     "text": "Choose 1 other player. That player gains that technology.",
     "flavorText": "Rin had received multiple warnings to avoid working with the Vuil'Raith. However, existential threats to the galaxy had never done much to stifle her curiosity.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "kickbacks",
-    "name": "Kickbacks",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome must give you 1 promissory note from their hand.",
-    "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
   {
@@ -472,8 +463,17 @@
     "name": "Pivoted Plans",
     "phase": "Action",
     "window": "Action",
-    "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards. Then, draw 1 additional action card.",
+    "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
     "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "promissory_rider",
+    "name": "Promissory Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+    "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
   {
@@ -553,7 +553,7 @@
     "name": "Rendezvous Point",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport ground forces during this movement.]",
+    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport units during this movement.]",
     "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
     "source": "action_deck_2"
   },
@@ -652,7 +652,7 @@
     "name": "Smuggler Routes",
     "phase": "Action",
     "window": "Action",
-    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport ground forces during this movement.]",
+    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport units during this movement.]",
     "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
