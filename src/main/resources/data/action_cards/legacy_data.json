@@ -565,5 +565,14 @@
     "text": "That player must perform an additional action this turn or pass.",
     "flavorText": "Mathis pursed his lips with disdain, \"You will see to our agreements with the correct expedience.\" When Ssruu did not respond, his anger broke through, \"Perhaps our massive fleets could provide you with motivation, should you continue to test us!\"",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "kickbacks",
+    "name": "Kickbacks",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for that outcome must give you 1 promissory note from their hand.",
+    "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
+    "source": "action_deck_2"
   }
 ]

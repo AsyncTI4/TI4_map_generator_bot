@@ -667,7 +667,7 @@ public class AgendaHelper {
             }
             if ("wormhole_research".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
-                    new WormholeResearchFor().doResearch(event, activeGame);
+                    WormholeResearchFor.doResearch(event, activeGame);
                 } else {
                     List<Player> players = getWinningVoters(winner, activeGame);
                     for (Player player : players) {
@@ -928,11 +928,8 @@ public class AgendaHelper {
         }
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Sent pings to all those who ridered");
-        } else {
-            if (riders.size() > 0) {
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), ridSum);
-            }
-
+        } else if (riders.size() > 0) {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), ridSum);
         }
         String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
         String voteMessage = "Click the buttons for next steps after you're done resolving riders.";
