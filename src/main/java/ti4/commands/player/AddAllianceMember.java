@@ -12,7 +12,8 @@ import ti4.message.MessageHelper;
 public class AddAllianceMember extends PlayerSubcommandData {
     public AddAllianceMember() {
         super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
+                "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
     }
 
     @Override
@@ -20,12 +21,12 @@ public class AddAllianceMember extends PlayerSubcommandData {
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
-        if (player == null) {
+        if (player == null || player.isNotRealPlayer()) {
             sendMessage("Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeGame, player, event);
-        if (player_ == null) {
+        if (player_ == null || player_.isNotRealPlayer()) {
             sendMessage("Player to add to the alliance could not be found");
             return;
         }
@@ -61,10 +62,12 @@ public class AddAllianceMember extends PlayerSubcommandData {
         if (player_.hasAbility("edict")) {
             player_.addMahactCC(player.getColor());
         }
-        String msg = player.getRepresentation(true, true) + player_.getRepresentation(true, true) + " pinging you into this";
+        String msg = player.getRepresentation(true, true) + player_.getRepresentation(true, true)
+                + " pinging you into this";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), msg);
 
-        sendMessage("Added " + player_.getFaction() + " as part of " + player.getFaction() + "'s alliance. This works 2 ways");
+        sendMessage("Added " + player_.getFaction() + " as part of " + player.getFaction()
+                + "'s alliance. This works 2 ways");
     }
 }

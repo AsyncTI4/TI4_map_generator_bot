@@ -671,28 +671,37 @@ public class Emojis {
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
     public static final String PinkHeart = "<:PinkHeart:1197584926359425145>";
+    public static final String CheckMark = "<:PinkHeart:1197584926359425145>";
 
     // SOURCE ICONS
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
-    public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
-    public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
-    public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
-    public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff https://discord.com/channels/743629929484386395/1096820095470272582
+    public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff
+                                                                       // https://discord.com/channels/743629929484386395/1023681580989939712
+    public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars
+                                                                              // https://discord.com/channels/743629929484386395/990061481238364160
+    public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2
+                                                                                   // mod
+                                                                                   // https://discord.com/channels/743629929484386395/1111799687184396338
+    public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff
+                                                                           // https://discord.com/channels/743629929484386395/1096820095470272582
     public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff
-    public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus https://discord.com/channels/743629929484386395/1027385712821149706
+    public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus
+                                                                                   // https://discord.com/channels/743629929484386395/1027385712821149706
     public static final String ProjectPi = "<:ProjectPie:1128504084811481219>";
-    public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; //Symbol for Milty's mod https://discord.com/channels/743629929484386395/1087435266249207869
+    public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; // Symbol for Milty's mod
+                                                                             // https://discord.com/channels/743629929484386395/1087435266249207869
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = Arrays.asList(
-        warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
-        CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
-        tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
-        PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
-        BortWindow);
+            warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
+            CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
+            tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
+            PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
+            BortWindow);
 
-    // private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
+    // private static List<String> testingEmoji =
+    // Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
     @NotNull
     public static String getRandomizedEmoji(int value, String messageID) {
@@ -1107,7 +1116,8 @@ public class Emojis {
     /**
      * Takes an emoji's name string and returns its full name including ID.
      * 
-     * @emojiName the name of the emoji as entered on the Emoji section of the server
+     * @emojiName the name of the emoji as entered on the Emoji section of the
+     *            server
      * @return the name of the emoji including ID
      */
     public static String getEmojiFromDiscord(String emojiName) {
@@ -1343,7 +1353,8 @@ public class Emojis {
     }
 
     public static String getTGorNomadCoinEmoji(Game activeGame) {
-        if (activeGame == null) return tg;
+        if (activeGame == null)
+            return tg;
         return activeGame.getNomadCoin() ? nomadcoin : tg;
     }
 }
