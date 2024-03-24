@@ -31,23 +31,35 @@ public class Stats extends PlayerSubcommandData {
 	public Stats() {
 		super(Constants.STATS, "Player Stats: CC,TG,Commodities");
 		addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "# turns this round"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
-			//.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
-			//.addOptions(new OptionData(OptionType.INTEGER, Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral system for your turn specifically"))
-			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
-			//.addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE, "Prefers distance based tile selection"))
-			.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+				.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL,
+						"Tactical command counter count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.FLEET,
+						"Fleet command counter count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY,
+						"Strategy command counter count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.TG,
+						"Trade goods count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES,
+						"Commodity count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "# turns this round"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED,
+						"Flip a Strategy Card's played status. Enter the SC #"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
+				// .addOptions(new OptionData(OptionType.INTEGER,
+				// Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto
+				// passes on sabo if they have none"))
+				// .addOptions(new OptionData(OptionType.INTEGER,
+				// Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral
+				// system for your turn specifically"))
+				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
+				// .addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE,
+				// "Prefers distance based tile selection"))
+				.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
+						"Faction or Color for which you set stats").setAutoComplete(true));
 	}
 
 	@Override
@@ -67,17 +79,18 @@ public class Stats extends PlayerSubcommandData {
 		List<OptionMapping> optionMappings = event.getOptions();
 		optionMappings.remove(playerOption);
 		optionMappings.remove(factionColorOption);
-		//NO OPTIONS SELECTED, JUST DISPLAY STATS
+		// NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty()) {
 			if (activeGame.isFoWMode()) {
-				MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getPlayersCurrentStatsText(player, activeGame));
+				MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+						getPlayersCurrentStatsText(player, activeGame));
 			} else {
 				sendMessage(getPlayersCurrentStatsText(player, activeGame));
 			}
 			return;
 		}
 
-		//DO CCs FIRST
+		// DO CCs FIRST
 		OptionMapping optionCC = event.getOption(Constants.CC);
 		OptionMapping optionT = event.getOption(Constants.TACTICAL);
 		OptionMapping optionF = event.getOption(Constants.FLEET);
@@ -85,7 +98,8 @@ public class Stats extends PlayerSubcommandData {
 		if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
 			sendMessage("Use format 3/3/3 for command counters or individual values, not both");
 		} else {
-			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/"
+					+ player.getStrategicCC();
 			if (optionCC != null) {
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
 				StringTokenizer tokenizer = new StringTokenizer(cc, "/");
@@ -93,9 +107,12 @@ public class Stats extends PlayerSubcommandData {
 					sendMessage("Wrong format for tokens count. Must be 3/3/3");
 				} else {
 					try {
-						setValue(event, activeGame, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken(), true);
-						setValue(event, activeGame, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken(), true);
-						setValue(event, activeGame, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
+								tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
+								tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Strategy CC", player::setStrategicCC,
+								player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
 						sendMessage("Not number entered, check CC count again");
 					}
@@ -123,7 +140,8 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionT);
 		optionMappings.remove(optionF);
 		optionMappings.remove(optionS);
-		if (optionMappings.isEmpty()) return;
+		if (optionMappings.isEmpty())
+			return;
 
 		sendMessage(player.getRepresentation(true, true) + " player stats changed:");
 
@@ -145,11 +163,14 @@ public class Stats extends PlayerSubcommandData {
 		if (optionC != null) {
 
 			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
-			if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
+			if (player.hasAbility("military_industrial_complex")
+					&& ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
 				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-					player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+						player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
+						ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
 			}
-			if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
+			if (player.getLeaderIDs().contains("mykomentoricommander")
+					&& !player.hasLeaderUnlocked("mykomentoricommander")) {
 				ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
 			}
 		}
@@ -225,7 +246,7 @@ public class Stats extends PlayerSubcommandData {
 			if ("y".equals(value) || "yes".equals(value)) {
 				player.setPassed(true);
 				// Turn.pingNextPlayer(event, activeMap, player);
-				if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+				if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
 					ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
 				}
 			} else if ("n".equals(value) || "no".equals(value)) {
@@ -246,7 +267,8 @@ public class Stats extends PlayerSubcommandData {
 				boolean scIsPlayed = activeGame.getScPlayed().get(sc);
 				if (!scIsPlayed) {
 					activeGame.setSCPlayed(sc, true);
-					message.append("> flipped ").append(Emojis.getSCEmojiFromInteger(sc)).append(" to ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");
+					message.append("> flipped ").append(Emojis.getSCEmojiFromInteger(sc)).append(" to ")
+							.append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");
 				} else {
 					activeGame.setSCPlayed(sc, false);
 
@@ -255,14 +277,16 @@ public class Stats extends PlayerSubcommandData {
 							continue;
 						}
 						String faction = player_.getFaction();
-						if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
+						if (faction == null || faction.isEmpty() || "null".equals(faction))
+							continue;
 						player_.addFollowedSC(sc);
 					}
-					message.append("> flipped ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" to ").append(Emojis.getSCEmojiFromInteger(sc)).append(" (unplayed)");
+					message.append("> flipped ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" to ")
+							.append(Emojis.getSCEmojiFromInteger(sc)).append(" (unplayed)");
 				}
 			} else {
 				message.append(
-					"> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
+						"> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
 			}
 			sendMessage(message.toString());
 		}
@@ -276,13 +300,15 @@ public class Stats extends PlayerSubcommandData {
 
 	}
 
-	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
-		StringBuilder sb = new StringBuilder(player.getRepresentation() + " player's current stats:\n");
+	public String getPlayersCurrentStatsText(Player player, Game activeGame) {
+		StringBuilder sb = new StringBuilder(player.getFactionEmoji() + " player's current stats:\n");
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints());
-		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
+		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/")
+				.append(player.getStrategicCC());
 		sb.append("      ").append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(player.getTg());
-		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/")
+				.append(player.getCommoditiesTotal());
 		sb.append("      ").append(Emojis.CFrag).append(player.getCrf());
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
 		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
@@ -290,7 +316,8 @@ public class Stats extends PlayerSubcommandData {
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
 			for (int sc : player.getSCs()) {
-				if (getActiveGame().getScPlayed() != null && !getActiveGame().getScPlayed().isEmpty() && getActiveGame().getScPlayed().get(sc) != null) {
+				if (activeGame.getScPlayed() != null && !activeGame.getScPlayed().isEmpty()
+						&& activeGame.getScPlayed().get(sc) != null) {
 					sb.append(Emojis.getSCBackEmojiFromInteger(sc));
 				} else {
 					sb.append(Emojis.getSCEmojiFromInteger(sc));
@@ -301,7 +328,7 @@ public class Stats extends PlayerSubcommandData {
 		}
 		sb.append("\n");
 		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-		sb.append("> Speaker: `").append(getActiveGame().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Speaker: `").append(activeGame.getSpeaker().equals(player.getUserID())).append("`\n");
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
 		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
@@ -319,14 +346,20 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
 		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
 		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
-		sb.append("> Total Resource Value of Units: ").append(Emojis.resources).append("`").append(player.getTotalResourceValueOfUnits()).append("`\n");
-		sb.append("> Total Hit-point Value of Units: ").append(Emojis.PinkHeart).append("`").append(player.getTotalHPValueOfUnits()).append("`\n");
-		sb.append("> Total Combat Value of Units: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits()).append("`\n");
-		sb.append("> Total Unit Ability Value of Units: ").append(Emojis.UnitUpgradeTech).append("`").append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
+		sb.append("> Total Resource Value of Units: ").append(Emojis.resources).append("`")
+				.append(player.getTotalResourceValueOfUnits()).append("`\n");
+		sb.append("> Total Hit-point Value of Units: ").append(Emojis.PinkHeart).append("`")
+				.append(player.getTotalHPValueOfUnits()).append("`\n");
+		sb.append("> Total Combat Value of Units: ").append("💥").append("`")
+				.append(player.getTotalCombatValueOfUnits()).append("`\n");
+		sb.append("> Total Unit Ability Value of Units: ").append(Emojis.UnitUpgradeTech).append("`")
+				.append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 		Guild guild = activeGame.getGuild();
-		if (guild != null && activeGame.isFrankenGame() && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
-			sb.append("> Bag Draft Thread: ").append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
+		if (guild != null && activeGame.isFrankenGame()
+				&& guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
+			sb.append("> Bag Draft Thread: ")
+					.append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
 		}
 		sb.append("\n");
 
@@ -341,21 +374,25 @@ public class Stats extends PlayerSubcommandData {
 		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player,
+			int scNumber) {
 		Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+					"Can only pick SC if both Faction and Color have been picked");
 			return false;
 		}
 		if (!scTradeGoods.containsKey(scNumber)) {
-			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+					"Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
 			return false;
 		}
 
 		Map<String, Player> players = activeGame.getPlayers();
 		for (Player playerStats : players.values()) {
 			if (playerStats.getSCs().contains(scNumber)) {
-				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "SC #" + scNumber + " is already picked.");
+				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+						"SC #" + scNumber + " is already picked.");
 				return false;
 			}
 		}
@@ -366,20 +403,24 @@ public class Stats extends PlayerSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 
-		if (scNumber == 5 && !activeGame.isHomeBrewSCMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " heads up, you just picked trade but dont currently hold your Trade Agreement");
+		if (scNumber == 5 && !activeGame.isHomeBrewSCMode()
+				&& !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
+			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true)
+					+ " heads up, you just picked trade but dont currently hold your Trade Agreement");
 		}
 
 		Integer tgCount = scTradeGoods.get(scNumber);
 		String msg = player.getRepresentation(true, true) +
-            "\n> Picked: " + Helper.getSCRepresentation(activeGame, scNumber);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+				"\n> Picked: " + Helper.getSCRepresentation(activeGame, scNumber);
+		MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+					player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
 			if (activeGame.isFoWMode()) {
-				String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
+				String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
+						+ " tgs from picking SC #" + scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 			player.setTg(tg);
@@ -392,17 +433,18 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, OptionMapping option,
-		Consumer<Integer> consumer, Supplier<Integer> supplier) {
+			Consumer<Integer> consumer, Supplier<Integer> supplier) {
 		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(), false);
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, OptionMapping option,
-		Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
-		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
+			Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
+		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(),
+				suppressMessage);
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, String optionName,
-		Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
+			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
 			String explanation = "";
@@ -415,8 +457,10 @@ public class Stats extends PlayerSubcommandData {
 			int existingNumber = supplier.get();
 			if (setValue) {
 				consumer.accept(number);
-				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber, explanation);
-				if (!suppressMessage) sendMessage(messageToSend);
+				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber,
+						explanation);
+				if (!suppressMessage)
+					sendMessage(messageToSend);
 				if (activeGame.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
@@ -424,8 +468,10 @@ public class Stats extends PlayerSubcommandData {
 				int newNumber = existingNumber + number;
 				newNumber = Math.max(newNumber, 0);
 				consumer.accept(newNumber);
-				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber, explanation);
-				if (!suppressMessage) sendMessage(messageToSend);
+				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber,
+						newNumber, explanation);
+				if (!suppressMessage)
+					sendMessage(messageToSend);
 				if (activeGame.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
@@ -435,21 +481,22 @@ public class Stats extends PlayerSubcommandData {
 		}
 	}
 
-	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber, String explanation) {
+	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
+			Integer setToNumber, Integer existingNumber, String explanation) {
 		if (explanation == null || "".equalsIgnoreCase(explanation)) {
 			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
-				+ existingNumber + ", a change of " + (setToNumber - existingNumber)
-				+ ")_";
+					+ existingNumber + ", a change of " + (setToNumber - existingNumber)
+					+ ")_";
 		} else {
 			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
-				+ existingNumber + ", a change of " + (setToNumber - existingNumber)
-				+ ")_ for the reason of: " + explanation;
+					+ existingNumber + ", a change of " + (setToNumber - existingNumber)
+					+ ")_ for the reason of: " + explanation;
 		}
 
 	}
 
 	public static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
-		Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
+			Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
 		String changeDescription = "changed";
 		if (changeNumber > 0) {
 			changeDescription = "increased";
@@ -458,10 +505,10 @@ public class Stats extends PlayerSubcommandData {
 		}
 		if (explanation == null || "".equalsIgnoreCase(explanation)) {
 			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
-				+ existingNumber + ", now **" + newNumber + "**)_";
+					+ existingNumber + ", now **" + newNumber + "**)_";
 		} else {
 			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
-				+ existingNumber + ", now **" + newNumber + "**)_ for the reason of: " + explanation;
+					+ existingNumber + ", now **" + newNumber + "**)_ for the reason of: " + explanation;
 		}
 
 	}
