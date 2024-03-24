@@ -75,6 +75,7 @@ import ti4.model.*;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -474,7 +475,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             if (buttonID.contains("foresight")) {
                 MessageHelper.sendMessageToChannel(event.getChannel(),
-                        ident + " lost a strategy cc to resolve the foresight ability");
+                        ident + " lost a strategy CC to resolve the foresight ability");
                 player.setStrategicCC(player.getStrategicCC() - 1);
                 skilled = true;
             }
@@ -1986,7 +1987,7 @@ public class ButtonListener extends ListenerAdapter {
             if (p2 != null) {
                 List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, player, p2);
                 String message = p2.getRepresentation(true, true)
-                        + " You have been hit with mentak commander. Please select the PN you would like to send";
+                        + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " S'Ula Mentarion, the Mentak commander. Please select the PN you would like to send";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         "Sent " + color + " the buttons for resolving mentak commander");
@@ -3281,7 +3282,7 @@ public class ButtonListener extends ListenerAdapter {
                             if (properGain > 2) {
                                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                         player.getRepresentation(true, true) + " heads up, bot thinks you should gain "
-                                                + properGain + " cc now due to: " + reasons);
+                                                + properGain + " CC now due to: " + reasons);
                             }
 
                         }
@@ -5212,7 +5213,7 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                     "# " + player.getRepresentation(true, true)
                                             + " heads up, bot thinks you should have gained " + properGain
-                                            + " cc due to: " + reasons);
+                                            + " CC due to: " + reasons);
                         }
                     }
                 }

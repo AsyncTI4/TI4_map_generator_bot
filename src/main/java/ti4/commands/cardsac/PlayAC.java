@@ -164,7 +164,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 xxchaButtons.add(refuse);
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2
                         .getRepresentation(true, true)
-                        + "You have Instinct Training unexhausted and a cc available. Use Buttons to decide whether to cancel",
+                        + "You have Instinct Training unexhausted and a CC available. Use Buttons to decide whether to cancel",
                         xxchaButtons);
             }
 

@@ -853,25 +853,25 @@ public class ButtonHelperAbilities {
         if (Mapper.getRelic(order).getName().contains("Dreadnought")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "dreadnought",
                     "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 1 dreadnought in a system with your ships and cc";
+            message = "Use buttons to put 1 dreadnought in a system with your ships and CC";
             techName = "dn2";
         }
         if (Mapper.getRelic(order).getName().contains("Carrier")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "carrier",
                     "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 1 carrier in a system with your ships and cc";
+            message = "Use buttons to put 1 carrier in a system with your ships and CC";
             techName = "cv2";
         }
         if (Mapper.getRelic(order).getName().contains("Cruiser")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "cruiser",
                     "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 1 cruiser in a system with your ships and cc";
+            message = "Use buttons to put 1 cruiser in a system with your ships and CC";
             techName = "cr2";
         }
         if (Mapper.getRelic(order).getName().contains("Destroyer")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "2destroyer",
                     "placeOneNDone_skipbuild", event));
-            message = "Use buttons to put 2 destroyers in a system with your ships and cc";
+            message = "Use buttons to put 2 destroyers in a system with your ships and CC";
             techName = "dd2";
         }
         message = player.getRepresentation(true, true) + " " + message;

@@ -258,7 +258,7 @@ public class AgendaHelper {
                             AddCC.addCC(event, player.getColor(), tile);
                         }
                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
-                                "Added player's ccs to their HS");
+                                "Added player's CCs to their HS");
                     }
                 }
                 if ("conventions".equalsIgnoreCase(agID)) {
@@ -382,7 +382,7 @@ public class AgendaHelper {
                     player2.setStrategicCC(2);
                     player2.setFleetCC(3);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "Set " + ButtonHelper.getIdentOrColor(player2, activeGame) + " ccs to 3/3/2");
+                            "Set " + ButtonHelper.getIdentOrColor(player2, activeGame) + " CCs to 3/3/2");
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
                     DrawRelic.drawRelicAndNotify(player2, event, activeGame);

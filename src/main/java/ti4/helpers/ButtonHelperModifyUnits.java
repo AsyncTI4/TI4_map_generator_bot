@@ -1125,7 +1125,7 @@ public class ButtonHelperModifyUnits {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander") && !buttonID.contains("skilled")
                 && !AddCC.hasCC(event, player.getColor(), tile1)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)
-                    + " did not place a cc in the retreat system due to kollecc commander");
+                    + " did not place a CC in the retreat system due to kollecc commander");
         } else {
             AddCC.addCC(event, player.getColor(), tile2, true);
         }
@@ -1367,7 +1367,7 @@ public class ButtonHelperModifyUnits {
                         "construction");
             }
             if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
-                String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
+                String message = playerRep + " Would you like to put a CC from reinforcements in the same system?";
                 Button placeCCInSystem = Button.success(
                         finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
                         "Place A CC From Reinforcements In The System.");
