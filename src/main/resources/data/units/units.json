@@ -669,7 +669,7 @@
         "baseType": "mech",
         "asyncId": "mf",
         "name": "Iconoclast",
-        "source": "base",
+        "source": "pok",
         "faction": "Naalu",
         "capacityUsed": 1,
         "cost": 2,
