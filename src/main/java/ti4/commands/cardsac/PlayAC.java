@@ -323,18 +323,20 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Micrometeoroid Storm";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveMicrometeoroidStormStep1",
-                        "Resolve " + codedName));
+                codedButtons
+                        .add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveMicrometeoroidStormStep1",
+                                "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
             codedName = "Upgrade";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(
                         player.getFinsFactionCheckerPrefix() + "resolveUpgrade_" + game.getActiveSystem(),
-                "Resolve " + codedName));
-                if(game.getActiveSystem().isEmpty()){
-                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
-                }else{
+                        "Resolve " + codedName));
+                if (game.getActiveSystem().isEmpty()) {
+                    MessageHelper.sendMessageToChannel(channel2,
+                            "The active system is currently non-existant, so this card cannot be automated");
+                } else {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
                 }
             }
@@ -352,9 +354,10 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success(
                         player.getFinsFactionCheckerPrefix() + "resolveEmergencyRepairs_" + game.getActiveSystem(),
                         "Resolve " + codedName));
-                if(game.getActiveSystem().isEmpty()){
-                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
-                }else{
+                if (game.getActiveSystem().isEmpty()) {
+                    MessageHelper.sendMessageToChannel(channel2,
+                            "The active system is currently non-existant, so this card cannot be automated");
+                } else {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
                 }
             }
@@ -477,7 +480,8 @@ public class PlayAC extends ACCardsSubcommandData {
                         player.getFinsFactionCheckerPrefix() + "resolveDecoyOperationStep1_" + game.getActiveSystem(),
                         "Resolve " + codedName));
                 if (game.getActiveSystem().isEmpty()) {
-                    MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
+                    MessageHelper.sendMessageToChannel(channel2,
+                            "The active system is currently non-existant, so this card cannot be automated");
                 } else {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
                 }
@@ -534,13 +538,16 @@ public class PlayAC extends ACCardsSubcommandData {
             // "resolveCounterStroke"
             // codedName = "Counterstroke";
             // if (actionCardTitle.contains(codedName)) {
-            //     codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveCounterStroke_"+game.getActiveSystem(),
-            //             "Resolve " + codedName));
-            //     if(game.getActiveSystem().isEmpty()){
-            //         MessageHelper.sendMessageToChannel(channel2, "The active system is currently non-existant, so this card cannot be automated");
-            //     }else{
-            //         MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
-            //     }
+            // codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() +
+            // "resolveCounterStroke_"+game.getActiveSystem(),
+            // "Resolve " + codedName));
+            // if(game.getActiveSystem().isEmpty()){
+            // MessageHelper.sendMessageToChannel(channel2, "The active system is currently
+            // non-existant, so this card cannot be automated");
+            // }else{
+            // MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage +
+            // codedName, codedButtons);
+            // }
             // }
             codedName = "Divert Funding";
             if (actionCardTitle.contains(codedName)) {
@@ -579,7 +586,7 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Veto";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(
-                        Button.primary(player.getFinsFactionCheckerPrefix() + "flip_agenda", "Reveal next Agenda"));
+                        Button.primary(player.getFinsFactionCheckerPrefix() + "resolveVeto", "Reveal next Agenda"));
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), codedMessage + codedName,
                         codedButtons);
             }

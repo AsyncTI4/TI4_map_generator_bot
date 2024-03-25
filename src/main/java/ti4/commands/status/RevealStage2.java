@@ -32,7 +32,11 @@ public class RevealStage2 extends StatusSubcommandData {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if(activeGame.getCurrentPhase().equalsIgnoreCase("status")){
+        if (!activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(channel,
+                    ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+        }
+        if (activeGame.getCurrentPhase().equalsIgnoreCase("status")) {
             // first do cleanup if necessary
             int playersWithSCs = 0;
             for (Player player : activeGame.getRealPlayers()) {
@@ -43,11 +47,13 @@ public class RevealStage2 extends StatusSubcommandData {
 
             if (playersWithSCs > 0) {
                 new Cleanup().runStatusCleanup(activeGame);
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing() + "Status Cleanup Run!");
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+                        activeGame.getPing() + "Status Cleanup Run!");
                 if (!activeGame.isFoWMode()) {
                     DisplayType displayType = DisplayType.map;
                     MapGenerator.saveImage(activeGame, displayType, event)
-                        .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
+                            .thenAccept(fileUpload -> MessageHelper
+                                    .sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
                 }
             }
         }

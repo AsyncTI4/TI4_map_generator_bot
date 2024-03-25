@@ -31,7 +31,11 @@ public class RevealStage1 extends StatusSubcommandData {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if(activeGame.getCurrentPhase().equalsIgnoreCase("status")){
+        if (!activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(channel,
+                    ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+        }
+        if (activeGame.getCurrentPhase().equalsIgnoreCase("status")) {
             // first do cleanup if necessary
             int playersWithSCs = 0;
             for (Player player : activeGame.getRealPlayers()) {
@@ -42,11 +46,13 @@ public class RevealStage1 extends StatusSubcommandData {
 
             if (playersWithSCs > 0) {
                 new Cleanup().runStatusCleanup(activeGame);
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing() + "Status Cleanup Run!");
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+                        activeGame.getPing() + "Status Cleanup Run!");
                 if (!activeGame.isFoWMode()) {
                     DisplayType displayType = DisplayType.map;
                     MapGenerator.saveImage(activeGame, displayType, event)
-                        .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
+                            .thenAccept(fileUpload -> MessageHelper
+                                    .sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
                 }
             }
         }
@@ -61,7 +67,9 @@ public class RevealStage1 extends StatusSubcommandData {
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objectives Revealed**");
-        channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed())).queue(m -> m.pin().queue());
+        channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
+                .queue(m -> m.pin().queue());
+
         int maxSCsPerPlayer;
         if (activeGame.getRealPlayers().isEmpty()) {
             maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
@@ -69,10 +77,11 @@ public class RevealStage1 extends StatusSubcommandData {
             maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
         }
 
-        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
+        if (maxSCsPerPlayer == 0)
+            maxSCsPerPlayer = 1;
 
-        if(activeGame.getRealPlayers().size() == 1){
-            maxSCsPerPlayer =1;
+        if (activeGame.getRealPlayers().size() == 1) {
+            maxSCsPerPlayer = 1;
         }
         activeGame.setStrategyCardsPerPlayer(maxSCsPerPlayer);
     }

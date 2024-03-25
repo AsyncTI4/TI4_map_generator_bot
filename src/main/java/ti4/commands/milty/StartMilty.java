@@ -502,15 +502,15 @@ public class StartMilty extends MiltySubcommandData {
                 id.contains("mecatol") || path.toLowerCase().contains("mecatol") ||
                 id.contains("blank") || path.contains("blank") ||
                 id.contains("border") || path.contains("border") ||
-                id.contains("FOW") || path.contains("FOW") ||
+                id.contains("FOW") || path.contains("fow") ||
                 id.contains("anomaly") || path.contains("anomaly") ||
-                id.contains("DeltaWH") || path.contains("DeltaWH") ||
-                id.contains("Seed") || path.contains("Seed") ||
-                id.contains("MR") || path.contains("MR") ||
-                id.contains("Mallice") || path.contains("Mallice") ||
-                id.contains("Ethan") || path.contains("Ethan") ||
+                id.contains("DeltaWH") || path.contains("deltawh") ||
+                id.contains("Seed") || path.contains("seed") ||
+                id.contains("MR") || path.contains("mr") || id.equalsIgnoreCase("18") ||
+                id.contains("Mallice") || path.contains("mallice") ||
+                id.contains("Ethan") || path.contains("rthan") ||
                 id.contains("prison") || path.contains("prison") ||
-                id.contains("Kwon") || path.contains("Kwon") ||
+                id.contains("Kwon") || path.contains("kwon") ||
                 id.contains("home") || path.contains("home") ||
                 id.contains("hs") || path.contains("hs") ||
                 id.contains("red") || path.contains("red") ||

@@ -678,7 +678,7 @@ public class MapGenerator {
                 }
                 String needToMsg = "Needs To Follow: ";
                 List<Integer> unfollowedSCs = new ArrayList<>();
-                for (int sc : game.getPlayedSCsInOrder(player)) {
+                for (int sc : game.getPlayedSCsInOrder(player, game)) {
                     if (!player.hasFollowedSC(sc)) {
                         unfollowedSCs.add(sc);
                     }

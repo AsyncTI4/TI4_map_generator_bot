@@ -100,6 +100,7 @@ public class MessageListener extends ListenerAdapter {
                 if (!event.getInteraction().getName().equals(Constants.HELP)
                         && !event.getInteraction().getName().equals(Constants.STATISTICS)
                         && !event.getInteraction().getName().equals(Constants.BOTHELPER)
+                        && !event.getInteraction().getName().equals(Constants.DEVELOPER)
                         && (event.getInteraction().getSubcommandName() == null || !event.getInteraction()
                                 .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
                         && !event.getInteraction().getName().equals(Constants.SEARCH)
@@ -270,7 +271,7 @@ public class MessageListener extends ListenerAdapter {
                 }
                 if (activeGame.isFastSCFollowMode()) {
                     for (Player player : activeGame.getRealPlayers()) {
-                        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
+                        for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
                             if (!player.hasFollowedSC(sc)) {
                                 long twelveHrs = 12 * 60 * 60 * multiplier;
                                 long twentyFourhrs = 24 * 60 * 60 * multiplier;

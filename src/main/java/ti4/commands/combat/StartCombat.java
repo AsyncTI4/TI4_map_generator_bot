@@ -128,6 +128,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!activeGame.isFoWMode()) {
             channel = activeGame.getMainGameChannel();
         }
+        StartCombat.sendStartOfCombatSecretMessages(activeGame, player1, player2, tile, spaceOrGround);
         TextChannel textChannel = (TextChannel) channel;
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
@@ -151,7 +152,6 @@ public class StartCombat extends CombatSubcommandData {
 
         // Create the thread
         final String finalThreadName = threadName;
-        StartCombat.sendStartOfCombatSecretMessages(activeGame, player1, player2, tile, spaceOrGround);
         channel.sendMessage("Resolve Combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             if (activeGame.isFoWMode()) {
