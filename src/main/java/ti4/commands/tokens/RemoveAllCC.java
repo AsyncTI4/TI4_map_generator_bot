@@ -53,7 +53,7 @@ public class RemoveAllCC implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Remove all cc from entire map")
+                Commands.slash(getActionID(), "Remove all CCs from entire map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                                 .setRequired(true))
         );

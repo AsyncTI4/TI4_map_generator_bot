@@ -513,7 +513,7 @@ public class ButtonHelperTacticalAction {
     public static void selectRingThatActiveSystemIsIn(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (player.getTacticalCC() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    ButtonHelper.getIdent(player) + " does not have any tactical cc.");
+                    ButtonHelper.getIdent(player) + " does not have any tactical CC.");
             return;
         }
         activeGame.setNaaluAgent(false);

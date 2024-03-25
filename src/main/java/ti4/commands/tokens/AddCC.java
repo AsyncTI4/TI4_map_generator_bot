@@ -109,7 +109,7 @@ public class AddCC extends AddRemoveToken {
 
     @Override
     protected String getActionDescription() {
-        return "Add cc to tile/system";
+        return "Add CC to tile/system";
     }
 
     @Override

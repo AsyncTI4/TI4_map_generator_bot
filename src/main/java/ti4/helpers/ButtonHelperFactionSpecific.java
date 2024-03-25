@@ -71,7 +71,7 @@ public class ButtonHelperFactionSpecific {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " tell the bot who's cc you want to place down",
+                player.getRepresentation(true, true) + " tell the bot who's CC you want to place down",
                 buttons);
     }
 
@@ -651,7 +651,7 @@ public class ButtonHelperFactionSpecific {
         int oldStratCC = hacan.getStrategicCC();
         if (oldStratCC < 1) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-                    ButtonHelper.getIdent(hacan) + " did not have enough strat cc. #rejected");
+                    ButtonHelper.getIdent(hacan) + " did not have enough strategy CCs. #rejected");
             return;
         }
 
@@ -660,7 +660,7 @@ public class ButtonHelperFactionSpecific {
         hacan.setStrategicCC(oldStratCC - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(hacan, activeGame, event);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-                ButtonHelper.getIdent(hacan) + " lost a strat cc and gained 4tg (" + oldTg + "->" + hacan.getTg()
+                ButtonHelper.getIdent(hacan) + " lost a strategy CC and gained 4tg (" + oldTg + "->" + hacan.getTg()
                         + ")");
         ButtonHelperAbilities.pillageCheck(hacan, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(hacan, activeGame, 4);
@@ -688,7 +688,7 @@ public class ButtonHelperFactionSpecific {
         int oldStratCC = hacan.getStrategicCC();
         if (oldStratCC < 1) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-                    ButtonHelper.getIdent(hacan) + " did not have enough strat cc. #rejected");
+                    ButtonHelper.getIdent(hacan) + " did not have enough strategy CCs. #rejected");
             return;
         }
 
@@ -698,7 +698,7 @@ public class ButtonHelperFactionSpecific {
         hacan.setTg(oldTg - 3);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-                ButtonHelper.getIdent(hacan) + " lost a strat cc and 3tg (" + oldTg + "->" + hacan.getTg() + ")");
+                ButtonHelper.getIdent(hacan) + " lost a strategy CC and 3tg (" + oldTg + "->" + hacan.getTg() + ")");
 
         List<Button> buttons = getSwapSCButtons(activeGame, "qdn", hacan);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(hacan, activeGame),
@@ -1940,11 +1940,11 @@ public class ButtonHelperFactionSpecific {
             } else {
                 if (player.getTacticalCC() > 0) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
-                    msg = msg + " You lost a tactic cc";
+                    msg = msg + " You lost a tactic CC";
                 } else {
                     if (player.getFleetCC() > 0) {
                         player.setFleetCC(player.getFleetCC() - 1);
-                        msg = msg + " You lost a fleet cc";
+                        msg = msg + " You lost a fleet CC";
                     }
                 }
             }

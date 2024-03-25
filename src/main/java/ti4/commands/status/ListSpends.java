@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class ListSpends extends StatusSubcommandData {
     public ListSpends() {
-        super(Constants.SPENDS, "List value of plastic and ccs gained by players this game");
+        super(Constants.SPENDS, "List value of plastic and CCs gained by players this game");
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ListSpends extends StatusSubcommandData {
     }
 
     private String playerSpends(Player player) {
-      return "> " + player.getUserName() + ": "+player.getTotalExpenses()+" total i/r value of plastic built and ccs gained";
+      return "> " + player.getUserName() + ": "+player.getTotalExpenses()+" total i/r value of plastic built and CCs gained";
     }
 
     @Override

@@ -302,7 +302,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
         String message = p2.getRepresentation(true, true) + " increased your tgs by 2 (" + (p2.getTg() - 2) + "->"
             + p2.getTg()
-            + "). Use buttons in your cards info thread to discard an AC, or lose a cc";
+            + "). Use buttons in your cards info thread to discard an AC, or lose a CC";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message);
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentation(true, true) + " use buttons to discard",
@@ -905,7 +905,7 @@ public class ButtonHelperAgents {
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             if (p2.getStrategicCC() < 1) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Target did not have a strat cc, no action taken");
+                    "Target did not have a strategy CC, no action taken");
                 return;
             }
             List<Button> buttons = new ArrayList<>();
@@ -915,7 +915,7 @@ public class ButtonHelperAgents {
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, activeGame);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, activeGame, event);
             String message0 = p2.getRepresentation(true, true)
-                + "A cc has been subtracted from your strat pool due to use of mirveda agent. You can add it back if you didnt agree to the agent";
+                + "A CC has been subtracted from your strat pool due to use of mirveda agent. You can add it back if you didnt agree to the agent";
             String message = p2.getRepresentation(true, true)
                 + " Use buttons to get a tech of a color which matches one of the unit upgrades pre-reqs";
             MessageHelper.sendMessageToChannel(channel, message0);
@@ -1279,7 +1279,7 @@ public class ButtonHelperAgents {
             buttons.add(Button.success("cheiranAgentStep2_" + tile.getPosition(),
                 tile.getRepresentationForButtons(activeGame, player)));
         }
-        String msg = player.getRepresentation(true, true) + " choose the tile you wish to remove a cc from";
+        String msg = player.getRepresentation(true, true) + " choose the tile you wish to remove a CC from";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
     }
 
@@ -1389,7 +1389,7 @@ public class ButtonHelperAgents {
         Tile origTile = activeGame.getTileByPosition(pos);
         RemoveCC.removeCC(event, player.getColor(), origTile, activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " removed a cc from "
+            ButtonHelper.getIdent(player) + " removed a CC from "
                 + origTile.getRepresentationForButtons(activeGame, player) + " using Cheiran Agent");
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : getAdjacentTilesWithStructuresInThem(player, activeGame, origTile)) {
@@ -1400,7 +1400,7 @@ public class ButtonHelperAgents {
                 return;
             }
         }
-        String msg = player.getRepresentation(true, true) + " choose the tile you wish to place a cc in";
+        String msg = player.getRepresentation(true, true) + " choose the tile you wish to place a CC in";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
         event.getMessage().delete().queue();
     }
@@ -1411,7 +1411,7 @@ public class ButtonHelperAgents {
         Tile origTile = activeGame.getTileByPosition(pos);
         AddCC.addCC(event, player.getColor(), origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " placed a cc in "
+            ButtonHelper.getIdent(player) + " placed a CC in "
                 + origTile.getRepresentationForButtons(activeGame, player) + " using Cheiran Agent");
         event.getMessage().delete().queue();
     }

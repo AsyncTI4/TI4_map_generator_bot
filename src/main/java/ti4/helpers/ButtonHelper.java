@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1376,7 +1377,7 @@ public class ButtonHelper {
                         channel = player.getPrivateChannel();
                     }
                     MessageHelper.sendMessageToChannel(channel, activePlayerident
-                            + " lost 1 fleet cc due to neuroglaive (" + cTG + "->" + player.getFleetCC() + ")");
+                            + " lost 1 fleet CC due to neuroglaive (" + cTG + "->" + player.getFleetCC() + ")");
                     checkFleetInEveryTile(player, game, event);
                 }
             }
@@ -2694,7 +2695,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, game),
                 mahact.getRepresentation(true, true) + " the " + target.getColor()
-                        + " cc has been removed from your fleet pool");
+                        + " CC has been removed from your fleet pool");
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Button.danger(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
@@ -2710,7 +2711,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), message2, buttons);
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target.getRepresentation(true,
                 true)
-                + " You've been hit with the Mahact mech ability. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+                + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " the Mahact Starlancer mech ability. You gain a CC to any command pool. Then, use the buttons to resolve end of turn abilities and then end turn.",
                 conclusionButtons);
         event.getMessage().delete().queue();
     }
@@ -2728,7 +2729,7 @@ public class ButtonHelper {
             AddCC.addCC(event, target.getColor(), tile);
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, game),
-                mahact.getRepresentation(true, true) + " you have spent a strat cc");
+                mahact.getRepresentation(true, true) + " you have spent a strategy CC");
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Button.danger(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
@@ -2739,7 +2740,7 @@ public class ButtonHelper {
 
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target
                 .getRepresentation(true, true)
-                + " You've been hit with nullification field. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+                + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " *Nullification Field*. A CC has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
                 conclusionButtons);
         event.getMessage().delete().queue();
 
@@ -2786,7 +2787,7 @@ public class ButtonHelper {
 
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target
                 .getRepresentation(true, true)
-                + " You've been hit with minister of peace. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+                + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " *Minister of Peace*. A CC has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
                 conclusionButtons);
         deleteTheOneButton(event);
 
@@ -4132,7 +4133,7 @@ public class ButtonHelper {
                 }
                 RemoveCC.removeCC(event, p2.getColor(), tile, game);
                 String message = p2.getRepresentation(true, true)
-                        + " due to having the empyrean commander, the cc you had in the active system has been removed. Reminder that this is optional but was done automatically";
+                        + " due to having the empyrean commander, the CC you had in the active system has been removed. Reminder that this is optional but was done automatically";
                 MessageHelper.sendMessageToChannel(channel, message);
             }
         }
@@ -8471,11 +8472,11 @@ public class ButtonHelper {
             case "absolMOW" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         getIdent(p1)
-                                + " is exhausting the agenda called Minister of War and spending a strategy cc to remove 1 cc from the board");
+                                + " is exhausting the agenda called Minister of War and spending a strategy CC to remove 1 CC from the board");
                 if (p1.getStrategicCC() > 0) {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), getIdent(p1)
-                            + " strategy cc went from " + (p1.getStrategicCC() + 1) + " to " + p1.getStrategicCC());
+                            + " strategy CC went from " + (p1.getStrategicCC() + 1) + " to " + p1.getStrategicCC());
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
                 }
                 List<Button> buttons = getButtonsToRemoveYourCC(p1, game, event, "absol");
@@ -8867,7 +8868,7 @@ public class ButtonHelper {
                     player.getRepresentation(true, true) + " acquired Warsun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = owner.getRepresentation(true, true)
-                    + " reduced your fleet cc by 1 due to fires being played";
+                    + " reduced your fleet CC by 1 due to fires being played";
             if (game.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
             } else {
@@ -8892,7 +8893,7 @@ public class ButtonHelper {
             if (owner.getStrategicCC() > 0) {
                 owner.setStrategicCC(owner.getStrategicCC() - 1);
                 String reducedMsg = owner.getRepresentation(true, true)
-                        + " reduced your strategy cc by 1 due to your PN getting played";
+                        + " reduced your strategy CC by 1 due to your PN getting played";
                 if (game.isFoWMode()) {
                     MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
                 } else {
@@ -8903,7 +8904,7 @@ public class ButtonHelper {
                         "Political Facor (xxcha PN) was played");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "PN owner did not have a strategy cc, agenda not vetod");
+                        "PN owner did not have a strategy CC, agenda not vetod");
             }
         }
         if (("scepter".equalsIgnoreCase(id))) {

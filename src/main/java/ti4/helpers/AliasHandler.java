@@ -44,7 +44,7 @@ public class AliasHandler {
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitListForHelp);
-        readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
+        readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read CC token alias file");
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");

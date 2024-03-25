@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -691,7 +692,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " tell the bot who's cc you want to place down",
+                player.getRepresentation(true, true) + " tell the bot who's CC you want to place down",
                 buttons);
     }
 
@@ -951,7 +952,7 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true)
-                        + " tell the bot which player you want to subtract a tactical cc from",
+                        + " tell the bot which player you want to subtract a tactical CC from",
                 buttons);
     }
 
@@ -1024,10 +1025,10 @@ public class ButtonHelperActionCards {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         p2.setTacticalCC(p2.getTacticalCC() - 1);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " you subtracted 1 tactical cc from "
+                player.getRepresentation(true, true) + " you subtracted 1 tactical CC from "
                         + ButtonHelper.getIdentOrColor(p2, activeGame));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
-                p2.getRepresentation(true, true) + " you lost a tactic cc due to insubordination ("
+                p2.getRepresentation(true, true) + " you lost a tactic CC due to insubordination ("
                         + (p2.getTacticalCC() + 1) + "->" + p2.getTacticalCC() + ").");
         event.getMessage().delete().queue();
     }
@@ -1086,7 +1087,7 @@ public class ButtonHelperActionCards {
         buttons.add(Button.success("spyStep3_" + player.getFaction(), "Send random AC"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentation(true, true)
-                        + " you have been hit with an ability which forces you to send a random AC. Press the button to send a random AC to the person.",
+                        + " you have been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " an ability which forces you to send a random AC. Press the button to send a random AC to the person.",
                 buttons);
         event.getMessage().delete().queue();
     }

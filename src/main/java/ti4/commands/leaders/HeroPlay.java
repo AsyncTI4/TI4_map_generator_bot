@@ -232,7 +232,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        player.getRepresentation(true, true) + " removed all of your ccs from the board");
+                        player.getRepresentation(true, true) + " removed all of your CCs from the board");
                 for (Tile t : activeGame.getTileMap().values()) {
                     if (AddCC.hasCC(event, player.getColor(), t)) {
                         RemoveCC.removeCC(event, player.getColor(), t, activeGame);
@@ -253,7 +253,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
-                        + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical cc from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
+                        + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical CC from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
                 activeGame.setL1Hero(true);
                 activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
@@ -263,7 +263,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                         showFlavourText)
-                        + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
+                        + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a CC for resolving it.",
                         buttons);
             }
             case "gheminaherolady" -> {
