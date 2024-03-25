@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
@@ -3012,7 +3013,6 @@ public class AgendaHelper {
                 }
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
                 while (vote_info.hasMoreTokens()) {
-
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     if (capitalize) {
@@ -3025,17 +3025,13 @@ public class AgendaHelper {
                             faction = "Someone";
                         }
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
-                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")
-                                && !vote.contains("Tarrock")) {
+                        if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
                         }
                         outcomeSummaryBuilder.append(faction).append("-").append(vote).append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
-                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                                && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")
-                                && !vote.contains("Tarrock")) {
+                        if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder.append(faction).append(" voted ").append(vote).append(" votes. ");
                         } else {

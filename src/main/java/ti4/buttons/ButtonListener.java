@@ -2964,7 +2964,8 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = new ArrayList<>();
                     boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
                     int scNum = 7;
-                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()
+                            && !activeGame.getComponentAction()) {
                         player.addFollowedSC(scNum);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                         if (player.getStrategicCC() > 0) {
