@@ -271,7 +271,7 @@ public class MessageListener extends ListenerAdapter {
                 }
                 if (activeGame.isFastSCFollowMode()) {
                     for (Player player : activeGame.getRealPlayers()) {
-                        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
+                        for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
                             if (!player.hasFollowedSC(sc)) {
                                 long twelveHrs = 12 * 60 * 60 * multiplier;
                                 long twentyFourhrs = 24 * 60 * 60 * multiplier;
