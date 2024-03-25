@@ -54,6 +54,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         buttons.add(Button.success("offerInfoButtonStep2_hero", "Hero Info"));
         buttons.add(Button.success("offerInfoButtonStep2_relic", "Relic Info"));
         buttons.add(Button.success("offerInfoButtonStep2_planet", "Planet Info"));
+        buttons.add(Button.success("offerInfoButtonStep2_units", "Special Units"));
+        buttons.add(Button.success("offerInfoButtonStep2_pn", "Faction PN"));
         buttons.add(Button.success("offerInfoButtonStep2_tech", "Researched Tech"));
         buttons.add(Button.success("offerInfoButtonStep2_ftech", "Faction Tech"));
         String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
@@ -103,6 +105,11 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         for (String tech : p2.getFactionTechs()) {
                             messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                         }
+                        for (String unit : p2.getUnitsOwned()) {
+                            if (unit.contains("_")) {
+                                messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
+                            }
+                        }
                         for (String relic : p2.getRelics()) {
                             messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
                         }
@@ -112,6 +119,11 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         }
                         for (String tech : p2.getTechs()) {
                             messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                        }
+                        for (String pn : p2.getPromissoryNotesOwned()) {
+                            if (!pn.contains("_")) {
+                                messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                            }
                         }
                     }
                     case "abilities" -> {
@@ -143,10 +155,24 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                                     + "\n");
                         }
                     }
+                    case "pn" -> {
+                        for (String pn : p2.getPromissoryNotesOwned()) {
+                            if (!pn.contains("_")) {
+                                messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                            }
+                        }
+                    }
                     case "agent", "commander", "hero" -> {
                         for (Leader lead : p2.getLeaders()) {
                             if (lead.getId().contains(category)) {
                                 messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed());
+                            }
+                        }
+                    }
+                    case "units" -> {
+                        for (String unit : p2.getUnitsOwned()) {
+                            if (unit.contains("_")) {
+                                messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
                             }
                         }
                     }
@@ -159,6 +185,11 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     sb.append(new Stats().getPlayersCurrentStatsText(p2, activeGame));
                     for (String ability : p2.getAbilities()) {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
+                    }
+                    for (String unit : p2.getUnitsOwned()) {
+                        if (unit.contains("_")) {
+                            messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
+                        }
                     }
                     for (Leader lead : p2.getLeaders()) {
                         messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed());
@@ -175,6 +206,11 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     }
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                    for (String pn : p2.getPromissoryNotesOwned()) {
+                        if (!pn.contains("_")) {
+                            messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
+                        }
                     }
                 }
                 case "abilities" -> {
@@ -210,6 +246,20 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     for (Leader lead : p2.getLeaders()) {
                         if (lead.getId().contains(category)) {
                             messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed());
+                        }
+                    }
+                }
+                case "units" -> {
+                    for (String unit : p2.getUnitsOwned()) {
+                        if (unit.contains("_")) {
+                            messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
+                        }
+                    }
+                }
+                case "pn" -> {
+                    for (String pn : p2.getPromissoryNotesOwned()) {
+                        if (!pn.contains("_")) {
+                            messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                         }
                     }
                 }
@@ -423,7 +473,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "outer_rim", "control_borderlands" -> {
                 int edge = 0;
                 for (Tile tile : activeGame.getTileMap().values()) {
-                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(activeGame)) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(activeGame)
+                            && tile != FoWHelper.getPlayerHS(activeGame, player)) {
                         edge++;
                     }
                 }
@@ -443,7 +494,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int counter = 0;
                 for (String planet : player.getPlanets()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-                    if (uH != null && !activeGame.getTileFromPlanet(planet).isHomeSystem()
+                    if (uH != null && activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)
                             && (uH.getUnitCount(UnitType.Spacedock, player) > 0
                                     || uH.getUnitCount(UnitType.Pds, player) > 0)) {
                         counter++;
