@@ -87,7 +87,7 @@ public class GameStats extends StatisticsSubcommandData {
     public enum GameStatistics {
         // Add your new statistic here
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
-        HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on ccs/plastics that bot has"),
+        HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"),
         GAME_LENGTH("Game Length", "Show game lengths"),
         GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
         FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),

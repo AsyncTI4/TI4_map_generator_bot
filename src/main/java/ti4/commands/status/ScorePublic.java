@@ -161,7 +161,7 @@ public class ScorePublic extends StatusSubcommandData {
 								+ ")");
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 5tg because you didnt have that");
+						"Did not deduct 5tg because you didn't have that");
 			}
 		}
 		if (poName.contains("Centralize Galactic Trade")) {
@@ -173,7 +173,7 @@ public class ScorePublic extends StatusSubcommandData {
 								+ ")");
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 10tg because you didnt have that");
+						"Did not deduct 10tg because you didn't have that");
 			}
 		}
 		if (poName.contains("Lead From the Front")) {
@@ -186,7 +186,7 @@ public class ScorePublic extends StatusSubcommandData {
 					}
 					player.setStrategicCC(currentStrat - 3);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 3 strat cc (" + currentStrat + "->"
+							player.getRepresentation() + " Automatically deducted 3 strategy CCs (" + currentStrat + "->"
 									+ player.getStrategicCC() + ")");
 				} else {
 					String currentCC = player.getCCRepresentation();
@@ -197,12 +197,12 @@ public class ScorePublic extends StatusSubcommandData {
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 3 strat/tactic cc (" + currentCC
+							player.getRepresentation() + " Automatically deducted 3 strategy/tactic CCs (" + currentCC
 									+ "->" + player.getCCRepresentation() + ")");
 				}
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 3cc because you didnt have that");
+						"Did not deduct 3 CCs because you didn't have that");
 			}
 		}
 		if (poName.contains("Galvanize the People")) {
@@ -215,7 +215,7 @@ public class ScorePublic extends StatusSubcommandData {
 					}
 					player.setStrategicCC(currentStrat - 6);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 6 strat cc (" + currentStrat + "->"
+							player.getRepresentation() + " Automatically deducted 6 strategy CCs (" + currentStrat + "->"
 									+ player.getStrategicCC() + ")");
 				} else {
 					String currentCC = player.getCCRepresentation();
@@ -226,12 +226,12 @@ public class ScorePublic extends StatusSubcommandData {
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 6 strat/tactic cc (" + currentCC
+							player.getRepresentation() + " Automatically deducted 6 strategy/tactic CCs (" + currentCC
 									+ "->" + player.getCCRepresentation() + ")");
 				}
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 6cc because you didnt have that");
+						"Did not deduct 6 CCs because you didn't have that");
 			}
 		}
 

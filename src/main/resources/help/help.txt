@@ -40,7 +40,7 @@ This adds a template with positions
 Now additional commands:
 /map add_tile tileName positionOnMap
 (We using somno template positions on map. from setup template and you see positions.
-Also we support TopLeft, TopRight, BottomLeft and BottomRight positions coresponding to TL, TR, BL, BR
+Also we support TopLeft, TopRight, BottomLeft and BottomRight positions corresponding to TL, TR, BL, BR
 Mecatol position is MR)
 /map add_tile_list tileList <- tile list is code from map Generators like TTS uses, example: https://ti4-map-generator.derekpeterson.ca/
 You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
@@ -48,13 +48,13 @@ You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /delete_game <-deletes your game, only can delete the map you created
 /show_game gameName(optional) display_type(optional) <- displays the game map, display_type can be set to all, map, stats. Displays map + player stats, just map or just player stats
 If you have active game set, it shows your active game if no game name is defines
-/add_cc colorList(factionList) tile or position <- add's cc to system: colorList can be pink,red,black as example/
-/remove_cc colorList(FactionList) tile or position <- remove's cc from system: colorList can be pink,red,black as example/
-/remove_all_cc confirmation(YES) <- need to type in YES, will remove all CC's from active game
+/add_cc colorList(factionList) tile or position <- adds CC to system: colorList can be pink,red,black as example/
+/remove_cc colorList(FactionList) tile or position <- removes CC from system: colorList can be pink,red,black as example/
+/remove_all_cc confirmation(YES) <- need to type in YES, will remove all CCs from active game
 /add_control faction_or_color tile planetList <- need to specify tile and planetList, example /add_control pink 3a arnor,lor
 /remove_control faction_or_color tile planet
 and most interesting is
-/add_units tile unitList faction_or_color add_cc_from_tactics(optional) <- add_cc_from_tactics if types yes or y, will remove cc from tactics and add to tile
+/add_units tile unitList faction_or_color add_cc_from_tactics(optional) <- add_cc_from_tactics if types yes or y, will remove CC from tactics and add to tile
 /remove_units tile unitList faction_or_color
 /remove_all_units tile faction_or_color
 /add_damage_unit tile unitList faction_or_color
@@ -79,25 +79,25 @@ example
 /add_units blue 1c carrier, ff, 2 inf l, sd l, 3 inf
 this command would place blue units in tile 1c
 carrier, fighter, 3 infantry in space
-2 infantry and space dock on lodor planet (or any planet beggining with letter L in that tile)
+2 infantry and space dock on lodor planet (or any planet beginning with letter L in that tile)
 
 commands improvements:
 /remove_units and /move_units
-priority is move/remove damaged units. If we selecte priority_no_damage (and type in yes or y)
+priority is move/remove damaged units. If we select priority_no_damage (and type in yes or y)
 units without damage will be removed/moved to other system
 also moves damage to new system by default if option  is not specified
 
-unitList examples and explanation. If dont specify planet, all units go into space
+unitList examples and explanation. If don't specify planet, all units go into space
 Listing only unit list, so add into command that you want
-dn <- sinle dread into space
-dread <- same sinle dread into space
+dn <- single dread into space
+dread <- same single dread into space
 3 dn <- 3 dreads added into space
 3 dn, 2 destroyers <- 3dread and 2 dd added into space
 3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann
 ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann
 
 /move_units systemFrom unitList systemTo unitListTo faction_or_color cc (optional can be no or retreat)
-Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add cc into moved system
+Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add CC into moved system
 unitListTo <- if you enter 0 or none into as a unit, no unit will spawn in target system :)
 Example:
 /move_units pink quann 2 dn, dd, gf, gf quann wellon 2 dn, dd, 2 gf wellon
@@ -113,14 +113,14 @@ hope helps speed things up
 
 /add_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
 /remove_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
-Attachement tokens can only be added to planets
+Attachment tokens can only be added to planets
 
-/player stats .... <- can set all the major stats for player, when SC is picked, TG's automatically added to user Trade Goods from left on SC TG's
+/player stats .... <- can set all the major stats for player, when SC is picked, TGs automatically added to user Trade Goods from left on SC TGs
 faction_or_color tag helps to define for which player you want to set stats. FOR SELF not needed, needed only if you set for other players
 /player setup faction color hs_tile_position(optional) keleres_hs(options) <- needs to set player faction and color
 /player sc_play faction_color(optional) <- plays your SC that you have in game
 /player sc_pick scNumber <- adds your pick to game. Does not generate map
-/player sc_follow <- removes 1 cc from strategy tokens
+/player sc_follow <- removes 1 CC from strategy tokens
 /player send_tg faction <- take tg from your existing ones and send(add) to target faction tg
 /player send_commodities faction <- take commodities from your existing ones and send(add) to target faction tg
 /player pass <- passes
@@ -143,7 +143,7 @@ Also if you add a planet that another player has it, it auto removes that planet
 Cards commands
 /so draw count(optional) <- draws a secret or specified number of secrets
 /so discard soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
-/so info <- sents player all private cards for given game
+/so info <- sends player all private cards for given game
 /so show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
 /so show_all player <- sends all Secret Objectives to player
 /so show_all_to_add <- shows all Secret Objectives to all players
@@ -152,7 +152,7 @@ Cards commands
 /so deal @player count(optional) <- draws a Secret objective for specified player, can specify count
 /so deal_to_all count(optional) <- draws a Secret objective(s) for all game players
 
-/ac info <- sents player all private cards for given game
+/ac info <- sends player all private cards for given game
 /ac draw count(optional) <- draws a secret or specified number of secrets
 /ac discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
 /ac show acUniqueID player <- sends given action card to player and changes acUniqueID
@@ -181,26 +181,26 @@ Cards commands
 /agenda put_bottom agendaID <- puts agenda bottom
 /agenda look_at_top <- shows top agenda, no action possible
 /agenda look_at_bottom <- shows bottom agenda, no action possible
-/agenda show_discarded <- shows discarded agendas and the id's
+/agenda show_discarded <- shows discarded agendas and the IDs
 /agenda reveal <- reveals agenda to all with ID and automatically puts in discard pile
-/agenda add_law agendaID optionalTextForElected <- add's law to game map and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed
+/agenda add_law agendaID optionalTextForElected <- adds law to game map and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed
 /agenda remove_law agendaID <- removes law from game and puts in discard, ID is showed in map
 /agenda vote_count <- lists vote count, only if planets are used in bot
 /agenda shuffle_deck <- shuffles agenda deck
 /agenda reset_deck <- reset agenda deck and discards to new state
 /agenda reset_draw_state_for_deck <- resets player agenda draw state, when player drew cards but did not put top or bottom, it resets draw
-/agenda shuffle_discard_back_into_deck id <- takes discard agenda and shufles back into deck
+/agenda shuffle_discard_back_into_deck id <- takes discard agenda and shuffles back into deck
 /agenda cleanup confirm:YES <- refresh all player planets after agenda phase
 
 /status po_reveal_stage1 <- reveals stage 1 public objective
 /status po_reveal_stage2 <- reveals stage 2 public objective
 /status po_add_custom name vpWorth <- adds a custom objective with given name and vp worth, like need law VP, need SO scorable for all, use this
 /status po_remove_custom objectiveID <- removes custom objective
-/status po_score id <- score existing objevtcive
+/status po_score id <- score existing objective
 /status po_unscore id <- unscore if you scored by mistake
 /status po_shuffle_back id <- shuffles given objective back into deck, don't use for custom ones, just remove those
-/status cleanup confirmYES <- cleans up all CC's, all unit damage, resets passed status and SC played and SC player selection :) Also increases round number
-/status sc_trade_goods scNumber(optional) tgCount(optional) <- add's Trade goods to unchoose strategy cards, tgCount is total how much it should be on card, when SC is picked, TG's automatically added to user Trade Goods
+/status cleanup confirmYES <- cleans up all CCs, all unit damage, resets passed status and SC played and SC player selection :) Also increases round number
+/status sc_trade_goods scNumber(optional) tgCount(optional) <- adds Trade goods to unchoose strategy cards, tgCount is total how much it should be on card, when SC is picked, TGs automatically added to user Trade Goods
 if not specifying SC and TG, it auto adds +1TG to each unselected SC card
 you can also do
 /status sc_trade_goods SC TGCount
@@ -230,9 +230,9 @@ if need to add Enigmatic Device, please use
 /explore relic_draw_specific Enigmatic Device
 Its workaround for that single explore
 
-/special mahact_cc_to_fs color <- add's any color CC to fleet supply
+/special mahact_cc_to_fs color <- adds any color CC to fleet supply
 /special mahact_cc_from_fs color <- removes any color CC from fleet supply
-/special diplo_system tile <- add's cc for diplomacy SC
+/special diplo_system tile <- adds CC for diplomacy SC
 /special make_secret_into_po soID <- makes scored Secret objective into public objective. To remove Secret as Public, use /status po_remove_custom poID
 /special adjust_round_number <- set round number for game (default increases when using /status cleanup command)
 /special swap_systems tileID tileIDTo <- swaps two tiles (ghost hero)

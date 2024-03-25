@@ -53,7 +53,7 @@ public class RemoveCC extends AddRemoveToken {
 
     @Override
     protected String getActionDescription() {
-        return "Remove cc from tile/system";
+        return "Remove CCs from tile/system";
     }
 
     @Override
