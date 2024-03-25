@@ -1861,6 +1861,8 @@ public class ButtonHelperHeroes {
                 buttons.add(button);
             }
         }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, game), "Use buttons to resolve",
+                buttons);
     }
 
     public static void vadenHeroClearDebt(Game game, Player vaden, ButtonInteractionEvent event, String buttonID) {

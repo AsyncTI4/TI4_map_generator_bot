@@ -32,8 +32,10 @@ public class RevealStage2 extends StatusSubcommandData {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        MessageHelper.sendMessageToChannel(channel,
-                ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+        if (!activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(channel,
+                    ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+        }
         if (activeGame.getCurrentPhase().equalsIgnoreCase("status")) {
             // first do cleanup if necessary
             int playersWithSCs = 0;

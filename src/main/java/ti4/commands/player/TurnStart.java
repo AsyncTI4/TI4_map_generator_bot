@@ -195,7 +195,7 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(player.getRepresentation(true, true));
         sb.append(" Please resolve these before doing anything else:\n");
         int count = 0;
-        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
+        for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
                 if (!activeGame.getFactionsThatReactedToThis("scPlay" + sc).isEmpty()) {
