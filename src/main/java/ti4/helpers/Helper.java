@@ -1416,6 +1416,9 @@ public class Helper {
                         && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("plenaryorbital");
                 }
+                if (player == null || player.getUnitsByAsyncID(unit.asyncID()).size() < 1) {
+                    continue;
+                }
                 UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 int productionValue = unitModel.getProductionValue();
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
