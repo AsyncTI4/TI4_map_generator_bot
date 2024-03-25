@@ -2879,13 +2879,13 @@ public class AgendaHelper {
                 if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey())
                         || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
-                        boolean scored = activeGame.unscorePublicObjective(player.getUserID(), scoredPublic.getKey());
+                        activeGame.unscorePublicObjective(player.getUserID(), scoredPublic.getKey());
                     }
                 }
             }
             List<Integer> scoredSOs = new ArrayList<>(player.getSecretsScored().values());
             for (int soID : scoredSOs) {
-                boolean scored = activeGame.unscoreAndShuffleSecretObjective(player.getUserID(), soID);
+                activeGame.unscoreAndShuffleSecretObjective(player.getUserID(), soID);
             }
 
         }
@@ -2921,15 +2921,13 @@ public class AgendaHelper {
 
             StringBuilder voteSummBuilder = new StringBuilder(voteSumm);
             while (vote_info.hasMoreTokens()) {
-
                 String specificVote = vote_info.nextToken();
                 String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
                 String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                 if (vote.contains("Rider") || vote.contains("Sanction") || vote.contains("Radiance")
                         || vote.contains("Unity Algorithm") || vote.contains("Tarrock") || vote.contains("Hero")) {
                     voteSummBuilder.append(";").append(specificVote);
-                } else if (faction2.equals(faction)) {
-                } else {
+                } else if (!faction2.equals(faction)) {
                     voteSummBuilder.append(";").append(specificVote);
                 }
             }
@@ -2952,9 +2950,7 @@ public class AgendaHelper {
             while (vote_info.hasMoreTokens()) {
                 String specificVote = vote_info.nextToken();
                 String vote = specificVote.split("_")[1];
-                if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")
-                        && !vote.contains("Radiance") && !vote.contains("Unity Algorithm")
-                        && !vote.contains("Tarrock")) {
+                if (NumberUtils.isDigits(vote)) {
                     totalVotes += Integer.parseInt(vote);
                 }
             }
