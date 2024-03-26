@@ -34,6 +34,7 @@ public class AliasHandler {
     private static final Map<String, String> ttpgAttachmentAliasList = new HashMap<>();
     private static final Map<String, String> ttpgTokenAliasList = new HashMap<>();
     private static final Map<String, String> ttpgUnitAliasList = new HashMap<>();
+    private static final Map<String, String> rulesLinks = new HashMap<>();
     private static final Map<String, String> allTileAliases = new HashMap<>();
     private static final Map<String, String> allPlanetAliases = new HashMap<>();
 
@@ -60,6 +61,7 @@ public class AliasHandler {
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
+        readAliasFile("rules_injection.properties", rulesLinks, "Could not read TTPG unit_alias file");
 
         readAliasFile("unit_alias.properties", unitValuesList, false);
         readAliasFile("faction_alias.properties", factionAliasValuesList, false);
@@ -310,6 +312,14 @@ public class AliasHandler {
             //System.out.println("Could not find an alias for TTPGUnit: " + name);
             return name;
         }
+    }
+
+    public static Set<String> getInjectedRules() {
+        return rulesLinks.keySet();
+    }
+
+    public static String getInjectedRule(String keyWork) {
+        return rulesLinks.get(keyWork);
     }
 
     /**
