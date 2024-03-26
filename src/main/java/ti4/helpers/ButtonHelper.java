@@ -1787,7 +1787,7 @@ public class ButtonHelper {
                                             "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
                                             "Website View");
                                     buttonsWeb.add(linkToWebsite);
-                                    buttonsWeb.add(Button.success("gameInfoButtons", "Other Player Info"));
+                                    buttonsWeb.add(Button.success("gameInfoButtons", "Player Info"));
                                 }
                                 buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
                                 buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
@@ -1808,7 +1808,7 @@ public class ButtonHelper {
                                     "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
                                     "Website View");
                             buttonsWeb.add(linkToWebsite);
-                            buttonsWeb.add(Button.success("gameInfoButtons", "Other Player Info"));
+                            buttonsWeb.add(Button.success("gameInfoButtons", "Player Info"));
                         }
                         buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
                         buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
@@ -2872,6 +2872,11 @@ public class ButtonHelper {
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event) {
+
+        deleteTheOneButton(event, true);
+    }
+
+    public static void deleteTheOneButton(ButtonInteractionEvent event, boolean deleteMsg) {
         String exhaustedMessage = event.getMessage().getContentRaw();
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Updated";
@@ -2912,7 +2917,9 @@ public class ButtonHelper {
                 }
             }
         } else {
-            event.getMessage().delete().queue();
+            if (deleteMsg) {
+                event.getMessage().delete().queue();
+            }
         }
     }
 
@@ -6707,18 +6714,6 @@ public class ButtonHelper {
                                 getCrownButtons());
                     }
                 }
-            }
-            if (player.getActionCards() != null && player.getActionCards().containsKey("summit")
-                    && !game.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + "Reminder this is the window to do summit");
-            }
-            if (player.getActionCards() != null && (player.getActionCards().containsKey("investments")
-                    && !game.isCustodiansScored())) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + "Reminder this is the window to do manipulate investments.");
             }
 
             if (player.getActionCards() != null && player.getActionCards().containsKey("stability")) {

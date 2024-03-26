@@ -1597,6 +1597,48 @@ public class Helper {
 
     }
 
+    public static List<Button> getPlaceUnitButtonsForSaarCommander(Player player, Tile origTile, Game activeGame,
+            String placePrefix) {
+        List<Button> unitButtons = new ArrayList<>();
+
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock)) {
+                if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
+                        || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)) {
+                    continue;
+                }
+                for (UnitHolder uH : tile.getUnitHolders().values()) {
+                    if (player.getUnitsOwned().contains("saar_spacedock")
+                            || player.getUnitsOwned().contains("saar_spacedock2")
+                            || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                        if (uH instanceof Planet planet) {
+                            String pp = planet.getName();
+                            Button inf1Button = Button.success(
+                                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
+                                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, activeGame));
+                            inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                            unitButtons.add(inf1Button);
+                        } else {
+                            Button inf1Button = Button.success(
+                                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space"
+                                            + tile.getPosition(),
+                                    "Produce 1 Inf in " + tile.getPosition() + " space");
+                            inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                            unitButtons.add(inf1Button);
+                        }
+                    }
+                }
+                Button ff1Button = Button.success(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tile.getPosition(),
+                        "Produce 1 Fighter in " + tile.getPosition());
+                ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                unitButtons.add(ff1Button);
+            }
+        }
+
+        return unitButtons;
+    }
+
     public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game activeGame,
             Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
@@ -1686,7 +1728,8 @@ public class Helper {
         unitButtons.add(ff1Button);
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                 && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)
-                && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
+                && getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix).size() == 0) {
             Button ff2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp,
                     "Produce 2 Fighters");
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
@@ -1753,7 +1796,8 @@ public class Helper {
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                         && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                         && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4
-                        && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                        && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
+                        && getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix).size() == 0) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp,
                             "Produce 2 Infantry on " + getPlanetRepresentation(pp, activeGame));
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
@@ -1780,7 +1824,8 @@ public class Helper {
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                         && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                         && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4
-                        && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                        && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
+                        && getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix).size() == 0) {
                     Button inf2Button = Button.success(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(),
                             "Produce 2 Infantry in space");
@@ -1793,6 +1838,9 @@ public class Helper {
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 unitButtons.add(mfButton);
             }
+        }
+        if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+            unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix));
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(),
