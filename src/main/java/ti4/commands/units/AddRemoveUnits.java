@@ -61,10 +61,14 @@ abstract public class AddRemoveUnits implements Command {
         }
 
         OptionMapping option = event.getOption(Constants.TILE_NAME);
-        String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
+        String tileOption = option != null
+                ? StringUtils.substringBefore(
+                        event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ")
+                : "nombox";
         String tileID = AliasHandler.resolveTile(tileOption);
         Tile tile = getTileObject(event, tileID, activeGame);
-        if (tile == null) return;
+        if (tile == null)
+            return;
 
         unitParsingForTile(event, color, tile, activeGame);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
@@ -106,14 +110,15 @@ abstract public class AddRemoveUnits implements Command {
         unitParsing(event, color, tile, unitList, activeGame);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame) {
-        
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList,
+            Game activeGame) {
+
         commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
     }
 
-
-    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
+    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList,
+            Game activeGame) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
         commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll(event, tile, color, activeGame);
@@ -123,7 +128,8 @@ abstract public class AddRemoveUnits implements Command {
         return color;
     }
 
-    public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
+    public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList,
+            Game activeGame) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
 
@@ -174,63 +180,72 @@ abstract public class AddRemoveUnits implements Command {
             boolean isValidCount = count > 0;
             boolean isValidUnit = unitPath != null;
             boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
-            if (event instanceof SlashCommandInteractionEvent && (!isValidCount || !isValidUnit || !isValidUnitHolder)) {
+            if (event instanceof SlashCommandInteractionEvent
+                    && (!isValidCount || !isValidUnit || !isValidUnitHolder)) {
 
                 String sb = "Could not parse this section of the command: `" + unitListToken + "`\n> " +
-                    (isValidCount ? "✅" : "❌") +
-                    " Count = `" + count + "`" +
-                    (isValidCount ? "" : " -> Count must be a positive integer") +
-                    "\n> " +
-                    (isValidUnit ? "✅" : "❌") +
-                    " Unit = `" + originalUnit + "`" +
-                    (isValidUnit ? " -> `" + resolvedUnit + "`" : " ->  UnitID or Alias not found. Try something like: `inf, mech, dn, car, cru, des, fs, ws, sd, pds`") +
-                    "\n> " +
-                    (isValidUnitHolder ? "✅" : "❌") +
-                    " Planet = ` " + originalPlanetName + "`" +
-                    (isValidUnitHolder ? " -> `" + planetName + "`" : " -> Planets in this system are: `" + CollectionUtils.join(tile.getUnitHolders().keySet(), ", ") + "`") +
-                    "\n";
+                        (isValidCount ? "✅" : "❌") +
+                        " Count = `" + count + "`" +
+                        (isValidCount ? "" : " -> Count must be a positive integer") +
+                        "\n> " +
+                        (isValidUnit ? "✅" : "❌") +
+                        " Unit = `" + originalUnit + "`" +
+                        (isValidUnit ? " -> `" + resolvedUnit + "`"
+                                : " ->  UnitID or Alias not found. Try something like: `inf, mech, dn, car, cru, des, fs, ws, sd, pds`")
+                        +
+                        "\n> " +
+                        (isValidUnitHolder ? "✅" : "❌") +
+                        " Planet = ` " + originalPlanetName + "`" +
+                        (isValidUnitHolder ? " -> `" + planetName + "`"
+                                : " -> Planets in this system are: `"
+                                        + CollectionUtils.join(tile.getUnitHolders().keySet(), ", ") + "`")
+                        +
+                        "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
                 continue;
             }
             int numPlayersOld = 0;
             int numPlayersNew = 0;
-            if(event instanceof SlashCommandInteractionEvent){
-                List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
-                if(!planetName.equalsIgnoreCase("space")&& !activeGame.isFoWMode()){
+            if (event instanceof SlashCommandInteractionEvent) {
+                List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
+                if (!planetName.equalsIgnoreCase("space") && !activeGame.isFoWMode()) {
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, planetName);
                 }
                 numPlayersOld = playersForCombat.size();
             }
             unitAction(event, tile, count, planetName, unitID, color, activeGame);
-            if(event instanceof SlashCommandInteractionEvent && !activeGame.isFoWMode()){
-                List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
-                if(!planetName.equalsIgnoreCase("space")){
+            if (event instanceof SlashCommandInteractionEvent && !activeGame.isFoWMode()) {
+                List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
+                if (!planetName.equalsIgnoreCase("space")) {
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, planetName);
                 }
                 numPlayersNew = playersForCombat.size();
             }
             addPlanetToPlayArea(event, tile, planetName, activeGame);
-            if(numPlayersNew > numPlayersOld && numPlayersOld!=0){
-                List<Player>  playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
+            if (numPlayersNew > numPlayersOld && numPlayersOld != 0) {
+                List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(activeGame, tile);
                 String combatType = "space";
-                if(!planetName.equalsIgnoreCase("space")){
+                if (!planetName.equalsIgnoreCase("space")) {
                     combatType = "ground";
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, planetName);
                 }
 
-                // Try to get players in order of [activePlayer, otherPlayer, ... (discarded players)]
+                // Try to get players in order of [activePlayer, otherPlayer, ... (discarded
+                // players)]
                 Player player1 = activeGame.getActivePlayer();
-                if (player1 == null) player1 = playersForCombat.get(0);
+                if (player1 == null)
+                    player1 = playersForCombat.get(0);
                 playersForCombat.remove(player1);
                 Player player2 = player1;
-                for(Player p2 : playersForCombat){
-                    if(p2 != player1 && !player1.getAllianceMembers().contains(p2.getFaction())){
+                for (Player p2 : playersForCombat) {
+                    if (p2 != player1 && !player1.getAllianceMembers().contains(p2.getFaction())) {
                         player2 = p2;
                         break;
                     }
                 }
-                if(player1 != player2){
-                    StartCombat.findOrCreateCombatThread(activeGame, event.getMessageChannel(), player1, player2, tile, event, combatType);
+                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox")) {
+                    StartCombat.findOrCreateCombatThread(activeGame, event.getMessageChannel(), player1, player2, tile,
+                            event, combatType);
                 }
             }
         }
@@ -278,7 +293,8 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game activeGame) {
+    public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName,
+            Game activeGame) {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
         if (activeGame == null) {
@@ -314,23 +330,26 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
-        if (tile.isSpaceHolderValid(planetName)) return planetName;
+        if (tile.isSpaceHolderValid(planetName))
+            return planetName;
         return tile.getUnitHolders().keySet().stream()
-            .filter(id -> !Constants.SPACE.equals(planetName))
-            .filter(unitHolderID -> unitHolderID.startsWith(planetName))
-            .findFirst().orElse(planetName);
+                .filter(id -> !Constants.SPACE.equals(planetName))
+                .filter(unitHolderID -> unitHolderID.startsWith(planetName))
+                .findFirst().orElse(planetName);
     }
 
-    abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame);
+    abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName,
+            UnitKey unitID, String color, Game activeGame);
 
-    abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame);
+    abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName,
+            UnitKey unitID, String color, Game activeGame);
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
-        //do nothing, overriden by child classes
+        // do nothing, overriden by child classes
     }
 
     protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Game activeGame) {
-        //do nothing, overriden by child classes
+        // do nothing, overriden by child classes
     }
 
     @Override
@@ -343,12 +362,18 @@ abstract public class AddRemoveUnits implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(
-                    new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
+                Commands.slash(getActionID(), getActionDescription())
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                                .setRequired(true).setAutoComplete(true))
+                        .addOptions(
+                                new OptionData(OptionType.STRING, Constants.UNIT_NAMES,
+                                        "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
+                                        .setRequired(true))
+                        .addOptions(
+                                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                                        .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN,
+                                "'True' to not generate a map update with this command")));
     }
 
     abstract protected String getActionDescription();

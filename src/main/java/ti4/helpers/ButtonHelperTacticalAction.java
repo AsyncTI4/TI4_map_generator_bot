@@ -421,6 +421,9 @@ public class ButtonHelperTacticalAction {
                 if (!"space".equalsIgnoreCase(unitHolder.getName())) {
                     continue;
                 }
+                if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                    break;
+                }
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
                 Player player2 = player;
                 for (Player p2 : players) {

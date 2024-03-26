@@ -1436,13 +1436,13 @@ public class ButtonListener extends ListenerAdapter {
                 case "st" -> { // Sarween Tools
                     player.addSpentThing("sarween");
                     String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
-                    ButtonHelper.deleteTheOneButton(event);
+                    ButtonHelper.deleteTheOneButton(event, false);
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "absol_st" -> { // Absol's Sarween Tools
                     player.addSpentThing("absol_sarween");
                     String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
-                    ButtonHelper.deleteTheOneButton(event);
+                    ButtonHelper.deleteTheOneButton(event, false);
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "absol_pa" -> { // Absol's Psychoarcheology
