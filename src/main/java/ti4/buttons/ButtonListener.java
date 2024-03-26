@@ -3381,6 +3381,37 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                 }
+                case "draw2ac" -> {
+                    boolean hasSchemingAbility = player.hasAbility("scheming");
+                    String message = hasSchemingAbility
+                            ? "Drew 3 Action Cards (Scheming) - please discard an Action Card from your hand"
+                            : "Drew 2 Action cards";
+                    int count = hasSchemingAbility ? 3 : 2;
+                    if (player.hasAbility("autonetic_memory")) {
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+
+                    } else {
+                        for (int i = 0; i < count; i++) {
+                            activeGame.drawActionCard(player.getUserID());
+                        }
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        ButtonHelper.checkACLimit(activeGame, event, player);
+                    }
+
+                    ButtonHelper.addReaction(event, false, false, message, "");
+                    if (hasSchemingAbility) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                                player.getRepresentation(true, true) + " use buttons to discard",
+                                ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+                    }
+                    if (player.getLeaderIDs().contains("yssarilcommander")
+                            && !player.hasLeaderUnlocked("yssarilcommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                    }
+                    ButtonHelper.deleteTheOneButton(event);
+
+                }
                 case "resolveDistinguished" -> ButtonHelperActionCards.resolveDistinguished(player, activeGame, event);
                 case "resolveMykoMech" -> ButtonHelperFactionSpecific.resolveMykoMech(player, activeGame);
                 case "offerNecrophage" -> ButtonHelperFactionSpecific.offerNekrophageButtons(player, event);
