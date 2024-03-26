@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
@@ -32,6 +33,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
@@ -81,11 +83,7 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText,
 			List<MessageEmbed> embeds, List<Button> buttons) {
-		String gameName = channel.getName();
-		gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
-		gameName = StringUtils.substringBefore(gameName, "-");
-		Game activeGame = GameManager.getInstance().getGame(gameName);
+		Game activeGame = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
 				&& !messageText.contains("end of turn ability") && activeGame != null && activeGame.getUndoButton()) {
 			boolean undoPresent = false;
@@ -323,17 +321,23 @@ public class MessageHelper {
 			return;
 		}
 		buttons = sanitizeButtons(buttons, channel);
-		List<MessageCreateData> objects = getMessageCreateDataObjects(messageText, embeds, buttons);
+
+		Game game = getGameFromChannelName(channel.getName());
+		if (game != null && game.isInjectRulesLinks()) {
+			messageText = injectRules(messageText);
+		}
+		final String message = messageText;
+		List<MessageCreateData> objects = getMessageCreateDataObjects(message, embeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
 			if (iterator.hasNext()) { // not message
 				channel.sendMessage(messageCreateData).queue(null,
-						(error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
+						(error) -> BotLogger.log(getRestActionFailureMessage(channel, message, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (messageText != null && (messageText.contains("Use buttons to do your turn")
-							|| messageText.contains("Use buttons to end turn"))) {
+					if (message != null && (message.contains("Use buttons to do your turn")
+							|| message.contains("Use buttons to end turn"))) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -343,8 +347,8 @@ public class MessageHelper {
 						}
 					}
 
-					if (messageText != null && messageText.toLowerCase().contains("up next")
-							&& messageText.contains("#")) {
+					if (message != null && message.toLowerCase().contains("up next")
+							&& message.contains("#")) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -353,20 +357,20 @@ public class MessageHelper {
 							if (activeGame.getLatestUpNextMsg() != null
 									&& !"".equalsIgnoreCase(activeGame.getLatestUpNextMsg())) {
 								String id = activeGame.getLatestUpNextMsg().split("_")[0];
-								String message = activeGame.getLatestUpNextMsg()
+								String msg = activeGame.getLatestUpNextMsg()
 										.substring(activeGame.getLatestUpNextMsg().indexOf("_") + 1).replace("#", "");
-								message = message.replace("UP NEXT", "started their turn");
-
-								activeGame.getActionsChannel().editMessageById(id, message).queue(null,
+								msg = msg.replace("UP NEXT", "started their turn");
+								final String finalMsg = msg;
+								activeGame.getActionsChannel().editMessageById(id, msg).queue(null,
 										(error) -> BotLogger
-												.log(getRestActionFailureMessage(channel, messageText, error)));
+												.log(getRestActionFailureMessage(channel, finalMsg, error)));
 							}
-							activeGame.setLatestUpNextMsg(complete.getId() + "_" + messageText);
+							activeGame.setLatestUpNextMsg(complete.getId() + "_" + message);
 						}
 					}
 					if (restAction != null)
 						restAction.run(complete);
-				}, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
+				}, (error) -> BotLogger.log(getRestActionFailureMessage(channel, message, error)));
 			}
 		}
 	}
@@ -777,5 +781,37 @@ public class MessageHelper {
 			BotLogger.log(sb.toString());
 		}
 		return newButtons;
+	}
+
+	private static String injectRules(String message) {
+		if (message == null) {
+			return null;
+		}
+		try {
+			StringBuilder edited = new StringBuilder(message);
+			StringBuilder copy = new StringBuilder(message.toLowerCase());
+			for (String keyWord : AliasHandler.getInjectedRules()) {
+				if (copy.indexOf(keyWord) > -1) {
+					String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
+					int firstIndex = copy.indexOf(keyWord);
+					int lastIndex = firstIndex + keyWord.length() + 1;
+					copy.insert(firstIndex, "[");
+					copy.insert(lastIndex, replace);
+					edited.insert(firstIndex, "[");
+					edited.insert(lastIndex, replace);
+				}
+			}
+			return edited.toString();
+		} catch (Exception e) {
+			BotLogger.log("Issue injecting Rules into message: " + message, e);
+			return message;
+		}
+	}
+
+	private static Game getGameFromChannelName(String channelName) {
+		String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
+		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
+		gameName = gameName.substring(0, gameName.indexOf("-"));
+		return GameManager.getInstance().getGame(gameName);
 	}
 }
