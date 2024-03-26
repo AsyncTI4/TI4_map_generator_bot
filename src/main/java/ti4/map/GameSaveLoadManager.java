@@ -625,6 +625,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.INJECT_RULES_LINKS + " " + activeGame.isInjectRulesLinks());
+        writer.write(System.lineSeparator());
         writer.write(Constants.SPIN_MODE + " " + activeGame.isSpinMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_UNIT_TAGS + " " + activeGame.isShowUnitTags());
@@ -1863,6 +1865,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setHomeBrewSCMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.INJECT_RULES_LINKS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setInjectRulesLinks(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

@@ -25,6 +25,7 @@ public class CustomizationOptions extends CustomSubcommandData{
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they dont respond with 24hrs"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
@@ -97,6 +98,9 @@ public class CustomizationOptions extends CustomSubcommandData{
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null) activeGame.setHomeBrew(homebrew);
 
+        Boolean injectRules = event.getOption(Constants.INJECT_RULES_LINKS, null, OptionMapping::getAsBoolean);
+        if (injectRules != null) activeGame.setInjectRulesLinks(injectRules);
+
         Boolean queueSO = event.getOption(Constants.QUEUE_SO, null, OptionMapping::getAsBoolean);
         if (queueSO != null) {
             activeGame.setQueueSO(queueSO);
@@ -119,7 +123,7 @@ public class CustomizationOptions extends CustomSubcommandData{
         String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
         if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity)) activeGame.setOutputVerbosity(verbosity);
 
-        String unit_source = event.getOption(Constants.UNIT_SOURCE, null, OptionMapping::getAsString);
-        if (unit_source != null && Mapper.getUnitSources().contains(unit_source)) activeGame.swapInVariantUnits(unit_source);
+        String unitSource = event.getOption(Constants.UNIT_SOURCE, null, OptionMapping::getAsString);
+        if (unitSource != null && Mapper.getUnitSources().contains(unitSource)) activeGame.swapInVariantUnits(unitSource);
     }
 }

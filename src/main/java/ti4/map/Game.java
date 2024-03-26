@@ -152,6 +152,8 @@ public class Game {
     private boolean spinMode;
     @ExportableField
     private boolean stratPings = true;
+    @Getter @Setter
+    private boolean injectRulesLinks = true;
     @ExportableField
     @Getter
     @Setter

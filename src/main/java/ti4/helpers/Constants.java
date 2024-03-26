@@ -1059,4 +1059,5 @@ public class Constants {
     public static final String ELIMINATED = "eliminated";
     public static final String PLANET_FLAVOUR_TEXT = "planet_flavour_text";
     public static final String SOURCE = "source";
+    public static final String INJECT_RULES_LINKS = "inject_rules_links";
 }
