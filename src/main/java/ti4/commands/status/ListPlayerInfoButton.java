@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.player.Stats;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -58,6 +59,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         buttons.add(Button.success("offerInfoButtonStep2_pn", "Faction PN"));
         buttons.add(Button.success("offerInfoButtonStep2_tech", "Researched Tech"));
         buttons.add(Button.success("offerInfoButtonStep2_ftech", "Faction Tech"));
+        buttons.add(Buttons.REFRESH_INFO);
         String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         // event.getMessage().delete().queue();
@@ -82,7 +84,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
-        event.getMessage().delete().queue();
+        // event.getMessage().delete().queue();
     }
 
     public static void resolveOfferInfoButtonStep3(ButtonInteractionEvent event, String buttonID, Game activeGame,
@@ -267,7 +269,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         }
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
-        event.getMessage().delete().queue();
+        // event.getMessage().delete().queue();
     }
 
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game activeGame) {

@@ -31,10 +31,6 @@ public class RevealStage1 extends StatusSubcommandData {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if (!activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(channel,
-                    ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
-        }
         if (activeGame.getCurrentPhase().equalsIgnoreCase("status")) {
             // first do cleanup if necessary
             int playersWithSCs = 0;
@@ -46,6 +42,10 @@ public class RevealStage1 extends StatusSubcommandData {
 
             if (playersWithSCs > 0) {
                 new Cleanup().runStatusCleanup(activeGame);
+                if (!activeGame.isFoWMode()) {
+                    MessageHelper.sendMessageToChannel(channel,
+                            ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+                }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                         activeGame.getPing() + "Status Cleanup Run!");
                 if (!activeGame.isFoWMode()) {
@@ -54,6 +54,11 @@ public class RevealStage1 extends StatusSubcommandData {
                             .thenAccept(fileUpload -> MessageHelper
                                     .sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
                 }
+            }
+        } else {
+            if (!activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(channel,
+                        ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
             }
         }
     }
