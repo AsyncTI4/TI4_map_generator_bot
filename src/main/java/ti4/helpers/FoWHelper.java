@@ -291,8 +291,8 @@ public class FoWHelper {
 			Collection<Tile> tileList = game.getTileMap().values();
 			List<String> frontierTileList = Mapper.getFrontierTileIds();
 			for (Tile tile : tileList) {
-				if ((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size() == 2)
-						|| frontierTileList.contains(tile.getTileID())) {
+				if (tile.getPlanetUnitHolders().size() == 0 && (tile.getUnitHolders().size() == 2
+						|| frontierTileList.contains(tile.getTileID()))) {
 					adjacentPositions.add(tile.getPosition());
 				}
 			}

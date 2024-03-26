@@ -87,7 +87,7 @@ public class GameCommand implements Command {
                     Button linkToWebsite = Button.link(
                             "https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
                     buttons.add(linkToWebsite);
-                    buttons.add(Button.success("gameInfoButtons", "Other Player Info"));
+                    buttons.add(Button.success("gameInfoButtons", "Player Info"));
                 }
                 buttons.add(Button.success("cardsInfo", "Cards Info"));
                 buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
