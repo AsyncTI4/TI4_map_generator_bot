@@ -732,6 +732,14 @@ public class Emojis {
     public static final String Franken6 = "<:Franken6:1180167520079065239>";
     public static final String Franken7 = "<:Franken7:1180167520821452931>";
     public static final String Franken8 = "<:Franken8:1180167522176213062>";
+    public static final String Franken9 = "<:Franken9:1222165989278617620>";
+    public static final String Franken10 = "<:Franken10:1222165990297702471>";
+    public static final String Franken11 = "<:Franken11:1222165991459393658>";
+    public static final String Franken12 = "<:Franken12:1222165992571146341>";
+    public static final String Franken13 = "<:Franken13:1222165993753804870>";
+    public static final String Franken14 = "<:Franken14:1222165994806448261>";
+    public static final String Franken15 = "<:Franken15:1222165995733385287>";
+    public static final String Franken16 = "<:Franken16:1222165988238430238>";
 
     // PBD2000 FACTIONS
     public static final String echoes = "<:echoes:1189668215413026968>";
@@ -921,6 +929,14 @@ public class Emojis {
             case "franken6" -> Franken6;
             case "franken7" -> Franken7;
             case "franken8" -> Franken8;
+            case "franken9" -> Franken9;
+            case "franken10" -> Franken10;
+            case "franken11" -> Franken11;
+            case "franken12" -> Franken12;
+            case "franken13" -> Franken13;
+            case "franken14" -> Franken14;
+            case "franken15" -> Franken15;
+            case "franken16" -> Franken16;
 
             case "echoes" -> echoes;
             case "enclave" -> enclave;
