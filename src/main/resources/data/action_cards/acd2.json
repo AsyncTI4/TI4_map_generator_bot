@@ -270,6 +270,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "electromagnetic_pulse",
+    "name": "Electromagnetic Pulse",
+    "phase": "Action",
+    "window": "After the \"Move Ships\" step in a system that contains your units",
+    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "escape_route",
     "name": "Escape Route",
     "phase": "Action",
@@ -627,15 +636,6 @@
     "window": "Action",
     "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
     "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "singularity_charge",
-    "name": "Singularity Charge",
-    "phase": "Action",
-    "window": "At the start of a combat you are participating in",
-    "text": "Each unit that is participating in this combat and has SUSTAIN DAMAGE becomes damaged.",
-    "flavorText": "In a barely visible flash, their ships' shields dropped. Mendosa growled, \"Full throttle evasive maneuvers, the Tribesmen have laid a trap!\"",
     "source": "action_deck_2"
   },
   {
