@@ -331,6 +331,8 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Speaker: `").append(activeGame.getSpeaker().equals(player.getUserID())).append("`\n");
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
 		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
+		sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");
+		sb.append("> Display Name: `").append(player.getDisplayName()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
 
 		sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
@@ -346,17 +348,19 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
 		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
 		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
-		sb.append("> Total Resource Value of Units: ").append(Emojis.resources).append("`")
+		sb.append("> Total Unit Resource Value: ").append(Emojis.resources).append("`")
 				.append(player.getTotalResourceValueOfUnits()).append("`\n");
-		sb.append("> Total Hit-point Value of Units: ").append(Emojis.PinkHeart).append("`")
+		sb.append("> Total Unit Hit-point Value: ").append(Emojis.PinkHeart).append("`")
 				.append(player.getTotalHPValueOfUnits()).append("`\n");
-		sb.append("> Total Combat Value of Units: ").append("💥").append("`")
+		sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`")
 				.append(player.getTotalCombatValueOfUnits()).append("`\n");
-		sb.append("> Total Unit Ability Value of Units: ").append(Emojis.UnitUpgradeTech).append("`")
+		sb.append("> Total Unit Ability Expected Hits: ").append(Emojis.UnitUpgradeTech).append("`")
 				.append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 		Guild guild = activeGame.getGuild();
 		if (guild != null && activeGame.isFrankenGame()
+				&& player.getBagInfoThreadID() != null
+				&& !"null".equals(player.getBagInfoThreadID())
 				&& guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
 			sb.append("> Bag Draft Thread: ")
 					.append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");

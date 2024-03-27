@@ -545,21 +545,31 @@ public class MapGenerator {
                     continue;
                 }
 
+                // PAINT AVATAR AND USERNAME
                 graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
                 y += 34;
                 graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
-                String userName = player.getUserName()
-                        + ("null".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
-                if (player.isAFK()) {
-                    userName = userName + " -- AFK";
+
+                StringBuilder userName = new StringBuilder();
+                if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
+                    userName.append("[").append(player.getDisplayName()).append("] ");
                 }
-                graphics.drawString(userName, x + 34, y);
+                userName.append(player.getUserName());
+                if (!"null".equals(player.getColor())) {
+                    userName.append(" (").append(player.getColor()).append(")");
+                }
+                if (player.isAFK()) {
+                    userName.append(" -- AFK");
+                }
+
+                graphics.drawString(userName.toString(), x + 34, y);
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
 
+                // PAINT FACTION ICON
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
@@ -2503,7 +2513,11 @@ public class MapGenerator {
 
             // PAINT FACTION
             point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);
-            graphics.drawString(StringUtils.capitalize(player.getFaction()), point.x + deltaX, point.y + deltaY);
+            String factionText = player.getFaction();
+            if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
+                factionText = player.getDisplayName();
+            }
+            graphics.drawString(StringUtils.capitalize(factionText), point.x + deltaX, point.y + deltaY);
 
             // PAIN VICTORY POINTS
             int vpCount = player.getTotalVictoryPoints();
