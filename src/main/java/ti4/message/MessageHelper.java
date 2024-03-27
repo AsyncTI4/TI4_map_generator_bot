@@ -323,9 +323,9 @@ public class MessageHelper {
 		buttons = sanitizeButtons(buttons, channel);
 
 		Game game = getGameFromChannelName(channel.getName());
-		// if (game != null && game.isInjectRulesLinks()) {
-		// messageText = injectRules(messageText);
-		// }
+		if (game != null && game.isInjectRulesLinks()) {
+			messageText = injectRules(messageText);
+		}
 		final String message = messageText;
 		List<MessageCreateData> objects = getMessageCreateDataObjects(message, embeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
