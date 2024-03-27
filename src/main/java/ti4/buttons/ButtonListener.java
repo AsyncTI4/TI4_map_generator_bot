@@ -1987,7 +1987,9 @@ public class ButtonListener extends ListenerAdapter {
             if (p2 != null) {
                 List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, player, p2);
                 String message = p2.getRepresentation(true, true)
-                        + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " S'Ula Mentarion, the Mentak commander. Please select the PN you would like to send";
+                        + " You've been hit by"
+                        + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+                        + " S'Ula Mentarion, the Mentak commander. Please select the PN you would like to send";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                         "Sent " + color + " the buttons for resolving mentak commander");
@@ -2266,6 +2268,11 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveBestowTitleStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("argentHeroStep2_")) {
             ButtonHelperHeroes.argentHeroStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("fogAllianceAgentStep2_")) {
+            ButtonHelperAgents.fogAllianceAgentStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("fogAllianceAgentStep3_")) {
+            event.getMessage().delete().queue();
+            ButtonHelperHeroes.argentHeroStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("argentHeroStep3_")) {
             ButtonHelperHeroes.argentHeroStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("argentHeroStep4_")) {
@@ -2961,47 +2968,10 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "acquireATech" -> { // Buttons.GET_A_TECH
-                    List<Button> buttons = new ArrayList<>();
-                    boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
-                    int scNum = 7;
-                    if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()
-                            && !activeGame.getComponentAction()) {
-                        player.addFollowedSC(scNum);
-                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
-                        if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
-                        }
-                        String message = deductCC(player, event);
-                        ButtonHelper.addReaction(event, false, false, message, "");
-                    }
-                    Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion",
-                            "Get a Blue Tech");
-                    propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
-                    buttons.add(propulsionTech);
-
-                    Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllTechOfType_biotic",
-                            "Get a Green Tech");
-                    bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
-                    buttons.add(bioticTech);
-
-                    Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic",
-                            "Get a Yellow Tech");
-                    cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
-                    buttons.add(cyberneticTech);
-
-                    Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllTechOfType_warfare",
-                            "Get a Red Tech");
-                    warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
-                    buttons.add(warfareTech);
-
-                    Button unitupgradesTech = Button.secondary(
-                            finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
-                    unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
-                    buttons.add(unitupgradesTech);
-
-                    String message = player.getRepresentation() + " What type of tech would you want?";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-
+                    ButtonHelper.acquireATech(player, activeGame, event, buttonID, false);
+                }
+                case "acquireATechWithSC" -> { // Buttons.GET_A_TECH
+                    ButtonHelper.acquireATech(player, activeGame, event, buttonID, true);
                 }
                 case Constants.SO_NO_SCORING -> {
                     String message = player.getRepresentation()
