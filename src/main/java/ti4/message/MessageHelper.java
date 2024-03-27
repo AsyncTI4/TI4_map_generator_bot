@@ -323,9 +323,9 @@ public class MessageHelper {
 		buttons = sanitizeButtons(buttons, channel);
 
 		Game game = getGameFromChannelName(channel.getName());
-		if (game != null && game.isInjectRulesLinks()) {
-			messageText = injectRules(messageText);
-		}
+		// if (game != null && game.isInjectRulesLinks()) {
+		// messageText = injectRules(messageText);
+		// }
 		final String message = messageText;
 		List<MessageCreateData> objects = getMessageCreateDataObjects(message, embeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
@@ -811,7 +811,7 @@ public class MessageHelper {
 	private static Game getGameFromChannelName(String channelName) {
 		String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
-		gameName = gameName.substring(0, gameName.indexOf("-"));
+		gameName = StringUtils.substringBefore(gameName, "-");
 		return GameManager.getInstance().getGame(gameName);
 	}
 }

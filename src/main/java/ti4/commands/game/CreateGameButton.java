@@ -27,6 +27,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class CreateGameButton extends GameSubcommandData {
@@ -87,7 +88,6 @@ public class CreateGameButton extends GameSubcommandData {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
-
         if (members.size() > 0) {
             buttonMsg = "Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n";
             int counter = 1;
