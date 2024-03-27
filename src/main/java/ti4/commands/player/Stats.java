@@ -332,6 +332,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
 		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
 		sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");
+		sb.append("> Display Name: `").append(player.getDisplayName()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
 
 		sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
