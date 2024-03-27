@@ -574,5 +574,14 @@
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
     "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "singularity_charge",
+    "name": "Singularity Charge",
+    "phase": "Action",
+    "window": "After the \"Move Ships\" step in a system that contains your units",
+    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+    "source": "action_deck_2"
   }
 ]
