@@ -73,6 +73,9 @@ public class Player {
     private String faction;
     private String factionEmoji;
 
+    @Getter @Setter
+    private String displayName;
+
     @Setter
     private String playerStatsAnchorPosition;
     private String allianceMembers = "";
