@@ -32,7 +32,7 @@ public class LeaderModelTest extends BaseTi4Test {
     private boolean validateHomebrewReplacesID(LeaderModel techModel) {
         if (techModel.getHomebrewReplacesID().isEmpty())
             return true;
-        if (Mapper.isValidTech(techModel.getHomebrewReplacesID().get()))
+        if (Mapper.isValidLeader(techModel.getHomebrewReplacesID().get()))
             return true;
         System.out.println(
                 "Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `"
