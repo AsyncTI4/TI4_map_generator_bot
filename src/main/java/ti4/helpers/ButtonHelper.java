@@ -2711,7 +2711,9 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), message2, buttons);
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target.getRepresentation(true,
                 true)
-                + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " the Mahact Starlancer mech ability. You gain a CC to any command pool. Then, use the buttons to resolve end of turn abilities and then end turn.",
+                + " You've been hit by"
+                + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+                + " the Mahact Starlancer mech ability. You gain a CC to any command pool. Then, use the buttons to resolve end of turn abilities and then end turn.",
                 conclusionButtons);
         event.getMessage().delete().queue();
     }
@@ -2740,7 +2742,9 @@ public class ButtonHelper {
 
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target
                 .getRepresentation(true, true)
-                + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " *Nullification Field*. A CC has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+                + " You've been hit by"
+                + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+                + " *Nullification Field*. A CC has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
                 conclusionButtons);
         event.getMessage().delete().queue();
 
@@ -2787,7 +2791,9 @@ public class ButtonHelper {
 
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target
                 .getRepresentation(true, true)
-                + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " *Minister of Peace*. A CC has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+                + " You've been hit by"
+                + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+                + " *Minister of Peace*. A CC has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
                 conclusionButtons);
         deleteTheOneButton(event);
 
@@ -7701,6 +7707,14 @@ public class ButtonHelper {
                                     .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
+                        led = "fogallianceagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Button
+                                    .secondary(finChecker + prefix + "leader_" + led,
+                                            "Use " + leaderName + " as Fog Alliance agent")
+                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(lButton);
+                        }
                         led = "yssarilagent";
                         Button lButton = Button
                                 .secondary(finChecker + prefix + "leader_" + led,
@@ -8201,6 +8215,56 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    public static void acquireATech(Player player, Game activeGame, ButtonInteractionEvent event, String messageID,
+            boolean sc) {
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        List<Button> buttons = new ArrayList<>();
+        if (sc) {
+            activeGame.setComponentAction(false);
+            boolean used = new ButtonListener().addUsedSCPlayer(messageID, activeGame, player, event, "");
+            int scNum = 7;
+            if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()
+                    && !activeGame.getComponentAction()) {
+                player.addFollowedSC(scNum);
+                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
+                if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                }
+                String message = new ButtonListener().deductCC(player, event);
+                ButtonHelper.addReaction(event, false, false, message, "");
+            }
+        } else {
+            activeGame.setComponentAction(true);
+        }
+        Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion",
+                "Get a Blue Tech");
+        propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
+        buttons.add(propulsionTech);
+
+        Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllTechOfType_biotic",
+                "Get a Green Tech");
+        bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+        buttons.add(bioticTech);
+
+        Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic",
+                "Get a Yellow Tech");
+        cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
+        buttons.add(cyberneticTech);
+
+        Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllTechOfType_warfare",
+                "Get a Red Tech");
+        warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
+        buttons.add(warfareTech);
+
+        Button unitupgradesTech = Button.secondary(
+                finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
+        unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
+        buttons.add(unitupgradesTech);
+
+        String message = player.getRepresentation() + " What type of tech would you want?";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
     public static void resolvePressedCompButton(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         String prefix = "componentActionRes_";
         String finChecker = p1.getFinsFactionCheckerPrefix();
@@ -8230,6 +8294,9 @@ public class ButtonHelper {
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
                         ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null), null);
+                        if (buttonID.equalsIgnoreCase("fogallianceagent")) {
+                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1, p1.getFactionEmoji());
+                        }
                     }
                 } else if (buttonID.contains("hero")) {
                     HeroPlay.playHero(event, game, p1, p1.getLeader(buttonID).orElse(null));
