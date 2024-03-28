@@ -15,7 +15,7 @@ public class UnitAdd extends UnitAddRemove {
     @Override
     public void doAction(Player player, List<String> unitIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
-        for (String unitID : unitIDs ) {
+        for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
             player.removeOwnedUnitByID(unitModel.getBaseType());
             if (player.ownsUnit(unitID)) {
@@ -25,6 +25,9 @@ public class UnitAdd extends UnitAddRemove {
             }
             sb.append("\n");
             player.addOwnedUnitByID(unitID);
+            if (unitID.equalsIgnoreCase("naaz_mech")) {
+                unitID.equalsIgnoreCase("naaz_mech_space");
+            }
         }
         sendMessage(sb.toString());
     }
