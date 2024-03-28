@@ -50,6 +50,16 @@ Ensure your launch.json file includes a configuration like this:
 
 Set the 5 {VARIABLES} to match your bot, user, server, and system.
 
+### Default Formatter
+
+Ensure your default formatter is set to use the `eclipse-formatter.xml` configuration file.
+
+For VSCode you can set it within User/Workspace settings:
+![image](https://github.com/AsyncTI4/TI4_map_generator_bot/assets/39609802/9a86b828-f16a-49c9-b223-af9624bd9ffe)
+
+In VSCode, to check your current formatter, you can use prompt `Java: Open Java Formatter Settings` and it should open the `eclipse-formatter.xml` file if set correctly.
+![image](https://github.com/AsyncTI4/TI4_map_generator_bot/assets/39609802/f036b3ff-a1b1-40ba-8d64-e3fed493ae76)
+
 ## Run Docker Container
 
 ### Windows 10, VS Code, Docker Desktop
