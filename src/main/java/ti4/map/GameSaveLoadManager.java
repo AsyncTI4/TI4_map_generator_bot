@@ -597,6 +597,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.LIGHT_FOG_MODE + " " + activeGame.isLightFogMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.RED_TAPE_MODE + " " + activeGame.isRedTapeMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.STRAT_PINGS + " " + activeGame.isStratPings());
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + activeGame.isAbsolMode());
@@ -1859,6 +1861,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setLightFogMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.RED_TAPE_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setRedTapeMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

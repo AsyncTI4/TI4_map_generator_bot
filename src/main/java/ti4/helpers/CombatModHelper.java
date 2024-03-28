@@ -293,20 +293,22 @@ public class CombatModHelper {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lizhocommander")) {
                     int nonFighter = 0;
                     int infantry = 0;
+                    int ships = 0;
                     for (UnitModel unitM : unitsByQuantity.keySet()) {
                         if (unitM.getIsShip()) {
                             if (!unitM.getBaseType().equalsIgnoreCase("fighter")) {
                                 nonFighter = nonFighter + unitsByQuantity.get(unitM);
                             }
+                            ships = ships + unitsByQuantity.get(unitM);
                         } else {
                             if (unitM.getBaseType().equalsIgnoreCase("infantry")) {
                                 infantry = infantry + unitsByQuantity.get(unitM);
                             }
                         }
                     }
-                    if (nonFighter < 1 && infantry < 2) {
+                    if (ships > 0 && nonFighter < 2) {
                         meetsCondition = true;
-                    } else if (nonFighter < 2) {
+                    } else if (ships < 1 && infantry < 2) {
                         meetsCondition = true;
                     }
                 }
