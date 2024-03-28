@@ -1007,6 +1007,8 @@ public class Constants {
     public static final String FACTION_EMOJI = "faction_emoji";
     public static final String FACTION_IMAGE_URL = "faction_image_url";
     public static final String SET_FACTION_ICON = "set_faction_icon";
+    public static final String SET_FACTION_DISPLAY_NAME = "set_faction_display_name";
+    public static final String FRANKEN_FACTION_NAME = "franken_faction_suffix";
     public static final String FORCE = "force";
     public static final String REVEAL_SPECIFIC = "reveal_specific";
     public static final String DECAL_SET = "decal_set";
@@ -1065,4 +1067,5 @@ public class Constants {
     public static final String PLANET_FLAVOUR_TEXT = "planet_flavour_text";
     public static final String SOURCE = "source";
     public static final String INJECT_RULES_LINKS = "inject_rules_links";
+    public static final String FACTION_DISPLAY_NAME = "faction_display_name";
 }
