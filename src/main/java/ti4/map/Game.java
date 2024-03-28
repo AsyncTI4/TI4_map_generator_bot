@@ -64,6 +64,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
+import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -147,12 +148,15 @@ public class Game {
     @ExportableField
     private boolean lightFogMode;
     @ExportableField
+    private boolean redTapeMode;
+    @ExportableField
     private boolean homebrewSCMode;
     @ExportableField
     private boolean spinMode;
     @ExportableField
     private boolean stratPings = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean injectRulesLinks = true;
     @ExportableField
     @Getter
@@ -669,6 +673,10 @@ public class Game {
         return lightFogMode;
     }
 
+    public boolean isRedTapeMode() {
+        return redTapeMode;
+    }
+
     public boolean isBaseGameMode() {
         return baseGameMode;
     }
@@ -679,6 +687,10 @@ public class Game {
 
     public void setLightFogMode(boolean lightFogMode) {
         this.lightFogMode = lightFogMode;
+    }
+
+    public void setRedTapeMode(boolean redTape) {
+        redTapeMode = redTape;
     }
 
     public void setBaseGameMode(boolean baseGameMode) {
@@ -1498,6 +1510,36 @@ public class Game {
         }
     }
 
+    public void setUpPeakableObjectives(int num, int type) {
+        if (type == 1) {
+            while (publicObjectives1Peakable.size() != num) {
+                if (publicObjectives1Peakable.size() > num) {
+                    String id = publicObjectives1Peakable.remove(publicObjectives1Peakable.size() - 1);
+                    publicObjectives1.add(id);
+                    Collections.shuffle(publicObjectives1);
+                } else {
+                    Collections.shuffle(publicObjectives1);
+                    String id = publicObjectives1.get(0);
+                    publicObjectives1.remove(id);
+                    publicObjectives1Peakable.add(id);
+                }
+            }
+        } else {
+            while (publicObjectives2Peakable.size() != num) {
+                if (publicObjectives2Peakable.size() > num) {
+                    String id = publicObjectives2Peakable.remove(publicObjectives2Peakable.size() - 1);
+                    publicObjectives2.add(id);
+                    Collections.shuffle(publicObjectives2);
+                } else {
+                    Collections.shuffle(publicObjectives2);
+                    String id = publicObjectives2.get(0);
+                    publicObjectives2.remove(id);
+                    publicObjectives2Peakable.add(id);
+                }
+            }
+        }
+    }
+
     public void setUpPeakableObjectives(int num) {
         if (publicObjectives1Peakable != null && publicObjectives1Peakable.size() < num - 1) {
             for (int x = 0; x < num; x++) {
@@ -1552,12 +1594,49 @@ public class Game {
         }
     }
 
+    public void swapObjectiveOut(int stage1Or2, int place, String id) {
+        if (stage1Or2 == 1) {
+            String removed = publicObjectives1Peakable.remove(place);
+            publicObjectives1Peakable.add(place, id);
+            addObjectiveToDeck(removed);
+        } else {
+            String removed = publicObjectives2Peakable.remove(place);
+            publicObjectives2Peakable.add(place, id);
+            addObjectiveToDeck(removed);
+        }
+    }
+
     public String peakAtObjective(List<String> objectiveList, int place) {
         if (!objectiveList.isEmpty()) {
             place = place - 1;
             return objectiveList.get(place);
         }
         return null;
+    }
+
+    public String getTopObjective(int stage1Or2) {
+        if (stage1Or2 == 1) {
+            String id = publicObjectives1.get(0);
+            publicObjectives1.remove(id);
+            return id;
+        } else {
+            String id = publicObjectives2.get(0);
+            publicObjectives2.remove(id);
+            return id;
+        }
+    }
+
+    public void addObjectiveToDeck(String id) {
+        PublicObjectiveModel obj = Mapper.getPublicObjective(id);
+        if (obj != null) {
+            if (obj.getPoints() == 1) {
+                publicObjectives1.add(id);
+                Collections.shuffle(publicObjectives1);
+            } else {
+                publicObjectives2.add(id);
+                Collections.shuffle(publicObjectives2);
+            }
+        }
     }
 
     public Map.Entry<String, Integer> revealObjective(List<String> objectiveList) {
@@ -4010,6 +4089,7 @@ public class Game {
                 || isHomeBrew()
                 || isFoWMode()
                 || isLightFogMode()
+                || isRedTapeMode()
                 || isDiscordantStarsMode()
                 || isFrankenGame()
                 || isMiltyModMode()

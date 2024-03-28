@@ -63,6 +63,7 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.*;
 import ti4.helpers.Units.UnitKey;
@@ -613,10 +614,26 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("reveal_stage_")) {
             String lastC = buttonID.replace("reveal_stage_", "");
-            if ("2".equalsIgnoreCase(lastC)) {
-                new RevealStage2().revealS2(event, event.getChannel());
+            if (!activeGame.isRedTapeMode()) {
+                if ("2".equalsIgnoreCase(lastC)) {
+                    new RevealStage2().revealS2(event, event.getChannel());
+                } else {
+                    new RevealStage1().revealS1(event, event.getChannel());
+                }
             } else {
-                new RevealStage1().revealS1(event, event.getChannel());
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+                        "In Red Tape, no objective is revealed at this stage");
+                int playersWithSCs = 0;
+                for (Player player2 : activeGame.getRealPlayers()) {
+                    if (player2.getSCs() != null && player2.getSCs().size() > 0 && !player2.getSCs().contains(0)) {
+                        playersWithSCs++;
+                    }
+                }
+                if (playersWithSCs > 0) {
+                    new Cleanup().runStatusCleanup(activeGame);
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+                            activeGame.getPing() + "Status Cleanup Run!");
+                }
             }
 
             ButtonHelper.startStatusHomework(event, activeGame);
