@@ -1,12 +1,18 @@
 package ti4.commands.bothelper;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
-//import ti4.helpers.AgendaHelper;
-import ti4.helpers.ButtonHelper;
+import ti4.commands.special.CheckDistance;
+import ti4.helpers.Helper;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.*;
 
 public class JazzCommand extends BothelperSubcommandData {
     public JazzCommand() {
@@ -18,38 +24,38 @@ public class JazzCommand extends BothelperSubcommandData {
         if (!"228999251328368640".equals(event.getUser().getId())) {
             String jazz = AsyncTI4DiscordBot.jda.getUserById("228999251328368640").getAsMention();
             if ("150809002974904321".equals(event.getUser().getId())) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + jazz + ", but you are an honorary jazz so you may proceed");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are an honorary jazz so you may proceed");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + jazz);
                 return;
             }
         }
 
-        List<String> colorsToCheck = List.of("gray", "black", "blue", "green", "orange", "pink", "purple", "red", "yellow", "petrol", "brown", "tan", "forest", "chrome", "sunset", "turquoise", "gold",
-            "lightgray", "teal", "bloodred", "emerald", "navy", "rose", "lime", "lavender", "spring", "chocolate", "rainbow", "ethereal", "orca", "splitred", "splitblue", "splitgreen", "splitpurple",
-            "splitorange", "splityellow", "splitpink", "splitgold", "splitlime", "splittan", "splitteal", "splitturquoise", "splitbloodred", "splitchocolate", "splitemerald", "splitnavy",
-            "splitpetrol", "splitrainbow");
-
-        StringBuilder sb2 = new StringBuilder("\t");
-        for (String c : colorsToCheck) {
-            sb2.append(c).append("\t");
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
         }
-        sb2.append("\n");
 
-        Map<String, Map<String, Double>> contrastMap = new HashMap<>();
-        for (int i = 0; i < colorsToCheck.size(); i++) {
-            String c1 = colorsToCheck.get(i);
-            sb2.append(c1);
-
-            for (String c2 : colorsToCheck) {
-                double contrast = ButtonHelper.colorContrast(c1, c2);
-                sb2.append(String.format("\t%f", contrast));
-
-                contrastMap.computeIfAbsent(c1, k -> new HashMap<>());
-                contrastMap.get(c1).put(c2, contrast);
-            }
-            sb2.append("\n");
+        int maxDistance = 10;
+        StringBuilder sb = new StringBuilder("x");
+        List<String> positions = game.getTileMap().values().stream().map(Tile::getPosition).sorted().toList();
+        for (String pos : positions) {
+            sb.append(" ").append(pos);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb2.toString());
+        
+        for (String pos : positions) {
+            Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance);
+            sb.append("\n");
+            String row = distances.entrySet().stream()
+                .sorted(Comparator.comparing(Entry::getKey))
+                .map(entry -> entry.getValue() == null ? "100" : Integer.toString(entry.getValue()))
+                .reduce(pos, (a, b) -> a + " " + b);
+            sb.append(row);
+        }
+        sendMessage(sb.toString());
     }
 }
