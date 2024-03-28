@@ -11,18 +11,27 @@ import ti4.message.MessageHelper;
 
 public class SetUpPeakableObjectives extends CustomSubcommandData {
     public SetUpPeakableObjectives() {
-        super(Constants.SETUP_PEAKABLE_OBJECTIVES, "Set up a set of peakable POs");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.NUMBER_OF_OBJECTIVES, "How many objectives you want in stage 1s/stage 2s(4 or 5)").setRequired(true));
-        
+        super(Constants.SETUP_PEAKABLE_OBJECTIVES, "Set up how many remaining unrevealed objectives there are");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.NUMBER_OF_STAGE1_OBJECTIVES,
+                "How many unrevealed stage 1s"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.NUMBER_OF_STAGE2_OBJECTIVES,
+                "How many unrevealed stage 2s"));
+
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        OptionMapping loc1 = event.getOption(Constants.NUMBER_OF_OBJECTIVES);
-        
-        activeGame.setUpPeakableObjectives(loc1.getAsInt());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peakable objective decks with "+ loc1.getAsInt() + " objectives in each.");
+        OptionMapping loc1 = event.getOption(Constants.NUMBER_OF_STAGE1_OBJECTIVES);
+        OptionMapping loc2 = event.getOption(Constants.NUMBER_OF_STAGE2_OBJECTIVES);
+        if (loc1 != null) {
+            activeGame.setUpPeakableObjectives(loc1.getAsInt(), 1);
+        }
+        if (loc2 != null) {
+            activeGame.setUpPeakableObjectives(loc2.getAsInt(), 2);
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Set up objective decks. Check map to confirm remaining unrevealed objectives.");
         GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

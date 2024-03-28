@@ -302,11 +302,9 @@ public class Setup extends PlayerSubcommandData {
                     Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
-            activeGame.setUpPeakableObjectives(10);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
-                            + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
-            GameSaveLoadManager.saveMap(activeGame, event);
+                    player.getRepresentation(true, true)
+                            + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded");
         }
         CardsInfo.sendVariousAdditionalButtons(activeGame, player);
 

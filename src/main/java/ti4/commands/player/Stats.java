@@ -356,11 +356,11 @@ public class Stats extends PlayerSubcommandData {
 				.append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 		Guild guild = activeGame.getGuild();
-		if (guild != null && activeGame.isFrankenGame()
-				&& guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
-			sb.append("> Bag Draft Thread: ")
-					.append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
-		}
+		// if (guild != null && activeGame.isFrankenGame()
+		// && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
+		// sb.append("> Bag Draft Thread: ")
+		// .append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
+		// }
 		sb.append("\n");
 
 		return sb.toString();
