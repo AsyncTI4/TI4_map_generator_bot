@@ -56,7 +56,13 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getLeaderEmoji() {
-        return Optional.ofNullable(getEmoji()).orElse(Emojis.getEmojiFromDiscord(getID()));
+        if (getEmoji() != null) {
+            return getEmoji();
+        }
+        if (getHomebrewReplacesID().isPresent()) {
+            return Emojis.getEmojiFromDiscord(getHomebrewReplacesID().get());
+        }
+        return Emojis.getEmojiFromDiscord(getID());
     }
 
     public Optional<String> getAbilityName() {
@@ -139,11 +145,12 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             || getAbilityText().toLowerCase().contains(searchString)
             || getUnlockCondition().toLowerCase().contains(searchString)
             || getAutoCompleteName().toLowerCase().contains(searchString)
+            || getSource().toString().toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFaction() + " " + getType() + ")";
+        return getName() + " (" + getFaction() + " " + getType() + ") [" + getSource().toString() + "]";
     }
 
 }
