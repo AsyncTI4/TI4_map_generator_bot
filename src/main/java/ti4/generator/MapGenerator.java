@@ -2718,18 +2718,20 @@ public class MapGenerator {
         int x = 5;
         int y1 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
                 publicObjectivesState1, po1, 1, null, false);
+        int y1b = displayUnrevealedObjectives(y1, x, game.getPublicObjectives1Peakable(), 1, game);
 
         x = 801;
         graphics.setColor(new Color(93, 173, 226));
         int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
                 publicObjectivesState2, po2, 2, null, false);
+        int y2b = displayUnrevealedObjectives(y2, x, game.getPublicObjectives2Peakable(), 2, game);
 
         x = 1598;
         graphics.setColor(Color.WHITE);
         int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics,
                 customVP, null, customPublicVP, false);
 
-        return Math.max(y3, Math.max(y1, y2)) + 15;
+        return Math.max(y3, Math.max(y1b, y2b)) + 15;
     }
 
     private int laws(int y) {
@@ -2991,6 +2993,29 @@ public class MapGenerator {
         }
         keysToRemove.forEach(revealedPublicObjectives::remove);
 
+        return y;
+    }
+
+    private int displayUnrevealedObjectives(
+            int y,
+            int x,
+            List<String> unrevealedPublicObjectives,
+            Integer objectiveWorth,
+            Game activeGame) {
+        for (String unRevealed : unrevealedPublicObjectives) {
+
+            String name = Mapper.getPublicObjective(unRevealed).getName();
+
+            if (activeGame.isRedTapeMode()) {
+                graphics.drawString("(Unrevealed) " + name + " - " + objectiveWorth + " VP", x, y + 23);
+            } else {
+                graphics.drawString("(Unrevealed) - " + objectiveWorth + " VP", x, y + 23);
+            }
+
+            graphics.drawRect(x - 4, y - 5, 785, 38);
+
+            y += 43;
+        }
         return y;
     }
 

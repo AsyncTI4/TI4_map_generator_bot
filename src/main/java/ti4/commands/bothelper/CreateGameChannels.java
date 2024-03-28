@@ -302,6 +302,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 "> " + botThread.getAsMention() + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
+        newGame.setUpPeakableObjectives(5, 1);
+        newGame.setUpPeakableObjectives(5, 2);
+
         GameSaveLoadManager.saveMap(newGame, event);
         GameCreate.reportNewGameCreated(newGame);
 

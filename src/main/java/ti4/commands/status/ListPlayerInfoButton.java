@@ -269,7 +269,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         }
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
-        // event.getMessage().delete().queue();
+        event.getMessage().delete().queue();
     }
 
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game activeGame) {

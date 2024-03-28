@@ -1300,14 +1300,14 @@ public class ButtonHelperHeroes {
     }
 
     public static void augersHeroSwap(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        int num = Integer.parseInt(buttonID.split("_")[2]);
+        String id = buttonID.split("_")[2];
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            game.swapStage1(1, num);
+            game.swapObjectiveOut(1, 0, id);
         } else {
-            game.swapStage2(1, num);
+            game.swapObjectiveOut(2, 0, id);
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " put the objective at location " + num
+                player.getRepresentation(true, true) + " put " + Mapper.getPublicObjective(id).getName()
                         + " as next up. Feel free to peek at it to confirm it worked");
         // GameSaveLoadManager.saveMap(game, event);
         event.getMessage().delete().queue();
@@ -1317,20 +1317,17 @@ public class ButtonHelperHeroes {
             ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            int size = game.getPublicObjectives1Peakable().size() - 2;
-            for (int x = size; x < size + 3; x++) {
-                new PeakAtStage1().secondHalfOfPeak(event, game, player, x);
-                String obj = game.peakAtStage1(x);
+
+            for (int x = 0; x < 3; x++) {
+                String obj = game.getTopObjective(1);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-                buttons.add(Button.success("augerHeroSwap_1_" + x, "Put " + po.getName() + " As The Next Objective"));
+                buttons.add(Button.success("augerHeroSwap_1_" + obj, "Put " + po.getName() + " As The Next Objective"));
             }
         } else {
-            int size = game.getPublicObjectives2Peakable().size() - 2;
-            for (int x = size; x < size + 3; x++) {
-                new PeakAtStage2().secondHalfOfPeak(event, game, player, x);
-                String obj = game.peakAtStage2(x);
+            for (int x = 0; x < 3; x++) {
+                String obj = game.getTopObjective(2);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-                buttons.add(Button.success("augerHeroSwap_2_" + x, "Put " + po.getName() + " As The Next Objective"));
+                buttons.add(Button.success("augerHeroSwap_2_" + obj, "Put " + po.getName() + " As The Next Objective"));
             }
         }
         buttons.add(Button.danger("deleteButtons", "Decline to change the next objective"));
