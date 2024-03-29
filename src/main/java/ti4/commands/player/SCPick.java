@@ -103,7 +103,7 @@ public class SCPick extends PlayerSubcommandData {
     public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = new ArrayList<>();
         List<Player> activePlayers = activeGame.getRealPlayers();
-        
+
         int maxSCsPerPlayer = activeGame.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer < 1) {
             maxSCsPerPlayer = 1;
@@ -161,6 +161,11 @@ public class SCPick extends PlayerSubcommandData {
             }
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             activeGame.setScTradeGood(scPicked, 0);
+            if (scPicked == 2 && activeGame.isRedTapeMode()) {
+                for (int x = 0; x < tgCount; x++) {
+                    ButtonHelper.offerRedTapButtons(activeGame, player);
+                }
+            }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " chose which player to give this SC", buttons);
         event.getMessage().delete().queue();
@@ -172,7 +177,7 @@ public class SCPick extends PlayerSubcommandData {
         String factionPicked = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(factionPicked);
         boolean pickSuccessful = new Stats().secondHalfOfPickSC(event, activeGame, p2, scpick);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick +" by "+player.getFactionEmoji());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick + " by " + player.getFactionEmoji());
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), p2.getColor() + " was given SC #" + scpick);
 
@@ -226,7 +231,7 @@ public class SCPick extends PlayerSubcommandData {
 
     public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
-        
+
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
@@ -241,7 +246,6 @@ public class SCPick extends PlayerSubcommandData {
             maxSCsPerPlayer = 1;
         }
 
-        
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
@@ -277,7 +281,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
 
-            msgExtra +=  "\nAll players picked SC";
+            msgExtra += "\nAll players picked SC";
 
             Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
@@ -331,8 +335,6 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
         }
-       
-        
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
