@@ -9,6 +9,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 
 public class LookAtBottomAgenda extends AgendaSubcommandData {
+
     public LookAtBottomAgenda() {
         super(Constants.LOOK_AT_BOTTOM, "Look at bottom Agenda from deck");
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
