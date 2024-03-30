@@ -37,5 +37,7 @@
     "planets": [
         "cormund"
     ],
-    "isGravityRift": true
+    "isGravityRift": true,
+        "source": "pok",
+    "tile_back": "red"
 }
