@@ -36,5 +36,7 @@
     ],
     "wormholes": [],
     "planets": [],
-    "isSupernova": true
+    "isSupernova": true,
+    "source": "base",
+    "tile_back": "red" 
 }
