@@ -39,5 +39,7 @@
         "ALPHA"
     ],
     "planets": [],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "source": "pok",
+    "tile_back": "red"
 }
