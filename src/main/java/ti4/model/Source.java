@@ -19,7 +19,10 @@ public class Source {
         admins, pbd100, testsource, pbd2000,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous;
+        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous,
+        
+        //catchall
+        other;
 
         public String toString() {
             return super.toString().toLowerCase();
