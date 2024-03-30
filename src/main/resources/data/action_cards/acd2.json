@@ -130,7 +130,7 @@
     "name": "Concise Legal Text",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
+    "text": "Place 2 command tokens from your reinforcements in your strategy pool. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
   },

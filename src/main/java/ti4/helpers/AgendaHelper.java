@@ -948,7 +948,7 @@ public class AgendaHelper {
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
-            if ("action_deck_2".equals(activeGame.getAcDeckID())) {
+            if ("action_deck_2".equals(activeGame.getAcDeckID()) && aCount > 2) {
                 String acd2Shenanigans = "This is the window for *Last Minute Deliberations* and *Data Archive*! " + activeGame.getPing();
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), acd2Shenanigans);
             }
