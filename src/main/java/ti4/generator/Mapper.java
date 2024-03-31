@@ -35,6 +35,7 @@ import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.AttachmentModel;
+import ti4.model.ColorableModelInterface;
 import ti4.model.CombatModifierModel;
 import ti4.model.DeckModel;
 import ti4.model.DraftErrataModel;
@@ -121,6 +122,8 @@ public class Mapper {
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
+        
+        duplicateObjectsForAllColors(promissoryNotes);
     }
 
     private static void readData(String propertyFileName, Properties properties) throws IOException {
@@ -177,6 +180,28 @@ public class Mapper {
         if (!badObjects.isEmpty())
             BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
                 + String.join("\n> ", badObjects));
+    }
+
+    private static <T extends ColorableModelInterface<T>> void duplicateObjectsForAllColors(Map<String, T> objectMap) {
+        String mostRecentObject = "none";
+        try {
+            List<String> colorsToCreate = getColors();
+            List<T> newObjects = new ArrayList<T>();
+            for (T obj : objectMap.values()) {
+                mostRecentObject = obj.getAlias();
+                if (obj.isColorable()) {
+                    for (String color : colorsToCreate) {
+                        T newObj = obj.duplicateAndSetColor(color);
+                        newObjects.add(newObj);
+                    }
+                }
+            }
+            for (T obj : newObjects) {
+                objectMap.put(obj.getAlias(), obj);
+            }
+        } catch (Exception e) {
+            BotLogger.log("Failed duplicating colors: " + mostRecentObject, e);
+        }
     }
 
     public static List<String> getColorPromissoryNoteIDs(Game activeGame, String color) {
