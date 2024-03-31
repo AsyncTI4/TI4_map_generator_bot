@@ -992,6 +992,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getPromissoryNotes().entrySet().stream()
+                        .filter(entry -> !entry.getValue().isDupe())
                         .filter(entry -> entry.getValue().search(enteredValue))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
