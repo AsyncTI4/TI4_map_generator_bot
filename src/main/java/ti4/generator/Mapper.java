@@ -43,6 +43,7 @@ import ti4.model.EventModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
+import ti4.model.MapTemplateModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
@@ -87,6 +88,7 @@ public class Mapper {
     private static final Map<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
+    private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
 
     public static void init() {
         try {
@@ -122,7 +124,8 @@ public class Mapper {
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
-        
+        importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
+
         duplicateObjectsForAllColors(promissoryNotes);
     }
 
@@ -763,6 +766,10 @@ public class Mapper {
 
     public static boolean isValidTech(String id) {
         return technologies.containsKey(id);
+    }
+
+    public static MapTemplateModel getMapTemplate(String id) {
+        return mapTemplates.get(id);
     }
 
     public static boolean isValidPlanet(String id) {

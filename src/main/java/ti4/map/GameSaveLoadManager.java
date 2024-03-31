@@ -33,6 +33,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+
+import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
@@ -653,10 +655,15 @@ public class GameSaveLoadManager {
         writer.write(Constants.EXPLORATION_DECK_ID + " " + activeGame.getExplorationDeckID());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.BAG_DRAFT + " "
-                + (activeGame.getActiveBagDraft() == null ? "" : activeGame.getActiveBagDraft().getSaveString()));
+        writer.write(Constants.BAG_DRAFT + " " + (activeGame.getActiveBagDraft() == null ? "" : activeGame.getActiveBagDraft().getSaveString()));
         writer.write(System.lineSeparator());
-
+        
+        MiltyDraftManager manager = activeGame.getMiltyDraftManager();
+        if (manager != null) {
+            writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
+            writer.write(System.lineSeparator());
+        }
+        
         writer.write(Constants.STRATEGY_CARD_SET + " " + activeGame.getScSetID());
         writer.write(System.lineSeparator());
 
@@ -2023,6 +2030,15 @@ public class GameSaveLoadManager {
                 case Constants.BAG_DRAFT -> {
                     try {
                         activeGame.setBagDraft(BagDraft.GenerateDraft(info, activeGame));
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.MILTY_DRAFT_MANAGER -> {
+                    try {
+                        MiltyDraftManager manager = activeGame.getMiltyDraftManager();
+                        manager.init();
+                        manager.loadSuperSaveString(activeGame, info);
                     } catch (Exception e) {
                         // Do nothing
                     }

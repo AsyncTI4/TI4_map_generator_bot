@@ -31,11 +31,11 @@ public class AddFrontierTokens implements Command {
         return event.getName().equals(getActionID());
     }
 
-    public void parsingForTile(GenericInteractionCreateEvent event, Game activeGame) {
-        Collection<Tile> tileList = activeGame.getTileMap().values();
+    public static void parsingForTile(GenericInteractionCreateEvent event, Game game) {
+        Collection<Tile> tileList = game.getTileMap().values();
         List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
-            if (((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size()==2) || frontierTileList.contains(tile.getTileID()) ) && !activeGame.isBaseGameMode()) {
+            if (((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size()==2) || frontierTileList.contains(tile.getTileID()) ) && !game.isBaseGameMode()) {
                 boolean hasMirage = false;
                 for (UnitHolder unitholder : tile.getUnitHolders().values()) {
                     if (unitholder.getName().equals(Constants.MIRAGE)) {
@@ -43,13 +43,13 @@ public class AddFrontierTokens implements Command {
                         break;
                     }
                 }
-                if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
+                if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, game);
             }
         }
-        if(activeGame.getRound() == 1){
+        if(game.getRound() == 1){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("deal2SOToAll" , "Deal 2 SO To All"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Press this button after every player is setup", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after every player is setup", buttons);
         }
     }
 

@@ -1,5 +1,6 @@
 package ti4.commands.tokens;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
@@ -36,29 +37,31 @@ public class AddToken extends AddRemoveToken {
         }
     }
 
-    public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game activeGame) {
+    public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game game) {
+        MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String tokenFileName = Mapper.getAttachmentImagePath(tokenName);
         String tokenPath = tile.getAttachmentPath(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
-            addToken(event, tile, tokenFileName, true, activeGame);
+            addToken(event, tile, tokenFileName, true, game);
         } else {
             tokenName = AliasHandler.resolveToken(tokenName);
             tokenFileName = Mapper.getTokenID(tokenName);
             tokenPath = tile.getTokenPath(tokenFileName);
 
             if (tokenPath == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Token: " + tokenName + " is not valid");
+                MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");
                 return;
             }
-            addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName), activeGame);
+            addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName), game);
         }
     }
 
-    private static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Game activeGame) {
+    private static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Game game) {
+        MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
             OptionMapping option = null;
-            if (event instanceof SlashCommandInteractionEvent) {
+            if (event != null && event instanceof SlashCommandInteractionEvent) {
                 option = ((CommandInteractionPayload) event).getOption(Constants.PLANET);
             }
 
@@ -75,7 +78,7 @@ public class AddToken extends AddRemoveToken {
                     if (unitHolderIDs.size() == 1) {
                         message = "No planets present in system.";
                     }
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    MessageHelper.sendMessageToChannel(channel, message);
                     return;
                 }
             }
@@ -87,7 +90,7 @@ public class AddToken extends AddRemoveToken {
             String planet = planetTokenizer.nextToken();
             planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet: " + planet + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(channel, "Planet: " + planet + " is not valid and not supported.");
                 continue;
             }
             if (tokenID.contains("dmz")) {
@@ -96,7 +99,7 @@ public class AddToken extends AddRemoveToken {
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                 if (planetUnitHolder != null && spaceUnitHolder != null) {
                     Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
-                    for (Player player_ : activeGame.getPlayers().values()) {
+                    for (Player player_ : game.getPlayers().values()) {
                         String color = player_.getColor();
                         planetUnitHolder.removeAllUnits(color);
                     }

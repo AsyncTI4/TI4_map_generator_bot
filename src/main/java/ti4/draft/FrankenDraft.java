@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.StartMilty;
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
 import ti4.map.Game;
@@ -80,7 +81,7 @@ public class FrankenDraft extends BagDraft {
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(activeGame));
 
         MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
-        new StartMilty().initDraftTiles(draftManager);
+        MiltyDraftHelper.initDraftTiles(draftManager);
         allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
         allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
 

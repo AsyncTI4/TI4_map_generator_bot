@@ -1,92 +1,35 @@
 package ti4.commands.milty;
 
+import lombok.Data;
+import ti4.map.Planet;
 import ti4.map.Tile;
 
+@Data
 public class MiltyDraftTile {
     private Tile tile;
     private TierList tierList;
     private int resources;
     private int influence;
-    private double milty_resources;
-    private double milty_influence;
     private boolean hasAlphaWH;
     private boolean hasBetaWH;
     private boolean hasOtherWH;
     private boolean isLegendary;
 
-    public Tile getTile() {
-        return tile;
-    }
+    private int milty_res;
+    private int milty_inf;
+    private int milty_flex;
+    
+    public void addPlanet(Planet planet) {
+        int r = planet.getResources();
+        int i = planet.getInfluence();
 
-    public void setTile(Tile tile) {
-        this.tile = tile;
-    }
+        resources += r;
+        influence += i;
 
-    public TierList getTierList() {
-        return tierList;
-    }
+        if (r > i) milty_res += r;
+        else if (i > r) milty_inf += i;
+        else milty_flex += r;
 
-    public void setTierList(TierList tierList) {
-        this.tierList = tierList;
-    }
-
-    public int getResources() {
-        return resources;
-    }
-
-    public void addResources(int resources) {
-        this.resources += resources;
-    }
-
-    public int getInfluence() {
-        return influence;
-    }
-
-    public void addInfluence(int influence) {
-        this.influence += influence;
-    }
-
-    public double getMilty_resources() {
-        return milty_resources;
-    }
-
-    public void addMilty_resources(double milty_resources) {
-        this.milty_resources += milty_resources;
-    }
-
-    public double getMilty_influence() {
-        return milty_influence;
-    }
-
-    public void addMilty_influence(double milty_influence) {
-        this.milty_influence += milty_influence;
-    }
-
-    public boolean isHasAlphaWH() {
-        return hasAlphaWH;
-    }
-
-    public void setHasAlphaWH(boolean hasAlphaWH) {
-        this.hasAlphaWH = hasAlphaWH;
-    }
-
-    public boolean isHasBetaWH() {
-        return hasBetaWH;
-    }
-
-    public void setHasBetaWH(boolean hasBetaWH) {
-        this.hasBetaWH = hasBetaWH;
-    }
-
-    public void setHasOtherWH(boolean hasOtherWH) {
-        this.hasOtherWH = hasOtherWH;
-    }
-
-    public boolean isLegendary() {
-        return isLegendary;
-    }
-
-    public void setLegendary(boolean legendary) {
-        isLegendary = legendary;
+        if (planet.isLegendary()) isLegendary = true;
     }
 }

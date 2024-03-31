@@ -68,7 +68,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         String tileName = Mapper.getTileID(getId());
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.log("Could not find tile image: " + getId());
+            //BotLogger.log("Could not find tile image: " + getId());
         }
         return tilePath;
     }

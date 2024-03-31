@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
@@ -313,6 +312,10 @@ public class MessageHelper {
 
 	public static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
 		splitAndSentWithAction(messageText, channel, restAction, null, null);
+	}
+
+	public static void splitAndSentWithAction(String messageText, MessageChannel channel, List<Button> buttons, MessageFunction restAction) {
+		splitAndSentWithAction(messageText, channel, restAction, null, buttons);
 	}
 
 	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction,

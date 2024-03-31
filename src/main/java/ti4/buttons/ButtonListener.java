@@ -2152,7 +2152,7 @@ public class ButtonListener extends ListenerAdapter {
             }
 
         } else if (buttonID.startsWith("milty_")) {
-
+            activeGame.getMiltyDraftManager().doMiltyPick(activeGame, buttonID, player);
             // System.out.println("MILTY");
         } else if (buttonID.startsWith("ring_")) {
             List<Button> ringButtons = ButtonHelper.getTileInARing(player, activeGame, buttonID, event);

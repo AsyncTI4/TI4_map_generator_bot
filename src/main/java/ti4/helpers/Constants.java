@@ -815,7 +815,10 @@ public class Constants {
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
 
+    //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
+    public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
+
     public static final String ABILITY = "ability";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
