@@ -1,5 +1,6 @@
 package ti4.commands.milty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,7 +11,6 @@ import lombok.Data;
 public class MiltyDraftSlice {
 
     private String name;
-
     private MiltyDraftTile left;
     private MiltyDraftTile equidistant;
     private MiltyDraftTile right;
@@ -18,51 +18,42 @@ public class MiltyDraftSlice {
     private MiltyDraftTile farFront;
 
     @JsonIgnore
-    public int getOptimalTotalValue() {
-        int total = 0;
-        total += left.getMilty_influence() + left.getMilty_resources();
-        total += equidistant.getMilty_influence() + equidistant.getMilty_resources();
-        total += right.getMilty_influence() + right.getMilty_resources();
-        total += front.getMilty_influence() + front.getMilty_resources();
-        total += farFront.getMilty_influence() + farFront.getMilty_resources();
-        return total;
-    }
-    
-    @JsonIgnore
-    public int getOptimalInf() {
-        int total = 0;
-        total += left.getMilty_influence() + left.getMilty_resources();
-        total += equidistant.getMilty_influence() + equidistant.getMilty_resources();
-        total += right.getMilty_influence() + right.getMilty_resources();
-        total += front.getMilty_influence() + front.getMilty_resources();
-        total += farFront.getMilty_influence() + farFront.getMilty_resources();
-        return total;
-    }
-    
-    @JsonIgnore
-    public int getOptimalRes() {
-        int total = 0;
-        total += left.getMilty_influence() + left.getMilty_resources();
-        total += equidistant.getMilty_influence() + equidistant.getMilty_resources();
-        total += right.getMilty_influence() + right.getMilty_resources();
-        total += front.getMilty_influence() + front.getMilty_resources();
-        total += farFront.getMilty_influence() + farFront.getMilty_resources();
-        return total;
+    public List<MiltyDraftTile> getTiles() {
+        return new ArrayList<>(List.of(left, front, right, equidistant, farFront));
     }
 
     @JsonIgnore
-    public int getFlex() {
-        int total = 0;
-        total += left.getMilty_influence() + left.getMilty_resources();
-        total += equidistant.getMilty_influence() + equidistant.getMilty_resources();
-        total += right.getMilty_influence() + right.getMilty_resources();
-        total += front.getMilty_influence() + front.getMilty_resources();
-        total += farFront.getMilty_influence() + farFront.getMilty_resources();
-        return total;
+    public int getOptimalTotalValue() {
+        return getOptimalRes() + getOptimalInf() + getOptimalFlex();
+    }
+
+    @JsonIgnore
+    public int getOptimalRes() {
+        return getTiles().stream().map(MiltyDraftTile::getMilty_res).reduce(0, (x, y) -> x + y);
+    }
+
+    @JsonIgnore
+    public int getOptimalInf() {
+        return getTiles().stream().map(MiltyDraftTile::getMilty_inf).reduce(0, (x, y) -> x + y);
+    }
+
+    @JsonIgnore
+    public int getOptimalFlex() {
+        return getTiles().stream().map(MiltyDraftTile::getMilty_flex).reduce(0, (x, y) -> x + y);
+    }
+
+    @JsonIgnore
+    public int getTotalRes() {
+        return getTiles().stream().map(MiltyDraftTile::getResources).reduce(0, (x, y) -> x + y);
+    }
+
+    @JsonIgnore
+    public int getTotalInf() {
+        return getTiles().stream().map(MiltyDraftTile::getInfluence).reduce(0, (x, y) -> x + y);
     }
 
     public String ttsString() {
-        List<String> ls = List.of(left, front, right, equidistant, farFront).stream().map(tile -> tile.getTile().getTileID()).toList();
+        List<String> ls = getTiles().stream().map(tile -> tile.getTile().getTileID()).toList();
         return String.join(",", ls);
     }
 }

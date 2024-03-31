@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -73,12 +72,12 @@ public class MiltyCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        MiltySubcommandData executedCommand = null;
+        //MiltySubcommandData executedCommand = null;
         for (MiltySubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                executedCommand = subcommand;
+                //executedCommand = subcommand;
                 break;
             }
         }
@@ -98,6 +97,7 @@ public class MiltyCommand implements Command {
     private Collection<MiltySubcommandData> getSubcommands() {
         Collection<MiltySubcommandData> subcommands = new HashSet<>();
         subcommands.add(new StartMilty());
+        subcommands.add(new ShowMilty());
 
         return subcommands;
     }

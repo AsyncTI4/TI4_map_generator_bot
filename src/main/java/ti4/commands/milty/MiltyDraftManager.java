@@ -3,6 +3,7 @@ package ti4.commands.milty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class MiltyDraftManager {
     private String prevOrderMessage = null;
 
     @Data
-    private static class PlayerDraft {
+    public static class PlayerDraft {
         private String faction = null;
         private MiltyDraftSlice slice = null;
         private Integer order = null;
@@ -55,7 +56,7 @@ public class MiltyDraftManager {
             if (faction == null) {
                 sb.append("<faction>");
             } else {
-                sb.append(Emojis.getFactionIconFromDiscord(faction) + " " + faction);
+                sb.append(Emojis.getFactionIconFromDiscord(faction));
             }
             sb.append(" -- ");
             if (slice == null) {
@@ -67,8 +68,7 @@ public class MiltyDraftManager {
             if (order == null) {
                 sb.append("<pick>");
             } else {
-                String emoji = Emojis.getSpeakerPickEmoji(order);
-                sb.append(emoji).append(" ").append(StringHelper.ordinal(order)).append(" pick");
+                sb.append(Emojis.getSpeakerPickEmoji(order));
             }
             return sb.toString();
         }
@@ -150,7 +150,7 @@ public class MiltyDraftManager {
 
     public void init() {
         clear();
-        StartMilty.initDraftTiles(this);
+        MiltyDraftHelper.initDraftTiles(this);
     }
 
     @JsonIgnore
@@ -218,6 +218,10 @@ public class MiltyDraftManager {
     public void doMiltyPick(Game game, String buttonID, Player player) {
         String userId = player.getUserID();
         MessageChannel mainGameChannel = game.getMainGameChannel();
+        if (draftIndex >= draftOrder.size()) {
+            finishDraft(game);
+            return;
+        }
         if (!userId.equals(getCurrentDraftPlayer())) {
             MessageHelper.sendMessageToChannel(mainGameChannel, "You are not up to draft.");
             return;
@@ -261,7 +265,26 @@ public class MiltyDraftManager {
         if (draftIndex < draftOrder.size()) {
             serveCurrentPlayer(game);
         } else {
-            // TODO: finish draft
+            MessageHelper.sendMessageToChannel(mainGameChannel, "Draft is finished! Setting up the map...");
+            finishDraft(game);
+        }
+    }
+
+    private void finishDraft(Game game) {
+        MessageChannel mainGameChannel = game.getMainGameChannel();
+        try {
+            MiltyDraftHelper.buildMap(game);
+        } catch (Exception e) {
+            String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
+            List<PlayerDraft> speakerOrdered = getDraft().values().stream()
+                .sorted(Comparator.comparing(PlayerDraft::getOrder))
+                .toList();
+            int index = 1;
+            for (PlayerDraft d : speakerOrdered) {
+                error += "\n" + index + ". " + d.getSlice().ttsString();
+            }
+            MessageHelper.sendMessageToChannel(mainGameChannel, error);
+            BotLogger.log(e.getMessage(), e);
         }
     }
 
@@ -510,7 +533,8 @@ public class MiltyDraftManager {
         slice.setRight(draftTiles.get(2));
         slice.setEquidistant(draftTiles.get(3));
         slice.setFarFront(draftTiles.get(4));
-        slice.setName(Integer.toString(index));
+
+        slice.setName(Character.toString(index - 1 + 'A'));
         slices.add(slice);
     }
 

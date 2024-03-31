@@ -771,16 +771,15 @@ public class Emojis {
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
     
     // MILTY DRAFT
-    public static final String miltyDraft = "<:miltyBase:1222726932576207060>";
-    public static final String milty1 = "<:milty1:1222723097354833980>";
-    public static final String milty2 = "<:milty2:1222723509944582256>";
-    public static final String milty3 = "<:milty3:1222725740039245825>";
-    public static final String milty4 = "<:milty4:1222725754526371891>";
-    public static final String milty5 = "<:milty5:1222725767067205745>";
-    public static final String milty6 = "<:milty6:1222725779511840788>";
-    public static final String milty7 = "<:milty7:1222725792186761390>";
-    public static final String milty8 = "<:milty8:1222725803763040326>";
-    public static final String milty9 = "<:milty9:1222725814173433937>";
+    public static final String miltyA = "<:miltyA:1223132315476037773>";
+    public static final String miltyB = "<:miltyB:1223132318311387146>";
+    public static final String miltyC = "<:miltyC:1223132319947423787>";
+    public static final String miltyD = "<:miltyD:1223132322245640314>";
+    public static final String miltyE = "<:miltyE:1223132324175151174>";
+    public static final String miltyF = "<:miltyF:1223132325932699689>";
+    public static final String miltyG = "<:miltyG:1223132327744634982>";
+    public static final String miltyH = "<:miltyH:1223132330000912434>";
+    public static final String miltyI = "<:miltyI:1223132332547117086>";
 
     // SPEAKER TOKENS
     public static final String speakerPick1 = "<:pick1:1222754925105381416>";
@@ -1374,31 +1373,31 @@ public class Emojis {
 
     public static String getMiltyDraftEmoji(int ord) {
         return switch (ord) {
-            case 1 -> milty1;
-            case 2 -> milty2;
-            case 3 -> milty3;
-            case 4 -> milty4;
-            case 5 -> milty5;
-            case 6 -> milty6;
-            case 7 -> milty7;
-            case 8 -> milty8;
-            case 9 -> milty9;
-            default -> miltyDraft + " " + ord;
+            case 1 -> miltyA;
+            case 2 -> miltyB;
+            case 3 -> miltyC;
+            case 4 -> miltyD;
+            case 5 -> miltyE;
+            case 6 -> miltyF;
+            case 7 -> miltyG;
+            case 8 -> miltyH;
+            case 9 -> miltyI;
+            default -> Integer.toString(ord);
         };
     }
 
     public static String getMiltyDraftEmoji(String ord) {
-        return switch (ord) {
-            case "1" -> milty1;
-            case "2" -> milty2;
-            case "3" -> milty3;
-            case "4" -> milty4;
-            case "5" -> milty5;
-            case "6" -> milty6;
-            case "7" -> milty7;
-            case "8" -> milty8;
-            case "9" -> milty9;
-            default -> miltyDraft + " " + ord;
+        return switch (ord.toLowerCase()) {
+            case "1", "a" -> miltyA;
+            case "2", "b" -> miltyB;
+            case "3", "c" -> miltyC;
+            case "4", "d" -> miltyD;
+            case "5", "e" -> miltyE;
+            case "6", "f" -> miltyF;
+            case "7", "g" -> miltyG;
+            case "8", "h" -> miltyH;
+            case "9", "i" -> miltyI;
+            default -> ord;
         };
     }
 
