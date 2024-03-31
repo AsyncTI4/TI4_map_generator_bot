@@ -769,6 +769,27 @@ public class Emojis {
     public static final String d10red_7 = "<:d10red_7:1189667994977181796>";
     public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
+    
+    // MILTY DRAFT
+    public static final String miltyA = "<:miltyA:1223132315476037773>";
+    public static final String miltyB = "<:miltyB:1223132318311387146>";
+    public static final String miltyC = "<:miltyC:1223132319947423787>";
+    public static final String miltyD = "<:miltyD:1223132322245640314>";
+    public static final String miltyE = "<:miltyE:1223132324175151174>";
+    public static final String miltyF = "<:miltyF:1223132325932699689>";
+    public static final String miltyG = "<:miltyG:1223132327744634982>";
+    public static final String miltyH = "<:miltyH:1223132330000912434>";
+    public static final String miltyI = "<:miltyI:1223132332547117086>";
+
+    // SPEAKER TOKENS
+    public static final String speakerPick1 = "<:pick1:1222754925105381416>";
+    public static final String speakerPick2 = "<:pick2:1222754926174666843>";
+    public static final String speakerPick3 = "<:pick3:1222754927294550076>";
+    public static final String speakerPick4 = "<:pick4:1222754928368422993>";
+    public static final String speakerPick5 = "<:pick5:1222754929219993601>";
+    public static final String speakerPick6 = "<:pick6:1222754930092146780>";
+    public static final String speakerPick7 = "<:pick7:1222754930922754099>";
+    public static final String speakerPick8 = "<:pick8:1222754932503875604>";
 
     // OTHER
     public static final String WHalpha = "<:WHalpha:1159118794334146570>";
@@ -1347,6 +1368,50 @@ public class Emojis {
             case 8 -> EightToes;
             case 9 -> NineToes;
             default -> NoToes + count;
+        };
+    }
+
+    public static String getMiltyDraftEmoji(int ord) {
+        return switch (ord) {
+            case 1 -> miltyA;
+            case 2 -> miltyB;
+            case 3 -> miltyC;
+            case 4 -> miltyD;
+            case 5 -> miltyE;
+            case 6 -> miltyF;
+            case 7 -> miltyG;
+            case 8 -> miltyH;
+            case 9 -> miltyI;
+            default -> Integer.toString(ord);
+        };
+    }
+
+    public static String getMiltyDraftEmoji(String ord) {
+        return switch (ord.toLowerCase()) {
+            case "1", "a" -> miltyA;
+            case "2", "b" -> miltyB;
+            case "3", "c" -> miltyC;
+            case "4", "d" -> miltyD;
+            case "5", "e" -> miltyE;
+            case "6", "f" -> miltyF;
+            case "7", "g" -> miltyG;
+            case "8", "h" -> miltyH;
+            case "9", "i" -> miltyI;
+            default -> ord;
+        };
+    }
+
+    public static String getSpeakerPickEmoji(int ord) {
+        return switch (ord) {
+            case 1 -> speakerPick1;
+            case 2 -> speakerPick2;
+            case 3 -> speakerPick3;
+            case 4 -> speakerPick4;
+            case 5 -> speakerPick5;
+            case 6 -> speakerPick6;
+            case 7 -> speakerPick7;
+            case 8 -> speakerPick8;
+            default -> getToesEmoji(ord);
         };
     }
 

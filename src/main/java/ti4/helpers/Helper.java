@@ -20,6 +20,12 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
@@ -40,10 +46,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
@@ -52,9 +54,9 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
+import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
-import ti4.commands.milty.StartMilty;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -203,9 +205,13 @@ public class Helper {
         return player;
     }
 
+    // TODO: Jazz: This method only includes base game + pok tiles. It really should at least include DS.
+    //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
+    //     - from every source available to the active game
     public static void getRandomBlueTile(Game activeGame, GenericInteractionCreateEvent event) {
         MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
-        new StartMilty().initDraftTiles(draftManager);
+        MiltyDraftHelper.initDraftTiles(draftManager);
+
         List<MiltyDraftTile> allTiles;
         allTiles = draftManager.getBlue();
         boolean inMap = true;
@@ -1225,7 +1231,8 @@ public class Helper {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
-                    if (!activeGame.getTileFromPlanet(planet.getName()).isHomeSystem()) {
+                    Tile t = activeGame.getTileFromPlanet(planet.getName());
+                    if (t != null && !t.isHomeSystem()) {
                         if (planet.getResources() > bestRes) {
                             bestRes = planet.getResources();
                         }
