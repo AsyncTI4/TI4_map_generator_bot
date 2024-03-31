@@ -56,7 +56,7 @@ public class MiltyCommand implements Command {
             activeGame = "Active map: " + userActiveGame.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -64,7 +64,7 @@ public class MiltyCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
+        if (option.getName().equals(Constants.PLAYER)) {
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -82,20 +82,14 @@ public class MiltyCommand implements Command {
                 break;
             }
         }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
+        reply(event);
     }
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
-        ShowGame.simpleShowGame(activeGame, event);
     }
-
 
     protected String getActionDescription() {
         return "Milty draft";
@@ -110,8 +104,6 @@ public class MiltyCommand implements Command {
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

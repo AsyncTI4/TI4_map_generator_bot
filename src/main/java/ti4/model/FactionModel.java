@@ -103,10 +103,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String title = getFactionEmoji() +
-            " __**" + getFactionName() + "**__" +
-            getSource().emoji();
-        eb.setTitle(title);
+        eb.setTitle(getFactionTitle());
 
         // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
         // if (emoji instanceof CustomEmoji customEmoji) {
@@ -149,5 +146,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     public String getFactionNameWithSourceEmoji() {
         return getFactionName() + getSource().emoji();
+    }
+
+    public String getFactionTitle() {
+        return getFactionEmoji() + " __**" + getFactionName() + "**__" + getSource().emoji();
     }
 }
