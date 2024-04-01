@@ -387,7 +387,6 @@ public class SCPick extends PlayerSubcommandData {
                             "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                             ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
                     }
-                    activeGame.setComponentAction(false);
                     activeGame.setCurrentPhase("action");
                 }
             }

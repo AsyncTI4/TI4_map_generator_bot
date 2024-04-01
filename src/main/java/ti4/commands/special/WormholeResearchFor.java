@@ -26,15 +26,14 @@ public class WormholeResearchFor extends SpecialSubcommandData {
     }
 
     public static void doResearch(GenericInteractionCreateEvent event, Game activeGame) {
-        for(Tile tile : activeGame.getTileMap().values()){
-            if(FoWHelper.doesTileHaveAlphaOrBeta(activeGame, tile.getPosition())){
+        for (Tile tile : activeGame.getTileMap().values()) {
+            if (FoWHelper.doesTileHaveAlphaOrBeta(activeGame, tile.getPosition())) {
                 UnitHolder uH = tile.getUnitHolders().get(Constants.SPACE);
-                for(Player player : activeGame.getRealPlayers()){
-                   uH.removeAllUnits(player.getColor());
+                for (Player player : activeGame.getRealPlayers()) {
+                    uH.removeAllUnits(player.getColor());
                 }
             }
         }
-        activeGame.setComponentAction(true);
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Removed all ships from alphas/betas\nYou can use the button to get your tech", List.of(Buttons.GET_A_TECH));
     }
 

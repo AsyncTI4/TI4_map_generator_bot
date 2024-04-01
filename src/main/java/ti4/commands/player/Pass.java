@@ -33,23 +33,22 @@ public class Pass extends PlayerSubcommandData {
             return;
         }
         player.setPassed(true);
-        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")){
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
         }
         String text = player.getRepresentation() + " PASSED";
         sendMessage(text);
-        if(player.hasTech("absol_aida")){
-            String msg = player.getRepresentation()+" since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
+        if (player.hasTech("absol_aida")) {
+            String msg = player.getRepresentation() + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
             if (!player.hasAbility("propagation")) {
-                activeGame.setComponentAction(true);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true) + " you can use the button to get your tech",
-                        List.of(Buttons.GET_A_TECH));
+                    player.getRepresentation(true, true) + " you can use the button to get your tech",
+                    List.of(Buttons.GET_A_TECH));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                        + ". Use buttons to gain CCs";
+                    + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
