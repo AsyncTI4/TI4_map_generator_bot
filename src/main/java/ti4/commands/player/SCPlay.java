@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 
-import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -32,6 +31,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.StrategyCardModel;
 
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
@@ -73,17 +73,16 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
 
-        Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()),
-            OptionMapping::getAsInt);
+        Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         playSC(event, scToPlay, activeGame, mainGameChannel, player);
     }
 
-    public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame,
+    public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame,
         MessageChannel mainGameChannel, Player player) {
         playSC(event, scToPlay, activeGame, mainGameChannel, player, false);
     }
 
-    public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame,
+    public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame,
         MessageChannel mainGameChannel, Player player, boolean winnuHero) {
 
         if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
@@ -154,10 +153,17 @@ public class SCPlay extends PlayerSubcommandData {
             player2.removeFollowedSC(scToPlay);
         }
 
-        if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
+        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
+
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getSCModel(scToPlay).orElse(null);
+        if (scModel != null && scModel.hasImageFile()) {
             MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame), true);
+        } else if (scModel != null) {
+            baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
-        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
+
+        baseMessageObject.addContent(message);
+
 
         // GET BUTTONS
         ActionRow actionRow = null;
@@ -339,7 +345,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
-    private List<Button> getSCButtons(int sc, Game activeGame, boolean winnuHero) {
+    private static List<Button> getSCButtons(int sc, Game activeGame, boolean winnuHero) {
         boolean isGroupedSCGameWithPoKSCs = "pbd100".equals(activeGame.getName())
             || "pbd1000".equals(activeGame.getName());
         if (activeGame.isHomeBrewSCMode() && !isGroupedSCGameWithPoKSCs) {
@@ -392,7 +398,7 @@ public class SCPlay extends PlayerSubcommandData {
         };
     }
 
-    private List<Button> getLeadershipButtons() {
+    private static List<Button> getLeadershipButtons() {
         // Button followButton = Button.success("sc_leadership_follow", "SC Follow");
         Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Gain CCs");
         Button exhaust = Button.danger("leadershipExhaust", "Spend");
@@ -400,7 +406,7 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(exhaust, leadershipGenerateCCButtons, noFollowButton);
     }
 
-    private List<Button> getDiplomacyButtons() {
+    private static List<Button> getDiplomacyButtons() {
         Button followButton = Button.success("sc_follow_2", "Spend A Strategy CC");
         Button diploSystemButton = Button.primary("diploSystem", "Diplo a System");
         Button refreshButton = Button.success("diploRefresh2", "Ready 2 Planets");
@@ -409,7 +415,7 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
     }
 
-    private List<Button> getPoliticsButtons() {
+    private static List<Button> getPoliticsButtons() {
         Button followButton = Button.success("sc_follow_3", "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_3", "Not Following");
         Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards")
@@ -440,7 +446,7 @@ public class SCPlay extends PlayerSubcommandData {
         return assignSpeakerButtons;
     }
 
-    private List<Button> getConstructionButtons() {
+    private static List<Button> getConstructionButtons() {
         Button followButton = Button.success("sc_follow_4", "Spend A Strategy CC");
         Button sdButton = Button.success("construction_sd", "Place A SD");
         sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
@@ -451,7 +457,7 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
 
-    private List<Button> getTradeButtons() {
+    private static List<Button> getTradeButtons() {
         Button trade_primary = Button.success("trade_primary", "Resolve Primary");
         Button followButton = Button.success("sc_trade_follow", "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_5", "Not Following");
@@ -462,7 +468,7 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
     }
 
-    private List<Button> getWarfareButtons() {
+    private static List<Button> getWarfareButtons() {
         Button warfarePrimary = Button.primary("primaryOfWarfare", "Do Warfare Primary");
         Button followButton = Button.success("sc_follow_6", "Spend A Strategy CC");
         Button homeBuild = Button.success("warfareBuild", "Build At Home");
@@ -470,14 +476,14 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
 
-    private List<Button> getTechnologyButtons() {
+    private static List<Button> getTechnologyButtons() {
         Button followButton = Button.success("sc_follow_7", "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_7", "Not Following");
         Button getTech = Button.success("acquireATechWithSC", "Get a Tech");
         return List.of(followButton, getTech, noFollowButton);
     }
 
-    private List<Button> getImperialButtons() {
+    private static List<Button> getImperialButtons() {
         Button followButton = Button.success("sc_follow_8", "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_8", "Not Following");
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective")
@@ -490,7 +496,7 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, noFollowButton, draw_so, scoreImperial, scoreAnObjective);
     }
 
-    private List<Button> getGenericButtons(int sc) {
+    private static List<Button> getGenericButtons(int sc) {
         Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, noFollowButton);

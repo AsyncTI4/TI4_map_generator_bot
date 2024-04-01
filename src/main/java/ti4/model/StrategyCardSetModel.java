@@ -53,4 +53,11 @@ public class StrategyCardSetModel implements ModelInterface {
     public Optional<String> getDescription() {
         return Optional.ofNullable(description);
     }
+
+    public Optional<StrategyCardModel> getSCModel(int scNumber) {
+        return scIDs.stream()
+            .map(Mapper::getStrategyCard)
+            .filter(sc -> sc.getInitiative() == scNumber)
+            .findFirst();
+    }
 }
