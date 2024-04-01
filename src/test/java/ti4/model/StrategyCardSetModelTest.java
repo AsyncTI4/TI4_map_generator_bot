@@ -1,0 +1,25 @@
+package ti4.model;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import ti4.generator.Mapper;
+import ti4.testUtils.BaseTi4Test;
+
+public class StrategyCardSetModelTest extends BaseTi4Test {
+    @Test
+    public void testDeckModels() {
+        for (StrategyCardSetModel scSetModel : Mapper.getStrategyCardSets().values()) {
+            assertTrue(scSetModel.isValid(), scSetModel.getAlias() + "'s data is invalid");
+            assertTrue(validateSCIDs(scSetModel), scSetModel.getAlias() + " [" + scSetModel.getName() + "]: Invalid SC IDs");
+        }
+    }
+
+    private static boolean validateSCIDs(StrategyCardSetModel scSetModel) {
+        if (Mapper.getStrategyCards().keySet().containsAll(scSetModel.getScIDs()))
+            return true;
+        System.out.println("SCSet **" + scSetModel.getName() + "** failed validation due to invalid SC IDs: `" + scSetModel.getScIDs() + "`");
+        return false;
+    }
+}
