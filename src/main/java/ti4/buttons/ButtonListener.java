@@ -394,6 +394,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.resolveCeldauriAgentStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("kolleccAgentResStep2_")) {
             ButtonHelperAgents.kolleccAgentResStep2(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("hitOpponent_")) {
+            ButtonHelperModifyUnits.resolveGettingHit(activeGame, event, buttonID);
         } else if (buttonID.startsWith("getPsychoButtons")) {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 trueIdentity + " use buttons to get a tg per planet exhausted.",
@@ -1077,6 +1079,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("seedySpace_")) {
             ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
+        } else if (buttonID.startsWith("startDevotion_")) {
+            ButtonHelperModifyUnits.startDevotion(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("resolveDevote_")) {
+            ButtonHelperModifyUnits.resolveDevote(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("prophetsTears_")) {
             player.addExhaustedRelic("prophetstears");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -1161,7 +1167,12 @@ public class ButtonListener extends ListenerAdapter {
                 buttons = Helper.getTechButtons(techs, techType, player, "nekro");
             }
 
-            buttons.add(Button.secondary("acquireATech", "Get Tech of a Different Type"));
+            if (activeGame.getComponentAction()) {
+                buttons.add(Button.secondary("acquireATech", "Get Tech of a Different Type"));
+            } else {
+                buttons.add(Button.secondary("acquireATechWithSC", "Get Tech of a Different Type"));
+            }
+
             String message = player.getRepresentation() + " Use the buttons to get the tech you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
@@ -2672,22 +2683,9 @@ public class ButtonListener extends ListenerAdapter {
             GameSaveLoadManager.undo(activeGame, event);
 
         } else if (buttonID.startsWith("addIonStorm_")) {
-            String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
-            Tile tile = activeGame.getTileByPosition(pos);
-            if (buttonID.contains("alpha")) {
-                String tokenFilename = Mapper.getTokenID("ionalpha");
-                tile.addToken(tokenFilename, Constants.SPACE);
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Added ionstorm alpha to " + tile.getRepresentation());
-
-            } else {
-                String tokenFilename = Mapper.getTokenID("ionbeta");
-                tile.addToken(tokenFilename, Constants.SPACE);
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Added ionstorm beta to " + tile.getRepresentation());
-            }
-
-            event.getMessage().delete().queue();
+            ButtonHelper.addIonStorm(activeGame, buttonID, event);
+        } else if (buttonID.startsWith("flipIonStorm_")) {
+            ButtonHelper.flipIonStorm(activeGame, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("gledgeBasePlanet_")) {
@@ -2956,7 +2954,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "offerMirvedaCommander" -> ButtonHelperModifyUnits.offerMirvedaCommanderButtons(event, activeGame, player);
                 case "acquireAFreeTech" -> { // Buttons.GET_A_FREE_TECH
                     List<Button> buttons = new ArrayList<>();
-
+                    activeGame.setComponentAction(true);
                     Button propulsionTech = Button
                         .primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech");
                     propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
@@ -3035,7 +3033,6 @@ public class ButtonListener extends ListenerAdapter {
                             + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
                         if (!player.hasAbility("propagation")) {
-                            activeGame.setComponentAction(true);
                             MessageHelper.sendMessageToChannelWithButtons(
                                 ButtonHelper.getCorrectChannel(player, activeGame),
                                 player.getRepresentation(true, true) + " you can use the button to get your tech",
@@ -3359,12 +3356,15 @@ public class ButtonListener extends ListenerAdapter {
                         if (!buttons2.isEmpty()) {
                             MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCardsInfoThread(),
-                                trueIdentity + " use buttons to resolve contagion planet #1", buttons2);
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCardsInfoThread(),
-                                trueIdentity
-                                    + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)",
-                                buttons2);
+                                trueIdentity + " use buttons to resolve contagion", buttons2);
+
+                            if (Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1711997257707L)) > 0) {
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCardsInfoThread(),
+                                    trueIdentity
+                                        + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)",
+                                    buttons2);
+                            }
                         }
                     }
                 }

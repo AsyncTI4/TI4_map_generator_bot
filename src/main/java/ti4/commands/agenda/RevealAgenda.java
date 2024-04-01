@@ -26,7 +26,7 @@ public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
         super(Constants.REVEAL, "Reveal top Agenda from deck");
         addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM,
-                "Reveal the agenda from the bottom of the deck instead of the top");
+            "Reveal the agenda from the bottom of the deck instead of the top");
     }
 
     @Override
@@ -41,13 +41,13 @@ public class RevealAgenda extends AgendaSubcommandData {
     }
 
     public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game activeGame,
-            MessageChannel channel) {
+        MessageChannel channel) {
         if (!activeGame.getFactionsThatReactedToThis("lastAgendaReactTime").isEmpty()
-                && ((new Date().getTime())
-                        - Long.parseLong(activeGame.getFactionsThatReactedToThis("lastAgendaReactTime"))) < 10 * 60
-                                * 10) {
+            && ((new Date().getTime())
+                - Long.parseLong(activeGame.getFactionsThatReactedToThis("lastAgendaReactTime"))) < 10 * 60
+                    * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
+                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
             return;
         }
         activeGame.setCurrentReacts("noWhenThisAgenda", "");
@@ -75,14 +75,14 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
             MessageHelper.sendMessageToChannel(channel, "# " + activeGame.getPing()
-                    + " __Emergency Session__ revealed.\n## This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
+                + " __Emergency Session__ revealed.\n## This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
         }
         if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().isEmpty())) {
             MessageHelper.sendMessageToChannel(channel,
-                    activeGame.getPing() + "An \"Elect Law\" Agenda (" + agendaName
-                            + ") was revealed when no laws in play, flipping next agenda");
+                activeGame.getPing() + "An \"Elect Law\" Agenda (" + agendaName
+                    + ") was revealed when no laws in play, flipping next agenda");
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
         }
@@ -94,14 +94,14 @@ public class RevealAgenda extends AgendaSubcommandData {
                 if ("Emergency Session".equalsIgnoreCase(agendaName)) {
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel, activeGame.getPing()
-                            + " Emergency Session revealed underneath Covert Legislation, discarding it.");
+                        + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
                 if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
-                        && activeGame.getLaws().size() < 1) {
+                    && activeGame.getLaws().size() < 1) {
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel,
-                            activeGame.getPing()
-                                    + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
+                        activeGame.getPing()
+                            + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
                 }
                 String id2 = activeGame.getNextAgenda(revealFromBottom);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
@@ -123,9 +123,10 @@ public class RevealAgenda extends AgendaSubcommandData {
                     if (speaker != null) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(speaker.getRepresentation(true, true))
-                                .append(" this is the top agenda for Covert Legislation:");
+                            .append(" this is the top agenda for Covert Legislation:");
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, speaker, sb.toString(), embeds);
+                        activeGame.drawAgenda();
 
                     }
                 }
@@ -159,7 +160,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
 
         StringBuilder whensAftersMessage = new StringBuilder(
-                "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you can simply play it.");
+            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you can simply play it.");
         if (action) {
             whensAftersMessage.append("\nYou can play afters during this agenda");
         }
@@ -192,23 +193,23 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
-                    "# " + activeGame.getPing() + " the agenda target is " + agendaTarget
-                            + ". Sent the agenda to the speakers cards info");
+                "# " + activeGame.getPing() + " the agenda target is " + agendaTarget
+                    + ". Sent the agenda to the speakers cards info");
         }
         MessageHelper.sendMessageToChannel(channel,
-                "The game believes this is agenda #" + aCount + " of this agenda phase");
+            "The game believes this is agenda #" + aCount + " of this agenda phase");
         for (Player player : activeGame.getRealPlayers()) {
             if (!action && activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                    && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0 && aCount == 2) {
+                && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0 && aCount == 2) {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true)
-                                + " you have Florzen commander and can thus explore and ready a planet",
-                        ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
+                    player.getRepresentation(true, true)
+                        + " you have Florzen commander and can thus explore and ready a planet",
+                    ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
             }
         }
         if (!activeGame.isFoWMode() && !action) {
             ButtonHelper.updateMap(activeGame, event,
-                    "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+                "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
         }
     }
 }
