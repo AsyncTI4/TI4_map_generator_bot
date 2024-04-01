@@ -23,7 +23,8 @@ public class StrategyCardSetModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return scIDs.size() > 0
+        return scIDs != null
+            && !scIDs.isEmpty()
             && StringUtils.isNotBlank(name)
             && StringUtils.isNotBlank(alias);
     }

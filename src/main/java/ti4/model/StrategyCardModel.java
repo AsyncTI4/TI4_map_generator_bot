@@ -34,7 +34,6 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
             && initiative >= 0
             && primaryTexts != null
             && secondaryTexts != null
-            && botSCAutomationID != null
             && source != null;
     }
 
@@ -127,7 +126,8 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
-        imageFileName + ".png", null) != null;
+        return imageFileName != null
+            && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
+                imageFileName + ".png", null) != null;
     }
 }
