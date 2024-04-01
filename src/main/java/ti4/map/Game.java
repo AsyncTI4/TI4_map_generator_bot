@@ -65,7 +65,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.PublicObjectiveModel;
-import ti4.model.StrategyCardModel;
+import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
@@ -3667,7 +3667,7 @@ public class Game {
     }
 
     @JsonIgnore
-    public StrategyCardModel getStrategyCardSet() {
+    public StrategyCardSetModel getStrategyCardSet() {
         return Mapper.getStrategyCardSets().get(getScSetID());
     }
 

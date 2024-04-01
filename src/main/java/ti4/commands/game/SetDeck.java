@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
-import ti4.model.StrategyCardModel;
+import ti4.model.StrategyCardSetModel;
 
 public class SetDeck extends GameSubcommandData {
 
@@ -44,7 +44,7 @@ public class SetDeck extends GameSubcommandData {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
                 if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
-                    StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
+                    StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
                     activeGame.setHomeBrewSCMode(!"pok".equals(value) && !"base_game".equals(value));
                     activeGame.setScTradeGoods(new LinkedHashMap<>());
                     activeGame.setScSetID(strategyCardModel.getAlias());

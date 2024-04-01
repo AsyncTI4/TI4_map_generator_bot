@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Data
-public class StrategyCardModel implements ModelInterface {
+public class StrategyCardSetModel implements ModelInterface {
     private String name;
     private String alias;
     private Map<Integer, String> cardValues;
