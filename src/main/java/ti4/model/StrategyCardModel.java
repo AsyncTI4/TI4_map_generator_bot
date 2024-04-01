@@ -1,7 +1,10 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,8 +19,8 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private int initiative; // 0 though infinity
     private String group; // used for grouped SC games (pbd100 style)
     private String name;
-    private String primaryText;
-    private String secondaryText;
+    private List<String> primaryTexts;
+    private List<String> secondaryTexts;
     private String botSCAutomationID; //ID of another SCModel to use the automation/button suite of
     private String imageFileName;
     private String flavourText;
@@ -29,8 +32,8 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return id != null
             && name != null
             && initiative >= 0
-            && primaryText != null
-            && secondaryText != null
+            && primaryTexts != null
+            && secondaryTexts != null
             && botSCAutomationID != null
             && source != null;
     }
@@ -49,10 +52,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         // PRIMARY
-        eb.addField("Primary", secondaryText, false);
+        eb.addField("Primary Ability", getPrimaryTextFormatted(), false);
 
         // SECONDARY
-        eb.addField("Secondary", secondaryText, false);
+        eb.addField("Secondary Ability", getSecondaryTextFormatted(), false);
 
         // FLAVOUR
         if (getFlavourText().isPresent()) {
@@ -69,6 +72,24 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
             eb.setFooter(sb.toString());
         }
         return eb.build();
+    }
+
+    @JsonIgnore
+    private String getPrimaryTextFormatted() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : primaryTexts) {
+            sb.append("- ").append(s).append("\n");
+        }
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    private String getSecondaryTextFormatted() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : secondaryTexts) {
+            sb.append("- ").append(s).append("\n");
+        }
+        return sb.toString();
     }
 
     @Override

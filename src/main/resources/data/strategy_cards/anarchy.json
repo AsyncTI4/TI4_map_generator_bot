@@ -3,6 +3,8 @@
         "id": "anarchy1",
         "initiative": 1,
         "name": "Leadership",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_1",
         "colourHexCode": "#FFFFFF",
         "source": "asteroid"
@@ -11,6 +13,8 @@
         "id": "anarchy2",
         "initiative": 2,
         "name": "Preparation",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_2",
         "source": "asteroid"
     },
@@ -18,6 +22,8 @@
         "id": "anarchy3",
         "initiative": 3,
         "name": "Diplomacy",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_3",
         "source": "asteroid"
     },
@@ -25,6 +31,8 @@
         "id": "4",
         "initiative": 4,
         "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "botSCAutomationID": "base3",
         "imageFileName": "_4",
         "source": "asteroid"
@@ -33,6 +41,8 @@
         "id": "anarchy5",
         "initiative": 5,
         "name": "Construction",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "anarchy_5",
         "source": "asteroid"
@@ -41,6 +51,8 @@
         "id": "anarchy6",
         "initiative": 6,
         "name": "Trade",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_6",
         "source": "asteroid"
     },
@@ -48,6 +60,8 @@
         "id": "anarchy7",
         "initiative": 7,
         "name": "Fabrication",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_7",
         "source": "asteroid"
     },
@@ -55,6 +69,8 @@
         "id": "anarchy8",
         "initiative": 8,
         "name": "Warfare",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "anarchy_8",
         "source": "asteroid"
@@ -63,6 +79,8 @@
         "id": "anarchy9",
         "initiative": 9,
         "name": "Technology",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "anarchy_9",
         "source": "asteroid"
@@ -71,6 +89,8 @@
         "id": "anarchy10",
         "initiative": 10,
         "name": "Espionage",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_10",
         "source": "asteroid"
     },
@@ -78,6 +98,8 @@
         "id": "anarchy11",
         "initiative": 11,
         "name": "Imperial",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "imageFileName": "anarchy_11",
         "source": "asteroid"
     }

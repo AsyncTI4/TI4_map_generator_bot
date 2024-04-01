@@ -3,6 +3,8 @@
         "id": "miltymod_4",
         "initiative": 4,
         "name": "Construction",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "miltymod_4",
         "source": "miltymod"
