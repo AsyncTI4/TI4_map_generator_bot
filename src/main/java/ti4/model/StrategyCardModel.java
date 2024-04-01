@@ -1,0 +1,112 @@
+package ti4.model;
+
+import java.awt.Color;
+import java.util.Optional;
+
+import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.ResourceHelper;
+import ti4.model.Source.ComponentSource;
+
+@Data
+public class StrategyCardModel implements ModelInterface, EmbeddableModel {
+
+    private String id;
+    private int initiative; // 0 though infinity
+    private String group; // used for grouped SC games (pbd100 style)
+    private String name;
+    private String primaryText;
+    private String secondaryText;
+    private String botSCAutomationID; //ID of another SCModel to use the automation/button suite of
+    private String imageFileName;
+    private String flavourText;
+    private String colourHexCode;
+    private ComponentSource source;
+
+    @Override
+    public boolean isValid() {
+        return id != null
+            && name != null
+            && initiative >= 0
+            && primaryText != null
+            && secondaryText != null
+            && botSCAutomationID != null
+            && source != null;
+    }
+
+    @Override
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+        EmbedBuilder eb = new EmbedBuilder();
+        StringBuilder sb = new StringBuilder();
+
+        // TITLE
+        sb.append("**").append(initiative).append("** __").append(name).append("__");
+        eb.setTitle(sb.toString());
+
+        // PRIMARY
+        eb.addField("Primary", secondaryText, false);
+
+        // SECONDARY
+        eb.addField("Secondary", secondaryText, false);
+
+        // FLAVOUR
+        if (getFlavourText().isPresent()) {
+            eb.addField("", getFlavourText().get(), false);
+        }
+
+        // COLOR
+        eb.setColor(Color.decode(getColourHexCode()));
+
+        // FOOTER
+        if (includeID) {
+            sb = new StringBuilder();
+            sb.append("ID: ").append(id).append("  source: ").append(source.toString());
+            eb.setFooter(sb.toString());
+        }
+        return eb.build();
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        return id.contains(searchString)
+            || source.toString().contains(searchString);
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(initiative).append(" ").append(name).append(" (").append(id).append(") [").append(source.toString()).append("]");
+        return sb.toString();
+    }
+
+    @Override
+    public String getAlias() {
+        return id;
+    }
+
+    public Optional<String> getGroup() {
+        return Optional.ofNullable(group);
+    }
+
+    public Optional<String> getFlavourText() {
+        return Optional.ofNullable(flavourText);
+    }
+
+    public String getColourHexCode() {
+        return Optional.ofNullable(colourHexCode).orElse("000000");
+    }
+
+    public String getBotAutomationID() {
+        return Optional.ofNullable(botSCAutomationID).orElse(getId());
+    }
+
+    public boolean hasImageFile() {
+        return imageFileName != null && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
+        imageFileName + ".png", null) != null;
+    }
+}

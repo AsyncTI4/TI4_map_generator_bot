@@ -1,20 +1,5 @@
 [
   {
-    "name": "SC Set Template",
-    "alias": "template",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Imperial"
-    },
-    "description": "A template json strategy card set"
-  },
-  {
     "name": "PoK Strategy Cards",
     "alias": "pok",
     "cardValues": {
