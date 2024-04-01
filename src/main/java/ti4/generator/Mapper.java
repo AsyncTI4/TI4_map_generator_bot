@@ -152,7 +152,11 @@ public class Mapper {
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
             if (file.isFile() && file.getName().endsWith(".json")) {
-                importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+                try {
+                    importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+                } catch (Exception e) {
+                    BotLogger.log("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
+                }
             }
         }
     }
