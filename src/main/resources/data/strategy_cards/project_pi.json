@@ -3,6 +3,8 @@
         "id": "project_pi_4",
         "initiative": 4,
         "name": "Construction",
+        "primaryTexts": [],
+        "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pi_4",
         "source": "project_pi"

@@ -192,17 +192,17 @@
   {
     "name": "Ignis Aurora Strategy Cards",
     "alias": "ignis_aurora",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Antiquities",
-      "9": "Imperial"
-    },
+    "scIDs": [
+      "base1",
+      "base2codex1",
+      "ignisaurora3",
+      "pok4",
+      "base5",
+      "base6",
+      "base7",
+      "ignisaurora8",
+      "ignisaurora9"
+    ],
     "description": "Strategy Cards for Baldrick's Ignis Aurora expansion"
   },
   {
@@ -225,16 +225,16 @@
   {
     "name": "MiltyMod Strategy Cards",
     "alias": "miltymod",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Imperial"
-    },
+    "scIDs": [
+      "base1",
+      "base2codex1",
+      "base3",
+      "miltymod_4",
+      "base5",
+      "base6",
+      "base7",
+      "base8"
+    ],
     "description": "MiltyMod strategy cards, featuring updated Construction"
   },
   {
