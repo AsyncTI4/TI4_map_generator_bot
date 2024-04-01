@@ -3356,12 +3356,15 @@ public class ButtonListener extends ListenerAdapter {
                         if (!buttons2.isEmpty()) {
                             MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCardsInfoThread(),
-                                trueIdentity + " use buttons to resolve contagion planet #1", buttons2);
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                player.getCardsInfoThread(),
-                                trueIdentity
-                                    + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)",
-                                buttons2);
+                                trueIdentity + " use buttons to resolve contagion", buttons2);
+
+                            if (Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1711997257707L)) > 0) {
+                                MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCardsInfoThread(),
+                                    trueIdentity
+                                        + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)",
+                                    buttons2);
+                            }
                         }
                     }
                 }
