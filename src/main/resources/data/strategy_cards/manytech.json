@@ -1,0 +1,80 @@
+[
+    {
+        "id": "manytech8",
+        "initiative": 8,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "source": "other"
+    },
+    {
+        "id": "manytech9",
+        "initiative": 9,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "source": "other"
+    },
+    {
+        "id": "manytech10",
+        "initiative": 10,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "source": "other"
+    },
+    {
+        "id": "manytech11",
+        "initiative": 11,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "source": "other"
+    },
+    {
+        "id": "manytech12",
+        "initiative": 12,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "source": "other"
+    },
+    {
+        "id": "base13",
+        "initiative": 13,
+        "name": "Imperial",
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements.",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective."
+        ],
+        "source": "other"
+    }
+]

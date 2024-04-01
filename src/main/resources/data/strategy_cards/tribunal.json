@@ -1,0 +1,92 @@
+[
+    {
+        "id": "tribunal1",
+        "initiative": 1,
+        "name": "Anticipation",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_1",
+        "source": "other"
+    },
+    {
+        "id": "tribunal2",
+        "initiative": 2,
+        "name": "Diplomacy",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_2",
+        "source": "other"
+    },
+    {
+        "id": "tribunal3",
+        "initiative": 3,
+        "name": "Leadership",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_3",
+        "source": "other"
+    },
+    {
+        "id": "tribunal4",
+        "initiative": 4,
+        "name": "Politics",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_4",
+        "source": "other"
+    },
+    {
+        "id": "tribunal5",
+        "initiative": 5,
+        "name": "Construction",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_5",
+        "source": "other"
+    },
+    {
+        "id": "tribunal6",
+        "initiative": 6,
+        "name": "Trade",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_6",
+        "source": "other"
+    },
+    {
+        "id": "tribunal7",
+        "initiative": 7,
+        "name": "Warfare",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_7",
+        "source": "other"
+    },
+    {
+        "id": "tribunal8",
+        "initiative": 8,
+        "name": "Technology",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_8",
+        "source": "other"
+    },
+    {
+        "id": "tribunal9",
+        "initiative": 9,
+        "name": "Espionage",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_9",
+        "source": "other"
+    },
+    {
+        "id": "tribunal10",
+        "initiative": 10,
+        "name": "Impertial",
+        "primaryText": [],
+        "secondaryText": [],
+        "imageFileName": "tribunal_10",
+        "source": "other"
+    }
+]

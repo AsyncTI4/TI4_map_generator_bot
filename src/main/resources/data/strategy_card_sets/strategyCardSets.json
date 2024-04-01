@@ -47,35 +47,35 @@
   {
     "name": "Tispoon Ten",
     "alias": "tispoon",
-    "cardValues": {
-      "1": "Anticipation",
-      "2": "Diplomacy",
-      "3": "Leadership",
-      "4": "Politics",
-      "5": "Construction",
-      "6": "Trade",
-      "7": "Warfare",
-      "8": "Technology",
-      "9": "Espionage",
-      "10": "Imperial"
-    },
+    "scIDs": [
+      "tispoon1",
+      "tispoon2",
+      "tispoon3",
+      "tispoon4",
+      "tispoon5",
+      "tispoon6",
+      "tispoon7",
+      "tispoon8",
+      "tispoon9",
+      "tispoon10"
+    ],
     "description": "A set of 10 strategy cards by HolyTispoon used in FoW41"
   },
   {
     "name": "Tispoon's Tribunal",
     "alias": "tribunal",
-    "cardValues": {
-      "1": "Anticipation",
-      "2": "Diplomacy",
-      "3": "Leadership",
-      "4": "Politics",
-      "5": "Construction",
-      "6": "Trade",
-      "7": "Warfare",
-      "8": "Technology",
-      "9": "Espionage",
-      "10": "Imperial"
-    },
+    "scIDs": [
+      "tribunal1",
+      "tribunal2",
+      "tribunal3",
+      "tribunal4",
+      "tribunal5",
+      "tribunal6",
+      "tribunal7",
+      "tribunal8",
+      "tribunal9",
+      "tribunal10"
+    ],
     "description": "A set of 10 strategy cards by HolyTispoon used in PBD500"
   },
   {
@@ -208,18 +208,18 @@
   {
     "name": "Luminous' Tispoon Ten",
     "alias": "luminous",
-    "cardValues": {
-      "1": "Anticipation",
-      "2": "Diplomacy",
-      "3": "Leadership",
-      "4": "Politics",
-      "5": "Construction",
-      "6": "Trade",
-      "7": "Warfare",
-      "8": "Technology",
-      "9": "Espionage",
-      "10": "Imperial"
-    },
+    "scIDs": [
+      "luminous1",
+      "luminous2",
+      "luminous3",
+      "luminous4",
+      "luminous5",
+      "luminous6",
+      "luminous7",
+      "luminous8",
+      "luminous9",
+      "luminous10"
+    ],
     "description": "A set of 10 strategy cards by Luminous"
   },
   {
@@ -240,24 +240,24 @@
   {
     "name": "Infinite Tech Strategy Cards",
     "alias": "many_techs",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Technology",
-      "9": "Technology",
-      "10": "Technology",
-      "11": "Technology",
-      "12": "Technology",
-      "13": "Imperial"
-    },
+    "scIDs": [
+      "base1",
+      "base2codex1",
+      "base3",
+      "pok4",
+      "base5",
+      "base6",
+      "base7",
+      "manytech8",
+      "manytech9",
+      "manytech10",
+      "manytech11",
+      "manytech12",
+      "manytech13"
+    ],
     "description": "Normal Strategy Cards except with five extra Techs"
   },
-   {
+  {
     "name": "Pi Strategy Cards",
     "alias": "pi",
     "scIDs": [
