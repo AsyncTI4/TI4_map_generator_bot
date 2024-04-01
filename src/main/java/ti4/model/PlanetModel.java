@@ -29,6 +29,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int influence;
     private String factionHomeworld;
     private PlanetTypeModel.PlanetType planetType;
+    private String tileBack;
     private String cardImagePath; //todo
     private List<TechSpecialtyModel.TechSpecialty> techSpecialties;
     private String legendaryAbilityName;
@@ -164,7 +165,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+            || getId().toLowerCase().contains(searchString)
+            || getSource().toString().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     @JsonIgnore
@@ -179,5 +183,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public Optional<String> getContrastColor() {
         return Optional.ofNullable(contrastColor);
+    }
+
+    @JsonIgnore
+    public Optional<String> getTileBack() {
+        return Optional.ofNullable(tileBack);
     }
 }
