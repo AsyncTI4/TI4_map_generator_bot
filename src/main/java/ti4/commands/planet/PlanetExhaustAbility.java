@@ -48,7 +48,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             buttons.add(Button.success("mallice_convert_comm", "Convert Commodities"));
 
         }
-        
+
         if ("hopesend".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
             MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Hope's End Ability");
             message = "Use buttons to drop a mech on a planet or draw an AC";
@@ -82,7 +82,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild"));
             message = "Use buttons to put 1 cruiser with your ships";
         }
-        if(ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode() && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList().contains("attachment_nanoforge.png")){
+        if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode() && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList().contains("attachment_nanoforge.png")) {
             MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Nanoforge Ability to ready the planet (technically done right after it was exhausted)");
             player.refreshPlanet(planet);
         }
@@ -93,7 +93,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
                 MessageHelper.sendMessageToChannelWithFactionReact(ButtonHelper.getCorrectChannel(player, activeGame), "Please select your target", activeGame, player, riderButtons);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getActionsChannel(), "Please indicate no afters again.", activeGame, afterButtons, "after");
-            }else{
+            } else {
                 MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Tarrock's Ability to draw 1 agenda and bottom/top it");
                 new DrawAgenda().drawAgenda(1, activeGame, player);
             }
@@ -102,9 +102,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             if (!activeGame.isFoWMode() && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
                 MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Prism's Ability to Force Another Player to give either an AC or PN");
                 resolvePrismStep1(player, activeGame);
-            }else{
+            } else {
                 MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Prism's Ability to Return a Non-Faction, Non-Unit Upgrade tech and get one with the same number of prereqs");
-                MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Choose a tech to return",getNewPrismLoseTechOptions(player, activeGame));
+                MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Choose a tech to return", getNewPrismLoseTechOptions(player, activeGame));
             }
         }
         if ("echo".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))) {
@@ -126,6 +126,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         }
 
     }
+
     public static List<Button> getNewPrismLoseTechOptions(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -143,13 +144,13 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         player.removeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " removed the tech " + techM1.getName());
-        activeGame.setComponentAction(true);
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of pre-requisites", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);
     }
+
     public void resolvePrismStep1(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {

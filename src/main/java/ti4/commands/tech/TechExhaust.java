@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -40,14 +41,19 @@ public class TechExhaust extends TechAddRemove {
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game activeGame, Player player,
-            String tech) {
+        String tech) {
+        String pos = "";
+        if (tech.contains("dskortg")) {
+            pos = tech.split("_")[1];
+            tech = "dskortg";
+        }
         TechnologyModel techModel = Mapper.getTech(tech);
         String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
         if (activeGame.isShowFullComponentTextEmbeds()) {
-            MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), exhaustMessage,
-                    techModel.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbed(ButtonHelper.getCorrectChannel(player, activeGame), exhaustMessage,
+                techModel.getRepresentationEmbed());
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), exhaustMessage);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), exhaustMessage);
         }
         player.exhaustTech(tech);
         switch (tech) {
@@ -65,17 +71,32 @@ public class TechExhaust extends TechAddRemove {
             }
             case "absol_dxa" -> { // Dacxive
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Use buttons to drop 2 infantry on a planet",
-                        Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                    "Use buttons to drop 2 infantry on a planet",
+                    Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);
                 Button draw2ACButton = Button
-                        .secondary(player.getFinsFactionCheckerPrefix() + "draw2ac", "Draw 2 Action Cards")
-                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                    .secondary(player.getFinsFactionCheckerPrefix() + "draw2ac", "Draw 2 Action Cards")
+                    .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
+            }
+            case "dskortg" -> {
+                Tile tile = null;
+                if (!pos.isEmpty()) {
+                    tile = activeGame.getTileByPosition(pos);
+                } else if (!activeGame.getActiveSystem().isEmpty()) {
+                    tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+                }
+                if (tile != null) {
+                    String tileRep = tile.getRepresentationForButtons(activeGame, player);
+                    String ident = player.getFactionEmoji();
+                    String msg = ident + " removed CC from " + tileRep;
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    RemoveCC.removeCC(event, player.getColor(), tile, activeGame);
+                }
             }
             case "td" -> { // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(activeGame, player);
@@ -83,7 +104,7 @@ public class TechExhaust extends TechAddRemove {
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                        player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
+                    player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
             }
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
@@ -92,20 +113,20 @@ public class TechExhaust extends TechAddRemove {
                     for (Leader leader : player.getLeaders()) {
                         if (leader.isExhausted() && leader.getId().contains("agent")) {
                             buttons.add(Button.primary(
-                                    player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + leader.getId(),
-                                    "Ready " + leader.getId()));
+                                player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + leader.getId(),
+                                "Ready " + leader.getId()));
                         }
                     }
                     for (String relic : player.getExhaustedRelics()) {
                         if ("titanprototype".equalsIgnoreCase("relic") || "absol_jr".equalsIgnoreCase(relic)) {
                             buttons.add(Button.primary(
-                                    player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
-                                    "Ready JR"));
+                                player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
+                                "Ready JR"));
                         }
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
-                        + " use button to gain a CC or spend a strat CC to ready your agent", buttons);
+                    + " use button to gain a CC or spend a strat CC to ready your agent", buttons);
             }
             case "aida", "sar", "htp" -> {
                 if (event instanceof ButtonInteractionEvent) {
@@ -123,10 +144,10 @@ public class TechExhaust extends TechAddRemove {
             case "pi" -> { // Predictive Intelligence
                 deleteTheOneButtonIfButtonEvent(event);
                 Button deleteButton = Button.danger("FFCC_" + player.getFaction() + "_deleteButtons",
-                        "Delete These Buttons");
+                    "Delete These Buttons");
                 String message = player.getRepresentation(false, true) + " use buttons to redistribute";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
-                        List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
+                    List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
@@ -138,9 +159,9 @@ public class TechExhaust extends TechAddRemove {
             case "dsaxisy" -> {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, "sd",
-                        "placeOneNDone_skipbuild");
+                    "placeOneNDone_skipbuild");
                 String message = player.getRepresentation(true, true)
-                        + " select the planet you would like to place or move a spacedock to.";
+                    + " select the planet you would like to place or move a spacedock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
@@ -169,7 +190,7 @@ public class TechExhaust extends TechAddRemove {
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                 String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        message, buttons);
+                    message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator
@@ -177,9 +198,9 @@ public class TechExhaust extends TechAddRemove {
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                 String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        message, buttons);
+                    message, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        message, buttons);
+                    message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
             case "pm" -> { // Production Biomes
@@ -191,13 +212,13 @@ public class TechExhaust extends TechAddRemove {
                 if (player.getPlanets().contains("mr")) {
                     deleteIfButtonEvent(event);
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet("mr"), "inf mr",
-                            activeGame);
+                        activeGame);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                            player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
+                        player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, activeGame, player);
                 } else {
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                            player.getRepresentation() + " You do not control Mecatol Rex");
+                        player.getRepresentation() + " You do not control Mecatol Rex");
                     player.refreshTech("lgf");
                 }
             }
@@ -205,7 +226,7 @@ public class TechExhaust extends TechAddRemove {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
                 List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player,
-                        UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
+                    UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
                 if (player.hasUnit("ghoti_flagship")) {
                     tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship));
                 }
@@ -214,35 +235,35 @@ public class TechExhaust extends TechAddRemove {
                     if (!pos2.contains(tile.getPosition())) {
                         String buttonID = "produceOneUnitInTile_" + tile.getPosition() + "_sling";
                         Button tileButton = Button.success(buttonID,
-                                tile.getRepresentationForButtons(activeGame, player));
+                            tile.getRepresentationForButtons(activeGame, player));
                         buttons.add(tileButton);
                         pos2.add(tile.getPosition());
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                        "Select which tile you would like to produce a ship in ", buttons);
+                    "Select which tile you would like to produce a ship in ", buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
             case "dsdihmy" -> { // Impressment Programs
                 List<Button> buttons = ButtonHelper.getButtonsToExploreReadiedPlanets(player, activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select a planet to explore",
-                        buttons);
+                    buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
             default -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "> This tech is not automated. Please resolve manually.");
+                    "> This tech is not automated. Please resolve manually.");
             }
         }
     }
 
     private static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
         TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.TECH,
-                techID, player.getNumberTurns());
+            techID, player.getNumberTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Combat modifier will be applied next time you push the combat roll button.");
+                "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 
@@ -253,7 +274,7 @@ public class TechExhaust extends TechAddRemove {
     }
 
     private static void sendNextActionButtonsIfButtonEvent(GenericInteractionCreateEvent event, Game activeGame,
-            Player player) {
+        Player player) {
         if (event instanceof ButtonInteractionEvent) {
             ButtonHelper.serveNextComponentActionButtons(event, activeGame, player);
         }

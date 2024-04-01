@@ -91,7 +91,6 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer, boolean justPassed) {
-        activeGame.setComponentAction(false);
         activeGame.setTemporaryPingDisable(false);
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         for (Player player : activeGame.getRealPlayers()) {
@@ -312,7 +311,6 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
-                activeGame.setComponentAction(true);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
             }
