@@ -468,7 +468,7 @@
         "name": "War Stories",
         "faction": "lanefir",
         "window": "Once per action, after you win a combat",
-        "windowEffect": "Explore 1 planet you control, or if the active system does not contain any planets, the frontier exploration deck in the active system.",
+        "windowEffect": "You may explore 1 planet you control, or if the active system does not contain any planets, the frontier exploration deck in the active system.",
         "source": "ds"
     },
     {
