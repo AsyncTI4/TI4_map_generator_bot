@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class StrategyCardSetModel implements ModelInterface {
     private String name;
     private String alias;
-    private List<String> scIDs;
+    private List<String> scIDs; // List of strategy card IDs
     private String description;
     private ComponentSource source;
 

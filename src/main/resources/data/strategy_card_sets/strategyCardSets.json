@@ -2,32 +2,47 @@
   {
     "name": "PoK Strategy Cards",
     "alias": "pok",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Imperial"
-    },
+    "scIDs": [
+      "base1",
+      "base2codex1",
+      "base3",
+      "pok4",
+      "base5",
+      "base6",
+      "base7",
+      "base8"
+    ],
     "description": "The \"default\" set of strategy cards, used in PoK"
   },
   {
     "name": "Base Game Strategy Cards",
     "alias": "base_game",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Imperial"
-    },
+    "scIDs": [
+      "base1",
+      "base2",
+      "base3",
+      "base4",
+      "base5",
+      "base6",
+      "base7",
+      "base8"
+    ],
     "description": "The original set of strategy cards, before Diplomacy and Construction were updated"
+  },
+  {
+    "name": "Base Game Strategy Cards (Codex I)",
+    "alias": "base_game_codex1",
+    "scIDs": [
+      "base1",
+      "base2codex1",
+      "base3",
+      "base4",
+      "base5",
+      "base6",
+      "base7",
+      "base8"
+    ],
+    "description": "The original set of strategy cards, with Codex I Diplomacy and before Construction was updated"
   },
   {
     "name": "Tispoon Ten",
@@ -66,19 +81,19 @@
   {
     "name": "Asteroid's Anarchy",
     "alias": "anarchy",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Preparation",
-      "3": "Diplomacy",
-      "4": "Politics",
-      "5": "Construction",
-      "6": "Trade",
-      "7": "Fabrication",
-      "8": "Warfare",
-      "9": "Technology",
-      "10": "Espionage",
-      "11": "Imperial"
-    },
+    "scIDs": [
+      "anarchy1",
+      "anarchy2",
+      "anarchy3",
+      "anarchy4",
+      "anarchy5",
+      "anarchy6",
+      "anarchy7",
+      "anarchy8",
+      "anarchy9",
+      "anarchy10",
+      "anarchy11"
+    ],
     "description": "Asteroid's set of 11 custom SCs"
   },
   {
@@ -245,16 +260,16 @@
    {
     "name": "Pi Strategy Cards",
     "alias": "pi",
-    "cardValues": {
-      "1": "Leadership",
-      "2": "Diplomacy",
-      "3": "Politics",
-      "4": "Construction",
-      "5": "Trade",
-      "6": "Warfare",
-      "7": "Technology",
-      "8": "Imperial"
-    },
+    "scIDs": [
+      "base1",
+      "base2codex1",
+      "base3",
+      "project_pi_4",
+      "base5",
+      "base6",
+      "base7",
+      "base8"
+    ],
     "description": "The Project_Pi set of strategy cards"
   }
 ]
