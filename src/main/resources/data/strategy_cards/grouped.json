@@ -8,7 +8,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2A",
@@ -19,7 +19,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped3",
@@ -30,7 +30,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base3",
         "imageFileName": "base_game_3",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4A",
@@ -41,7 +41,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5A",
@@ -52,7 +52,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6A",
@@ -63,7 +63,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7A",
@@ -74,7 +74,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8A",
@@ -85,7 +85,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1B",
@@ -96,7 +96,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2B",
@@ -107,7 +107,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4B",
@@ -118,7 +118,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5B",
@@ -129,7 +129,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6B",
@@ -140,7 +140,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7B",
@@ -151,7 +151,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8B",
@@ -162,7 +162,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1C",
@@ -173,7 +173,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2C",
@@ -184,7 +184,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4C",
@@ -195,7 +195,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5C",
@@ -206,7 +206,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6C",
@@ -217,7 +217,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7C",
@@ -228,7 +228,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8C",
@@ -239,7 +239,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1D",
@@ -250,7 +250,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2D",
@@ -261,7 +261,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4D",
@@ -272,7 +272,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5D",
@@ -283,7 +283,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6D",
@@ -294,7 +294,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7D",
@@ -305,7 +305,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8D",
@@ -316,7 +316,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1E",
@@ -327,7 +327,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2E",
@@ -338,7 +338,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4E",
@@ -349,7 +349,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5E",
@@ -360,7 +360,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6E",
@@ -371,7 +371,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7E",
@@ -382,7 +382,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8E",
@@ -393,7 +393,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1F",
@@ -404,7 +404,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2F",
@@ -415,7 +415,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4F",
@@ -426,7 +426,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5F",
@@ -437,7 +437,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6F",
@@ -448,7 +448,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7F",
@@ -459,7 +459,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8F",
@@ -470,7 +470,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1G",
@@ -481,7 +481,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2G",
@@ -492,7 +492,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4G",
@@ -503,7 +503,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5G",
@@ -514,7 +514,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6G",
@@ -525,7 +525,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7G",
@@ -536,7 +536,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8G",
@@ -547,7 +547,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped1H",
@@ -558,7 +558,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base1",
         "imageFileName": "base_game_1",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped2H",
@@ -569,7 +569,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base2codex1",
         "imageFileName": "pok_2",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped4H",
@@ -580,7 +580,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4",
         "imageFileName": "pok_4",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped5H",
@@ -591,7 +591,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base5",
         "imageFileName": "base_game_5",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped6H",
@@ -602,7 +602,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base6",
         "imageFileName": "base_game_6",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped7H",
@@ -613,7 +613,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base7",
         "imageFileName": "base_game_7",
-        "source": "grouped"
+        "source": "other"
     },
     {
         "id": "grouped8H",
@@ -624,6 +624,6 @@
         "secondaryTexts": [],
         "botSCAutomationID": "base8",
         "imageFileName": "base_game_8",
-        "source": "grouped"
+        "source": "other"
     }
 ]
