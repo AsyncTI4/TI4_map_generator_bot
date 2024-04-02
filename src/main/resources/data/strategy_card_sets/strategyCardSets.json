@@ -12,7 +12,8 @@
       "base7",
       "base8"
     ],
-    "description": "The \"default\" set of strategy cards, used in PoK"
+    "description": "The \"default\" set of strategy cards, used in PoK",
+    "source": "pok"
   },
   {
     "name": "Base Game Strategy Cards",
@@ -27,7 +28,8 @@
       "base7",
       "base8"
     ],
-    "description": "The original set of strategy cards, before Diplomacy and Construction were updated"
+    "description": "The original set of strategy cards, before Diplomacy and Construction were updated",
+    "source": "base"
   },
   {
     "name": "Base Game Strategy Cards (Codex I)",
@@ -42,7 +44,8 @@
       "base7",
       "base8"
     ],
-    "description": "The original set of strategy cards, with Codex I Diplomacy and before Construction was updated"
+    "description": "The original set of strategy cards, with Codex I Diplomacy and before Construction was updated",
+    "source": "codex1"
   },
   {
     "name": "Tispoon Ten",
@@ -59,7 +62,8 @@
       "tispoon9",
       "tispoon10"
     ],
-    "description": "A set of 10 strategy cards by HolyTispoon used in FoW41"
+    "description": "A set of 10 strategy cards by HolyTispoon used in FoW41",
+    "source": "holytispoon"
   },
   {
     "name": "Tispoon's Tribunal",
@@ -76,7 +80,8 @@
       "tribunal9",
       "tribunal10"
     ],
-    "description": "A set of 10 strategy cards by HolyTispoon used in PBD500"
+    "description": "A set of 10 strategy cards by HolyTispoon used in PBD500",
+    "source": "holytispoon"
   },
   {
     "name": "Asteroid's Anarchy",
@@ -94,7 +99,8 @@
       "anarchy10",
       "anarchy11"
     ],
-    "description": "Asteroid's set of 11 custom SCs"
+    "description": "Asteroid's set of 11 custom SCs",
+    "source": "asteroid"
   },
   {
     "name": "PBD #100 Strategy Cards",
@@ -130,7 +136,8 @@
       "grouped8C",
       "grouped8D"
     ],
-    "description": "Grouped SCs for PBD #100"
+    "description": "Grouped SCs for PBD #100",
+    "source": "pbd100"
   },
   {
     "name": "PBD #1000 Strategy Cards",
@@ -187,7 +194,8 @@
       "grouped86",
       "grouped87"
     ],
-    "description": "Grouped SCs for PBD #1000"
+    "description": "Grouped SCs for PBD #1000",
+    "source": "pbd1000"
   },
   {
     "name": "Ignis Aurora Strategy Cards",
@@ -203,7 +211,8 @@
       "ignisaurora8",
       "ignisaurora9"
     ],
-    "description": "Strategy Cards for Baldrick's Ignis Aurora expansion"
+    "description": "Strategy Cards for Baldrick's Ignis Aurora expansion",
+    "source": "ignis_aurora"
   },
   {
     "name": "Luminous' Tispoon Ten",
@@ -220,7 +229,8 @@
       "luminous9",
       "luminous10"
     ],
-    "description": "A set of 10 strategy cards by Luminous"
+    "description": "A set of 10 strategy cards by Luminous",
+    "source": "luminous"
   },
   {
     "name": "MiltyMod Strategy Cards",
@@ -235,7 +245,8 @@
       "base7",
       "base8"
     ],
-    "description": "MiltyMod strategy cards, featuring updated Construction"
+    "description": "MiltyMod strategy cards, featuring updated Construction",
+    "source": "miltymod"
   },
   {
     "name": "Infinite Tech Strategy Cards",
@@ -255,7 +266,8 @@
       "manytech12",
       "manytech13"
     ],
-    "description": "Normal Strategy Cards except with five extra Techs"
+    "description": "Normal Strategy Cards except with five extra Techs",
+    "source": "other"
   },
   {
     "name": "Pi Strategy Cards",
@@ -270,6 +282,7 @@
       "base7",
       "base8"
     ],
-    "description": "The Project_Pi set of strategy cards"
+    "description": "The Project_Pi set of strategy cards",
+    "source": "project_pi"
   }
 ]

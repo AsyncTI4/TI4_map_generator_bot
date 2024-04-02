@@ -26,7 +26,8 @@ public class StrategyCardSetModel implements ModelInterface {
         return scIDs != null
             && !scIDs.isEmpty()
             && StringUtils.isNotBlank(name)
-            && StringUtils.isNotBlank(alias);
+            && StringUtils.isNotBlank(alias)
+            && source != null;
     }
 
     @Override
