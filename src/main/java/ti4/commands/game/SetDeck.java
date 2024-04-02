@@ -44,12 +44,7 @@ public class SetDeck extends GameSubcommandData {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
                 if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
-                    StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
-                    activeGame.setHomeBrewSCMode(!"pok".equals(value) && !"base_game".equals(value));
-                    activeGame.setScTradeGoods(new LinkedHashMap<>());
-                    activeGame.setScSetID(strategyCardModel.getAlias());
-
-                    strategyCardModel.getCardValues().keySet().forEach(scValue -> activeGame.setScTradeGood(scValue, 0));
+                    activeGame.setStrategyCardSet(value);
                 } else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
                     if (setDeck(event, activeGame, deckType, deckModel)) {

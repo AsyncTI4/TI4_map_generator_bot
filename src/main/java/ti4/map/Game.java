@@ -65,6 +65,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -3672,6 +3673,11 @@ public class Game {
     }
 
     @JsonIgnore
+    public StrategyCardModel getStrategyCardModel(int scID) {
+        return getStrategyCardSet().getSCModel(scID).orElse(null);
+    }
+
+    @JsonIgnore
     public int getActionCardDeckSize() {
         return getActionCards().size();
     }
@@ -4114,7 +4120,7 @@ public class Game {
                 || explorationDeckID != null
                         && !List.of("explores_pok", "explores_base", "null").contains(explorationDeckID)
                 || technologyDeckID != null && !List.of("techs_pok", "techs_base", "null").contains(technologyDeckID)
-                || scSetID != null && !List.of("pok", "base_game", "null").contains(scSetID)
+                || scSetID != null && !List.of("pok", "base_game", "base_game_codex1", "null").contains(scSetID)
                 || eventDeckID != null && !"null".equals(eventDeckID)
                 || Mapper.getFactions().stream()
                         .filter(faction -> !faction.getSource().isPok())
@@ -4131,5 +4137,13 @@ public class Game {
                 || getRealAndEliminatedAndDummyPlayers().size() < 3
                 || playerCountForMap > 8
                 || getRealAndEliminatedAndDummyPlayers().size() > 8;
+    }
+
+    public void setStrategyCardSet(String scSetID) {
+        StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
+        setHomeBrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
+        setScTradeGoods(new LinkedHashMap<>());
+        setScSetID(strategyCardModel.getAlias());
+        strategyCardModel.getCardValues().keySet().forEach(scValue -> setScTradeGood(scValue, 0));
     }
 }
