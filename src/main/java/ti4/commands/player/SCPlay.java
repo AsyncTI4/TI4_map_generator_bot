@@ -165,20 +165,19 @@ public class SCPlay extends PlayerSubcommandData {
         // GET BUTTONS
         ActionRow actionRow = null;
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, activeGame, winnuHero));
-        if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToPlay == 7
-            && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
+        if (scModel.usesAutomationForSCID("pok7technology") && !activeGame.isFoWMode() && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
 
-        if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToPlay == 4
-            && Helper.getPlayerFromUnit(activeGame, "titans_mech") != null) {
-            scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf")
-                .withEmoji(Emoji.fromFormatted(Emojis.Titans)));
+        if (scModel.usesAutomationForSCID("pok4construction") && !activeGame.isFoWMode() && Helper.getPlayerFromUnit(activeGame, "titans_mech") != null) {
+            scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
-        if (!scButtons.isEmpty())
+        if (!scButtons.isEmpty()) {
             actionRow = ActionRow.of(scButtons);
-        if (actionRow != null)
+        }
+        if (actionRow != null) {
             baseMessageObject.addComponents(actionRow);
+        }
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player, message_);
@@ -230,7 +229,7 @@ public class SCPlay extends PlayerSubcommandData {
         });
 
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
-        if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {
+        if (scModel.usesAutomationForSCID("pok3politics")) {
             String assignSpeakerMessage = player.getRepresentation()
                 + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
                 + Emojis.SpeakerToken;
@@ -246,7 +245,7 @@ public class SCPlay extends PlayerSubcommandData {
                     + " this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
         }
 
-        if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {
+        if (scModel.usesAutomationForSCID("pok3politics")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                 + " after assigning speaker, Use this button to draw agendas into your cards info thread.";
 
@@ -261,7 +260,7 @@ public class SCPlay extends PlayerSubcommandData {
             ButtonHelper.offerRedTapButtons(activeGame, player);
         }
 
-        if (scToPlay == 5 && !activeGame.isHomeBrewSCMode()) {
+        if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                 + " you can force players to refresh, normally done in order to trigger a trade agreement. This is not required and not advised if you are offering them a conditional refresh.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(activeGame, player);
@@ -269,12 +268,9 @@ public class SCPlay extends PlayerSubcommandData {
                 assignSpeakerMessage2, forceRefresh);
         }
 
-        if (scToPlay != 1) {
-            // "scepterE_follow_") || buttonID.startsWith("mahactA_follow_")){
-
+        if (scModel.usesAutomationForSCID("pok1leadership")) {
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
-            Button mahactA = Button.danger("mahactA_follow_" + scToPlay, "Use Mahact Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Mahact));
+            Button mahactA = Button.danger("mahactA_follow_" + scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
             for (Player player3 : activeGame.getRealPlayers()) {
                 if (player3 == player) {
                     continue;

@@ -108,6 +108,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
@@ -8418,8 +8419,9 @@ public class ButtonHelper {
         if (sc) {
             activeGame.setComponentAction(false);
             boolean used = new ButtonListener().addUsedSCPlayer(messageID, activeGame, player, event, "");
-            int scNum = 7;
-            if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+            StrategyCardModel scModel = activeGame.getStrategyCardModelByName("technology").orElse(null);
+            if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology") && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+                int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                 if (player.getStrategicCC() > 0) {

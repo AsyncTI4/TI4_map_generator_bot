@@ -732,6 +732,7 @@ public class Helper {
     }
 
     public static String getSCAsMention(int sc, Game activeGame) {
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         if (activeGame.isHomeBrewSCMode()) {
             return getSCName(sc, activeGame);
         }
