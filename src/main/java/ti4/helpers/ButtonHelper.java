@@ -8783,32 +8783,16 @@ public class ButtonHelper {
         };
     }
 
-    public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName,
-        @Nullable List<Button> buttons) {
+    public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName;
-        boolean messageSent = false;
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ((threadChannel_.getName().startsWith(threadName)
-                || threadChannel_.getName().equals(threadName + "WinnuHero"))
-                && (!"technology".equalsIgnoreCase(stratName) || !game.getComponentAction())) {
-                if (buttons == null) {
-                    MessageHelper.sendMessageToChannel(threadChannel_, message);
-                } else {
-                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
-                }
-                messageSent = true;
-                break;
+            if ((threadChannel_.getName().startsWith(threadName) || threadChannel_.getName().equals(threadName + "WinnuHero")) && (!"technology".equalsIgnoreCase(stratName) || !game.getComponentAction())) {
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
+                return;
             }
         }
-        if (messageSent) {
-            return;
-        }
-        if (buttons == null) {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, buttons);
-        }
+        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, buttons);
     }
 
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
