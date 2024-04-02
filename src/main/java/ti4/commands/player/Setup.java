@@ -46,11 +46,11 @@ public class Setup extends PlayerSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true)
-                .setAutoComplete(true));
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true)
-                .setAutoComplete(true));
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION,
-                "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
+            "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SPEAKER, "True to set player as speaker."));
     }
@@ -82,38 +82,38 @@ public class Setup extends PlayerSubcommandData {
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
         String positionHS = StringUtils
-                .substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); // Substring
-                                                                                                                    // to
-                                                                                                                    // grab
-                                                                                                                    // "305"
-                                                                                                                    // from
-                                                                                                                    // "305
-                                                                                                                    // Moll
-                                                                                                                    // Primus
-                                                                                                                    // (Mentak)"
-                                                                                                                    // autocomplete
+            .substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); // Substring
+                                                                                                                                               // to
+                                                                                                                                               // grab
+                                                                                                                                               // "305"
+                                                                                                                                               // from
+                                                                                                                                               // "305
+                                                                                                                                               // Moll
+                                                                                                                                               // Primus
+                                                                                                                                               // (Mentak)"
+                                                                                                                                               // autocomplete
         secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
     }
 
     public void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS,
-            GenericInteractionCreateEvent event, boolean setSpeaker) {
+        GenericInteractionCreateEvent event, boolean setSpeaker) {
         Map<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Player:" + playerInfo.getUserName() + " already uses color:" + color);
+                        "Player:" + playerInfo.getUserName() + " already uses color:" + color);
                     return;
                 } else if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                        "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
             }
         }
         if (player.isRealPlayer() && player.getSo() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "You have SOs that would get lost to the void if you were setup again. If you wish to change color, use /player change_color. If you want to setup as another faction, discard your SOs first");
+                "You have SOs that would get lost to the void if you were setup again. If you wish to change color, use /player change_color. If you want to setup as another faction, discard your SOs first");
             return;
         }
 
@@ -132,14 +132,14 @@ public class Setup extends PlayerSubcommandData {
 
         if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !activeGame.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
+                "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
 
         // HOME SYSTEM
         if (!PositionMapper.isTilePositionValid(positionHS)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
+                "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
         }
 
@@ -204,7 +204,7 @@ public class Setup extends PlayerSubcommandData {
         if (setSpeaker) {
             activeGame.setSpeaker(player.getUserID());
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+                Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs
@@ -247,18 +247,17 @@ public class Setup extends PlayerSubcommandData {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true)
-                                + " after every other faction gets their tech, press this button to resolve Keleres tech",
-                        buttons);
+                    player.getRepresentation(true, true)
+                        + " after every other faction gets their tech, press this button to resolve Keleres tech",
+                    buttons);
             } else if (player.getFaction().contains("winnu")) {
                 ButtonHelperFactionSpecific.offerWinnuStartingTech(player, activeGame);
             } else if (player.getFaction().contains("argent")) {
                 ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
             } else {
-                activeGame.setComponentAction(true);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true) + " you can use the button to get your starting tech",
-                        List.of(Buttons.GET_A_TECH));
+                    player.getRepresentation(true, true) + " you can use the button to get your starting tech",
+                    List.of(Buttons.GET_A_TECH));
             }
         }
 
@@ -272,21 +271,21 @@ public class Setup extends PlayerSubcommandData {
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Set up free people ability markers. " + player.getRepresentation(true, true)
-                            + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
+                "Set up free people ability markers. " + player.getRepresentation(true, true)
+                    + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
+                "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+                "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
@@ -294,23 +293,23 @@ public class Setup extends PlayerSubcommandData {
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
-                            + " due to the teeming ability");
+                "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                    + " due to the teeming ability");
         }
         if (player.hasAbility("necrophage")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
-                    Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    player.getRepresentation(true, true)
-                            + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded");
+                player.getRepresentation(true, true)
+                    + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded");
         }
         CardsInfo.sendVariousAdditionalButtons(activeGame, player);
 
         if (!activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
-                    "Player: " + player.getRepresentation() + " has been set up");
+                "Player: " + player.getRepresentation() + " has been set up");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
@@ -369,7 +368,7 @@ public class Setup extends PlayerSubcommandData {
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Unit: " + unit + " is not valid and not supported.");
+                    "Unit: " + unit + " is not valid and not supported.");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {

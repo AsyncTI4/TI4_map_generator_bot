@@ -428,7 +428,6 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
                 }
                 if ("grant_reallocation".equalsIgnoreCase(agID)) {
-                    activeGame.setComponentAction(true);
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player2, activeGame),
                         player2.getRepresentation()
                             + " Use the button to get a tech. You will need to lose any fleet CC manually",
@@ -882,7 +881,6 @@ public class AgendaHelper {
                             scButtons.add(Button.success("warfareBuild", "Build At Home"));
                         }
                         case "7" -> {
-                            activeGame.setComponentAction(true);
                             scButtons.add(Buttons.GET_A_TECH);
                         }
                         case "8" -> {
@@ -1120,7 +1118,6 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannel(watchParty, watchMsg);
         }
         if (d1.isSuccess() && !activeGame.isFoWMode()) {
-            activeGame.setComponentAction(true);
             if (Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
                 Player player = Helper.getPlayerFromAbility(activeGame, "propagation");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
@@ -2144,7 +2141,6 @@ public class AgendaHelper {
                                     activeGame));
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
-                            activeGame.setComponentAction(true);
 
                             MessageHelper.sendMessageToChannelWithButtons(channel,
                                 identity + " resolve Technology Rider by using the button to get a tech",

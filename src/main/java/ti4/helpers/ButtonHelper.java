@@ -2914,7 +2914,7 @@ public class ButtonHelper {
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
-        if (actionRow2.size() > 0) {
+        if (actionRow2.size() > 0 && deleteMsg) {
             if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
                 event.getMessage().delete().queue();
             } else {
@@ -5197,6 +5197,54 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static void addIonStorm(Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        Tile tile = activeGame.getTileByPosition(pos);
+        if (buttonID.contains("alpha")) {
+            String tokenFilename = Mapper.getTokenID("ionalpha");
+            tile.addToken(tokenFilename, Constants.SPACE);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Added ionstorm alpha to " + tile.getRepresentation());
+
+        } else {
+            String tokenFilename = Mapper.getTokenID("ionbeta");
+            tile.addToken(tokenFilename, Constants.SPACE);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Added ionstorm beta to " + tile.getRepresentation());
+        }
+        event.getMessage().delete().queue();
+    }
+
+    public static void checkForIonStorm(Game activeGame, Tile tile, Player player) {
+        String tokenFilenameAlpha = Mapper.getTokenID("ionalpha");
+        UnitHolder space = tile.getUnitHolders().get("space");
+        String tokenFilename = Mapper.getTokenID("ionbeta");
+        if (space.getTokenList().contains(tokenFilenameAlpha) || space.getTokenList().contains(tokenFilename)) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("flipIonStorm_" + tile.getPosition(), "Flip Ion Storm"));
+            buttons.add(Button.danger("deleteButtons", "Not Used"));
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " if you used the ion storm please press button to flip it", buttons);
+        }
+    }
+
+    public static void flipIonStorm(Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        Tile tile = activeGame.getTileByPosition(pos);
+        String tokenFilenameAlpha = Mapper.getTokenID("ionalpha");
+        UnitHolder space = tile.getUnitHolders().get("space");
+        String tokenFilename = Mapper.getTokenID("ionbeta");
+        if (space.getTokenList().contains(tokenFilenameAlpha)) {
+            tile.addToken(tokenFilename, Constants.SPACE);
+            tile.removeToken(tokenFilenameAlpha, "space");
+        } else {
+            tile.removeToken(tokenFilename, Constants.SPACE);
+            tile.addToken(tokenFilenameAlpha, "space");
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Flipped ionstorm in " + tile.getRepresentation());
+        event.getMessage().delete().queue();
+    }
+
     public static List<Tile> getAllWormholeTiles(Game game) {
         List<Tile> wormholes = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -5863,7 +5911,14 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread,
             "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
+        List<Button> buttons2 = new ArrayList<>();
+        buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
+        buttons2.add(Button.danger("deleteButtons", "No Homebrew"));
+        MessageHelper.sendMessageToChannel(actionsChannel,
+            "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons",
+            buttons2);
         GameSaveLoadManager.saveMap(newGame, event);
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
@@ -7129,8 +7184,6 @@ public class ButtonHelper {
         for (String planet : player.getPlanets()) {
             player.exhaustPlanet(planet);
         }
-        game.setComponentAction(true);
-
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, game),
             player.getRepresentation() + " purged Twilight Mirror to take one action.");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -8366,8 +8419,7 @@ public class ButtonHelper {
             activeGame.setComponentAction(false);
             boolean used = new ButtonListener().addUsedSCPlayer(messageID, activeGame, player, event, "");
             int scNum = 7;
-            if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()
-                && !activeGame.getComponentAction()) {
+            if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
                 player.addFollowedSC(scNum);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                 if (player.getStrategicCC() > 0) {

@@ -67,7 +67,7 @@ public class Tile {
 
         if (Optional.ofNullable(tilePlanetPositions).isPresent())
             tilePlanetPositions
-                    .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
+                .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
     @Nullable
@@ -254,7 +254,7 @@ public class Tile {
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         if (("44".equals(tileID) || ("45".equals(tileID)))
-                && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
+            && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
             tileName = "S15_Cucumber.png";
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
@@ -454,7 +454,7 @@ public class Tile {
         }
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png",
-                    "token_anomalydummy.png")) {
+                "token_anomalydummy.png")) {
                 return true;
             }
         }
@@ -485,7 +485,7 @@ public class Tile {
         }
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png",
-                    "token_anomalydummy.png")) {
+                "token_anomalydummy.png")) {
                 return true;
             }
         }
@@ -495,36 +495,36 @@ public class Tile {
     @JsonIgnore
     public boolean containsPlayersUnits(Player p) {
         return getUnitHolders().values().stream()
-                .flatMap(uh -> uh.getUnits().entrySet().stream())
-                .anyMatch(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()));
+            .flatMap(uh -> uh.getUnits().entrySet().stream())
+            .anyMatch(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()));
     }
 
     @JsonIgnore
     public boolean containsPlayersUnitsWithModelCondition(Player p, Predicate<? super UnitModel> condition) {
         return getUnitHolders().values().stream()
-                .flatMap(uh -> uh.getUnits().entrySet().stream())
-                .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
-                .map(Map.Entry::getKey)
-                .map(p::getUnitFromUnitKey)
-                .filter(Objects::nonNull)
-                .anyMatch(condition);
+            .flatMap(uh -> uh.getUnits().entrySet().stream())
+            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
+            .map(Map.Entry::getKey)
+            .map(p::getUnitFromUnitKey)
+            .filter(Objects::nonNull)
+            .anyMatch(condition);
     }
 
     @JsonIgnore
     public boolean containsPlayersUnitsWithKeyCondition(Player p, Predicate<? super UnitKey> condition) {
         return getUnitHolders().values().stream()
-                .flatMap(uh -> uh.getUnits().entrySet().stream())
-                .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
-                .map(Map.Entry::getKey)
-                .filter(Objects::nonNull)
-                .anyMatch(condition);
+            .flatMap(uh -> uh.getUnits().entrySet().stream())
+            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
+            .map(Map.Entry::getKey)
+            .filter(Objects::nonNull)
+            .anyMatch(condition);
     }
 
     @JsonIgnore
     public boolean search(String searchString) {
         return getTileID().contains(searchString) ||
-                getPosition().contains(searchString) ||
-                getTileModel().search(searchString);
+            getPosition().contains(searchString) ||
+            getTileModel().search(searchString);
     }
 
     @JsonIgnore
@@ -536,11 +536,11 @@ public class Tile {
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
                 boolean oneOfThree = planetHolder.getOriginalPlanetType() != null
-                        && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                                || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                                || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
+                    && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                        || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
+                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
                 if (!planetHolder.getName().toLowerCase().contains("rex")
-                        && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree) {
+                    && !planetHolder.getName().equalsIgnoreCase("mr") && !oneOfThree) {
                     isHome = true;
                 }
             }

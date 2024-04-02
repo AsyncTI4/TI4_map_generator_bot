@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -857,14 +860,28 @@ public class ButtonHelperHeroes {
 
     public static List<Button> getPossibleTechForVeldyrToGainFromPlayer(Player veldyr, Player victim, Game game) {
         List<Button> techToGain = new ArrayList<>();
+        List<String> techs = new ArrayList<>();
         for (String tech : victim.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!veldyr.getTechs().contains(tech) && !techToGain.contains(tech)
-                && "unitupgrade".equalsIgnoreCase(techM.getType().toString())
-                && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
-                techToGain.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
-                    Mapper.getTech(tech).getName()));
+            if ("unitupgrade".equalsIgnoreCase(techM.getType().toString())) {
+                if (techM.getFaction().orElse("").length() > 0) {
+                    techM = Mapper.getTech(techM.getBaseUpgrade().orElse(tech));
+                }
+                for (String fTech : veldyr.getFactionTechs()) {
+                    TechnologyModel techF = Mapper.getTech(fTech);
+                    if ("unitupgrade".equalsIgnoreCase(techF.getType().toString())) {
+                        if (techF.getBaseUpgrade().orElse("").equalsIgnoreCase(techM.getAlias())) {
+                            techM = techF;
+                        }
+                    }
+                }
+                if (!veldyr.getTechs().contains(techM.getAlias()) && !techs.contains(techM.getAlias())) {
+                    techToGain.add(Button.success("getTech_" + techM.getAlias() + "__noPay",
+                        techM.getName()));
+                    techs.add(techM.getAlias());
+                }
             }
+
         }
         return techToGain;
     }
@@ -1300,8 +1317,10 @@ public class ButtonHelperHeroes {
     }
 
     public static void augersHeroSwap(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        String id = buttonID.split(".")[2];
-        if ("1".equalsIgnoreCase(buttonID.split(".")[1])) {
+        buttonID = buttonID.replace("augerHeroSwap.", "");
+        String id = StringUtils.substringAfter(buttonID, ".");
+        String num = StringUtils.substringBefore(buttonID, ".");
+        if ("1".equalsIgnoreCase(num)) {
             game.swapObjectiveOut(1, 0, id);
         } else {
             game.swapObjectiveOut(2, 0, id);
@@ -2051,7 +2070,6 @@ public class ButtonHelperHeroes {
             scButtons.add(Button.success("warfareBuild", "Build At Home"));
         }
         if (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7)) {
-            game.setComponentAction(true);
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {

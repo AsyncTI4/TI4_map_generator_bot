@@ -52,7 +52,7 @@ public class FoWHelper {
 	}
 
 	public static boolean isPrivateGame(Game game, @Nullable GenericInteractionCreateEvent event,
-			@Nullable Channel channel_) {
+		@Nullable Channel channel_) {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
@@ -99,9 +99,9 @@ public class FoWHelper {
 		}
 
 		return viewingPlayer != null && player != null && game != null &&
-				(hasHomeSystemInView(game, player, viewingPlayer)
-						|| hasPlayersPromInPlayArea(player, viewingPlayer)
-						|| hasMahactCCInFleet(player, viewingPlayer));
+			(hasHomeSystemInView(game, player, viewingPlayer)
+				|| hasPlayersPromInPlayArea(player, viewingPlayer)
+				|| hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class FoWHelper {
 				}
 			}
 			if (player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null
-					&& (faction.contains("ghost") || faction.contains("franken"))) {
+				&& (faction.contains("ghost") || faction.contains("franken"))) {
 				return tile;
 			}
 		}
@@ -218,7 +218,7 @@ public class FoWHelper {
 	}
 
 	private static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
-			@NotNull Player viewingPlayer) {
+		@NotNull Player viewingPlayer) {
 		Tile tile = getPlayerHS(game, player);
 		if (tile != null && !tile.hasFog(viewingPlayer)) {
 			return true;
@@ -255,7 +255,7 @@ public class FoWHelper {
 	}
 
 	public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow,
-			boolean includeTile) {
+		boolean includeTile) {
 		Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
 
 		List<String> adjacentCustomTiles = game.getCustomAdjacentTiles().get(position);
@@ -265,7 +265,7 @@ public class FoWHelper {
 			if (!toShow) {
 				for (String t : adjacentCustomTiles) {
 					if (game.getCustomAdjacentTiles().get(t) != null
-							&& game.getCustomAdjacentTiles().get(t).contains(position)) {
+						&& game.getCustomAdjacentTiles().get(t).contains(position)) {
 						adjacentCustomTiles2.add(t);
 					}
 				}
@@ -286,13 +286,13 @@ public class FoWHelper {
 		adjacentPositions.addAll(wormholeAdjacencies);
 
 		if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
-				&& player == game.getActivePlayer() && !game.getActiveSystem().isEmpty()
-				&& game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0) {
+			&& player == game.getActivePlayer() && !game.getActiveSystem().isEmpty()
+			&& game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0) {
 			Collection<Tile> tileList = game.getTileMap().values();
 			List<String> frontierTileList = Mapper.getFrontierTileIds();
 			for (Tile tile : tileList) {
 				if (tile.getPlanetUnitHolders().size() == 0 && (tile.getUnitHolders().size() == 2
-						|| frontierTileList.contains(tile.getTileID()))) {
+					|| frontierTileList.contains(tile.getTileID()))) {
 					adjacentPositions.add(tile.getPosition());
 				}
 			}
@@ -306,7 +306,7 @@ public class FoWHelper {
 	}
 
 	public static Set<String> getAdjacentTilesAndNotThisTile(Game game, String position, Player player,
-			boolean toShow) {
+		boolean toShow) {
 
 		return getAdjacentTiles(game, position, player, toShow, false);
 	}
@@ -328,7 +328,7 @@ public class FoWHelper {
 	 * Does not traverse wormholes
 	 */
 	private static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position,
-			Integer sourceDirection, Set<String> exploredSet, String prevTile) {
+		Integer sourceDirection, Set<String> exploredSet, String prevTile) {
 		Set<String> tiles = new HashSet<>();
 		if (exploredSet.contains(position + sourceDirection)) {
 			// We already explored this tile from this direction!
@@ -392,7 +392,7 @@ public class FoWHelper {
 			// explore that tile now!
 			int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
 			Set<String> newTiles = traverseAdjacencies(game, naturalMapOnly, position_, direcetionFrom, exploredSet,
-					position + sourceDirection);
+				position + sourceDirection);
 			tiles.addAll(newTiles);
 		}
 		return tiles;
@@ -553,7 +553,7 @@ public class FoWHelper {
 					}
 				}
 				if (wormholeIDs.contains(Constants.DELTA)
-						&& unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+					&& unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
 					adjacentPositions.add(position_);
 				}
 			}
@@ -744,11 +744,11 @@ public class FoWHelper {
 		int successfulCount = 0;
 		for (Player player_ : players) {
 			String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> "
-					+ message;
+				+ message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
 			MessageChannel channel = player_.getPrivateChannel();
 			MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-					StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+				StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
 			successfulCount += success ? 1 : 0;
 		}
 		feedbackMessage(event, successfulCount, players.size());
@@ -767,10 +767,10 @@ public class FoWHelper {
 	}
 
 	public static void pingAllPlayersWithFullStats(Game game, GenericInteractionCreateEvent event,
-			Player playerWithChange, String message) {
+		Player playerWithChange, String message) {
 		var playersToPing = game.getPlayers().values().stream()
-				.filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
-				.collect(Collectors.toSet());
+			.filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
+			.collect(Collectors.toSet());
 		int succesfulCount = 0;
 
 		String playerMessage = playerWithChange.getRepresentation() + " stats changed:\n" + message;
@@ -782,17 +782,17 @@ public class FoWHelper {
 	}
 
 	public static void pingPlayersDifferentMessages(
-			Game game,
-			GenericInteractionCreateEvent event,
-			Player playerWithChange,
-			String messageForFullInfo,
-			String messageForAll) {
+		Game game,
+		GenericInteractionCreateEvent event,
+		Player playerWithChange,
+		String messageForFullInfo,
+		String messageForAll) {
 		Set<Player> playersWithVisiblity = game.getPlayers().values().stream()
-				.filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
-				.collect(Collectors.toSet());
+			.filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
+			.collect(Collectors.toSet());
 		Set<Player> playersWithoutVisiblity = game.getPlayers().values().stream()
-				.filter(player -> !playersWithVisiblity.contains(player) && player != playerWithChange)
-				.collect(Collectors.toSet());
+			.filter(player -> !playersWithVisiblity.contains(player) && player != playerWithChange)
+			.collect(Collectors.toSet());
 		int succesfulCount = 0;
 		int totalPings = playersWithVisiblity.size() + playersWithoutVisiblity.size();
 
@@ -810,12 +810,12 @@ public class FoWHelper {
 	}
 
 	public static void pingPlayersTransaction(
-			Game game,
-			GenericInteractionCreateEvent event,
-			Player sendingPlayer,
-			Player receivingPlayer,
-			String transactedObject,
-			String noVisibilityMessage // for stuff like SFTT
+		Game game,
+		GenericInteractionCreateEvent event,
+		Player sendingPlayer,
+		Player receivingPlayer,
+		String transactedObject,
+		String noVisibilityMessage // for stuff like SFTT
 	) {
 		int successCount = 0;
 		int attemptCount = 0;
@@ -863,7 +863,7 @@ public class FoWHelper {
 	private static void feedbackMessage(GenericInteractionCreateEvent event, int success, int total) {
 		if (success < total) {
 			MessageHelper.replyToMessage(event,
-					"One more more pings failed to send.  Please follow up with game's GM.");
+				"One more more pings failed to send.  Please follow up with game's GM.");
 		} else {
 			MessageHelper.replyToMessage(event, "Successfully sent all pings.");
 		}
