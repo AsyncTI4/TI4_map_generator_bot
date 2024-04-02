@@ -38,5 +38,7 @@
     ],
     "wormholes": [],
     "planets": [],
-    "isAsteroidField": true
+    "isAsteroidField": true, 
+    "source": "base", 
+    "tileBack": "red"
 }
