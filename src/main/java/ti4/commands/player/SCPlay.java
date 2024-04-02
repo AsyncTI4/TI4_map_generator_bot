@@ -349,19 +349,20 @@ public class SCPlay extends PlayerSubcommandData {
 
         // Handle Special Cases
         switch (scAutomationID) {
-            case "base8" -> handleSOQueueing(activeGame, winnuHero);
+            case "pok8imperial" -> handleSOQueueing(activeGame, winnuHero);
         }
 
         // Return Buttons
         return switch (scAutomationID) {
-            case "base1" -> getLeadershipButtons(sc);
-            case "base2codex1" -> getDiplomacyButtons(sc);
-            case "base3" -> getPoliticsButtons(sc);
-            case "pok4" -> getConstructionButtons(sc);
-            case "base5 " -> getTradeButtons(sc);
-            case "base6" -> getWarfareButtons(sc);
-            case "base7" -> getTechnologyButtons(sc);
-            case "base8" -> getImperialButtons(sc);
+            case "pok1leadership" -> getLeadershipButtons(sc);
+            case "pok2diplomacy" -> getDiplomacyButtons(sc);
+            case "pok3politics" -> getPoliticsButtons(sc);
+            case "pok4construction" -> getConstructionButtons(sc);
+            case "pok5trade " -> getTradeButtons(sc);
+            case "pok6warfare" -> getWarfareButtons(sc);
+            case "pok7technology" -> getTechnologyButtons(sc);
+            case "pok8imperial" -> getImperialButtons(sc);
+            // add your own special button resolutions here as additional cases
             default -> getGenericButtons(sc);
         };
     }

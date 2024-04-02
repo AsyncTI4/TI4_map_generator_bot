@@ -33,7 +33,7 @@
         "name": "Politics",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base3",
+        "botSCAutomationID": "pok3politics",
         "imageFileName": "_4",
         "source": "asteroid"
     },
@@ -43,7 +43,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "anarchy_5",
         "source": "asteroid"
     },
@@ -71,7 +71,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "anarchy_8",
         "source": "asteroid"
     },
@@ -81,7 +81,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "anarchy_9",
         "source": "asteroid"
     },

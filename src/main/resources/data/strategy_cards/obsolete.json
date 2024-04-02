@@ -23,7 +23,7 @@
         "secondaryTexts": [
             "Place 1 token from your strategy pool in any system; you may place either 1 space dock or 1 PDS on a planet you control in that system."
         ],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "base_game_4",
         "source": "base"
     }

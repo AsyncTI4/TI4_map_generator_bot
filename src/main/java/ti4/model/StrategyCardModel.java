@@ -125,7 +125,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
      * SC ID used for automation - buttons/resolving/etc.
      * Example: You have a Homebrew Leadership on Initiative 3 (instead of 1), 
      * but it can safely use the normal Leadership buttons.
-     * Then set botSCAutomationID = "base1".
+     * Then set botSCAutomationID = "pok1leadership".
      */
     public String getBotSCAutomationID() {
         return Optional.ofNullable(botSCAutomationID).orElse(getId());
