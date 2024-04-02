@@ -442,12 +442,9 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getConstructionButtons(int sc) {
-        Button followButton = Button.success("sc_follow_4", "Spend A Strategy CC");
-        Button sdButton = Button.success("construction_sd", "Place A SD");
-        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-        Button pdsButton = Button.success("construction_pds", "Place a PDS");
-
-        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
+        Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
+        Button sdButton = Button.success("construction_sd", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+        Button pdsButton = Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds));
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
@@ -463,26 +460,25 @@ public class SCPlay extends PlayerSubcommandData {
 
     private static List<Button> getWarfareButtons(int sc) {
         Button warfarePrimary = Button.primary("primaryOfWarfare", "Do Warfare Primary");
-        Button followButton = Button.success("sc_follow_6", "Spend A Strategy CC");
+        Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
         Button homeBuild = Button.success("warfareBuild", "Build At Home");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
 
     private static List<Button> getTechnologyButtons(int sc) {
-        Button followButton = Button.success("sc_follow_7", "Spend A Strategy CC");
+        Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         Button getTech = Button.success("acquireATechWithSC", "Get a Tech");
         return List.of(followButton, getTech, noFollowButton);
     }
 
     private static List<Button> getImperialButtons(int sc) {
-        Button followButton = Button.success("sc_follow_8", "Spend A Strategy CC");
+        Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         Button drawSo = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
         Button scoreImperial = Button.secondary("score_imperial", "Score Imperial").withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
         Button scoreAnObjective = Button.secondary("scoreAnObjective", "Score A Public").withEmoji(Emoji.fromFormatted(Emojis.Public1));
-
         return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
     }
 
