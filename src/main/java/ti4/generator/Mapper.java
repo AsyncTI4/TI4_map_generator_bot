@@ -84,8 +84,6 @@ public class Mapper {
     private static final Map<String, UnitModel> units = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
-
-    @Getter
     private static final Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
     private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
@@ -849,6 +847,14 @@ public class Mapper {
 
     public static boolean isValidDeck(String deckID) {
         return getDecks().containsKey(deckID);
+    }
+
+    public static Map<String, StrategyCardSetModel> getStrategyCardSets() {
+        return new HashMap<>(strategyCardSets);
+    }
+
+    public static boolean isValidStrategyCardSet(String strategyCardSetID) {
+        return strategyCardSets.containsKey(strategyCardSetID);
     }
 
     public static Map<String, StrategyCardModel> getStrategyCards() {

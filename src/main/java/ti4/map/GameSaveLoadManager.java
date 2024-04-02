@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
+import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -1370,7 +1371,14 @@ public class GameSaveLoadManager {
                 case Constants.AGENDA_DECK_ID -> activeGame.setAgendaDeckID(info);
                 case Constants.EVENT_DECK_ID -> activeGame.setEventDeckID(info);
                 case Constants.EXPLORATION_DECK_ID -> activeGame.setExplorationDeckID(info);
-                case Constants.STRATEGY_CARD_SET -> activeGame.setScSetID(info);
+                case Constants.STRATEGY_CARD_SET -> {
+                    String scSetID = info;
+                    if (Mapper.isValidStrategyCardSet(scSetID)) {
+                        activeGame.setScSetID(scSetID);
+                    } else {
+                        BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + activeGame.getName() + "`");
+                    }
+                }
                 case Constants.CUSTOM_ADJACENT_TILES -> {
                     Map<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
                     Map<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
