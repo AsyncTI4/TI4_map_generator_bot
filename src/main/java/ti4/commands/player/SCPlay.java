@@ -85,13 +85,15 @@ public class SCPlay extends PlayerSubcommandData {
     public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player, boolean winnuHero) {
         StrategyCardModel scModel = activeGame.getStrategyCardModel(scToPlay);
         if (scModel == null) { // Temporary Error Reporting
-            BotLogger.log("`SCPlay.playSC` - SC Model not found for SC `" + scToPlay + "` from set`" + activeGame.getScSetID() + "`");
+            BotLogger.log("`SCPlay.playSC` - Game: `" + activeGame.getName() + "` - SC Model not found for SC `" + scToPlay + "` from set `" + activeGame.getScSetID() + "`");
         }
 
         if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "SC already played");
             return;
         }
+
+        // HANDLE COUP
         if (!winnuHero && activeGame.getFactionsThatReactedToThis("Coup") != null
             && activeGame.getFactionsThatReactedToThis("Coup").contains("_" + scToPlay)) {
             for (Player p2 : activeGame.getRealPlayers()) {
@@ -118,25 +120,19 @@ public class SCPlay extends PlayerSubcommandData {
             activeGame.setSCPlayed(scToPlay, true);
         }
         Helper.checkThreadLimitAndArchive(event.getGuild());
-        String categoryForPlayers = activeGame.getPing();
-        // String message = "Strategy card " + Emojis.getEmojiFromDiscord(emojiName) +
-        // Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? "
-        // Group " + pbd100group : "") + " played by " +
-        // player.getPlayerRepresentation(player, activeMap) + "\n\n";
-        StringBuilder scMessageBuilder = new StringBuilder();
-        scMessageBuilder.append(Helper.getSCRepresentation(activeGame, scToPlay));
-
-        scMessageBuilder.append(" played");
+        StringBuilder message = new StringBuilder();
+        message.append(Helper.getSCRepresentation(activeGame, scToPlay));
+        message.append(" played");
         if (!activeGame.isFoWMode()) {
-            scMessageBuilder.append(" by ").append(player.getRepresentation());
+            message.append(" by ").append(player.getRepresentation());
         }
-        scMessageBuilder.append(".\n\n");
-        String message = scMessageBuilder.toString();
-
-        if (!categoryForPlayers.isEmpty()) {
-            message += categoryForPlayers + "\n";
+        message.append(".\n\n");
+        
+        String gamePing = activeGame.getPing();
+        if (!gamePing.isEmpty()) {
+            message.append(gamePing).append("\n");
         }
-        message += "Indicate your choice by pressing a button below";
+        message.append("Indicate your choice by pressing a button below");
 
         String scName = Helper.getSCName(scToPlay, activeGame).toLowerCase();
         if (winnuHero) {
@@ -164,8 +160,7 @@ public class SCPlay extends PlayerSubcommandData {
         } else if (scModel != null) {
             baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
-        baseMessageObject.addContent(message);
-
+        baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
         ActionRow actionRow = null;
@@ -345,81 +340,81 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getSCButtons(int sc, Game activeGame, boolean winnuHero) {
-        boolean isGroupedSCGameWithPoKSCs = "pbd100".equals(activeGame.getName())
-            || "pbd1000".equals(activeGame.getName());
-        if (activeGame.isHomeBrewSCMode() && !isGroupedSCGameWithPoKSCs) {
+        StrategyCardModel scModel = activeGame.getStrategyCardModel(sc);
+        if (scModel == null) {
             return getGenericButtons(sc);
         }
 
-        if (isGroupedSCGameWithPoKSCs) {
-            String scId = String.valueOf(sc);
-            sc = Integer.parseInt(StringUtils.left(scId, 1));
+        String scAutomationID = scModel.getBotSCAutomationID();
+
+        // Handle Special Cases
+        switch (scAutomationID) {
+            case "base8" -> handleSOQueueing(activeGame, winnuHero);
         }
 
-        if (sc == 8) {
-            if (!winnuHero) {
-                Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
-                String key = "factionsThatAreNotDiscardingSOs";
-                String key2 = "queueToDrawSOs";
-                String key3 = "potentialBlockers";
-                activeGame.setCurrentReacts(key, "");
-                activeGame.setCurrentReacts(key2, "");
-                activeGame.setCurrentReacts(key3, "");
-                if (activeGame.getQueueSO()) {
-                    for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
-                        if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
-                            || player.getSoScored() == player.getMaxSOCount()
-                            || (player == imperialHolder && player.getPlanets().contains("mr"))) {
-                            activeGame.setCurrentReacts(key,
-                                activeGame.getFactionsThatReactedToThis(key) + player.getFaction() + "*");
-                        } else {
-                            activeGame.setCurrentReacts(key3,
-                                activeGame.getFactionsThatReactedToThis(key3) + player.getFaction() + "*");
-                        }
-                    }
-                }
-            } else {
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
-                    "# Since this is a winnu hero play, SO draws will not be queued or resolved in a particular order");
-            }
-        }
-
-        return switch (sc) {
-            case 1 -> getLeadershipButtons();
-            case 2 -> getDiplomacyButtons();
-            case 3 -> getPoliticsButtons();
-            case 4 -> getConstructionButtons();
-            case 5 -> getTradeButtons();
-            case 6 -> getWarfareButtons();
-            case 7 -> getTechnologyButtons();
-            case 8 -> getImperialButtons();
+        // Return Buttons
+        return switch (scAutomationID) {
+            case "base1" -> getLeadershipButtons(sc);
+            case "base2codex1" -> getDiplomacyButtons(sc);
+            case "base3" -> getPoliticsButtons(sc);
+            case "pok4" -> getConstructionButtons(sc);
+            case "base5 " -> getTradeButtons(sc);
+            case "base6" -> getWarfareButtons(sc);
+            case "base7" -> getTechnologyButtons(sc);
+            case "base8" -> getImperialButtons(sc);
             default -> getGenericButtons(sc);
         };
     }
 
-    private static List<Button> getLeadershipButtons() {
-        // Button followButton = Button.success("sc_leadership_follow", "SC Follow");
+    private static void handleSOQueueing(Game activeGame, boolean winnuHero) {
+        if (winnuHero) {
+            String message = "# Since this is a Winnu Hero play, SO draws will not be queued or resolved in a particular order";
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
+            return;
+        }
+        Player imperialHolder = Helper.getPlayerWithThisSC(activeGame, 8);
+        String key = "factionsThatAreNotDiscardingSOs";
+        String key2 = "queueToDrawSOs";
+        String key3 = "potentialBlockers";
+        activeGame.setCurrentReacts(key, "");
+        activeGame.setCurrentReacts(key2, "");
+        activeGame.setCurrentReacts(key3, "");
+        if (activeGame.getQueueSO()) {
+            for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
+                if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
+                    || player.getSoScored() == player.getMaxSOCount()
+                    || (player == imperialHolder && player.getPlanets().contains("mr"))) {
+                    activeGame.setCurrentReacts(key,
+                        activeGame.getFactionsThatReactedToThis(key) + player.getFaction() + "*");
+                } else {
+                    activeGame.setCurrentReacts(key3,
+                        activeGame.getFactionsThatReactedToThis(key3) + player.getFaction() + "*");
+                }
+            }
+        }
+    }
+
+    private static List<Button> getLeadershipButtons(int sc) {
         Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Gain CCs");
         Button exhaust = Button.danger("leadershipExhaust", "Spend");
-        Button noFollowButton = Button.primary("sc_no_follow_1", "Not Following");
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(exhaust, leadershipGenerateCCButtons, noFollowButton);
     }
 
-    private static List<Button> getDiplomacyButtons() {
+    private static List<Button> getDiplomacyButtons(int sc) {
         Button followButton = Button.success("sc_follow_2", "Spend A Strategy CC");
         Button diploSystemButton = Button.primary("diploSystem", "Diplo a System");
         Button refreshButton = Button.success("diploRefresh2", "Ready 2 Planets");
 
-        Button noFollowButton = Button.danger("sc_no_follow_2", "Not Following");
+        Button noFollowButton = Button.danger("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
     }
 
-    private static List<Button> getPoliticsButtons() {
+    private static List<Button> getPoliticsButtons(int sc) {
         Button followButton = Button.success("sc_follow_3", "Spend A Strategy CC");
-        Button noFollowButton = Button.primary("sc_no_follow_3", "Not Following");
-        Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards")
-            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
-        return List.of(followButton, noFollowButton, draw_2_ac);
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
+        Button draw2AC = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+        return List.of(followButton, noFollowButton, draw2AC);
     }
 
     private static List<Button> getPoliticsAssignSpeakerButtons(Game activeGame) {
@@ -445,54 +440,49 @@ public class SCPlay extends PlayerSubcommandData {
         return assignSpeakerButtons;
     }
 
-    private static List<Button> getConstructionButtons() {
+    private static List<Button> getConstructionButtons(int sc) {
         Button followButton = Button.success("sc_follow_4", "Spend A Strategy CC");
         Button sdButton = Button.success("construction_sd", "Place A SD");
         sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
         Button pdsButton = Button.success("construction_pds", "Place a PDS");
 
         pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
-        Button noFollowButton = Button.primary("sc_no_follow_4", "Not Following");
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
 
-    private static List<Button> getTradeButtons() {
-        Button trade_primary = Button.success("trade_primary", "Resolve Primary");
+    private static List<Button> getTradeButtons(int sc) {
+        Button tradePrimary = Button.success("trade_primary", "Resolve Primary");
         Button followButton = Button.success("sc_trade_follow", "Spend A Strategy CC");
-        Button noFollowButton = Button.primary("sc_no_follow_5", "Not Following");
-        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash")
-            .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities")
-            .withEmoji(Emoji.fromFormatted(Emojis.comm));
-        return List.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
+        Button refreshAndWash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        return List.of(tradePrimary, followButton, noFollowButton, refresh, refreshAndWash);
     }
 
-    private static List<Button> getWarfareButtons() {
+    private static List<Button> getWarfareButtons(int sc) {
         Button warfarePrimary = Button.primary("primaryOfWarfare", "Do Warfare Primary");
         Button followButton = Button.success("sc_follow_6", "Spend A Strategy CC");
         Button homeBuild = Button.success("warfareBuild", "Build At Home");
-        Button noFollowButton = Button.primary("sc_no_follow_6", "Not Following");
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
 
-    private static List<Button> getTechnologyButtons() {
+    private static List<Button> getTechnologyButtons(int sc) {
         Button followButton = Button.success("sc_follow_7", "Spend A Strategy CC");
-        Button noFollowButton = Button.primary("sc_no_follow_7", "Not Following");
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         Button getTech = Button.success("acquireATechWithSC", "Get a Tech");
         return List.of(followButton, getTech, noFollowButton);
     }
 
-    private static List<Button> getImperialButtons() {
+    private static List<Button> getImperialButtons(int sc) {
         Button followButton = Button.success("sc_follow_8", "Spend A Strategy CC");
-        Button noFollowButton = Button.primary("sc_no_follow_8", "Not Following");
-        Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective")
-            .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
-        Button scoreImperial = Button.secondary("score_imperial", "Score Imperial")
-            .withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
-        Button scoreAnObjective = Button.secondary("scoreAnObjective", "Score A Public")
-            .withEmoji(Emoji.fromFormatted(Emojis.Public1));
+        Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
+        Button drawSo = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
+        Button scoreImperial = Button.secondary("score_imperial", "Score Imperial").withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
+        Button scoreAnObjective = Button.secondary("scoreAnObjective", "Score A Public").withEmoji(Emoji.fromFormatted(Emojis.Public1));
 
-        return List.of(followButton, noFollowButton, draw_so, scoreImperial, scoreAnObjective);
+        return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
     }
 
     private static List<Button> getGenericButtons(int sc) {
