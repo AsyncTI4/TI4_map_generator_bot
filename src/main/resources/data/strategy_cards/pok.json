@@ -1,6 +1,6 @@
 [
     {
-        "id": "base1",
+        "id": "pok1leadership",
         "initiative": 1,
         "name": "Leadership",
         "primaryTexts": [
@@ -15,7 +15,7 @@
         "source": "base"
     },
     {
-        "id": "base2codex1",
+        "id": "pok2diplomacy",
         "initiative": 2,
         "name": "Diplomacy",
         "primaryTexts": [
@@ -28,7 +28,7 @@
         "source": "codex1"
     },
     {
-        "id": "base3",
+        "id": "pok3politics",
         "initiative": 3,
         "name": "Politics",
         "primaryTexts": [
@@ -43,7 +43,7 @@
         "source": "base"
     },
     {
-        "id": "pok4",
+        "id": "pok4construction",
         "initiative": 4,
         "name": "Construction",
         "primaryTexts": [
@@ -57,7 +57,7 @@
         "source": "pok"
     },
     {
-        "id": "base5",
+        "id": "pok5trade",
         "initiative": 5,
         "name": "Trade",
         "primaryTexts": [
@@ -72,7 +72,7 @@
         "source": "base"
     },
     {
-        "id": "base6",
+        "id": "pok6warfare",
         "initiative": 6,
         "name": "Warfare",
         "primaryTexts": [
@@ -86,7 +86,7 @@
         "source": "base"
     },
     {
-        "id": "base7",
+        "id": "pok7technology",
         "initiative": 7,
         "name": "Technology",
         "primaryTexts": [
@@ -100,7 +100,7 @@
         "source": "base"
     },
     {
-        "id": "base8",
+        "id": "pok8imperial",
         "initiative": 8,
         "name": "Imperial",
         "primaryTexts": [

@@ -23,6 +23,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "tispoon_3",
         "source": "other"
     },
@@ -32,6 +33,7 @@
         "name": "Politics",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
         "imageFileName": "tispoon_4",
         "source": "other"
     },
@@ -41,6 +43,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "tispoon_5",
         "source": "other"
     },
@@ -50,6 +53,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "tispoon_6",
         "source": "other"
     },
@@ -68,6 +72,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "tispoon_8",
         "source": "other"
     },
@@ -86,6 +91,7 @@
         "name": "Impertial",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "tispoon_10",
         "source": "other"
     }

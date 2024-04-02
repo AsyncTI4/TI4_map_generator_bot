@@ -3670,8 +3670,22 @@ public class Game {
     }
 
     @JsonIgnore
-    public StrategyCardModel getStrategyCardModel(int scID) {
-        return getStrategyCardSet().getSCModel(scID).orElse(null);
+    public Optional<StrategyCardModel> getStrategyCardModelByInitiative(int scInitiative) {
+        return getStrategyCardSet().getStrategyCardModelByInitiative(scInitiative);
+    }
+
+    @JsonIgnore
+    public Optional<StrategyCardModel> getStrategyCardModelByName(String name) {
+        return getStrategyCardSet().getStrategyCardModelByName(name);
+    }
+
+    /**
+     * @param scID
+     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
+     */
+    public boolean usesStrategyCardAutomation(String scID) {
+        return getStrategyCardSet().getStrategyCardModels().stream()
+                .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
     }
 
     @JsonIgnore
