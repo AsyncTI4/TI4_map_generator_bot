@@ -340,10 +340,7 @@ public class Game {
         events = new ArrayList<>();
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
         addCustomPO(Constants.CUSTODIAN, 1);
-        // Default SC initialization
-        for (int i = 1; i <= 8; i++) {
-            scTradeGoods.put(i, 0);
-        }
+        setStrategyCardSet("pok");
     }
 
     public void fixScrewedSOs() {
