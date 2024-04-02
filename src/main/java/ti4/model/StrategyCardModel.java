@@ -131,6 +131,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(botSCAutomationID).orElse(getId());
     }
 
+    public boolean usesAutomationForSCID(String scID) {
+        return getBotSCAutomationID().equals(scID);
+    }
+
     public boolean hasImageFile() {
         return imageFileName != null
             && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
