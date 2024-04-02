@@ -30,6 +30,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 
@@ -77,13 +78,15 @@ public class SCPlay extends PlayerSubcommandData {
         playSC(event, scToPlay, activeGame, mainGameChannel, player);
     }
 
-    public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame,
-        MessageChannel mainGameChannel, Player player) {
+    public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player) {
         playSC(event, scToPlay, activeGame, mainGameChannel, player, false);
     }
 
-    public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame,
-        MessageChannel mainGameChannel, Player player, boolean winnuHero) {
+    public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player, boolean winnuHero) {
+        StrategyCardModel scModel = activeGame.getStrategyCardModel(scToPlay);
+        if (scModel == null) { // Temporary Error Reporting
+            BotLogger.log("`SCPlay.playSC` - SC Model not found for SC `" + scToPlay + "` from set`" + activeGame.getScSetID() + "`");
+        }
 
         if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "SC already played");
@@ -155,13 +158,12 @@ public class SCPlay extends PlayerSubcommandData {
 
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
 
-        StrategyCardModel scModel = activeGame.getStrategyCardSet().getSCModel(scToPlay).orElse(null);
+        // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (scModel != null && scModel.hasImageFile()) {
             MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame), true);
         } else if (scModel != null) {
             baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
-
         baseMessageObject.addContent(message);
 
 
@@ -304,17 +306,14 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         List<Button> conclusionButtons = new ArrayList<>();
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-        Button endTurn = Button.danger(finChecker + "turnEnd", "End Turn");
+        Button endTurn = Button.danger(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
         if (ButtonHelper.getEndOfTurnAbilities(player, activeGame).size() > 1) {
-            conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("
-                + (ButtonHelper.getEndOfTurnAbilities(player, activeGame).size() - 1) + ")"));
+            conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, activeGame).size() - 1) + ")"));
         }
         conclusionButtons.add(deleteButton);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use the buttons to end turn or take another action.", conclusionButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!activeGame.isHomeBrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")
             && ButtonHelperAbilities.getGraceButtons(activeGame, player, scToPlay).size() > 2) {
