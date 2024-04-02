@@ -778,22 +778,10 @@ public class Helper {
     public static File getSCImageFile(Integer sc, Game activeGame) {
         String scSet = activeGame.getScSetID();
         if (Optional.ofNullable(activeGame.getScSetID()).isEmpty()
-        || "null".equals(activeGame.getScSetID())) { // I
-                                                                                                                // don't
-                                                                                                                // know
-                                                                                                                // *why*
-                                                                                                                // this
-                                                                                                                // is a
-                                                                                                                // thing
-                                                                                                                // that
-                                                                                                                // can
-                                                                                                                // happen,
-                                                                                                                // but
-                                                                                                                // it is
+            || "null".equals(activeGame.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName())
-                || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
+        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         if (gameWithGroupedSCs) {
             char scValue = String.valueOf(sc).charAt(0);
             scSet = scSet.replace("pbd100", "pok");

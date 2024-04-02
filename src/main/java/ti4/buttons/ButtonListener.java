@@ -5622,20 +5622,17 @@ public class ButtonListener extends ListenerAdapter {
         }
         switch (buttonID) {
             case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow", "sc_leadership_follow" -> {
+                String message = "All players have reacted to this Strategy Card";
                 if (activeGame.isFoWMode()) {
-                    event.getInteraction().getMessage().reply("All players have reacted to this Strategy Card")
-                        .queueAfter(1, TimeUnit.SECONDS);
+                    event.getInteraction().getMessage().reply(message).queueAfter(1, TimeUnit.SECONDS);
                 } else {
                     GuildMessageChannel guildMessageChannel = Helper.getThreadChannelIfExists(event);
-                    guildMessageChannel.sendMessage("All players have reacted to this Strategy Card").queueAfter(10,
-                        TimeUnit.SECONDS);
-                    if (guildMessageChannel instanceof ThreadChannel)
-                        ((ThreadChannel) guildMessageChannel).getManager().setArchived(true).queueAfter(5,
-                            TimeUnit.MINUTES);
+                    guildMessageChannel.sendMessage(message).queueAfter(10, TimeUnit.SECONDS);
                 }
             }
-            case "no_when", "no_when_persistent" -> event.getInteraction().getMessage()
-                .reply("All players have indicated 'No Whens'").queueAfter(1, TimeUnit.SECONDS);
+            case "no_when", "no_when_persistent" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1, TimeUnit.SECONDS);
+            }
             case "no_after", "no_after_persistent" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Afters'").queue();
                 AgendaHelper.startTheVoting(activeGame);
