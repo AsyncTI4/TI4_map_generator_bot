@@ -6,7 +6,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -17,7 +17,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -28,7 +28,7 @@
         "name": "Politics",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base3",
+        "botSCAutomationID": "pok3politics",
         "imageFileName": "base_game_3",
         "source": "other"
     },
@@ -39,7 +39,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -50,7 +50,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -61,7 +61,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -72,7 +72,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -83,7 +83,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -94,7 +94,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -105,7 +105,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -116,7 +116,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -127,7 +127,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -138,7 +138,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -149,7 +149,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -160,7 +160,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -171,7 +171,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -182,7 +182,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -193,7 +193,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -204,7 +204,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -215,7 +215,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -226,7 +226,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -237,7 +237,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -248,7 +248,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -259,7 +259,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -270,7 +270,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -281,7 +281,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -292,7 +292,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -303,7 +303,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -314,7 +314,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -325,7 +325,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -336,7 +336,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -347,7 +347,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -358,7 +358,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -369,7 +369,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -380,7 +380,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -391,7 +391,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -402,7 +402,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -413,7 +413,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -424,7 +424,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -435,7 +435,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -446,7 +446,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -457,7 +457,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -468,7 +468,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -479,7 +479,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -490,7 +490,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -501,7 +501,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -512,7 +512,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -523,7 +523,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -534,7 +534,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -545,7 +545,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     },
@@ -556,7 +556,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base1",
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "base_game_1",
         "source": "other"
     },
@@ -567,7 +567,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base2codex1",
+        "botSCAutomationID": "pok2diplomacy",
         "imageFileName": "pok_2",
         "source": "other"
     },
@@ -578,7 +578,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4",
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "pok_4",
         "source": "other"
     },
@@ -589,7 +589,7 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base5",
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "base_game_5",
         "source": "other"
     },
@@ -600,7 +600,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base6",
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "base_game_6",
         "source": "other"
     },
@@ -611,7 +611,7 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base7",
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "base_game_7",
         "source": "other"
     },
@@ -622,7 +622,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "base8",
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "base_game_8",
         "source": "other"
     }

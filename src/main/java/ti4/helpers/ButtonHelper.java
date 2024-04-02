@@ -108,6 +108,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
@@ -8418,8 +8419,9 @@ public class ButtonHelper {
         if (sc) {
             activeGame.setComponentAction(false);
             boolean used = new ButtonListener().addUsedSCPlayer(messageID, activeGame, player, event, "");
-            int scNum = 7;
-            if (!used && !player.getFollowedSCs().contains(scNum) && !activeGame.isHomeBrewSCMode()) {
+            StrategyCardModel scModel = activeGame.getStrategyCardModelByName("technology").orElse(null);
+            if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology") && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+                int scNum = scModel.getInitiative();
                 player.addFollowedSC(scNum);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                 if (player.getStrategicCC() > 0) {
@@ -8783,32 +8785,16 @@ public class ButtonHelper {
         };
     }
 
-    public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName,
-        @Nullable List<Button> buttons) {
+    public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName;
-        boolean messageSent = false;
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ((threadChannel_.getName().startsWith(threadName)
-                || threadChannel_.getName().equals(threadName + "WinnuHero"))
-                && (!"technology".equalsIgnoreCase(stratName) || !game.getComponentAction())) {
-                if (buttons == null) {
-                    MessageHelper.sendMessageToChannel(threadChannel_, message);
-                } else {
-                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
-                }
-                messageSent = true;
-                break;
+            if ((threadChannel_.getName().startsWith(threadName) || threadChannel_.getName().equals(threadName + "WinnuHero")) && (!"technology".equalsIgnoreCase(stratName) || !game.getComponentAction())) {
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
+                return;
             }
         }
-        if (messageSent) {
-            return;
-        }
-        if (buttons == null) {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, buttons);
-        }
+        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, buttons);
     }
 
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {

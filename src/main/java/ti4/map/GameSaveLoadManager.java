@@ -1376,7 +1376,7 @@ public class GameSaveLoadManager {
                     if (Mapper.isValidStrategyCardSet(scSetID)) {
                         activeGame.setScSetID(scSetID);
                     } else {
-                        BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + activeGame.getName() + "`");
+                        // BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + activeGame.getName() + "`");
                         activeGame.setScSetID("pok");
                     }
                 }

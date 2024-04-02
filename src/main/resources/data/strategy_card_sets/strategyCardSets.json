@@ -3,14 +3,14 @@
     "name": "PoK Strategy Cards",
     "alias": "pok",
     "scIDs": [
-      "base1",
-      "base2codex1",
-      "base3",
-      "pok4",
-      "base5",
-      "base6",
-      "base7",
-      "base8"
+      "pok1leadership",
+      "pok2diplomacy",
+      "pok3politics",
+      "pok4construction",
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
+      "pok8imperial"
     ],
     "description": "The \"default\" set of strategy cards, used in PoK",
     "source": "pok"
@@ -19,14 +19,14 @@
     "name": "Base Game Strategy Cards",
     "alias": "base_game",
     "scIDs": [
-      "base1",
+      "pok1leadership",
       "base2",
-      "base3",
+      "pok3politics",
       "base4",
-      "base5",
-      "base6",
-      "base7",
-      "base8"
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
+      "pok8imperial"
     ],
     "description": "The original set of strategy cards, before Diplomacy and Construction were updated",
     "source": "base"
@@ -35,14 +35,14 @@
     "name": "Base Game Strategy Cards (Codex I)",
     "alias": "base_game_codex1",
     "scIDs": [
-      "base1",
-      "base2codex1",
-      "base3",
+      "pok1leadership",
+      "pok2diplomacy",
+      "pok3politics",
       "base4",
-      "base5",
-      "base6",
-      "base7",
-      "base8"
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
+      "pok8imperial"
     ],
     "description": "The original set of strategy cards, with Codex I Diplomacy and before Construction was updated",
     "source": "codex1"
@@ -201,13 +201,13 @@
     "name": "Ignis Aurora Strategy Cards",
     "alias": "ignis_aurora",
     "scIDs": [
-      "base1",
-      "base2codex1",
+      "pok1leadership",
+      "pok2diplomacy",
       "ignisaurora3",
-      "pok4",
-      "base5",
-      "base6",
-      "base7",
+      "pok4construction",
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
       "ignisaurora8",
       "ignisaurora9"
     ],
@@ -236,14 +236,14 @@
     "name": "MiltyMod Strategy Cards",
     "alias": "miltymod",
     "scIDs": [
-      "base1",
-      "base2codex1",
-      "base3",
+      "pok1leadership",
+      "pok2diplomacy",
+      "pok3politics",
       "miltymod_4",
-      "base5",
-      "base6",
-      "base7",
-      "base8"
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
+      "pok8imperial"
     ],
     "description": "MiltyMod strategy cards, featuring updated Construction",
     "source": "miltymod"
@@ -252,13 +252,13 @@
     "name": "Infinite Tech Strategy Cards",
     "alias": "many_techs",
     "scIDs": [
-      "base1",
-      "base2codex1",
-      "base3",
-      "pok4",
-      "base5",
-      "base6",
-      "base7",
+      "pok1leadership",
+      "pok2diplomacy",
+      "pok3politics",
+      "pok4construction",
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
       "manytech8",
       "manytech9",
       "manytech10",
@@ -273,14 +273,14 @@
     "name": "Pi Strategy Cards",
     "alias": "pi",
     "scIDs": [
-      "base1",
-      "base2codex1",
-      "base3",
+      "pok1leadership",
+      "pok2diplomacy",
+      "pok3politics",
       "project_pi_4",
-      "base5",
-      "base6",
-      "base7",
-      "base8"
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
+      "pok8imperial"
     ],
     "description": "The Project_Pi set of strategy cards",
     "source": "project_pi"

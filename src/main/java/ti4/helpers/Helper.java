@@ -732,6 +732,7 @@ public class Helper {
     }
 
     public static String getSCAsMention(int sc, Game activeGame) {
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         if (activeGame.isHomeBrewSCMode()) {
             return getSCName(sc, activeGame);
         }
@@ -778,28 +779,16 @@ public class Helper {
     public static File getSCImageFile(Integer sc, Game activeGame) {
         String scSet = activeGame.getScSetID();
         if (Optional.ofNullable(activeGame.getScSetID()).isEmpty()
-        || "null".equals(activeGame.getScSetID())) { // I
-                                                                                                                // don't
-                                                                                                                // know
-                                                                                                                // *why*
-                                                                                                                // this
-                                                                                                                // is a
-                                                                                                                // thing
-                                                                                                                // that
-                                                                                                                // can
-                                                                                                                // happen,
-                                                                                                                // but
-                                                                                                                // it is
+            || "null".equals(activeGame.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName())
-                || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
+        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         if (gameWithGroupedSCs) {
             char scValue = String.valueOf(sc).charAt(0);
             scSet = scSet.replace("pbd100", "pok");
             scSet = scSet.replace("pbd1000", "pok");
         }
-        StrategyCardModel scModel = activeGame.getStrategyCardSet().getSCModel(sc).orElse(null);
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         String scImagePath = scModel.getImageFilePath();
         if (scImagePath == null)
             scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",
