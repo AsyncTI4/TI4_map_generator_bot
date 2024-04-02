@@ -787,7 +787,7 @@ public class Helper {
             scSet = scSet.replace("pbd100", "pok");
             scSet = scSet.replace("pbd1000", "pok");
         }
-        StrategyCardModel scModel = activeGame.getStrategyCardSet().getSCModel(sc).orElse(null);
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         String scImagePath = scModel.getImageFilePath();
         if (scImagePath == null)
             scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",

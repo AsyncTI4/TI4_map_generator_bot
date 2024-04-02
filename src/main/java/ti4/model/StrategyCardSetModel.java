@@ -66,10 +66,17 @@ public class StrategyCardSetModel implements ModelInterface {
         return Optional.ofNullable(description);
     }
 
-    public Optional<StrategyCardModel> getSCModel(int scNumber) {
+    public Optional<StrategyCardModel> getStrategyCardModelByInitiative(int initiative) {
         return scIDs.stream()
             .map(Mapper::getStrategyCard)
-            .filter(sc -> sc.getInitiative() == scNumber)
+            .filter(sc -> sc.getInitiative() == initiative)
+            .findFirst();
+    }
+
+    public Optional<StrategyCardModel> getStrategyCardModelByName(String name) {
+        return scIDs.stream()
+            .map(Mapper::getStrategyCard)
+            .filter(sc -> name.equalsIgnoreCase(sc.getName()))
             .findFirst();
     }
 

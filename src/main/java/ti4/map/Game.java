@@ -3671,7 +3671,7 @@ public class Game {
 
     @JsonIgnore
     public StrategyCardModel getStrategyCardModel(int scID) {
-        return getStrategyCardSet().getSCModel(scID).orElse(null);
+        return getStrategyCardSet().getStrategyCardModelByInitiative(scID).orElse(null);
     }
 
     @JsonIgnore
