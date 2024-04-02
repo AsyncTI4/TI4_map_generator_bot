@@ -1,0 +1,26 @@
+[
+    {
+        "id": "ignisaurora3",
+        "initiative": 3,
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "source": "base"
+    },
+    {
+        "id": "ignisaurora8",
+        "initiative": 8,
+        "name": "Antiquities",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "source": "base"
+    },
+    {
+        "id": "ignisaurora9",
+        "initiative": 9,
+        "name": "Imperial",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "source": "base"
+    }
+]

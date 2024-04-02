@@ -50,8 +50,9 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
-import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
+import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
@@ -83,9 +84,8 @@ public class Mapper {
     private static final Map<String, UnitModel> units = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
-
-    @Getter
-    private static final Map<String, StrategyCardModel> strategyCardSets = new HashMap<>();
+    private static final Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
+    private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
@@ -121,7 +121,8 @@ public class Mapper {
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
-        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class);
+        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
+        importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
@@ -149,7 +150,11 @@ public class Mapper {
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
             if (file.isFile() && file.getName().endsWith(".json")) {
-                importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+                try {
+                    importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+                } catch (Exception e) {
+                    BotLogger.log("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
+                }
             }
         }
     }
@@ -842,6 +847,26 @@ public class Mapper {
 
     public static boolean isValidDeck(String deckID) {
         return getDecks().containsKey(deckID);
+    }
+
+    public static Map<String, StrategyCardSetModel> getStrategyCardSets() {
+        return new HashMap<>(strategyCardSets);
+    }
+
+    public static boolean isValidStrategyCardSet(String strategyCardSetID) {
+        return strategyCardSets.containsKey(strategyCardSetID);
+    }
+
+    public static Map<String, StrategyCardModel> getStrategyCards() {
+        return new HashMap<>(strategyCards);
+    }
+
+    public static StrategyCardModel getStrategyCard(String strategyCardID) {
+        return strategyCards.get(strategyCardID);
+    }
+
+    public static boolean isValidStrategyCard(String strategyCardID) {
+        return strategyCards.containsKey(strategyCardID);
     }
 
     public static Map<String, CombatModifierModel> getCombatModifiers() {
