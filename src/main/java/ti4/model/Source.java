@@ -16,10 +16,10 @@ public class Source {
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi,
 
         // async homebrew
-        admins, pbd100, testsource, pbd2000,
+        admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous,
+        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon,
 
         // catchall
         other;

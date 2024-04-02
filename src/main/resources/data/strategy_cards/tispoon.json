@@ -1,0 +1,92 @@
+[
+    {
+        "id": "tispoon1",
+        "initiative": 1,
+        "name": "Anticipation",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_1",
+        "source": "other"
+    },
+    {
+        "id": "tispoon2",
+        "initiative": 2,
+        "name": "Diplomacy",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_2",
+        "source": "other"
+    },
+    {
+        "id": "tispoon3",
+        "initiative": 3,
+        "name": "Leadership",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_3",
+        "source": "other"
+    },
+    {
+        "id": "tispoon4",
+        "initiative": 4,
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_4",
+        "source": "other"
+    },
+    {
+        "id": "tispoon5",
+        "initiative": 5,
+        "name": "Construction",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_5",
+        "source": "other"
+    },
+    {
+        "id": "tispoon6",
+        "initiative": 6,
+        "name": "Trade",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_6",
+        "source": "other"
+    },
+    {
+        "id": "tispoon7",
+        "initiative": 7,
+        "name": "Warfare",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_7",
+        "source": "other"
+    },
+    {
+        "id": "tispoon8",
+        "initiative": 8,
+        "name": "Technology",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_8",
+        "source": "other"
+    },
+    {
+        "id": "tispoon9",
+        "initiative": 9,
+        "name": "Espionage",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_9",
+        "source": "other"
+    },
+    {
+        "id": "tispoon10",
+        "initiative": 10,
+        "name": "Impertial",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "tispoon_10",
+        "source": "other"
+    }
+]
