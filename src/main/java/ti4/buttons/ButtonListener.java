@@ -773,7 +773,10 @@ public class ButtonListener extends ListenerAdapter {
             players.remove(player);
             playerUsedSC.put(messageID, players);
 
-            StrategyCardModel scModel = activeGame.getStrategyCardModel(scNum);
+            StrategyCardModel scModel = activeGame.getStrategyCardModelByInitiative(scNum).orElse(null);
+            if (scModel == null) {
+                return;
+            }
             switch (scModel.getBotSCAutomationID()) {
                 case "pok8imperial" -> { // HANDLE SO QUEUEING
                     String key = "factionsThatAreNotDiscardingSOs";
@@ -1752,9 +1755,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveWinnuHeroSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("construction_")) {
             boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
-            if (!used && !player.getFollowedSCs().contains(4) && !activeGame.isHomeBrewSCMode()) {
-                player.addFollowedSC(4);
-                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 4, activeGame, event);
+            StrategyCardModel scModel = activeGame.getStrategyCardModelByName("construction").orElse(null);
+            if (!used && scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative()) && scModel.usesAutomationForSCID("pok4construction")) {
+                player.addFollowedSC(scModel.getInitiative());
+                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), activeGame, event);
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
                 }
@@ -1763,8 +1767,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             ButtonHelper.addReaction(event, false, false, "", "");
             String unit = buttonID.replace("construction_", "");
-            String message = trueIdentity
-                + " Click the name of the planet you wish to put your unit on for construction";
+            String message = trueIdentity + " Click the name of the planet you wish to put your " + Emojis.getEmojiFromDiscord(unit) + " on for construction";
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, unit, "place");
             if (!activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);

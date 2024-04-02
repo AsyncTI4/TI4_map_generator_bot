@@ -83,7 +83,7 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player, boolean winnuHero) {
-        StrategyCardModel scModel = activeGame.getStrategyCardModel(scToPlay);
+        StrategyCardModel scModel = activeGame.getStrategyCardModelByInitiative(scToPlay).orElse(null);
         if (scModel == null) { // Temporary Error Reporting
             BotLogger.log("`SCPlay.playSC` - Game: `" + activeGame.getName() + "` - SC Model not found for SC `" + scToPlay + "` from set `" + activeGame.getScSetID() + "`");
         }
@@ -340,7 +340,7 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getSCButtons(int sc, Game activeGame, boolean winnuHero) {
-        StrategyCardModel scModel = activeGame.getStrategyCardModel(sc);
+        StrategyCardModel scModel = activeGame.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {
             return getGenericButtons(sc);
         }
@@ -443,7 +443,7 @@ public class SCPlay extends PlayerSubcommandData {
 
     private static List<Button> getConstructionButtons(int sc) {
         Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
-        Button sdButton = Button.success("construction_sd", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+        Button sdButton = Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock));
         Button pdsButton = Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds));
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);

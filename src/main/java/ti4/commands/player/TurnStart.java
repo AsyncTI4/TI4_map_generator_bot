@@ -247,7 +247,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
 
             startButtons.add(pass);
-            if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode()) {
+            if (!activeGame.isFoWMode()) {
                 for (Player p2 : activeGame.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();

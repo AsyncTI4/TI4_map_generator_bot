@@ -26,6 +26,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.StrategyCardModel;
 
 public class Stats extends PlayerSubcommandData {
 	public Stats() {
@@ -376,8 +377,7 @@ public class Stats extends PlayerSubcommandData {
 		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player,
-		int scNumber) {
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
 		Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
@@ -405,10 +405,12 @@ public class Stats extends PlayerSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 
-		if (scNumber == 5 && !activeGame.isHomeBrewSCMode()
-			&& !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true)
-				+ " heads up, you just picked trade but dont currently hold your Trade Agreement");
+		StrategyCardModel scModel = activeGame.getStrategyCardModelByInitiative(scNumber).orElse(null);
+
+		// WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
+		if (scModel.usesAutomationForSCID("pok5trade") && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
+			String message = player.getRepresentation(true, true) + " heads up, you just picked trade but dont currently hold your Trade Agreement";
+			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
 		}
 
 		Integer tgCount = scTradeGoods.get(scNumber);
