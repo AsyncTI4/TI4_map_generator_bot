@@ -133,4 +133,9 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     public String getAlias() {
         return getId();
     }
+
+    @JsonIgnore
+    public Optional<String> getTileBack() {
+        return Optional.ofNullable(tileBack);
+    }
 }
