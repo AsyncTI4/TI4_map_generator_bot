@@ -3570,22 +3570,6 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                 }
-                case "sc_follow_leadership" -> {
-                    String message = player.getRepresentation() + " following.";
-                    if (!player.getFollowedSCs().contains(1)) {
-                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame, event);
-                    }
-                    player.addFollowedSC(1);
-                    ButtonHelper.addReaction(event, false, false, message, "");
-                }
-                case "sc_leadership_follow" -> {
-                    String message = player.getRepresentation() + " following.";
-                    if (!player.getFollowedSCs().contains(1)) {
-                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame, event);
-                    }
-                    player.addFollowedSC(1);
-                    ButtonHelper.addReaction(event, false, false, message, "");
-                }
                 case "sc_refresh" -> {
                     boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "Replenish");
                     if (used) {
@@ -5621,7 +5605,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getInteraction().getMessage().reply("All players have reacted to '" + buttonText + "'").queue();
         }
         switch (buttonID) {
-            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow", "sc_leadership_follow" -> {
+            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow" -> {
                 String message = "All players have reacted to this Strategy Card";
                 if (activeGame.isFoWMode()) {
                     event.getInteraction().getMessage().reply(message).queueAfter(1, TimeUnit.SECONDS);
