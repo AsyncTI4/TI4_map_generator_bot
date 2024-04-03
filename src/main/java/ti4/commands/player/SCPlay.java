@@ -354,7 +354,7 @@ public class SCPlay extends PlayerSubcommandData {
             case "pok2diplomacy" -> getDiplomacyButtons(sc);
             case "pok3politics" -> getPoliticsButtons(sc);
             case "pok4construction" -> getConstructionButtons(sc);
-            case "pok5trade " -> getTradeButtons(sc);
+            case "pok5trade" -> getTradeButtons(sc);
             case "pok6warfare" -> getWarfareButtons(sc);
             case "pok7technology" -> getTechnologyButtons(sc);
             case "pok8imperial" -> getImperialButtons(sc);
