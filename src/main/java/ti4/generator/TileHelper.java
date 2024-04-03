@@ -97,7 +97,7 @@ public class TileHelper {
             }
         });
 
-        allTiles.values().stream()
+        new ArrayList<>(allTiles.values()).stream()
             .filter(tile -> tile != null)
             .filter(tile -> isDraftTile(tile))
             .forEach(tile -> duplicateDraftTiles(tile));
