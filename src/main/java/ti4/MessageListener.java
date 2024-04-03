@@ -49,6 +49,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.StrategyCardModel;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -330,7 +331,8 @@ public class MessageListener extends ListenerAdapter {
                                             ButtonHelper.addReaction(player, false, true, "Not following", "",
                                                 messageID, activeGame);
 
-                                            if (sc == 8 && !activeGame.isHomeBrewSCMode()) {
+                                            StrategyCardModel scModel = activeGame.getStrategyCardModelByInitiative(sc).orElse(null);
+                                            if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
                                                 String key = "factionsThatAreNotDiscardingSOs";
                                                 String key2 = "queueToDrawSOs";
                                                 String key3 = "potentialBlockers";

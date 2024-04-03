@@ -1,0 +1,30 @@
+[
+    {
+        "id": "base2",
+        "initiative": 2,
+        "name": "Diplomacy",
+        "primaryTexts": [
+            "Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from their reinforcements in the chosen system.\nThen, ready each exhausted planet you control in that system."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to ready up to 2 exhausted planets"
+        ],
+        "imageFileName": "base_game_2",
+        "source": "base"
+    },
+    {
+        "id": "base4",
+        "initiative": 4,
+        "name": "Construction",
+        "primaryTexts": [
+            "Place 1 PDS or 1 Space Dock on a planet you control.",
+            "Place 1 PDS on a planet you control."
+        ],
+        "secondaryTexts": [
+            "Place 1 token from your strategy pool in any system; you may place either 1 space dock or 1 PDS on a planet you control in that system."
+        ],
+        "botSCAutomationID": "pok4construction",
+        "imageFileName": "base_game_4",
+        "source": "base"
+    }
+]

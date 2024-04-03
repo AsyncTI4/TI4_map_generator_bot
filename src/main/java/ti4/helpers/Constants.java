@@ -851,14 +851,6 @@ public class Constants {
     public static final String BOT_SHUSHING = "bot_shushing";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
-    public static final String SC_FOLLOW_1 = "sc_follow_1";
-    public static final String SC_FOLLOW_2 = "sc_follow_2";
-    public static final String SC_FOLLOW_3 = "sc_follow_3";
-    public static final String SC_FOLLOW_4 = "sc_follow_4";
-    public static final String SC_FOLLOW_5 = "sc_follow_5";
-    public static final String SC_FOLLOW_6 = "sc_follow_6";
-    public static final String SC_FOLLOW_7 = "sc_follow_7";
-    public static final String SC_FOLLOW_8 = "sc_follow_8";
 
     // Installation constants
     public static final String INSTALLATION = "installation";
@@ -891,14 +883,6 @@ public class Constants {
     public static final String AUTO_ARCHIVE_DURATION = "auto_archive_duration";
     public static final String ALL_INFO = "all_info";
 
-    public static final String LEADERSHIP_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/1e/Ti07_strategy_1_leadership.png/revision/latest?cb=20200827003959";
-    public static final String DIPLOMACY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/a/a1/Untitled.png/revision/latest?cb=20210623202428";
-    public static final String POLITICS_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/f/f1/Ti07_strategy_3_politics.png/revision/latest?cb=20200827005158";
-    public static final String CONSTRUCTION_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/5/5e/Newconstruction.png/revision/latest?cb=20210221060723";
-    public static final String TRADE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/c/ca/Ti07_strategy_5_trade.png/revision/latest?cb=20200827005351";
-    public static final String WARFARE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/0/02/Ti07_strategy_6_warfare.png/revision/latest?cb=20200827005450";
-    public static final String TECHNOLOGY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/e/ea/Ti07_strategy_7_technology.png/revision/latest?cb=20200827005534";
-    public static final String IMPERIAL_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/2/24/Ti07_strategy_8_imperial.png/revision/latest?cb=20200827005806";
     public static final String BUTTON = "button";
     public static final String BUTTON_TEXT = "button_text";
     public static final String GENERIC_BUTTON_ID_PREFIX = "generic_button_id_";

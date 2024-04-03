@@ -868,7 +868,7 @@ public class AgendaHelper {
                                 .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                         }
                         case "4" -> {
-                            scButtons.add(Button.success("construction_sd", "Place A SD")
+                            scButtons.add(Button.success("construction_spacedock", "Place A SD")
                                 .withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
                             scButtons.add(Button.success("construction_pds", "Place a PDS")
                                 .withEmoji(Emoji.fromFormatted(Emojis.pds)));
