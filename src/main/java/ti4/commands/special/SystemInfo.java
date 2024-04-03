@@ -100,17 +100,6 @@ public class SystemInfo extends SpecialSubcommandData {
                 if (hasCC) {
                     sb.append("\n");
                 }
-                boolean hasControl = false;
-                for (String control : unitHolder.getControlList()) {
-                    if (!hasControl) {
-                        sb.append("Control Counters: ");
-                        hasControl = true;
-                    }
-                    addtFactionIcon(activeGame, sb, colorToId, control, privateGame);
-                }
-                if (hasControl) {
-                    sb.append("\n");
-                }
                 boolean hasToken = false;
                 Map<String, String> tokensToName = Mapper.getTokensToName();
                 for (String token : unitHolder.getTokenList()) {
@@ -128,6 +117,17 @@ public class SystemInfo extends SpecialSubcommandData {
                     }
                 }
                 if (hasToken) {
+                    sb.append("\n");
+                }
+                boolean hasControl = false;
+                for (String control : unitHolder.getControlList()) {
+                    if (!hasControl) {
+                        sb.append("Control Counters: ");
+                        hasControl = true;
+                    }
+                    addtFactionIcon(activeGame, sb, colorToId, control, privateGame);
+                }
+                if (hasControl) {
                     sb.append("\n");
                 }
 

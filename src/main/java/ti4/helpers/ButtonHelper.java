@@ -619,6 +619,7 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.freesystems));
             buttons.add(release);
         }
+        buttons.add(Button.secondary("resetSpend_" + whatIsItFor, "Reset Spent Planets and Tgs"));
 
         return buttons;
     }
@@ -747,6 +748,7 @@ public class ButtonHelper {
             + getIdentOrColor(p2, game);
         goAgainButtons.add(button);
         goAgainButtons.add(done);
+        goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
         if (game.isFoWMode()) {
             MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(),
@@ -779,6 +781,7 @@ public class ButtonHelper {
             + getIdentOrColor(p2, game);
         goAgainButtons.add(button);
         goAgainButtons.add(done);
+        goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
 
         if (game.isFoWMode()) {
             MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
@@ -2815,6 +2818,18 @@ public class ButtonHelper {
         return netgain;
     }
 
+    public static void resetCCs(Player player, String ccs) {
+        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
+        ccs = ccs.substring(ccs.indexOf("/") + 1);
+        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
+        ccs = ccs.substring(ccs.indexOf("/") + 1);
+        int oldStrat = Integer.parseInt(ccs);
+        player.setTacticalCC(oldTactic);
+        player.setStrategicCC(oldStrat);
+        player.setFleetCC(oldFleet);
+
+    }
+
     public static List<Button> getButtonsToRemoveYourCC(Player player, Game game, GenericInteractionCreateEvent event,
         String whatIsItFor) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
@@ -4120,7 +4135,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         Set<String> explorationTraits = new HashSet<>(planet.getPlanetTypes());
 
-        if (player.hasAbility("black_markets") && explorationTraits.size() > 0) {
+        if (player.hasAbility("black_markets") && (explorationTraits.contains("cultural") || explorationTraits.contains("industrial") || explorationTraits.contains("hazardous"))) {
             Set<String> traits = getTypesOfPlanetPlayerHas(game, player);
             explorationTraits.addAll(traits);
         }
@@ -6109,6 +6124,8 @@ public class ButtonHelper {
         buttons.add(
             Button.success(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy CC"));
         buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Done Gaining CCs"));
+        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "resetCCs",
+            "Reset CCs"));
         player.getGame().setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         return buttons;
     }
@@ -7709,6 +7726,7 @@ public class ButtonHelper {
         Button done = Button.secondary("finishTransaction_" + p2.getColor(), "Done With This Transaction");
 
         goAgainButtons.add(button);
+        goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
         goAgainButtons.add(done);
         if (game.isFoWMode()) {
             MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);

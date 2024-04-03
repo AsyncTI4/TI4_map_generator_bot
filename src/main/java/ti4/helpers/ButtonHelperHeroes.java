@@ -1547,7 +1547,7 @@ public class ButtonHelperHeroes {
                 "Cymiae hero gave " + Mapper.getActionCard(acID).getName()
                     + " to you and you now have to discard an AC");
             String msg = p2.getRepresentation(true, true) + " use buttons to discard";
-            List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, player, false);
+            List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, p2, false);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }

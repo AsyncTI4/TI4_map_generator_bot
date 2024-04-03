@@ -1206,17 +1206,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             new PlanetExhaust().doAction(player, planetName, activeGame);
             player.addSpentThing(planetName);
-            List<ActionRow> actionRow2 = new ArrayList<>();
-            for (ActionRow row : event.getMessage().getActionRows()) {
-                List<ItemComponent> buttonRow = row.getComponents();
-                int buttonIndex = buttonRow.indexOf(event.getButton());
-                if (buttonIndex > -1) {
-                    buttonRow.remove(buttonIndex);
-                }
-                if (buttonRow.size() > 0) {
-                    actionRow2.add(ActionRow.of(buttonRow));
-                }
-            }
+
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
             if (uH != null) {
                 if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
@@ -1247,14 +1237,32 @@ public class ButtonListener extends ListenerAdapter {
                         buttons);
                 }
             }
-            String exhaustedMessage;
-            exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
+            List<ActionRow> actionRow2 = new ArrayList<>();
+            for (ActionRow row : event.getMessage().getActionRows()) {
+                List<ItemComponent> buttonRow = row.getComponents();
+                int buttonIndex = buttonRow.indexOf(event.getButton());
+                if (buttonIndex > -1) {
+                    buttonRow.remove(buttonIndex);
+                }
+                if (buttonRow.size() > 0) {
+                    actionRow2.add(ActionRow.of(buttonRow));
+                }
+            }
+            String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         } else if (buttonID.startsWith("finishTransaction_")) {
             String player2Color = buttonID.split("_")[1];
             Player player2 = activeGame.getPlayerFromColorOrFaction(player2Color);
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             ButtonHelperAbilities.pillageCheck(player2, activeGame);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("demandSomething_")) {
+            String player2Color = buttonID.split("_")[1];
+            Player p2 = activeGame.getPlayerFromColorOrFaction(player2Color);
+            List<Button> buttons = ButtonHelper.getStuffToTransButtons(activeGame, p2, player);
+            String message = p2.getRepresentation()
+                + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to " + ButtonHelper.getIdentOrColor(player, activeGame);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message, buttons);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("sabotage_")) {
             String typeNName = buttonID.replace("sabotage_", "");
@@ -2496,6 +2504,28 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveUnstableStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
             ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, activeGame, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("resetSpend_")) {
+            Helper.refreshPlanetsOnTheRespend(player, activeGame);
+            String whatIsItFor = "both";
+            if (buttonID.split("_").length > 1) {
+                whatIsItFor = buttonID.split("_")[1];
+            }
+
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, whatIsItFor);
+            List<ActionRow> actionRow2 = new ArrayList<>();
+            for (ActionRow row : event.getMessage().getActionRows()) {
+                List<ItemComponent> buttonRow = row.getComponents();
+                for (ItemComponent but : buttonRow) {
+                    if (but instanceof Button butt) {
+                        if (!Helper.doesListContainButtonID(buttons, butt.getId())) {
+                            buttons.add(butt);
+                        }
+                    }
+                }
+            }
+            String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
+            event.getMessage().editMessage(exhaustedMessage).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons)).queue();
+
         } else if (buttonID.startsWith("reinforcements_cc_placement_")) {
             String planet = buttonID.replace("reinforcements_cc_placement_", "");
             String tileID = AliasHandler.resolveTile(planet.toLowerCase());
@@ -2550,8 +2580,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("transactWith_")) {
             String faction = buttonID.replace("transactWith_", "");
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
-            List<Button> buttons;
-            buttons = ButtonHelper.getStuffToTransButtons(activeGame, player, p2);
+            List<Button> buttons = ButtonHelper.getStuffToTransButtons(activeGame, player, p2);
             String message = player.getRepresentation()
                 + " Use the buttons to select what you want to transact";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -3127,7 +3156,9 @@ public class ButtonListener extends ListenerAdapter {
                     activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                     String message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                         + ". Use buttons to gain CCs";
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC);
+                    Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
+                        "Reset CCs");
+                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
                     List<Button> buttons2 = List.of(exhaust);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
@@ -3239,8 +3270,10 @@ public class ButtonListener extends ListenerAdapter {
 
                     Button doneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons",
                         "Done Redistributing CCs");
+                    Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
+                        "Reset CCs");
                     List<Button> buttons = List.of(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,
-                        doneGainingCC);
+                        doneGainingCC, resetCC);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
@@ -3299,9 +3332,15 @@ public class ButtonListener extends ListenerAdapter {
                     activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                     Button getTactic = Button.success(finsFactionCheckerPrefix + "increase_tactic_cc", "Gain 1 Tactic CC");
                     Button getFleet = Button.success(finsFactionCheckerPrefix + "increase_fleet_cc", "Gain 1 Fleet CC");
-                    Button getStrat = Button.success(finsFactionCheckerPrefix + "increase_strategy_cc", "Gain 1 Strategy CC");
-                    Button doneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons_leadership", "Done Gaining CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC);
+                    Button getStrat = Button.success(finsFactionCheckerPrefix + "increase_strategy_cc",
+                        "Gain 1 Strategy CC");
+                    // Button exhaust = Button.danger(finsFactionCheckerPrefix +
+                    // "leadershipExhaust", "Exhaust Planets");
+                    Button doneGainingCC = Button.danger(finsFactionCheckerPrefix + "deleteButtons_leadership",
+                        "Done Gaining CCs");
+                    Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
+                        "Reset CCs");
+                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
@@ -4101,6 +4140,14 @@ public class ButtonListener extends ListenerAdapter {
                         + player.getCCRepresentation() + ". Net gain of: " + netGain;
                     event.getMessage().editMessage(editedMessage).queue();
                 }
+                case "resetCCs" -> {
+                    String originalCCs = activeGame
+                        .getFactionsThatReactedToThis("originalCCsFor" + player.getFaction());
+                    ButtonHelper.resetCCs(player, originalCCs);
+                    String editedMessage = player.getRepresentation() + " CCs have gone from " + originalCCs + " -> "
+                        + player.getCCRepresentation() + ". Net gain of: 0";
+                    event.getMessage().editMessage(editedMessage).queue();
+                }
                 case "increase_fleet_cc" -> {
                     player.setFleetCC(player.getFleetCC() + 1);
                     String originalCCs = activeGame
@@ -4786,6 +4833,28 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
                 }
                 case "eraseMyRiders" -> AgendaHelper.reverseAllRiders(event, activeGame, player);
+                case "resetSpend" -> {
+                    Helper.refreshPlanetsOnTheRevote(player, activeGame);
+                    String whatIsItFor = "both";
+                    if (buttonID.split("_").length > 2) {
+                        whatIsItFor = buttonID.split("_")[2];
+                    }
+                    player.resetSpentThings();
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, whatIsItFor);
+                    List<ActionRow> actionRow2 = new ArrayList<>();
+                    for (ActionRow row : event.getMessage().getActionRows()) {
+                        List<ItemComponent> buttonRow = row.getComponents();
+                        for (ItemComponent but : buttonRow) {
+                            if (but instanceof Button butt) {
+                                if (!buttons.contains(butt)) {
+                                    buttons.add(butt);
+                                }
+                            }
+                        }
+                    }
+                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
+                    event.getMessage().editMessage(exhaustedMessage).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons)).queue();
+                }
                 case "eraseMyVote" -> {
                     String pfaction = player.getFaction();
                     if (activeGame.isFoWMode()) {

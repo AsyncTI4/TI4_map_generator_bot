@@ -1755,7 +1755,7 @@ public class MapGenerator {
                         originalPlanetType = "none";
                     }
                     if ("faction".equals(originalPlanetType)) {
-                        originalPlanetType = player.getFaction();
+                        originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     }
 
                     if (!originalPlanetType.isEmpty()) {
@@ -2718,12 +2718,14 @@ public class MapGenerator {
         int x = 5;
         int y1 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
             publicObjectivesState1, po1, 1, null, false);
+        graphics.setColor(new Color(130, 70, 0));
         int y1b = displayUnrevealedObjectives(y1, x, game.getPublicObjectives1Peakable(), 1, game);
 
         x = 801;
         graphics.setColor(new Color(93, 173, 226));
         int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
             publicObjectivesState2, po2, 2, null, false);
+        graphics.setColor(new Color(30, 60, 128));
         int y2b = displayUnrevealedObjectives(y2, x, game.getPublicObjectives2Peakable(), 2, game);
 
         x = 1598;
