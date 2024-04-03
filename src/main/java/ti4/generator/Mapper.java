@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -285,7 +286,6 @@ public class Mapper {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
-            .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
             .filter(tileModel -> tileModel.isEmpty())
             .map(TileModel::getId)
             .toList();
