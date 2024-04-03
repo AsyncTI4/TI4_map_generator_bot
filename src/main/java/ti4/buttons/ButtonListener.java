@@ -63,7 +63,6 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
-import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.*;
 import ti4.helpers.Units.UnitKey;
@@ -160,15 +159,14 @@ public class ButtonListener extends ListenerAdapter {
 
         if (buttonID.startsWith("FFCC_")) {
             buttonID = buttonID.replace("FFCC_", "");
-            String factionWhoGeneratedButton = buttonID.substring(0, buttonID.indexOf("_"));
-            buttonID = buttonID.replaceFirst(factionWhoGeneratedButton + "_", "");
-            String factionWhoIsUp = player == null ? "nullPlayer" : player.getFaction();
-            if (player != null && !player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton)
-                && !buttonLabel.toLowerCase().contains(factionWhoIsUp)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "To " + player.getFactionEmoji()
-                    + ": these buttons are for someone else");
+            String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
+            if (player != null && !buttonID.startsWith(factionWhoPressedButton + "_")
+                && !buttonLabel.toLowerCase().contains(factionWhoPressedButton)) {
+                String message = "To " + player.getFactionEmoji() + ": these buttons are for someone else";
+                MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 return;
             }
+            buttonID = buttonID.replaceFirst(factionWhoPressedButton + "_", "");
         }
         String finsFactionCheckerPrefix = player == null ? "FFCC_nullPlayer_" : player.getFinsFactionCheckerPrefix();
         String trueIdentity = null;
