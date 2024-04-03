@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
@@ -26,15 +27,38 @@ public class WormholeResearchFor extends SpecialSubcommandData {
     }
 
     public static void doResearch(GenericInteractionCreateEvent event, Game activeGame) {
+
+        List<Player> players = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
+            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition())) {
+                for (Player p2 : activeGame.getRealPlayers()) {
+                    if (FoWHelper.playerHasShipsInSystem(p2, tile) && !players.contains(p2)) {
+                        players.add(p2);
+                    }
+                }
+            }
             if (FoWHelper.doesTileHaveAlphaOrBeta(activeGame, tile.getPosition())) {
                 UnitHolder uH = tile.getUnitHolders().get(Constants.SPACE);
                 for (Player player : activeGame.getRealPlayers()) {
-                    uH.removeAllUnits(player.getColor());
+                    uH.removeAllShips(player);
                 }
             }
         }
+        for (Player p2 : activeGame.getRealPlayers()) {
+            ButtonHelper.checkFleetInEveryTile(p2, activeGame, event);
+        }
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Removed all ships from alphas/betas\nYou can use the button to get your tech", List.of(Buttons.GET_A_TECH));
+        String msg = " can get tech due to wormhole research";
+        if (activeGame.isFoWMode()) {
+            for (Player p2 : players) {
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), p2.getRepresentation() + msg);
+            }
+        } else {
+            for (Player p2 : players) {
+                msg = p2.getRepresentation() + msg;
+            }
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+        }
     }
 
     @Override

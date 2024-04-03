@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "javaClassType")
 @JsonSubTypes({
@@ -157,6 +158,10 @@ abstract public class UnitHolder {
         if (colorID == null)
             return;
         units.keySet().removeIf(key -> key.getColorID().equals(colorID));
+    }
+
+    public void removeAllShips(Player player) {
+        units.keySet().removeIf(key -> key.getColorID().equals(player.getColorID()) && player.getUnitFromUnitKey(key).getIsShip());
     }
 
     public Map<UnitKey, Integer> getUnits() {

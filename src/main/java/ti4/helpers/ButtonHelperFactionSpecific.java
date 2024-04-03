@@ -855,6 +855,7 @@ public class ButtonHelperFactionSpecific {
             + " and relocated the unit(s) to " + Helper.getPlanetRepresentation(newPlanet, activeGame);
         goAgainButtons.add(button);
         goAgainButtons.add(done);
+        goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(hacan.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannelWithButtons(hacan.getPrivateChannel(),
