@@ -1761,6 +1761,9 @@ public class MapGenerator {
                     if ("faction".equals(originalPlanetType)) {
                         originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     }
+                    if (originalPlanetType == null) {
+                        originalPlanetType = "keleres";
+                    }
 
                     if (!originalPlanetType.isEmpty()) {
                         if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
