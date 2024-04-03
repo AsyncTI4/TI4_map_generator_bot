@@ -218,7 +218,7 @@ public class MessageListener extends ListenerAdapter {
             if (msg.getContentRaw().startsWith("[DELETE]")) {
                 msg.delete().queue();
             }
-            if (msg.getContentRaw().contains("to boldly go where no stroter has gone before")) {
+            if (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before")) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "https://discord.gg/RZ7qg9kbVZ");
             }
             autoPingGames();
