@@ -1747,13 +1747,17 @@ public class MapGenerator {
                     drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
                 } else {
                     String originalPlanetType = planetHolder.getOriginalPlanetType();
+                    if (originalPlanetType == null) {
+                        originalPlanetType = "none";
+                    }
                     if ("none".equals(originalPlanetType) && ("mr".equals(planet) || "mrte".equals(planet)))
                         originalPlanetType = "mr";
-                    if ("none".equals(originalPlanetType))
-                        originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
+
                     if (Optional.ofNullable(originalPlanetType).isEmpty()) {
                         originalPlanetType = "none";
                     }
+                    if ("none".equals(originalPlanetType))
+                        originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     if ("faction".equals(originalPlanetType)) {
                         originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     }
