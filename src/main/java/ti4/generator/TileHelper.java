@@ -2,6 +2,7 @@ package ti4.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.Storage;
@@ -92,9 +93,36 @@ public class TileHelper {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
             } catch (Exception e) {
-                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
+
+        allTiles.values().stream()
+            .filter(tile -> tile != null)
+            .filter(tile -> isDraftTile(tile))
+            .forEach(tile -> duplicateDraftTiles(tile));
+    }
+
+    private static void duplicateDraftTiles(TileModel tile) {
+        String color = tile.getId().replaceAll("blank","");
+        String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
+
+        for (int i = 0; i <= 5; i++) {
+            TileModel newTile = new TileModel();
+            newTile.setId(color + i);
+            newTile.setName(namePre + i);
+            newTile.setAliases(new ArrayList<>(List.of(color + i)));
+            newTile.setImagePath(tile.getImagePath());
+            newTile.setWormholes(Collections.emptySet());
+            newTile.setPlanets(Collections.emptyList());
+            allTiles.put(newTile.getId(), newTile);
+        }
+    }
+
+    public static boolean isDraftTile(TileModel tile) {
+        if (tile.getImagePath() == null) return false;
+        if (tile.getImagePath().startsWith("draft_")) return true;
+        return false;
     }
 
     public static void addNewTileToList(TileModel tile) {
@@ -122,7 +150,9 @@ public class TileHelper {
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         allTiles.values().forEach(tileModel -> {
             try {
-                mapper.writeValue(new File(resourcePath + tileModel.getId() + ".json"), tileModel);
+                if (!isDraftTile(tileModel) || tileModel.getId().endsWith("blank")) {
+                    mapper.writeValue(new File(resourcePath + tileModel.getId() + ".json"), tileModel);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
