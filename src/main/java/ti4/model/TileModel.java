@@ -20,6 +20,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private String name;
     private List<String> aliases;
     private String imagePath;
+    private String tileBack;
     private List<String> planets;
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
@@ -131,5 +132,10 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getAlias() {
         return getId();
+    }
+
+    @JsonIgnore
+    public Optional<String> getTileBack() {
+        return Optional.ofNullable(tileBack);
     }
 }

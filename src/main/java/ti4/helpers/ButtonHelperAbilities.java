@@ -289,7 +289,7 @@ public class ButtonHelperAbilities {
         }
         if (scPlayed > 4 && (activeGame.getScPlayed().get(4) == null || !activeGame.getScPlayed().get(4))) {
             scButtons.add(
-                Button.success("construction_sd", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+                Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
             scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
         }
         if (scPlayed > 5 && (activeGame.getScPlayed().get(5) == null || !activeGame.getScPlayed().get(5))) {

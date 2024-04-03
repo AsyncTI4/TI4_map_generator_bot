@@ -66,6 +66,7 @@ import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
@@ -339,10 +340,7 @@ public class Game {
         events = new ArrayList<>();
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
         addCustomPO(Constants.CUSTODIAN, 1);
-        // Default SC initialization
-        for (int i = 1; i <= 8; i++) {
-            scTradeGoods.put(i, 0);
-        }
+        setStrategyCardSet("pok");
     }
 
     public void fixScrewedSOs() {
@@ -3667,8 +3665,27 @@ public class Game {
     }
 
     @JsonIgnore
-    public StrategyCardModel getStrategyCardSet() {
+    public StrategyCardSetModel getStrategyCardSet() {
         return Mapper.getStrategyCardSets().get(getScSetID());
+    }
+
+    @JsonIgnore
+    public Optional<StrategyCardModel> getStrategyCardModelByInitiative(int scInitiative) {
+        return getStrategyCardSet().getStrategyCardModelByInitiative(scInitiative);
+    }
+
+    @JsonIgnore
+    public Optional<StrategyCardModel> getStrategyCardModelByName(String name) {
+        return getStrategyCardSet().getStrategyCardModelByName(name);
+    }
+
+    /**
+     * @param scID
+     * @return true when the Game's SC Set contains a strategt card which uses a certain automation
+     */
+    public boolean usesStrategyCardAutomation(String scID) {
+        return getStrategyCardSet().getStrategyCardModels().stream()
+                .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
     }
 
     @JsonIgnore
@@ -4114,7 +4131,7 @@ public class Game {
                 || explorationDeckID != null
                         && !List.of("explores_pok", "explores_base", "null").contains(explorationDeckID)
                 || technologyDeckID != null && !List.of("techs_pok", "techs_base", "null").contains(technologyDeckID)
-                || scSetID != null && !List.of("pok", "base_game", "null").contains(scSetID)
+                || scSetID != null && !List.of("pok", "base_game", "base_game_codex1", "null").contains(scSetID)
                 || eventDeckID != null && !"null".equals(eventDeckID)
                 || Mapper.getFactions().stream()
                         .filter(faction -> !faction.getSource().isPok())
@@ -4131,5 +4148,13 @@ public class Game {
                 || getRealAndEliminatedAndDummyPlayers().size() < 3
                 || playerCountForMap > 8
                 || getRealAndEliminatedAndDummyPlayers().size() > 8;
+    }
+
+    public void setStrategyCardSet(String scSetID) {
+        StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
+        setHomeBrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
+        setScTradeGoods(new LinkedHashMap<>());
+        setScSetID(strategyCardModel.getAlias());
+        strategyCardModel.getCardValues().keySet().forEach(scValue -> setScTradeGood(scValue, 0));
     }
 }

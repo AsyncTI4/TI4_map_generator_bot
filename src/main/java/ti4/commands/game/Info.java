@@ -63,6 +63,7 @@ public class Info extends GameSubcommandData {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
         }
         sb.append("Strategy Card Set: `").append(activeGame.getScSetID()).append("`").append(NEW_LINE);
+        sb.append("Strategy Cards: `").append(activeGame.getStrategyCardSet().getScIDs()).append("`").append(NEW_LINE);
         sb.append("Decks: ").append(NEW_LINE);
         sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ").append(activeGame.getActionCardDeckSize()).append("/")
             .append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);

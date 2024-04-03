@@ -46,7 +46,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.Source;
-import ti4.model.StrategyCardModel;
+import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -647,7 +647,7 @@ public class AutoCompleteProvider {
             }
             case Constants.STRATEGY_CARD_SET -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, StrategyCardModel> decks = Mapper.getStrategyCardSets();
+                Map<String, StrategyCardSetModel> decks = Mapper.getStrategyCardSets();
                 List<Command.Choice> options = decks.values().stream()
                     .filter(scSet -> !"template".equals(scSet.getAlias()))
                     .filter(value -> value.getAlias().contains(enteredValue))

@@ -1,0 +1,116 @@
+[
+    {
+        "id": "pok1leadership",
+        "initiative": 1,
+        "name": "Leadership",
+        "primaryTexts": [
+            "Gain 3 command tokens",
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
+        "secondaryTexts": [
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
+        "imageFileName": "base_game_1",
+        "colourHexCode": "#FF0000",
+        "source": "base"
+    },
+    {
+        "id": "pok2diplomacy",
+        "initiative": 2,
+        "name": "Diplomacy",
+        "primaryTexts": [
+            "Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from their reinforcements in the chosen system. Then, ready up to 2 exhausted planets you control."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to ready up to 2 exhausted planets you control."
+        ],
+        "imageFileName": "pok_2",
+        "source": "codex1"
+    },
+    {
+        "id": "pok3politics",
+        "initiative": 3,
+        "name": "Politics",
+        "primaryTexts": [
+            "Choose a player other than the speaker.  That player gains the speaker token.",
+            "Draw 2 action cards",
+            "Look at the top 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 action cards."
+        ],
+        "imageFileName": "base_game_3",
+        "source": "base"
+    },
+    {
+        "id": "pok4construction",
+        "initiative": 4,
+        "name": "Construction",
+        "primaryTexts": [
+            "Place 1 PDS or 1 Space Dock on a planet you control.",
+            "Place 1 PDS on a planet you control."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and place it in any system; you may place either 1 space dock or 1 PDS on a planet you control in that system"
+        ],
+        "imageFileName": "pok_4",
+        "source": "pok"
+    },
+    {
+        "id": "pok5trade",
+        "initiative": 5,
+        "name": "Trade",
+        "primaryTexts": [
+            "Gain 3 trade goods.",
+            "Replenish commodities.",
+            "Choose any number of other players. Those players use the secondary ability of this strategy card without spending a command token."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to replenish your commodities."
+        ],
+        "imageFileName": "base_game_5",
+        "source": "base"
+    },
+    {
+        "id": "pok6warfare",
+        "initiative": 6,
+        "name": "Warfare",
+        "primaryTexts": [
+            "Remove 1 of your command tokens from the game board; then, gain 1 command token.",
+            "Redistribute any number of the command tokens on your command sheet."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to use the Production ability of 1 of your space docks in your home system (This token is not placed in your home system)"
+        ],
+        "imageFileName": "base_game_6",
+        "source": "base"
+    },
+    {
+        "id": "pok7technology",
+        "initiative": 7,
+        "name": "Technology",
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "imageFileName": "base_game_7",
+        "source": "base"
+    },
+    {
+        "id": "pok8imperial",
+        "initiative": 8,
+        "name": "Imperial",
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements.",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective."
+        ],
+        "imageFileName": "base_game_8",
+        "source": "base"
+    }
+]

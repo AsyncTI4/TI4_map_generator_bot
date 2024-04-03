@@ -77,6 +77,7 @@ import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
@@ -731,6 +732,7 @@ public class Helper {
     }
 
     public static String getSCAsMention(int sc, Game activeGame) {
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         if (activeGame.isHomeBrewSCMode()) {
             return getSCName(sc, activeGame);
         }
@@ -776,32 +778,18 @@ public class Helper {
 
     public static File getSCImageFile(Integer sc, Game activeGame) {
         String scSet = activeGame.getScSetID();
-        if (Optional.ofNullable(activeGame.getScSetID()).isEmpty() || "null".equals(activeGame.getScSetID())) { // I
-                                                                                                                // don't
-                                                                                                                // know
-                                                                                                                // *why*
-                                                                                                                // this
-                                                                                                                // is a
-                                                                                                                // thing
-                                                                                                                // that
-                                                                                                                // can
-                                                                                                                // happen,
-                                                                                                                // but
-                                                                                                                // it is
+        if (Optional.ofNullable(activeGame.getScSetID()).isEmpty()
+            || "null".equals(activeGame.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName())
-            || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
-        String scAsString = String.valueOf(sc);
+        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         if (gameWithGroupedSCs) {
             char scValue = String.valueOf(sc).charAt(0);
-            scAsString = String.valueOf(scValue);
             scSet = scSet.replace("pbd100", "pok");
             scSet = scSet.replace("pbd1000", "pok");
         }
-
-        String scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
-            scSet + "_" + scAsString + ".png", "Could not find SC image!");
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
+        String scImagePath = scModel.getImageFilePath();
         if (scImagePath == null)
             scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",
                 "Could not find SC image!");

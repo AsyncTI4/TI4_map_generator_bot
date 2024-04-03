@@ -38,5 +38,7 @@
     "planets": [
         "thedark"
     ],
-    "isNebula": true
+    "isNebula": true,
+    "source": "pok",
+    "tileBack": "green"
 }

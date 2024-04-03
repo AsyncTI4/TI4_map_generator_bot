@@ -164,7 +164,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+            || getId().toLowerCase().contains(searchString)
+            || getSource().toString().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     @JsonIgnore
