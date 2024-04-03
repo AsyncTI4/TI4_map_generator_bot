@@ -93,7 +93,7 @@ public class TileHelper {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
             } catch (Exception e) {
-                BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
 
