@@ -263,7 +263,7 @@ public class MapGenerator {
                     try {
                         tileRingNumber = Integer.parseInt(tileRing);
                     } catch (Exception e) {
-                        // Do nothing
+                        BotLogger.log("Hitting an error");
                     }
 
                     if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
@@ -413,12 +413,15 @@ public class MapGenerator {
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
         if (factionFile == null) {
             // Handle homebrew factions based on real factions
-            if (Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
+            if (Mapper.getFaction(factionID) != null && Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
                 factionFile = ResourceHelper.getInstance()
                     .getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
             }
         }
         if (factionFile == null) {
+            if (factionID.equalsIgnoreCase("fogalliance")) {
+                return null;
+            }
             BotLogger.log("Could not find image file for faction icon: " + factionID);
         }
         return factionFile;
@@ -475,6 +478,18 @@ public class MapGenerator {
     }
 
     private void drawGame(GenericInteractionCreateEvent event) {
+
+        boolean finRun = false;
+        int checkpoint = 1;
+        if (event instanceof SlashCommandInteractionEvent slash) {
+            if (slash.getUser().getIdLong() == 488681163146133504l) {
+                finRun = true;
+            }
+        }
+        if (finRun) {
+            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            checkpoint++;
+        }
         if (debug)
             debugStartTime = System.nanoTime();
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
@@ -485,7 +500,10 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
         String timeStamp = getTimeStamp();
         graphics.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
-
+        if (finRun) {
+            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            checkpoint++;
+        }
         int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
         int x = 10;
@@ -527,6 +545,10 @@ public class MapGenerator {
         tempY = scoreTrack(tempY + 20);
         if (displayType != DisplayType.stats) {
             playerInfo(game);
+        }
+        if (finRun) {
+            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            checkpoint++;
         }
 
         if (displayType == DisplayType.all || displayType == DisplayType.stats) {
@@ -838,6 +860,10 @@ public class MapGenerator {
                 y += 15;
 
             }
+        }
+        if (finRun) {
+            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            checkpoint++;
         }
         if (debug)
             debugGameInfoTime = System.nanoTime() - debugStartTime;
@@ -1575,7 +1601,7 @@ public class MapGenerator {
                         decal = ImageHelper.read(decalPath);
                     }
                 } catch (Exception e) {
-                    // BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
+                    BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
                 }
 
                 BufferedImage spoopy = null;
@@ -2231,7 +2257,7 @@ public class MapGenerator {
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            // BotLogger.log("Could not display play area: " + resourceName, e);
+            BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -2241,7 +2267,7 @@ public class MapGenerator {
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            // BotLogger.log("Could not display play area: " + resourceName, e);
+            BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -2251,7 +2277,7 @@ public class MapGenerator {
             BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, size, size);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            // BotLogger.log("Could not display play area: " + resourceName, e);
+            BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -2262,6 +2288,7 @@ public class MapGenerator {
             graphics.drawImage(img, x, y, null);
         } catch (Exception e) {
             // Do Nothing
+            BotLogger.log("Could not display UU", e);
         }
     }
 
@@ -2328,8 +2355,7 @@ public class MapGenerator {
                     convertToGeneric, scale);
             } catch (Exception e) {
                 // nothing
-                // LoggerHandler.log("Could not display player: " + player.getUserName() + " VP
-                // count", e);
+                BotLogger.log("Could not display player: " + player.getUserName(), e);
             }
             tempCounter++;
             if (tempCounter >= 4) {
@@ -3493,6 +3519,7 @@ public class MapGenerator {
                     drawCCOfPlayer(tileGraphics, ccID, imgX, imgY, 1, player, convertToGeneric);
                 }
             } catch (Exception ignored) {
+                BotLogger.log("Could not addCC", ignored);
             }
 
             if (image != null) {
