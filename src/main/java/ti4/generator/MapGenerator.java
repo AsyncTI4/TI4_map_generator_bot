@@ -1050,8 +1050,21 @@ public class MapGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
 
+        List<String> relics = new ArrayList(player.getRelics());
+        List<String> fakeRelics = relics.stream()
+            .filter(relic -> Mapper.getRelic(relic).isFakeRelic())
+            .filter(relic -> !relic.contains("axisorder"))
+            .collect(Collectors.toList());
+        List<String> axisOrderRelics = player.getRelics().stream()
+            .filter(relic -> relic.contains("axisorder"))
+            .collect(Collectors.toList());
+
+        relics.removeAll(fakeRelics);
+        relics.removeAll(axisOrderRelics);
+        
         List<String> exhaustedRelics = player.getExhaustedRelics();
-        for (String relicID : player.getRelics()) {
+
+        for (String relicID : relics) {
             RelicModel relicModel = Mapper.getRelic(relicID);
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
@@ -1059,25 +1072,89 @@ public class MapGenerator {
             } else {
                 graphics.setColor(Color.WHITE);
             }
+            
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+
             String relicStatus = isExhausted ? "_exh" : "_rdy";
-            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
-
-            int extraAxisOrderWidth = relicID.contains("axisorder") ? 10 : 0;
-            graphics.drawRect(x + deltaX - 2, y - 2, 44 + extraAxisOrderWidth, 152);
-            if (!relicID.contains("axisorder")) {
-                if (relicModel.isFakeRelic()) {
-                    drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
-                } else {
-                    drawPAImage(x + deltaX, y, "pa_relics_icon.png");
-                }
-            }
-
+            
             // ABSOL QUANTUMCORE
             if (relicID.contains("quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_multicolorry" + relicStatus + ".png");
             }
+            
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
+            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
+            BufferedImage resourceBufferedImage;
+            try {
+                resourceBufferedImage = ImageHelper.read(resourcePath);
+                if (resourceBufferedImage == null) {
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                } else {
+                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+                }
+            } catch (Exception e) {
+                BotLogger.log("Bad file: " + relicFileName, e);
+            }
+
+            deltaX += 48;
+        }
+
+        // FAKE RELICS
+        if (!fakeRelics.isEmpty()) {
+            deltaX += 10;
+        }
+        for (String relicID : fakeRelics) {
+            RelicModel relicModel = Mapper.getRelic(relicID);
+            boolean isExhausted = exhaustedRelics.contains(relicID);
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+            
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+
+            drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
+
+            String relicStatus = isExhausted ? "_exh" : "_rdy";
+                        
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
+            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
+            BufferedImage resourceBufferedImage;
+            try {
+                resourceBufferedImage = ImageHelper.read(resourcePath);
+                if (resourceBufferedImage == null) {
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                } else {
+                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+                }
+            } catch (Exception e) {
+                BotLogger.log("Bad file: " + relicFileName, e);
+            }
+
+            deltaX += 48;
+        }
+
+        // AXIS ORDER FAKE RELICS
+        if (!axisOrderRelics.isEmpty()) {
+            deltaX += 10;
+        }
+        for (String relicID : axisOrderRelics) {
+            boolean isExhausted = exhaustedRelics.contains(relicID);
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+            
+            graphics.drawRect(x + deltaX - 2, y - 2, 54, 152);
+
+            String relicStatus = isExhausted ? "_exh" : "_rdy";
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
             drawPAImage(x + deltaX, y, relicFileName);
-            deltaX += 48 + extraAxisOrderWidth;
+
+            deltaX += 58;
         }
         return x + deltaX + 20;
     }
