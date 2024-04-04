@@ -8593,9 +8593,9 @@ public class ButtonHelper {
                             message = p1.getRepresentation(true, true) + " Select the planet you want to destroy";
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getButtonsForStellar(p1, game));
                         }
-
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        case "passkey" -> {
+                            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), purgeOrExhaust, Buttons.REDISTRIBUTE_CCs);
+                        }
                     }
                 }
             }
