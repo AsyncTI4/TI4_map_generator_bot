@@ -1,0 +1,65 @@
+[
+    {
+        "id": "minor1",
+        "initiative": 11,
+        "name": "Minor Leadership",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "11_leadership_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor2",
+        "initiative": 12,
+        "name": "Minor Diplomacy",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "12_diplomacy_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor3",
+        "initiative": 13,
+        "name": "Minor Politics",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "13_politics_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor4",
+        "initiative": 14,
+        "name": "Minor Construction",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "14_construction_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor5",
+        "initiative": 15,
+        "name": "Minor Trade",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "15_trade_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor6",
+        "initiative": 16,
+        "name": "Minor Warfare",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "16_warfare_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor7",
+        "initiative": 17,
+        "name": "Minor Technology",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "17_technology_minor",
+        "source": "Salliance"
+    },
+    {
+        "id": "minor8",
+        "initiative": 18,
+        "name": "Minor Imperial",
+        "primaryTexts": "ACTION: Exhaust this card to:\n- Spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn immediately ends (you can still do ‘end of turn’ abilities but not the other parts of this token).\n- Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens.",
+        "imageFileName": "18_imperial_minor",
+        "source": "Salliance"
+    }]
