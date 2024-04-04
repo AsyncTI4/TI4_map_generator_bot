@@ -8524,23 +8524,21 @@ public class ButtonHelper {
                 } else {
                     String purgeOrExhaust = "Purged ";
                     if ("titanprototype".equalsIgnoreCase(relicID) || "absol_jr".equalsIgnoreCase(relicID)) {
-                        List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution",
-                            null);
+                        List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
                         p1.addExhaustedRelic(relicID);
                         purgeOrExhaust = "Exhausted ";
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            "Use buttons to decide who to use JR on", buttons2);
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
+
+                        // OFFER TCS
                         for (Player p2 : game.getRealPlayers()) {
                             if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                                 List<Button> buttons3 = new ArrayList<>();
-                                buttons3.add(Button.success("exhaustTCS_" + relicID + "_" + p1.getFaction(),
-                                    "Exhaust TCS to Ready " + relicID));
+                                buttons3.add(Button.success("exhaustTCS_" + relicID + "_" + p1.getFaction(), "Exhaust TCS to Ready " + relicID));
                                 buttons3.add(Button.danger("deleteButtons", "Decline"));
                                 String msg = p2.getRepresentation(true, true)
                                     + " you have the opportunity to exhaust your TCS tech to ready " + relicID
                                     + " and potentially resolve a transaction.";
-                                MessageHelper.sendMessageToChannelWithButtons(
-                                    getCorrectChannel(p2, game), msg, buttons3);
+                                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg, buttons3);
                             }
                         }
                     } else {
