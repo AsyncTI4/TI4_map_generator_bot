@@ -284,10 +284,10 @@
     ],
     "description": "The Project_Pi set of strategy cards",
     "source": "project_pi"
-  }
+  },
   {
     "name": "Strategic Alliance Variant",
-    "alias": "pi",
+    "alias": "salliance",
     "scIDs": [
       "pok1leadership",
       "pok2diplomacy",
@@ -304,9 +304,9 @@
       "minor5",
       "minor6",
       "minor7",
-      "minor8",
+      "minor8"
     ],
-    "description": "The Project_Pi set of strategy cards",
-    "source": "project_pi"
+    "description": "The Strategic Alliance set of strategy cards",
+    "source": "salliance"
   }
 ]
