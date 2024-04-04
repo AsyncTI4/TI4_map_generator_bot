@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -80,6 +81,8 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 import ti4.selections.SelectionMenuListener;
+import ti4.settings.UserSettings;
+import ti4.settings.UserSettingsManager;
 
 public class AsyncTI4DiscordBot {
 
@@ -272,6 +275,9 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        UserSettingsManager.init();
+
+        Map<String, UserSettings> userSettings = UserSettingsManager.getInstance().getAllUserSettings();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
