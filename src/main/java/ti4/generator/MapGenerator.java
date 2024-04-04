@@ -3129,8 +3129,8 @@ public class MapGenerator {
 
     private Color getSCColor(int sc, Game game) {
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        if (scPlayed.containsKey(sc)) {
-                return Color.GRAY;
+        if (scPlayed.get(sc) != null && scPlayed.get(sc)) {
+            return Color.GRAY;
         }
         return getSCColor(sc, game);
     }
