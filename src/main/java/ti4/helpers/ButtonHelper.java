@@ -8707,7 +8707,7 @@ public class ButtonHelper {
     }
 
     private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {
-        if (!player.hasRelic(relicID)) {
+        if (!Mapper.isValidRelic(relicID) || !player.hasRelic(relicID)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid relic or player does not have specified relic: `" + relicID + "`");
             return;
         }
@@ -8739,21 +8739,12 @@ public class ButtonHelper {
         String message = player.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
 
-        // RESOLVE
-        if (relicModel.getName().contains("Enigmatic")) {
-            ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
-        }
-        if (relicModel.getName().contains("Nanoforge")) {
-            offerNanoforgeButtons(player, game, event);
-        }
-        if (relicModel.getName().contains("The Codex")) {
-            offerCodexButtons(player, game, event);
-        }
-        if (relicID.contains("decrypted_cartoglyph")) {
-            new DrawBlueBackTile().drawBlueBackTiles(event, game, player, 3, false);
-        }
-
+        // SPECIFIC HANDLING 
         switch (relicID) {
+            case "enigmaticdevice" -> ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
+            case "codex", "absol_codex" ->  offerCodexButtons(player, game, event);
+            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" ->  offerNanoforgeButtons(player, game, event);
+            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3, false);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("drawRelic", "Draw a relic"));
@@ -8784,7 +8775,6 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "This Relic is not tied to any automation. Please resolve manually.");
-
         }
     }
 
