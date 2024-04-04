@@ -427,6 +427,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static Guild getNextAvailableServer() {
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
+
         Guild guild = AsyncTI4DiscordBot.jda
             .getGuildById(GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
@@ -490,7 +491,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
-        if (roleCount > 225) {
+        if (roleCount > 200) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                 + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
