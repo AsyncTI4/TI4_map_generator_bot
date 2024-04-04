@@ -10,6 +10,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
+import ti4.generator.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -117,8 +118,15 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(flavourText);
     }
 
+    public Color getColour() {
+        return Color.decode(getColourHexCode());
+    }
+
     public String getColourHexCode() {
-        return Optional.ofNullable(colourHexCode).orElse("000000");
+        if (colourHexCode == null) {
+            return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
+        }
+        return Optional.ofNullable(colourHexCode).orElse("#ffffff");
     }
 
     /**
