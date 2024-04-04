@@ -79,6 +79,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.EventModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
@@ -721,7 +722,7 @@ public class MapGenerator {
                     graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
                     int xSpacer = 20;
                     for (int sc : unfollowedSCs) {
-                        graphics.setColor(getSCColor(sc));
+                        graphics.setColor(getSCColor(sc, game));
                         graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
                         xSpacer = xSpacer + 20;
                     }
@@ -2389,7 +2390,7 @@ public class MapGenerator {
             if (sc > 19)
                 horizontalSpacingIncrement = 100;
             if (!convertToGenericSC && !scPicked.contains(sc)) {
-                graphics.setColor(getSCColor(sc));
+                graphics.setColor(getSCColor(sc, game));
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 Integer tg = scTGs.getValue();
@@ -3128,15 +3129,17 @@ public class MapGenerator {
 
     private Color getSCColor(int sc, Game game) {
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        if (scPlayed.get(sc) != null) {
-            if (scPlayed.get(sc)) {
+        if (scPlayed.containsKey(sc)) {
                 return Color.GRAY;
-            }
         }
-        return getSCColor(sc);
+        return getSCColor(sc, game);
     }
 
-    private Color getSCColor(Integer sc) {
+    private Color getSCColor(Integer sc, Game game) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel != null) {
+            return scModel.getColour();
+        }
         String scString = sc.toString();
         int scGroup = Integer.parseInt(StringUtils.left(scString, 1));
         return switch (scGroup) {

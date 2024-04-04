@@ -89,5 +89,12 @@
         "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",
         "isFakeRelic": true,
         "source": "ds"
+    },
+    {
+        "alias": "passturn",
+        "name": "Pass Turn",
+        "text": "Place this token faceup in your play area. When this token is in your play area, you must perform the following action before doing any other actions. ACTION: You may redistribute your command tokens. Your turn ends immediately. Discard this token.",
+        "isFakeRelic": true,
+        "source": "salliance"
     }
 ]
