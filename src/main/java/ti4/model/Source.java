@@ -54,6 +54,7 @@ public class Source {
                 case project_pi -> Emojis.ProjectPi;
                 case miltymod -> Emojis.MiltyMod;
                 case lazax -> Emojis.Lazax;
+                case salliance -> Emojis.StrategicAlliance;
                 default -> "";
             };
         }
