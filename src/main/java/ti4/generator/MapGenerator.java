@@ -79,6 +79,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.EventModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -1051,6 +1052,7 @@ public class MapGenerator {
 
         List<String> exhaustedRelics = player.getExhaustedRelics();
         for (String relicID : player.getRelics()) {
+            RelicModel relicModel = Mapper.getRelic(relicID);
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
@@ -1063,10 +1065,14 @@ public class MapGenerator {
             int extraAxisOrderWidth = relicID.contains("axisorder") ? 10 : 0;
             graphics.drawRect(x + deltaX - 2, y - 2, 44 + extraAxisOrderWidth, 152);
             if (!relicID.contains("axisorder")) {
-                drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+                if (relicModel.isFakeRelic()) {
+                    drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
+                } else {
+                    drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+                }
             }
 
-            // drawPAImage(x + deltaX, y, relicFileName);
+            // ABSOL QUANTUMCORE
             if (relicID.contains("quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_multicolorry" + relicStatus + ".png");
             }
