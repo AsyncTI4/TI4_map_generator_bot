@@ -8739,7 +8739,7 @@ public class ButtonHelper {
         String message = player.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
 
-        // SPECIFIC HANDLING 
+        // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
             case "codex", "absol_codex" ->  offerCodexButtons(player, game, event);
