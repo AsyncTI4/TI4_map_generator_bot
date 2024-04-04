@@ -8494,7 +8494,6 @@ public class ButtonHelper {
                 // (buttonID.startsWith("exhaustTech_"))`
             }
             case "leader" -> {
-
                 if (!Mapper.isValidLeader(buttonID)) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve leader.");
                     return;
@@ -8707,84 +8706,85 @@ public class ButtonHelper {
         }
     }
 
-    private static void resolveRelicComponentAction(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
-        String relicID = buttonID;
-        if (!p1.hasRelic(relicID)) {
+    private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {
+        if (!player.hasRelic(relicID)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid relic or player does not have specified relic: `" + relicID + "`");
-        } else {
-            String purgeOrExhaust = "Purged";
-            if ("titanprototype".equalsIgnoreCase(relicID) || "absol_jr".equalsIgnoreCase(relicID)) {
-                List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
-                p1.addExhaustedRelic(relicID);
-                purgeOrExhaust = "Exhausted";
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
+            return;
+        }
+        String purgeOrExhaust = "Purged";
+        if ("titanprototype".equalsIgnoreCase(relicID) || "absol_jr".equalsIgnoreCase(relicID)) { // EXHAUST THE RELIC
+            List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "Exhausted";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
 
-                // OFFER TCS
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
-                        List<Button> buttons3 = new ArrayList<>();
-                        buttons3.add(Button.success("exhaustTCS_" + relicID + "_" + p1.getFaction(), "Exhaust TCS to Ready " + relicID));
-                        buttons3.add(Button.danger("deleteButtons", "Decline"));
-                        String msg = p2.getRepresentation(true, true)
-                            + " you have the opportunity to exhaust your TCS tech to ready " + relicID
-                            + " and potentially resolve a transaction.";
-                        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg, buttons3);
-                    }
+            // OFFER TCS
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
+                    List<Button> buttons3 = new ArrayList<>();
+                    buttons3.add(Button.success("exhaustTCS_" + relicID + "_" + player.getFaction(), "Exhaust TCS to Ready " + relicID));
+                    buttons3.add(Button.danger("deleteButtons", "Decline"));
+                    String msg = p2.getRepresentation(true, true)
+                        + " you have the opportunity to exhaust your TCS tech to ready " + relicID
+                        + " and potentially resolve a transaction.";
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg, buttons3);
                 }
-            } else {
-                p1.removeRelic(relicID);
-                p1.removeExhaustedRelic(relicID);
             }
+        } else { // PURGE THE RELIC
+            player.removeRelic(relicID);
+            player.removeExhaustedRelic(relicID);
+        }
 
-            RelicModel relicModel = Mapper.getRelic(relicID);
-            String message = p1.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
-            MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        RelicModel relicModel = Mapper.getRelic(relicID);
+        String message = player.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
+        MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
 
-            // RESOLVE
-            if (relicModel.getName().contains("Enigmatic")) {
-                ButtonHelperActionCards.resolveFocusedResearch(game, p1, relicID, event);
-            }
-            if (relicModel.getName().contains("Nanoforge")) {
-                offerNanoforgeButtons(p1, game, event);
-            }
-            if (relicModel.getName().contains("The Codex")) {
-                offerCodexButtons(p1, game, event);
-            }
-            if (relicID.contains("decrypted_cartoglyph")) {
-                new DrawBlueBackTile().drawBlueBackTiles(event, game, p1, 3, false);
-            }
+        // RESOLVE
+        if (relicModel.getName().contains("Enigmatic")) {
+            ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
+        }
+        if (relicModel.getName().contains("Nanoforge")) {
+            offerNanoforgeButtons(player, game, event);
+        }
+        if (relicModel.getName().contains("The Codex")) {
+            offerCodexButtons(player, game, event);
+        }
+        if (relicID.contains("decrypted_cartoglyph")) {
+            new DrawBlueBackTile().drawBlueBackTiles(event, game, player, 3, false);
+        }
 
-            switch (relicID) {
-                case "throne_of_the_false_emperor" -> {
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("drawRelic", "Draw a relic"));
-                    buttons.add(Button.primary("thronePoint", "Score a secret someone else scored"));
-                    buttons.add(Button.danger("deleteButtons", "Score one of your unscored secrets"));
-                    message = p1.getRepresentation()
-                        + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button";
-                    MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
-                }
-                case "dynamiscore", "absol_dynamiscore" -> {
-                    int oldTg = p1.getTg();
-                    p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
-                    if ("absol_dynamiscore".equals(relicID)) {
-                        p1.setTg(oldTg + Math.min(p1.getCommoditiesTotal() * 2, 10));
-                    } else {
-                        p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
-                    }
-                    message = p1.getRepresentation(true, true) + " Your tgs increased from " + oldTg + " -> " + p1.getTg();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    ButtonHelperAbilities.pillageCheck(p1, game);
-                    ButtonHelperAgents.resolveArtunoCheck(p1, game, p1.getTg() - oldTg);
-                }
-                case "stellarconverter" -> {
-                    message = p1.getRepresentation(true, true) + " Select the planet you want to destroy";
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getButtonsForStellar(p1, game));
-                }
-                case "passturn" -> {
-                    MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
-                }
+        switch (relicID) {
+            case "throne_of_the_false_emperor" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("drawRelic", "Draw a relic"));
+                buttons.add(Button.primary("thronePoint", "Score a secret someone else scored"));
+                buttons.add(Button.danger("deleteButtons", "Score one of your unscored secrets"));
+                message = player.getRepresentation()
+                    + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button";
+                MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
             }
+            case "dynamiscore", "absol_dynamiscore" -> {
+                int oldTg = player.getTg();
+                player.setTg(oldTg + player.getCommoditiesTotal() + 2);
+                if ("absol_dynamiscore".equals(relicID)) {
+                    player.setTg(oldTg + Math.min(player.getCommoditiesTotal() * 2, 10));
+                } else {
+                    player.setTg(oldTg + player.getCommoditiesTotal() + 2);
+                }
+                message = player.getRepresentation(true, true) + " Your tgs increased from " + oldTg + " -> " + player.getTg();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
+            }
+            case "stellarconverter" -> {
+                message = player.getRepresentation(true, true) + " Select the planet you want to destroy";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getButtonsForStellar(player, game));
+            }
+            case "passturn" -> {
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+            }
+            default -> MessageHelper.sendMessageToChannel(event.getChannel(), "This Relic is not tied to any automation. Please resolve manually.");
+
         }
     }
 
