@@ -123,11 +123,6 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getColourHexCode() {
-        if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
-            return "#ffffff";
-        } else if (colourHexCode == null) {
-            return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
-        }
         return Optional.ofNullable(colourHexCode).orElse("#ffffff");
     }
 
