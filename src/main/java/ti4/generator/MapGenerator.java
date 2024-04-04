@@ -3127,15 +3127,12 @@ public class MapGenerator {
         return player;
     }
 
-    private Color getSCColor(int sc, Game game) {
+    private Color getSCColor(Integer sc, Game game) {
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         if (scPlayed.get(sc) != null && scPlayed.get(sc)) {
             return Color.GRAY;
         }
-        return getSCColor(sc, game);
-    }
 
-    private Color getSCColor(Integer sc, Game game) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel != null) {
             return scModel.getColour();
