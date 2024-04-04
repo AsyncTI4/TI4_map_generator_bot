@@ -161,6 +161,12 @@ public class Game {
     private boolean miltyModMode;
     @Getter
     @Setter
+    private boolean promisesPromises;
+    @Getter
+    @Setter
+    private boolean flagshipping;
+    @Getter
+    @Setter
     private boolean showUnitTags;
     @Getter
     @Setter
@@ -3967,6 +3973,8 @@ public class Game {
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isAbsolMode()
+                || isPromisesPromises()
+                || isFlagshipping()
                 || isAllianceMode()
                 || isSpinMode()
                 || isHomeBrewSCMode()

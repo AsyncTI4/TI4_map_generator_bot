@@ -27,6 +27,8 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to base game mode."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with Base Game Mode)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PROMISES_PROMISES, "True to turn on _Promises Promises_ homebrew "));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FLAGSHIPPING, "True to turn on _Flagshipping_ homebrew "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
@@ -132,22 +134,26 @@ public class Setup extends GameSubcommandData {
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
         if (event.getOption(Constants.TIGL_GAME) == null && event.getOption(Constants.ABSOL_MODE) == null && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
-            && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null) {
+            && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null
+			&& event.getOption(Constants.PROMISES_PROMISES) == null && event.getOption(Constants.FLAGSHPPING) == null) {
             return true; //no changes were made
         }
         boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, activeGame.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
         boolean absolMode = event.getOption(Constants.ABSOL_MODE, activeGame.isAbsolMode(), OptionMapping::getAsBoolean);
         boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, activeGame.isMiltyModMode(), OptionMapping::getAsBoolean);
+        boolean promisesPromisesMode = event.getOption(Constants.PROMISES_PROMISES, activeGame.isPromisesPromisesMode(), OptionMapping::getAsBoolean);
+        boolean flagshippngMode = event.getOption(Constants.FLAGSHPPING, activeGame.isFlagshippngMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, activeGame.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, activeGame.isBaseGameMode(), OptionMapping::getAsBoolean);
-        return setGameMode(event, activeGame, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame);
+        return setGameMode(event, activeGame, baseGameMode, absolMode, miltyModMode, promisesPromisesMode, flagshippngMode, discordantStarsMode, isTIGLGame);
     }
 
     // TODO: find a better way to handle this - this is annoying
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean miltyModMode,
+		boolean promisesPromisesMode, boolean flagshippngMode, boolean discordantStarsMode,
         boolean isTIGLGame) {
         if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
+            && (baseGameMode || absolMode || promisesPromisesMode || flagshippngMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
@@ -163,6 +169,10 @@ public class Setup extends GameSubcommandData {
 
         if (baseGameMode && (absolMode || discordantStarsMode)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Base Game Mode is not supported with Discordant Stars or Absol Mode");
+            return false;
+
+        if (discordantStarsMode && (promisesPromisesMode || flagshippngMode)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Discordant Stars Mode is not supported with Promises Promises or Flagshipping");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
