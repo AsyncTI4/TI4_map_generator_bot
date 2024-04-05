@@ -1092,10 +1092,10 @@ public class ButtonHelperHeroes {
         int count = planetHolder.getResources() + planetHolder.getInfluence();
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ")");
+            ButtonHelper.getIdent(player) + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
-
+        game.setComponentAction(true);
         List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techType, player);
         List<Button> buttons = Helper.getTechButtons(techs, techType, player, "nekro");
         String message = player.getRepresentation() + " Use the buttons to get the tech you want";
