@@ -1719,7 +1719,7 @@ public class ButtonHelperAgents {
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
         AgendaHelper.ministerOfIndustryCheck(player, activeGame, activeGame.getTileFromPlanet(planet), event);
-        if (player.hasAbility("necrophage")) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
