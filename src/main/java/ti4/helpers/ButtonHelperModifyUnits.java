@@ -1625,7 +1625,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "gledge", event);
-        if (player.hasAbility("necrophage")) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
@@ -1874,7 +1874,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "rohdhna", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
-        if (player.hasAbility("necrophage")) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }

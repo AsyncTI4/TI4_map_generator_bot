@@ -1132,7 +1132,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)
                 + " deployed a spacedock on " + planet + " by removing " + requiredNum + " infantry");
             event.getMessage().delete().queue();
-            if (player.hasAbility("necrophage")) {
+            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
                 player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
                     Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
             }
