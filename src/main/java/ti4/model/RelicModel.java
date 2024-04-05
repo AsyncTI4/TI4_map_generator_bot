@@ -41,6 +41,10 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         return getIsFakeRelic();
     }
 
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getName());
+    }
+
     private boolean getIsFakeRelic() {
         return Optional.ofNullable(isFakeRelic).orElse(false);
     }

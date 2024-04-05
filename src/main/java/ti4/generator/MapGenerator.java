@@ -79,6 +79,8 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.EventModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.RelicModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
@@ -724,7 +726,7 @@ public class MapGenerator {
                     graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
                     int xSpacer = 20;
                     for (int sc : unfollowedSCs) {
-                        graphics.setColor(getSCColor(sc));
+                        graphics.setColor(getSCColor(sc, game));
                         graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
                         xSpacer = xSpacer + 20;
                     }
@@ -1051,29 +1053,111 @@ public class MapGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
 
+        List<String> relics = new ArrayList(player.getRelics());
+        List<String> fakeRelics = relics.stream()
+            .filter(relic -> Mapper.getRelic(relic).isFakeRelic())
+            .filter(relic -> !relic.contains("axisorder"))
+            .collect(Collectors.toList());
+        List<String> axisOrderRelics = player.getRelics().stream()
+            .filter(relic -> relic.contains("axisorder"))
+            .collect(Collectors.toList());
+
+        relics.removeAll(fakeRelics);
+        relics.removeAll(axisOrderRelics);
+        
         List<String> exhaustedRelics = player.getExhaustedRelics();
-        for (String relicID : player.getRelics()) {
+
+        for (String relicID : relics) {
+            RelicModel relicModel = Mapper.getRelic(relicID);
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
             } else {
                 graphics.setColor(Color.WHITE);
             }
+            
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+
             String relicStatus = isExhausted ? "_exh" : "_rdy";
-            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
-
-            int extraAxisOrderWidth = relicID.contains("axisorder") ? 10 : 0;
-            graphics.drawRect(x + deltaX - 2, y - 2, 44 + extraAxisOrderWidth, 152);
-            if (!relicID.contains("axisorder")) {
-                drawPAImage(x + deltaX, y, "pa_relics_icon.png");
-            }
-
-            // drawPAImage(x + deltaX, y, relicFileName);
+            
+            // ABSOL QUANTUMCORE
             if (relicID.contains("quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_multicolorry" + relicStatus + ".png");
             }
+            
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
+            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
+            BufferedImage resourceBufferedImage;
+            try {
+                resourceBufferedImage = ImageHelper.read(resourcePath);
+                if (resourceBufferedImage == null) {
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                } else {
+                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+                }
+            } catch (Exception e) {
+                BotLogger.log("Bad file: " + relicFileName, e);
+            }
+
+            deltaX += 48;
+        }
+
+        // FAKE RELICS
+        if (!fakeRelics.isEmpty()) {
+            deltaX += 10;
+        }
+        for (String relicID : fakeRelics) {
+            RelicModel relicModel = Mapper.getRelic(relicID);
+            boolean isExhausted = exhaustedRelics.contains(relicID);
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+            
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+
+            drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
+
+            String relicStatus = isExhausted ? "_exh" : "_rdy";
+                        
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
+            String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
+            BufferedImage resourceBufferedImage;
+            try {
+                resourceBufferedImage = ImageHelper.read(resourcePath);
+                if (resourceBufferedImage == null) {
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                } else {
+                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+                }
+            } catch (Exception e) {
+                BotLogger.log("Bad file: " + relicFileName, e);
+            }
+
+            deltaX += 48;
+        }
+
+        // AXIS ORDER FAKE RELICS
+        if (!axisOrderRelics.isEmpty()) {
+            deltaX += 10;
+        }
+        for (String relicID : axisOrderRelics) {
+            boolean isExhausted = exhaustedRelics.contains(relicID);
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+            
+            graphics.drawRect(x + deltaX - 2, y - 2, 54, 152);
+
+            String relicStatus = isExhausted ? "_exh" : "_rdy";
+            String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
             drawPAImage(x + deltaX, y, relicFileName);
-            deltaX += 48 + extraAxisOrderWidth;
+
+            deltaX += 58;
         }
         return x + deltaX + 20;
     }
@@ -2401,7 +2485,7 @@ public class MapGenerator {
             if (sc > 19)
                 horizontalSpacingIncrement = 100;
             if (!convertToGenericSC && !scPicked.contains(sc)) {
-                graphics.setColor(getSCColor(sc));
+                graphics.setColor(getSCColor(sc, game));
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 Integer tg = scTGs.getValue();
@@ -3136,17 +3220,16 @@ public class MapGenerator {
         return player;
     }
 
-    private Color getSCColor(int sc, Game game) {
+    private Color getSCColor(Integer sc, Game game) {
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        if (scPlayed.get(sc) != null) {
-            if (scPlayed.get(sc)) {
-                return Color.GRAY;
-            }
+        if (scPlayed.get(sc) != null && scPlayed.get(sc)) {
+            return Color.GRAY;
         }
-        return getSCColor(sc);
-    }
 
-    private Color getSCColor(Integer sc) {
+        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+        if (scModel != null) {
+            return scModel.getColour();
+        }
         String scString = sc.toString();
         int scGroup = Integer.parseInt(StringUtils.left(scString, 1));
         return switch (scGroup) {

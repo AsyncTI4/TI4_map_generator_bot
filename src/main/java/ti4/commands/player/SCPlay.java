@@ -268,7 +268,7 @@ public class SCPlay extends PlayerSubcommandData {
                 assignSpeakerMessage2, forceRefresh);
         }
 
-        if (scModel.usesAutomationForSCID("pok1leadership")) {
+        if (!scModel.usesAutomationForSCID("pok1leadership")) {
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
             Button mahactA = Button.danger("mahactA_follow_" + scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
             for (Player player3 : activeGame.getRealPlayers()) {

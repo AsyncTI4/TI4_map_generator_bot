@@ -9,7 +9,7 @@ import ti4.testUtils.BaseTi4Test;
 
 public class StrategyCardSetModelTest extends BaseTi4Test {
     @Test
-    public void testDeckModels() {
+    public void testSCSetModels() {
         for (StrategyCardSetModel scSetModel : Mapper.getStrategyCardSets().values()) {
             assertTrue(scSetModel.isValid(), scSetModel.getAlias() + "'s data is invalid");
             assertTrue(validateSCIDs(scSetModel), scSetModel.getAlias() + " [" + scSetModel.getName() + "]: Invalid SC IDs");
