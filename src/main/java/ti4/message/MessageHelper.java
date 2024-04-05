@@ -243,8 +243,7 @@ public class MessageHelper {
 				.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", error)));
 	}
 
-	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message,
-			List<Button> buttons) {
+	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message,			List<Button> buttons) {
 		sendFileUploadToChannel(channel, fileUpload);
 		splitAndSent(message, channel, null, buttons);
 	}

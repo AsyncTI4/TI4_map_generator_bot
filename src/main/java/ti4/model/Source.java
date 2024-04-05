@@ -19,7 +19,7 @@ public class Source {
         admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon,
+        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance,
 
         // catchall
         other;
@@ -54,6 +54,7 @@ public class Source {
                 case project_pi -> Emojis.ProjectPi;
                 case miltymod -> Emojis.MiltyMod;
                 case lazax -> Emojis.Lazax;
+                case salliance -> Emojis.StrategicAlliance;
                 default -> "";
             };
         }

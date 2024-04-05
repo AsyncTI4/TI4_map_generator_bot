@@ -8503,7 +8503,6 @@ public class ButtonHelper {
                 // (buttonID.startsWith("exhaustTech_"))`
             }
             case "leader" -> {
-
                 if (!Mapper.isValidLeader(buttonID)) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve leader.");
                     return;
@@ -8526,85 +8525,7 @@ public class ButtonHelper {
                     HeroPlay.playHero(event, game, p1, p1.getLeader(buttonID).orElse(null));
                 }
             }
-            case "relic" -> {
-                String purgeOrExhaust = "Purged ";
-
-                if (p1.hasRelic(buttonID)) {
-                    if ("titanprototype".equalsIgnoreCase(buttonID) || "absol_jr".equalsIgnoreCase(buttonID)) {
-                        List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution",
-                            null);
-                        p1.addExhaustedRelic(buttonID);
-                        purgeOrExhaust = "Exhausted ";
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            "Use buttons to decide who to use JR on", buttons2);
-                        for (Player p2 : game.getRealPlayers()) {
-                            if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
-                                List<Button> buttons3 = new ArrayList<>();
-                                buttons3.add(Button.success("exhaustTCS_" + buttonID + "_" + p1.getFaction(),
-                                    "Exhaust TCS to Ready " + buttonID));
-                                buttons3.add(Button.danger("deleteButtons", "Decline"));
-                                String msg = p2.getRepresentation(true, true)
-                                    + " you have the opportunity to exhaust your TCS tech to ready " + buttonID
-                                    + " and potentially resolve a transaction.";
-                                MessageHelper.sendMessageToChannelWithButtons(
-                                    getCorrectChannel(p2, game), msg, buttons3);
-                            }
-                        }
-                    } else {
-                        p1.removeRelic(buttonID);
-                        p1.removeExhaustedRelic(buttonID);
-                    }
-
-                    RelicModel relicModel = Mapper.getRelic(buttonID);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), purgeOrExhaust + Emojis.Relic
-                        + " relic: " + relicModel.getName() + "\n> " + relicModel.getText());
-                    if (relicModel.getName().contains("Enigmatic")) {
-                        ButtonHelperActionCards.resolveFocusedResearch(game, p1, buttonID, event);
-                    }
-                    if (relicModel.getName().contains("Nanoforge")) {
-                        offerNanoforgeButtons(p1, game, event);
-                    }
-                    if (relicModel.getName().contains("The Codex")) {
-                        offerCodexButtons(p1, game, event);
-                    }
-                    if (buttonID.contains("decrypted_cartoglyph")) {
-                        new DrawBlueBackTile().drawBlueBackTiles(event, game, p1, 3, false);
-                    }
-                    if ("throne_of_the_false_emperor".equals(buttonID)) {
-                        List<Button> buttons = new ArrayList<>();
-                        buttons.add(Button.success("drawRelic", "Draw a relic"));
-                        buttons.add(Button.primary("thronePoint", "Score a secret someone else scored"));
-                        buttons.add(Button.danger("deleteButtons", "Score one of your unscored secrets"));
-                        MessageHelper.sendMessageToChannel(event.getChannel(), p1.getRepresentation()
-                            + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button",
-                            buttons);
-
-                    }
-                    if ("dynamiscore".equals(buttonID) || "absol_dynamiscore".equals(buttonID)) {
-                        int oldTg = p1.getTg();
-                        p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
-                        if ("absol_dynamiscore".equals(buttonID)) {
-                            p1.setTg(oldTg + Math.min(p1.getCommoditiesTotal() * 2, 10));
-                        } else {
-                            p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
-                        }
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getRepresentation(true, true)
-                            + " Your tgs increased from " + oldTg + " -> " + p1.getTg());
-                        ButtonHelperAbilities.pillageCheck(p1, game);
-                        ButtonHelperAgents.resolveArtunoCheck(p1, game, p1.getTg() - oldTg);
-                    }
-                    if ("stellarconverter".equals(buttonID)) {
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                            p1.getRepresentation(true, true) + " Select the planet you want to destroy",
-                            getButtonsForStellar(p1, game));
-                    }
-
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Invalid relic or player does not have specified relic");
-                }
-
-            }
+            case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);
             case "pn" -> resolvePNPlay(buttonID, p1, game, event);
             case "ability" -> {
                 if ("starForge".equalsIgnoreCase(buttonID)) {
@@ -8791,6 +8712,78 @@ public class ButtonHelper {
 
         if (!firstPart.contains("ability") && !firstPart.contains("getRelic") && !firstPart.contains("pn")) {
             serveNextComponentActionButtons(event, game, p1);
+        }
+    }
+
+    private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {
+        if (!Mapper.isValidRelic(relicID) || !player.hasRelic(relicID)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid relic or player does not have specified relic: `" + relicID + "`");
+            return;
+        }
+        String purgeOrExhaust = "Purged";
+        if ("titanprototype".equalsIgnoreCase(relicID) || "absol_jr".equalsIgnoreCase(relicID)) { // EXHAUST THE RELIC
+            List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "Exhausted";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
+
+            // OFFER TCS
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
+                    List<Button> buttons3 = new ArrayList<>();
+                    buttons3.add(Button.success("exhaustTCS_" + relicID + "_" + player.getFaction(), "Exhaust TCS to Ready " + relicID));
+                    buttons3.add(Button.danger("deleteButtons", "Decline"));
+                    String msg = p2.getRepresentation(true, true)
+                        + " you have the opportunity to exhaust your TCS tech to ready " + relicID
+                        + " and potentially resolve a transaction.";
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg, buttons3);
+                }
+            }
+        } else { // PURGE THE RELIC
+            player.removeRelic(relicID);
+            player.removeExhaustedRelic(relicID);
+        }
+
+        RelicModel relicModel = Mapper.getRelic(relicID);
+        String message = player.getFactionEmoji() + " " + purgeOrExhaust + ": " + relicModel.getName();
+        MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+
+        // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
+        switch (relicID) {
+            case "enigmaticdevice" -> ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
+            case "codex", "absol_codex" -> offerCodexButtons(player, game, event);
+            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> offerNanoforgeButtons(player, game, event);
+            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3, false);
+            case "throne_of_the_false_emperor" -> {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("drawRelic", "Draw a relic"));
+                buttons.add(Button.primary("thronePoint", "Score a secret someone else scored"));
+                buttons.add(Button.danger("deleteButtons", "Score one of your unscored secrets"));
+                message = player.getRepresentation()
+                    + " choose one of the options. Reminder than you cant score more secrets than normal with this relic (even if they're someone elses), and you cant score the same secret twice. If scoring one of your unscored secrets, just score it via the normal process after pressing the button";
+                MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
+            }
+            case "dynamiscore", "absol_dynamiscore" -> {
+                int oldTg = player.getTg();
+                player.setTg(oldTg + player.getCommoditiesTotal() + 2);
+                if ("absol_dynamiscore".equals(relicID)) {
+                    player.setTg(oldTg + Math.min(player.getCommoditiesTotal() * 2, 10));
+                } else {
+                    player.setTg(oldTg + player.getCommoditiesTotal() + 2);
+                }
+                message = player.getRepresentation(true, true) + " Your tgs increased from " + oldTg + " -> " + player.getTg();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
+            }
+            case "stellarconverter" -> {
+                message = player.getRepresentation(true, true) + " Select the planet you want to destroy";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getButtonsForStellar(player, game));
+            }
+            case "passturn" -> {
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+            }
+            default -> MessageHelper.sendMessageToChannel(event.getChannel(), "This Relic is not tied to any automation. Please resolve manually.");
         }
     }
 

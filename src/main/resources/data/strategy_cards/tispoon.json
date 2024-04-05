@@ -6,6 +6,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tispoon_1",
+        "colourHexCode": "#ff1600",
         "source": "other"
     },
     {
@@ -15,6 +16,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tispoon_2",
+        "colourHexCode": "#ff6901",
         "source": "other"
     },
     {
@@ -25,6 +27,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok1leadership",
         "imageFileName": "tispoon_3",
+        "colourHexCode": "#ffc401",
         "source": "other"
     },
     {
@@ -35,6 +38,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok3politics",
         "imageFileName": "tispoon_4",
+        "colourHexCode": "#fcfc01",
         "source": "other"
     },
     {
@@ -45,6 +49,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok4construction",
         "imageFileName": "tispoon_5",
+        "colourHexCode": "#65d915",
         "source": "other"
     },
     {
@@ -55,6 +60,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok5trade",
         "imageFileName": "tispoon_6",
+        "colourHexCode": "#01bb5d",
         "source": "other"
     },
     {
@@ -64,6 +70,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tispoon_7",
+        "colourHexCode": "#02eaf4",
         "source": "other"
     },
     {
@@ -74,6 +81,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok7technology",
         "imageFileName": "tispoon_8",
+        "colourHexCode": "#015bbe",
         "source": "other"
     },
     {
@@ -83,6 +91,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tispoon_9",
+        "colourHexCode": "#3f05ab",
         "source": "other"
     },
     {
@@ -93,6 +102,7 @@
         "secondaryTexts": [],
         "botSCAutomationID": "pok8imperial",
         "imageFileName": "tispoon_10",
+        "colourHexCode": "#942de3",
         "source": "other"
     }
 ]
