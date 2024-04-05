@@ -149,6 +149,9 @@ public class MapGenerator {
         int stage2 = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage2()::containsKey).toList().size();
         int other = game.getRevealedPublicObjectives().size() - stage1 - stage2;
+        stage1 = game.getPublicObjectives1Peakable().size() + stage1;
+        stage2 = game.getPublicObjectives2Peakable().size() + stage2;
+
         int mostObjs = Math.max(Math.max(stage1, stage2), other);
         int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
@@ -1881,6 +1884,9 @@ public class MapGenerator {
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
+            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
+                techType = game.getFactionsThatReactedToThis("colorChange" + tech);
+            }
             List<String> techList = techsFiltered.get(techType);
             if (techList == null) {
                 techList = new ArrayList<>();
@@ -1951,6 +1957,9 @@ public class MapGenerator {
                 case UNITUPGRADE -> techIcon = Constants.UNIT_UPGRADE;
                 default -> techIcon = "";
             }
+            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
+                techIcon = game.getFactionsThatReactedToThis("colorChange" + tech);
+            }
 
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
@@ -2003,6 +2012,9 @@ public class MapGenerator {
                 case CYBERNETIC -> techIcon = Constants.CYBERNETIC;
                 case BIOTIC -> techIcon = Constants.BIOTIC;
                 default -> techIcon = "";
+            }
+            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
+                techIcon = game.getFactionsThatReactedToThis("colorChange" + tech);
             }
 
             if (!techIcon.isEmpty()) {
@@ -2753,7 +2765,6 @@ public class MapGenerator {
             publicObjectivesState1, po1, 1, null, false);
         graphics.setColor(new Color(130, 70, 0));
         int y1b = displayUnrevealedObjectives(y1, x, game.getPublicObjectives1Peakable(), 1, game);
-
         x = 801;
         graphics.setColor(new Color(93, 173, 226));
         int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
@@ -2765,7 +2776,6 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
         int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics,
             customVP, null, customPublicVP, false);
-
         return Math.max(y3, Math.max(y1b, y2b)) + 15;
     }
 

@@ -407,6 +407,7 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+    public static final String CHANGE_TYPE = "change_type";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
 
     public static final String FORCE_BAG_PASS = "franken_force_bag_pass";
@@ -471,6 +472,7 @@ public class Constants {
     public static final String PO_NO_SCORING = "po_no_scoring";
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String TECH_TYPE = "tech_type";
     public static final String FACTION_COLOR_1 = "faction_or_color_1";
     public static final String FACTION_COLOR_2 = "faction_or_color_2";
     public static final String STATS = "stats";

@@ -433,6 +433,15 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.TECH_TYPE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("cybernetic", "biotic", "warfare", "propulsion")
+                    .filter(value -> value.contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value, value))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.SPECIFIC_PHASE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup", "ixthian")
