@@ -6020,7 +6020,8 @@ public class ButtonHelper {
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         game.setHomeBrew(false);
-        buttons.add(Button.success("setupHomebrew_444", "4 stage 1s, 4 stage 2s, 4 secrets"));
+        buttons.add(Button.success("setupHomebrew_456", "5 stage 1s, 6 stage 2s, 4 secrets, 14 VP"));
+        buttons.add(Button.success("setupHomebrew_444", "4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
         buttons.add(Button.success("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas"));
         buttons.add(Button.success("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs"));
         buttons.add(Button.success("setupHomebrew_dsfactions", "Discordant Stars Factions"));
@@ -6044,7 +6045,15 @@ public class ButtonHelper {
                 game.setMaxSOCountPerPlayer(4);
                 game.setUpPeakableObjectives(4, 1);
                 game.setUpPeakableObjectives(4, 2);
+                game.setVp(12);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/4/4");
+            }
+            case "456" -> {
+                game.setMaxSOCountPerPlayer(4);
+                game.setUpPeakableObjectives(5, 1);
+                game.setUpPeakableObjectives(6, 2);
+                game.setVp(14);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/5/6/14VP");
             }
             case "absolRelicsNAgendas" -> {
                 game.setAbsolMode(true);
@@ -8742,8 +8751,8 @@ public class ButtonHelper {
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
-            case "codex", "absol_codex" ->  offerCodexButtons(player, game, event);
-            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" ->  offerNanoforgeButtons(player, game, event);
+            case "codex", "absol_codex" -> offerCodexButtons(player, game, event);
+            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3, false);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();

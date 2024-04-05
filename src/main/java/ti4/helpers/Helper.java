@@ -2583,7 +2583,7 @@ public class Helper {
         List<TechnologyModel> techs = new ArrayList<>();
         Mapper.getTechs().values().stream()
             .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
-            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
+            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || activeGame.getFactionsThatReactedToThis("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
             .filter(tech -> !player.hasTech(tech.getAlias()))
             .filter(tech -> tech.getFaction().isEmpty() || tech.getFaction().get() == null
                 || "".equalsIgnoreCase(tech.getFaction().get())
