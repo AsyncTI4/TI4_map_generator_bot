@@ -6020,14 +6020,15 @@ public class ButtonHelper {
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         game.setHomeBrew(false);
-        buttons.add(Button.success("setupHomebrew_456", "5 stage 1s, 6 stage 2s, 4 secrets, 14 VP"));
         buttons.add(Button.success("setupHomebrew_444", "4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
         buttons.add(Button.success("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas"));
         buttons.add(Button.success("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs"));
         buttons.add(Button.success("setupHomebrew_dsfactions", "Discordant Stars Factions"));
         buttons.add(Button.success("setupHomebrew_dsexplores", "DS Explores/Relics/ACs"));
         buttons.add(Button.success("setupHomebrew_acDeck2", "Action Cards Deck 2"));
+        buttons.add(Button.success("setupHomebrew_456", "5 stage 1s, 6 stage 2s, 4 secrets, 14 VP"));
         buttons.add(Button.success("setupHomebrew_redTape", "Red Tape"));
+        buttons.add(Button.success("setupHomebrew_removeSupports", "Remove Supports"));
         buttons.add(Button.success("setupHomebrew_homebrewSCs", "Homebrew SCs"));
         buttons.add(Button.danger("deleteButtons", "Done With Buttons"));
         event.getMessage().delete().queue();
@@ -6047,6 +6048,13 @@ public class ButtonHelper {
                 game.setUpPeakableObjectives(4, 2);
                 game.setVp(12);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/4/4");
+            }
+            case "removeSupports" -> {
+                for (Player p2 : game.getRealPlayers()) {
+                    p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
+                    p2.removePromissoryNote(p2.getColor() + "_sftt");
+                }
+                game.setCurrentReacts("removeSupports", "true");
             }
             case "456" -> {
                 game.setMaxSOCountPerPlayer(4);
@@ -6592,6 +6600,13 @@ public class ButtonHelper {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
+                if (tilePos.equalsIgnoreCase(adjTilePos) && unitHolder.getName().equalsIgnoreCase("mr")) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.getPlanetsAllianceMode().contains("mr") && p2.getTechs().contains("iihq")) {
+                            playersWithPds2.add(p2);
+                        }
+                    }
+                }
                 for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
                     if (unitEntry.getValue() == 0) {
                         continue;
