@@ -2,6 +2,7 @@ package ti4.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
@@ -80,8 +81,31 @@ public class TileHelper {
         List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
+        // Jazz wants to delete/ignore a few systems from the repo:
+        boolean jazz = true;
+        if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles)) && jazz) {
+            boolean somethingHappened = false;
+            try {
+                String regex = "(black|blue|brown|forest|green|orange|ornage|pink|purple|red|sunset|teal|white|yellow)(black|blank|1|2|3|4|5|6|7|8|9|10|11|12|13|0)(\\.json)";
+                for (File file : Arrays.asList(storedFiles)) {
+                    if (file.getName().matches(regex)) {
+                        BotLogger.log("Jazz is deleting a file:" + file.getName());
+                        somethingHappened = true;
+                        file.delete();
+                    }
+                }
+            } catch(Exception e) {
+                somethingHappened = true;
+                BotLogger.log("Jazz's delete failed", e);
+            }
+            //refresh the files
+            if (somethingHappened)
+                storedFiles = new File(storagePath).listFiles();
+        }
+
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
+                    .filter(file -> file.exists())
                     .filter(file -> !file.isDirectory())
                     .toList());
         }
@@ -92,22 +116,21 @@ public class TileHelper {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
+
+                if (isDraftTile(tile)) {
+                    duplicateDraftTiles(tile);
+                }
             } catch (Exception e) {
-                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                //BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
-
-        new ArrayList<>(allTiles.values()).stream()
-            .filter(tile -> tile != null)
-            .filter(tile -> isDraftTile(tile))
-            .forEach(tile -> duplicateDraftTiles(tile));
     }
 
     private static void duplicateDraftTiles(TileModel tile) {
-        String color = tile.getId().replaceAll("blank","");
+        String color = tile.getAlias().replaceAll("blank","");
         String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
 
-        for (int i = 0; i <= 5; i++) {
+        for (int i = 0; i < 13; i++) {
             TileModel newTile = new TileModel();
             newTile.setId(color + i);
             newTile.setName(namePre + i);
@@ -120,7 +143,6 @@ public class TileHelper {
     }
 
     public static boolean isDraftTile(TileModel tile) {
-        if (tile.getImagePath() == null) return false;
         if (tile.getImagePath().startsWith("draft_")) return true;
         return false;
     }
@@ -150,9 +172,7 @@ public class TileHelper {
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         allTiles.values().forEach(tileModel -> {
             try {
-                if (!isDraftTile(tileModel) || tileModel.getId().endsWith("blank")) {
-                    mapper.writeValue(new File(resourcePath + tileModel.getId() + ".json"), tileModel);
-                }
+                mapper.writeValue(new File(resourcePath + tileModel.getId() + ".json"), tileModel);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
