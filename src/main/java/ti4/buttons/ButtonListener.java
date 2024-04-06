@@ -3079,6 +3079,15 @@ public class ButtonListener extends ListenerAdapter {
                                 player.getCCRepresentation());
                         }
                     }
+                    if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
+                        String msg = player.getRepresentation()
+                            + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                        String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
+                            + ". Use buttons to gain CCs";
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+                    }
                     if (player.hasTech("dskolug")) {
                         int oldComm = player.getCommodities();
                         for (Player p2 : activeGame.getRealPlayers()) {
@@ -3272,6 +3281,10 @@ public class ButtonListener extends ListenerAdapter {
                         "Reset CCs");
                     List<Button> buttons = List.of(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,
                         doneGainingCC, resetCC);
+                    if (player.hasAbility("deliberate_action") && activeGame.getCurrentPhase().contains("status")) {
+                        buttons = List.of(getTactic, getFleet, getStrat,
+                            doneGainingCC, resetCC);
+                    }
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {

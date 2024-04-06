@@ -338,6 +338,11 @@ public class Setup extends PlayerSubcommandData {
         if (hsTile.equalsIgnoreCase("d11")) {
             AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
+        if (activeGame.getFactionsThatReactedToThis("removeSupports").equalsIgnoreCase("true")) {
+            Player p2 = player;
+            p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
+            p2.removePromissoryNote(p2.getColor() + "_sftt");
+        }
 
     }
 
