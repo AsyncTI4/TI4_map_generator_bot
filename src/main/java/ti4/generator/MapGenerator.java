@@ -1064,7 +1064,7 @@ public class MapGenerator {
 
         relics.removeAll(fakeRelics);
         relics.removeAll(axisOrderRelics);
-        
+
         List<String> exhaustedRelics = player.getExhaustedRelics();
 
         for (String relicID : relics) {
@@ -1075,17 +1075,17 @@ public class MapGenerator {
             } else {
                 graphics.setColor(Color.WHITE);
             }
-            
+
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
-            
+
             // ABSOL QUANTUMCORE
             if (relicID.contains("quantumcore")) {
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_multicolorry" + relicStatus + ".png");
             }
-            
+
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
             BufferedImage resourceBufferedImage;
@@ -1115,13 +1115,13 @@ public class MapGenerator {
             } else {
                 graphics.setColor(Color.WHITE);
             }
-            
+
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
 
             drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
-                        
+
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(relicFileName);
             BufferedImage resourceBufferedImage;
@@ -1150,7 +1150,7 @@ public class MapGenerator {
             } else {
                 graphics.setColor(Color.WHITE);
             }
-            
+
             graphics.drawRect(x + deltaX - 2, y - 2, 54, 152);
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
@@ -3690,37 +3690,6 @@ public class MapGenerator {
             }
             return o1.compareTo(o2);
         });
-        boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
-        for (String tokenID : tokenList) {
-            if (isValid.apply(tokenID)) {
-                String tokenPath = tile.getTokenPath(tokenID);
-                if (tokenPath == null) {
-                    BotLogger.log("Could not find token file for: " + tokenID);
-                    continue;
-                }
-                float scale = 0.85f;
-                if (tokenPath.contains(Constants.DMZ_LARGE)) {
-                    scale = 0.6f;
-                } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                    scale = 1.32f;
-                } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
-                    scale = 0.5f; // didnt previous get changed for custodians
-                }
-                tokenImage = ImageHelper.readScaled(tokenPath, scale);
-                if (tokenImage == null)
-                    continue;
-                Point position = new Point(centerPosition.x - (tokenImage.getWidth() / 2),
-                    centerPosition.y - (tokenImage.getHeight() / 2));
-                if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
-                    position = new Point(125, 115); // 70, 45
-                } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
-                    position = new Point(position.x + 10, position.y + 10);
-                } else if (tokenID.contains(Constants.WORLD_DESTROYED)) {
-                    position = new Point(position.x + 4, position.y + 13);
-                }
-                tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
-            }
-        }
         if (activeGame.getShowBubbles() && unitHolder instanceof Planet planetHolder
             && shouldPlanetHaveShield(unitHolder, activeGame)) {
             String tokenPath;
@@ -3752,6 +3721,38 @@ public class MapGenerator {
             position = new Point(position.x, position.y + 10);
             tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
         }
+        boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
+        for (String tokenID : tokenList) {
+            if (isValid.apply(tokenID)) {
+                String tokenPath = tile.getTokenPath(tokenID);
+                if (tokenPath == null) {
+                    BotLogger.log("Could not find token file for: " + tokenID);
+                    continue;
+                }
+                float scale = 0.85f;
+                if (tokenPath.contains(Constants.DMZ_LARGE)) {
+                    scale = 0.6f;
+                } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
+                    scale = 1.32f;
+                } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
+                    scale = 0.5f; // didnt previous get changed for custodians
+                }
+                tokenImage = ImageHelper.readScaled(tokenPath, scale);
+                if (tokenImage == null)
+                    continue;
+                Point position = new Point(centerPosition.x - (tokenImage.getWidth() / 2),
+                    centerPosition.y - (tokenImage.getHeight() / 2));
+                if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
+                    position = new Point(125, 115); // 70, 45
+                } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
+                    position = new Point(position.x + 10, position.y + 10);
+                } else if (tokenID.contains(Constants.WORLD_DESTROYED)) {
+                    position = new Point(position.x + 4, position.y + 13);
+                }
+                tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
+            }
+        }
+
     }
 
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game activeGame) {

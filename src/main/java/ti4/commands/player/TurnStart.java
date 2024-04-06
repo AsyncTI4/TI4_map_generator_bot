@@ -181,6 +181,15 @@ public class TurnStart extends PlayerSubcommandData {
                     activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 }
             }
+            if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
+                String msg = player.getRepresentation()
+                    + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
+                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
+                    + ". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons2);
+            }
             TurnEnd.pingNextPlayer(event, activeGame, player, true);
         }
     }
