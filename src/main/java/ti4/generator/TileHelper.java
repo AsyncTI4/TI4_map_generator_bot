@@ -81,28 +81,6 @@ public class TileHelper {
         List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
-        // Jazz wants to delete/ignore a few systems from the repo:
-        boolean jazz = true;
-        if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles)) && jazz) {
-            boolean somethingHappened = false;
-            try {
-                String regex = "(black|blue|brown|forest|green|orange|ornage|pink|purple|red|sunset|teal|white|yellow)(black|blank|1|2|3|4|5|6|7|8|9|10|11|12|13|0)(\\.json)";
-                for (File file : Arrays.asList(storedFiles)) {
-                    if (file.getName().matches(regex)) {
-                        BotLogger.log("Jazz is deleting a file:" + file.getName());
-                        somethingHappened = true;
-                        file.delete();
-                    }
-                }
-            } catch(Exception e) {
-                somethingHappened = true;
-                BotLogger.log("Jazz's delete failed", e);
-            }
-            //refresh the files
-            if (somethingHappened)
-                storedFiles = new File(storagePath).listFiles();
-        }
-
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
                     .filter(file -> file.exists())
