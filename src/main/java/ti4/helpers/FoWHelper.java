@@ -892,7 +892,7 @@ public class FoWHelper {
 			.map(emoji -> emoji.getName() + " " + emoji.getId())
 			.toList();
 		if (badEmojis.size() > 0) {
-			StringBuilder sb = new StringBuilder(Constants.jazzPing);
+			StringBuilder sb = new StringBuilder(Constants.jazzPing());
 			sb.append(" Bad emojis are being used for FOW reacts:\n");
 			for (String err : badEmojis) {
 				sb.append("```\n").append(err).append("\n```");
