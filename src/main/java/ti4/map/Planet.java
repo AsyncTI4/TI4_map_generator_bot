@@ -215,7 +215,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public Set<String> getPlanetTypes() {
         Set<String> types = new HashSet<String>();
-        List<String> three = List.of("HAZARDOUS", "CULTURAL", "INDUSTRIAL");
+        List<String> three = List.of("hazardous", "cultural", "industrial");
         for (String type : planetType) {
             if (three.contains(type)) types.add(type);
         }
