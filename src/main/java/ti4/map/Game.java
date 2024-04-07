@@ -90,7 +90,7 @@ public class Game {
     private boolean hasHadAStatusPhase;
     private boolean botShushing = true;
     @JsonIgnore
-    private final Map<String, UnitHolder> planets = new HashMap<>();
+    private final Map<String, Planet> planets = new HashMap<>();
     @Nullable
     private DisplayType displayTypeForced;
     @ExportableField
@@ -3456,7 +3456,7 @@ public class Game {
         }
     }
 
-    public Map<String, UnitHolder> getPlanetsInfo() {
+    public Map<String, Planet> getPlanetsInfo() {
         if (planets.isEmpty()) {
             getPlanets();
         }
@@ -3472,8 +3472,8 @@ public class Game {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
                 for (Map.Entry<String, UnitHolder> unitHolderEntry : tile.getUnitHolders().entrySet()) {
-                    if (unitHolderEntry.getValue() instanceof Planet) {
-                        planets.put(unitHolderEntry.getKey(), unitHolderEntry.getValue());
+                    if (unitHolderEntry.getValue() instanceof Planet p) {
+                        planets.put(unitHolderEntry.getKey(), p);
                     }
                 }
             }

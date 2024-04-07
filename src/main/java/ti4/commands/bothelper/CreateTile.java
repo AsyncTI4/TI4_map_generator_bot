@@ -104,7 +104,6 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setImagePath(image);
         tile.setPlanets(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
-        tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
         if(!"".equals(wormholes))
             tile.setWormholes(getWormholesFromString(wormholes));
         tile.setIsAsteroidField(isAsteroidField);

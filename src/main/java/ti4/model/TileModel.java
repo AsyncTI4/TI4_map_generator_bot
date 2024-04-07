@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -23,6 +22,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private String tileBack;
     private List<String> planets;
     private ShipPositionModel.ShipPosition shipPositionsType;
+    @Deprecated
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
     private Boolean isAsteroidField;
