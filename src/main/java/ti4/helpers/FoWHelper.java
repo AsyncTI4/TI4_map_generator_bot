@@ -11,10 +11,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.combat.StartCombat;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -369,6 +373,7 @@ public class FoWHelper {
 			String position_ = directlyAdjacentTiles.get(i);
 			boolean borderBlocked = false;
 			for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
+				if (b == null || b.getTile() == null) continue;
 				if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency())
 					borderBlocked = true;
 				if (b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacency())
@@ -876,5 +881,23 @@ public class FoWHelper {
 			return false;
 		initializeFog(game, viewer, false);
 		return canSeeStatsOfPlayer(game, player, viewer);
+	}
+
+	public static void sanityCheckFowReacts() {
+		List<String> badEmojis = new ArrayList<>(Emojis.symbols).stream()
+			.map(emoji -> Emoji.fromFormatted(emoji))
+			.map(emoji -> (emoji instanceof CustomEmoji c) ? c : null)
+			.filter(e -> e != null)
+			.filter(e -> AsyncTI4DiscordBot.jda.getEmojiById(e.getId()) == null)
+			.map(emoji -> emoji.getName() + " " + emoji.getId())
+			.toList();
+		if (badEmojis.size() > 0) {
+			StringBuilder sb = new StringBuilder(Constants.jazzPing());
+			sb.append(" Bad emojis are being used for FOW reacts:\n");
+			for (String err : badEmojis) {
+				sb.append("```\n").append(err).append("\n```");
+			}
+			BotLogger.log(sb.toString());
+		}
 	}
 }
