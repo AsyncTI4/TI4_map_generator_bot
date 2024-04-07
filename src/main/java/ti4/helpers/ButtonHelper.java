@@ -6061,6 +6061,7 @@ public class ButtonHelper {
                 game.setUpPeakableObjectives(5, 1);
                 game.setUpPeakableObjectives(6, 2);
                 game.setVp(14);
+                game.setStoredValue("homebrewMode", "456");
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/5/6/14VP");
             }
             case "absolRelicsNAgendas" -> {
