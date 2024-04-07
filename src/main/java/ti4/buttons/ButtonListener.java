@@ -669,6 +669,8 @@ public class ButtonListener extends ListenerAdapter {
             if (!activeGame.isRedTapeMode()) {
                 if ("2".equalsIgnoreCase(lastC)) {
                     new RevealStage2().revealS2(event, event.getChannel());
+                } else if("2x2".equalsIgnoreCase(lastC)) {
+                    new RevealStage2().revealTwoStage2(event, event.getChannel());
                 } else {
                     new RevealStage1().revealS1(event, event.getChannel());
                 }
@@ -5755,6 +5757,7 @@ public class ButtonListener extends ListenerAdapter {
 
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
                 String message2 = "All players have indicated scoring. Flip the relevant PO using the buttons. This will automatically run status clean-up if it has not been run already.";
+                Button draw2Stage2 = Button.success("reveal_stage_2x2", "Reveal 2 Stage 2");
                 Button drawStage2 = Button.success("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Button.success("reveal_stage_1", "Reveal Stage 1");
                 // Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status
@@ -5765,7 +5768,11 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(drawStage1);
                 }
                 if (activeGame.getRound() > 2) {
-                    buttons.add(drawStage2);
+                    if(activeGame.getStoredValue("homebrewMode") == "456") {
+                        buttons.add(draw2Stage2);
+                    } else {
+                        buttons.add(drawStage2);
+                    }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 // event.getMessage().delete().queueAfter(20, TimeUnit.SECONDS);
