@@ -347,6 +347,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
         adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
         adminRoles.add(jda.getRoleById("1215451631622164610")); // Sigma's Server
+        adminRoles.add(jda.getRoleById("1226068025464197160")); // Rintsi's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -358,6 +359,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1209956332380229677")); // Async Quinary (Fighter Club)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
+        developerRoles.add(jda.getRoleById("1226068105071956058")); // Rintsi's Server
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
@@ -369,8 +371,9 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1209956332380229675")); // Async Quinary (Fighter Club)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
-        bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
-        bothelperRoles.add(jda.getRoleById("1215450829096624129")); //Sigma's Server
+        bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
+        bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
+        bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 
