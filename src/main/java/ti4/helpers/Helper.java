@@ -839,7 +839,7 @@ public class Helper {
         planet = planet.toLowerCase().replace(" ", "");
         planet = planet.replace("'", "");
         planet = planet.replace("-", "");
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = (Planet) unitHolder;
         if (planet2 == null) {
             return planet + " bot error. Tell fin";
@@ -850,7 +850,7 @@ public class Helper {
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game activeGame) {
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -877,7 +877,7 @@ public class Helper {
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game activeGame) {
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -887,7 +887,7 @@ public class Helper {
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Game activeGame) {
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -1233,7 +1233,7 @@ public class Helper {
                 && !thing.contains("absol_sarween")
                 && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida")
                 && !thing.contains("commander") && !thing.contains("Agent")) {
-                UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
+                Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
                     if (thing.contains("reduced comms")) {
@@ -1912,7 +1912,7 @@ public class Helper {
     }
 
     public static int getPlanetResources(String planetID, Game activeGame) {
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
         } else {
@@ -1922,7 +1922,7 @@ public class Helper {
     }
 
     public static int getPlanetInfluence(String planetID, Game activeGame) {
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
         } else {
@@ -2116,7 +2116,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2137,7 +2137,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2157,7 +2157,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2173,7 +2173,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2189,7 +2189,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2210,7 +2210,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2231,7 +2231,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2247,7 +2247,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2263,7 +2263,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2279,7 +2279,7 @@ public class Helper {
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();

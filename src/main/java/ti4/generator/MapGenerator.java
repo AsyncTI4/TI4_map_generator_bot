@@ -130,14 +130,14 @@ public class MapGenerator {
     private long debugDiscordTime;
     private long debugSuperStringTime;
 
-    private static final BasicStroke stroke1 = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke2 = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke3 = new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke4 = new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke5 = new BasicStroke(5.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke6 = new BasicStroke(6.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke7 = new BasicStroke(7.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final BasicStroke stroke8 = new BasicStroke(8.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+    private static final BasicStroke stroke1 = new BasicStroke(1.0f);
+    private static final BasicStroke stroke2 = new BasicStroke(2.0f);
+    private static final BasicStroke stroke3 = new BasicStroke(3.0f);
+    private static final BasicStroke stroke4 = new BasicStroke(4.0f);
+    private static final BasicStroke stroke5 = new BasicStroke(5.0f);
+    private static final BasicStroke stroke6 = new BasicStroke(6.0f);
+    private static final BasicStroke stroke7 = new BasicStroke(7.0f);
+    private static final BasicStroke stroke8 = new BasicStroke(8.0f);
 
     private MapGenerator(Game game) {
         this(game, null, true);
@@ -256,8 +256,10 @@ public class MapGenerator {
         if (displayType != DisplayType.all && displayType != DisplayType.map) {
             return;
         }
-        if (debug)
+        if (debug) {
+            debugSuperStringTime = 0;
             debugStartTime = System.nanoTime();
+        }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
         String setup = tileMap.keySet().stream()
             .filter("0"::equals)
@@ -1751,7 +1753,7 @@ public class MapGenerator {
     }
 
     private int planetInfo(Player player, int x, int y) {
-        Map<String, UnitHolder> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
         List<String> planets = player.getPlanets();
         List<String> exhaustedPlanets = player.getExhaustedPlanets();
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
