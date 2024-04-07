@@ -526,7 +526,7 @@ public class ButtonHelper {
     public static Set<String> getTypesOfPlanetPlayerHas(Game game, Player player) {
         Set<String> types = new HashSet<>();
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = game.getPlanetsInfo().get(planet);
+            Planet unitHolder = game.getPlanetsInfo().get(planet);
             if (unitHolder == null)
                 continue;
 
@@ -2869,7 +2869,7 @@ public class ButtonHelper {
     public static List<Button> getButtonsToExploreAllPlanets(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String plan : player.getPlanetsAllianceMode()) {
-            UnitHolder planetUnit = game.getPlanetsInfo().get(plan);
+            Planet planetUnit = game.getPlanetsInfo().get(plan);
             Planet planetReal = (Planet) planetUnit;
             if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
@@ -3375,7 +3375,7 @@ public class ButtonHelper {
                 + " capacity, and you are trying to carry "
                 + (numInfNFightersNMechs - numFighter2s) + " things";
         }
-        System.out.printf("%d %d %d %d%n", fleetCap, numOfCapitalShips, capacity, numInfNFightersNMechs);
+        //System.out.printf("%d %d %d %d%n", fleetCap, numOfCapitalShips, capacity, numInfNFightersNMechs);
         if (capacityViolated || fleetSupplyViolated) {
             Button remove = Button.danger("getDamageButtons_" + tile.getPosition(),
                 "Remove units in " + tile.getRepresentationForButtons(game, player));
@@ -3435,7 +3435,7 @@ public class ButtonHelper {
             }
         }
         for (String planet : planetsToCheck) {
-            UnitHolder planetUnit2 = game.getPlanetsInfo().get(planet);
+            Planet planetUnit2 = game.getPlanetsInfo().get(planet);
             if (planetUnit2 != null) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
@@ -4258,7 +4258,7 @@ public class ButtonHelper {
     }
 
     public static Set<String> getTypeOfPlanet(Game activeGame, String planet) {
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
         if (unitHolder == null)
             return new HashSet<>();
         Planet planetReal = (Planet) unitHolder;
@@ -8332,7 +8332,7 @@ public class ButtonHelper {
         ignoredPlanets.addAll(fakePlanets);
 
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = game.getPlanetsInfo().get(planet.toLowerCase());
+            Planet unitHolder = game.getPlanetsInfo().get(planet.toLowerCase());
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
@@ -8835,7 +8835,7 @@ public class ButtonHelper {
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = game.getPlanetsInfo().get(planet);
+            Planet unitHolder = game.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
             if (planetReal == null)
                 continue;

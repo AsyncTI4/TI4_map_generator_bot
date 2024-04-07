@@ -1,5 +1,21 @@
 package ti4.buttons;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -16,11 +32,13 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
-import ti4.commands.agenda.*;
+import ti4.commands.agenda.DrawAgenda;
+import ti4.commands.agenda.ListVoteCount;
+import ti4.commands.agenda.PutAgendaBottom;
+import ti4.commands.agenda.PutAgendaTop;
+import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.PlayAC;
@@ -35,7 +53,11 @@ import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.ZelianHero;
-import ti4.commands.explore.*;
+import ti4.commands.explore.DrawRelic;
+import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreSubcommandData;
+import ti4.commands.explore.RelicInfo;
 import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
@@ -45,7 +67,13 @@ import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetInfo;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.*;
+import ti4.commands.player.AbilityInfo;
+import ti4.commands.player.SCPick;
+import ti4.commands.player.SCPlay;
+import ti4.commands.player.Stats;
+import ti4.commands.player.TurnEnd;
+import ti4.commands.player.TurnStart;
+import ti4.commands.player.UnitInfo;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
@@ -64,18 +92,42 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
-import ti4.helpers.*;
+import ti4.helpers.AgendaHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperCommanders;
+import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.ButtonHelperTacticalAction;
+import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.FrankenDraftHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Leader;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.*;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadLocalRandom;
+import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.RelicModel;
+import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -1489,8 +1541,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (String planetID : player.getReadiedPlanets()) {
                         Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, activeGame);
                         if (planet != null && planet.getOriginalPlanetType() != null) {
-                            List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planet,
-                                player);
+                            List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planet, player);
                             absolPAButtons.addAll(planetButtons);
                         }
                     }
@@ -2725,8 +2776,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
             String planet = buttonID.replace("nanoforgePlanet_", "");
-            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = activeGame.getPlanetsInfo().get(planet);
             planetReal.addToken("attachment_nanoforge.png");
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Attached nanoforge to " + Helper.getPlanetRepresentation(planet, activeGame));
