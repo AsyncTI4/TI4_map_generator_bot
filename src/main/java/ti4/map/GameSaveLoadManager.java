@@ -1588,7 +1588,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            activeGame.setCurrentReacts(outcome, voteInfo);
+                            activeGame.setStoredValue(outcome, voteInfo);
                         }
                     }
                 }

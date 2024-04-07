@@ -1986,8 +1986,8 @@ public class MapGenerator {
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
-            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
-                techType = game.getFactionsThatReactedToThis("colorChange" + tech);
+            if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
+                techType = game.getStoredValue("colorChange" + tech);
             }
             List<String> techList = techsFiltered.get(techType);
             if (techList == null) {
@@ -2059,8 +2059,8 @@ public class MapGenerator {
                 case UNITUPGRADE -> techIcon = Constants.UNIT_UPGRADE;
                 default -> techIcon = "";
             }
-            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
-                techIcon = game.getFactionsThatReactedToThis("colorChange" + tech);
+            if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
+                techIcon = game.getStoredValue("colorChange" + tech);
             }
 
             if (!techIcon.isEmpty()) {
@@ -2115,8 +2115,8 @@ public class MapGenerator {
                 case BIOTIC -> techIcon = Constants.BIOTIC;
                 default -> techIcon = "";
             }
-            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
-                techIcon = game.getFactionsThatReactedToThis("colorChange" + tech);
+            if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
+                techIcon = game.getStoredValue("colorChange" + tech);
             }
 
             if (!techIcon.isEmpty()) {

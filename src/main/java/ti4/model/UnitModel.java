@@ -154,7 +154,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
     }
     public int getSpaceCannonDieCount(Player player, Game activeGame){
-        if(!activeGame.getFactionsThatReactedToThis("EBSFaction").equalsIgnoreCase(player.getFaction())){
+        if(!activeGame.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())){
             return getSpaceCannonDieCount();
         }else{
             if(getBaseType().equalsIgnoreCase("spacedock")){
@@ -177,7 +177,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
     }
     public int getSpaceCannonHitsOn(Player player, Game activeGame){
-        if(!activeGame.getFactionsThatReactedToThis("EBSFaction").equalsIgnoreCase(player.getFaction())){
+        if(!activeGame.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())){
             return getSpaceCannonHitsOn();
         }else{
             if(getBaseType().equalsIgnoreCase("spacedock")){

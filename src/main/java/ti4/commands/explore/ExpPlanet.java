@@ -89,7 +89,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
-        activeGame.setCurrentReacts(player.getFaction() + "planetsExplored", activeGame.getFactionsThatReactedToThis(player.getFaction() + "planetsExplored") + planetName + "*");
+        activeGame.setStoredValue(player.getFaction() + "planetsExplored", activeGame.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {

@@ -231,17 +231,17 @@ public class CombatRoll extends CombatSubcommandData {
                 if(h > 0){
                     int round = 0;
                     String combatName = "combatRoundTracker"+opponent.getFaction()+tile.getPosition()+combatOnHolder.getName();
-                    if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
+                    if(activeGame.getStoredValue(combatName).isEmpty()){
                         round = 1;
                     }else{
-                        round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                        round = Integer.parseInt(activeGame.getStoredValue(combatName))+1;
                     }
                     int round2 = 0;
                     String combatName2 = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
-                    if(activeGame.getFactionsThatReactedToThis(combatName2).isEmpty()){
+                    if(activeGame.getStoredValue(combatName2).isEmpty()){
                         round2 = 1;
                     }else{
-                        round2 = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName2))+1;
+                        round2 = Integer.parseInt(activeGame.getStoredValue(combatName2))+1;
                     }
                     if(round2 > round){
                         buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),"Roll Dice For Combat Round #"+round));

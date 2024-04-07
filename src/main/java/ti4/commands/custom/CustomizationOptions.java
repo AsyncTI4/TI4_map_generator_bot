@@ -136,9 +136,9 @@ public class CustomizationOptions extends CustomSubcommandData {
                 String key = "factionsThatAreNotDiscardingSOs";
                 String key2 = "queueToDrawSOs";
                 String key3 = "potentialBlockers";
-                activeGame.setCurrentReacts(key, "");
-                activeGame.setCurrentReacts(key2, "");
-                activeGame.setCurrentReacts(key3, "");
+                activeGame.setStoredValue(key, "");
+                activeGame.setStoredValue(key2, "");
+                activeGame.setStoredValue(key3, "");
             }
         }
 
