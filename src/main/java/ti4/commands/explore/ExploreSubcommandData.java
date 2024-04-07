@@ -541,7 +541,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 String trueIdentity = player.getRepresentation(true, true);
                 message += "\n" + trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain CCs";
-                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "exp1", "exp2", "exp3" -> {

@@ -31,8 +31,8 @@ public class KyroHero extends DiscordantStarsSubcommandData {
             return;
         }
         int dieResult = event.getOption(Constants.SC, 1, OptionMapping::getAsInt);
-        activeGame.setCurrentReacts("kyroHeroSC", dieResult+"");
-        activeGame.setCurrentReacts("kyroHeroPlayer", player.getFaction());
+        activeGame.setStoredValue("kyroHeroSC", dieResult+"");
+        activeGame.setStoredValue("kyroHeroPlayer", player.getFaction());
         MessageHelper.sendMessageToChannel(event.getChannel(), "Marked the Blex Hero Target as SC #"+dieResult + " and the faction that played the hero as "+player.getFaction());
         ListTurnOrder.turnOrder(event, activeGame);
     }

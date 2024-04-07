@@ -42,19 +42,19 @@ public class RevealAgenda extends AgendaSubcommandData {
 
     public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game activeGame,
         MessageChannel channel) {
-        if (!activeGame.getFactionsThatReactedToThis("lastAgendaReactTime").isEmpty()
+        if (!activeGame.getStoredValue("lastAgendaReactTime").isEmpty()
             && ((new Date().getTime())
-                - Long.parseLong(activeGame.getFactionsThatReactedToThis("lastAgendaReactTime"))) < 10 * 60
+                - Long.parseLong(activeGame.getStoredValue("lastAgendaReactTime"))) < 10 * 60
                     * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
             return;
         }
-        activeGame.setCurrentReacts("noWhenThisAgenda", "");
-        activeGame.setCurrentReacts("noAfterThisAgenda", "");
-        activeGame.setCurrentReacts("AssassinatedReps", "");
-        activeGame.setCurrentReacts("riskedPredictive", "");
-        activeGame.setCurrentReacts("conspiratorsFaction", "");
+        activeGame.setStoredValue("noWhenThisAgenda", "");
+        activeGame.setStoredValue("noAfterThisAgenda", "");
+        activeGame.setStoredValue("AssassinatedReps", "");
+        activeGame.setStoredValue("riskedPredictive", "");
+        activeGame.setStoredValue("conspiratorsFaction", "");
         String agendaID = activeGame.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
@@ -132,22 +132,22 @@ public class RevealAgenda extends AgendaSubcommandData {
                 }
             }
         }
-        activeGame.setCurrentReacts("Pass On Shenanigans", "");
-        activeGame.setCurrentReacts("Abstain On Agenda", "");
+        activeGame.setStoredValue("Pass On Shenanigans", "");
+        activeGame.setStoredValue("Abstain On Agenda", "");
         if (!action) {
             AgendaHelper.offerEveryonePrepassOnShenanigans(activeGame);
             AgendaHelper.offerEveryonePreAbstain(activeGame);
             AgendaHelper.checkForAssigningGeneticRecombination(activeGame);
             AgendaHelper.checkForPoliticalSecret(activeGame);
         }
-        String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
+        String agendaCount = activeGame.getStoredValue("agendaCount");
         int aCount = 0;
         if (agendaCount.isEmpty()) {
             aCount = 1;
         } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
-        activeGame.setCurrentReacts("agendaCount", aCount + "");
+        activeGame.setStoredValue("agendaCount", aCount + "");
         activeGame.resetCurrentAgendaVotes();
         activeGame.setHackElectionStatus(false);
         activeGame.setPlayersWhoHitPersistentNoAfter("");
@@ -174,7 +174,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", activeGame, afterButtons, "after");
 
-        activeGame.setCurrentReacts("lastAgendaReactTime", "" + new Date().getTime());
+        activeGame.setStoredValue("lastAgendaReactTime", "" + new Date().getTime());
 
         List<Button> proceedButtons = new ArrayList<>();
         String msg;
