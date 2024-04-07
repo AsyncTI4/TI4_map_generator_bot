@@ -9,7 +9,7 @@ import ti4.AsyncTI4DiscordBot;
 public class Constants {
     // Staff Pings
     public static final String jazzId = "228999251328368640";
-    public String jazzPing() { return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention(); }
+    public static String jazzPing() { return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention(); }
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
