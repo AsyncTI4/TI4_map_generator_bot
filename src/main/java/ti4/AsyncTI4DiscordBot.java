@@ -72,6 +72,7 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
@@ -218,6 +219,9 @@ public class AsyncTI4DiscordBot {
                 commandsD.queue();
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildFogOfWar.getName());
                 guilds.add(guildFogOfWar);
+                
+                // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
+                FoWHelper.sanityCheckFowReacts();
             }
         }
 
