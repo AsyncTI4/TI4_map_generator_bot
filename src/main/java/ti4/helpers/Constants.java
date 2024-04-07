@@ -4,7 +4,14 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import ti4.AsyncTI4DiscordBot;
+
 public class Constants {
+    // Staff Pings
+    public static final String jazzId = "228999251328368640";
+    public static final String jazzPing = AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();;
+
+    // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
