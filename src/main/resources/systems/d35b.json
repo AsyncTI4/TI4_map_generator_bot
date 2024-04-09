@@ -9,5 +9,7 @@
     "spaceTokenLocations": [],
     "wormholes": [],
     "planets": [],
-    "isSupernova": true
+    "isSupernova": true,
+    "source": "ds",
+    "tileBack": "green"
 }

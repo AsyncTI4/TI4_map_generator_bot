@@ -777,6 +777,46 @@ public class Mapper {
         return mapTemplates.get(id);
     }
 
+    public static List<MapTemplateModel> getMapTemplates() {
+        return new ArrayList<>(mapTemplates.values());
+    }
+
+    public static List<MapTemplateModel> getMapTemplatesForPlayerCount(int players) {
+        return new ArrayList<>(mapTemplates.values()).stream()
+            .filter(template -> template.getPlayerCount() == players)
+            .toList();
+    }
+
+    public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {
+        MapTemplateModel mapTemplate = null;
+        List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(players);
+        if (templates.size() == 0) {
+            return null;
+        } else if (templates.size() == 1) {
+            mapTemplate = templates.get(0);
+        } else {
+            String defaultMapTemplate = switch (players) {
+                case 3 -> "3pHyperlanes";
+                case 4 -> "4pHyperlanes";
+                case 5 -> "5pHyperlanes";
+                case 6 -> "6pStandard";
+                case 7 -> "7pHyperlanes";
+                case 8 -> "8pHyperlanes";
+                default -> null;
+            };
+            if (defaultMapTemplate == null) {
+                mapTemplate = templates.get(0); // just get whatever template lol
+            } else {
+                for (MapTemplateModel model : templates) {
+                    if (model.getAlias().equals(defaultMapTemplate)) {
+                        return model;
+                    }
+                }
+            }
+        }
+        return mapTemplate;
+    }
+
     public static boolean isValidPlanet(String id) {
         return AliasHandler.getPlanetKeyList().contains(id);
     }

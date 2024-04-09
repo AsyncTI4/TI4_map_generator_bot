@@ -1738,7 +1738,7 @@ public class ButtonListener extends ListenerAdapter {
             Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda #" + aCount);
             Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
                 "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
-            List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);
+            List<Button> resActionRow = Arrays.asList(flipNextAgenda, proceedToStrategyPhase);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("outcome_")) {
@@ -2223,8 +2223,9 @@ public class ButtonListener extends ListenerAdapter {
             }
 
         } else if (buttonID.startsWith("milty_")) {
-            activeGame.getMiltyDraftManager().doMiltyPick(activeGame, buttonID, player);
-            // System.out.println("MILTY");
+            activeGame.getMiltyDraftManager().doMiltyPick(event, activeGame, buttonID, player);
+        } else if (buttonID.startsWith("showMiltyDraft")) {
+            activeGame.getMiltyDraftManager().repostDraftInformation(activeGame);
         } else if (buttonID.startsWith("ring_")) {
             List<Button> ringButtons = ButtonHelper.getTileInARing(player, activeGame, buttonID, event);
             String num = buttonID.replace("ring_", "");
@@ -3118,7 +3119,7 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannelWithButtons(
                                 ButtonHelper.getCorrectChannel(player, activeGame),
                                 player.getRepresentation(true, true) + " you can use the button to get your tech",
-                                List.of(Buttons.GET_A_TECH));
+                                Arrays.asList(Buttons.GET_A_TECH));
                         } else {
                             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                             String message2 = player.getRepresentation() + "! Your current CCs are "
@@ -3215,8 +3216,8 @@ public class ButtonListener extends ListenerAdapter {
                         + ". Use buttons to gain CCs";
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
-                    List<Button> buttons2 = List.of(exhaust);
+                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
+                    List<Button> buttons2 = Arrays.asList(exhaust);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Exhaust using this",
@@ -3329,10 +3330,10 @@ public class ButtonListener extends ListenerAdapter {
                         "Done Redistributing CCs");
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,
+                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,
                         doneGainingCC, resetCC);
                     if (player.hasAbility("deliberate_action") && activeGame.getCurrentPhase().contains("status")) {
-                        buttons = List.of(getTactic, getFleet, getStrat,
+                        buttons = Arrays.asList(getTactic, getFleet, getStrat,
                             doneGainingCC, resetCC);
                     }
                     if (!activeGame.isFoWMode()) {
@@ -3401,7 +3402,7 @@ public class ButtonListener extends ListenerAdapter {
                         "Done Gaining CCs");
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
+                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
@@ -4935,7 +4936,7 @@ public class ButtonListener extends ListenerAdapter {
                         "(For Others) Abstain for this player");
 
                     String buttonMsg = "Use buttons to vote again. Reminder that this erasing of old votes did not refresh any planets.";
-                    List<Button> buttons = List.of(vote, abstain, forcedAbstain);
+                    List<Button> buttons = Arrays.asList(vote, abstain, forcedAbstain);
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                         buttonMsg, buttons);
                 }
@@ -5774,7 +5775,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.isCustodiansScored()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
-                    List<Button> buttons = List.of(flipAgenda);
+                    List<Button> buttons = Arrays.asList(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now",
                         buttons);
                 } else {
@@ -5787,12 +5788,12 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.isCustodiansScored()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
-                    List<Button> buttons = List.of(flipAgenda);
+                    List<Button> buttons = Arrays.asList(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now",
                         buttons);
                 } else {
                     Button flipAgenda = Button.primary("startStrategyPhase", "Press this to start Strategy Phase");
-                    List<Button> buttons = List.of(flipAgenda);
+                    List<Button> buttons = Arrays.asList(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Start Strategy Phase", buttons);
                 }
             }
