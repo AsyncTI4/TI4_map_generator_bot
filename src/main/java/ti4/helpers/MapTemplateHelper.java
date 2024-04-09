@@ -112,7 +112,7 @@ public class MapTemplateHelper {
                         if (tile.getPlayerNumber() != null) {
                             String color = backupColors.get(tile.getPlayerNumber());
                             if (tile.getMiltyTileIndex() != null) {
-                                tileID = color + tile.getMiltyTileIndex();
+                                tileID = color + (tile.getMiltyTileIndex()+1);
                             } else if (tile.getHome() != null) {
                                 tileID = color + "blank";
                             }
