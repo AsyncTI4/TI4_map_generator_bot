@@ -341,11 +341,15 @@ public class Constants {
     public static final String FOW_FILTER_PINK = "Pink";
     public static final String FOW_FILTER_PURPLE = "Purple";
 
+    // milty draft stuff
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";
     public static final String FACTION_COUNT = "faction_count";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
+    public static final String INCLUDE_DS_TILES = "include_ds_tiles";
+    public static final String INCLUDE_DS_FACTIONS = "include_ds_factions";
+    public static final String USE_MAP_TEMPLATE = "use_map_template";
 
     // /custom command
     public static final String CUSTOM = "custom";

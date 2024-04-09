@@ -40,6 +40,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.MapTemplateModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
@@ -761,6 +762,16 @@ public class AutoCompleteProvider {
                     .limit(25)
                     .sorted(Comparator.comparing(PlayerStats.PlayerStatistics::getAutoCompleteName))
                     .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.USE_MAP_TEMPLATE -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<MapTemplateModel> templates = Mapper.getMapTemplates();
+                List<Command.Choice> options = templates.stream()
+                    .filter(tmp -> tmp.autoCompleteString().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(tmp -> new Command.Choice(tmp.autoCompleteString(), tmp.getAlias()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
