@@ -69,7 +69,6 @@ public class StartMilty extends MiltySubcommandData {
 
         List<String> factions = new ArrayList<>(Mapper.getFactions().stream()
             .filter(f -> factionSources.contains(f.getSource()))
-            .filter(f -> !f.getAlias().equals("sardakk-base") && !f.getAlias().startsWith("keleres"))
             .map(f -> f.getAlias()).toList());
         List<String> factionDraft = createFactionDraft(factionCount, factions);
         
