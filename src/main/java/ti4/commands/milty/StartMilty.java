@@ -166,6 +166,7 @@ public class StartMilty extends MiltySubcommandData {
                 if (hasKeleres) continue;
                 hasKeleres = true;
             }
+            /*
             if (List.of("keleresa", "argent").contains(f)) {
                 if (hasArgent) continue;
                 hasArgent = true;
@@ -177,7 +178,7 @@ public class StartMilty extends MiltySubcommandData {
             if (List.of("keleresx", "xxcha").contains(f)) {
                 if (hasXxcha) continue;
                 hasXxcha = true;
-            }
+            }*/
             factionDraft.add(f);
         }
         return factionDraft;
