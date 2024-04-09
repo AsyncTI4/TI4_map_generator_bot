@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +20,11 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
+import ti4.commands.uncategorized.ShowGame;
+import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.MapTemplateHelper;
@@ -32,8 +36,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapTemplateModel;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
+import ti4.model.Source.ComponentSource;
 
 public class MiltyDraftHelper {
 
@@ -124,6 +130,8 @@ public class MiltyDraftHelper {
         Point hs = new Point(260, 600);
         Point right = new Point(520, 450);
 
+        System.out.println("Generating slice: " + slice.ttsString());
+
         BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = sliceImage.getGraphics();
 
@@ -169,10 +177,21 @@ public class MiltyDraftHelper {
     }
     
     public static void initDraftTiles(MiltyDraftManager draftManager) {
-        Map<String, TileModel> allTiles = TileHelper.getAllTiles();
-        for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
+        List<ComponentSource> defaultSources = Arrays.asList(
+            ComponentSource.base, 
+            ComponentSource.codex1,
+            ComponentSource.codex2,
+            ComponentSource.codex3,
+            ComponentSource.pok, // TODO: JAZZ
+            ComponentSource.ds); // temporarily include DS here
+        initDraftTiles(draftManager, defaultSources);
+    }
+
+    public static void initDraftTiles(MiltyDraftManager draftManager, List<ComponentSource> sources) {
+        List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTiles().values());
+        for (TileModel tileModel : allTiles) {
             String tileID = tileModel.getId();
-            if (isValid(tileModel, tileID)) {
+            if (isInvalid(tileModel, tileID)) {
                 continue;
             }
             Set<WormholeModel.Wormhole> wormholes = tileModel.getWormholes();
@@ -188,10 +207,16 @@ public class MiltyDraftHelper {
                     }
                 }
             }
+
             Tile tile = new Tile(tileID, "none");
-            if (tileID.length() > 2) {
-                continue;
-            }
+            boolean sourceAllowed = false;
+            if (sources.contains(tile.getTileModel().getSource())) sourceAllowed = true;
+
+            // leaving these as a stop-gap for now until I can verify all sources are setup
+            if (tileID.length() <= 2) sourceAllowed = true; 
+            if (tileID.matches("d\\d{1,3}") && sources.contains(ComponentSource.ds)) sourceAllowed = true; 
+
+            if (!sourceAllowed) continue;
 
             if (tile.isHomeSystem() || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres")) {
                 continue;
@@ -217,7 +242,16 @@ public class MiltyDraftHelper {
         }
     }
 
-    private static boolean isValid(TileModel tileModel, String tileID) {
+    private static boolean isInvalid(TileModel tileModel, String tileID) {
+        if (tileModel.getTileBackOption().isPresent()) {
+            String back = tileModel.getTileBackOption().orElse("");
+            if (back.equals("red") || back.equals("blue")) {
+                //good
+            } else {
+                return true;
+            }
+        }
+
         String id = tileID.toLowerCase();
         String path = tileModel.getTilePath() == null ? "" : tileModel.getTilePath().toLowerCase();
         List<String> disallowedTerms = List.of("corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh",
@@ -225,18 +259,32 @@ public class MiltyDraftHelper {
         return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
     }
 
+    public static void buildPartialMap(Game game, GenericInteractionCreateEvent event) throws Exception {
+        MiltyDraftManager manager = game.getMiltyDraftManager();
+        
+        String mapTemplate = manager.getMapTemplate();
+        if (mapTemplate == null) {
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());
+            if (defaultTemplate == null) {
+                throw new Exception("idk how to build this map yet");
+            }
+            mapTemplate = defaultTemplate.getAlias();
+        }
+
+        MapTemplateHelper.buildPartialMapFromMiltyData(game, event, mapTemplate);
+    }
+
     public static void buildMap(Game game) throws Exception {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         
-        String mapTemplate = switch (manager.getPlayers().size()) {
-            case 3 -> "3pHyperlanes";
-            case 4 -> "4pHyperlanes";
-            case 5 -> "5pHyperlanes";
-            case 6 -> "6pStandard";
-            case 7 -> "7pHyperlanes";
-            case 8 -> "8pHyperlanes";
-            default -> throw new Exception("idk how to build this map yet");
-        };
+        String mapTemplate = manager.getMapTemplate();
+        if (mapTemplate == null) {
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());
+            if (defaultTemplate == null) {
+                throw new Exception("idk how to build this map yet");
+            }
+            mapTemplate = defaultTemplate.getAlias();
+        }
 
         MapTemplateHelper.buildMapFromMiltyData(game, mapTemplate);
     }

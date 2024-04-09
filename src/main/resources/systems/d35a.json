@@ -9,5 +9,7 @@
     "spaceTokenLocations": [],
     "wormholes": [],
     "planets": [],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "source": "ds",
+    "tileBack": "green"
 }

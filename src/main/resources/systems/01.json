@@ -1,4 +1,5 @@
 {
+    "tileBack":"green",
     "id": "01",
     "name": "Jord (Sol)",
     "aliases": [
@@ -11,28 +12,7 @@
     ],
     "imagePath": "01_Jord.png",
     "shipPositionsType": "TYPE01",
-    "spaceTokenLocations": [
-        {
-            "x": 195.0,
-            "y": 10.0
-        },
-        {
-            "x": 225.0,
-            "y": 75.0
-        },
-        {
-            "x": 225.0,
-            "y": 155.0
-        },
-        {
-            "x": 145.0,
-            "y": 205.0
-        }
-    ],
     "wormholes": [],
-    "planets": [
-        "jord"
-    ],
-    "source": "base",
-    "tileBack": "green"
+    "planets": ["jord"],
+    "source": "base"
 }
