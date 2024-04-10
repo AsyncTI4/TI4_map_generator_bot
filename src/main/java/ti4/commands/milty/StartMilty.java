@@ -152,9 +152,9 @@ public class StartMilty extends MiltySubcommandData {
 
     private static List<String> createFactionDraft(int factionCount, List<String> factions) {
         boolean hasKeleres = false;
-        boolean hasMentak = false;
-        boolean hasXxcha = false;
-        boolean hasArgent = false;
+        // boolean hasMentak = false;
+        // boolean hasXxcha = false;
+        // boolean hasArgent = false;
         factions.remove("lazax");
         Collections.shuffle(factions);
         List<String> factionDraft = new ArrayList<>();
@@ -239,11 +239,7 @@ public class StartMilty extends MiltySubcommandData {
                 int optRes = miltyDraftSlice.getOptimalRes();
                 int totalOptimal = miltyDraftSlice.getOptimalTotalValue();
                 if (optInf < 3 || optRes < 2 || totalOptimal < 9 || totalOptimal > 13) {
-                    double shenanInf = optInf + miltyDraftSlice.getOptimalFlex() / 2.0;
-                    double shenanRes = optRes + miltyDraftSlice.getOptimalFlex() / 2.0;
-                    if (shenanInf < 3.95 || shenanRes < 2.45) {
-                        break;
-                    }
+                    break;
                 }
 
                 String sliceName = Character.toString(sliceNum - 1 + 'A');

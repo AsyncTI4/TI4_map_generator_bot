@@ -338,8 +338,7 @@ public class MessageHelper {
 						(error) -> BotLogger.log(getRestActionFailureMessage(channel, message, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (message != null && (message.contains("Use buttons to do your turn")
-							|| message.contains("Use buttons to end turn"))) {
+					if (message != null && (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn"))) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -349,8 +348,7 @@ public class MessageHelper {
 						}
 					}
 
-					if (message != null && message.toLowerCase().contains("up next")
-							&& message.contains("#")) {
+					if (message != null && message.toLowerCase().contains("up next") && message.contains("#")) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
