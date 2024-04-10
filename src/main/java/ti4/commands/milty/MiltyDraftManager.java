@@ -22,9 +22,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import ti4.commands.map.AddTileList;
+import ti4.commands.player.Setup;
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -76,7 +79,7 @@ public class MiltyDraftManager {
         private String positionEmoji() {
             return position == null ? Emojis.positionUnpicked : Emojis.getSpeakerPickEmoji(position);
         }
-        
+
         @JsonIgnore
         public String save() {
             String factionStr = faction == null ? "null" : faction;
@@ -286,8 +289,22 @@ public class MiltyDraftManager {
 
     private void finishDraft(Game game, ButtonInteractionEvent event) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
+        List<String> backupColors = Arrays.asList("black","bloodred","blue","chocolate","emerald","orange",
+            "ethereal","forest","gold","green","grey","brown","lavender","lightbrown","navy","chrome","petrol",
+            "pink","purple","rainbow","red","rose","spring","sunset","tan","teal","lightgrey","turquoise","yellow");
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
+            for (String playerId : players) {
+                Player player = game.getPlayer(playerId);
+                PlayerDraft picks = getPlayerDraft(playerId);
+                String color = backupColors.get(picks.getPosition());
+                String faction = picks.getFaction();
+
+                if (playerId.equals(Constants.chassitId)) color = "lightgrey";
+                String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, mapTemplate);
+
+                Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, picks.getPosition() == 1);
+            }
             AddTileList.finishSetup(game, event);
         } catch (Exception e) {
             String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
