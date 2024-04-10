@@ -71,6 +71,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Cannot determine trait, please specify");
             return;
         }
+        
         boolean over = false;
         OptionMapping overRider = event.getOption(Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ);
         if (overRider != null && "YES".equalsIgnoreCase(overRider.getAsString())) {
