@@ -95,7 +95,7 @@ public class Setup extends PlayerSubcommandData {
         secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
     }
 
-    public void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS,
+    public static void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS,
         GenericInteractionCreateEvent event, boolean setSpeaker) {
         Map<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
@@ -346,7 +346,7 @@ public class Setup extends PlayerSubcommandData {
 
     }
 
-    private void addUnits(FactionModel setupInfo, Tile tile, String color, GenericInteractionCreateEvent event) {
+    private static void addUnits(FactionModel setupInfo, Tile tile, String color, GenericInteractionCreateEvent event) {
         String units = setupInfo.getStartingFleet();
         units = units.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(units, ",");

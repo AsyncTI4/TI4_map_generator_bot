@@ -5696,21 +5696,14 @@ public class ButtonHelper {
         for (Player player : players) {
             if (x < 9) {
                 switch (x) {
-                    case 1 -> new Setup().secondHalfOfPlayerSetup(player, game, "black", "franken1", "201", event,
-                        false);
-                    case 2 -> new Setup().secondHalfOfPlayerSetup(player, game, "green", "franken2", "202", event,
-                        false);
-                    case 3 -> new Setup().secondHalfOfPlayerSetup(player, game, "purple", "franken3", "203",
-                        event, false);
-                    case 4 -> new Setup().secondHalfOfPlayerSetup(player, game, "orange", "franken4", "204",
-                        event, false);
-                    case 5 -> new Setup().secondHalfOfPlayerSetup(player, game, "pink", "franken5", "205", event,
-                        false);
-                    case 6 -> new Setup().secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206",
-                        event, false);
-                    case 7 -> new Setup().secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
-                    case 8 -> new Setup().secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event,
-                        false);
+                    case 1 -> Setup.secondHalfOfPlayerSetup(player, game, "black", "franken1", "201", event, false);
+                    case 2 -> Setup.secondHalfOfPlayerSetup(player, game, "green", "franken2", "202", event, false);
+                    case 3 -> Setup.secondHalfOfPlayerSetup(player, game, "purple", "franken3", "203", event, false);
+                    case 4 -> Setup.secondHalfOfPlayerSetup(player, game, "orange", "franken4", "204", event, false);
+                    case 5 -> Setup.secondHalfOfPlayerSetup(player, game, "pink", "franken5", "205", event, false);
+                    case 6 -> Setup.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
+                    case 7 -> Setup.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
+                    case 8 -> Setup.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
                     default -> {
 
                     }
