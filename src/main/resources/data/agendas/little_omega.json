@@ -312,8 +312,8 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: Players choose strategy cards during the strategy phase in order from the player with the fewest victory points to the player with the most; on a tie, the order for those players starts with the speaker and proceeds clockwise.",
-        "text2": "Against: During the next strategy phase, when a player chooses a strategy card, they give that strategy card to another player who does not have 1.",
-        "mapText": "Players choose strategy cards during the strategy phase from fewest to most victory points; on a tie, start with the speaker and proceed clockwise.",
+        "text2": "Against: During the next strategy phase, when a player chooses a strategy card, they give that strategy card to another player who does not have one, if able.",
+        "mapText": "Players choose strategy cards in order of fewest to most victory points; on a tie, start with the speaker and proceed clockwise.",
         "source": "little_omega"
     },
     {

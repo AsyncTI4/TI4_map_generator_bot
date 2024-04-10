@@ -94,7 +94,7 @@
         "alias": "passturn",
         "name": "Pass Turn",
         "shortName": "Pass\nTurn",
-        "text": "Place this token faceup in your play area. When this token is in your play area, you must perform the following action before doing any other actions.\nACTION: You may redistribute your command tokens. Your turn ends immediately. Discard this token.",
+        "text": "Place this token faceup in your play area. When this token is in your play area, you must perform the following action before doing any other actions.\nACTION: You may redistribute your command tokens. Discard this token and end your turn.",
         "isFakeRelic": true,
         "source": "salliance"
     }

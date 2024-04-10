@@ -43,7 +43,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if ("mirage".equals(planet)) {
             activeGame.clearPlanetsCache();
         }
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
 
         if (unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
@@ -269,17 +269,12 @@ public class PlanetAdd extends PlanetAddRemove {
                     + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
                 saarButton);
         }
-        if (player.hasTech("ie") && unitHolder instanceof Planet plan) {
-            if (plan.getResources() > 0) {
-                String message = ButtonHelper.getIdent(player) + " Click the button to resolve an integrated build on "
-                    + Helper.getPlanetRepresentation(planet, activeGame);
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary("integratedBuild_" + planet,
-                    "Integrated on " + Helper.getPlanetRepresentation(planet, activeGame)));
-                buttons.add(Button.danger("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message,
-                    buttons);
-            }
+        if (player.hasTech("ie") && unitHolder.getResources() > 0) {
+            String message = ButtonHelper.getIdent(player) + " Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, activeGame);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.primary("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, activeGame)));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         }
         if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);

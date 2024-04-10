@@ -62,10 +62,14 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Invalid planet");
             return;
         }
-        String drawColor = planet.getPlanetType().toString();
+        String drawColor = planet.getPlanetType() == null ? null : planet.getPlanetType().toString();
         OptionMapping traitOption = event.getOption(Constants.TRAIT);
         if (traitOption != null) {
             drawColor = traitOption.getAsString();
+        }
+        if (drawColor == null) {
+            sendMessage("Cannot determine trait, please specify");
+            return;
         }
         boolean over = false;
         OptionMapping overRider = event.getOption(Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ);

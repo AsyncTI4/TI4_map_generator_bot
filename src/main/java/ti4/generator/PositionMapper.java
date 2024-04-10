@@ -28,7 +28,6 @@ public class PositionMapper {
 
     private static final Properties tileAdjacencies = new Properties();
 
-
     public static void init() {
         readData("tileImageCoordinates.properties", tileImageCoordinates, "Could not read position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
@@ -55,22 +54,20 @@ public class PositionMapper {
             return null;
         }
         return TileHelper.getAllPlanets().values().stream()
-                .filter(planetModel -> Optional.ofNullable(planetModel.getTileId()).isPresent())
-                .filter(planetModel -> planetModel.getTileId().equals(tileID))
-                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
+            .filter(planetModel -> Optional.ofNullable(planetModel.getTileId()).isPresent())
+            .filter(planetModel -> planetModel.getTileId().equals(tileID))
+            .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
-        List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185,205),
-                new Point(100, 190), new Point(60, 130));
+        List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
         TileModel tile = TileHelper.getAllTiles().get(tileID);
 
-        return Optional.ofNullable(tile.getSpaceTokenLocations())
-                .orElse(Optional.ofNullable(tile.getShipPositionsType()).isPresent()
-                        ?
-                        Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout())
-                                .orElse(backup)
-                        : backup);
+        if (Optional.ofNullable(tile.getShipPositionsType()).isPresent()) {
+            return Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout()).orElse(backup);
+        } else {
+            return backup;
+        }
     }
 
     public static boolean isTilePositionValid(String position) {
@@ -152,9 +149,8 @@ public class PositionMapper {
         return positions;
     }
 
-
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
-        if("space".equals(planetName))
+        if ("space".equals(planetName))
             return null;
         UnitTokenPosition pos = TileHelper.getAllPlanets().get(planetName).getUnitPositions();
         return SerializationUtils.clone(pos);
@@ -192,7 +188,7 @@ public class PositionMapper {
 
     public static String getTileSpaceUnitLayout(String tileId) {
         return Optional.ofNullable(TileHelper.getAllTiles().get(tileId).getShipPositionsType())
-                .orElse(ShipPositionModel.ShipPosition.TYPE08).getPositions();
+            .orElse(ShipPositionModel.ShipPosition.TYPE08).getPositions();
     }
 
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
@@ -269,11 +265,16 @@ public class PositionMapper {
                     adjacentTiles.add(getInsideRingSamePosition(ring, side, position)); //SW
                     adjacentTiles.add(getSameRingOnePositionBack(ring, side, position)); //NW
                 }
-                case 2 -> {}
-                case 3 -> {}
-                case 4 -> {}
-                case 5 -> {}
-                case 6 -> {}
+                case 2 -> {
+                }
+                case 3 -> {
+                }
+                case 4 -> {
+                }
+                case 5 -> {
+                }
+                case 6 -> {
+                }
             }
         }
 

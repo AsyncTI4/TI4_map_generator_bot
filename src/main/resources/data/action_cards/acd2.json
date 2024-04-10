@@ -13,7 +13,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose any number of players. Those players gain 1 commodity. During this turn, treat each other player as if you were neighbors.",
+    "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. During this turn, treat those players as if you were neighbors.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
     "source": "action_deck_2"
   },
@@ -40,7 +40,7 @@
     "name": "Arms Deal",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 of your neighbors. That player places 1 cruiser and 1 destroyer from their reinforcements in any system containing their ships.",
+    "text": "Choose 1 of your neighbors. That player places up to a total of 2 cruisers and/or destroyers from their reinforcements in a system that contains their ships.",
     "flavorText": "Ipswitch smirked when the Commander asked for the ships' documentation, \"Probably burned... with the bodies.\"",
     "source": "action_deck_2"
   },
@@ -67,7 +67,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 3 resources and purge 2 of your relic fragments to gain 1 relic.",
+    "text": "Spend 9 resources to gain 1 relic; you may purge 1 or more of your relic fragments to reduce the resources spent by 3 for each relic fragment you purged.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
     "source": "action_deck_2"
   },
@@ -94,7 +94,7 @@
     "name": "Brutal Occupation",
     "phase": "Action",
     "window": "After you gain control of a planet",
-    "text": "Ready that planet or gain 2 commodities.",
+    "text": "Ready and explore that planet.",
     "flavorText": "The harvest of Ordinian was so complete that even the planet's core was depleted. The Nekro left nothing usable. Only its lifeless shell remained.",
     "source": "action_deck_2"
   },
@@ -130,7 +130,7 @@
     "name": "Concise Legal Text",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Place 2 command tokens from your reinforcements in your strategy pool. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
+    "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
   },
@@ -138,7 +138,7 @@
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
-    "window": "At the start of a round of space combat",
+    "window": "At the start of a round of space combat, other than the first",
     "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
     "source": "action_deck_2"
@@ -194,7 +194,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 PDS from your reinforcements on a planet you control.",
-    "flavorText": "\"In the final moments of their empire, the Lazax wished to see us armed against our oppressors.\" As  Magmus spoke, his voice rose from a gravelly rumble to a roar, \"I now invoke their final decree!\"",
+    "flavorText": "\"In the final moments of their empire, the Lazax wished to see us armed against our oppressors.\" As Magmus spoke, his voice rose from a gravelly rumble to a roar, \"I now invoke their final decree!\"",
     "source": "action_deck_2"
   },
   {
@@ -292,7 +292,7 @@
     "name": "Espionage",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
+    "text": "Choose 1 other player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
   },
@@ -337,7 +337,7 @@
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "After you commit units to land on another player's non-home planet",
-    "text": "Place 1 infantry on that planet. Then, if you have more ground forces on that planet than that player, place 1 additional infantry.",
+    "text": "Place 1 infantry on that planet. Then, if you have less units on that planet than that player, place 1 additional infantry.",
     "flavorText": "Harrugh had brought them supplies, lived among them, honored their traditions, and filled them with hope. On the promised day, they would repay him with their determination for liberation.",
     "source": "action_deck_2"
   },
@@ -427,7 +427,7 @@
     "name": "Mercenary Contract",
     "phase": "Action",
     "window": "After a player activates a system that contains your ships",
-    "text": "Spend 2 trade goods to place 1 cruiser and 1 destroyer from your reinforcements in the active system.",
+    "text": "Spend 2 trade goods to place 1 cruiser and 1 destroyer from your reinforcements in that system.",
     "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
     "source": "action_deck_2"
   },
@@ -669,7 +669,7 @@
     "alias": "special_considerations",
     "name": "Special Considerations",
     "phase": "Agenda",
-    "window": "After an agenda is revealed",
+    "window": "When an agenda is revealed",
     "text": "Ready up to 3 planets you control. Game effects cannot prevent you from voting on this agenda.",
     "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
     "source": "action_deck_2"
@@ -697,7 +697,7 @@
     "name": "Stranded Ship",
     "phase": "Action",
     "window": "Action",
-    "text": "Place 1 cruiser from your reinforcements in a non-home anomaly that does not contain other players' units.",
+    "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets and does not contain other players' units.",
     "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\" he gestured, \"here we are.\"",
     "source": "action_deck_2"
   },

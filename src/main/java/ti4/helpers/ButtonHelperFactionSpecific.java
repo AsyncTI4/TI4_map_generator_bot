@@ -1563,7 +1563,7 @@ public class ButtonHelperFactionSpecific {
         List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
@@ -1600,7 +1600,7 @@ public class ButtonHelperFactionSpecific {
     public static void offerGledgeBaseButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
                 && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
@@ -1631,7 +1631,7 @@ public class ButtonHelperFactionSpecific {
         List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
@@ -1707,7 +1707,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void terraformPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
         String planet = buttonID.replace("terraformPlanet_", "");
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -1717,7 +1717,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void gledgeBasePlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
         String planet = buttonID.replace("gledgeBasePlanet_", "");
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         planetReal.addToken("attachment_gledgebase.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -1729,7 +1729,7 @@ public class ButtonHelperFactionSpecific {
         Player player) {
         String planet = buttonID.split("_")[1];
         String pnID = buttonID.split("_")[2];
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         switch (pnID) {
             case "dspnveld1" -> planetReal.addToken("attachment_veldyrtaxhaven.png");

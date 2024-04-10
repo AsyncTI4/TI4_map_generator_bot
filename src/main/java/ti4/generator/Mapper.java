@@ -20,7 +20,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -286,6 +285,7 @@ public class Mapper {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
+            .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
             .filter(tileModel -> tileModel.isEmpty())
             .map(TileModel::getId)
             .toList();
@@ -775,6 +775,46 @@ public class Mapper {
 
     public static MapTemplateModel getMapTemplate(String id) {
         return mapTemplates.get(id);
+    }
+
+    public static List<MapTemplateModel> getMapTemplates() {
+        return new ArrayList<>(mapTemplates.values());
+    }
+
+    public static List<MapTemplateModel> getMapTemplatesForPlayerCount(int players) {
+        return new ArrayList<>(mapTemplates.values()).stream()
+            .filter(template -> template.getPlayerCount() == players)
+            .toList();
+    }
+
+    public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {
+        MapTemplateModel mapTemplate = null;
+        List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(players);
+        if (templates.size() == 0) {
+            return null;
+        } else if (templates.size() == 1) {
+            mapTemplate = templates.get(0);
+        } else {
+            String defaultMapTemplate = switch (players) {
+                case 3 -> "3pHyperlanes";
+                case 4 -> "4pHyperlanes";
+                case 5 -> "5pHyperlanes";
+                case 6 -> "6pStandard";
+                case 7 -> "7pHyperlanes";
+                case 8 -> "8pHyperlanes";
+                default -> null;
+            };
+            if (defaultMapTemplate == null) {
+                mapTemplate = templates.get(0); // just get whatever template lol
+            } else {
+                for (MapTemplateModel model : templates) {
+                    if (model.getAlias().equals(defaultMapTemplate)) {
+                        return model;
+                    }
+                }
+            }
+        }
+        return mapTemplate;
     }
 
     public static boolean isValidPlanet(String id) {
