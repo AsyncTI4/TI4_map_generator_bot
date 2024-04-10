@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.utils.StringUtils;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -38,7 +39,7 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;
         }
-        if(!activeGame.isFoWMode()){
+        if (!activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
             return;
         }
@@ -59,8 +60,12 @@ public class Whisper extends FOWSubcommandData {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
-        if(!activeGame.isFoWMode()){
-            player1 = player.getFactionEmoji() + "("+StringUtils.capitalize(player.getFaction())+") "+player1;
+        if (!activeGame.isFoWMode() && !(feedbackChannel instanceof ThreadChannel)) {
+            feedbackChannel = player.getCardsInfoThread();
+            MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
+        }
+        if (!activeGame.isFoWMode()) {
+            player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
 
         if (anonY.compareToIgnoreCase("y") == 0) {
