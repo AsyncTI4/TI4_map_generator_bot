@@ -1981,32 +1981,29 @@ public class AgendaHelper {
     }
 
     public static List<Button> getUnitUpgradeOutcomeButtons(Game activeGame, String rider, String prefix) {
-        List<Button> secretButtons = new ArrayList<>();
+        List<Button> buttons = new ArrayList<>();
         for (Player player : activeGame.getPlayers().values()) {
             for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(player)) {
                 Button button;
-                String techName = tech.getName();
                 if (rider == null) {
-
-                    button = Button.secondary(prefix + "_" + tech.getAlias(), techName);
+                    button = Button.secondary(prefix + "_" + tech.getAlias(), tech.getName());
                 } else {
-                    button = Button.secondary(prefix + "rider_so;" + tech.getAlias() + "_" + rider, techName);
+                    button = Button.secondary(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
                 }
-                secretButtons.add(button);
+                buttons.add(button);
             }
         }
-        return secretButtons;
+        return buttons;
     }
 
     public static List<Button> getUnitOutcomeButtons(String rider, String prefix) {
         List<Button> buttons = new ArrayList<>();
-        List<String> techs = List.of("Infantry", "Fighter", "Destroyer", "Cruiser", "Carrier", "Dreadnought", "Warsun", "PDS", "SpaceDock");
-        for (String tech : techs) {
+        for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech()) {
             Button button;
             if (rider == null) {
-                button = Button.secondary(prefix + "_" + tech, tech);
+                button = Button.secondary(prefix + "_" + tech.getAlias(), tech.getName());
             } else {
-                button = Button.secondary(prefix + "rider_so;" + tech + "_" + rider, tech);
+                button = Button.secondary(prefix + "rider_so;" + tech.getAlias() + "_" + rider, tech.getName());
             }
             buttons.add(button);
         }
@@ -2110,7 +2107,7 @@ public class AgendaHelper {
         } else if (agendaDetails.contains("unit upgrade")) {
             outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
+            outcomeActionRow = getUnitOutcomeButtons(ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
