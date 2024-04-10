@@ -3404,22 +3404,22 @@ public class MapGenerator {
                         int yMod = -290;
                         BufferedImage gearImage = ImageHelper.readScaled(
                             ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod,
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 15,
                             TILE_PADDING + tilePositionPoint.y + yMod, null);
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer,
+                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 15,
                             TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     } else {
                         int xMod = -155;
                         int yMod = -290;
                         BufferedImage gearImage = ImageHelper.readScaled(
                             ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod,
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 15,
                             TILE_PADDING + tilePositionPoint.y + yMod, null);
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer,
+                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 15,
                             TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     }
                 }
