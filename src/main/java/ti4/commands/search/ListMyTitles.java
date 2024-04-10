@@ -51,7 +51,7 @@ public class ListMyTitles extends SearchSubcommandData {
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
         Map<String, Integer> titles = new HashMap<String, Integer>();
         for (Game playerGame : games) {
-            String singularGameTiles = playerGame.getFactionsThatReactedToThis("TitlesFor"+userID);
+            String singularGameTiles = playerGame.getStoredValue("TitlesFor"+userID);
             if(!singularGameTiles.isEmpty()){
                 for(String title : singularGameTiles.split("_")){
                     if(titles.containsKey(title)){

@@ -98,7 +98,7 @@ public class AgendaHelper {
         String agID = "";
         List<Player> predictiveCheck = getLosingVoters(winner, activeGame);
         for (Player playerWL : predictiveCheck) {
-            if (activeGame.getFactionsThatReactedToThis("riskedPredictive").contains(playerWL.getFaction())
+            if (activeGame.getStoredValue("riskedPredictive").contains(playerWL.getFaction())
                 && playerWL.hasTech("pi")) {
                 playerWL.exhaustTech("pi");
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(playerWL, activeGame),
@@ -106,7 +106,7 @@ public class AgendaHelper {
                         + " predictive was exhausted since you voted the way that lost while using it");
             }
         }
-        activeGame.setCurrentReacts("riskedPredictive", "");
+        activeGame.setStoredValue("riskedPredictive", "");
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(aID)) {
                 agID = agendas.getKey();
@@ -278,8 +278,8 @@ public class AgendaHelper {
                     if (!"for".equalsIgnoreCase(winner)) {
                         winOrLose = getWinningVoters(winner, activeGame);
                         for (Player playerWL : winOrLose) {
-                            activeGame.setCurrentReacts("agendaRepGov",
-                                activeGame.getFactionsThatReactedToThis("agendaRepGov") + playerWL.getFaction());
+                            activeGame.setStoredValue("agendaRepGov",
+                                activeGame.getStoredValue("agendaRepGov") + playerWL.getFaction());
                         }
                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                             "Will exhaust cultural planets of all players who voted against at start of next strat phase");
@@ -393,7 +393,7 @@ public class AgendaHelper {
                 if ("execution".equalsIgnoreCase(agID)) {
                     String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda";
                     new DiscardACRandom().discardRandomAC(event, activeGame, player2, player2.getAc());
-                    activeGame.setCurrentReacts("PublicExecution", player2.getFaction());
+                    activeGame.setStoredValue("PublicExecution", player2.getFaction());
                     if (activeGame.getSpeaker().equalsIgnoreCase(player2.getUserID())) {
                         message = message + ". Also passed the speaker token";
                         boolean foundSpeaker = false;
@@ -602,7 +602,7 @@ public class AgendaHelper {
                             + player.getCCRepresentation() + ". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2,
                             buttons);
-                        activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(),
+                        activeGame.setStoredValue("originalCCsFor" + player.getFaction(),
                             player.getCCRepresentation());
                     }
                 } else {
@@ -631,7 +631,7 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                         "Sent buttons for each person to remove excess dreads/cruisers");
                 } else {
-                    activeGame.setCurrentReacts("agendaArmsReduction", "true");
+                    activeGame.setStoredValue("agendaArmsReduction", "true");
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                         "# Will exhaust all tech skip planets at the start of next Strategy phase");
 
@@ -685,7 +685,7 @@ public class AgendaHelper {
                             + player.getCCRepresentation() + ". Use buttons to lose CCs";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2,
                             buttons);
-                        activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(),
+                        activeGame.setStoredValue("originalCCsFor" + player.getFaction(),
                             player.getCCRepresentation());
                     }
                 }
@@ -725,7 +725,7 @@ public class AgendaHelper {
                     for (String law : laws) {
                         activeGame.removeLaw(law);
                     }
-                    activeGame.setCurrentReacts("agendaConstitution", "true");
+                    activeGame.setStoredValue("agendaConstitution", "true");
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                         "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
                 }
@@ -932,7 +932,7 @@ public class AgendaHelper {
         }
         String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
         String voteMessage = "Click the buttons for next steps after you're done resolving riders.";
-        String agendaCount = activeGame.getFactionsThatReactedToThis("agendaCount");
+        String agendaCount = activeGame.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {
             aCount = 1;
@@ -1125,7 +1125,7 @@ public class AgendaHelper {
                     + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     message2, buttons);
-                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(),
                 "You can use the button to get your tech", Buttons.GET_A_TECH);
@@ -1251,7 +1251,7 @@ public class AgendaHelper {
     public static void checkForAssigningGeneticRecombination(Game activeGame) {
 
         for (Player player : activeGame.getRealPlayers()) {
-            activeGame.setCurrentReacts("Genetic Recombination " + player.getFaction(), "");
+            activeGame.setStoredValue("Genetic Recombination " + player.getFaction(), "");
             if (player.hasTechReady("gr")) {
                 String msg = player.getRepresentation()
                     + " you have the option to pre-assign the declaration of using genetic recombination on someone. When they are up to vote, it will ping them saying that you wish to use genetic recombination, and then it will be your job to clarify. Feel free to not preassign if you dont want to use it on this agenda";
@@ -1423,14 +1423,14 @@ public class AgendaHelper {
             int[] voteInfo = getVoteTotal(nextInLine, activeGame);
 
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
-                || activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())) {
+                || activeGame.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                 String skippedMessage = realIdentity2
                     + "You are being skipped because you cannot vote";
-                if (activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())) {
+                if (activeGame.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity2
                         + "You are being skipped because you told the bot you wanted to preset an abstain";
-                    activeGame.setCurrentReacts("Abstain On Agenda", activeGame
-                        .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                    activeGame.setStoredValue("Abstain On Agenda", activeGame
+                        .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
@@ -1895,14 +1895,14 @@ public class AgendaHelper {
             int[] voteInfo = getVoteTotal(nextInLine, activeGame);
             int counter = 0;
             while ((voteInfo[0] < 1
-                || activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction()))
+                || activeGame.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()))
                 && counter < activeGame.getRealPlayers().size()) {
                 String skippedMessage = realIdentity + "You are being skipped because the bot thinks you cant vote";
-                if (activeGame.getFactionsThatReactedToThis("Abstain On Agenda").contains(nextInLine.getFaction())) {
+                if (activeGame.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity
                         + "You are being skipped because you told the bot you wanted to preset an abstain";
-                    activeGame.setCurrentReacts("Abstain On Agenda", activeGame
-                        .getFactionsThatReactedToThis("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
+                    activeGame.setStoredValue("Abstain On Agenda", activeGame
+                        .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
                 if (activeGame.isFoWMode()) {
@@ -2151,7 +2151,7 @@ public class AgendaHelper {
                             List<Button> buttons = ButtonHelper.getGainCCButtons(winningR);
                             String message = identity + "! Your current CCs are " + winningR.getCCRepresentation()
                                 + ". Use buttons to gain CCs";
-                            activeGame.setCurrentReacts("originalCCsFor" + winningR.getFaction(),
+                            activeGame.setStoredValue("originalCCsFor" + winningR.getFaction(),
                                 winningR.getCCRepresentation());
                             MessageHelper.sendMessageToChannel(channel,
                                 identity + " resolve rider by using the button to get 3 command counters");
@@ -2458,8 +2458,8 @@ public class AgendaHelper {
         }
 
         if (hasXxchaAlliance == 0
-            && (activeGame.getFactionsThatReactedToThis("AssassinatedReps").contains(player.getFaction())
-                || activeGame.getFactionsThatReactedToThis("PublicExecution").contains(player.getFaction()))) {
+            && (activeGame.getStoredValue("AssassinatedReps").contains(player.getFaction())
+                || activeGame.getStoredValue("PublicExecution").contains(player.getFaction()))) {
             voteCount = 0;
         }
 
@@ -2502,7 +2502,7 @@ public class AgendaHelper {
             orderList.remove(argentPlayer.orElse(null));
             orderList.add(0, argentPlayer.get());
         }
-        String conspiratorsFaction = activeGame.getFactionsThatReactedToThis("conspiratorsFaction");
+        String conspiratorsFaction = activeGame.getStoredValue("conspiratorsFaction");
         if (!conspiratorsFaction.isEmpty()) {
             Player rhodun = activeGame.getPlayerFromColorOrFaction(conspiratorsFaction);
             Optional<Player> speaker = orderList.stream()
@@ -2649,8 +2649,8 @@ public class AgendaHelper {
                 player.exhaustTech("dsghotg");
             }
             if (thing.contains("predictive")) {
-                activeGame.setCurrentReacts("riskedPredictive",
-                    activeGame.getFactionsThatReactedToThis("riskedPredictive") + player.getFaction());
+                activeGame.setStoredValue("riskedPredictive",
+                    activeGame.getStoredValue("riskedPredictive") + player.getFaction());
             }
             ButtonHelper.deleteTheOneButton(event);
         } else {

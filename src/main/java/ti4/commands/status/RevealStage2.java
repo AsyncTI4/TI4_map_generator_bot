@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -62,6 +63,34 @@ public class RevealStage2 extends StatusSubcommandData {
                         ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
             }
         }
+    }
+
+    public void revealTwoStage2(GenericInteractionCreateEvent event, MessageChannel channel) {
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+
+        Map.Entry<String, Integer> objective1 = activeGame.revealState2();
+        Map.Entry<String, Integer> objective2 = activeGame.revealState2();
+
+        PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
+        PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
+        MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objectives Revealed**");
+        channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
+                .queue(m -> m.pin().queue());
+
+        int maxSCsPerPlayer;
+        if (activeGame.getRealPlayers().isEmpty()) {
+            maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
+        } else {
+            maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
+        }
+
+        if (maxSCsPerPlayer == 0)
+            maxSCsPerPlayer = 1;
+
+        if (activeGame.getRealPlayers().size() == 1) {
+            maxSCsPerPlayer = 1;
+        }
+        activeGame.setStrategyCardsPerPlayer(maxSCsPerPlayer);
     }
 
     @Override

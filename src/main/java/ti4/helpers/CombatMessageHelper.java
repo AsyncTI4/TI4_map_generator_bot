@@ -158,22 +158,22 @@ public class CombatMessageHelper {
             int round = 0;
             Game activeGame = player.getGame();
             String combatName = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
-            if(activeGame.getFactionsThatReactedToThis(combatName).isEmpty()){
+            if(activeGame.getStoredValue(combatName).isEmpty()){
                 round = 1;
             }else{
-                if(activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
-                    round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName));
+                if(activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
+                    round = Integer.parseInt(activeGame.getStoredValue(combatName));
                 }else{
-                    round = Integer.parseInt(activeGame.getFactionsThatReactedToThis(combatName))+1;
+                    round = Integer.parseInt(activeGame.getStoredValue(combatName))+1;
                 }
             }
-            activeGame.setCurrentReacts(combatName, ""+round);
-            if(activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+            activeGame.setStoredValue(combatName, ""+round);
+            if(activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
                 combatTypeName=combatTypeName+" (Thalnos Reroll for Combat Round #"+round+")";
             }else{
                 combatTypeName=combatTypeName+" (Combat Round #"+round+")";
-                activeGame.setCurrentReacts("solagent","");
-                activeGame.setCurrentReacts("letnevagent", "");
+                activeGame.setStoredValue("solagent","");
+                activeGame.setStoredValue("letnevagent", "");
             }
         }
         return String.format("**%s** rolls for %s on %s %s:  \n",
