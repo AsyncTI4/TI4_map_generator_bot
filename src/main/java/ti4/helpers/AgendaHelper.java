@@ -2109,8 +2109,8 @@ public class AgendaHelper {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
         } else if (agendaDetails.contains("unit upgrade")) {
             outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
-        } else if (agendaDetails.contains("Non-Flagship, Non-Mech Unit")) {
-            outcomeActionRow = getUnitOutcomeButtons(ridername, prefix);
+        } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
+            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
