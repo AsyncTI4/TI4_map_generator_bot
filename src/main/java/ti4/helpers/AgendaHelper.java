@@ -2566,7 +2566,7 @@ public class AgendaHelper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         int[] voteInfo = getVoteTotal(player, activeGame);
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         for (String planet : planets) {
             PlanetModel planetModel = Mapper.getPlanet(planet);
             int voteAmount = 0;
@@ -2700,9 +2700,9 @@ public class AgendaHelper {
 
     public static int getSpecificPlanetsVoteWorth(Player player, Game activeGame, String planet) {
         int voteAmount = 0;
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int[] voteInfo = getVoteTotal(player, activeGame);
-        Planet p = (Planet) planetsInfo.get(planet);
+        Planet p = planetsInfo.get(planet);
         if (p == null) {
             if (planet.contains("custodia") || planet.contains("ghoti")) {
                 return 3;
@@ -2724,8 +2724,7 @@ public class AgendaHelper {
             voteAmount += 1;
         }
         if (player.hasAbility("policy_the_people_control")) {
-            PlanetModel planetModel = Mapper.getPlanet(planet);
-            if (planetModel != null && planetModel.getPlanetType().toString().equals(Constants.CULTURAL)) {
+            if (p.getPlanetTypes().contains(Constants.CULTURAL)) {
                 voteAmount += 2;
             }
         }
@@ -3129,7 +3128,7 @@ public class AgendaHelper {
 
     public static int getVoteCountFromPlanets(Game activeGame, Player player) {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-        Map<String, UnitHolder> planetsInfo = activeGame.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast)
             .mapToInt(Planet::getResources).sum();
         int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(Planet.class::cast)
@@ -3166,12 +3165,10 @@ public class AgendaHelper {
         // Olradin "Control" - +2 votes per cultural planet
         if (player.hasAbility("policy_the_people_control")) {
             List<String> cultPlanets = new ArrayList<>();
-            PlanetModel planetModel;
             for (String cplanet : planets) {
-                planetModel = Mapper.getPlanet(cplanet);
-                if (planetModel == null)
-                    continue;
-                if (planetModel.getPlanetType().toString().equals(Constants.CULTURAL)) {
+                Planet p = activeGame.getPlanetsInfo().get(cplanet);
+                if (p == null) continue;
+                if (p.getPlanetTypes().contains(Constants.CULTURAL)) {
                     cultPlanets.add(cplanet);
                 }
             }

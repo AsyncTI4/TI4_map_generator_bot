@@ -58,7 +58,7 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
 
     private static MessageEmbed getPlanetEmbed(Player player, String planetID) {
         Game activeGame = player.getGame();
-        Planet planet = (Planet) activeGame.getPlanetsInfo().get(planetID);
+        Planet planet = activeGame.getPlanetsInfo().get(planetID);
         PlanetModel planetModel = Mapper.getPlanet(planetID);
         Tile tile = activeGame.getTileFromPlanet(planetID);
 

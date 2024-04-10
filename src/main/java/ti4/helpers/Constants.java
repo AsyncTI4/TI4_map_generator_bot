@@ -4,7 +4,14 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import ti4.AsyncTI4DiscordBot;
+
 public class Constants {
+    // Staff Pings
+    public static final String jazzId = "228999251328368640";
+    public static String jazzPing() { return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention(); }
+
+    // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
@@ -334,11 +341,15 @@ public class Constants {
     public static final String FOW_FILTER_PINK = "Pink";
     public static final String FOW_FILTER_PURPLE = "Purple";
 
+    // milty draft stuff
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";
     public static final String FACTION_COUNT = "faction_count";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
+    public static final String INCLUDE_DS_TILES = "include_ds_tiles";
+    public static final String INCLUDE_DS_FACTIONS = "include_ds_factions";
+    public static final String USE_MAP_TEMPLATE = "use_map_template";
 
     // /custom command
     public static final String CUSTOM = "custom";

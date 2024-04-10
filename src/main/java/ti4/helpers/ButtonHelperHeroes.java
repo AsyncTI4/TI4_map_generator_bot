@@ -743,7 +743,7 @@ public class ButtonHelperHeroes {
     public static void offerFreeSystemsButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            UnitHolder unitHolder = game.getPlanetsInfo().get(planet);
+            Planet unitHolder = game.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
                 && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
@@ -761,7 +761,7 @@ public class ButtonHelperHeroes {
     public static void freeSystemsHeroPlanet(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String planet = buttonID.split("_")[1];
-        UnitHolder unitHolder = game.getPlanetsInfo().get(planet);
+        Planet unitHolder = game.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         planetReal.addToken("token_dmz.png");
         unitHolder.removeAllUnits(player.getColor());

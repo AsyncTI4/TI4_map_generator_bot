@@ -1,5 +1,21 @@
 package ti4.buttons;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -16,11 +32,13 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
-import ti4.commands.agenda.*;
+import ti4.commands.agenda.DrawAgenda;
+import ti4.commands.agenda.ListVoteCount;
+import ti4.commands.agenda.PutAgendaBottom;
+import ti4.commands.agenda.PutAgendaTop;
+import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.PlayAC;
@@ -35,7 +53,11 @@ import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.ZelianHero;
-import ti4.commands.explore.*;
+import ti4.commands.explore.DrawRelic;
+import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreSubcommandData;
+import ti4.commands.explore.RelicInfo;
 import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
@@ -45,7 +67,13 @@ import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetInfo;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.*;
+import ti4.commands.player.AbilityInfo;
+import ti4.commands.player.SCPick;
+import ti4.commands.player.SCPlay;
+import ti4.commands.player.Stats;
+import ti4.commands.player.TurnEnd;
+import ti4.commands.player.TurnStart;
+import ti4.commands.player.UnitInfo;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
@@ -64,18 +92,42 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
-import ti4.helpers.*;
+import ti4.helpers.AgendaHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperCommanders;
+import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.ButtonHelperTacticalAction;
+import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.FrankenDraftHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Leader;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.*;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadLocalRandom;
+import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.RelicModel;
+import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -1489,8 +1541,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (String planetID : player.getReadiedPlanets()) {
                         Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, activeGame);
                         if (planet != null && planet.getOriginalPlanetType() != null) {
-                            List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planet,
-                                player);
+                            List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planet, player);
                             absolPAButtons.addAll(planetButtons);
                         }
                     }
@@ -1687,7 +1738,7 @@ public class ButtonListener extends ListenerAdapter {
             Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda #" + aCount);
             Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
                 "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
-            List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);
+            List<Button> resActionRow = Arrays.asList(flipNextAgenda, proceedToStrategyPhase);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("outcome_")) {
@@ -2172,8 +2223,9 @@ public class ButtonListener extends ListenerAdapter {
             }
 
         } else if (buttonID.startsWith("milty_")) {
-            activeGame.getMiltyDraftManager().doMiltyPick(activeGame, buttonID, player);
-            // System.out.println("MILTY");
+            activeGame.getMiltyDraftManager().doMiltyPick(event, activeGame, buttonID, player);
+        } else if (buttonID.startsWith("showMiltyDraft")) {
+            activeGame.getMiltyDraftManager().repostDraftInformation(activeGame);
         } else if (buttonID.startsWith("ring_")) {
             List<Button> ringButtons = ButtonHelper.getTileInARing(player, activeGame, buttonID, event);
             String num = buttonID.replace("ring_", "");
@@ -2725,8 +2777,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
             String planet = buttonID.replace("nanoforgePlanet_", "");
-            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = activeGame.getPlanetsInfo().get(planet);
             planetReal.addToken("attachment_nanoforge.png");
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Attached nanoforge to " + Helper.getPlanetRepresentation(planet, activeGame));
@@ -3068,7 +3119,7 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannelWithButtons(
                                 ButtonHelper.getCorrectChannel(player, activeGame),
                                 player.getRepresentation(true, true) + " you can use the button to get your tech",
-                                List.of(Buttons.GET_A_TECH));
+                                Arrays.asList(Buttons.GET_A_TECH));
                         } else {
                             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                             String message2 = player.getRepresentation() + "! Your current CCs are "
@@ -3165,8 +3216,8 @@ public class ButtonListener extends ListenerAdapter {
                         + ". Use buttons to gain CCs";
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
-                    List<Button> buttons2 = List.of(exhaust);
+                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
+                    List<Button> buttons2 = Arrays.asList(exhaust);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Exhaust using this",
@@ -3279,10 +3330,10 @@ public class ButtonListener extends ListenerAdapter {
                         "Done Redistributing CCs");
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,
+                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,
                         doneGainingCC, resetCC);
                     if (player.hasAbility("deliberate_action") && activeGame.getCurrentPhase().contains("status")) {
-                        buttons = List.of(getTactic, getFleet, getStrat,
+                        buttons = Arrays.asList(getTactic, getFleet, getStrat,
                             doneGainingCC, resetCC);
                     }
                     if (!activeGame.isFoWMode()) {
@@ -3351,7 +3402,7 @@ public class ButtonListener extends ListenerAdapter {
                         "Done Gaining CCs");
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
+                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
@@ -4903,7 +4954,7 @@ public class ButtonListener extends ListenerAdapter {
                         "(For Others) Abstain for this player");
 
                     String buttonMsg = "Use buttons to vote again. Reminder that this erasing of old votes did not refresh any planets.";
-                    List<Button> buttons = List.of(vote, abstain, forcedAbstain);
+                    List<Button> buttons = Arrays.asList(vote, abstain, forcedAbstain);
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                         buttonMsg, buttons);
                 }
@@ -5742,7 +5793,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.isCustodiansScored()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
-                    List<Button> buttons = List.of(flipAgenda);
+                    List<Button> buttons = Arrays.asList(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now",
                         buttons);
                 } else {
@@ -5755,12 +5806,12 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.isCustodiansScored()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
-                    List<Button> buttons = List.of(flipAgenda);
+                    List<Button> buttons = Arrays.asList(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now",
                         buttons);
                 } else {
                     Button flipAgenda = Button.primary("startStrategyPhase", "Press this to start Strategy Phase");
-                    List<Button> buttons = List.of(flipAgenda);
+                    List<Button> buttons = Arrays.asList(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Start Strategy Phase", buttons);
                 }
             }

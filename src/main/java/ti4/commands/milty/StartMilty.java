@@ -4,86 +4,135 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+import ti4.model.MapTemplateModel;
+import ti4.model.Source.ComponentSource;
 
 public class StartMilty extends MiltySubcommandData {
 
-    public static final int SLICE_GENERATION_CYCLES = 100;
-
-    private boolean anomalies_can_touch;
+    public static final int SLICE_GENERATION_CYCLES = 1000;
 
     public StartMilty() {
         super(Constants.START, "Start Milty Draft");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count").setRequired(false).setRequiredRange(1, 25));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ANOMALIES_CAN_TOUCH, "Anomalies can touch").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.USE_MAP_TEMPLATE, "Use map template").setAutoComplete(true).setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
 
-        //if (!game.isTestBetaFeaturesMode()) {
-        //    MessageHelper.sendMessageToChannel(event.getChannel(), "Milty Draft in this bot is incomplete.\nEnable access by running `/game setup beta_test_mode: true`\nMost folks use [this website](https://milty.shenanigans.be/) to do the Milty Draft and import the TTPG string with `/map add_tile_list`");
-        //    return;
-        //}
 
-        OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
-        int sliceCount = game.getPlayerCountForMap() + 2;
-        if (sliceOption != null) {
-            sliceCount = sliceOption.getAsInt();
-        }
-        if (sliceCount > 9) {
-            String limit9slice = "Milty draft in this bot does not support more than 9 slices yet.";
-            MessageHelper.sendMessageToChannel(event.getChannel(), limit9slice);
-            return;
-        }
-        if (game.getPlayers().values().size() > 8) {
-            String limit8p = "Milty draft in this bot does not support more than 8 players yet.";
-            MessageHelper.sendMessageToChannel(event.getChannel(), limit8p);
-            return;
-        }
+        // Map Template ---------------------------------------------------------------------------
+        MapTemplateModel template = getMapTemplateFromOption(event, game);
+        if (template == null) return; // we have already sent an error message
 
-        int factionCount = game.getPlayerCountForMap() + 2;
+
+        // Sources --------------------------------------------------------------------------------
+        List<ComponentSource> tileSources = new ArrayList<>();
+        tileSources.add(ComponentSource.base);
+        tileSources.add(ComponentSource.pok);
+        tileSources.add(ComponentSource.codex1);
+        tileSources.add(ComponentSource.codex2);
+        tileSources.add(ComponentSource.codex3);
+        List<ComponentSource> factionSources = new ArrayList<>(tileSources);
+        OptionMapping includeDsTilesOption = event.getOption(Constants.INCLUDE_DS_TILES);
+        if (includeDsTilesOption != null && includeDsTilesOption.getAsBoolean()) {
+            tileSources.add(ComponentSource.ds);
+        }
+        OptionMapping includeDsFactionsOption = event.getOption(Constants.INCLUDE_DS_FACTIONS);
+        if (includeDsFactionsOption != null && includeDsFactionsOption.getAsBoolean()) {
+            factionSources.add(ComponentSource.ds);
+        }
+        
+        // Faction count & setup ------------------------------------------------------------------
+        int factionCount = game.getPlayerCountForMap() + 3;
         OptionMapping factionOption = event.getOption(Constants.FACTION_COUNT);
         if (factionOption != null) {
             factionCount = factionOption.getAsInt();
         }
-        if (factionCount > 25) {
-            factionCount = 25;
-        }
+        if (factionCount > 25) factionCount = 25;
 
         List<String> factions = new ArrayList<>(Mapper.getFactions().stream()
-                .filter(f -> f.getSource().isPok())
-                .map(f -> f.getAlias()).toList());
+            .filter(f -> factionSources.contains(f.getSource()))
+            .map(f -> f.getAlias()).toList());
         List<String> factionDraft = createFactionDraft(factionCount, factions);
+        
 
-        anomalies_can_touch = false;
-        OptionMapping anomaliesCanTouchOption = event.getOption(Constants.ANOMALIES_CAN_TOUCH);
-        if (anomaliesCanTouchOption != null) {
-            anomalies_can_touch = anomaliesCanTouchOption.getAsBoolean();
-        }
-
+        // Milty Draft Manager Setup --------------------------------------------------------------
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
-        draftManager.init();
+        draftManager.init(tileSources);
         draftManager.setFactionDraft(factionDraft);
+        draftManager.setMapTemplate(template.getAlias());
         initDraftOrder(draftManager, game);
 
-        boolean slicesCreated = generateSlices(sliceCount, draftManager);
-        if (!slicesCreated) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Did not find correct slices, check settings");
-        } else {
-            // Kick it off with a bang!
-            MiltyDraftHelper.generateAndPostSlices(game);
-            draftManager.serveCurrentPlayer(game);
+
+        // Slice count ----------------------------------------------------------------------------
+        OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
+        int presliceCount = game.getPlayerCountForMap() + 1;
+        if (sliceOption != null) presliceCount = sliceOption.getAsInt();
+        int sliceCount = presliceCount;
+
+        int redTiles = draftManager.getRed().size();
+        int blueTiles = draftManager.getBlue().size();
+        int maxSlices = Math.min(redTiles / 2, blueTiles / 3);
+        if (sliceCount > maxSlices) {
+            String msg = "Milty draft in this bot does not support " + sliceCount + " slices. You can enable DS to allow building additional slices";
+            msg += "\n> The options you have selected enable a maximum of `" + maxSlices + "` slices. [" + blueTiles + "blue/" + redTiles + "red]";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            return;
         }
+        
+
+        // Slice generation -----------------------------------------------------------------------
+        boolean anomaliesCanTouch = false;
+        OptionMapping anomaliesCanTouchOption = event.getOption(Constants.ANOMALIES_CAN_TOUCH);
+        if (anomaliesCanTouchOption != null) {
+            anomaliesCanTouch = anomaliesCanTouchOption.getAsBoolean();
+        }
+        boolean anomalies = anomaliesCanTouch;
+
+        String startMsg = "## Generating the milty draft!!";
+        startMsg += "\n - Also clearing out any tiles that may have already been on the map so that the draft will fill in tiles properly.";
+        if (sliceCount == maxSlices) {
+            startMsg += "\n - *You asked for the max number of slices, so this may take several seconds*";
+        }
+
+        game.clearTileMap();
+        try {
+            MiltyDraftHelper.buildPartialMap(game, event);
+        } catch (Exception e) {
+            //asdf
+        }
+
+        event.getChannel().sendMessage(startMsg).queue((ignore) -> {
+            boolean slicesCreated = generateSlices(event, sliceCount, draftManager, anomalies);
+            if (!slicesCreated) {
+                String msg = "Generating slices was too hard so I gave up.... Please try again.";
+                if (sliceCount == maxSlices) {
+                    msg += "\n*...and maybe consider asking for fewer slices*";
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            } else {
+                // Kick it off with a bang!
+                draftManager.repostDraftInformation(game);
+                GameSaveLoadManager.saveMap(game, event);
+            }
+        });
     }
 
     private static void initDraftOrder(MiltyDraftManager draftManager, Game activeGame) {
@@ -102,19 +151,46 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private static List<String> createFactionDraft(int factionCount, List<String> factions) {
+        boolean hasKeleres = false;
+        boolean hasMentak = false;
+        boolean hasXxcha = false;
+        boolean hasArgent = false;
         factions.remove("lazax");
         Collections.shuffle(factions);
         List<String> factionDraft = new ArrayList<>();
-        for (int i = 0; i < factionCount; i++) {
-            factionDraft.add(factions.get(i));
+        int i = 0;
+        while (factionDraft.size() < factionCount) {
+            String f = factions.get(i);
+            i++;
+            if (List.of("keleresa", "keleresm", "keleresx").contains(f)) {
+                if (hasKeleres) continue;
+                hasKeleres = true;
+            }
+            /*
+            if (List.of("keleresa", "argent").contains(f)) {
+                if (hasArgent) continue;
+                hasArgent = true;
+            }
+            if (List.of("keleresm", "mentak").contains(f)) {
+                if (hasMentak) continue;
+                hasMentak = true;
+            }
+            if (List.of("keleresx", "xxcha").contains(f)) {
+                if (hasXxcha) continue;
+                hasXxcha = true;
+            }*/
+            factionDraft.add(f);
         }
         return factionDraft;
     }
 
-    private boolean generateSlices(int sliceCount, MiltyDraftManager draftManager) {
+    private static boolean generateSlices(GenericInteractionCreateEvent event, int sliceCount, MiltyDraftManager draftManager, boolean anomaliesCanTouch) {
+        long startTime = System.nanoTime();
+        long quittinTime = startTime + 5 * 1000 * 1000 * 1000;
+
         boolean slicesCreated = false;
         int i = 0;
-        while (!slicesCreated && i < 1000) {
+        while (!slicesCreated && System.nanoTime() < quittinTime) {
             draftManager.clearSlices();
 
             List<MiltyDraftTile> blue = draftManager.getBlue();
@@ -136,10 +212,9 @@ public class StartMilty extends MiltySubcommandData {
                 boolean needToCheckAnomalies = red1.getTierList() == TierList.anomaly && red2.getTierList() == TierList.anomaly;
                 Collections.shuffle(tiles);
 
-                if (!anomalies_can_touch && needToCheckAnomalies) {
-                    int emergencyIndex = 0;
-                    while (emergencyIndex < 100) {
-
+                if (!anomaliesCanTouch && needToCheckAnomalies) {
+                    int turns = 0;
+                    while (turns < 5) {
                         boolean left = tiles.get(0).getTile().isAnomaly();
                         boolean front = tiles.get(1).getTile().isAnomaly();
                         boolean right = tiles.get(2).getTile().isAnomaly();
@@ -148,8 +223,9 @@ public class StartMilty extends MiltySubcommandData {
                         if (!((front && (left || right || equi || meca)) || (equi && (meca || left)))) {
                             break;
                         }
-                        Collections.shuffle(tiles);
-                        emergencyIndex++;
+                        //rotating the array will ALWAYS find an acceptable tile layout within 2 turns
+                        Collections.rotate(tiles, 1); 
+                        turns++;
                     }
                 }
                 miltyDraftSlice.setLeft(tiles.get(0));
@@ -158,12 +234,16 @@ public class StartMilty extends MiltySubcommandData {
                 miltyDraftSlice.setEquidistant(tiles.get(3));
                 miltyDraftSlice.setFarFront(tiles.get(4));
 
-                // CHECK IF SLICES ARE OK HERE -------------------------------
-                double shenInf = miltyDraftSlice.getOptimalInf() * 1.0 + miltyDraftSlice.getOptimalFlex() / 2.0;
-                double shenRes = miltyDraftSlice.getOptimalRes() * 1.0 + miltyDraftSlice.getOptimalFlex() / 2.0;
+                // CHECK IF SLICES ARE OK-ish HERE -------------------------------
+                int optInf = miltyDraftSlice.getOptimalInf();
+                int optRes = miltyDraftSlice.getOptimalRes();
                 int totalOptimal = miltyDraftSlice.getOptimalTotalValue();
-                if (shenInf < 4.0 || shenRes < 2.5 || totalOptimal < 9 || totalOptimal > 13) {
-                    break;
+                if (optInf < 3 || optRes < 2 || totalOptimal < 9 || totalOptimal > 13) {
+                    double shenanInf = optInf + miltyDraftSlice.getOptimalFlex() / 2.0;
+                    double shenanRes = optRes + miltyDraftSlice.getOptimalFlex() / 2.0;
+                    if (shenanInf < 3.95 || shenanRes < 2.45) {
+                        break;
+                    }
                 }
 
                 String sliceName = Character.toString(sliceNum - 1 + 'A');
@@ -176,7 +256,50 @@ public class StartMilty extends MiltySubcommandData {
             }
             i++;
         }
+        if (!slicesCreated) {
+            draftManager.clear();
+        }
+
+        long elapsed = System.nanoTime() - startTime;
+        System.out.println("Milty draft performance statistics:");
+        System.out.println("        Elapsed time: " + Helper.getTimeRepresentationNanoSeconds(elapsed));
+        System.out.println("    Number of cycles: " + i);
         return slicesCreated;
     }
 
+    private static MapTemplateModel getMapTemplateFromOption(SlashCommandInteractionEvent event, Game game) {
+        int players = game.getPlayers().values().size();
+        List<MapTemplateModel> allTemplates = Mapper.getMapTemplates();
+        List<MapTemplateModel> validTemplates = Mapper.getMapTemplatesForPlayerCount(players);
+        MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
+        
+        if (validTemplates.size() == 0) {
+            String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player(s) yet.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            return null;
+        }
+        
+        MapTemplateModel useTemplate = null;
+        String templateName = null;
+        OptionMapping templateOption = event.getOption(Constants.USE_MAP_TEMPLATE);
+        if (templateOption != null) {
+            templateName = templateOption.getAsString();
+        }
+        if (templateName != null) {
+            for (MapTemplateModel model : allTemplates) {
+                if (model.getAlias().equals(templateName)) {
+                    useTemplate = model;
+                }
+            }
+        } else {
+            useTemplate = defaultTemplate;
+        }
+
+        if (useTemplate == null) {
+            String msg = "There is not a default map layout defined for this player count. Specify map template in options.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+            return null;
+        }
+        return useTemplate;
+    }
 }
