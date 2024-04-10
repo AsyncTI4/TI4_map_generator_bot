@@ -4599,7 +4599,7 @@ public class ButtonListener extends ListenerAdapter {
                         } else if (agendaDetails.contains("unit upgrade")) {
                             outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, null, "outcome");
                         } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-                            outcomeActionRow = AgendaHelper.getUnitOutcomeButtons(null, "outcome");
+                            outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, null, "outcome");
                         } else {
                             outcomeActionRow = AgendaHelper.getLawOutcomeButtons(activeGame, null, "outcome");
                         }

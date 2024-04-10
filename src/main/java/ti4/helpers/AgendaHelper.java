@@ -2110,7 +2110,7 @@ public class AgendaHelper {
         } else if (agendaDetails.contains("unit upgrade")) {
             outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-            outcomeActionRow = getUnitOutcomeButtons(ridername, prefix);
+            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
