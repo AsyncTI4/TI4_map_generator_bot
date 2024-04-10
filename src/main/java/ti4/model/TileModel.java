@@ -19,10 +19,8 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private String name;
     private List<String> aliases;
     private String imagePath;
-    private String tileBack;
     private List<String> planets;
     private ShipPositionModel.ShipPosition shipPositionsType;
-    @Deprecated
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
     private Boolean isAsteroidField;
@@ -30,6 +28,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private Boolean isNebula;
     private Boolean isGravityRift;
     private ComponentSource source;
+    private String tileBack;
 
     @Override
     @JsonIgnore
@@ -135,7 +134,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public Optional<String> getTileBack() {
+    public Optional<String> getTileBackOption() {
         return Optional.ofNullable(tileBack);
     }
 }

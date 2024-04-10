@@ -1,16 +1,24 @@
 package ti4.helpers;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.commands.player.Setup;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.map.AddTileList;
 import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands.milty.MiltyDraftSlice;
 import ti4.commands.milty.MiltyDraftManager.PlayerDraft;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
@@ -22,7 +30,7 @@ public class MapTemplateHelper {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         List<PlayerDraft> speakerOrdered = manager.getDraft().values().stream()
-            .sorted(Comparator.comparing(PlayerDraft::getOrder))
+            .sorted(Comparator.comparing(PlayerDraft::getPosition))
             .toList();
         
         Map<String, String> positionMap = new HashMap<>();
@@ -46,7 +54,7 @@ public class MapTemplateHelper {
             tileId = templateTile.getStaticTileId();
         } else if (templateTile.getPlayerNumber() != null) {
             PlayerDraft player = draft.stream()
-                .filter(p -> p.getOrder() == templateTile.getPlayerNumber())
+                .filter(p -> p.getPosition() == templateTile.getPlayerNumber())
                 .findFirst().orElse(null);
             if (player == null) {
                 throw new Exception("Something went wrong, could not find player at speaker order: " + templateTile.getPlayerNumber());
@@ -66,4 +74,63 @@ public class MapTemplateHelper {
         }
         return Map.entry(position, AliasHandler.resolveTile(tileId));
     }
+
+    
+    public static void buildPartialMapFromMiltyData(Game game, GenericInteractionCreateEvent event, String mapTemplate) {
+        MiltyDraftManager manager = game.getMiltyDraftManager();
+        MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
+        List<Player> players = manager.getPlayers().stream().map(p -> game.getPlayer(p)).toList();
+        List<String> backupColors = Arrays.asList("black","bloodred","blue","brown","chocolate","chrome","emerald",
+            "ethereal","forest","gold","green","grey","lavender","lightbrown","lightgrey","navy","orange","petrol",
+            "pink","purple","rainbow","red","rose","spring","sunset","tan","teal","turquoise","white","yellow");
+        boolean somethingHappened = false;
+        // fill in draft tiles for all players
+        for (Player p : players) {
+            PlayerDraft draft = manager.getPlayerDraft(p);
+            Integer playerNum = draft.getPosition();
+            String faction = draft.getFaction();
+            MiltyDraftSlice slice = draft.getSlice();
+            for (MapTemplateTile tile : template.getTemplateTiles()) {
+                Tile gameTile = game.getTileByPosition(tile.getPos());
+                if (tile.getPos() != null && tile.getPlayerNumber() != null && tile.getPlayerNumber() == playerNum) {
+                    if (gameTile != null && !TileHelper.isDraftTile(gameTile.getTileModel())) continue; //already set
+
+                    
+                    if (slice != null && tile.getMiltyTileIndex() != null) {
+                        String tileID = slice.getTiles().get(tile.getMiltyTileIndex()).getTile().getTileID();
+                        Tile toAdd = new Tile(tileID, tile.getPos());
+                        game.setTile(toAdd);
+                        somethingHappened = true;
+                    } else if (faction != null && tile.getHome() != null && tile.getHome()) {
+                        Setup.secondHalfOfPlayerSetup(p, game, backupColors.get(playerNum), faction, tile.getPos(), event, playerNum == 1); // color,faction,positionHS,event,setSpeaker
+                        somethingHappened = true;
+                    }
+                } else if (tile.getPos() != null && gameTile == null) {
+                    String tileID = null;
+                    if (tile.getStaticTileId() != null) tileID = tile.getStaticTileId();
+                    else if (tile.getPlayerNumber() != null) {
+                        if (tile.getPlayerNumber() != null) {
+                            String color = backupColors.get(tile.getPlayerNumber());
+                            if (tile.getMiltyTileIndex() != null) {
+                                tileID = color + (tile.getMiltyTileIndex()+1);
+                            } else if (tile.getHome() != null) {
+                                tileID = color + "blank";
+                            }
+                        }
+                    }
+                    if (tileID != null) {
+                        tileID = AliasHandler.resolveTile(tileID);
+                        Tile toAdd = new Tile(tileID, tile.getPos());
+                        game.setTile(toAdd);
+                        somethingHappened = true;
+                    }
+                }
+            }
+        }
+
+        if (somethingHappened) {
+            ShowGame.simpleShowGame(game, event);
+        }
+    }
+
 }

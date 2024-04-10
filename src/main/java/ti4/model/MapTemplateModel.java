@@ -22,11 +22,17 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     String alias;
+    String author;
     Integer playerCount;
+    Integer tilesPerPlayer;
     // MECATOL REX IS NOT INCLUDED BY DEFAULT
     List<MapTemplateTile> templateTiles;
 
     public boolean isValid() {
         return true;
+    }
+
+    public String autoCompleteString() {
+        return getAlias() + ": " + getPlayerCount() + " player map by " + getAuthor();
     }
 }
