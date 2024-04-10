@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.commands.player.Setup;
-import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.map.AddTileList;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftSlice;
@@ -75,6 +73,17 @@ public class MapTemplateHelper {
         return Map.entry(position, AliasHandler.resolveTile(tileId));
     }
 
+    public static String getPlayerHomeSystemLocation(PlayerDraft pd, String mapTemplate) {
+        MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
+        for (MapTemplateTile t : template.getTemplateTiles()) {
+            if (t.getPlayerNumber() != null && t.getPlayerNumber() == pd.getPosition()) {
+                if (pd.getFaction() != null && t.getHome() != null && t.getHome()) {
+                    return t.getPos();
+                }
+            }
+        }
+        return null;
+    }
     
     public static void buildPartialMapFromMiltyData(Game game, GenericInteractionCreateEvent event, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
@@ -98,11 +107,17 @@ public class MapTemplateHelper {
                     
                     if (slice != null && tile.getMiltyTileIndex() != null) {
                         String tileID = slice.getTiles().get(tile.getMiltyTileIndex()).getTile().getTileID();
+                        tileID = AliasHandler.resolveTile(tileID);
+
                         Tile toAdd = new Tile(tileID, tile.getPos());
                         game.setTile(toAdd);
                         somethingHappened = true;
                     } else if (faction != null && tile.getHome() != null && tile.getHome()) {
-                        Setup.secondHalfOfPlayerSetup(p, game, backupColors.get(playerNum), faction, tile.getPos(), event, playerNum == 1); // color,faction,positionHS,event,setSpeaker
+                        String tileID = Mapper.getFaction(faction).getHomeSystem();
+                        tileID = AliasHandler.resolveTile(tileID);
+                        
+                        Tile toAdd = new Tile(tileID, tile.getPos());
+                        game.setTile(toAdd);
                         somethingHappened = true;
                     }
                 } else if (tile.getPos() != null && gameTile == null) {
