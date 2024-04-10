@@ -2108,13 +2108,13 @@ public class ButtonHelperFactionSpecific {
             String message = player.getRepresentation()
                 + " Use the buttons to produce 1 ship that was destroyed in the combat. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         }
         String msg = player.getRepresentation() + " used Salvage Ops to get 1tg (current tg is now " + player.getTg()
             + ")";
         ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
     }
 
     public static void resolveLanefirATS(Player player, ButtonInteractionEvent event, String buttonID) {

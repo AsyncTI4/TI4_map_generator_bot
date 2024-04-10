@@ -268,12 +268,12 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // MESSAGE ABOUT AGGRESSION METAS
         String agressionMsg = "Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who dont share that meta."
             + " Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
-            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as aggressive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
-            + "\n- Anything goes -- Is comfortable in a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2. Tournament games would be this by default. "
+            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
+            + "\n- No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2."
             + "\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives dont necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("anonDeclare_Friendly", "Friendly"));
-        buttons.add(Button.primary("anonDeclare_Anything Goes", "Anything Goes"));
+        buttons.add(Button.primary("anonDeclare_No Strong Preference", "No Strong Preference"));
         buttons.add(Button.danger("anonDeclare_Aggressive", "Aggressive"));
         newGame.setUndoButton(false);
         MessageHelper.sendMessageToChannel(actionsChannel, agressionMsg, buttons);

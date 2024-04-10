@@ -165,14 +165,14 @@ public class TechExhaust extends TechAddRemove {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
-            case "dskolug" -> {
+            case "dskolly" -> {
                 deleteIfButtonEvent(event);
                 if (event instanceof ButtonInteractionEvent bevent) {
                     ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, bevent, "yes");
                 }
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
-            case "dskolly" -> {
+            case "dskolug" -> {
                 deleteIfButtonEvent(event);
                 String message = player.getRepresentation(true, true) + " stalled using the Applied Biothermics tech.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
