@@ -4598,7 +4598,7 @@ public class ButtonListener extends ListenerAdapter {
                             outcomeActionRow = AgendaHelper.getStrategyOutcomeButtons(null, "outcome");
                         } else if (agendaDetails.contains("unit upgrade")) {
                             outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, null, "outcome");
-                        } else if (agendaDetails.contains("Non-Flagship, Non-Mech Unit")) {
+                        } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
                             outcomeActionRow = AgendaHelper.getUnitOutcomeButtons(null, "outcome");
                         } else {
                             outcomeActionRow = AgendaHelper.getLawOutcomeButtons(activeGame, null, "outcome");
