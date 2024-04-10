@@ -81,16 +81,16 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(
-                token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
+            token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
     }
 
     @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-                .map(UnitKey::asyncID)
-                .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
-                .filter(Objects::nonNull)
-                .anyMatch(UnitModel::getIsGroundForce);
+            .map(UnitKey::asyncID)
+            .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+            .filter(Objects::nonNull)
+            .anyMatch(UnitModel::getIsGroundForce);
     }
 
     @Override

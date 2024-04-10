@@ -354,7 +354,7 @@ public class MapGenerator {
         if (!debug)
             return;
         long total = System.nanoTime() - debugAbsoluteStartTime;
-        String sb = " Total time to generate map " + game.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total) + 
+        String sb = " Total time to generate map " + game.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total) +
             "\n" + debugString("    Frog time: ", debugFowTime, total) +
             "\n" + debugString("    Tile time: ", debugTileTime, total) +
             "\n" + debugString("    Info time: ", debugGameInfoTime, total) +
@@ -2426,8 +2426,13 @@ public class MapGenerator {
         if (debug) debugSuperStringTime += System.nanoTime();
     }
 
-    enum HorizontalAlign { Left, Center, Right; };
-    enum VerticalAlign { Top, Center, Bottom; };
+    enum HorizontalAlign {
+        Left, Center, Right;
+    };
+
+    enum VerticalAlign {
+        Top, Center, Bottom;
+    };
 
     /**
      * 
@@ -2437,15 +2442,16 @@ public class MapGenerator {
      * @param y
      * @param textColor
      * @param rightAlign
-     * @param outlineSize 
-     * @param outlineColor 
+     * @param outlineSize
+     * @param outlineColor
      */
     private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
         if (h != null) {
             switch (h) {
                 case Center -> x -= g.getFontMetrics().stringWidth(txt) / 2.0;
                 case Right -> x -= g.getFontMetrics().stringWidth(txt);
-                case Left -> {}
+                case Left -> {
+                }
             }
         }
         if (v != null) {
@@ -2453,7 +2459,8 @@ public class MapGenerator {
             switch (v) {
                 case Center -> y += height / 2.0;
                 case Top -> y += height;
-                case Bottom -> {}
+                case Bottom -> {
+                }
             }
         }
         if (outlineSize == null || outlineColor == null) {
@@ -2470,12 +2477,12 @@ public class MapGenerator {
 
         GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), text);
         Shape textShape = gv.getOutline();
-        
+
         g2.translate(x, y);
         g2.setColor(outlineColor);
         g2.setStroke(outlineStroke);
         g2.draw(textShape);
-        
+
         g2.setColor(fillColor);
         g2.fill(textShape);
 
@@ -3459,7 +3466,7 @@ public class MapGenerator {
                     int labelY = TILE_PADDING + labelPositionPoint.y;
                     superDrawString(tileGraphics, tile.getFogLabel(frogPlayer), labelX, labelY, Color.white, null, null, null, null);
                 }
-                
+
                 int textX = TILE_PADDING + tilePositionPoint.x;
                 int textY = TILE_PADDING + tilePositionPoint.y;
                 superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.white, HorizontalAlign.Right, VerticalAlign.Bottom, stroke7, Color.black);
@@ -3483,10 +3490,9 @@ public class MapGenerator {
                     }
                     tileGraphics.setFont(Storage.getFont24());
                     int numX = TILE_PADDING + 172; //172 //320
-                    int numY = TILE_PADDING + 228;  //50  //161
+                    int numY = TILE_PADDING + 228; //50  //161
                     superDrawString(tileGraphics, draftColor, numX, numY, Color.white, HorizontalAlign.Center, VerticalAlign.Bottom, stroke6, Color.black);
                 }
-
 
                 int prodInSystem = 0;
                 for (Player player : game.getRealPlayers()) {
@@ -3509,22 +3515,22 @@ public class MapGenerator {
                         int yMod = -290;
                         BufferedImage gearImage = ImageHelper.readScaled(
                             ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod,
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod, null);
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer,
+                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     } else {
                         int xMod = -155;
                         int yMod = -290;
                         BufferedImage gearImage = ImageHelper.readScaled(
                             ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod,
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod, null);
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer,
+                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     }
                 }
@@ -3545,7 +3551,7 @@ public class MapGenerator {
                 }
                 game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
                     if (borderAnomalyHolder.getTile().equals(tile.getPosition())) {
-                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics,borderAnomalyHolder.getType());
+                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
                     }
                 });
             }
