@@ -1,12 +1,12 @@
 package ti4.commands.milty;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,14 +23,14 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
-import ti4.commands.uncategorized.ShowGame;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.generator.MapGenerator.HorizontalAlign;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.MapFileDeleter;
 import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -59,126 +59,112 @@ public class MiltyDraftHelper {
         List<MiltyDraftSlice> slices = draftManager.getSlices();
 
         int sliceCount = slices.size();
+        int spanW = (int) (Math.ceil(Math.sqrt(sliceCount)) + 0.01);
+        int spanH = (sliceCount + spanW - 1) / spanW;
+
         float scale = 1.0f;
         int scaled = (int) (900 * scale);
-        int width = scaled * 5;
-        int height = scaled * (sliceCount > 5 ? sliceCount > 10 ? 3 : 2 : 1);
+        int width = scaled * spanW;
+        int height = scaled * spanH;
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics graphicsMain = mainImage.getGraphics();
 
-        File file = Storage.getMapImageStorage("temp_slice.png");
-        if (file == null) return null;
-        try {
-            int index = 0;
-            int deltaX = 0;
-            int deltaY = 0;
-            for (MiltyDraftSlice slice : slices) {
-                BufferedImage sliceImage = generateSliceImage(slice);
-                BufferedImage resizedSlice = ImageHelper.scale(sliceImage, scale);
-                graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
-                index++;
+        int index = 0;
+        int deltaX = 0;
+        int deltaY = 0;
+        for (MiltyDraftSlice slice : slices) {
+            BufferedImage sliceImage = generateSliceImage(slice);
+            BufferedImage resizedSlice = ImageHelper.scale(sliceImage, scale);
+            graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
+            index++;
 
-                int heightSlice = resizedSlice.getHeight();
-                int widthSlice = resizedSlice.getWidth();
+            int heightSlice = resizedSlice.getHeight();
+            int widthSlice = resizedSlice.getWidth();
 
-                deltaX += widthSlice;
-                if (index % 5 == 0) {
-                    deltaY += heightSlice;
-                    deltaX = 0;
-                }
+            deltaX += widthSlice;
+            if (index % spanW == 0) {
+                deltaY += heightSlice;
+                deltaX = 0;
             }
-            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
-            imageWriter.setOutput(ImageIO.createImageOutputStream(file));
+        }
+
+        FileUpload fileUpload = null;
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            boolean jpg = true;
+            String ext = jpg ? "jpg" : "png";
+            BufferedImage jpgImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            jpgImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
+            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
+            imageWriter.setOutput(ImageIO.createImageOutputStream(out));
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
             if (defaultWriteParam.canWriteCompressed()) {
                 defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(1f);
+                defaultWriteParam.setCompressionQuality(1.0f);
             }
-
-            imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
+            imageWriter.write(null, new IIOImage(jpg ? jpgImage : mainImage, null, null), defaultWriteParam);
+            String fileName = game.getName() + "_miltydraft_" + MapGenerator.getTimeStamp() + "." + ext;
+            fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
-            BotLogger.log("Could not save generated slice image", e);
+            BotLogger.log("Could not create FileUpload for milty draft", e);
         }
 
-        String absolutePath = file.getParent() + "/" + game.getName() + "_slices.jpg";
-        try (FileInputStream fileInputStream = new FileInputStream(file);
-            FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-
-            BufferedImage image = ImageIO.read(fileInputStream);
-            fileInputStream.close();
-
-            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
-
-            ImageIO.write(convertedImage, "jpg", fileOutputStream);
-        } catch (IOException e) {
-            BotLogger.log("Could not save jpg file", e);
-        }
-
-        file.delete();
-        File jpgFile = new File(absolutePath);
-        FileUpload fileUpload = FileUpload.fromData(jpgFile, jpgFile.getName());
-        MapFileDeleter.addFileToDelete(jpgFile);
         return fileUpload;
     }
 
-    private static BufferedImage generateSliceImage(MiltyDraftSlice slice) throws IOException {
-        Point equidistant = new Point(0, 150);
-        Point left = new Point(0, 450);
-        Point farFront = new Point(260, 0);
-        Point front = new Point(260, 300);
-        Point hs = new Point(260, 600);
-        Point right = new Point(520, 450);
+    private static final BasicStroke innerStroke = new BasicStroke(4.0f);
+    private static final BasicStroke outlineStroke = new BasicStroke(9.0f);
 
-        System.out.println("Generating slice: " + slice.ttsString());
+    private static BufferedImage generateSliceImage(MiltyDraftSlice slice) {
+        Point left = new Point(0, 450);
+        Point front = new Point(260, 300);
+        Point right = new Point(520, 450);
+        Point equidistant = new Point(0, 150);
+        Point farFront = new Point(260, 0);
+        Point hs = new Point(260, 600);
+
+        List<String> tileStrings = new ArrayList<>();
+        tileStrings.addAll(slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
+        tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
+        List<Point> tilePositions = Arrays.asList(left, front, right, equidistant, farFront, hs);
 
         BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = sliceImage.getGraphics();
 
-        BufferedImage image = ImageIO.read(new File(slice.getLeft().getTile().getTilePath()));
-        graphics.drawImage(image, left.x, left.y, null);
-
-        image = ImageIO.read(new File(slice.getFront().getTile().getTilePath()));
-        graphics.drawImage(image, front.x, front.y, null);
-
-        image = ImageIO.read(new File(slice.getRight().getTile().getTilePath()));
-        graphics.drawImage(image, right.x, right.y, null);
-
-        image = ImageIO.read(new File(slice.getEquidistant().getTile().getTilePath()));
-        graphics.drawImage(image, equidistant.x, equidistant.y, null);
-
-        image = ImageIO.read(new File(slice.getFarFront().getTile().getTilePath()));
-        graphics.drawImage(image, farFront.x, farFront.y, null);
-
-        String tileFile = ResourceHelper.getInstance().getTileFile("00_green.png");
-        if (tileFile != null) {
-            image = ImageIO.read(new File(tileFile));
-            graphics.drawImage(image, hs.x, hs.y, null);
+        int index = 0;
+        BufferedImage img = null;
+        for (String tilePath : tileStrings) {
+            img = ImageHelper.read(tilePath);
+            Point p = tilePositions.get(index);
+            graphics.drawImage(img, p.x, p.y, null);
+            index++;
         }
 
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont64());
-        graphics.drawString(slice.getName(), hs.x + 150, hs.y + 60);
-
-        graphics.setFont(Storage.getFont50());
         int resources = slice.getTotalRes();
         int influence = slice.getTotalInf();
         String totalsString = resources + "/" + influence;
-
+        
         int resourcesMilty = slice.getOptimalRes();
         int influenceMilty = slice.getOptimalInf();
         int flexMilty = slice.getOptimalFlex();
         String optimalString = "(" + resourcesMilty + "/" + influenceMilty + " +" + flexMilty + ")";
 
-        graphics.drawString(totalsString, hs.x + 130, hs.y + 130);
-        graphics.drawString(optimalString, hs.x + 70, hs.y + 190);
+        ((Graphics2D) graphics).setStroke(innerStroke);
+
+        HorizontalAlign hAlign = HorizontalAlign.Center;
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont64());
+        MapGenerator.superDrawString(graphics, slice.getName(), hs.x + 172, hs.y + 60, Color.white, hAlign, null, outlineStroke, Color.black);
+
+        graphics.setFont(Storage.getFont50());
+        MapGenerator.superDrawString(graphics, totalsString, hs.x + 172, hs.y + 130, Color.white, hAlign, null, outlineStroke, Color.black);
+        MapGenerator.superDrawString(graphics, optimalString, hs.x + 172, hs.y + 190, Color.white, hAlign, null, outlineStroke, Color.black);
 
         return sliceImage;
     }
-    
+
     public static void initDraftTiles(MiltyDraftManager draftManager) {
         List<ComponentSource> defaultSources = Arrays.asList(
-            ComponentSource.base, 
+            ComponentSource.base,
             ComponentSource.codex1,
             ComponentSource.codex2,
             ComponentSource.codex3,
@@ -261,7 +247,7 @@ public class MiltyDraftHelper {
 
     public static void buildPartialMap(Game game, GenericInteractionCreateEvent event) throws Exception {
         MiltyDraftManager manager = game.getMiltyDraftManager();
-        
+
         String mapTemplate = manager.getMapTemplate();
         if (mapTemplate == null) {
             MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());
@@ -276,7 +262,7 @@ public class MiltyDraftHelper {
 
     public static void buildMap(Game game) throws Exception {
         MiltyDraftManager manager = game.getMiltyDraftManager();
-        
+
         String mapTemplate = manager.getMapTemplate();
         if (mapTemplate == null) {
             MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(manager.getPlayers().size());

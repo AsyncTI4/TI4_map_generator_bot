@@ -129,7 +129,7 @@ public class MapTemplateHelper {
         }
 
         if (somethingHappened) {
-            ShowGame.simpleShowGame(game, event);
+            ButtonHelper.updateMap(game, event);
         }
     }
 

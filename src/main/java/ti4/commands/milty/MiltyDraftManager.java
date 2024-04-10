@@ -61,12 +61,12 @@ public class MiltyDraftManager {
         private MiltyDraftSlice slice = null;
         private Integer position = null;
 
-        public String summary() {
-            return String.join("/", factionEmoji(), sliceEmoji(), positionEmoji());
+        public String summary(String doggy) {
+            return String.join(" ", factionEmoji(doggy), sliceEmoji(), positionEmoji());
         }
 
-        private String factionEmoji() {
-            return faction == null ? Emojis.getRandomGoodDog() : Emojis.getFactionIconFromDiscord(faction);
+        private String factionEmoji(String doggy) {
+            return faction == null ? doggy : Emojis.getFactionIconFromDiscord(faction);
         }
 
         private String sliceEmoji() {
@@ -76,7 +76,7 @@ public class MiltyDraftManager {
         private String positionEmoji() {
             return position == null ? Emojis.positionUnpicked : Emojis.getSpeakerPickEmoji(position);
         }
-
+        
         @JsonIgnore
         public String save() {
             String factionStr = faction == null ? "null" : faction;
@@ -419,7 +419,8 @@ public class MiltyDraftManager {
     }
 
     private String getOverallSummaryString(Game game) {
-        int padding = String.format("%s", getPlayers().size()).length();
+        int padding = String.format("%s", getPlayers().size()).length() + 1;
+        String goodDogOfTheDay = Emojis.getRandomGoodDog();
         StringBuilder sb = new StringBuilder();
         sb.append("# **__Draft Picks So Far__**:");
         int pickNum = 1;
@@ -427,13 +428,13 @@ public class MiltyDraftManager {
             Player player = game.getPlayer(p);
             PlayerDraft picks = getPlayerDraft(p);
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
-            sb.append("[ ").append(picks.summary()).append(" ] ");
+            sb.append(picks.summary(goodDogOfTheDay)).append(" ");
 
             if (p.equals(getNextDraftPlayer())) sb.append("*");
             if (p.equals(getCurrentDraftPlayer())) sb.append("**__");
             sb.append(player.getUserName());
             if (p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
-            if (p.equals(getNextDraftPlayer())) sb.append("   <- up next");
+            if (p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
             if (p.equals(getCurrentDraftPlayer())) sb.append("__**");
             if (p.equals(getNextDraftPlayer())) sb.append("*");
 
