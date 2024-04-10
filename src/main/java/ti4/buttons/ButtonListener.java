@@ -1657,7 +1657,7 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, activeGame));
         } else if (buttonID.startsWith("getReleaseButtons")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                trueIdentity + " you can release units one at a time with the buttons",
+                trueIdentity + " you can release units one at a time with the buttons. Reminder that captured units can only be released as part of an ability or a transaction.",
                 ButtonHelperFactionSpecific.getReleaseButtons(player, activeGame));
         } else if (buttonID.startsWith("ghotiHeroIn_")) {
             String pos = buttonID.substring(buttonID.indexOf("_") + 1);
@@ -1813,7 +1813,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("construction_")) {
             boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
             StrategyCardModel scModel = activeGame.getStrategyCardModelByName("construction").orElse(null);
-            if (!used && scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative()) && scModel.usesAutomationForSCID("pok4construction")) {
+            if (!used && scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative()) && scModel.usesAutomationForSCID("pok4construction") && activeGame.getPlayedSCs().contains(scModel.getInitiative())) {
                 player.addFollowedSC(scModel.getInitiative());
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), activeGame, event);
                 if (player.getStrategicCC() > 0) {
@@ -3637,6 +3637,15 @@ public class ButtonListener extends ListenerAdapter {
                         aCount = Integer.parseInt(agendaCount) - 1;
                     }
                     activeGame.setCurrentReacts("agendaCount", aCount + "");
+                    String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
+                    if ("CL".equalsIgnoreCase(agendaid)) {
+                        String id2 = activeGame.revealAgenda(false);
+                        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+                        AgendaModel agendaDetails = Mapper.getAgenda(id2);
+                        String agendaName = agendaDetails.getName();
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# The hidden agenda was " + agendaName
+                            + "! You can find it in the discard.");
+                    }
                     new RevealAgenda().revealAgenda(event, false, activeGame, event.getChannel());
                     event.getMessage().delete().queue();
 
@@ -4794,6 +4803,15 @@ public class ButtonListener extends ListenerAdapter {
                         aCount = Integer.parseInt(agendaCount) - 1;
                     }
                     activeGame.setCurrentReacts("agendaCount", aCount + "");
+                    String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
+                    if ("CL".equalsIgnoreCase(agendaid)) {
+                        String id2 = activeGame.revealAgenda(false);
+                        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
+                        AgendaModel agendaDetails = Mapper.getAgenda(id2);
+                        String agendaName = agendaDetails.getName();
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# The hidden agenda was " + agendaName
+                            + "! You can find it in the discard.");
+                    }
                     new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
                     event.getMessage().delete().queue();
                 }
