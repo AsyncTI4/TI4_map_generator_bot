@@ -1998,6 +1998,21 @@ public class AgendaHelper {
         return secretButtons;
     }
 
+    public static List<Button> getUnitOutcomeButtons(String rider, String prefix) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> techs = List.of("Infantry", "Fighter", "Destroyer", "Cruiser", "Carrier", "Dreadnought", "Warsun", "PDS", "SpaceDock");
+        for (String tech : techs) {
+            Button button;
+            if (rider == null) {
+                button = Button.secondary(prefix + "_" + tech, tech);
+            } else {
+                button = Button.secondary(prefix + "rider_so;" + tech + "_" + rider, tech);
+            }
+            buttons.add(button);
+        }
+        return buttons;
+    }
+
     public static List<Button> getStrategyOutcomeButtons(String rider, String prefix) {
         List<Button> strategyButtons = new ArrayList<>();
         for (int x = 1; x < 9; x++) {
@@ -2094,6 +2109,8 @@ public class AgendaHelper {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
         } else if (agendaDetails.contains("unit upgrade")) {
             outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
+        } else if (agendaDetails.contains("Non-Flagship, Non-Mech Unit")) {
+            outcomeActionRow = getUnitOutcomeButtons(ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
@@ -2570,7 +2587,7 @@ public class AgendaHelper {
         for (String planet : planets) {
             PlanetModel planetModel = Mapper.getPlanet(planet);
             int voteAmount = 0;
-            Planet p = (Planet) planetsInfo.get(planet);
+            Planet p = planetsInfo.get(planet);
             if (p == null) {
                 continue;
             }
