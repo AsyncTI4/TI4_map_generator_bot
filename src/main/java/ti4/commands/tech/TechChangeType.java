@@ -41,7 +41,7 @@ public class TechChangeType extends TechSubcommandData {
         if (techOption != null && techType != null) {
             String techID = AliasHandler.resolveTech(techOption.getAsString());
             if (Mapper.isValidTech(techID)) {
-                game.setCurrentReacts("colorChange" + techID, techType.getAsString());
+                game.setStoredValue("colorChange" + techID, techType.getAsString());
             } else {
                 Map<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
@@ -53,7 +53,7 @@ public class TechChangeType extends TechSubcommandData {
                     sendMessage("More that one matching Tech found");
                     return;
                 }
-                game.setCurrentReacts("colorChange" + techID, techType.getAsString());
+                game.setStoredValue("colorChange" + techID, techType.getAsString());
 
             }
         }

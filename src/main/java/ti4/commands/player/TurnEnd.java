@@ -99,12 +99,12 @@ public class TurnEnd extends PlayerSubcommandData {
                     continue;
                 }
                 String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
-                if (!activeGame.getFactionsThatReactedToThis(key).isEmpty()) {
-                    activeGame.setCurrentReacts(key, "");
+                if (!activeGame.getStoredValue(key).isEmpty()) {
+                    activeGame.setStoredValue(key, "");
                 }
             }
         }
-        activeGame.setCurrentReacts("mahactHeroTarget", "");
+        activeGame.setStoredValue("mahactHeroTarget", "");
         activeGame.setActiveSystem("");
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
@@ -368,19 +368,19 @@ public class TurnEnd extends PlayerSubcommandData {
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
 
-        activeGame.setCurrentReacts(key2, "");
-        activeGame.setCurrentReacts(key3, "");
-        activeGame.setCurrentReacts(key2b, "");
-        activeGame.setCurrentReacts(key3b, "");
+        activeGame.setStoredValue(key2, "");
+        activeGame.setStoredValue(key3, "");
+        activeGame.setStoredValue(key2b, "");
+        activeGame.setStoredValue(key3b, "");
         if (!activeGame.isFoWMode() && activeGame.getHighestScore() + 4 > activeGame.getVp()) {
-            activeGame.setCurrentReacts("forcedScoringOrder", "true");
+            activeGame.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You can turn this off at any time by pressing this button", buttons);
             for (Player player : Helper.getInitativeOrder(activeGame)) {
-                activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3) + player.getFaction() + "*");
-                activeGame.setCurrentReacts(key3b, activeGame.getFactionsThatReactedToThis(key3b) + player.getFaction() + "*");
+                activeGame.setStoredValue(key3, activeGame.getStoredValue(key3) + player.getFaction() + "*");
+                activeGame.setStoredValue(key3b, activeGame.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");

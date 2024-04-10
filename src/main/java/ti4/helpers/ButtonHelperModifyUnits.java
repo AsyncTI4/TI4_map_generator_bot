@@ -62,7 +62,7 @@ public class ButtonHelperModifyUnits {
         int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         Player mentakHero = activeGame
-            .getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
+            .getPlayerFromColorOrFaction(activeGame.getStoredValue("mentakHero"));
         if (hits > 0 && unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
@@ -366,7 +366,7 @@ public class ButtonHelperModifyUnits {
         boolean noMechPowers = activeGame.getLaws().containsKey("articles_war");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         Player mentakHero = activeGame
-            .getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
+            .getPlayerFromColorOrFaction(activeGame.getStoredValue("mentakHero"));
         boolean usedDuraniumAlready = true;
         String duraniumMsg = "";
         if (player.hasTech("da")) {
@@ -411,10 +411,10 @@ public class ButtonHelperModifyUnits {
                     min = Math.min(totalUnits, (hits + 1) / 2);
                 }
                 String stuffNotToSustain = activeGame
-                    .getFactionsThatReactedToThis("stuffNotToSustainFor" + player.getFaction());
+                    .getStoredValue("stuffNotToSustainFor" + player.getFaction());
 
                 if (stuffNotToSustain.isEmpty()) {
-                    activeGame.setCurrentReacts("stuffNotToSustainFor" + player.getFaction(), "warsun");
+                    activeGame.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
                     stuffNotToSustain = "warsun";
                 }
                 if (unitModel.getSustainDamage() && min > 0 && (!stuffNotToSustain.contains(unitName.toLowerCase())
@@ -563,10 +563,10 @@ public class ButtonHelperModifyUnits {
                     min = Math.min(totalUnits, (hits + 1) / 2);
                 }
                 String stuffNotToSustain = activeGame
-                    .getFactionsThatReactedToThis("stuffNotToSustainFor" + player.getFaction());
+                    .getStoredValue("stuffNotToSustainFor" + player.getFaction());
 
                 if (stuffNotToSustain.isEmpty()) {
-                    activeGame.setCurrentReacts("stuffNotToSustainFor" + player.getFaction(), "warsun");
+                    activeGame.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
                     stuffNotToSustain = "warsun";
                 }
                 if (unitModel.getSustainDamage() && min > 0 && !(!stuffNotToSustain.contains(unitName.toLowerCase())
@@ -2156,7 +2156,7 @@ public class ButtonHelperModifyUnits {
         rest = rest.replace(pos + "_", "");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         Player mentakHero = activeGame
-            .getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
+            .getPlayerFromColorOrFaction(activeGame.getStoredValue("mentakHero"));
         if (rest.contains("All")) {
             String cID = Mapper.getColorID(player.getColor());
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {

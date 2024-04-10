@@ -208,7 +208,7 @@ public class SCPick extends PlayerSubcommandData {
             boolean foundPlayer = false;
             Player privatePlayer = null;
             for (Player p3 : activeGame.getRealPlayers()) {
-                if (p3.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("politicalStabilityFaction"))) {
+                if (p3.getFaction().equalsIgnoreCase(activeGame.getStoredValue("politicalStabilityFaction"))) {
                     continue;
                 }
                 if (foundPlayer) {
@@ -274,7 +274,7 @@ public class SCPick extends PlayerSubcommandData {
 
             for (Player p2 : activeGame.getRealPlayers()) {
                 ButtonHelperActionCards.checkForAssigningCoup(activeGame, p2);
-                if (activeGame.getFactionsThatReactedToThis("Play Naalu PN") != null && activeGame.getFactionsThatReactedToThis("Play Naalu PN").contains(p2.getFaction())) {
+                if (activeGame.getStoredValue("Play Naalu PN") != null && activeGame.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
                     if (!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().containsKey("gift")) {
                         ButtonHelper.resolvePNPlay("gift", p2, activeGame, event);
                     }
