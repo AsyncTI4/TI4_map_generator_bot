@@ -46,7 +46,7 @@
             "You may spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn resumes as normal.",
             "Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens."
         ],
-        "secondaryTexts": ["You do not have to place a stratey token to resolve the secondary abilitiy of the Construction strategy card."],
+        "secondaryTexts": ["You do not have to spend a stratey token to resolve the secondary abilitiy of the Construction strategy card. Any tokens placed by this ability are placed from your reinforcements instead."],
         "imageFileName": "14_construction_minor",
         "colourHexCode": "#659d69",
         "source": "salliance"
