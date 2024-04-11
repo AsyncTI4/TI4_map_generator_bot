@@ -2618,16 +2618,6 @@ public class Helper {
 
     public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game) {
         List<TechnologyModel> techs = new ArrayList<>();
-        for (TechnologyModel tech : getAllNonFactionUnitUpgradeTech()) {
-            if (player.hasTech(tech.getAlias())) {
-                techs.add(tech);
-            }
-        }
-        return techs;
-    }
-
-    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech() {
-        List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
             if ("unitupgrade".equalsIgnoreCase(tech.getType().toString()) && tech.getFaction().isEmpty()
                     && game.getTechnologyDeck().contains(tech.getAlias())) {
