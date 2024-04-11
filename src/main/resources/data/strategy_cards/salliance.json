@@ -33,7 +33,7 @@
             "You may spend a strategy token and give your ally a Pass Turn token to have your ally take a strategic action on your turn. After the strategic action is completed, your turn resumes as normal.",
             "Your ally may spend any number of tokens from their strategy pool. You gain that number of command tokens."
         ],
-        "secondaryTexts": [
+        "secondaryTexts": [],
         "imageFileName": "13_politics_minor",
         "colourHexCode": "#cdc45c",
         "source": "salliance"
