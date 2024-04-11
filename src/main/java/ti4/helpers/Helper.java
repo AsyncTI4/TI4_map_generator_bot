@@ -2583,9 +2583,7 @@ public class Helper {
             .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
             .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || activeGame.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
             .filter(tech -> !player.hasTech(tech.getAlias()))
-            .filter(tech -> tech.getFaction().isEmpty() || tech.getFaction().get() == null
-                || "".equalsIgnoreCase(tech.getFaction().get())
-                || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+            .filter(tech -> tech.getFaction().isEmpty() || "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
             .forEach(techs::add);
 
         List<TechnologyModel> techs2 = new ArrayList<>();
@@ -2608,9 +2606,9 @@ public class Helper {
         return techs2;
     }
 
-    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Player player) {
+    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
-        for (TechnologyModel tech : getAllNonFactionUnitUpgradeTech()) {
+        for (TechnologyModel tech : getAllNonFactionUnitUpgradeTech(game)) {
             if (player.hasTech(tech.getAlias())) {
                 techs.add(tech);
             }
@@ -2618,10 +2616,11 @@ public class Helper {
         return techs;
     }
 
-    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech() {
+    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game) {
         List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
-            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString()) && tech.getFaction().isEmpty()) {
+            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString()) && tech.getFaction().isEmpty()
+                    && game.getTechnologyDeck().contains(tech.getAlias())) {
                 techs.add(tech);
             }
         }
