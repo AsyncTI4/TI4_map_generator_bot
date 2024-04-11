@@ -1980,10 +1980,10 @@ public class AgendaHelper {
         return secretButtons;
     }
 
-    public static List<Button> getUnitUpgradeOutcomeButtons(Game activeGame, String rider, String prefix) {
+    public static List<Button> getUnitUpgradeOutcomeButtons(Game game, String rider, String prefix) {
         List<Button> buttons = new ArrayList<>();
-        for (Player player : activeGame.getPlayers().values()) {
-            for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(player)) {
+        for (Player player : game.getPlayers().values()) {
+            for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(game, player)) {
                 Button button;
                 if (rider == null) {
                     button = Button.secondary(prefix + "_" + tech.getAlias(), tech.getName());
@@ -1996,9 +1996,9 @@ public class AgendaHelper {
         return buttons;
     }
 
-    public static List<Button> getUnitOutcomeButtons(String rider, String prefix) {
+    public static List<Button> getUnitOutcomeButtons(Game game, String rider, String prefix) {
         List<Button> buttons = new ArrayList<>();
-        for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech()) {
+        for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(game)) {
             Button button;
             if (rider == null) {
                 button = Button.secondary(prefix + "_" + tech.getAlias(), tech.getName());
@@ -2087,29 +2087,29 @@ public class AgendaHelper {
         return playerOutcomeButtons;
     }
 
-    public static List<Button> getAgendaButtons(String ridername, Game activeGame, String prefix) {
-        String agendaDetails = activeGame.getCurrentAgendaInfo().split("_")[1];
+    public static List<Button> getAgendaButtons(String ridername, Game game, String prefix) {
+        String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
         List<Button> outcomeActionRow;
         if (agendaDetails.contains("For")) {
             outcomeActionRow = getForAgainstOutcomeButtons(ridername, prefix);
         } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-            outcomeActionRow = getPlayerOutcomeButtons(activeGame, ridername, prefix, null);
+            outcomeActionRow = getPlayerOutcomeButtons(game, ridername, prefix, null);
         } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
             if (ridername == null) {
-                outcomeActionRow = getPlayerOutcomeButtons(activeGame, null, "tiedPlanets_" + prefix, "planetRider");
+                outcomeActionRow = getPlayerOutcomeButtons(game, null, "tiedPlanets_" + prefix, "planetRider");
             } else {
-                outcomeActionRow = getPlayerOutcomeButtons(activeGame, ridername, prefix, "planetRider");
+                outcomeActionRow = getPlayerOutcomeButtons(game, ridername, prefix, "planetRider");
             }
         } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-            outcomeActionRow = getSecretOutcomeButtons(activeGame, ridername, prefix);
+            outcomeActionRow = getSecretOutcomeButtons(game, ridername, prefix);
         } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
         } else if (agendaDetails.contains("unit upgrade")) {
-            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
+            outcomeActionRow = getUnitUpgradeOutcomeButtons(game, ridername, prefix);
         } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-            outcomeActionRow = getUnitOutcomeButtons(ridername, prefix);
+            outcomeActionRow = getUnitOutcomeButtons(game, ridername, prefix);
         } else {
-            outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
+            outcomeActionRow = getLawOutcomeButtons(game, ridername, prefix);
         }
 
         return outcomeActionRow;
