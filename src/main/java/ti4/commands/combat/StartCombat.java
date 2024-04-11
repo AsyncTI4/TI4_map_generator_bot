@@ -199,8 +199,8 @@ public class StartCombat extends CombatSubcommandData {
         if (isSpaceCombat) {
             sendStartOfSpaceCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile);
         }
-        activeGame.setCurrentReacts("solagent", "");
-        activeGame.setCurrentReacts("letnevagent", "");
+        activeGame.setStoredValue("solagent", "");
+        activeGame.setStoredValue("letnevagent", "");
 
         // AFB
         sendAFBButtonsToThread(event, threadChannel, activeGame,

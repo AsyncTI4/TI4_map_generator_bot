@@ -50,7 +50,7 @@ public class Pass extends PlayerSubcommandData {
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
         if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {

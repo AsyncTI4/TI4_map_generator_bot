@@ -651,12 +651,12 @@ public class Game {
         return allianceMode;
     }
 
-    public boolean isHomeBrew() {
-        return homeBrew;
-    }
-
     public void setAllianceMode(boolean allianceMode) {
         this.allianceMode = allianceMode;
+    }
+
+    public boolean isHomeBrew() {
+        return homeBrew;
     }
 
     public void setHomeBrew(boolean homebrew) {
@@ -667,28 +667,28 @@ public class Game {
         return fowMode;
     }
 
-    public boolean isLightFogMode() {
-        return lightFogMode;
-    }
-
-    public boolean isRedTapeMode() {
-        return redTapeMode;
-    }
-
-    public boolean isBaseGameMode() {
-        return baseGameMode;
-    }
-
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+
+    public boolean isLightFogMode() {
+        return lightFogMode;
     }
 
     public void setLightFogMode(boolean lightFogMode) {
         this.lightFogMode = lightFogMode;
     }
 
+    public boolean isRedTapeMode() {
+        return redTapeMode;
+    }
+
     public void setRedTapeMode(boolean redTape) {
         redTapeMode = redTape;
+    }
+
+    public boolean isBaseGameMode() {
+        return baseGameMode;
     }
 
     public void setBaseGameMode(boolean baseGameMode) {
@@ -699,12 +699,12 @@ public class Game {
         return homebrewSCMode;
     }
 
-    public boolean isSpinMode() {
-        return spinMode;
-    }
-
     public void setHomeBrewSCMode(boolean homeBrewSCMode) {
         homebrewSCMode = homeBrewSCMode;
+    }
+
+    public boolean isSpinMode() {
+        return spinMode;
     }
 
     public void setSpinMode(boolean homeBrewSCMode) {
@@ -931,6 +931,14 @@ public class Game {
         return currentAgendaVotes;
     }
 
+    public void setCurrentReacts(String messageID, String factionsWhoReacted) {
+        checkingForAllReacts.put(messageID, factionsWhoReacted);
+    }
+
+    public void removeMessageIDFromCurrentReacts(String messageID) {
+        checkingForAllReacts.remove(messageID);
+    }
+
     public Map<String, String> getMessagesThatICheckedForAllReacts() {
         return checkingForAllReacts;
     }
@@ -941,7 +949,18 @@ public class Game {
         } else {
             return "";
         }
+    }
 
+    public void setStoredValue(String key, String value) {
+        checkingForAllReacts.put(key, value);
+    }
+
+    public String getStoredValue(String key) {
+        return getFactionsThatReactedToThis(key);
+    }
+
+    public void removeStoredValue(String key) {
+        checkingForAllReacts.remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
@@ -1117,14 +1136,6 @@ public class Game {
 
     public void setCurrentAgendaVote(String outcome, String voteInfo) {
         currentAgendaVotes.put(outcome, voteInfo);
-    }
-
-    public void setCurrentReacts(String messageID, String factionsWhoReacted) {
-        checkingForAllReacts.put(messageID, factionsWhoReacted);
-    }
-
-    public void removeMessageIDFromCurrentReacts(String messageID) {
-        checkingForAllReacts.remove(messageID);
     }
 
     public void removeOutcomeAgendaVote(String outcome) {
@@ -1426,7 +1437,7 @@ public class Game {
         if (Objects.isNull(tradeGoodCount))
             tradeGoodCount = 0;
         if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)) {
-            Player player = getPlayerFromColorOrFaction(getFactionsThatReactedToThis("kyroHeroPlayer"));
+            Player player = getPlayerFromColorOrFaction(getStoredValue("kyroHeroPlayer"));
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);

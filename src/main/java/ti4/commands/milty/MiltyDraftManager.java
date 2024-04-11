@@ -22,9 +22,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import ti4.commands.map.AddTileList;
+import ti4.commands.player.Setup;
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -61,12 +64,12 @@ public class MiltyDraftManager {
         private MiltyDraftSlice slice = null;
         private Integer position = null;
 
-        public String summary() {
-            return String.join("/", factionEmoji(), sliceEmoji(), positionEmoji());
+        public String summary(String doggy) {
+            return String.join(" ", factionEmoji(doggy), sliceEmoji(), positionEmoji());
         }
 
-        private String factionEmoji() {
-            return faction == null ? Emojis.getRandomGoodDog() : Emojis.getFactionIconFromDiscord(faction);
+        private String factionEmoji(String doggy) {
+            return faction == null ? doggy : Emojis.getFactionIconFromDiscord(faction);
         }
 
         private String sliceEmoji() {
@@ -286,8 +289,22 @@ public class MiltyDraftManager {
 
     private void finishDraft(Game game, ButtonInteractionEvent event) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
+        List<String> backupColors = Arrays.asList("black","bloodred","blue","chocolate","emerald","orange",
+            "ethereal","forest","gold","green","brown","lavender","lightbrown","navy","chrome","petrol",
+            "pink","purple","rainbow","red","rose","spring","sunset","tan","teal","turquoise","yellow");
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
+            for (String playerId : players) {
+                Player player = game.getPlayer(playerId);
+                PlayerDraft picks = getPlayerDraft(playerId);
+                String color = backupColors.get(picks.getPosition());
+                String faction = picks.getFaction();
+
+                if (playerId.equals(Constants.chassitId)) color = "lightgray";
+                String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, mapTemplate);
+
+                Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, picks.getPosition() == 1);
+            }
             AddTileList.finishSetup(game, event);
         } catch (Exception e) {
             String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
@@ -419,7 +436,8 @@ public class MiltyDraftManager {
     }
 
     private String getOverallSummaryString(Game game) {
-        int padding = String.format("%s", getPlayers().size()).length();
+        int padding = String.format("%s", getPlayers().size()).length() + 1;
+        String goodDogOfTheDay = Emojis.getRandomGoodDog();
         StringBuilder sb = new StringBuilder();
         sb.append("# **__Draft Picks So Far__**:");
         int pickNum = 1;
@@ -427,13 +445,13 @@ public class MiltyDraftManager {
             Player player = game.getPlayer(p);
             PlayerDraft picks = getPlayerDraft(p);
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
-            sb.append("[ ").append(picks.summary()).append(" ] ");
+            sb.append(picks.summary(goodDogOfTheDay)).append(" ");
 
             if (p.equals(getNextDraftPlayer())) sb.append("*");
             if (p.equals(getCurrentDraftPlayer())) sb.append("**__");
             sb.append(player.getUserName());
             if (p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
-            if (p.equals(getNextDraftPlayer())) sb.append("   <- up next");
+            if (p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
             if (p.equals(getCurrentDraftPlayer())) sb.append("__**");
             if (p.equals(getNextDraftPlayer())) sb.append("*");
 

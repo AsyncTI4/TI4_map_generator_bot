@@ -144,7 +144,7 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = player.getFactionEmoji() + " choose a " + unit
             + " to use the cav on. It has been temporarily replaced with a Cavalry Unit. It will be automatically put back at the end of the tactical action.";
-        activeGame.setCurrentReacts("nomadPNShip", unit);
+        activeGame.setStoredValue("nomadPNShip", unit);
         String cav = "cavalry1";
         if (activeGame.getPNOwner("cavalry").hasTech("m2")) {
             cav = "cavalry2";
@@ -167,7 +167,7 @@ public class ButtonHelperFactionSpecific {
         for (Player player : activeGame.getRealPlayers()) {
             if (player.hasUnit("cavalry1") || player.hasUnit("cavalry2")) {
                 String cav = "cavalry1";
-                String unit = activeGame.getFactionsThatReactedToThis("nomadPNShip");
+                String unit = activeGame.getStoredValue("nomadPNShip");
                 if (player.hasUnit("cavalry2")) {
                     cav = "cavalry2";
                 }
@@ -189,7 +189,7 @@ public class ButtonHelperFactionSpecific {
                     }
                 }
                 player.removeOwnedUnitByID(cav);
-                activeGame.setCurrentReacts("nomadPNShip", "");
+                activeGame.setStoredValue("nomadPNShip", "");
             }
         }
     }
@@ -570,7 +570,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void checkForNaaluPN(Game activeGame) {
-        activeGame.setCurrentReacts("Play Naalu PN", "");
+        activeGame.setStoredValue("Play Naalu PN", "");
         for (Player player : activeGame.getRealPlayers()) {
             boolean naalu = false;
             for (String pn : player.getPromissoryNotes().keySet()) {
@@ -1009,7 +1009,7 @@ public class ButtonHelperFactionSpecific {
                 continue;
             }
             if (p2.hasTechReady("gr")) {
-                if (activeGame.getFactionsThatReactedToThis("Genetic Recombination " + p2.getFaction())
+                if (activeGame.getStoredValue("Genetic Recombination " + p2.getFaction())
                     .contains(voter.getFaction())) {
                     p2.exhaustTech("gr");
                     String msg = p2.getRepresentation(false, true) + " is using genetic recombination to force "
@@ -1071,25 +1071,25 @@ public class ButtonHelperFactionSpecific {
 
     public static void increaseMykoMech(Game activeGame) {
         int amount;
-        if (!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()) {
-            amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
+        if (!activeGame.getStoredValue("mykoMech").isEmpty()) {
+            amount = Integer.parseInt(activeGame.getStoredValue("mykoMech"));
             amount = amount + 1;
         } else {
             amount = 1;
         }
-        activeGame.setCurrentReacts("mykoMech", "" + amount);
+        activeGame.setStoredValue("mykoMech", "" + amount);
     }
 
     public static void decreaseMykoMech(Game activeGame) {
         int amount = 0;
-        if (!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()) {
-            amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
+        if (!activeGame.getStoredValue("mykoMech").isEmpty()) {
+            amount = Integer.parseInt(activeGame.getStoredValue("mykoMech"));
             amount = amount - 1;
         }
         if (amount < 0) {
             amount = 0;
         }
-        activeGame.setCurrentReacts("mykoMech", "" + amount);
+        activeGame.setStoredValue("mykoMech", "" + amount);
     }
 
     public static void resolveMykoMech(Player player, Game activeGame) {
@@ -1103,8 +1103,8 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveMykoMechCheck(Player player, Game activeGame) {
         if (player.hasUnit("mykomentori_mech")) {
-            if (!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()) {
-                int amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
+            if (!activeGame.getStoredValue("mykoMech").isEmpty()) {
+                int amount = Integer.parseInt(activeGame.getStoredValue("mykoMech"));
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("resolveMykoMech", "Replace Infantry With Mech"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -1192,7 +1192,7 @@ public class ButtonHelperFactionSpecific {
                     + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
                 String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation()
                     + ". Use buttons to gain CCs";
-                activeGame.setCurrentReacts("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message2,
                     buttons);
@@ -1260,7 +1260,7 @@ public class ButtonHelperFactionSpecific {
         StringBuilder sb = new StringBuilder();
         sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
         String topCard = deck.get(0);
-        activeGame.setCurrentReacts("lastExpLookedAt" + player.getFaction() + deckType, topCard);
+        activeGame.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
         sb.append(ExploreSubcommandData.displayExplore(topCard));
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
@@ -1290,7 +1290,7 @@ public class ButtonHelperFactionSpecific {
             String deckType = "industrial";
             List<String> deck = activeGame.getExploreDeck(deckType);
             String msg2 = StringUtils.capitalize(deckType);
-            if (activeGame.getFactionsThatReactedToThis("lastExpLookedAt" + player.getFaction() + deckType)
+            if (activeGame.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
@@ -1298,7 +1298,7 @@ public class ButtonHelperFactionSpecific {
             deckType = "hazardous";
             deck = activeGame.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
-            if (activeGame.getFactionsThatReactedToThis("lastExpLookedAt" + player.getFaction() + deckType)
+            if (activeGame.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
@@ -1306,7 +1306,7 @@ public class ButtonHelperFactionSpecific {
             deckType = "cultural";
             deck = activeGame.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
-            if (activeGame.getFactionsThatReactedToThis("lastExpLookedAt" + player.getFaction() + deckType)
+            if (activeGame.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
@@ -2108,13 +2108,13 @@ public class ButtonHelperFactionSpecific {
             String message = player.getRepresentation()
                 + " Use the buttons to produce 1 ship that was destroyed in the combat. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         }
         String msg = player.getRepresentation() + " used Salvage Ops to get 1tg (current tg is now " + player.getTg()
             + ")";
         ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
     }
 
     public static void resolveLanefirATS(Player player, ButtonInteractionEvent event, String buttonID) {

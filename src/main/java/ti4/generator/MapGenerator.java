@@ -128,7 +128,6 @@ public class MapGenerator {
     private long debugTileTime;
     private long debugGameInfoTime;
     private long debugDiscordTime;
-    private long debugSuperStringTime;
 
     private static final BasicStroke stroke1 = new BasicStroke(1.0f);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
@@ -257,7 +256,6 @@ public class MapGenerator {
             return;
         }
         if (debug) {
-            debugSuperStringTime = 0;
             debugStartTime = System.nanoTime();
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -354,12 +352,11 @@ public class MapGenerator {
         if (!debug)
             return;
         long total = System.nanoTime() - debugAbsoluteStartTime;
-        String sb = " Total time to generate map " + game.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total) + 
+        String sb = " Total time to generate map " + game.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total) +
             "\n" + debugString("    Frog time: ", debugFowTime, total) +
             "\n" + debugString("    Tile time: ", debugTileTime, total) +
             "\n" + debugString("    Info time: ", debugGameInfoTime, total) +
             "\n" + debugString(" Discord time: ", debugDiscordTime, total) +
-            "\n" + debugString("  String time: ", debugSuperStringTime, total) +
             "\n";
         MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         ImageHelper.getCacheStats()
@@ -512,7 +509,6 @@ public class MapGenerator {
         }
         if (debug) {
             debugStartTime = System.nanoTime();
-            debugSuperStringTime = 0;
         }
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
         setupFow(event, tilesToDisplay);
@@ -1986,8 +1982,8 @@ public class MapGenerator {
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
-            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
-                techType = game.getFactionsThatReactedToThis("colorChange" + tech);
+            if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
+                techType = game.getStoredValue("colorChange" + tech);
             }
             List<String> techList = techsFiltered.get(techType);
             if (techList == null) {
@@ -2059,8 +2055,8 @@ public class MapGenerator {
                 case UNITUPGRADE -> techIcon = Constants.UNIT_UPGRADE;
                 default -> techIcon = "";
             }
-            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
-                techIcon = game.getFactionsThatReactedToThis("colorChange" + tech);
+            if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
+                techIcon = game.getStoredValue("colorChange" + tech);
             }
 
             if (!techIcon.isEmpty()) {
@@ -2115,8 +2111,8 @@ public class MapGenerator {
                 case BIOTIC -> techIcon = Constants.BIOTIC;
                 default -> techIcon = "";
             }
-            if (!game.getFactionsThatReactedToThis("colorChange" + tech).isEmpty()) {
-                techIcon = game.getFactionsThatReactedToThis("colorChange" + tech);
+            if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
+                techIcon = game.getStoredValue("colorChange" + tech);
             }
 
             if (!techIcon.isEmpty()) {
@@ -2420,14 +2416,17 @@ public class MapGenerator {
         }
     }
 
-    private void superDrawString(Graphics g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
-        if (debug) debugSuperStringTime -= System.nanoTime();
+    public static void superDrawString(Graphics g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
         superDrawString((Graphics2D) g, txt, x, y, textColor, h, v, outlineSize, outlineColor);
-        if (debug) debugSuperStringTime += System.nanoTime();
     }
 
-    enum HorizontalAlign { Left, Center, Right; };
-    enum VerticalAlign { Top, Center, Bottom; };
+    public enum HorizontalAlign {
+        Left, Center, Right;
+    };
+
+    public enum VerticalAlign {
+        Top, Center, Bottom;
+    };
 
     /**
      * 
@@ -2437,15 +2436,16 @@ public class MapGenerator {
      * @param y
      * @param textColor
      * @param rightAlign
-     * @param outlineSize 
-     * @param outlineColor 
+     * @param outlineSize
+     * @param outlineColor
      */
     private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
         if (h != null) {
             switch (h) {
                 case Center -> x -= g.getFontMetrics().stringWidth(txt) / 2.0;
                 case Right -> x -= g.getFontMetrics().stringWidth(txt);
-                case Left -> {}
+                case Left -> {
+                }
             }
         }
         if (v != null) {
@@ -2453,7 +2453,8 @@ public class MapGenerator {
             switch (v) {
                 case Center -> y += height / 2.0;
                 case Top -> y += height;
-                case Bottom -> {}
+                case Bottom -> {
+                }
             }
         }
         if (outlineSize == null || outlineColor == null) {
@@ -2470,12 +2471,12 @@ public class MapGenerator {
 
         GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), text);
         Shape textShape = gv.getOutline();
-        
+
         g2.translate(x, y);
         g2.setColor(outlineColor);
         g2.setStroke(outlineStroke);
         g2.draw(textShape);
-        
+
         g2.setColor(fillColor);
         g2.fill(textShape);
 
@@ -3459,7 +3460,7 @@ public class MapGenerator {
                     int labelY = TILE_PADDING + labelPositionPoint.y;
                     superDrawString(tileGraphics, tile.getFogLabel(frogPlayer), labelX, labelY, Color.white, null, null, null, null);
                 }
-                
+
                 int textX = TILE_PADDING + tilePositionPoint.x;
                 int textY = TILE_PADDING + tilePositionPoint.y;
                 superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.white, HorizontalAlign.Right, VerticalAlign.Bottom, stroke7, Color.black);
@@ -3483,10 +3484,9 @@ public class MapGenerator {
                     }
                     tileGraphics.setFont(Storage.getFont24());
                     int numX = TILE_PADDING + 172; //172 //320
-                    int numY = TILE_PADDING + 228;  //50  //161
+                    int numY = TILE_PADDING + 228; //50  //161
                     superDrawString(tileGraphics, draftColor, numX, numY, Color.white, HorizontalAlign.Center, VerticalAlign.Bottom, stroke6, Color.black);
                 }
-
 
                 int prodInSystem = 0;
                 for (Player player : game.getRealPlayers()) {
@@ -3509,22 +3509,22 @@ public class MapGenerator {
                         int yMod = -290;
                         BufferedImage gearImage = ImageHelper.readScaled(
                             ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod,
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod, null);
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer,
+                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     } else {
                         int xMod = -155;
                         int yMod = -290;
                         BufferedImage gearImage = ImageHelper.readScaled(
                             ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod,
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod, null);
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer,
+                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25,
                             TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     }
                 }
@@ -3545,7 +3545,7 @@ public class MapGenerator {
                 }
                 game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
                     if (borderAnomalyHolder.getTile().equals(tile.getPosition())) {
-                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics,borderAnomalyHolder.getType());
+                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
                     }
                 });
             }

@@ -125,14 +125,14 @@ public class MessageHelper {
 			message.addReaction(reactionEmoji).queue();
 		}
 		String messageId = message.getId();
-		if (activeGame.getFactionsThatReactedToThis(messageId) != null
-				&& !activeGame.getFactionsThatReactedToThis(messageId).isEmpty()) {
-			if (!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())) {
-				activeGame.setCurrentReacts(messageId,
-						activeGame.getFactionsThatReactedToThis(messageId) + "_" + player.getFaction());
+		if (activeGame.getStoredValue(messageId) != null
+				&& !activeGame.getStoredValue(messageId).isEmpty()) {
+			if (!activeGame.getStoredValue(messageId).contains(player.getFaction())) {
+				activeGame.setStoredValue(messageId,
+						activeGame.getStoredValue(messageId) + "_" + player.getFaction());
 			}
 		} else {
-			activeGame.setCurrentReacts(messageId, player.getFaction());
+			activeGame.setStoredValue(messageId, player.getFaction());
 		}
 	}
 
@@ -175,10 +175,10 @@ public class MessageHelper {
 				activeGame.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoAfter(), "_");
 			} else {
-				if (activeGame.getFactionsThatReactedToThis("Pass On Shenanigans") == null) {
-					activeGame.setCurrentReacts("Pass On Shenanigans", "");
+				if (activeGame.getStoredValue("Pass On Shenanigans") == null) {
+					activeGame.setStoredValue("Pass On Shenanigans", "");
 				}
-				players = new StringTokenizer(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans"), "_");
+				players = new StringTokenizer(activeGame.getStoredValue("Pass On Shenanigans"), "_");
 			}
 			while (players.hasMoreTokens()) {
 				String player = players.nextToken();
@@ -338,8 +338,7 @@ public class MessageHelper {
 						(error) -> BotLogger.log(getRestActionFailureMessage(channel, message, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (message != null && (message.contains("Use buttons to do your turn")
-							|| message.contains("Use buttons to end turn"))) {
+					if (message != null && (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn"))) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -349,8 +348,7 @@ public class MessageHelper {
 						}
 					}
 
-					if (message != null && message.toLowerCase().contains("up next")
-							&& message.contains("#")) {
+					if (message != null && message.toLowerCase().contains("up next") && message.contains("#")) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
