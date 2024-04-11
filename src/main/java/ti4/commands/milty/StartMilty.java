@@ -36,11 +36,9 @@ public class StartMilty extends MiltySubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
 
-
         // Map Template ---------------------------------------------------------------------------
         MapTemplateModel template = getMapTemplateFromOption(event, game);
         if (template == null) return; // we have already sent an error message
-
 
         // Sources --------------------------------------------------------------------------------
         List<ComponentSource> tileSources = new ArrayList<>();
@@ -58,7 +56,7 @@ public class StartMilty extends MiltySubcommandData {
         if (includeDsFactionsOption != null && includeDsFactionsOption.getAsBoolean()) {
             factionSources.add(ComponentSource.ds);
         }
-        
+
         // Faction count & setup ------------------------------------------------------------------
         int factionCount = game.getPlayerCountForMap() + 3;
         OptionMapping factionOption = event.getOption(Constants.FACTION_COUNT);
@@ -71,7 +69,6 @@ public class StartMilty extends MiltySubcommandData {
             .filter(f -> factionSources.contains(f.getSource()))
             .map(f -> f.getAlias()).toList());
         List<String> factionDraft = createFactionDraft(factionCount, factions);
-        
 
         // Milty Draft Manager Setup --------------------------------------------------------------
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
@@ -79,7 +76,6 @@ public class StartMilty extends MiltySubcommandData {
         draftManager.setFactionDraft(factionDraft);
         draftManager.setMapTemplate(template.getAlias());
         initDraftOrder(draftManager, game);
-
 
         // Slice count ----------------------------------------------------------------------------
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
@@ -96,7 +92,6 @@ public class StartMilty extends MiltySubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return;
         }
-        
 
         // Slice generation -----------------------------------------------------------------------
         boolean anomaliesCanTouch = false;
@@ -135,8 +130,8 @@ public class StartMilty extends MiltySubcommandData {
         });
     }
 
-    private static void initDraftOrder(MiltyDraftManager draftManager, Game activeGame) {
-        List<String> players = new ArrayList<>(activeGame.getPlayers().values().stream().map(p -> p.getUserID()).toList());
+    private static void initDraftOrder(MiltyDraftManager draftManager, Game game) {
+        List<String> players = new ArrayList<>(game.getPlayers().values().stream().map(p -> p.getUserID()).toList());
         Collections.shuffle(players);
 
         List<String> playersReversed = new ArrayList<>(players);
@@ -152,9 +147,9 @@ public class StartMilty extends MiltySubcommandData {
 
     private static List<String> createFactionDraft(int factionCount, List<String> factions) {
         boolean hasKeleres = false;
-        // boolean hasMentak = false;
-        // boolean hasXxcha = false;
-        // boolean hasArgent = false;
+        boolean hasMentak = false;
+        boolean hasXxcha = false;
+        boolean hasArgent = false;
         factions.remove("lazax");
         Collections.shuffle(factions);
         List<String> factionDraft = new ArrayList<>();
@@ -166,7 +161,6 @@ public class StartMilty extends MiltySubcommandData {
                 if (hasKeleres) continue;
                 hasKeleres = true;
             }
-            /*
             if (List.of("keleresa", "argent").contains(f)) {
                 if (hasArgent) continue;
                 hasArgent = true;
@@ -178,7 +172,7 @@ public class StartMilty extends MiltySubcommandData {
             if (List.of("keleresx", "xxcha").contains(f)) {
                 if (hasXxcha) continue;
                 hasXxcha = true;
-            }*/
+            }
             factionDraft.add(f);
         }
         return factionDraft;
@@ -224,7 +218,7 @@ public class StartMilty extends MiltySubcommandData {
                             break;
                         }
                         //rotating the array will ALWAYS find an acceptable tile layout within 2 turns
-                        Collections.rotate(tiles, 1); 
+                        Collections.rotate(tiles, 1);
                         turns++;
                     }
                 }
@@ -238,9 +232,13 @@ public class StartMilty extends MiltySubcommandData {
                 int optInf = miltyDraftSlice.getOptimalInf();
                 int optRes = miltyDraftSlice.getOptimalRes();
                 int totalOptimal = miltyDraftSlice.getOptimalTotalValue();
-                if (optInf < 3 || optRes < 2 || totalOptimal < 9 || totalOptimal > 13) {
+                if (optInf < 3 || optRes < 2 || totalOptimal < 9 || totalOptimal > 12) {
                     break;
                 }
+
+                // if the slice has 2 alphas, or 2 betas, throw it out
+                if (miltyDraftSlice.getTiles().stream().filter(t -> t.isHasAlphaWH()).count() > 1) break;
+                if (miltyDraftSlice.getTiles().stream().filter(t -> t.isHasBetaWH()).count() > 1) break;
 
                 String sliceName = Character.toString(sliceNum - 1 + 'A');
                 miltyDraftSlice.setName(sliceName);
@@ -268,13 +266,13 @@ public class StartMilty extends MiltySubcommandData {
         List<MapTemplateModel> allTemplates = Mapper.getMapTemplates();
         List<MapTemplateModel> validTemplates = Mapper.getMapTemplatesForPlayerCount(players);
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
-        
+
         if (validTemplates.size() == 0) {
             String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player(s) yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }
-        
+
         MapTemplateModel useTemplate = null;
         String templateName = null;
         OptionMapping templateOption = event.getOption(Constants.USE_MAP_TEMPLATE);
