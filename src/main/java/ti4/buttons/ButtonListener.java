@@ -669,7 +669,7 @@ public class ButtonListener extends ListenerAdapter {
             if (!activeGame.isRedTapeMode()) {
                 if ("2".equalsIgnoreCase(lastC)) {
                     new RevealStage2().revealS2(event, event.getChannel());
-                } else if("2x2".equalsIgnoreCase(lastC)) {
+                } else if ("2x2".equalsIgnoreCase(lastC)) {
                     new RevealStage2().revealTwoStage2(event, event.getChannel());
                 } else {
                     new RevealStage1().revealS1(event, event.getChannel());
@@ -3064,7 +3064,7 @@ public class ButtonListener extends ListenerAdapter {
                         finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech");
                     unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
                     buttons.add(unitupgradesTech);
-
+                    ButtonHelperCommanders.yinCommanderSummary(player, activeGame);
                     String message = player.getRepresentation() + " What type of tech would you want?";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     event.getMessage().delete().queue();
@@ -5769,7 +5769,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(drawStage1);
                 }
                 if (activeGame.getRound() > 2) {
-                    if(activeGame.getStoredValue("homebrewMode") == "456") {
+                    if (activeGame.getStoredValue("homebrewMode") == "456") {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);
