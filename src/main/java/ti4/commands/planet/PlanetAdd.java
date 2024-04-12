@@ -157,7 +157,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if (!activeGame.getCurrentPhase().contains("agenda")) {
             activeGame.setStoredValue("planetsTakenThisRound",
-                    activeGame.getStoredValue("planetsTakenThisRound") + "_" + planet);
+                activeGame.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
         if (activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))
             && player.hasAbility("scavenge") && !doubleCheck && event != null) {

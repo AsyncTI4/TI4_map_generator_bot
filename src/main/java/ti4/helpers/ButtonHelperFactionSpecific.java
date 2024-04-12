@@ -1039,15 +1039,14 @@ public class ButtonHelperFactionSpecific {
     public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game activeGame,
         Player player,
         String ident) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + player.getFactionEmoji()
-            + player.getFaction() + " May produce 1 ship in the explored planet system.");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " May produce 1 ship in the explored planet system.");
         String pos = buttonID.replace("dsdihmy_", "");
         List<Button> buttons;
         // Sling relay works for this
         buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
             activeGame.getTileByPosition(pos), "sling", "place");
         String message = player.getRepresentation() + " Use the buttons to produce 1 ship. ";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         event.getMessage().delete().queue();
     }
 

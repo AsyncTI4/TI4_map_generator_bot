@@ -115,7 +115,7 @@ public class PlayAC extends ACCardsSubcommandData {
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentation(true, true)
-                + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. Ping Fin if this is an error";
+                + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. You can discard the AC and manually resolve if you need to";
         }
 
         if (player.hasAbility("cybernetic_madness")) {

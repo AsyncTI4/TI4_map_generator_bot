@@ -1105,6 +1105,8 @@ public class ButtonHelper {
         buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         buttons.add(Button.secondary("showDeck_unscoredSO", "Unscored SOs")
             .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+        buttons.add(Button.secondary("showObjInfo_both", "All Revealed Objectives in Game")
+            .withEmoji(Emoji.fromFormatted(Emojis.Public1)));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
     }
 
@@ -2967,7 +2969,11 @@ public class ButtonHelper {
                 return;
             }
         }
-        channel.sendMessage("New Thread for " + threadName).queue(m -> {
+        String msg = "New Thread for " + threadName;
+        if (msg.contains("undo-log")) {
+            msg = msg + activeGame.getPing();
+        }
+        channel.sendMessage(msg).queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message));
@@ -5258,7 +5264,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Flipped ionstorm in " + tile.getRepresentation());
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Tile> getAllWormholeTiles(Game game) {
@@ -5920,7 +5926,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread,
             "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
+        //ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
@@ -6724,11 +6730,16 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
                 msgExtra + "\n Use Buttons to do turn.",
                 TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-            if (privatePlayer.getStasisInfantry() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                        + " infantry left to revive.",
-                    getPlaceStatusInfButtons(game, privatePlayer));
+            Game activeGame = game;
+            if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                    ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+            } else {
+                privatePlayer.setStasisInfantry(0);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                    + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
             }
 
         } else {
@@ -6741,11 +6752,16 @@ public class ButtonHelper {
                     BotLogger.log(event, "`ButtonHelper.startMyTurn` privatePlayer is null");
                     return;
                 }
-                if (privatePlayer.getStasisInfantry() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                Game activeGame = game;
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
                 }
             }
         }
@@ -6834,11 +6850,16 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
                     msgExtra + "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                if (privatePlayer.getStasisInfantry() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                Game activeGame = game;
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
                 }
             }
 
@@ -6853,11 +6874,16 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                     "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                if (privatePlayer.getStasisInfantry() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                Game activeGame = game;
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
                 }
             }
         }
@@ -8493,7 +8519,7 @@ public class ButtonHelper {
             finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
         unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
         buttons.add(unitupgradesTech);
-
+        ButtonHelperCommanders.yinCommanderSummary(player, activeGame);
         String message = player.getRepresentation() + " What type of tech would you want?";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
@@ -8684,7 +8710,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, purgeFragButtons);
             }
             case "generic" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Doing unspecified component action. You could ping Fin to add this. ");
+                "Doing unspecified component action.");
             case "absolMOW" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     getIdent(p1)
@@ -8791,6 +8817,9 @@ public class ButtonHelper {
             }
             case "passturn" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+            }
+            case "titanprototype", "absol_jr" -> {
+                //handled above
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "This Relic is not tied to any automation. Please resolve manually.");
         }
