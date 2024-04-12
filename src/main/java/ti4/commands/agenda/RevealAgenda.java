@@ -47,7 +47,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 - Long.parseLong(activeGame.getStoredValue("lastAgendaReactTime"))) < 10 * 60
                     * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
+                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake");
             return;
         }
         activeGame.setStoredValue("noWhenThisAgenda", "");
@@ -198,6 +198,9 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         MessageHelper.sendMessageToChannel(channel,
             "The game believes this is agenda #" + aCount + " of this agenda phase");
+        if (!action && aCount == 1) {
+            AgendaHelper.pingAboutDebt(activeGame);
+        }
         for (Player player : activeGame.getRealPlayers()) {
             if (!action && activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0 && aCount == 2) {

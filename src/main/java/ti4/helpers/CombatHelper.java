@@ -404,7 +404,7 @@ public class CombatHelper {
                 activeGame, playerUnitsList, opponentUnitsList, rollType);
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType, player, activeGame);
             boolean extraRollsCount = false;
-            if((numRollsPerUnit > 1 || extraRollsForUnit > 0) && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
+            if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                 extraRollsCount = true;
                 numRollsPerUnit = 1;
                 extraRollsForUnit = 0;
@@ -425,12 +425,12 @@ public class CombatHelper {
                     }
                 }
             }
-            int misses = numRolls-hitRolls;
-            totalMisses = totalMisses+misses;
-            
-            if(misses > 0 && !extraRollsCount && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
-                extra = player.getFactionEmoji()+" destroyed "+misses+" of their own "+unit.getName() +" due to Thalnos misses";
-                for(String thalnosUnit : activeGame.getThalnosUnits().keySet()){
+            int misses = numRolls - hitRolls;
+            totalMisses = totalMisses + misses;
+
+            if (misses > 0 && !extraRollsCount && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                extra = player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + " due to Thalnos misses";
+                for (String thalnosUnit : activeGame.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
                     Tile tile = activeGame.getTileByPosition(pos);
@@ -461,9 +461,10 @@ public class CombatHelper {
                         break;
                     }
                 }
-            }else{
-                if(misses > 0 && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),player.getFactionEmoji()+" had "+misses+" "+unit.getName() +" misses on a thalnos roll, but no units were removed due to extra rolls being unaccounted for");
+
+            } else {
+                if (misses > 0 && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " had " + misses + " " + unit.getName() + " misses on a thalnos roll, but no units were removed due to extra rolls being unaccounted for");
                 }
             }
 
@@ -524,7 +525,7 @@ public class CombatHelper {
         if (!extra.isEmpty()) {
             result = result + "\n\n" + extra;
         }
-        if (activeGame.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround){
+        if (activeGame.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
             activeGame.setStoredValue("munitionsReserves", "");
         }
         return result;

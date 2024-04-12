@@ -1033,6 +1033,21 @@ public class ButtonHelperModifyUnits {
                 if (!activeGame.isFoWMode()) {
                     StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2,
                         threadName, tile, event, "ground");
+                    if ((unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) < 1
+                        || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
+                        && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) < 1
+                        && unitHolder.getUnitCount(UnitType.Infantry, player2.getColor()) < 1
+                        && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
+                            || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
+                        String msg2 = player2.getRepresentation()
+                            + " you may want to remove structures if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(
+                            Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
+                                "Remove Structures"));
+                        buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                    }
                 } else {
                     StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2,
                         threadName, tile, event, "ground");
