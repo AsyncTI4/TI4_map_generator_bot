@@ -20,12 +20,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
@@ -46,6 +40,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
@@ -840,7 +838,7 @@ public class Helper {
         planet = planet.replace("'", "");
         planet = planet.replace("-", "");
         Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
-        Planet planet2 = (Planet) unitHolder;
+        Planet planet2 = unitHolder;
         if (planet2 == null) {
             return planet + " bot error. Tell fin";
         }
@@ -854,7 +852,7 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            Planet planet = (Planet) unitHolder;
+            Planet planet = unitHolder;
             String techType = "";
             String techEmoji = "";
             if (Mapper.getPlanet(planetID) != null && Mapper.getPlanet(planetID).getTechSpecialties() != null
@@ -881,7 +879,7 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            Planet planet = (Planet) unitHolder;
+            Planet planet = unitHolder;
             return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getInfluenceEmoji(planet.getInfluence());
         }
     }
@@ -891,7 +889,7 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            Planet planet = (Planet) unitHolder;
+            Planet planet = unitHolder;
             String techType = "";
             String techEmoji = "";
             if (Mapper.getPlanet(planetID).getTechSpecialties() != null
@@ -1243,7 +1241,7 @@ public class Helper {
                     }
                     msg = msg + thing + "\n";
                 } else {
-                    Planet planet = (Planet) unitHolder;
+                    Planet planet = unitHolder;
                     Tile t = activeGame.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem()) {
                         if (planet.getResources() > bestRes) {
@@ -1916,7 +1914,7 @@ public class Helper {
         if (unitHolder == null) {
             return 0;
         } else {
-            Planet planet = (Planet) unitHolder;
+            Planet planet = unitHolder;
             return planet.getResources();
         }
     }
@@ -1926,7 +1924,7 @@ public class Helper {
         if (unitHolder == null) {
             return 0;
         } else {
-            Planet planet = (Planet) unitHolder;
+            Planet planet = unitHolder;
             return planet.getInfluence();
         }
     }
@@ -2120,12 +2118,12 @@ public class Helper {
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
             resourcesCount += resourcesCountFromPlanetsRes;
         }
 
         int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+            .map(planet -> planet).mapToInt(Planet::getResources).sum();
 
         resourcesCount += resourcesCountFromPlanets;
         return resourcesCount;
@@ -2141,11 +2139,11 @@ public class Helper {
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
             resourcesCount += resourcesCountFromPlanetsRes;
         }
         int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+            .map(planet -> planet).mapToInt(Planet::getResources).sum();
 
         resourcesCount += resourcesCountFromPlanets;
         return resourcesCount;
@@ -2160,11 +2158,11 @@ public class Helper {
         Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+                .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalResources).sum();
+            .map(planet -> planet).mapToInt(Planet::getOptimalResources).sum();
     }
 
     public static Integer getPlayerOptimalResourcesTotal(Player player, Game activeGame) {
@@ -2176,11 +2174,11 @@ public class Helper {
         Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+                .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalResources).sum();
+            .map(planet -> planet).mapToInt(Planet::getOptimalResources).sum();
     }
 
     public static Integer getPlayerInfluenceAvailable(Player player, Game activeGame) {
@@ -2193,12 +2191,12 @@ public class Helper {
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                .map(planet -> planet).mapToInt(Planet::getResources).sum();
             influenceCount += influenceCountFromPlanetsRes;
         }
 
         int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+            .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
 
         influenceCount += influenceCountFromPlanets;
         return influenceCount;
@@ -2214,12 +2212,12 @@ public class Helper {
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                .map(planet -> planet).mapToInt(Planet::getResources).sum();
             influenceCount += influenceCountFromPlanetsRes;
         }
 
         int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+            .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
 
         influenceCount += influenceCountFromPlanets;
         return influenceCount;
@@ -2233,12 +2231,12 @@ public class Helper {
 
         Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet)
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalInfluence).sum();
+            .map(planet -> planet).mapToInt(Planet::getOptimalInfluence).sum();
     }
 
     public static Integer getPlayerOptimalInfluenceTotal(Player player, Game activeGame) {
@@ -2250,11 +2248,11 @@ public class Helper {
         Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+                .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalInfluence).sum();
+            .map(planet -> planet).mapToInt(Planet::getOptimalInfluence).sum();
     }
 
     public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game activeGame) {
@@ -2265,12 +2263,12 @@ public class Helper {
 
         Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet)
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
+            .map(planet -> planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
     }
 
     public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game activeGame) {
@@ -2281,12 +2279,12 @@ public class Helper {
 
         Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet)
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
+            .map(planet -> planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
     }
 
     public static String getPlayerResourceInfluenceRepresentation(Player player, Game activeGame) {
@@ -2585,9 +2583,7 @@ public class Helper {
             .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
             .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || activeGame.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
             .filter(tech -> !player.hasTech(tech.getAlias()))
-            .filter(tech -> tech.getFaction().isEmpty() || tech.getFaction().get() == null
-                || "".equalsIgnoreCase(tech.getFaction().get())
-                || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+            .filter(tech -> tech.getFaction().isEmpty() || "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
             .forEach(techs::add);
 
         List<TechnologyModel> techs2 = new ArrayList<>();
@@ -2610,16 +2606,22 @@ public class Helper {
         return techs2;
     }
 
-    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Player player) {
+    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game, Player player) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        for (TechnologyModel tech : getAllNonFactionUnitUpgradeTech(game)) {
+            if (player.hasTech(tech.getAlias())) {
+                techs.add(tech);
+            }
+        }
+        return techs;
+    }
+
+    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game) {
         List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
-            String faction = tech.getFaction().orElse("");
-            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString())) {
-                if (player.hasTech(tech.getAlias())) {
-                    if (faction.isEmpty()) {
-                        techs.add(tech);
-                    }
-                }
+            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString()) && tech.getFaction().isEmpty()
+                    && game.getTechnologyDeck().contains(tech.getAlias())) {
+                techs.add(tech);
             }
         }
         return techs;

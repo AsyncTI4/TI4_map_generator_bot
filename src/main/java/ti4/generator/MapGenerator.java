@@ -128,7 +128,6 @@ public class MapGenerator {
     private long debugTileTime;
     private long debugGameInfoTime;
     private long debugDiscordTime;
-    private long debugSuperStringTime;
 
     private static final BasicStroke stroke1 = new BasicStroke(1.0f);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
@@ -257,7 +256,6 @@ public class MapGenerator {
             return;
         }
         if (debug) {
-            debugSuperStringTime = 0;
             debugStartTime = System.nanoTime();
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -359,7 +357,6 @@ public class MapGenerator {
             "\n" + debugString("    Tile time: ", debugTileTime, total) +
             "\n" + debugString("    Info time: ", debugGameInfoTime, total) +
             "\n" + debugString(" Discord time: ", debugDiscordTime, total) +
-            "\n" + debugString("  String time: ", debugSuperStringTime, total) +
             "\n";
         MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         ImageHelper.getCacheStats()
@@ -512,7 +509,6 @@ public class MapGenerator {
         }
         if (debug) {
             debugStartTime = System.nanoTime();
-            debugSuperStringTime = 0;
         }
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
         setupFow(event, tilesToDisplay);
@@ -2420,17 +2416,15 @@ public class MapGenerator {
         }
     }
 
-    private void superDrawString(Graphics g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
-        if (debug) debugSuperStringTime -= System.nanoTime();
+    public static void superDrawString(Graphics g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
         superDrawString((Graphics2D) g, txt, x, y, textColor, h, v, outlineSize, outlineColor);
-        if (debug) debugSuperStringTime += System.nanoTime();
     }
 
-    enum HorizontalAlign {
+    public enum HorizontalAlign {
         Left, Center, Right;
     };
 
-    enum VerticalAlign {
+    public enum VerticalAlign {
         Top, Center, Bottom;
     };
 
