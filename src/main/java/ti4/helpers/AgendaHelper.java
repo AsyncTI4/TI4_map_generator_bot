@@ -1137,6 +1137,18 @@ public class AgendaHelper {
         }
     }
 
+    public static void pingAboutDebt(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player || player.getTg() < 0 || p2.hasAbility("binding_debts") || p2.getDebtTokenCount(player.getColor()) < 1) {
+                    continue;
+                }
+                String msg = player.getRepresentation() + " This is a reminder that you owe debt to " + ButtonHelper.getIdentOrColor(p2, game) + " and now could be a good time to pay it (or get it cleared if it was paid already)";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+            }
+        }
+    }
+
     public static void pingMissingPlayers(Game activeGame) {
 
         List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestWhenMsg(),

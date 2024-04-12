@@ -3059,7 +3059,6 @@ public class ButtonListener extends ListenerAdapter {
                         finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech");
                     unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
                     buttons.add(unitupgradesTech);
-                    ButtonHelperCommanders.yinCommanderSummary(player, activeGame);
                     String message = player.getRepresentation() + " What type of tech would you want?";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     event.getMessage().delete().queue();
@@ -5782,8 +5781,8 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.getRound() < 4) {
                     buttons.add(drawStage1);
                 }
-                if (activeGame.getRound() > 2) {
-                    if (activeGame.getStoredValue("homebrewMode") == "456") {
+                if (activeGame.getRound() > 2 || activeGame.getPublicObjectives1Peakable().size() == 0) {
+                    if (activeGame.getStoredValue("homebrewMode").equalsIgnoreCase("456")) {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);

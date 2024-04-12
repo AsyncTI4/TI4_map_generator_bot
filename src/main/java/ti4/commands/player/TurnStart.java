@@ -273,7 +273,7 @@ public class TurnStart extends PlayerSubcommandData {
                         sb.append(p2.getRepresentation(true, true));
                         sb.append(" You are getting this ping because SC #").append(sc)
                             .append(
-                                " has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. \nTIP: Double check that you paid the command counter to follow\n");
+                                " has been played and now it is their turn again and you still havent reacted. If you already reacted, check if your reaction got undone");
                         if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(
                                 activeGame.getStoredValue("scPlay" + sc).replace("666fin", ":"))

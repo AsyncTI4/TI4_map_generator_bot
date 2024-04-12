@@ -108,13 +108,16 @@ public class ButtonHelperCommanders {
     }
 
     public static void yinCommanderSummary(Player player, Game activeGame) {
-        String summary = player.getRepresentation() + " you could potentially use Yin Commander to ignore the pre-reqs for these techs:\n";
+        if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
+            return;
+        }
+        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs:\n";
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             for (String tech : p2.getTechs()) {
                 if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
                     TechnologyModel model = Mapper.getTech(tech);
-                    if (!model.getFaction().isPresent() || model.getFaction().isEmpty() || !model.getRequirements().isPresent() || model.getRequirements().isEmpty()) {
+                    if (model.getFaction().isPresent() || !model.getFaction().isEmpty() || !model.getRequirements().isPresent() || model.getRequirements().isEmpty()) {
                         continue;
                     }
                     techsSummed.add(tech);
@@ -122,7 +125,10 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary);
+        if (techsSummed.size() > 0) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary);
+        }
+
     }
 
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
