@@ -259,28 +259,28 @@ public class CombatModHelper {
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
                 if (onTile.isNebula() && !game.getActivePlayerID().equals(player.getUserID()) && !game
-                        .getFactionsThatReactedToThis("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
+                        .getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
             }
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
-                        && !game.getFactionsThatReactedToThis("vaylerianHeroActive").isEmpty()) {
+                        && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
                     meetsCondition = true;
                 }
             }
             case "solagent" -> {
-                if (game.getFactionsThatReactedToThis("solagent").contains(player.getFaction())) {
+                if (game.getStoredValue("solagent").contains(player.getFaction())) {
                     meetsCondition = true;
                 }
             }
             case "letnevagent" -> {
-                if (game.getFactionsThatReactedToThis("letnevagent").contains(player.getFaction())) {
+                if (game.getStoredValue("letnevagent").contains(player.getFaction())) {
                     meetsCondition = true;
                 }
             }
             case "thalnosPlusOne" -> {
-                if (game.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")) {
+                if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                     meetsCondition = true;
                 }
             }

@@ -68,14 +68,14 @@ public class DiscardSO extends SOCardsSubcommandData {
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        if(activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction()+"*")){
-            activeGame.setCurrentReacts(key2, activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction()+"*",""));
+        if(activeGame.getStoredValue(key2).contains(player.getFaction()+"*")){
+            activeGame.setStoredValue(key2, activeGame.getStoredValue(key2).replace(player.getFaction()+"*",""));
         }
-        if(!activeGame.getFactionsThatReactedToThis(key).contains(player.getFaction()+"*")){
-            activeGame.setCurrentReacts(key, activeGame.getFactionsThatReactedToThis(key)+player.getFaction()+"*");
+        if(!activeGame.getStoredValue(key).contains(player.getFaction()+"*")){
+            activeGame.setStoredValue(key, activeGame.getStoredValue(key)+player.getFaction()+"*");
         }
-        if(activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction()+"*")){
-            activeGame.setCurrentReacts(key3, activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction()+"*",""));
+        if(activeGame.getStoredValue(key3).contains(player.getFaction()+"*")){
+            activeGame.setStoredValue(key3, activeGame.getStoredValue(key3).replace(player.getFaction()+"*",""));
             Helper.resolveQueue(activeGame);
         }
         

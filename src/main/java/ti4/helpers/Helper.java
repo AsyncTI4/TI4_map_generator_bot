@@ -361,28 +361,28 @@ public class Helper {
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2) {
+        if (activeGame.getStoredValue(key2).length() < 2) {
             return;
         }
 
         for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
             String message = player.getRepresentation(true, true) + " Drew Queued Secret Objective From Imperial. ";
-            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+            if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 activeGame.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     activeGame.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to plausible deniability";
                 }
                 SOInfo.sendSecretObjectiveInfo(activeGame, player);
-                activeGame.setCurrentReacts(key2,
-                    activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
+                activeGame.setStoredValue(key2,
+                    activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                 if (!activeGame.isFoWMode()) {
                     ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
                 }
             }
-            if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
-                && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
+            if (activeGame.getStoredValue(key3).contains(player.getFaction() + "*")
+                && activeGame.getStoredValue(key2).length() > 2) {
                 if (!activeGame.isFoWMode()) {
                     message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
@@ -401,7 +401,7 @@ public class Helper {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2
+        if (activeGame.getStoredValue(key2).length() < 2
             || activeGame.getHighestScore() + 1 > activeGame.getVp()) {
             return;
         }
@@ -409,39 +409,39 @@ public class Helper {
             if (activeGame.getHighestScore() + 1 > activeGame.getVp()) {
                 return;
             }
-            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")
-                || activeGame.getFactionsThatReactedToThis(key2b).contains(player.getFaction() + "*")) {
-                if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+            if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")
+                || activeGame.getStoredValue(key2b).contains(player.getFaction() + "*")) {
+                if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     int poIndex = Integer
-                        .parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction() + "queuedPOScore"));
+                        .parseInt(activeGame.getStoredValue(player.getFaction() + "queuedPOScore"));
                     ScorePublic.scorePO(event, activeGame.getMainGameChannel(), activeGame, player, poIndex);
-                    activeGame.setCurrentReacts(key2,
-                        activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
-                    activeGame.setCurrentReacts(key3,
-                        activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                    activeGame.setStoredValue(key2,
+                        activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                    activeGame.setStoredValue(key3,
+                        activeGame.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                 }
                 if (activeGame.getHighestScore() + 1 > activeGame.getVp()) {
                     return;
                 }
-                if (activeGame.getFactionsThatReactedToThis(key2b).contains(player.getFaction() + "*")) {
+                if (activeGame.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                     int soIndex = Integer
-                        .parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction() + "queuedSOScore"));
+                        .parseInt(activeGame.getStoredValue(player.getFaction() + "queuedSOScore"));
                     ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
-                    activeGame.setCurrentReacts(key2b,
-                        activeGame.getFactionsThatReactedToThis(key2b).replace(player.getFaction() + "*", ""));
-                    activeGame.setCurrentReacts(key3b,
-                        activeGame.getFactionsThatReactedToThis(key3b).replace(player.getFaction() + "*", ""));
+                    activeGame.setStoredValue(key2b,
+                        activeGame.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
+                    activeGame.setStoredValue(key3b,
+                        activeGame.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
                 }
             } else {
-                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
-                    && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
+                if (activeGame.getStoredValue(key3).contains(player.getFaction() + "*")
+                    && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
-                if (activeGame.getFactionsThatReactedToThis(key3b).contains(player.getFaction() + "*")
-                    && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
+                if (activeGame.getStoredValue(key3b).contains(player.getFaction() + "*")
+                    && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
@@ -454,22 +454,22 @@ public class Helper {
     public static void resolveSOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
         String key2 = "queueToScoreSOs";
         String key3 = "potentialScoreSOBlockers";
-        if (activeGame.getFactionsThatReactedToThis(key2).length() < 2
+        if (activeGame.getStoredValue(key2).length() < 2
             || activeGame.getHighestScore() + 1 > activeGame.getVp()) {
             return;
         }
         for (Player player : getInitativeOrder(activeGame)) {
-            if (activeGame.getFactionsThatReactedToThis(key2).contains(player.getFaction() + "*")) {
+            if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 int soIndex = Integer
-                    .parseInt(activeGame.getFactionsThatReactedToThis(player.getFaction() + "queuedSOScore"));
+                    .parseInt(activeGame.getStoredValue(player.getFaction() + "queuedSOScore"));
                 ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
-                activeGame.setCurrentReacts(key2,
-                    activeGame.getFactionsThatReactedToThis(key2).replace(player.getFaction() + "*", ""));
-                activeGame.setCurrentReacts(key3,
-                    activeGame.getFactionsThatReactedToThis(key3).replace(player.getFaction() + "*", ""));
+                activeGame.setStoredValue(key2,
+                    activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                activeGame.setStoredValue(key3,
+                    activeGame.getStoredValue(key3).replace(player.getFaction() + "*", ""));
             } else {
-                if (activeGame.getFactionsThatReactedToThis(key3).contains(player.getFaction() + "*")
-                    && activeGame.getFactionsThatReactedToThis(key2).length() > 2) {
+                if (activeGame.getStoredValue(key3).contains(player.getFaction() + "*")
+                    && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
@@ -2583,7 +2583,7 @@ public class Helper {
         List<TechnologyModel> techs = new ArrayList<>();
         Mapper.getTechs().values().stream()
             .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
-            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || activeGame.getFactionsThatReactedToThis("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
+            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || activeGame.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
             .filter(tech -> !player.hasTech(tech.getAlias()))
             .filter(tech -> tech.getFaction().isEmpty() || tech.getFaction().get() == null
                 || "".equalsIgnoreCase(tech.getFaction().get())

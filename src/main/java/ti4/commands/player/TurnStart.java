@@ -56,24 +56,24 @@ public class TurnStart extends PlayerSubcommandData {
         maps.putAll(activeGame.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
             if (id.contains("combatRoundTracker")) {
-                activeGame.removeMessageIDFromCurrentReacts(id);
+                activeGame.removeStoredValue(id);
             }
         }
-        activeGame.setCurrentReacts(player.getFaction() + "planetsExplored", "");
+        activeGame.setStoredValue(player.getFaction() + "planetsExplored", "");
         activeGame.setNaaluAgent(false);
         activeGame.setL1Hero(false);
-        activeGame.setCurrentReacts("vaylerianHeroActive", "");
-        activeGame.setCurrentReacts("tnelisCommanderTracker", "");
-        activeGame.setCurrentReacts("planetsTakenThisRound", "");
-        activeGame.setCurrentReacts("absolLux", "");
-        activeGame.setCurrentReacts("mentakHero", "");
+        activeGame.setStoredValue("vaylerianHeroActive", "");
+        activeGame.setStoredValue("tnelisCommanderTracker", "");
+        activeGame.setStoredValue("planetsTakenThisRound", "");
+        activeGame.setStoredValue("absolLux", "");
+        activeGame.setStoredValue("mentakHero", "");
         boolean goingToPass = false;
-        if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
-            && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction())
+        if (activeGame.getStoredValue("Pre Pass " + player.getFaction()) != null
+            && activeGame.getStoredValue("Pre Pass " + player.getFaction())
                 .contains(player.getFaction())) {
-            if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())
+            if (activeGame.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())
                 && !player.isPassed()) {
-                activeGame.setCurrentReacts("Pre Pass " + player.getFaction(), "");
+                activeGame.setStoredValue("Pre Pass " + player.getFaction(), "");
                 goingToPass = true;
             }
         }
@@ -103,11 +103,16 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
                     getMissedSCFollowsText(activeGame, player));
             }
-            if (player.getStasisInfantry() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Use buttons to revive infantry. You have " + player.getStasisInfantry()
-                        + " infantry left to revive.",
-                    ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
+            Player privatePlayer = player;
+            if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                    ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+            } else {
+                privatePlayer.setStasisInfantry(0);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                    + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
             }
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
@@ -125,34 +130,39 @@ public class TurnStart extends PlayerSubcommandData {
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeGame, player));
             }
-            if (player.getStasisInfantry() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Use buttons to revive infantry. You have " + player.getStasisInfantry()
-                        + " infantry left to revive.",
-                    ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
+            Player privatePlayer = player;
+            if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                    ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+            } else {
+                privatePlayer.setStasisInfantry(0);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                    + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
             }
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
 
         }
-        if (!activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction()).isEmpty()) {
+        if (!activeGame.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 player.getRepresentation(true, true) + " you left yourself the following message: \n"
-                    + activeGame.getFactionsThatReactedToThis("futureMessageFor" + player.getFaction())
+                    + activeGame.getStoredValue("futureMessageFor" + player.getFaction())
                         .replace("666fin", ":"));
-            activeGame.setCurrentReacts("futureMessageFor" + player.getFaction(), "");
+            activeGame.setStoredValue("futureMessageFor" + player.getFaction(), "");
         }
         for (Player p2 : activeGame.getRealPlayers()) {
             if (!activeGame
-                .getFactionsThatReactedToThis("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
+                .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
                 .isEmpty()) {
                 String msg2 = "This is a message sent from the past:\n" + activeGame
-                    .getFactionsThatReactedToThis("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
+                    .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
                     .replace("666fin", ":");
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                     p2.getRepresentation(true, true) + " your future message got delivered");
                 Whisper.sendWhisper(activeGame, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
-                activeGame.setCurrentReacts("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
+                activeGame.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
             }
         }
 
@@ -178,7 +188,7 @@ public class TurnStart extends PlayerSubcommandData {
                         + ". Use buttons to gain CCs";
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                         message2, buttons2);
-                    activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                    activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 }
             }
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
@@ -206,9 +216,9 @@ public class TurnStart extends PlayerSubcommandData {
         for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
-                if (!activeGame.getFactionsThatReactedToThis("scPlay" + sc).isEmpty()) {
+                if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
                     sb.append(" ")
-                        .append(activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":"));
+                        .append(activeGame.getStoredValue("scPlay" + sc).replace("666fin", ":"));
                 }
                 sb.append("\n");
                 sendReminder = true;
@@ -264,9 +274,9 @@ public class TurnStart extends PlayerSubcommandData {
                         sb.append(" You are getting this ping because SC #").append(sc)
                             .append(
                                 " has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. \nTIP: Double check that you paid the command counter to follow\n");
-                        if (!activeGame.getFactionsThatReactedToThis("scPlay" + sc).isEmpty()) {
+                        if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(
-                                activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":"))
+                                activeGame.getStoredValue("scPlay" + sc).replace("666fin", ":"))
                                 .append("\n");
                         }
                         sb.append("You currently have ").append(p2.getStrategicCC())
