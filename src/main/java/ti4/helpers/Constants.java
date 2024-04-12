@@ -8,6 +8,7 @@ import ti4.AsyncTI4DiscordBot;
 
 public class Constants {
     // Staff Pings
+    public static final String chassitId = "183213554445320192";
     public static final String jazzId = "228999251328368640";
     public static String jazzPing() { return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention(); }
 

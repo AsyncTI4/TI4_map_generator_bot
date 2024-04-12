@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -132,8 +131,8 @@ public class TurnEnd extends PlayerSubcommandData {
             String lastTransaction = activeGame.getLatestTransactionMsg();
             try {
                 if (lastTransaction != null && !"".equals(lastTransaction)) {
-                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queueAfter(1, TimeUnit.SECONDS);
                     activeGame.setLatestTransactionMsg("");
+                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {});
                 }
             } catch (Exception e) {
                 //  Block of code to handle errors

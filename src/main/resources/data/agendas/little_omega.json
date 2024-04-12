@@ -243,7 +243,7 @@
         "alias": "little_omega_schematics",
         "name": "Publicize Weapon Schematics ω",
         "type": "Directive",
-        "target": "Elect Non-Flagship Unit, Non-Mech Unit",
+        "target": "Elect Non-Flagship, Non-Mech Unit",
         "text1": "Each player who owns a unit upgrade technology of the same type as the elected unit places 2 command tokens from their reinforcements in their strategy pool. Then, each other player gains a unit upgrade technology of the same type as the elected unit.",
         "text2": "",
         "source": "little_omega"
