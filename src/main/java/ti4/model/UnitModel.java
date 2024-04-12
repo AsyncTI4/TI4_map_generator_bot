@@ -47,6 +47,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
+    private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
@@ -114,6 +115,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
+        if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -384,6 +386,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getAbility() {
         return Optional.ofNullable(ability);
+    }
+
+    public Optional<String> getUnlock() {
+        return Optional.ofNullable(unlock);
     }
 
     public Optional<String> getHomebrewReplacesID() {

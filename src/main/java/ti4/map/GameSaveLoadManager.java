@@ -573,6 +573,10 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + activeGame.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.PROMISES_PROMISES + " " + activeGame.isPromisesPromises());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.FLAGSHIPPING + " " + activeGame.isFlagshipping());
+        writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
@@ -1844,6 +1848,22 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setAbsolMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.PROMISES_PROMISES -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setPromisesPromises(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.FLAGSHIPPING -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setFlagshipping(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
