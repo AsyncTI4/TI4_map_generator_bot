@@ -58,7 +58,11 @@ public class NaaluCommander extends SpecialSubcommandData {
         } else {
             sb.append("Could not find agenda");
         }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        if (embed != null) {
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+        }
 
         sb.setLength(0);
         boolean first = true;

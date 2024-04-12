@@ -1105,6 +1105,8 @@ public class ButtonHelper {
         buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         buttons.add(Button.secondary("showDeck_unscoredSO", "Unscored SOs")
             .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+        buttons.add(Button.secondary("showObjInfo_both", "All Revealed Objectives in Game")
+            .withEmoji(Emoji.fromFormatted(Emojis.Public1)));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
     }
 
@@ -5262,7 +5264,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Flipped ionstorm in " + tile.getRepresentation());
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Tile> getAllWormholeTiles(Game game) {
@@ -8708,7 +8710,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, purgeFragButtons);
             }
             case "generic" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Doing unspecified component action. You could ping Fin to add this. ");
+                "Doing unspecified component action.");
             case "absolMOW" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     getIdent(p1)
