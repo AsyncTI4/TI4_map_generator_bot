@@ -93,14 +93,14 @@ public class Whisper extends FOWSubcommandData {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
-            String whisperHistory = activeGame.getFactionsThatReactedToThis(key);
+            String whisperHistory = activeGame.getStoredValue(key);
             if (whisperHistory.isEmpty()) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " is whispering for the first time this turn to " + ButtonHelper.getIdent(player_));
-                activeGame.setCurrentReacts(key, "1");
+                activeGame.setStoredValue(key, "1");
             } else {
                 int num = Integer.parseInt(whisperHistory);
                 num = num + 1;
-                activeGame.setCurrentReacts(key, "" + num);
+                activeGame.setStoredValue(key, "" + num);
                 if (num == 5 || num == 10) {
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " is sending whisper #" + num + " of this turn to " + ButtonHelper.getIdent(player_));
                 }

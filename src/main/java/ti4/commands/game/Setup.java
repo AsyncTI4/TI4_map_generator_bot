@@ -66,9 +66,9 @@ public class Setup extends GameSubcommandData {
             String key = "factionsThatAreNotDiscardingSOs";
             String key2 = "queueToDrawSOs";
             String key3 = "potentialBlockers";
-            activeGame.setCurrentReacts(key, "");
-            activeGame.setCurrentReacts(key2, "");
-            activeGame.setCurrentReacts(key3, "");
+            activeGame.setStoredValue(key, "");
+            activeGame.setStoredValue(key2, "");
+            activeGame.setStoredValue(key3, "");
             if (activeGame.getRound() > 1) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
             }
