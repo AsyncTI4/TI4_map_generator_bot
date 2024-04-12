@@ -80,6 +80,7 @@ public class AgendaHelper {
 
     public static void resolveAgenda(Game activeGame, String buttonID, ButtonInteractionEvent event,
         MessageChannel actionsChannel) {
+        actionsChannel = activeGame.getMainGameChannel();
         String winner = buttonID.substring(buttonID.indexOf("_") + 1);
         String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
         int aID;

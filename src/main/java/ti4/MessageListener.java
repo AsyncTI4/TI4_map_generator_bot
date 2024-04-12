@@ -387,6 +387,10 @@ public class MessageListener extends ListenerAdapter {
                                 if (player != null) {
                                     realIdentity = player.getRepresentation(true, true);
                                     ping = realIdentity + " this is a gentle reminder that it is your turn.";
+                                    if (player != null && player.shouldPlayerBeTenMinReminded()
+                                        && milliSinceLastPing > (60 * 5 * multiplier) && (60 * 60 * multiplier * spacer) > milliSinceLastPing) {
+                                        ping = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinance";
+                                    }
                                 }
                                 if ("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                                     AgendaHelper.pingMissingPlayers(activeGame);
