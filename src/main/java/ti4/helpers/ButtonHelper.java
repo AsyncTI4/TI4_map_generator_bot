@@ -6731,15 +6731,17 @@ public class ButtonHelper {
                 msgExtra + "\n Use Buttons to do turn.",
                 TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
             Game activeGame = game;
-            if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
-                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                    ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
-            } else {
-                privatePlayer.setStasisInfantry(0);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
-                    + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+            if (privatePlayer.getStasisInfantry() > 0) {
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
+                }
             }
 
         } else {
@@ -6753,15 +6755,17 @@ public class ButtonHelper {
                     return;
                 }
                 Game activeGame = game;
-                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
-                } else {
-                    privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                if (privatePlayer.getStasisInfantry() > 0) {
+                    if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
+                    }
                 }
             }
         }
@@ -6851,15 +6855,17 @@ public class ButtonHelper {
                     msgExtra + "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
                 Game activeGame = game;
-                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
-                } else {
-                    privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                if (privatePlayer.getStasisInfantry() > 0) {
+                    if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
+                    }
                 }
             }
 
@@ -6875,15 +6881,17 @@ public class ButtonHelper {
                     "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
                 Game activeGame = game;
-                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
-                } else {
-                    privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                if (privatePlayer.getStasisInfantry() > 0) {
+                    if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
+                    }
                 }
             }
         }
