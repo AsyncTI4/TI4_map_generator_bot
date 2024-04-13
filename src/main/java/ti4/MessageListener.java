@@ -224,7 +224,7 @@ public class MessageListener extends ListenerAdapter {
             }
             //947310962485108816
             Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
-            if (lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
+            if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
                 String msg2 = lfgRole.getAsMention() + " this game is looking for more members (its old if it has -launched in its title) "
                     + msg.getJumpUrl();
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary
