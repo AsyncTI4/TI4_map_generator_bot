@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -78,6 +79,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.Source.ComponentSource;
 
 public class Helper {
 
@@ -204,12 +206,12 @@ public class Helper {
         return player;
     }
 
-    // TODO: Jazz: This method only includes base game + pok tiles. It really should at least include DS.
+    // TODO: Jazz: This method only includes base game + pok tiles. It will include DS tiles if DS mode is set
     //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
     //     - from every source available to the active game
-    public static void getRandomBlueTile(Game activeGame, GenericInteractionCreateEvent event) {
-        MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
-        MiltyDraftHelper.initDraftTiles(draftManager);
+    public static void getRandomBlueTile(Game game, GenericInteractionCreateEvent event) {
+        MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        MiltyDraftHelper.initDraftTiles(draftManager, game);
 
         List<MiltyDraftTile> allTiles;
         allTiles = draftManager.getBlue();
@@ -221,7 +223,7 @@ public class Helper {
             MiltyDraftTile tile = allTiles.get(result);
             tile.getTile().getTileID();
             boolean foundInMap = false;
-            for (Tile mapTile : activeGame.getTileMap().values()) {
+            for (Tile mapTile : game.getTileMap().values()) {
                 if (mapTile.getTileID().equalsIgnoreCase(tile.getTile().getTileID())) {
                     foundInMap = true;
                     break;
