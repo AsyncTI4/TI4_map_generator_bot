@@ -2043,7 +2043,7 @@ public class GameSaveLoadManager {
                 case Constants.MILTY_DRAFT_MANAGER -> {
                     try {
                         MiltyDraftManager manager = activeGame.getMiltyDraftManager();
-                        manager.init();
+                        manager.init(activeGame);
                         manager.loadSuperSaveString(activeGame, info);
                     } catch (Exception e) {
                         // Do nothing

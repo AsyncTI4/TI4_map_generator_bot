@@ -5,9 +5,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
 
@@ -24,6 +27,7 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import ti4.commands.map.AddTileList;
 import ti4.commands.player.Setup;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -35,6 +39,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileModel;
 
 @Data
 public class MiltyDraftManager {
@@ -155,9 +160,9 @@ public class MiltyDraftManager {
         factionDraft.addAll(factions);
     }
 
-    public void init() {
+    public void init(Game game) {
         clear();
-        MiltyDraftHelper.initDraftTiles(this);
+        MiltyDraftHelper.initDraftTiles(this, game);
     }
 
     //TODO: Integrate this directly in the manager. For now, it's just dumb and hacky
@@ -627,6 +632,20 @@ public class MiltyDraftManager {
     }
 
     private MiltyDraftTile findTile(String tileId) {
-        return all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElseThrow();
+        MiltyDraftTile result = null;
+        result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
+        if (result == null) {
+            TileModel tileRequested = TileHelper.getTile(tileId);
+            Set<ComponentSource> currentsources = new HashSet<>(all.stream()
+                .map(t -> t.getTile().getTileModel().getSource())
+                .filter(x -> x != null)
+                .collect(Collectors.toSet()));
+            if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
+            if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.ds);
+            if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);
+            MiltyDraftHelper.initDraftTiles(this, new ArrayList<>(currentsources));
+            result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElseThrow();
+        }
+        return result;
     }
 }

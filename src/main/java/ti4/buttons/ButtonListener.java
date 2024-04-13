@@ -2183,7 +2183,6 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("freeSystemsHeroPlanet_")) {// "freeSystemsHeroPlanet_"
             ButtonHelperHeroes.freeSystemsHeroPlanet(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("scPick_")) {
-            Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
             if (activeGame.getStoredValue("Public Disgrace") != null
@@ -2210,11 +2209,11 @@ public class ButtonListener extends ListenerAdapter {
             }
 
             if (activeGame.getLaws().containsKey("checks") || activeGame.getLaws().containsKey("absol_checks")) {
-                new SCPick().secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
+                SCPick.secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
             } else {
-                boolean pickSuccessful = stats.secondHalfOfPickSC(event, activeGame, player, scpick);
+                boolean pickSuccessful = Stats.secondHalfOfPickSC(event, activeGame, player, scpick);
                 if (pickSuccessful) {
-                    new SCPick().secondHalfOfSCPick(event, player, activeGame, scpick);
+                    SCPick.secondHalfOfSCPick(event, player, activeGame, scpick);
                     event.getMessage().delete().queue();
                 }
             }

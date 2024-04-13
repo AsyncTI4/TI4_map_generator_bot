@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.commands.map.AddTile;
 import ti4.commands.map.AddTileList;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftSlice;
@@ -139,6 +140,11 @@ public class MapTemplateHelper {
                         game.setTile(toAdd);
                         somethingHappened = true;
                     }
+                }
+
+                if (tile.getPos() != null && tile.getCustodians() != null && tile.getCustodians()) {
+                    Tile newgametile = game.getTile(tile.getPos());
+                    if (newgametile != null) AddTile.addCustodianToken(newgametile); //only works on MR for now
                 }
             }
         }

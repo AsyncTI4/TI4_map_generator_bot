@@ -61,9 +61,9 @@ public class FrankenDraft extends BagDraft {
     }
 
     @Override
-    public List<DraftBag> generateBags(Game activeGame) {
+    public List<DraftBag> generateBags(Game game) {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
-        List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(activeGame);
+        List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
 
         allDraftableItems.put(DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions));
@@ -78,17 +78,17 @@ public class FrankenDraft extends BagDraft {
         allDraftableItems.put(DraftItem.Category.STARTINGFLEET, StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.STARTINGTECH, StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions));
 
-        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(activeGame));
+        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
-        MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
-        MiltyDraftHelper.initDraftTiles(draftManager);
+        MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        MiltyDraftHelper.initDraftTiles(draftManager, game);
         allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
         allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
 
 
         List<DraftBag> bags = new ArrayList<>();
 
-        for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
+        for (int i = 0; i < game.getRealPlayers().size(); i++) {
             DraftBag bag = new DraftBag();
 
             // Walk through each type of draftable...
