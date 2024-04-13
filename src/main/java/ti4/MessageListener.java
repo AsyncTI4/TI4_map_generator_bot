@@ -222,6 +222,16 @@ public class MessageListener extends ListenerAdapter {
             if (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before")) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "https://discord.gg/RZ7qg9kbVZ");
             }
+            //947310962485108816
+            Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
+            if (lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
+                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (its old if it has -launched in its title) "
+                    + msg.getJumpUrl();
+                TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary
+                    .getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
+                MessageHelper.sendMessageToChannel(lfgPings, msg2);
+            }
+
             autoPingGames();
             handleFoWWhispersAndFowCombats(event, msg);
             mapLog(event, msg);
