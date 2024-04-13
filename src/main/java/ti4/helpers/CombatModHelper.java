@@ -26,7 +26,7 @@ import ti4.model.UnitModel;
 public class CombatModHelper {
 
     public static Boolean IsModInScopeForUnits(List<UnitModel> units, CombatModifierModel modifier,
-            CombatRollType rollType) {
+        CombatRollType rollType) {
         for (UnitModel unit : units) {
             if (modifier.isInScopeForUnit(unit, units, rollType)) {
                 return true;
@@ -36,29 +36,29 @@ public class CombatModHelper {
     }
 
     public static List<NamedCombatModifierModel> GetModifiers(Player player, Player opponent,
-            Map<UnitModel, Integer> unitsByQuantity,
-            TileModel tile,
-            Game activeGame,
-            CombatRollType rollType,
-            String modifierType) {
+        Map<UnitModel, Integer> unitsByQuantity,
+        TileModel tile,
+        Game activeGame,
+        CombatRollType rollType,
+        String modifierType) {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
         HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
-                .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString()))
-                .filter(entry -> entry.getValue().getType().equals(modifierType))
-                .filter(entry -> !entry.getValue().getApplyToOpponent())
-                .filter(entry -> IsModInScopeForUnits(new ArrayList<>(unitsByQuantity.keySet()), entry.getValue(),
-                        rollType))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString()))
+            .filter(entry -> entry.getValue().getType().equals(modifierType))
+            .filter(entry -> !entry.getValue().getApplyToOpponent())
+            .filter(entry -> IsModInScopeForUnits(new ArrayList<>(unitsByQuantity.keySet()), entry.getValue(),
+                rollType))
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (String ability : player.getAbilities()) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.ABILITY, ability))
-                    .findFirst();
+                .filter(modifier -> modifier.isRelevantTo(Constants.ABILITY, ability))
+                .findFirst();
 
             if (relevantMod.isPresent()
-                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                            activeGame)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                    activeGame)) {
                 AbilityModel abilityModel = Mapper.getAbility(ability);
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), abilityModel.getRepresentation()));
             }
@@ -66,78 +66,78 @@ public class CombatModHelper {
 
         for (String tech : player.getTechs()) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.TECH, tech))
-                    .findFirst();
+                .filter(modifier -> modifier.isRelevantTo(Constants.TECH, tech))
+                .findFirst();
 
             if (relevantMod.isPresent()
-                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                            activeGame)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                    activeGame)) {
                 TechnologyModel technologyModel = Mapper.getTech(tech);
                 modifiers
-                        .add(new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
+                    .add(new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
             }
         }
 
         if (opponent != null && opponent != player
-                && ((player != activeGame.getActivePlayer() && opponent == activeGame.getActivePlayer())
-                        || player == activeGame.getActivePlayer())) {
+            && ((player != activeGame.getActivePlayer() && opponent == activeGame.getActivePlayer())
+                || player == activeGame.getActivePlayer())) {
             for (String tech : opponent.getTechs()) {
                 Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                        .filter(modifier -> modifier.isRelevantTo("opponent_tech", tech))
-                        .findFirst();
+                    .filter(modifier -> modifier.isRelevantTo("opponent_tech", tech))
+                    .findFirst();
 
                 if (relevantMod.isPresent()
-                        && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                                activeGame)) {
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                        activeGame)) {
                     TechnologyModel technologyModel = Mapper.getTech(tech);
                     modifiers.add(
-                            new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
+                        new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
                 }
             }
         }
 
         for (String relic : player.getRelics()) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.RELIC, relic))
-                    .findFirst();
+                .filter(modifier -> modifier.isRelevantTo(Constants.RELIC, relic))
+                .findFirst();
 
             if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent,
-                    unitsByQuantity, activeGame)) {
+                unitsByQuantity, activeGame)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
             }
         }
 
         List<AgendaModel> lawAgendasTargetingPlayer = activeGame.getLawsInfo().entrySet().stream()
-                .filter(entry -> entry.getValue().equals(player.getFaction()))
-                .map(entry -> Mapper.getAgenda(entry.getKey()))
-                .toList();
+            .filter(entry -> entry.getValue().equals(player.getFaction()))
+            .map(entry -> Mapper.getAgenda(entry.getKey()))
+            .toList();
         for (AgendaModel agenda : lawAgendasTargetingPlayer) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.AGENDA, agenda.getAlias()))
-                    .findFirst();
+                .filter(modifier -> modifier.isRelevantTo(Constants.AGENDA, agenda.getAlias()))
+                .findFirst();
 
             if (relevantMod.isPresent()
-                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                            activeGame)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                    activeGame)) {
                 modifiers
-                        .add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
+                    .add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
             }
         }
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         for (UnitModel unit : unitsInCombat) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, unit.getAlias()))
-                    .findFirst();
+                .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, unit.getAlias()))
+                .findFirst();
 
             if (relevantMod.isPresent()
-                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                            activeGame)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                    activeGame)) {
                 modifiers.add(
-                        new NamedCombatModifierModel(relevantMod.get(),
-                                Emojis.getEmojiFromDiscord(unit.getBaseType()) + " "
-                                        + unit.getName() + " " + unit.getAbility()));
+                    new NamedCombatModifierModel(relevantMod.get(),
+                        Emojis.getEmojiFromDiscord(unit.getBaseType()) + " "
+                            + unit.getName() + " " + unit.getAbility()));
             }
         }
 
@@ -146,25 +146,25 @@ public class CombatModHelper {
                 continue;
             }
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.LEADER, leader.getId()))
-                    .findFirst();
+                .filter(modifier -> modifier.isRelevantTo(Constants.LEADER, leader.getId()))
+                .findFirst();
 
             if (relevantMod.isPresent()
-                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                            activeGame)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                    activeGame)) {
                 modifiers.add(
-                        new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
+                    new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
             }
         }
 
         List<CombatModifierModel> customAlwaysRelveantMods = combatModifiers.values().stream()
-                .filter(modifier -> modifier.isRelevantTo(Constants.CUSTOM, Constants.CUSTOM))
-                .toList();
+            .filter(modifier -> modifier.isRelevantTo(Constants.CUSTOM, Constants.CUSTOM))
+            .toList();
         for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
             if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
-                    activeGame)) {
+                activeGame)) {
                 modifiers.add(
-                        new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
+                    new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
             }
         }
 
@@ -172,9 +172,9 @@ public class CombatModHelper {
     }
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
-            List<NamedCombatModifierModel> modifiers, Player player,
-            Player opponent, Game activeGame, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
-            CombatRollType rollType) {
+        List<NamedCombatModifierModel> modifiers, Player player,
+        Player opponent, Game activeGame, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
+        CombatRollType rollType) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
@@ -191,8 +191,13 @@ public class CombatModHelper {
     }
 
     public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,
-            Player opponent, Map<UnitModel, Integer> unitsByQuantity, Game game) {
+        Player opponent, Map<UnitModel, Integer> unitsByQuantity, Game game) {
         boolean meetsCondition = false;
+
+        Tile tile = null;
+        if (onTile != null) {
+            tile = game.getTile(onTile.getId());
+        }
         String condition = "";
         if (modifier != null && modifier.getCondition() != null) {
             condition = modifier.getCondition();
@@ -200,14 +205,14 @@ public class CombatModHelper {
         switch (condition) {
             case Constants.MOD_OPPONENT_TEKKLAR_PLAYER_OWNER -> {
                 if (opponent != null
-                        && player.getPromissoryNotesOwned().stream().anyMatch("tekklar"::equals)) {
+                    && player.getPromissoryNotesOwned().stream().anyMatch("tekklar"::equals)) {
                     meetsCondition = opponent.getTempCombatModifiers().stream().anyMatch(
+                        mod -> "tekklar".equals(mod.getRelatedID())
+                            && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
+                        ||
+                        opponent.getNewTempCombatModifiers().stream().anyMatch(
                             mod -> "tekklar".equals(mod.getRelatedID())
-                                    && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
-                            ||
-                            opponent.getNewTempCombatModifiers().stream().anyMatch(
-                                    mod -> "tekklar".equals(mod.getRelatedID())
-                                            && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES));
+                                && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES));
                 }
             }
             case Constants.MOD_OPPONENT_FRAG -> {
@@ -220,12 +225,12 @@ public class CombatModHelper {
                     String opponentFaction = opponent.getFaction();
                     if (opponentFaction.contains("keleres")) {
                         meetsCondition = player.getTechs().stream()
-                                .map(Mapper::getTech)
-                                .anyMatch(tech -> tech.getFaction().orElse("").equals("keleres"));
+                            .map(Mapper::getTech)
+                            .anyMatch(tech -> tech.getFaction().orElse("").equals("keleres"));
                     } else {
                         meetsCondition = player.getTechs().stream()
-                                .map(Mapper::getTech)
-                                .anyMatch(tech -> tech.getFaction().orElse("").equals(opponentFaction));
+                            .map(Mapper::getTech)
+                            .anyMatch(tech -> tech.getFaction().orElse("").equals(opponentFaction));
                     }
                 }
             }
@@ -234,7 +239,7 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
                 if (onTile.getPlanets().stream().anyMatch(
-                        planetId -> StringUtils.isNotBlank(Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
+                    planetId -> StringUtils.isNotBlank(Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
                 if (onTile.getPlanets().contains(Constants.MR)) {
@@ -248,24 +253,24 @@ public class CombatModHelper {
 
             }
             case Constants.MOD_HAS_FRAGILE -> meetsCondition = player.getAbilities().contains("fragile");
-            case Constants.MOD_OPPONENT_NO_CC_FLEET ->
-                meetsCondition = !player.getMahactCC().contains(opponent.getColor());
+            case Constants.MOD_OPPONENT_NO_CC_FLEET -> meetsCondition = !player.getMahactCC().contains(opponent.getColor());
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.entrySet().size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
                     meetsCondition = unitByQuantity.getValue() == 2
-                            && !"ff".equals(unitByQuantity.getKey().getAsyncId());
+                        && !"ff".equals(unitByQuantity.getKey().getAsyncId());
                 }
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
-                if (onTile.isNebula() && !game.getActivePlayerID().equals(player.getUserID()) && !game
-                        .getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
+                if ((onTile.isNebula() || tile.isNebula()) && !game.getActivePlayerID().equals(player.getUserID()) && !game
+                    .getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
+
                 }
             }
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
-                        && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
+                    && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
                     meetsCondition = true;
                 }
             }
@@ -315,7 +320,7 @@ public class CombatModHelper {
             }
             case "naazFS" -> {
                 if (ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player,
-                        game.getTileByPosition(game.getActiveSystem()))) {
+                    game.getTileByPosition(game.getActiveSystem()))) {
                     meetsCondition = true;
                 }
             }
@@ -331,7 +336,7 @@ public class CombatModHelper {
     /// or how many POs the opponent has scored that you havent etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-            Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
+        Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         Long scalingCount = (long) 0;
@@ -366,15 +371,15 @@ public class CombatModHelper {
                             }
                         }
                         scalingCount = scoredPOUserLists.stream()
-                                .filter(scoredPlayerList -> scoredPlayerList.contains(opponent.getUserID())
-                                        && !scoredPlayerList.contains(player.getUserID()))
-                                .count();
+                            .filter(scoredPlayerList -> scoredPlayerList.contains(opponent.getUserID())
+                                && !scoredPlayerList.contains(player.getUserID()))
+                            .count();
                     }
                 }
                 case Constants.UNIT_TECH -> scalingCount = player.getTechs().stream()
-                        .map(Mapper::getTech)
-                        .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
-                        .count();
+                    .map(Mapper::getTech)
+                    .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
+                    .count();
                 case Constants.MOD_DESTROYERS -> {
                     // TODO: Doesnt seem like an easier way to do this? Seems slow.
                     String colorID = Mapper.getColorID(player.getColor());
@@ -391,17 +396,17 @@ public class CombatModHelper {
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
                     scalingCount += opponentUnitsInCombat.stream()
-                            .filter(unit -> !unit.getBaseType().equals("fighter"))
-                            .count();
+                        .filter(unit -> !unit.getBaseType().equals("fighter"))
+                        .count();
                 }
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders()
-                            .get("space");
+                        .get("space");
                     int count = 0;
                     if (space.getUnitDamage().get(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()),
-                            player.getColorID())) != null) {
+                        player.getColorID())) != null) {
                         count = space.getUnitDamage().get(Mapper
-                                .getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()));
+                            .getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()));
                     }
                     scalingCount += count;
                     scalingCount = Math.min(scalingCount, 2);
@@ -409,17 +414,17 @@ public class CombatModHelper {
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
-                                .map(Mapper::getTech)
-                                .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
-                                .count();
+                            .map(Mapper::getTech)
+                            .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
+                            .count();
                     }
                 }
                 case Constants.MOD_OPPONENT_FACTION_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
-                                .map(Mapper::getTech)
-                                .filter(tech -> StringUtils.isNotBlank(tech.getFaction().orElse("")))
-                                .count();
+                            .map(Mapper::getTech)
+                            .filter(tech -> StringUtils.isNotBlank(tech.getFaction().orElse("")))
+                            .count();
                     }
                 }
                 default -> {
