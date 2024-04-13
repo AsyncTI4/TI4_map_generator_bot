@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.*;
+
 import java.util.*;
 
 public class ChangeColor extends PlayerSubcommandData {
@@ -61,6 +62,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 String key = pn.getKey();
                 Integer value = pn.getValue();
                 String newKey = key;
+
                 if (key.startsWith(oldColorKey)) {
                     newKey = key.replace(oldColorKey, newColorKey);
                 }
@@ -154,14 +156,15 @@ public class ChangeColor extends PlayerSubcommandData {
 
         Set<String> controlList = new HashSet<>(unitHolder.getControlList());
         for (String control : controlList) {
-            if (!control.contains(oldColorID)) continue;
+            if (!control.contains(oldColorSuffix)) continue;
             unitHolder.removeControl(control);
-            control = control.replace(oldColorID, newColorID);
+            control = control.replace(oldColorSuffix, newColorSuffix);
             unitHolder.addControl(control);
         }
-
+        
         Set<String> ccList = new HashSet<>(unitHolder.getCCList());
         for (String cc : ccList) {
+            if (!cc.contains(oldColorSuffix)) continue;
             unitHolder.removeCC(cc);
             cc = cc.replace(oldColorSuffix, newColorSuffix);
             unitHolder.addCC(cc);
