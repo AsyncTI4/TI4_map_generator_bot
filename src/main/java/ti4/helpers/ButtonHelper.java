@@ -538,7 +538,9 @@ public class ButtonHelper {
 
     public static List<Button> getPlaceStatusInfButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-
+        if (player.getStasisInfantry() == 0) {
+            return buttons;
+        }
         Tile tile = FoWHelper.getPlayerHS(game, player);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -1959,6 +1961,21 @@ public class ButtonHelper {
             }
             UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                count = count + space.getUnits().get(unit);
+            }
+        }
+        return count;
+    }
+
+    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Game game, Tile tile) {
+        int count = 0;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        for (UnitKey unit : space.getUnits().keySet()) {
+            if (!unit.getColor().equals(player.getColor())) {
+                continue;
+            }
+            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+            if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff") && removedUnit.getSpaceCannonDieCount() == 0) {
                 count = count + space.getUnits().get(unit);
             }
         }
@@ -6592,6 +6609,9 @@ public class ButtonHelper {
             adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
         }
         List<Player> playersWithPds2 = new ArrayList<>();
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game) && player.hasAbility("starfall_gunnery") && ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(player);
+        }
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
@@ -6602,7 +6622,7 @@ public class ButtonHelper {
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 if (tilePos.equalsIgnoreCase(adjTilePos) && unitHolder.getName().equalsIgnoreCase("mr")) {
                     for (Player p2 : game.getRealPlayers()) {
-                        if (p2.getPlanetsAllianceMode().contains("mr") && p2.getTechs().contains("iihq")) {
+                        if (p2.getPlanetsAllianceMode().contains("mr") && p2.getTechs().contains("iihq") && !playersWithPds2.contains(p2)) {
                             playersWithPds2.add(p2);
                         }
                     }

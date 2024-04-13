@@ -4548,6 +4548,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",
                         buttons);
+                    event.getMessage().delete().queue();
                 }
                 case "doneWithTacticalAction" -> {
                     ButtonHelperTacticalAction.concludeTacticalAction(player, activeGame, event);

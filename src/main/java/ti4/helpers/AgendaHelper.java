@@ -1140,7 +1140,7 @@ public class AgendaHelper {
     public static void pingAboutDebt(Game game) {
         for (Player player : game.getRealPlayers()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player || player.getTg() < 0 || p2.hasAbility("binding_debts") || p2.getDebtTokenCount(player.getColor()) < 1) {
+                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts") || p2.getDebtTokenCount(player.getColor()) < 1) {
                     continue;
                 }
                 String msg = player.getRepresentation() + " This is a reminder that you owe debt to " + ButtonHelper.getIdentOrColor(p2, game) + " and now could be a good time to pay it (or get it cleared if it was paid already)";
@@ -2134,6 +2134,34 @@ public class AgendaHelper {
         Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
+            StringTokenizer vote_info2 = new StringTokenizer(outcomes.get(outcome), ";");
+            while (vote_info2.hasMoreTokens()) {
+                String specificVote = vote_info2.nextToken();
+                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                Player keleres = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
+                Player player = keleres;
+                if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
+                    int size = getLosingVoters(outcome, activeGame).size();
+                    String message = keleres.getRepresentation()
+                        + " You have a Keleres Xxcha Hero to resolve. There were " + size + " players who voted for a different outcome, so you get that many tgs and CCs. ";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(keleres, activeGame), message);
+                    if (size > 0) {
+                        player.setTg(player.getTg() + size);
+                        String msg2 = "Gained 3" + Emojis.getTGorNomadCoinEmoji(activeGame) + " (" + (player.getTg() - size)
+                            + " -> **" + player.getTg() + "**) ";
+                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, size);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(keleres, activeGame), msg2);
+                        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                        String trueIdentity = player.getRepresentation(true, true);
+                        String msg3 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
+                            + ". Use buttons to gain CCs";
+                        activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(keleres, activeGame), msg3, buttons);
+                    }
+
+                }
+            }
             if (outcome.equalsIgnoreCase(winner)) {
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 while (vote_info.hasMoreTokens()) {
@@ -2258,6 +2286,7 @@ public class AgendaHelper {
                                 "dreadnought", "placeOneNDone_skipbuild");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+
                         if (specificVote.contains("Trade Rider")) {
                             int cTG = winningR.getTg();
                             winningR.setTg(cTG + 5);

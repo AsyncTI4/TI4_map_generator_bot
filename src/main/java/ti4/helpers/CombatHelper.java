@@ -271,8 +271,14 @@ public class CombatHelper {
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planets
+
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet planet) {
+                if (player.getPlanetsAllianceMode().contains("mr") && "mr".equalsIgnoreCase(planet.getName()) && player.hasTech("iihq")) {
+                    PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+                    planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+                    planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+                }
                 PlanetModel planetModel = Mapper.getPlanet(planet.getName());
                 String ccID = Mapper.getControlID(player.getColor());
                 if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
@@ -287,6 +293,25 @@ public class CombatHelper {
                     planetFakeUnit.setFaction(player.getFaction());
                     unitsOnTile.put(planetFakeUnit, 1);
                 }
+            }
+        }
+        if (player.hasAbility("starfall_gunnery")) {
+            if (player == activeGame.getActivePlayer()) {
+                int count = Math.min(3, ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, activeGame, tile));
+                if (count > 0) {
+                    UnitModel starfallFakeUnit = new UnitModel();
+                    starfallFakeUnit.setSpaceCannonHitsOn(8);
+                    starfallFakeUnit.setSpaceCannonDieCount(1);
+                    starfallFakeUnit
+                        .setName("Starfall Gunnery space cannon");
+                    starfallFakeUnit.setAsyncId("starfallpds");
+                    starfallFakeUnit.setId("starfallpds");
+                    starfallFakeUnit.setBaseType("pds");
+                    starfallFakeUnit.setFaction(player.getFaction());
+                    unitsOnTile.put(starfallFakeUnit, count);
+                }
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " this is a reminder that due to the starfall gunnery ability, only space cannon of 1 unit should be counted at this point. Hopefully you declared beforehand what that unit was, but by default its probably the best one. Only look at/count the rolls of that one unit");
             }
         }
 

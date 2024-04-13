@@ -407,16 +407,31 @@ public class Tile {
 
     @JsonIgnore
     public boolean isNebula() {
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
+                return true;
+            }
+        }
         return getTileModel().isNebula();
     }
 
     @JsonIgnore
     public boolean isGravityRift() {
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
+                return true;
+            }
+        }
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
     }
 
     @JsonIgnore
     public boolean isGravityRift(Game activeGame) {
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
+                return true;
+            }
+        }
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(activeGame);
     }
 
