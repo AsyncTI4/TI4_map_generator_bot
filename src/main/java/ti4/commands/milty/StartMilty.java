@@ -2,7 +2,9 @@ package ti4.commands.milty;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -181,11 +183,22 @@ public class StartMilty extends MiltySubcommandData {
 
     private static boolean generateSlices(GenericInteractionCreateEvent event, int sliceCount, MiltyDraftManager draftManager, boolean anomaliesCanTouch) {
         long startTime = System.nanoTime();
-        long quittinTime = startTime + 20 * 1000 * 1000 * 1000;
+        long quitDiff = 20l * 1000l * 1000l * 1000l;
+        long attempts = 1000000l;
 
         boolean slicesCreated = false;
         int i = 0;
-        while (!slicesCreated && System.nanoTime() < quittinTime) {
+        Map<String, Integer> reasons = new HashMap<>();
+        final String alpha = "alphas", beta = "betas", value = "value";
+        reasons.put(alpha, 0);
+        reasons.put(beta, 0);
+        reasons.put(value, 0);
+
+        while (!slicesCreated) {
+            long elapTime = System.nanoTime() - startTime;
+            if (elapTime > quitDiff && i > attempts) {
+                break;
+            }
             draftManager.clearSlices();
 
             List<MiltyDraftTile> blue = draftManager.getBlue();
@@ -233,13 +246,20 @@ public class StartMilty extends MiltySubcommandData {
                 int optInf = miltyDraftSlice.getOptimalInf();
                 int optRes = miltyDraftSlice.getOptimalRes();
                 int totalOptimal = miltyDraftSlice.getOptimalTotalValue();
-                if (optInf < 3 || optRes < 2 || totalOptimal < 9 || totalOptimal > 12) {
+                if (optInf < 3 || optRes < 2 || totalOptimal < 9 || totalOptimal > 13) {
+                    reasons.put(value, reasons.get(value) + 1);
                     break;
                 }
 
                 // if the slice has 2 alphas, or 2 betas, throw it out
-                if (miltyDraftSlice.getTiles().stream().filter(t -> t.isHasAlphaWH()).count() > 1) break;
-                if (miltyDraftSlice.getTiles().stream().filter(t -> t.isHasBetaWH()).count() > 1) break;
+                if (miltyDraftSlice.getTiles().stream().filter(t -> t.isHasAlphaWH()).count() > 1) {
+                    reasons.put(alpha, reasons.get(alpha) + 1);
+                    break;
+                }
+                if (miltyDraftSlice.getTiles().stream().filter(t -> t.isHasBetaWH()).count() > 1) {
+                    reasons.put(beta, reasons.get(beta) + 1);
+                    break;
+                }
 
                 String sliceName = Character.toString(sliceNum - 1 + 'A');
                 miltyDraftSlice.setName(sliceName);
@@ -256,14 +276,15 @@ public class StartMilty extends MiltySubcommandData {
         }
 
         long elapsed = System.nanoTime() - startTime;
-        StringBuilder sb = new StringBuilder();
-        sb.append("Milty draft performance statistics:\n");
-        sb.append("        Elapsed time: " + Helper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
-        sb.append("    Number of cycles: " + i);
-        System.out.println("Milty draft performance statistics:");
-        System.out.println("        Elapsed time: " + Helper.getTimeRepresentationNanoSeconds(elapsed));
-        System.out.println("    Number of cycles: " + i);
-        if (!slicesCreated) {
+        if (!slicesCreated || elapsed >= 2000000000l) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Milty draft took a while ").append(Constants.jazzPing()).append(", take a look:\n");
+            sb.append("`        Elapsed time:` " + Helper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
+            sb.append("`           Quit time:` " + Helper.getTimeRepresentationNanoSeconds(quitDiff)).append("\n");
+            sb.append("`    Number of cycles:` " + i);
+            sb.append("`          alpha fail:` " + reasons.get(alpha));
+            sb.append("`           beta fail:` " + reasons.get(beta));
+            sb.append("`          value fail:` " + reasons.get(value));
             BotLogger.log(event, sb.toString());
         }
         return slicesCreated;
