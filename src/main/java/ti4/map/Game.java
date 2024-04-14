@@ -13,20 +13,8 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -304,6 +292,8 @@ public class Game {
     private List<String> publicObjectives2;
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
+    private Map<String, List<Player>> publicObjectives1Peaked = new LinkedHashMap<>();
+    private Map<String, List<Player>> publicObjectives2Peaked = new LinkedHashMap<>();
     private List<String> savedButtons = new ArrayList<>();
     private List<String> soToPoList = new ArrayList<>();
     @JsonIgnore
@@ -1412,6 +1402,9 @@ public class Game {
             identifier++;
         }
         revealedPublicObjectives.put(id, identifier);
+
+        publicObjectives1Peaked.remove(id);
+        publicObjectives2Peaked.remove(id);
     }
 
     public Map<Integer, Integer> getScTradeGoods() {
@@ -1557,12 +1550,32 @@ public class Game {
         }
     }
 
-    public String peakAtStage1(int place) {
-        return peakAtObjective(publicObjectives1Peakable, place);
+    public String peakAtStage1(int place, Player player) {
+        String objective = peakAtObjective(publicObjectives1Peakable, place);
+
+        if (publicObjectives1Peaked.containsKey(objective) && !publicObjectives1Peaked.get(objective).contains(player)) {
+            publicObjectives1Peaked.get(objective).add(player);
+        } else {
+            ArrayList<Player> list = new ArrayList<>();
+            list.add(player);
+            publicObjectives1Peaked.put(objective, list);
+        }
+
+        return objective;
     }
 
-    public String peakAtStage2(int place) {
-        return peakAtObjective(publicObjectives2Peakable, place);
+    public String peakAtStage2(int place, Player player) {
+        String objective = peakAtObjective(publicObjectives2Peakable, place);
+
+        if (publicObjectives2Peaked.containsKey(objective) && !publicObjectives2Peaked.get(objective).contains(player)) {
+            publicObjectives2Peaked.get(objective).add(player);
+        } else {
+            ArrayList<Player> list = new ArrayList<>();
+            list.add(player);
+            publicObjectives2Peaked.put(objective, list);
+        }
+
+        return objective;
     }
 
     public Map.Entry<String, Integer> revealSpecificStage1(String id) {
@@ -1698,9 +1711,11 @@ public class Game {
             Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
             Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
             if (po1.contains(id)) {
+                publicObjectives1Peaked.remove(id);
                 publicObjectives1.add(id);
                 Collections.shuffle(publicObjectives1);
             } else if (po2.contains(id)) {
+                publicObjectives2Peaked.remove(id);
                 publicObjectives2.add(id);
                 Collections.shuffle(publicObjectives2);
             }
