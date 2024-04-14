@@ -2891,7 +2891,7 @@ public class Helper {
         long nanoSeconds = totalNanoSeconds % 1000;
         long microSeconds = totalMicroSeconds % 1000;
         long milleSeconds = totalMilliSeconds % 1000;
-        long seconds = totalSeconds % 60;
+        long seconds = totalSeconds;
         // long minutes = totalMinutes % 60;
         // long hours = totalHours % 24;
         // long days = totalDays;
