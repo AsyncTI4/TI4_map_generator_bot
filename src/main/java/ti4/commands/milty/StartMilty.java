@@ -14,6 +14,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
@@ -180,7 +181,7 @@ public class StartMilty extends MiltySubcommandData {
 
     private static boolean generateSlices(GenericInteractionCreateEvent event, int sliceCount, MiltyDraftManager draftManager, boolean anomaliesCanTouch) {
         long startTime = System.nanoTime();
-        long quittinTime = startTime + 5 * 1000 * 1000 * 1000;
+        long quittinTime = startTime + 20 * 1000 * 1000 * 1000;
 
         boolean slicesCreated = false;
         int i = 0;
@@ -255,9 +256,16 @@ public class StartMilty extends MiltySubcommandData {
         }
 
         long elapsed = System.nanoTime() - startTime;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Milty draft performance statistics:\n");
+        sb.append("        Elapsed time: " + Helper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
+        sb.append("    Number of cycles: " + i);
         System.out.println("Milty draft performance statistics:");
         System.out.println("        Elapsed time: " + Helper.getTimeRepresentationNanoSeconds(elapsed));
         System.out.println("    Number of cycles: " + i);
+        if (!slicesCreated) {
+            BotLogger.log(event, sb.toString());
+        }
         return slicesCreated;
     }
 

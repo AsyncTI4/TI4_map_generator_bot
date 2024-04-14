@@ -707,6 +707,7 @@ public class Emojis {
     public static final String Summer = "<:Summer:1070283656037412884>";
     public static final String Charlie = "<:Charlie:1096774713352650812>";
     public static final String Scout = "<:scout_face_2:1071965098639360081>";
+    public static final String scoutSpinner = "<a:spinner:1090392441477136434>";
 
     // LIST OF GOOD DOGS
     public static final List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie, Scout);
