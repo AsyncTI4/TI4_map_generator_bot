@@ -645,8 +645,11 @@ public class ButtonListener extends ListenerAdapter {
                     if (player_.getFaction().equals(faction)) {
                         activeGame.setSpeaker(player_.getUserID());
                         String message = Emojis.SpeakerToken + " Speaker assigned to: "
-                            + ButtonHelper.getIdentOrColor(player_, activeGame);
+                            + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                        if (!activeGame.isFoWMode()) {
+                            ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "politics");
+                        }
                     }
                 }
             }
@@ -657,8 +660,11 @@ public class ButtonListener extends ListenerAdapter {
                 for (Player player_ : activeGame.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
                         activeGame.setSpeaker(player_.getUserID());
-                        String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation();
+                        String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                        if (!activeGame.isFoWMode()) {
+                            ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "politics");
+                        }
                     }
                 }
             }
@@ -2317,6 +2323,9 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation() + " purged fragments: "
                 + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            if (!activeGame.isFoWMode() && event.getMessageChannel() instanceof ThreadChannel) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+            }
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);

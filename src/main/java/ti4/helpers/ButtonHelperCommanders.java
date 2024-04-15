@@ -260,6 +260,16 @@ public class ButtonHelperCommanders {
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
+        if (player.hasUnit("kolume_mech")) {
+            for (Tile tile : activeGame.getTileMap().values()) {
+                for (UnitHolder uH : tile.getUnitHolders().values()) {
+                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                    }
+                }
+            }
+        }
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game activeGame) {

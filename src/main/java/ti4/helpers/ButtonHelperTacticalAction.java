@@ -643,7 +643,7 @@ public class ButtonHelperTacticalAction {
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
         }
-        List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
+
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(activeGame, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !activeGame.getL1Hero()) {
             String msg = player.getRepresentation(true, true) + " You can use buttons to resolve L1 Agent if you want";
@@ -658,6 +658,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
+        List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
             && !activeGame.getL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink",
@@ -666,16 +667,15 @@ public class ButtonHelperTacticalAction {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos),
                     event);
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "\n\nUse buttons to select the first system you want to move from", systemButtons);
         } else {
             if (player.hasAbility("awaken")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos),
                     event);
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to select the first system you want to move from", systemButtons);
+
         }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            "Use buttons to select the first system you want to move from", systemButtons);
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(activeGame, player);
             if (!buttons.isEmpty()) {
