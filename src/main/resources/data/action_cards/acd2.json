@@ -185,7 +185,7 @@
     "phase": "Action",
     "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
     "text": "Remove your command token from the active system.",
-    "flavorText": "The Letnev fleet had sliced through the blockade in an instant. Their survival was owed solely to Sh'val's prudent decision to retreat.",
+    "flavorText": "The Letnev fleet had sliced through the blockade in an instant. Their survival was owed solely to T'ro's prudent decision to retreat.",
     "source": "action_deck_2"
   },
   {
@@ -245,7 +245,7 @@
   {
     "alias": "diverse_strategies",
     "name": "Diverse Strategies",
-    "phase": "Any",
+    "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
     "text": "Perform the secondary ability of up to 2 other different strategy cards instead; when you perform those abilities, spend command tokens from your reinforcements instead of your strategy pool.",
     "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
@@ -347,24 +347,15 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 2 frontier tokens on the game board.",
-    "flavorText": "Although Xuange had promised secrecy, they did not discourage the search for Mirage.",
+    "flavorText": "Acamar had sealed the fates of many within the void, not out of malice, but as a warning. When word spread of a fabled weapon on a long-forgotten world, Acamar knew the councilors would turn a deaf ear to tales of those lost souls.",
     "source": "action_deck_2"
   },
   {
-    "alias": "garner_tribute",
-    "name": "Tributes",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Exhaust 1 planet you control to gain trade goods equal to the combined value of its resources and influence.",
-    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "grand_heist",
+    "alias": "heist",
     "name": "Heist",
     "phase": "Action",
     "window": "After you gain control of a planet that was controlled by another player",
-    "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
+    "text": "Take up to 2 of that player's relic fragments. Then, for each, you may discard that relic fragment to gain 2 trade goods.",
     "flavorText": "Mot awoke in a pool of his own blood. He was no longer bound – S'Ula had granted him that courtesy at least – but he was too weak to stand. So, he laid in front of the empty vault and wept.",
     "source": "action_deck_2"
   },
@@ -598,7 +589,7 @@
     "name": "Safety Overrides",
     "phase": "Action",
     "window": "After 1 of your mechs is destroyed during a ground combat",
-    "text": "Produce 2 hits against your opponent's units.",
+    "text": "Choose up to 3 of your opponent's ground forces. Roll 1 die for each of those units; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
@@ -614,7 +605,7 @@
   {
     "alias": "short-lived_clone",
     "name": "Short-lived Clone",
-    "phase": "Any",
+    "phase": "Action",
     "window": "At the start of your turn",
     "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted, and is readied at the end of this turn.",
     "flavorText": "Commandeering the genetic spinner for the task was arduous and the creature it produced quickly became unpredictable.",
@@ -738,12 +729,21 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "tributes",
+    "name": "Tributes",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Exhaust 1 planet you control to gain trade goods equal to the combined value of its resources and influence.",
+    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "unexpected_strategy",
     "name": "Unexpected Strategy",
     "phase": "Strategy",
-    "window": "At the end of the strategy phase",
-    "text": "Swap 1 strategy card in your play area with 1 unchosen strategy card or place 2 command tokens from your reinforcements in your strategy pool.",
-    "flavorText": "A6AH3 felt long forgotten anger. Despite their best syllogisms and heuristics, they could not discern whether the Creuss operated based on reason or some strange mechanism of cause and effect.",
+    "window": "When you choose a strategy card",
+    "text": "Gain 1 command token. Then, gain a number of additional command tokens equal to the number of trade goods on that strategy card.",
+    "flavorText": "Despite their best syllogisms and heuristics, they could not discern whether the Creuss operated based on reason or some strange mechanism of cause and effect.",
     "source": "action_deck_2"
   },
   {
