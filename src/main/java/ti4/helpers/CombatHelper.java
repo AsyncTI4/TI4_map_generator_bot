@@ -423,10 +423,10 @@ public class CombatHelper {
             int toHit = unit.getCombatDieHitsOnForAbility(rollType, player, activeGame);
             int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, mods, player, opponent,
                 activeGame,
-                playerUnitsList, opponentUnitsList, rollType);
+                playerUnitsList, opponentUnitsList, rollType, activeSystem);
             int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, extraRolls, player,
                 opponent,
-                activeGame, playerUnitsList, opponentUnitsList, rollType);
+                activeGame, playerUnitsList, opponentUnitsList, rollType, activeSystem);
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType, player, activeGame);
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {

@@ -438,12 +438,12 @@ public class ButtonHelperTacticalAction {
                     String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                     if (!activeGame.isFoWMode()) {
                         StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player,
-                            player2, threadName, tile, event, "space");
+                            player2, threadName, tile, event, "space", "space");
                     } else {
                         StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2,
-                            threadName, tile, event, "space");
+                            threadName, tile, event, "space", "space");
                         StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player,
-                            threadName, tile, event, "space");
+                            threadName, tile, event, "space", "space");
                         for (Player player3 : activeGame.getRealPlayers()) {
                             if (player3 == player2 || player3 == player) {
                                 continue;
@@ -452,7 +452,7 @@ public class ButtonHelperTacticalAction {
                                 continue;
                             }
                             StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3,
-                                player3, threadName, tile, event, "space");
+                                player3, threadName, tile, event, "space", "space");
                         }
                     }
                 } else {
