@@ -946,6 +946,9 @@ public class GameSaveLoadManager {
 
             List<String> newTempCombatMods = new ArrayList<>();
             for (TemporaryCombatModifierModel mod : player.getNewTempCombatModifiers()) {
+                if (mod == null || mod.getModifier() == null) {
+                    continue;
+                }
                 newTempCombatMods.add(mod.getSaveString());
             }
             writer.write(Constants.PLAYER_NEW_TEMP_MODS + " " + String.join("|", newTempCombatMods));

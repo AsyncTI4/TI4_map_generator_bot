@@ -12,7 +12,11 @@ public class Constants {
     public static final String chassitId = "183213554445320192";
     public static final String tspId = "150809002974904321";
     public static final String jazzId = "228999251328368640";
-    public static String jazzPing() { return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention(); }
+
+    public static String jazzPing() {
+        return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
+    }
+
     public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     // other stuff
@@ -970,6 +974,7 @@ public class Constants {
     public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
     public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
     public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
+    public static final String MOD_ADJACENT_MECH = "adjacent_mech";
     public static final String MOD_OPPONENT_NON_FIGHTER_SHIP = "opponent_non_fighter_ship";
 
     public static final String MIGRATION_NAME = "migration_name";
