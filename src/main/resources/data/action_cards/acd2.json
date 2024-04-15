@@ -558,7 +558,7 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "renegotiation",
+    "alias": "renegotiation_acd2",
     "name": "Renegotiation",
     "phase": "Any",
     "window": "After a player resolves the effect of 1 of your promissory notes",
