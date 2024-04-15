@@ -100,7 +100,7 @@ public class SCPick extends PlayerSubcommandData {
         secondHalfOfSCPick(event, player, activeGame, scPicked);
     }
 
-    public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+    public static List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = new ArrayList<>();
         List<Player> activePlayers = activeGame.getRealPlayers();
 
@@ -136,7 +136,7 @@ public class SCPick extends PlayerSubcommandData {
         return buttons;
     }
 
-    public void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, int scPicked) {
+    public static void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, activeGame, scPicked);
         Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 
@@ -171,12 +171,12 @@ public class SCPick extends PlayerSubcommandData {
         event.getMessage().delete().queue();
     }
 
-    public void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, String buttonID) {
+    public static void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, String buttonID) {
         String scPicked = buttonID.split("_")[1];
         int scpick = Integer.parseInt(scPicked);
         String factionPicked = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(factionPicked);
-        boolean pickSuccessful = new Stats().secondHalfOfPickSC(event, activeGame, p2, scpick);
+        boolean pickSuccessful = Stats.secondHalfOfPickSC(event, activeGame, p2, scpick);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick + " by " + player.getFactionEmoji());
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), p2.getColor() + " was given SC #" + scpick);
@@ -229,7 +229,7 @@ public class SCPick extends PlayerSubcommandData {
         }
     }
 
-    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
 
         String msgExtra = "";

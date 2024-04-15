@@ -369,7 +369,7 @@ public class Stats extends PlayerSubcommandData {
 		return sb.toString();
 	}
 
-	public boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
+	public static boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
 		if (optionSC == null) {
 			return false;
 		}
@@ -377,7 +377,7 @@ public class Stats extends PlayerSubcommandData {
 		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
+	public static boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
 		Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),

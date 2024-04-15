@@ -35,7 +35,10 @@ public class Observer extends BothelperSubcommandData {
                 }
 
                 if ("remove".equals(event.getOption("add_remove").getAsString())) {
-                    channel.getPermissionContainer().upsertPermissionOverride(user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
+                    // clear permissions instead of revoking permissions.
+                    // This resets the user's perms to the default value, 
+                    //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
+                    channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
                     sendMessage("Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
                 }
             }

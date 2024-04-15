@@ -619,5 +619,23 @@
     "text": "Destroy half of that player's infantry on that planet, rounded up.",
     "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "grand_heist",
+    "name": "Heist",
+    "phase": "Action",
+    "window": "After you gain control of a planet that was controlled by another player",
+    "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
+    "flavorText": "Mot awoke in a pool of his own blood. He was no longer bound – S'Ula had granted him that courtesy at least – but he was too weak to stand. So, he laid in front of the empty vault and wept.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "garner_tribute",
+    "name": "Tributes",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Exhaust 1 planet you control to gain trade goods equal to the combined value of its resources and influence.",
+    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
+    "source": "action_deck_2"
   }
 ]

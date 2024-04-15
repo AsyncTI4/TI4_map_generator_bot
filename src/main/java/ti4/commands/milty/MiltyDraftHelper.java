@@ -250,15 +250,15 @@ public class MiltyDraftHelper {
         return null;
     }
 
-    public static void initDraftTiles(MiltyDraftManager draftManager) {
-        List<ComponentSource> defaultSources = Arrays.asList(
+    public static void initDraftTiles(MiltyDraftManager manager, Game game) {
+        List<ComponentSource> sources = new ArrayList<>(Arrays.asList(
             ComponentSource.base,
             ComponentSource.codex1,
             ComponentSource.codex2,
             ComponentSource.codex3,
-            ComponentSource.pok, // TODO: JAZZ
-            ComponentSource.ds); // temporarily include DS here
-        initDraftTiles(draftManager, defaultSources);
+            ComponentSource.pok));
+        if (game.isDiscordantStarsMode()) sources.add(ComponentSource.ds);
+        initDraftTiles(manager, sources);
     }
 
     public static void initDraftTiles(MiltyDraftManager draftManager, List<ComponentSource> sources) {

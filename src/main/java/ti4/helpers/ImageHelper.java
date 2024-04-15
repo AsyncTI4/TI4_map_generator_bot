@@ -106,10 +106,13 @@ public class ImageHelper {
             if (image == null) {
                 return null;
             }
+            if (width == height) {
+                image = square(image);
+            }
             return scale(image, width, height);
         });
     }
-
+    
     public static BufferedImage scale(BufferedImage originalImage, float percent) {
         int scaledWidth = (int) (originalImage.getWidth() * percent);
         int scaledHeight = (int) (originalImage.getHeight() * percent);
@@ -120,6 +123,15 @@ public class ImageHelper {
         Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
         BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return outputImage;
+    }
+
+    public static BufferedImage square(BufferedImage originalImage) {
+        int newSize = Math.max(originalImage.getWidth(), originalImage.getHeight());
+        BufferedImage outputImage = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
+        int newX = (newSize - originalImage.getWidth()) / 2;
+        int newY = (newSize - originalImage.getHeight()) / 2;
+        outputImage.getGraphics().drawImage(originalImage, newX, newY, null);
         return outputImage;
     }
 
