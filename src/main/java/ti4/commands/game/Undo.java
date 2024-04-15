@@ -25,9 +25,9 @@ public class Undo extends GameSubcommandData {
     public Undo() {
         super(Constants.UNDO, "Undo the last action");
         addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to")
-                .setRequired(true).setAutoComplete(true));
+            .setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
-                .setRequired(true));
+            .setRequired(true));
     }
 
     @Override
@@ -63,36 +63,37 @@ public class Undo extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
+        String intToUndoBackTo = gameToUndoBackTo.replace(activeGame.getName() + "_", "").replace(".txt", "");
 
-        Integer gameToUndoBackToNumber = Integer.parseInt(StringUtils.substringBetween(gameToUndoBackTo, "_", ".txt"))
-                + 1;
+        Integer gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo)
+            + 1;
 
         Map<String, Game> undoFiles = getAllUndoSavedGames(activeGame);
-        Integer maxSaveNumber = undoFiles.keySet().stream().map(s -> StringUtils.substringBetween(s, "_", ".txt"))
-                .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
+        Integer maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(activeGame.getName() + "_", "").replace(".txt", ""))
+            .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
 
         String undoFileToRestorePath = activeGame.getName() + "_" + gameToUndoBackToNumber + ".txt";
         File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
         if (!undoFileToRestore.exists()) {
             MessageHelper.replyToMessage(event,
-                    "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
+                "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
             return;
         }
         Game gameToRestore = GameSaveLoadManager.loadMap(undoFileToRestore);
         if (gameToRestore == null) {
             MessageHelper.replyToMessage(event,
-                    "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
+                "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
             return;
         }
 
         StringBuilder sb = new StringBuilder(
-                "Undoing Save #" + maxSaveNumber + " back to Save #" + gameToUndoBackToNumber + ":\n");
+            "Undoing Save #" + maxSaveNumber + " back to Save #" + gameToUndoBackToNumber + ":\n");
         for (int i = maxSaveNumber; i >= gameToUndoBackToNumber; i--) {
             String undoFile = activeGame.getName() + "_" + i + ".txt";
             File undoFileToBeDeleted = new File(Storage.getMapUndoDirectory(), undoFile);
             if (undoFileToBeDeleted.exists()) {
                 sb.append("> `").append(i).append("` ")
-                        .append(undoFiles.get(undoFileToBeDeleted.getName()).getLatestCommand()).append("\n");
+                    .append(undoFiles.get(undoFileToBeDeleted.getName()).getLatestCommand()).append("\n");
                 undoFileToBeDeleted.delete();
             }
         }
@@ -114,7 +115,7 @@ public class Undo extends GameSubcommandData {
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getMapUndoStorage)
-                .sorted(Comparator.comparing(File::getName).reversed())
-                .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadMap));
+            .sorted(Comparator.comparing(File::getName).reversed())
+            .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadMap));
     }
 }
