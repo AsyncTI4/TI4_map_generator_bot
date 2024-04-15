@@ -5,7 +5,7 @@
     "playerCount": 12,
     "tilesPerPlayer": 5,
     "templateTiles": [
-      { "pos": "000", "staticTileId": "18" },
+      { "pos": "000", "staticTileId": "18", "custodians": true },
       { "pos": "101", "staticTileId": "89b3" },
       { "pos": "102", "staticTileId": "89b4" },
       { "pos": "103", "staticTileId": "89b5" },
