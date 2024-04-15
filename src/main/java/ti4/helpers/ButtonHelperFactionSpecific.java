@@ -21,6 +21,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.TurnStart;
 import ti4.commands.tokens.AddCC;
@@ -41,6 +42,31 @@ import ti4.model.ExploreModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
+
+    public static void collateralizedLoans(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        Tile tile = activeGame.getTileByPosition(pos);
+        ClearDebt.clearDebt(player, p2, 1);
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " used collateralized loans ability to forgive 1 debt of their opponent to place 1 ship of a type that their opponent just lost");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation() + " one debt of yours was forgiven via the collateralized loans ability");
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "sling",
+            "placeOneNDone_skipbuild");
+        String message = player.getRepresentation() + " Use the buttons to place 1 unit that was destroyed. ";
+
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+    }
+
+    public static void gheminaMechStart(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame), player);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " due to your mech ability, you can explore " + Helper.getPlanetRepresentation(planet, activeGame) + " twice now");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " Explore #1", buttons);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " Explore #2", buttons);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveEdynAgendaStuffStep1(Player player, Game activeGame, List<Tile> tiles) {
         List<Button> buttons = new ArrayList<>();
