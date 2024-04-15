@@ -1101,31 +1101,38 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static void pillageCheck(Player player, Game activeGame) {
+    public static boolean canBePillaged(Player player, Game activeGame, int tg) {
         if (player.getPromissoryNotesInPlayArea().contains("pop")) {
-            return;
+            return false;
         }
         if (Helper.getPlayerFromAbility(activeGame, "pillage") != null && !Helper
             .getPlayerFromAbility(activeGame, "pillage").getFaction().equalsIgnoreCase(player.getFaction())) {
+            Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
+            if (tg > 2 && player.getNeighbouringPlayers().contains(pillager)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public static void pillageCheck(Player player, Game activeGame) {
+        if (canBePillaged(player, activeGame, player.getTg())) {
             Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
             String finChecker = "FFCC_" + pillager.getFaction() + "_";
-            if (player.getTg() > 2 && player.getNeighbouringPlayers().contains(pillager)) {
-                List<Button> buttons = new ArrayList<>();
-                String playerIdent = StringUtils.capitalize(player.getFaction());
-                MessageChannel channel = activeGame.getMainGameChannel();
-                if (activeGame.isFoWMode()) {
-                    playerIdent = StringUtils.capitalize(player.getColor());
-                    channel = pillager.getPrivateChannel();
-                }
-                String message = pillager.getRepresentation(true, true) + " you may have the opportunity to pillage "
-                    + playerIdent
-                    + ". Please check this is a valid pillage opportunity, and use buttons to resolve.";
-                buttons.add(Button.danger(finChecker + "pillage_" + player.getColor() + "_unchecked",
-                    "Pillage " + playerIdent));
-                buttons.add(Button.success(finChecker + "deleteButtons", "Decline Pillage Window"));
-                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+            List<Button> buttons = new ArrayList<>();
+            String playerIdent = StringUtils.capitalize(player.getFaction());
+            MessageChannel channel = activeGame.getMainGameChannel();
+            if (activeGame.isFoWMode()) {
+                playerIdent = StringUtils.capitalize(player.getColor());
+                channel = pillager.getPrivateChannel();
             }
+            String message = pillager.getRepresentation(true, true) + " you may have the opportunity to pillage "
+                + playerIdent
+                + ". Please check this is a valid pillage opportunity, and use buttons to resolve.";
+            buttons.add(Button.danger(finChecker + "pillage_" + player.getColor() + "_unchecked",
+                "Pillage " + playerIdent));
+            buttons.add(Button.success(finChecker + "deleteButtons", "Decline Pillage Window"));
+            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
     }
 

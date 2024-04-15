@@ -196,15 +196,24 @@ public class ButtonHelperCommanders {
     public static void resolveLetnevCommanderCheck(Player player, Game activeGame,
         GenericInteractionCreateEvent event) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
-            int old = player.getTg();
-            int newTg = player.getTg() + 1;
-            player.setTg(player.getTg() + 1);
-            String mMessage = player.getRepresentation(true, true)
-                + " Since you have Barony commander unlocked, 1tg has been added automatically (" + old
-                + "->" + newTg + ")";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-            ButtonHelperAbilities.pillageCheck(player, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+            if (!ButtonHelperAbilities.canBePillaged(player, activeGame, player.getTg() + 1) || activeGame.isFoWMode()) {
+                int old = player.getTg();
+                int newTg = player.getTg() + 1;
+                player.setTg(player.getTg() + 1);
+                String mMessage = player.getRepresentation(true, true)
+                    + " Since you have Barony commander unlocked, 1tg has been added automatically (" + old
+                    + "->" + newTg + ")";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                ButtonHelperAbilities.pillageCheck(player, activeGame);
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+            } else {
+                String mMessage = player.getRepresentation(true, true)
+                    + " Since you have Barony commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
+            }
         }
     }
 
@@ -246,19 +255,28 @@ public class ButtonHelperCommanders {
 
     public static void resolveMuaatCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
-            int old = player.getTg();
-            int newTg = player.getTg() + 1;
-            player.setTg(player.getTg() + 1);
-            String mMessage = player.getRepresentation(true, true)
-                + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
-                + "->" + newTg + ")";
-            if (activeGame.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
+            if (!ButtonHelperAbilities.canBePillaged(player, activeGame, player.getTg() + 1) || activeGame.isFoWMode()) {
+                int old = player.getTg();
+                int newTg = player.getTg() + 1;
+                player.setTg(player.getTg() + 1);
+                String mMessage = player.getRepresentation(true, true)
+                    + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
+                    + "->" + newTg + ")";
+                if (activeGame.isFoWMode()) {
+                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                }
+                ButtonHelperAbilities.pillageCheck(player, activeGame);
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                String mMessage = player.getRepresentation(true, true)
+                    + " Since you have Muaat commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
-            ButtonHelperAbilities.pillageCheck(player, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
         if (player.hasUnit("kolume_mech")) {
             for (Tile tile : activeGame.getTileMap().values()) {

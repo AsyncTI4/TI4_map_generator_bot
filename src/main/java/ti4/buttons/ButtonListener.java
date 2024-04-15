@@ -305,6 +305,10 @@ public class ButtonListener extends ListenerAdapter {
                 activeGame.getTileByPosition(buttonID.split("_")[1]), event);
         } else if (buttonID.startsWith("raghsCallStepOne_")) {
             ButtonHelperFactionSpecific.resolveRaghsCallStepOne(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("gheminaMechStart_")) {
+            ButtonHelperFactionSpecific.gheminaMechStart(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("collateralizedLoans_")) {
+            ButtonHelperFactionSpecific.collateralizedLoans(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("raghsCallStepTwo_")) {
             ButtonHelperFactionSpecific.resolveRaghsCallStepTwo(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanMechTradeStepTwo_")) {
@@ -1139,6 +1143,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
         } else if (buttonID.startsWith("startDevotion_")) {
             ButtonHelperModifyUnits.startDevotion(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("purgeTech_")) {
+            ButtonHelperHeroes.purgeTech(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resolveDevote_")) {
             ButtonHelperModifyUnits.resolveDevote(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("prophetsTears_")) {
@@ -1882,8 +1888,7 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace("produceOneUnitInTile_", "");
             String type = buttonID.split("_")[1];
             String pos = buttonID.split("_")[0];
-            List<Button> buttons;
-            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
+            List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
                 "placeOneNDone_dontskip");
             String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
@@ -4283,7 +4288,14 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                         }
                     }
-
+                }
+                case "gain1tgFromCommander" -> {
+                    String message = player.getRepresentation() + " Gained 1 tg (" + player.getTg() + "->" + (player.getTg() + 1) + ") from their commander";
+                    player.setTg(player.getTg() + 1);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                    MessageHelper.sendMessageToChannel(actionsChannel, message);
+                    event.getMessage().delete().queue();
                 }
                 case "mallice_2_tg" -> {
                     String playerRep = player.getFactionEmoji();

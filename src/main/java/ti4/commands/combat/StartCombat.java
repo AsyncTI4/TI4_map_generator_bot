@@ -97,7 +97,7 @@ public class StartCombat extends CombatSubcommandData {
         playersForCombat.remove(player1);
         Player player2 = playersForCombat.get(0);
 
-        findOrCreateCombatThread(activeGame, event.getChannel(), player1, player2, tile, event, combatType);
+        findOrCreateCombatThread(activeGame, event.getChannel(), player1, player2, tile, event, combatType, "space");
     }
 
     public static String combatThreadName(Game activeGame, Player player1, @Nullable Player player2, Tile tile) {
@@ -117,19 +117,20 @@ public class StartCombat extends CombatSubcommandData {
     }
 
     public static void findOrCreateCombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2,
-        Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
-        findOrCreateCombatThread(activeGame, channel, player1, player2, null, tile, event, spaceOrGround);
+        Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
+        findOrCreateCombatThread(activeGame, channel, player1, player2, null, tile, event, spaceOrGround, unitHolderName);
     }
 
     public static void findOrCreateCombatThread(Game activeGame, MessageChannel channel, Player player1, Player player2,
-        String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
+        String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null)
             threadName = combatThreadName(activeGame, player1, player2, tile);
         if (!activeGame.isFoWMode()) {
             channel = activeGame.getMainGameChannel();
         }
-        StartCombat.sendStartOfCombatSecretMessages(activeGame, player1, player2, tile, spaceOrGround);
+
+        StartCombat.sendStartOfCombatSecretMessages(activeGame, player1, player2, tile, spaceOrGround, unitHolderName);
         TextChannel textChannel = (TextChannel) channel;
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
@@ -248,7 +249,7 @@ public class StartCombat extends CombatSubcommandData {
         }
     }
 
-    private static void sendStartOfCombatSecretMessages(Game activeGame, Player p1, Player p2, Tile tile, String type) {
+    private static void sendStartOfCombatSecretMessages(Game activeGame, Player p1, Player p2, Tile tile, String type, String unitHolderName) {
         List<Player> combatPlayers = new ArrayList<>();
         combatPlayers.add(p1);
         combatPlayers.add(p2);
@@ -315,6 +316,15 @@ public class StartCombat extends CombatSubcommandData {
                     .withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                     + " this is a reminder that when you first kill an opponent unit this combat, you can use the button to steal a tech",
+                    buttons);
+            }
+            if (player.hasUnit("ghemina_mech") && type.equalsIgnoreCase("ground") && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, activeGame).getUnitCount(UnitType.Mech, player) == 2) {
+                buttons = new ArrayList<>();
+                String finChecker = "FFCC_" + player.getFaction() + "_";
+                buttons.add(Button.secondary(finChecker + "gheminaMechStart_" + otherPlayer.getFaction(), "Mech Explores")
+                    .withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
+                    + " this is a reminder that if you win the combat, you can use the button to resolve your mech ability",
                     buttons);
             }
 
@@ -652,6 +662,19 @@ public class StartCombat extends CombatSubcommandData {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory (Upon Win)")
                 .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+        }
+
+        if ((p2.hasAbility("collateralized_loans")) && !activeGame.isFoWMode()
+            && p2.getDebtTokenCount(p1.getColor()) > 0 && groundOrSpace.equalsIgnoreCase("space")) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "collateralizedLoans_" + pos + "_" + p1.getFaction(), "Collateralized Loans")
+                .withEmoji(Emoji.fromFormatted(Emojis.vaden)));
+        }
+        if ((p1.hasAbility("collateralized_loans"))
+            && p1.getDebtTokenCount(p2.getColor()) > 0 && groundOrSpace.equalsIgnoreCase("space")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "collateralizedLoans_" + pos + "_" + p2.getFaction(), "Collateralized Loans")
+                .withEmoji(Emoji.fromFormatted(Emojis.vaden)));
         }
 
         if (p2.hasAbility("necrophage") && !activeGame.isFoWMode()) {

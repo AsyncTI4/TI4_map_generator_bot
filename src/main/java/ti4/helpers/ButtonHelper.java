@@ -8155,6 +8155,11 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Sol));
             compButtons.add(abilityButton);
         }
+        if (p1.hasUnit("lanefir_mech") && p1.getFragments().size() > 0 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
+            Button abilityButton = Button.success(finChecker + prefix + "ability_lanefirMech", "Purge Frag For Mech")
+                .withEmoji(Emoji.fromFormatted(Emojis.lanefir));
+            compButtons.add(abilityButton);
+        }
         if (p1.hasAbility("mantle_cracking")
             && ButtonHelperAbilities.getMantleCrackingButtons(p1, game).size() > 0) {
             Button abilityButton = Button.success(finChecker + prefix + "ability_mantlecracking", "Mantle Crack")
@@ -8682,6 +8687,38 @@ public class ButtonHelper {
                     String message = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                     event.getMessage().delete().queue();
+                } else if ("lanefirMech".equalsIgnoreCase(buttonID)) {
+                    String message3 = "Use buttons to drop a mech on a planet";
+                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p1, game,
+                        "mech", "placeOneNDone_skipbuild"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message3, buttons);
+                    String message2 = "Click the fragment you'd like to purge. ";
+                    List<Button> purgeFragButtons = new ArrayList<>();
+                    if (p1.getCrf() > 0) {
+                        Button transact = Button.primary(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getIrf() > 0) {
+                        Button transact = Button.success(finChecker + "purge_Frags_IRF_1",
+                            "Purge 1 Industrial Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getHrf() > 0) {
+                        Button transact = Button.danger(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getUrf() > 0) {
+                        Button transact = Button.secondary(finChecker + "purge_Frags_URF_1",
+                            "Purge 1 Frontier Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    Button transact3 = Button.danger(finChecker + "deleteButtons",
+                        "Done Purging");
+                    purgeFragButtons.add(transact3);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, purgeFragButtons);
+                    String message = "Use buttons to end turn or do an action";
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
 
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
                     String message = "Click the fragment you'd like to purge. ";
