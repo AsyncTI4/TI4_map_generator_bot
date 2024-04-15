@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -174,12 +175,12 @@ public class CombatModHelper {
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
         List<NamedCombatModifierModel> modifiers, Player player,
         Player opponent, Game activeGame, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
-        CombatRollType rollType) {
+        CombatRollType rollType, Tile tile) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits, unit);
+                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits, unit, tile);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -337,6 +338,11 @@ public class CombatModHelper {
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
         Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
+        return GetVariableModValue(mod, player, opponent, activeGame, opponentUnitsInCombat, origUnit, null);
+    }
+
+    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
+        Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         Long scalingCount = (long) 0;
@@ -381,26 +387,23 @@ public class CombatModHelper {
                     .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
                     .count();
                 case Constants.MOD_DESTROYERS -> {
-                    // TODO: Doesnt seem like an easier way to do this? Seems slow.
-                    String colorID = Mapper.getColorID(player.getColor());
-                    for (Tile tile : activeGame.getTileMap().values()) {
-                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                            Map<String, Integer> unitsOnHolder = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-                            for (Entry<String, Integer> unitEntry : unitsOnHolder.entrySet()) {
-                                if ("dd".equals(unitEntry.getKey())) {
-                                    scalingCount += unitEntry.getValue();
-                                }
-                            }
-                        }
-                    }
+                    scalingCount = (long) ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer", false);
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
                     scalingCount += opponentUnitsInCombat.stream()
                         .filter(unit -> !unit.getBaseType().equals("fighter"))
                         .count();
                 }
+                case "adjacent_mech" -> {
+                    for (String pos : FoWHelper.getAdjacentTiles(activeGame, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = activeGame.getTileByPosition(pos);
+                        for (UnitHolder uH : tile.getUnitHolders().values()) {
+                            scalingCount += uH.getUnitCount(UnitType.Mech, player);
+                        }
+                    }
+                }
                 case "damaged_units_same_type" -> {
-                    UnitHolder space = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders()
+                    UnitHolder space = activeSystem.getUnitHolders()
                         .get("space");
                     int count = 0;
                     if (space.getUnitDamage().get(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()),
