@@ -844,7 +844,7 @@
         "forCombatAbility": "combatround"
     },
     {
-        "alias": "roll_1_for_every_adjacent_mech",
+        "alias": "roll_1_for_every_adjacent_mech_comb",
         "type": "extrarolls",
         "value": "+1",
         "persistenceType": "ALWAYS",
@@ -856,9 +856,21 @@
                 "alias": "gledge_flagship"
             }
         ],
-        "forCombatAbility": [
-            "combatround",
-            "bombardment"
-        ]
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_every_adjacent_mech_bomb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_mech",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "gledge_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
     }
 ]
