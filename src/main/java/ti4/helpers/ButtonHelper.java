@@ -991,6 +991,33 @@ public class ButtonHelper {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
             buttons.add(aiDEVButton);
         }
+        if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasAbility("iconoclasm")) {
+
+            for (int x = 1; x < player.getCrf() + 1; x++) {
+                Button transact = Button.primary("purge_Frags_CRF_" + x,
+                    "Purge Cultural Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+            for (int x = 1; (x < player.getIrf() + 1 && x < 4); x++) {
+                Button transact = Button.success("purge_Frags_IRF_" + x,
+                    "Purge Industrial Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+            for (int x = 1; (x < player.getHrf() + 1 && x < 4); x++) {
+                Button transact = Button.danger("purge_Frags_HRF_" + x,
+                    "Purge Hazardous Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+            for (int x = 1; x < player.getUrf() + 1; x++) {
+                Button transact = Button.secondary("purge_Frags_URF_" + x,
+                    "Purge Frontier Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+        }
         if (player.hasTechReady("is")) {
             Button aiDEVButton = Button.secondary("exhaustTech_is", "Exhaust Inheritance Systems");
             buttons.add(aiDEVButton);
@@ -3859,6 +3886,13 @@ public class ButtonHelper {
                 }
             }
         }
+        if (ButtonHelper.doesPlayerHaveFSHere("lanefir_flagship", player, tile)) {
+            List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
+            if (!button2.isEmpty()) {
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), player.getRepresentation() + "Due to lanefire FS, you can explore a planet you control in the system");
+                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), "Explore a planet", button2);
+            }
+        }
         if (player.hasAbility("secret_maps")) {
             String msg = player.getRepresentation()
                 + " you can use your secret maps ability to explore a planet with production that you did not explore this turn";
@@ -4142,6 +4176,23 @@ public class ButtonHelper {
             String planet = planetReal.getName();
             if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
                 && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                buttons.addAll(planetButtons);
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> lanefirFSResolution(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        List<Button> buttons = new ArrayList<>();
+        for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
+            if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                continue;
+            }
+            Planet planetReal = (Planet) planetUnit;
+            String planet = planetReal.getName();
+            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -8130,6 +8181,9 @@ public class ButtonHelper {
         // Get Relic
         if (p1.enoughFragsForRelic()) {
             Button getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Get Relic");
+            if (p1.hasAbility("a_new_edifice")) {
+                getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Purge Frags to Explore");
+            }
             compButtons.add(getRelicButton);
         }
         // ACs
@@ -8734,6 +8788,9 @@ public class ButtonHelper {
                     }
                 }
                 Button transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
+                if (p1.hasAbility("a_new_edifice")) {
+                    transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Explore");
+                }
                 purgeFragButtons.add(transact2);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, purgeFragButtons);
             }
@@ -9325,6 +9382,9 @@ public class ButtonHelper {
                     }
                 }
                 Button transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
+                if (player.hasAbility("a_new_edifice")) {
+                    transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Explore");
+                }
                 purgeFragButtons.add(transact2);
                 MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message,
                     purgeFragButtons);

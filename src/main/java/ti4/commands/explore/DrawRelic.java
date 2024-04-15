@@ -63,6 +63,14 @@ public class DrawRelic extends GenericRelicAction {
             drawWithAdvantage(player, event, activeGame, 2);
             return;
         }
+        if (player.hasAbility("a_new_edifice")) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Due to A New Edifice Ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
+            List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Explore planet #1 ", buttons);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Explore planet #2 ", buttons);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Explore planet #3 ", buttons);
+            return;
+        }
 
         String relicID = activeGame.drawRelic(position);
         if (relicID.isEmpty()) {
@@ -108,7 +116,7 @@ public class DrawRelic extends GenericRelicAction {
                 Integer poIndex = activeGame.addCustomPO(customPOName, 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
                 message.append("Custom PO '").append(customPOName).append("' has been added.\n")
-                .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
+                    .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
             }
         }
         if (activeGame.isFoWMode()) {
