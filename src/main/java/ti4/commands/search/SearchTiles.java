@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
@@ -41,23 +40,14 @@ public class SearchTiles extends SearchComponentModel {
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
 
-        // if (TileHelper.isValidTile(searchString)) {
-        //     event.getChannel().sendMessageEmbeds(TileHelper.getTile(searchString).getRepresentationEmbed()).queue();
-        //     return;
-        // }
-
-        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> !TileHelper.isValidTile(searchString) || searchString.equals(tile.getId()))
-            .sorted(Comparator.comparing(TileModel::getId)).toList();
-        MessageChannel channel = event.getMessageChannel();
-
-        List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
-
-        for (TileModel tile : tiles) {
-            MessageEmbed tileEmbed = tile.getHelpMessageEmbed(includeAliases);
-            if (Helper.embedContainsSearchTerm(tileEmbed, searchString)) tileEmbeds.add(Map.entry(tile, tileEmbed));
-        }
-
+        List<Entry<TileModel, MessageEmbed>> tileEmbeds = TileHelper.getAllTiles().values().stream()
+        .filter(tile -> tile.search(searchString, source))
+        .sorted(Comparator.comparing(TileModel::getId))
+        .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
+        .toList();
+        
         //TODO: upload tiles as emojis and use the URL for the image instead of as an attachment - alternatively, use the github URL link
+        MessageChannel channel = event.getMessageChannel();
         CompletableFuture<ThreadChannel> futureThread = null;
         if (tileEmbeds.size() > 3) {
             if (event.getChannel() instanceof TextChannel) {

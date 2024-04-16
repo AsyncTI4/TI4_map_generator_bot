@@ -1,6 +1,5 @@
 package ti4.commands.search;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -8,9 +7,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.message.MessageHelper;
-import ti4.model.EventModel;
 import ti4.model.Source.ComponentSource;
 
 public class SearchEvents extends SearchComponentModel {
@@ -29,11 +25,10 @@ public class SearchEvents extends SearchComponentModel {
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (EventModel model : Mapper.getEvents().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, null);
-            if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
-        }
+        List<MessageEmbed> messageEmbeds = Mapper.getEvents().values().stream()
+            .filter(model -> model.search(searchString, source))
+            .map(model -> model.getRepresentationEmbed(true, null))
+            .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }
