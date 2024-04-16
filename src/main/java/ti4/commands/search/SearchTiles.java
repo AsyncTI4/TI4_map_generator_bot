@@ -25,19 +25,20 @@ import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 
-public class SearchTiles extends SearchSubcommandData {
+public class SearchTiles extends SearchComponentModel {
 
     public SearchTiles() {
         super(Constants.SEARCH_TILES, "List all tiles");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "True to also show the available aliases you can use"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
 
         // if (TileHelper.isValidTile(searchString)) {
