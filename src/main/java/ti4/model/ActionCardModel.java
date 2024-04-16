@@ -69,11 +69,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
             || getSearchTags().contains(searchString);
     }
 
-    public boolean search(String searchString, ComponentSource searchSource) {
-        return (searchSource == null || getSource().equals(searchSource))
-            && (searchString == null || search(searchString));
-    }
-
     public String getAutoCompleteName() {
         return getName() + " (" + getSource() + ")";
     }
