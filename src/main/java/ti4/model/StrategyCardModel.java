@@ -123,12 +123,17 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getColourHexCode() {
+        if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
+            return "#ffffff";
+        } else if (colourHexCode == null) {
+            return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
+        }
         return Optional.ofNullable(colourHexCode).orElse("#ffffff");
     }
 
     /**
      * SC ID used for automation - buttons/resolving/etc.
-     * Example: You have a Homebrew Leadership on Initiative 3 (instead of 1), 
+     * Example: You have a Homebrew Leadership on Initiative 3 (instead of 1),
      * but it can safely use the normal Leadership buttons.
      * Then set botSCAutomationID = "pok1leadership".
      */
