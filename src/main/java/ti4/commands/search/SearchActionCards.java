@@ -3,6 +3,7 @@ package ti4.commands.search;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.qos.logback.core.joran.action.Action;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -32,17 +33,10 @@ public class SearchActionCards extends SearchSubcommandData {
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
-
-        for (ActionCardModel model : Mapper.getActionCards().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true);
-            if (model.search(searchString, source)) messageEmbeds.add(representationEmbed);
-        }
-        if (messageEmbeds.size() > 3) {
-            String threadName = event.getCommandString();
-            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
-        } else if (messageEmbeds.size() > 0) {
-            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
-        }
+        List<MessageEmbed> messageEmbeds = Mapper.getActionCards().values().stream()
+            .filter(model -> model.search(searchString, source))
+            .map(ActionCardModel::getRepresentationEmbed)
+            .toList();
+        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }
