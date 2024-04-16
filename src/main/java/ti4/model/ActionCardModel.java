@@ -29,7 +29,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
             && phase != null
             && window != null
             && text != null
-            // && flavorText != null
             && source != null;
     }
 
@@ -50,10 +49,10 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title);
 
         //DESCRIPTION
-        eb.setDescription("***" + getWindow() + ":***\n" + getText());
+        eb.setDescription(getPhase() + " Phase\n***" + getWindow() + ":***\n" + getText());
 
         //FLAVOUR TEXT
-        if (includeFlavourText && getFlavorText().isPresent()) eb.addField("", "*" + getFlavorText() + "*", true);
+        if (includeFlavourText && getFlavorText().isPresent()) eb.addField("", "*" + getFlavorText().get() + "*", true);
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
@@ -65,7 +64,14 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+            || getName().toLowerCase().contains(searchString)
+            || getSearchTags().contains(searchString);
+    }
+
+    public boolean search(String searchString, ComponentSource searchSource) {
+        return (searchSource == null || getSource().equals(searchSource))
+            && (searchString == null || search(searchString));
     }
 
     public String getAutoCompleteName() {

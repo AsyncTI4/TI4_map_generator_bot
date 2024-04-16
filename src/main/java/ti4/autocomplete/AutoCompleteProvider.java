@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
@@ -47,6 +49,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.Source;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
@@ -853,6 +856,7 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         switch (subCommandName) {
             case Constants.SEARCH_PLANETS -> {
                 if (optionName.equals(Constants.SEARCH)) {
@@ -979,7 +983,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getActionCards().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
