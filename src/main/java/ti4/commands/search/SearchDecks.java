@@ -12,12 +12,12 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.EventModel;
+import ti4.model.DeckModel;
 
-public class ListEvents extends SearchSubcommandData {
+public class SearchDecks extends SearchSubcommandData {
 
-    public ListEvents() {
-        super(Constants.SEARCH_EVENTS, "List all events the bot can use");
+    public SearchDecks() {
+        super(Constants.SEARCH_DECKS, "List all decks the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
@@ -25,18 +25,18 @@ public class ListEvents extends SearchSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
-        if (Mapper.isValidEvent(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getEvent(searchString).getRepresentationEmbed(true, null)).queue();
+        if (Mapper.isValidDeck(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getDeck(searchString).getRepresentationEmbed()).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (EventModel model : Mapper.getEvents().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, null);
+        for (DeckModel model : Mapper.getDecks().values()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed();
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
-        if (messageEmbeds.size() > 3) {
+        if (messageEmbeds.size() > 1) {
             String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
         } else if (messageEmbeds.size() > 0) {

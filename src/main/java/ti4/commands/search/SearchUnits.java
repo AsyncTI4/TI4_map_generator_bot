@@ -11,31 +11,32 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.ExploreModel;
+import ti4.model.UnitModel;
 
+public class SearchUnits extends SearchSubcommandData {
 
-public class ListExplores extends SearchSubcommandData {
-
-    public ListExplores() {
-        super(Constants.SEARCH_EXPLORES, "List all explore cards the bot can use");
+    public SearchUnits() {
+        super(Constants.SEARCH_UNITS, "List all units");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
 
-        if (Mapper.isValidExplore(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getExplore(searchString).getRepresentationEmbed(true, true)).queue();
+        if (Mapper.isValidUnit(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getUnit(searchString).getRepresentationEmbed(includeAliases)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (ExploreModel model : Mapper.getExplores().values().stream().sorted(Comparator.comparing(ExploreModel::getName)).toList()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true);
+
+        for (UnitModel model : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(includeAliases);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

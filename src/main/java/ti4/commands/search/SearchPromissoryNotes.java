@@ -12,12 +12,12 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.PublicObjectiveModel;
+import ti4.model.PromissoryNoteModel;
 
-public class ListPublicObjectives extends SearchSubcommandData {
+public class SearchPromissoryNotes extends SearchSubcommandData {
 
-    public ListPublicObjectives() {
-        super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
+    public SearchPromissoryNotes() {
+        super(Constants.SEARCH_PROMISSORY_NOTES, "List all promissory notes the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
@@ -25,15 +25,15 @@ public class ListPublicObjectives extends SearchSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
-        if (Mapper.isValidPublicObjective(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true)).queue();
+        if (Mapper.isValidPromissoryNote(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getPromissoryNote(searchString).getRepresentationEmbed(false, true, true)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (PublicObjectiveModel poModel : Mapper.getPublicObjectives().values().stream().sorted(PublicObjectiveModel.sortByPointsAndName).toList()) {
-            MessageEmbed representationEmbed = poModel.getRepresentationEmbed(true);
+        for (PromissoryNoteModel model : Mapper.getPromissoryNotes().values()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(false, true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

@@ -1,6 +1,7 @@
 package ti4.commands.search;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -12,28 +13,27 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.AbilityModel;
+import ti4.model.RelicModel;
 
-public class ListAbilities extends SearchSubcommandData {
+public class SearchRelics extends SearchSubcommandData {
 
-    public ListAbilities() {
-        super(Constants.SEARCH_ABILITIES, "List all abilities");
+    public SearchRelics() {
+        super(Constants.SEARCH_RELICS, "List all relics the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-
-        if (Mapper.isValidAbility(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getAbility(searchString).getRepresentationEmbed()).queue();
+        
+        if (Mapper.isValidRelic(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-
-        for (AbilityModel model : Mapper.getAbilities().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed();
+        for (RelicModel model : Mapper.getRelics().values().stream().sorted(Comparator.comparing(RelicModel::getName)).toList()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

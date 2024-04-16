@@ -12,8 +12,8 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ListEmojis extends SearchSubcommandData {
-    public ListEmojis() {
+public class SearchEmojis extends SearchSubcommandData {
+    public SearchEmojis() {
         super(Constants.SEARCH_EMOJIS, "List all emojis the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_RAW_STRING, "Includes the raw emoji string for copy/paste"));

@@ -12,12 +12,12 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.AgendaModel;
+import ti4.model.PublicObjectiveModel;
 
-public class ListAgendas extends SearchSubcommandData {
+public class SearchPublicObjectives extends SearchSubcommandData {
 
-    public ListAgendas() {
-        super(Constants.SEARCH_AGENDAS, "List all agendas the bot can use");
+    public SearchPublicObjectives() {
+        super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
@@ -25,15 +25,15 @@ public class ListAgendas extends SearchSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
-        if (Mapper.isValidAgenda(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true)).queue();
+        if (Mapper.isValidPublicObjective(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (AgendaModel model : Mapper.getAgendas().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
+        for (PublicObjectiveModel poModel : Mapper.getPublicObjectives().values().stream().sorted(PublicObjectiveModel.sortByPointsAndName).toList()) {
+            MessageEmbed representationEmbed = poModel.getRepresentationEmbed(true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

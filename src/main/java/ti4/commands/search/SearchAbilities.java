@@ -12,12 +12,12 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.TechnologyModel;
+import ti4.model.AbilityModel;
 
-public class ListTechs extends SearchSubcommandData {
+public class SearchAbilities extends SearchSubcommandData {
 
-    public ListTechs() {
-        super(Constants.SEARCH_TECHS, "List all techs the bot can use");
+    public SearchAbilities() {
+        super(Constants.SEARCH_ABILITIES, "List all abilities");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
@@ -25,14 +25,15 @@ public class ListTechs extends SearchSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
-        if (Mapper.isValidTech(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getTech(searchString).getRepresentationEmbed(true, true)).queue();
+        if (Mapper.isValidAbility(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getAbility(searchString).getRepresentationEmbed()).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (TechnologyModel techModel : Mapper.getTechs().values().stream().sorted(TechnologyModel.sortByTechRequirements).toList()) {
-            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(true, true);
+
+        for (AbilityModel model : Mapper.getAbilities().values()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed();
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
