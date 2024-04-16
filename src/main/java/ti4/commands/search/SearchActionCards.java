@@ -1,26 +1,18 @@
 package ti4.commands.search;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.core.joran.action.Action;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.Source.ComponentSource;
 
-public class SearchActionCards extends SearchSubcommandData {
+public class SearchActionCards extends SearchComponentModel {
 
     public SearchActionCards() {
         super(Constants.SEARCH_ACTION_CARDS, "List all action cards the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.SOURCE, "Limit results to a specific source.").setAutoComplete(true));
     }
 
     @Override
@@ -35,7 +27,7 @@ public class SearchActionCards extends SearchSubcommandData {
 
         List<MessageEmbed> messageEmbeds = Mapper.getActionCards().values().stream()
             .filter(model -> model.search(searchString, source))
-            .map(ActionCardModel::getRepresentationEmbed)
+            .map(model -> model.getRepresentationEmbed(true, true))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

@@ -27,23 +27,13 @@ public class SearchCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        SearchSubcommandData executedCommand = null;
         for (SearchSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                executedCommand = subcommand;
                 break;
             }
         }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
     }
 
     protected String getActionDescription() {
