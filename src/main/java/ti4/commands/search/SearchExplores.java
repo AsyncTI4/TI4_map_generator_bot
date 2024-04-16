@@ -15,19 +15,20 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Source.ComponentSource;
 
 
-public class SearchExplores extends SearchSubcommandData {
+public class SearchExplores extends SearchComponentModel {
 
     public SearchExplores() {
         super(Constants.SEARCH_EXPLORES, "List all explore cards the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
+        
         if (Mapper.isValidExplore(searchString)) {
             event.getChannel().sendMessageEmbeds(Mapper.getExplore(searchString).getRepresentationEmbed(true, true)).queue();
             return;
@@ -38,11 +39,6 @@ public class SearchExplores extends SearchSubcommandData {
             MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
-        if (messageEmbeds.size() > 3) {
-            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
-            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
-        } else if (messageEmbeds.size() > 0) {
-            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
-        }
+        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

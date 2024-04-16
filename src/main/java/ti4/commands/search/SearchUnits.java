@@ -13,19 +13,20 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
 
-public class SearchUnits extends SearchSubcommandData {
+public class SearchUnits extends SearchComponentModel {
 
     public SearchUnits() {
         super(Constants.SEARCH_UNITS, "List all units");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
 
         if (Mapper.isValidUnit(searchString)) {
@@ -39,11 +40,6 @@ public class SearchUnits extends SearchSubcommandData {
             MessageEmbed representationEmbed = model.getRepresentationEmbed(includeAliases);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
-        if (messageEmbeds.size() > 3) {
-            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
-            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
-        } else if (messageEmbeds.size() > 0) {
-            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
-        }
+        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }

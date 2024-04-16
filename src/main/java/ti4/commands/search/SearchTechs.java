@@ -12,18 +12,19 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 
-public class SearchTechs extends SearchSubcommandData {
+public class SearchTechs extends SearchComponentModel {
 
     public SearchTechs() {
         super(Constants.SEARCH_TECHS, "List all techs the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
 
         if (Mapper.isValidTech(searchString)) {
             event.getChannel().sendMessageEmbeds(Mapper.getTech(searchString).getRepresentationEmbed(true, true)).queue();
@@ -35,11 +36,6 @@ public class SearchTechs extends SearchSubcommandData {
             MessageEmbed representationEmbed = techModel.getRepresentationEmbed(true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
-        if (messageEmbeds.size() > 3) {
-            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
-            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
-        } else if (messageEmbeds.size() > 0) {
-            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
-        }
+        SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
 }
