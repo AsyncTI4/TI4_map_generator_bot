@@ -27,23 +27,13 @@ public class SearchCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        SearchSubcommandData executedCommand = null;
         for (SearchSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                executedCommand = subcommand;
                 break;
             }
         }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
     }
 
     protected String getActionDescription() {
@@ -52,35 +42,34 @@ public class SearchCommand implements Command {
 
     private Collection<SearchSubcommandData> getSubcommands() {
         Collection<SearchSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ListAbilities());
-        subcommands.add(new ListGames());
-        subcommands.add(new ListPlanets());
-        subcommands.add(new ListTiles());
-        subcommands.add(new ListUnits());
-        subcommands.add(new ListCommands());
-        subcommands.add(new ListMyGames());
-        subcommands.add(new ListMyTitles());
-        subcommands.add(new ListAgendas());
-        subcommands.add(new ListEvents());
-        subcommands.add(new ListSecretObjectives());
-        subcommands.add(new ListPublicObjectives());
-        subcommands.add(new ListRelics());
-        subcommands.add(new ListActionCards());
-        subcommands.add(new ListTechs());
-        subcommands.add(new ListLeaders());
-        subcommands.add(new ListPromissoryNotes());
-        subcommands.add(new ListExplores());
-        subcommands.add(new ListDecks());
-        subcommands.add(new ListFactions());
-        subcommands.add(new ListEmojis());
+        subcommands.add(new SearchAbilities());
+        subcommands.add(new SearchGames());
+        subcommands.add(new SearchPlanets());
+        subcommands.add(new SearchTiles());
+        subcommands.add(new SearchUnits());
+        subcommands.add(new SearchCommands());
+        subcommands.add(new SearchMyGames());
+        subcommands.add(new SearchMyTitles());
+        subcommands.add(new SearchAgendas());
+        subcommands.add(new SearchEvents());
+        subcommands.add(new SearchSecretObjectives());
+        subcommands.add(new SearchPublicObjectives());
+        subcommands.add(new SearchRelics());
+        subcommands.add(new SearchActionCards());
+        subcommands.add(new SearchTechs());
+        subcommands.add(new SearchLeaders());
+        subcommands.add(new SearchPromissoryNotes());
+        subcommands.add(new SearchExplores());
+        subcommands.add(new SearchDecks());
+        subcommands.add(new SearchFactions());
+        subcommands.add(new SearchEmojis());
+        subcommands.add(new SearchStrategyCards());
 
         return subcommands;
     }
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }
