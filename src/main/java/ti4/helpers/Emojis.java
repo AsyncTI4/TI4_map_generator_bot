@@ -1075,7 +1075,7 @@ public class Emojis {
             case "torkan" -> Torkan;
             case "trenlak" -> Trenlak;
             case "valk", "valkk" -> Valk;
-            case "vefut" -> Vefut;
+            case "vefutii", "vefut" -> Vefut;
             case "vegamajor" -> VegaMajor;
             case "vegaminor" -> VegaMinor;
             case "velnor" -> Velnor;
