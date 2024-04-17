@@ -1043,7 +1043,7 @@ public class Emojis {
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
             case "mollprimus", "mollprimusk" -> MollPrimus;
-            case "mordai" -> Mordai;
+            case "mordaiii", "mordai" -> Mordai;
             case "muaat" -> PlanetMuaat;
             case "naazir" -> Naazir;
             case "nar" -> Nar;
