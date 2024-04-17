@@ -873,7 +873,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = TileHelper.getAllTiles().values().stream()
-                        .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.search(enteredValue, source))
                         .limit(25)
                         .map(value -> new Command.Choice("(" + value.getId() + ") " + value.getName(), value.getId()))
                         .collect(Collectors.toList());

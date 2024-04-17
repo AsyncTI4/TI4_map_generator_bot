@@ -40,12 +40,17 @@ public class SearchTiles extends SearchComponentModel {
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
 
-        List<Entry<TileModel, MessageEmbed>> tileEmbeds = TileHelper.getAllTiles().values().stream()
-        .filter(tile -> tile.search(searchString, source))
-        .sorted(Comparator.comparing(TileModel::getId))
-        .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
-        .toList();
-        
+        List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
+        if (TileHelper.isValidTile(searchString)) {
+            TileModel tile = TileHelper.getTile(searchString);
+            tileEmbeds.add(Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)));
+        } else {
+            TileHelper.getAllTiles().values().stream()
+                .filter(tile -> tile.search(searchString, source))
+                .sorted(Comparator.comparing(TileModel::getId))
+                .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
+                .forEach(e -> tileEmbeds.add(e));
+        }
         //TODO: upload tiles as emojis and use the URL for the image instead of as an attachment - alternatively, use the github URL link
         MessageChannel channel = event.getMessageChannel();
         CompletableFuture<ThreadChannel> futureThread = null;
