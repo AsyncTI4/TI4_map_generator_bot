@@ -39,25 +39,6 @@ public class GameCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        String commandExecuted = "User: " + userName + " executed command.\n" +
-                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                        .map(option -> option.getName() + ":" + getOptionValue(option))
-                        .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getType() == OptionType.USER) {
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean undoCommand = false;
         String subcommandName = event.getInteraction().getSubcommandName();
