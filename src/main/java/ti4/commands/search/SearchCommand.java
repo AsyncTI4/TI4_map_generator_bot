@@ -63,14 +63,13 @@ public class SearchCommand implements Command {
         subcommands.add(new SearchDecks());
         subcommands.add(new SearchFactions());
         subcommands.add(new SearchEmojis());
+        subcommands.add(new SearchStrategyCards());
 
         return subcommands;
     }
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }
