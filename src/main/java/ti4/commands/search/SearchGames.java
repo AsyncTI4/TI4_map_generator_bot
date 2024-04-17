@@ -19,9 +19,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class ListGames extends SearchSubcommandData {
+public class SearchGames extends SearchSubcommandData {
 
-    public ListGames() {
+    public SearchGames() {
         super(Constants.SEARCH_GAMES, "List all games");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NORMAL_GAME, "True to include Normal (none of the other modes) games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to include TIGL games"));
