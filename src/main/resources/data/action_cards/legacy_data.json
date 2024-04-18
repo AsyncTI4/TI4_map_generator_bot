@@ -612,15 +612,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "virulent_gas",
-    "name": "Virulent Gas",
-    "phase": "Action",
-    "window": "After your unit's SPACE CANNON or BOMBARDMENT ability produces a hit against another player's ground forces on a planet",
-    "text": "Destroy half of that player's infantry on that planet, rounded up.",
-    "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "grand_heist",
     "name": "Heist",
     "phase": "Action",
@@ -636,6 +627,24 @@
     "window": "Action",
     "text": "Exhaust 1 planet you control to gain trade goods equal to the combined value of its resources and influence.",
     "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "proxy_war",
+    "name": "Proxy War",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "During this turn, until you activate another player's home system, players treat all promissory notes as blank.",
+    "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as an entire fleet of unmarked ships poured forth from the wormhole, raining destruction upon the unsuspecting convoy. Reports be damned, these were no mere pirates.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "unexpected_strategy",
+    "name": "Unexpected Strategy",
+    "phase": "Strategy",
+    "window": "When you choose a strategy card",
+    "text": "Gain 1 command token. Then, gain a number of additional command tokens equal to the number of trade goods on that strategy card.",
+    "flavorText": "Despite their best syllogisms and heuristics, they could not discern whether the Creuss operated based on reason or some strange mechanism of cause and effect.",
     "source": "action_deck_2"
   }
 ]
