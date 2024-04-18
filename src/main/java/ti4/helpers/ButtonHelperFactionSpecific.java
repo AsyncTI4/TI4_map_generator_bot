@@ -21,6 +21,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.TurnStart;
 import ti4.commands.tokens.AddCC;
@@ -41,6 +42,31 @@ import ti4.model.ExploreModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
+
+    public static void collateralizedLoans(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        Tile tile = activeGame.getTileByPosition(pos);
+        ClearDebt.clearDebt(player, p2, 1);
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " used collateralized loans ability to forgive 1 debt of their opponent to place 1 ship of a type that their opponent just lost");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation() + " one debt of yours was forgiven via the collateralized loans ability");
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "sling",
+            "placeOneNDone_skipbuild");
+        String message = player.getRepresentation() + " Use the buttons to place 1 unit that was destroyed. ";
+
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+    }
+
+    public static void gheminaMechStart(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame), player);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " due to your mech ability, you can explore " + Helper.getPlanetRepresentation(planet, activeGame) + " twice now");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " Explore #1", buttons);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " Explore #2", buttons);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveEdynAgendaStuffStep1(Player player, Game activeGame, List<Tile> tiles) {
         List<Button> buttons = new ArrayList<>();
@@ -1039,15 +1065,14 @@ public class ButtonHelperFactionSpecific {
     public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game activeGame,
         Player player,
         String ident) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), activeGame.getPing() + player.getFactionEmoji()
-            + player.getFaction() + " May produce 1 ship in the explored planet system.");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " May produce 1 ship in the explored planet system.");
         String pos = buttonID.replace("dsdihmy_", "");
         List<Button> buttons;
         // Sling relay works for this
         buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
             activeGame.getTileByPosition(pos), "sling", "place");
         String message = player.getRepresentation() + " Use the buttons to produce 1 ship. ";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1573,7 +1598,24 @@ public class ButtonHelperFactionSpecific {
             }
         }
         String message = "Use buttons to select which planet to terraform";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
+    public static void offerAutomatonsButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null
+                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+                buttons.add(Button.success("automatonsPlanet_" + planet,
+                    Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = "Use buttons to select which planet to place automatons on";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static void resolveOlradinPN(Player player, Game activeGame, GenericInteractionCreateEvent event) {
@@ -1612,7 +1654,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         String message = "Use buttons to select which planet to put a gledge base on";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static void resolveScour(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -1712,6 +1754,16 @@ public class ButtonHelperFactionSpecific {
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+
+    public static void automatonsPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
+        String planet = buttonID.replace("automatonsPlanet_", "");
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        planetReal.addToken("attachment_automatons.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached automatons to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 

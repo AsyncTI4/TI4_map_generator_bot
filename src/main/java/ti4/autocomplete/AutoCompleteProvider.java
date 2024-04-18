@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
@@ -47,6 +49,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.Source;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.TechnologyModel;
@@ -853,12 +856,13 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+        ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         switch (subCommandName) {
             case Constants.SEARCH_PLANETS -> {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = TileHelper.getAllPlanets().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -869,7 +873,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = TileHelper.getAllTiles().values().stream()
-                        .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.search(enteredValue, source))
                         .limit(25)
                         .map(value -> new Command.Choice("(" + value.getId() + ") " + value.getName(), value.getId()))
                         .collect(Collectors.toList());
@@ -880,7 +884,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getFactions().stream()
-                        .filter(entry -> entry.search(enteredValue))
+                        .filter(entry -> entry.search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
                         .collect(Collectors.toList());
@@ -891,7 +895,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getLeaders().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -902,7 +906,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getUnits().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -913,7 +917,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getTechs().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -924,7 +928,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getAbilities().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -935,7 +939,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getExplores().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -946,7 +950,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getRelics().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -957,7 +961,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -968,7 +972,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getEvents().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -979,7 +983,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getActionCards().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -990,7 +994,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getSecretObjectives().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -1001,7 +1005,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getPublicObjectives().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -1013,7 +1017,7 @@ public class AutoCompleteProvider {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getPromissoryNotes().entrySet().stream()
                         .filter(entry -> !entry.getValue().isDupe())
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());
@@ -1024,7 +1028,7 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getDecks().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .filter(entry -> entry.getValue().search(enteredValue, source))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                         .collect(Collectors.toList());

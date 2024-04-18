@@ -51,13 +51,13 @@ public class SCPick extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         Collection<Player> activePlayers = activeGame.getRealPlayers();
         if (activePlayers.size() == 0) {
-            sendMessage("No active players found");
+            MessageHelper.sendMessageToEventChannel(event, "No active players found");
             return;
         }
 
@@ -66,7 +66,7 @@ public class SCPick extends PlayerSubcommandData {
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
-            sendMessage("Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
+            MessageHelper.sendMessageToEventChannel(event, "Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
             return;
         }
 
@@ -94,13 +94,13 @@ public class SCPick extends PlayerSubcommandData {
         }
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
-            sendMessage("No SC picked.");
+            MessageHelper.sendMessageToEventChannel(event, "No SC picked.");
             return;
         }
         secondHalfOfSCPick(event, player, activeGame, scPicked);
     }
 
-    public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+    public static List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = new ArrayList<>();
         List<Player> activePlayers = activeGame.getRealPlayers();
 
@@ -136,7 +136,7 @@ public class SCPick extends PlayerSubcommandData {
         return buttons;
     }
 
-    public void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, int scPicked) {
+    public static void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, int scPicked) {
         List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, activeGame, scPicked);
         Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 
@@ -171,12 +171,12 @@ public class SCPick extends PlayerSubcommandData {
         event.getMessage().delete().queue();
     }
 
-    public void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, String buttonID) {
+    public static void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, String buttonID) {
         String scPicked = buttonID.split("_")[1];
         int scpick = Integer.parseInt(scPicked);
         String factionPicked = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(factionPicked);
-        boolean pickSuccessful = new Stats().secondHalfOfPickSC(event, activeGame, p2, scpick);
+        boolean pickSuccessful = Stats.secondHalfOfPickSC(event, activeGame, p2, scpick);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick + " by " + player.getFactionEmoji());
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), p2.getColor() + " was given SC #" + scpick);
@@ -229,7 +229,7 @@ public class SCPick extends PlayerSubcommandData {
         }
     }
 
-    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
 
         String msgExtra = "";
@@ -383,9 +383,16 @@ public class SCPick extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "\n Use Buttons to do turn.",
                         TurnStart.getStartOfTurnButtons(privatePlayer, activeGame, false, event));
                     if (privatePlayer.getStasisInfantry() > 0) {
-                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                        if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                                "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                                ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                        } else {
+                            privatePlayer.setStasisInfantry(0);
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                                + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                        }
                     }
                     activeGame.setCurrentPhase("action");
                 }

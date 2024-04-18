@@ -26,7 +26,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         secondHalfOfNaaluCommander(event, activeGame, player);
@@ -35,7 +35,7 @@ public class NaaluCommander extends SpecialSubcommandData {
     public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player) {
 
         if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
-            sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
+            MessageHelper.sendMessageToEventChannel(event, "Only players with access to an unlocked Naalu Commander can use this ability");
             return;
         }
 
@@ -58,7 +58,11 @@ public class NaaluCommander extends SpecialSubcommandData {
         } else {
             sb.append("Could not find agenda");
         }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        if (embed != null) {
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+        }
 
         sb.setLength(0);
         boolean first = true;

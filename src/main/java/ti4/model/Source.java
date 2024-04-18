@@ -28,6 +28,20 @@ public class Source {
             return super.toString().toLowerCase();
         }
 
+        /**
+         * Converts a string identifier to the corresponding ComponentSource enum value.
+         * @param id the string identifier
+         * @return the ComponentSource enum value, or null if not found
+         */
+        public static ComponentSource fromString(String id) {
+            for (ComponentSource source : values()) {
+                if (source.toString().equals(id)) {
+                    return source;
+                }
+            }
+            return null;
+        }
+
         public boolean isPok() {
             return switch (this) {
                 case base, pok, codex1, codex2, codex3 -> true;

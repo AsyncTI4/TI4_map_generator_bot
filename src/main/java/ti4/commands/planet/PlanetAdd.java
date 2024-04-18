@@ -2,13 +2,11 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -21,7 +19,6 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
@@ -49,7 +46,7 @@ public class PlanetAdd extends PlanetAddRemove {
             unitHolder.removeToken("token_freepeople.png");
         }
         if (Constants.MR.equalsIgnoreCase(planet) && player.hasTech("iihq")) {
-            Planet mecatolRex = (Planet) unitHolder;
+            Planet mecatolRex = unitHolder;
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -116,7 +113,9 @@ public class PlanetAdd extends PlanetAddRemove {
                             Helper.checkEndGame(activeGame, player);
                         }
                     }
-                    if (Mapper.getPlanet(planet) != null) {
+                    if (Mapper.getPlanet(planet) != null
+                            && "action_cards_pok".equals(activeGame.getAcDeckID())
+                            && !activeGame.getDiscardActionCards().containsKey("reparations")) {
                         String msg = player_.getRepresentation()
                             + " has a window to play reparations for the taking of "
                             + Mapper.getPlanet(planet).getName();
@@ -144,7 +143,7 @@ public class PlanetAdd extends PlanetAddRemove {
 
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
-                Planet planetReal = (Planet) unitHolder;
+                Planet planetReal = unitHolder;
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
                 if (event != null && buttons != null && !buttons.isEmpty()) {
                     String message = ButtonHelper.getIdent(player) + " Click button to explore "
@@ -157,7 +156,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if (!activeGame.getCurrentPhase().contains("agenda")) {
             activeGame.setStoredValue("planetsTakenThisRound",
-                    activeGame.getStoredValue("planetsTakenThisRound") + "_" + planet);
+                activeGame.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
         if (activeGame.getActivePlayerID() != null && !("".equalsIgnoreCase(activeGame.getActivePlayerID()))
             && player.hasAbility("scavenge") && !doubleCheck && event != null) {
@@ -248,7 +247,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !activeGame.isBaseGameMode()) {
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "

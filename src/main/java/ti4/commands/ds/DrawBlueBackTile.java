@@ -33,7 +33,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);

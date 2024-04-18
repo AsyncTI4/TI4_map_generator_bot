@@ -43,7 +43,7 @@ public class TurnStart extends PlayerSubcommandData {
         mainPlayer = Helper.getPlayer(activeGame, mainPlayer, event);
 
         if (mainPlayer == null) {
-            sendMessage("Player/Faction/Color could not be found in map:" + activeGame.getName());
+            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
         turnStart(event, activeGame, mainPlayer);
@@ -103,11 +103,18 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
                     getMissedSCFollowsText(activeGame, player));
             }
-            if (player.getStasisInfantry() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Use buttons to revive infantry. You have " + player.getStasisInfantry()
-                        + " infantry left to revive.",
-                    ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
+            Player privatePlayer = player;
+            if (privatePlayer.getStasisInfantry() > 0) {
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                }
             }
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
@@ -125,11 +132,18 @@ public class TurnStart extends PlayerSubcommandData {
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeGame, player));
             }
-            if (player.getStasisInfantry() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    "Use buttons to revive infantry. You have " + player.getStasisInfantry()
-                        + " infantry left to revive.",
-                    ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
+            Player privatePlayer = player;
+            if (privatePlayer.getStasisInfantry() > 0) {
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                }
             }
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
@@ -263,7 +277,7 @@ public class TurnStart extends PlayerSubcommandData {
                         sb.append(p2.getRepresentation(true, true));
                         sb.append(" You are getting this ping because SC #").append(sc)
                             .append(
-                                " has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. \nTIP: Double check that you paid the command counter to follow\n");
+                                " has been played and now it is their turn again and you still havent reacted. If you already reacted, check if your reaction got undone");
                         if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(
                                 activeGame.getStoredValue("scPlay" + sc).replace("666fin", ":"))

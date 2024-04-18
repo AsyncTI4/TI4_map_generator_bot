@@ -538,7 +538,9 @@ public class ButtonHelper {
 
     public static List<Button> getPlaceStatusInfButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-
+        if (player.getStasisInfantry() == 0) {
+            return buttons;
+        }
         Tile tile = FoWHelper.getPlayerHS(game, player);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -989,6 +991,33 @@ public class ButtonHelper {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
             buttons.add(aiDEVButton);
         }
+        if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasAbility("iconoclasm")) {
+
+            for (int x = 1; x < player.getCrf() + 1; x++) {
+                Button transact = Button.primary("purge_Frags_CRF_" + x,
+                    "Purge Cultural Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+            for (int x = 1; (x < player.getIrf() + 1 && x < 4); x++) {
+                Button transact = Button.success("purge_Frags_IRF_" + x,
+                    "Purge Industrial Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+            for (int x = 1; (x < player.getHrf() + 1 && x < 4); x++) {
+                Button transact = Button.danger("purge_Frags_HRF_" + x,
+                    "Purge Hazardous Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+            for (int x = 1; x < player.getUrf() + 1; x++) {
+                Button transact = Button.secondary("purge_Frags_URF_" + x,
+                    "Purge Frontier Fragments (" + x + ")");
+                buttons.add(transact);
+            }
+
+        }
         if (player.hasTechReady("is")) {
             Button aiDEVButton = Button.secondary("exhaustTech_is", "Exhaust Inheritance Systems");
             buttons.add(aiDEVButton);
@@ -1105,6 +1134,8 @@ public class ButtonHelper {
         buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         buttons.add(Button.secondary("showDeck_unscoredSO", "Unscored SOs")
             .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+        buttons.add(Button.secondary("showObjInfo_both", "All Revealed Objectives in Game")
+            .withEmoji(Emoji.fromFormatted(Emojis.Public1)));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
     }
 
@@ -1161,7 +1192,7 @@ public class ButtonHelper {
         for (String law : game.getLaws().keySet()) {
             if (lawID.equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
-                    || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColorID())) {
+                    || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     return true;
                 }
             }
@@ -1957,6 +1988,21 @@ public class ButtonHelper {
             }
             UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                count = count + space.getUnits().get(unit);
+            }
+        }
+        return count;
+    }
+
+    public static int checkNumberNonFighterShipsWithoutSpaceCannon(Player player, Game game, Tile tile) {
+        int count = 0;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        for (UnitKey unit : space.getUnits().keySet()) {
+            if (!unit.getColor().equals(player.getColor())) {
+                continue;
+            }
+            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+            if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff") && removedUnit.getSpaceCannonDieCount() == 0) {
                 count = count + space.getUnits().get(unit);
             }
         }
@@ -2967,7 +3013,11 @@ public class ButtonHelper {
                 return;
             }
         }
-        channel.sendMessage("New Thread for " + threadName).queue(m -> {
+        String msg = "New Thread for " + threadName;
+        if (msg.contains("undo-log")) {
+            msg = msg + activeGame.getPing();
+        }
+        channel.sendMessage(msg).queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message));
@@ -3292,33 +3342,38 @@ public class ButtonHelper {
         }
         // System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
+        List<String> unitTypesCounted = new ArrayList<>();
         Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player);
         for (UnitModel unit : unitsByQuantity.keySet()) {
-            if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType())
-                || "mech".equalsIgnoreCase(unit.getBaseType())) {
+            if (!unitTypesCounted.contains(unit.getBaseType())) {
+                if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType())
+                    || "mech".equalsIgnoreCase(unit.getBaseType())) {
 
-                if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
-                    numFighter2s += unitsByQuantity.get(unit) - fightersIgnored;
-                    if (numFighter2s < 0) {
-                        numFighter2s = 0;
+                    if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
+                        numFighter2s += unitsByQuantity.get(unit) - fightersIgnored;
+                        if (numFighter2s < 0) {
+                            numFighter2s = 0;
+                        }
                     }
-                }
-                if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
-                    int numCountedFighters = unit.getCapacityUsed() * unitsByQuantity.get(unit) - fightersIgnored;
-                    if (numCountedFighters < 0) {
-                        numCountedFighters = 0;
-                    }
-                    numInfNFightersNMechs += numCountedFighters;
-                } else {
-                    numInfNFightersNMechs += unit.getCapacityUsed() * unitsByQuantity.get(unit);
-                }
-
-            } else {
-                if (unit.getIsShip()) {
-                    if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
-                        numOfCapitalShips += unitsByQuantity.get(unit);
+                    if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
+                        int numCountedFighters = unit.getCapacityUsed() * unitsByQuantity.get(unit) - fightersIgnored;
+                        if (numCountedFighters < 0) {
+                            numCountedFighters = 0;
+                        }
+                        numInfNFightersNMechs += numCountedFighters;
                     } else {
-                        numOfCapitalShips += unitsByQuantity.get(unit) * 2;
+                        numInfNFightersNMechs += unit.getCapacityUsed() * unitsByQuantity.get(unit);
+                    }
+                    unitTypesCounted.add(unit.getBaseType());
+
+                } else {
+                    if (unit.getIsShip()) {
+                        if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
+                            numOfCapitalShips += unitsByQuantity.get(unit);
+                        } else {
+                            numOfCapitalShips += unitsByQuantity.get(unit) * 2;
+                        }
+                        unitTypesCounted.add(unit.getBaseType());
                     }
                 }
             }
@@ -3836,6 +3891,13 @@ public class ButtonHelper {
                 }
             }
         }
+        if (ButtonHelper.doesPlayerHaveFSHere("lanefir_flagship", player, tile)) {
+            List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
+            if (!button2.isEmpty()) {
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), player.getRepresentation() + "Due to lanefire FS, you can explore a planet you control in the system");
+                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), "Explore a planet", button2);
+            }
+        }
         if (player.hasAbility("secret_maps")) {
             String msg = player.getRepresentation()
                 + " you can use your secret maps ability to explore a planet with production that you did not explore this turn";
@@ -4119,6 +4181,23 @@ public class ButtonHelper {
             String planet = planetReal.getName();
             if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)
                 && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                buttons.addAll(planetButtons);
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> lanefirFSResolution(Player player, Game game, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        List<Button> buttons = new ArrayList<>();
+        for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
+            if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                continue;
+            }
+            Planet planetReal = (Planet) planetUnit;
+            String planet = planetReal.getName();
+            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -5258,7 +5337,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Flipped ionstorm in " + tile.getRepresentation());
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Tile> getAllWormholeTiles(Game game) {
@@ -5920,7 +5999,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread,
             "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
+        //ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
@@ -6586,6 +6665,9 @@ public class ButtonHelper {
             adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
         }
         List<Player> playersWithPds2 = new ArrayList<>();
+        if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game) && player.hasAbility("starfall_gunnery") && ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, game.getTileByPosition(tilePos)) > 0) {
+            playersWithPds2.add(player);
+        }
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
@@ -6596,7 +6678,7 @@ public class ButtonHelper {
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 if (tilePos.equalsIgnoreCase(adjTilePos) && unitHolder.getName().equalsIgnoreCase("mr")) {
                     for (Player p2 : game.getRealPlayers()) {
-                        if (p2.getPlanetsAllianceMode().contains("mr") && p2.getTechs().contains("iihq")) {
+                        if (p2.getPlanetsAllianceMode().contains("mr") && p2.getTechs().contains("iihq") && !playersWithPds2.contains(p2)) {
                             playersWithPds2.add(p2);
                         }
                     }
@@ -6724,11 +6806,18 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
                 msgExtra + "\n Use Buttons to do turn.",
                 TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+            Game activeGame = game;
             if (privatePlayer.getStasisInfantry() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                        + " infantry left to revive.",
-                    getPlaceStatusInfButtons(game, privatePlayer));
+                if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                } else {
+                    privatePlayer.setStasisInfantry(0);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                }
             }
 
         } else {
@@ -6741,11 +6830,18 @@ public class ButtonHelper {
                     BotLogger.log(event, "`ButtonHelper.startMyTurn` privatePlayer is null");
                     return;
                 }
+                Game activeGame = game;
                 if (privatePlayer.getStasisInfantry() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                    if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                    }
                 }
             }
         }
@@ -6834,11 +6930,18 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
                     msgExtra + "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                Game activeGame = game;
                 if (privatePlayer.getStasisInfantry() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                    if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                    }
                 }
             }
 
@@ -6853,11 +6956,18 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                     "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
+                Game activeGame = game;
                 if (privatePlayer.getStasisInfantry() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, privatePlayer));
+                    if (ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0) {
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame),
+                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
+                    } else {
+                        privatePlayer.setStasisInfantry(0);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), privatePlayer.getRepresentation()
+                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+
+                    }
                 }
             }
         }
@@ -8050,6 +8160,11 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Sol));
             compButtons.add(abilityButton);
         }
+        if (p1.hasUnit("lanefir_mech") && p1.getFragments().size() > 0 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
+            Button abilityButton = Button.success(finChecker + prefix + "ability_lanefirMech", "Purge Frag For Mech")
+                .withEmoji(Emoji.fromFormatted(Emojis.lanefir));
+            compButtons.add(abilityButton);
+        }
         if (p1.hasAbility("mantle_cracking")
             && ButtonHelperAbilities.getMantleCrackingButtons(p1, game).size() > 0) {
             Button abilityButton = Button.success(finChecker + prefix + "ability_mantlecracking", "Mantle Crack")
@@ -8076,6 +8191,9 @@ public class ButtonHelper {
         // Get Relic
         if (p1.enoughFragsForRelic()) {
             Button getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Get Relic");
+            if (p1.hasAbility("a_new_edifice")) {
+                getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Purge Frags to Explore");
+            }
             compButtons.add(getRelicButton);
         }
         // ACs
@@ -8493,7 +8611,7 @@ public class ButtonHelper {
             finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
         unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
         buttons.add(unitupgradesTech);
-
+        ButtonHelperCommanders.yinCommanderSummary(player, activeGame);
         String message = player.getRepresentation() + " What type of tech would you want?";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
@@ -8574,6 +8692,38 @@ public class ButtonHelper {
                     String message = "Use buttons to end turn or do another action";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                     event.getMessage().delete().queue();
+                } else if ("lanefirMech".equalsIgnoreCase(buttonID)) {
+                    String message3 = "Use buttons to drop a mech on a planet";
+                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p1, game,
+                        "mech", "placeOneNDone_skipbuild"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message3, buttons);
+                    String message2 = "Click the fragment you'd like to purge. ";
+                    List<Button> purgeFragButtons = new ArrayList<>();
+                    if (p1.getCrf() > 0) {
+                        Button transact = Button.primary(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getIrf() > 0) {
+                        Button transact = Button.success(finChecker + "purge_Frags_IRF_1",
+                            "Purge 1 Industrial Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getHrf() > 0) {
+                        Button transact = Button.danger(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    if (p1.getUrf() > 0) {
+                        Button transact = Button.secondary(finChecker + "purge_Frags_URF_1",
+                            "Purge 1 Frontier Fragment");
+                        purgeFragButtons.add(transact);
+                    }
+                    Button transact3 = Button.danger(finChecker + "deleteButtons",
+                        "Done Purging");
+                    purgeFragButtons.add(transact3);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, purgeFragButtons);
+                    String message = "Use buttons to end turn or do an action";
+                    List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
 
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
                     String message = "Click the fragment you'd like to purge. ";
@@ -8680,11 +8830,14 @@ public class ButtonHelper {
                     }
                 }
                 Button transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
+                if (p1.hasAbility("a_new_edifice")) {
+                    transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Explore");
+                }
                 purgeFragButtons.add(transact2);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, purgeFragButtons);
             }
             case "generic" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Doing unspecified component action. You could ping Fin to add this. ");
+                "Doing unspecified component action.");
             case "absolMOW" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     getIdent(p1)
@@ -8791,6 +8944,9 @@ public class ButtonHelper {
             }
             case "passturn" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
+            }
+            case "titanprototype", "absol_jr" -> {
+                //handled above
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "This Relic is not tied to any automation. Please resolve manually.");
         }
@@ -9070,7 +9226,10 @@ public class ButtonHelper {
         if ("terraform".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
         }
-        if ("dspngled".equalsIgnoreCase("id")) {
+        if ("dspnrohd".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
+        }
+        if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);
         }
         if ("iff".equalsIgnoreCase(id)) {
@@ -9268,6 +9427,9 @@ public class ButtonHelper {
                     }
                 }
                 Button transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
+                if (player.hasAbility("a_new_edifice")) {
+                    transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Explore");
+                }
                 purgeFragButtons.add(transact2);
                 MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message,
                     purgeFragButtons);
@@ -9340,7 +9502,7 @@ public class ButtonHelper {
         Player player) {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game), message, systemButtons);
     }
 
 }

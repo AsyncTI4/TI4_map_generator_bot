@@ -59,7 +59,7 @@
     "alias": "eh_little_omega",
     "name": "Establish Hegemony ω",
     "phase": "Status",
-    "text": "Control planets outside of your home system that have a combined influence value of at least 13.",
+    "text": "Control planets that have a combined influence value of at least 13.",
     "points": 1,
     "source": "little_omega"
   },

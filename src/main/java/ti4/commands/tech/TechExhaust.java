@@ -151,7 +151,21 @@ public class TechExhaust extends TechAddRemove {
             }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
-                List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
+                //List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null); old way
+                List<Button> buttons = new ArrayList<>();
+                for (Player p2 : activeGame.getRealPlayers()) {
+                    if (p2 == player || p2.getAc() == 0) {
+                        continue;
+                    }
+                    if (activeGame.isFoWMode()) {
+                        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
+                    } else {
+                        Button button = Button.secondary(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                        String factionEmojiString = p2.getFactionEmoji();
+                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                        buttons.add(button);
+                    }
+                }
                 String message = player.getRepresentation(true, true) + " Select who you would like to Mageon.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);

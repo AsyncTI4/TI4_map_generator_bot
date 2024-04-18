@@ -80,6 +80,7 @@ public class AgendaHelper {
 
     public static void resolveAgenda(Game activeGame, String buttonID, ButtonInteractionEvent event,
         MessageChannel actionsChannel) {
+        actionsChannel = activeGame.getMainGameChannel();
         String winner = buttonID.substring(buttonID.indexOf("_") + 1);
         String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
         int aID;
@@ -899,6 +900,14 @@ public class AgendaHelper {
         }
         List<Player> riders = getWinningRiders(winner, activeGame, event);
         List<Player> voters = getWinningVoters(winner, activeGame);
+        for (Player voter : voters) {
+            if (voter.hasTech("dskyrog")) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), ButtonHelper.getIdent(voter) + " gets to drop 2 infantry on a planet due to Kyro green tech");
+                List<Button> buttons = new ArrayList<>();
+                buttons.addAll(Helper.getPlanetPlaceUnitButtons(voter, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), "Use buttons to drop 2 infantry on a planet", buttons);
+            }
+        }
         voters.addAll(riders);
         for (Player player : voters) {
             if (player.getLeaderIDs().contains("florzencommander") && !player.hasLeaderUnlocked("florzencommander")) {
@@ -925,6 +934,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
             }
         }
+
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Sent pings to all those who ridered");
         } else if (riders.size() > 0) {
@@ -1133,6 +1143,18 @@ public class AgendaHelper {
             Button modify = Button.secondary("getModifyTiles", "Modify Units");
             MessageHelper.sendMessageToChannelWithButton(activeGame.getMainGameChannel(),
                 "Remove units on or adjacent to mecatol please", modify);
+        }
+    }
+
+    public static void pingAboutDebt(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts") || p2.getDebtTokenCount(player.getColor()) < 1) {
+                    continue;
+                }
+                String msg = player.getRepresentation() + " This is a reminder that you owe debt to " + ButtonHelper.getIdentOrColor(p2, game) + " and now could be a good time to pay it (or get it cleared if it was paid already)";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+            }
         }
     }
 
@@ -2121,6 +2143,34 @@ public class AgendaHelper {
         Map<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
         for (String outcome : outcomes.keySet()) {
+            StringTokenizer vote_info2 = new StringTokenizer(outcomes.get(outcome), ";");
+            while (vote_info2.hasMoreTokens()) {
+                String specificVote = vote_info2.nextToken();
+                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                Player keleres = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
+                Player player = keleres;
+                if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
+                    int size = getLosingVoters(outcome, activeGame).size();
+                    String message = keleres.getRepresentation()
+                        + " You have a Keleres Xxcha Hero to resolve. There were " + size + " players who voted for a different outcome, so you get that many tgs and CCs. ";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(keleres, activeGame), message);
+                    if (size > 0) {
+                        player.setTg(player.getTg() + size);
+                        String msg2 = "Gained 3" + Emojis.getTGorNomadCoinEmoji(activeGame) + " (" + (player.getTg() - size)
+                            + " -> **" + player.getTg() + "**) ";
+                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, size);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(keleres, activeGame), msg2);
+                        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                        String trueIdentity = player.getRepresentation(true, true);
+                        String msg3 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
+                            + ". Use buttons to gain CCs";
+                        activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(keleres, activeGame), msg3, buttons);
+                    }
+
+                }
+            }
             if (outcome.equalsIgnoreCase(winner)) {
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 while (vote_info.hasMoreTokens()) {
@@ -2245,6 +2295,7 @@ public class AgendaHelper {
                                 "dreadnought", "placeOneNDone_skipbuild");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+
                         if (specificVote.contains("Trade Rider")) {
                             int cTG = winningR.getTg();
                             winningR.setTg(cTG + 5);

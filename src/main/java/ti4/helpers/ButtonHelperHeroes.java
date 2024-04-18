@@ -1816,12 +1816,12 @@ public class ButtonHelperHeroes {
             }
             if (!game.isFoWMode()) {
                 StartCombat.findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
-                    threadName, tile2, event, "space");
+                    threadName, tile2, event, "space", "space");
             } else {
                 StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
-                    threadName, tile2, event, "space");
+                    threadName, tile2, event, "space", "space");
                 StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                    threadName, tile2, event, "space");
+                    threadName, tile2, event, "space", "space");
                 for (Player player3 : game.getRealPlayers()) {
                     if (player3 == player2 || player3 == player) {
                         continue;
@@ -1830,7 +1830,7 @@ public class ButtonHelperHeroes {
                         continue;
                     }
                     StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
-                        threadName, tile2, event, "space");
+                        threadName, tile2, event, "space", "space");
                 }
             }
         }

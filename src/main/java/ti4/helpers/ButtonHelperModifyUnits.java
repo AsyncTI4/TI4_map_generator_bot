@@ -1032,12 +1032,27 @@ public class ButtonHelperModifyUnits {
                 String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                 if (!activeGame.isFoWMode()) {
                     StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2,
-                        threadName, tile, event, "ground");
+                        threadName, tile, event, "ground", unitHolder.getName());
+                    if ((unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) < 1
+                        || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
+                        && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) < 1
+                        && unitHolder.getUnitCount(UnitType.Infantry, player2.getColor()) < 1
+                        && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
+                            || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
+                        String msg2 = player2.getRepresentation()
+                            + " you may want to remove structures if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(
+                            Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
+                                "Remove Structures"));
+                        buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                    }
                 } else {
                     StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2,
-                        threadName, tile, event, "ground");
+                        threadName, tile, event, "ground", unitHolder.getName());
                     StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player,
-                        threadName, tile, event, "ground");
+                        threadName, tile, event, "ground", unitHolder.getName());
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (player3 == player2 || player3 == player) {
                             continue;
@@ -1046,7 +1061,7 @@ public class ButtonHelperModifyUnits {
                             continue;
                         }
                         StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3,
-                            threadName, tile, event, "ground");
+                            threadName, tile, event, "ground", unitHolder.getName());
                     }
                 }
                 if (player2.ownsUnit("keleres_mech")

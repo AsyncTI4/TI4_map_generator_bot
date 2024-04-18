@@ -305,6 +305,10 @@ public class ButtonListener extends ListenerAdapter {
                 activeGame.getTileByPosition(buttonID.split("_")[1]), event);
         } else if (buttonID.startsWith("raghsCallStepOne_")) {
             ButtonHelperFactionSpecific.resolveRaghsCallStepOne(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("gheminaMechStart_")) {
+            ButtonHelperFactionSpecific.gheminaMechStart(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("collateralizedLoans_")) {
+            ButtonHelperFactionSpecific.collateralizedLoans(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("raghsCallStepTwo_")) {
             ButtonHelperFactionSpecific.resolveRaghsCallStepTwo(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanMechTradeStepTwo_")) {
@@ -645,8 +649,11 @@ public class ButtonListener extends ListenerAdapter {
                     if (player_.getFaction().equals(faction)) {
                         activeGame.setSpeaker(player_.getUserID());
                         String message = Emojis.SpeakerToken + " Speaker assigned to: "
-                            + ButtonHelper.getIdentOrColor(player_, activeGame);
+                            + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                        if (!activeGame.isFoWMode()) {
+                            ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "politics");
+                        }
                     }
                 }
             }
@@ -657,8 +664,11 @@ public class ButtonListener extends ListenerAdapter {
                 for (Player player_ : activeGame.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
                         activeGame.setSpeaker(player_.getUserID());
-                        String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation();
+                        String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                        if (!activeGame.isFoWMode()) {
+                            ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "politics");
+                        }
                     }
                 }
             }
@@ -668,7 +678,7 @@ public class ButtonListener extends ListenerAdapter {
             if (!activeGame.isRedTapeMode()) {
                 if ("2".equalsIgnoreCase(lastC)) {
                     new RevealStage2().revealS2(event, event.getChannel());
-                } else if("2x2".equalsIgnoreCase(lastC)) {
+                } else if ("2x2".equalsIgnoreCase(lastC)) {
                     new RevealStage2().revealTwoStage2(event, event.getChannel());
                 } else {
                     new RevealStage1().revealS1(event, event.getChannel());
@@ -1133,6 +1143,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
         } else if (buttonID.startsWith("startDevotion_")) {
             ButtonHelperModifyUnits.startDevotion(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("purgeTech_")) {
+            ButtonHelperHeroes.purgeTech(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resolveDevote_")) {
             ButtonHelperModifyUnits.resolveDevote(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("prophetsTears_")) {
@@ -1876,8 +1888,7 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace("produceOneUnitInTile_", "");
             String type = buttonID.split("_")[1];
             String pos = buttonID.split("_")[0];
-            List<Button> buttons;
-            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
+            List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), type,
                 "placeOneNDone_dontskip");
             String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
@@ -2183,7 +2194,6 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("freeSystemsHeroPlanet_")) {// "freeSystemsHeroPlanet_"
             ButtonHelperHeroes.freeSystemsHeroPlanet(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("scPick_")) {
-            Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
             if (activeGame.getStoredValue("Public Disgrace") != null
@@ -2210,11 +2220,11 @@ public class ButtonListener extends ListenerAdapter {
             }
 
             if (activeGame.getLaws().containsKey("checks") || activeGame.getLaws().containsKey("absol_checks")) {
-                new SCPick().secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
+                SCPick.secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
             } else {
-                boolean pickSuccessful = stats.secondHalfOfPickSC(event, activeGame, player, scpick);
+                boolean pickSuccessful = Stats.secondHalfOfPickSC(event, activeGame, player, scpick);
                 if (pickSuccessful) {
-                    new SCPick().secondHalfOfSCPick(event, player, activeGame, scpick);
+                    SCPick.secondHalfOfSCPick(event, player, activeGame, scpick);
                     event.getMessage().delete().queue();
                 }
             }
@@ -2318,6 +2328,9 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation() + " purged fragments: "
                 + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            if (!activeGame.isFoWMode() && event.getMessageChannel() instanceof ThreadChannel) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+            }
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
@@ -2768,6 +2781,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.flipIonStorm(activeGame, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame);
+        } else if (buttonID.startsWith("automatonsPlanet_")) {
+            ButtonHelperFactionSpecific.automatonsPlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("gledgeBasePlanet_")) {
             ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("veldyrAttach_")) {
@@ -3059,7 +3074,6 @@ public class ButtonListener extends ListenerAdapter {
                         finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech");
                     unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
                     buttons.add(unitupgradesTech);
-
                     String message = player.getRepresentation() + " What type of tech would you want?";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     event.getMessage().delete().queue();
@@ -3633,6 +3647,7 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         aCount = Integer.parseInt(agendaCount) - 1;
                     }
+                    activeGame.setStoredValue("agendaCount", aCount + "");
                     activeGame.setStoredValue("agendaCount", aCount + "");
                     String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
                     if ("CL".equalsIgnoreCase(agendaid)) {
@@ -4275,7 +4290,14 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                         }
                     }
-
+                }
+                case "gain1tgFromCommander" -> {
+                    String message = player.getRepresentation() + " Gained 1 tg (" + player.getTg() + "->" + (player.getTg() + 1) + ") from their commander";
+                    player.setTg(player.getTg() + 1);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                    MessageHelper.sendMessageToChannel(actionsChannel, message);
+                    event.getMessage().delete().queue();
                 }
                 case "mallice_2_tg" -> {
                     String playerRep = player.getFactionEmoji();
@@ -4548,6 +4570,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",
                         buttons);
+                    event.getMessage().delete().queue();
                 }
                 case "doneWithTacticalAction" -> {
                     ButtonHelperTacticalAction.concludeTacticalAction(player, activeGame, event);
@@ -4800,7 +4823,6 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         aCount = Integer.parseInt(agendaCount) - 1;
                     }
-
                     activeGame.setStoredValue("agendaCount", aCount + "");
                     String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
                     if ("CL".equalsIgnoreCase(agendaid)) {
@@ -5782,8 +5804,8 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.getRound() < 4) {
                     buttons.add(drawStage1);
                 }
-                if (activeGame.getRound() > 2) {
-                    if(activeGame.getStoredValue("homebrewMode") == "456") {
+                if (activeGame.getRound() > 2 || activeGame.getPublicObjectives1Peakable().size() == 0) {
+                    if (activeGame.getStoredValue("homebrewMode").equalsIgnoreCase("456")) {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);

@@ -5,6 +5,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class FlipGrace extends DiscordantStarsSubcommandData {
 
@@ -19,22 +20,22 @@ public class FlipGrace extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         
         if (!player.hasAbility("grace")) {
-            sendMessage("Player does not have Grace (Edyn Faction Ability)");
+            MessageHelper.sendMessageToEventChannel(event, "Player does not have Grace (Edyn Faction Ability)");
             return;
         }
 
         if (player.removeExhaustedAbility("grace")) {
-            sendMessage("Grace (Edyn Faction Ability) was exhausted. Flipping it back to ready.");
+            MessageHelper.sendMessageToEventChannel(event, "Grace (Edyn Faction Ability) was exhausted. Flipping it back to ready.");
             return;
         }
 
         player.addExhaustedAbility("grace");
-        sendMessage("Grace (Edyn Faction Ability) exhausted");
+        MessageHelper.sendMessageToEventChannel(event, "Grace (Edyn Faction Ability) exhausted");
     }
     
 }
