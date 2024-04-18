@@ -21,9 +21,9 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListMyTitles extends SearchSubcommandData {
+public class SearchMyTitles extends SearchSubcommandData {
 
-    public ListMyTitles() {
+    public SearchMyTitles() {
         super(Constants.SEARCH_MY_TITLES, "List all the titles you've acquired");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to Show"));
     }

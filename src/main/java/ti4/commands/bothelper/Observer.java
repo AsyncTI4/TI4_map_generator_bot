@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class Observer extends BothelperSubcommandData {
     public Observer() {
@@ -31,7 +32,7 @@ public class Observer extends BothelperSubcommandData {
 
                 if ("add".equals(event.getOption("add_remove").getAsString())) {
                     channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
-                    sendMessage("Permissions granted on " + user.getAsMention() + " to channel " + channel.getName());
+                    MessageHelper.sendMessageToEventChannel(event, "Permissions granted on " + user.getAsMention() + " to channel " + channel.getName());
                 }
 
                 if ("remove".equals(event.getOption("add_remove").getAsString())) {
@@ -39,7 +40,7 @@ public class Observer extends BothelperSubcommandData {
                     // This resets the user's perms to the default value, 
                     //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
                     channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
-                    sendMessage("Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
+                    MessageHelper.sendMessageToEventChannel(event, "Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
                 }
             }
         }

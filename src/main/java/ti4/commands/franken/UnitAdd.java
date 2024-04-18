@@ -5,6 +5,7 @@ import java.util.List;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
 public class UnitAdd extends UnitAddRemove {
@@ -29,6 +30,6 @@ public class UnitAdd extends UnitAddRemove {
                 unitID.equalsIgnoreCase("naaz_mech_space");
             }
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

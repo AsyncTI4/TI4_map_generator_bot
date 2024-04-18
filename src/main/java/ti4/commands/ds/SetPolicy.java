@@ -40,7 +40,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         String pol3 = null;
 
         if ((policy1 == null) && (policy2 == null) && (policy3 == null)) {
-            sendMessage("Must set at least one Policy!");
+            MessageHelper.sendMessageToEventChannel(event, "Must set at least one Policy!");
             return;
         }
 
@@ -49,7 +49,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             pol1 = policy1.getAsString().toLowerCase();
             pol1 = convertChoice(pol1);
             if (pol1 == null) {
-                sendMessage(
+                MessageHelper.sendMessageToEventChannel(event, 
                         "received an incorrect input for Policy: The People, will either ignore or default to + if this is your first time setting policies");
             }
         }
@@ -57,7 +57,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             pol2 = policy2.getAsString().toLowerCase();
             pol2 = convertChoice(pol2);
             if (pol2 == null) {
-                sendMessage(
+                MessageHelper.sendMessageToEventChannel(event, 
                         "received an incorrect input for Policy: The Environment, will either ignore or default to + if this is your first time setting policies");
             }
         }
@@ -65,35 +65,35 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             pol3 = policy3.getAsString().toLowerCase();
             pol3 = convertChoice(pol3);
             if (pol3 == null) {
-                sendMessage(
+                MessageHelper.sendMessageToEventChannel(event, 
                         "received an incorrect input for Policy: The Economy, will either ignore or default to + if this is your first time setting policies");
             }
         }
 
         if (!player.hasOlradinPolicies()) {
-            sendMessage("Player does not have Policy (Olradin Faction Ability)");
+            MessageHelper.sendMessageToEventChannel(event, "Player does not have Policy (Olradin Faction Ability)");
             return;
         }
 
         // extra returns for the first time policies are set
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");
-            sendMessage("Initiating Policies for Olradin.");
+            MessageHelper.sendMessageToEventChannel(event, "Initiating Policies for Olradin.");
             if (pol1 == null) {
                 pol1 = "+";
-                sendMessage("Need to initially set People policy. Defaulting to Policy - The People: Connect (+).");
+                MessageHelper.sendMessageToEventChannel(event, "Need to initially set People policy. Defaulting to Policy - The People: Connect (+).");
             }
             if (pol2 == null) {
                 pol2 = "+";
-                sendMessage(
+                MessageHelper.sendMessageToEventChannel(event, 
                         "Need to initially set Environment policy. Defaulting to Policy - The Environment: Preserve (+).");
             }
             if (pol3 == null) {
                 pol3 = "+";
-                sendMessage("Need to initially set Economy policy. Defaulting to Policy - The Economy: Empower (+).");
+                MessageHelper.sendMessageToEventChannel(event, "Need to initially set Economy policy. Defaulting to Policy - The Economy: Empower (+).");
             }
         }
-        // sendMessage("debug finalset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
+        // MessageHelper.sendMessageToEventChannel(event, "debug finalset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
         // pol3); (debug messagesender if more work is needed)
 
         int negativePolicies = 0;
@@ -104,64 +104,64 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             if ("-".equals(pol1)) {
                 if (player.hasAbility("policy_the_people_connect")) {
                     player.removeAbility("policy_the_people_connect");
-                    sendMessage("removed Policy - The People: Connect (+).");
+                    MessageHelper.sendMessageToEventChannel(event, "removed Policy - The People: Connect (+).");
                 }
                 player.addAbility("policy_the_people_control");
                 negativePolicies++;
-                sendMessage("added Policy - The People: Control (-).");
+                MessageHelper.sendMessageToEventChannel(event, "added Policy - The People: Control (-).");
             } else if ("+".equals(pol1)) {
                 if (player.hasAbility("policy_the_people_control")) {
                     player.removeAbility("policy_the_people_control");
-                    sendMessage("removed Policy - The People: Control (-).");
+                    MessageHelper.sendMessageToEventChannel(event, "removed Policy - The People: Control (-).");
                 }
                 player.addAbility("policy_the_people_connect");
                 positivePolicies++;
-                sendMessage("added Policy - The People: Connect (+).");
+                MessageHelper.sendMessageToEventChannel(event, "added Policy - The People: Connect (+).");
             }
         }
         if (pol2 != null) {
             if ("-".equals(pol2)) {
                 if (player.hasAbility("policy_the_environment_preserve")) {
                     player.removeAbility("policy_the_environment_preserve");
-                    sendMessage("removed Policy - The Environment: Preserve (+).");
+                    MessageHelper.sendMessageToEventChannel(event, "removed Policy - The Environment: Preserve (+).");
                 }
                 player.addAbility("policy_the_environment_plunder");
                 negativePolicies++;
-                sendMessage("added Policy - The Environment: Plunder (-).");
+                MessageHelper.sendMessageToEventChannel(event, "added Policy - The Environment: Plunder (-).");
             } else if ("+".equals(pol2)) {
                 if (player.hasAbility("policy_the_environment_plunder")) {
                     player.removeAbility("policy_the_environment_plunder");
-                    sendMessage("removed Policy - The Environment: Plunder (-).");
+                    MessageHelper.sendMessageToEventChannel(event, "removed Policy - The Environment: Plunder (-).");
                 }
                 player.addAbility("policy_the_environment_preserve");
                 positivePolicies++;
-                sendMessage("added Policy - The Environment: Preserve (+).");
+                MessageHelper.sendMessageToEventChannel(event, "added Policy - The Environment: Preserve (+).");
             }
         }
         if (pol3 != null) {
             if ("-".equals(pol3)) {
                 if (player.hasAbility("policy_the_economy_empower")) {
                     player.removeAbility("policy_the_economy_empower");
-                    sendMessage("removed Policy - The Economy: Empower (+).");
+                    MessageHelper.sendMessageToEventChannel(event, "removed Policy - The Economy: Empower (+).");
                 }
                 if (!player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
                     player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
-                    sendMessage("added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!");
+                    MessageHelper.sendMessageToEventChannel(event, "added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!");
                 } else if (player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
-                    sendMessage("added Policy - The Economy: Exploit (-). You already had this policy, so your Commodities total is unchanged.");
+                    MessageHelper.sendMessageToEventChannel(event, "added Policy - The Economy: Exploit (-). You already had this policy, so your Commodities total is unchanged.");
                 }
                 negativePolicies++;
             } else if ("+".equals(pol3)) {
                 if (player.hasAbility("policy_the_economy_exploit")) {
                     player.removeAbility("policy_the_economy_exploit");
                     player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-                    sendMessage("removed Policy - The Economy: Exploit (-). Increased Commodities total by 1 - double check the value is correct!.");
+                    MessageHelper.sendMessageToEventChannel(event, "removed Policy - The Economy: Exploit (-). Increased Commodities total by 1 - double check the value is correct!.");
                 }
                 player.addAbility("policy_the_economy_empower");
                 positivePolicies++;
-                sendMessage("added Policy - The Economy: Empower (+).");
+                MessageHelper.sendMessageToEventChannel(event, "added Policy - The Economy: Empower (+).");
             }
         }
 

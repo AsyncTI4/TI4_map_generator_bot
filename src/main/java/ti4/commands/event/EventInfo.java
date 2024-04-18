@@ -28,11 +28,11 @@ public class EventInfo extends EventSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         sendEventInfo(activeGame, player, event);
-        sendMessage("Event Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Event Info Sent");
     }
 
     public static void sendEventInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {

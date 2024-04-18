@@ -55,7 +55,7 @@ public class HeroPlay extends LeaderAction {
         player = Helper.getGamePlayer(activeGame, player, event, null);
 
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         action(event, "hero", activeGame, player);
@@ -75,18 +75,18 @@ public class HeroPlay extends LeaderAction {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
 
         if (playerLeader == null) {
-            sendMessage("Leader '" + leaderID + "'' could not be found. The leader might have been purged earlier.");
+            MessageHelper.sendMessageToEventChannel(event, "Leader '" + leaderID + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
 
         if (playerLeader.isLocked()) {
-            sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
-            sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
+            MessageHelper.sendMessageToEventChannel(event, "Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
+            MessageHelper.sendMessageToEventChannel(event, Helper.getLeaderLockedRepresentation(playerLeader));
             return;
         }
 
         if (!playerLeader.getType().equals(Constants.HERO)) {
-            sendMessage("Leader is not a hero");
+            MessageHelper.sendMessageToEventChannel(event, "Leader is not a hero");
             return;
         }
 

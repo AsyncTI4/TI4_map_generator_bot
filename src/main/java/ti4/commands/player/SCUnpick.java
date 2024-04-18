@@ -33,7 +33,7 @@ public class SCUnpick extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
@@ -134,7 +134,7 @@ public class SCUnpick extends PlayerSubcommandData {
                 ListTurnOrder.turnOrder(event, activeGame);
             }
             if (!msgExtra.isEmpty()) {
-                sendMessage(msgExtra);
+                MessageHelper.sendMessageToEventChannel(event, msgExtra);
             }
         }
     }

@@ -51,13 +51,13 @@ public class SCPick extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         Collection<Player> activePlayers = activeGame.getRealPlayers();
         if (activePlayers.size() == 0) {
-            sendMessage("No active players found");
+            MessageHelper.sendMessageToEventChannel(event, "No active players found");
             return;
         }
 
@@ -66,7 +66,7 @@ public class SCPick extends PlayerSubcommandData {
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
-            sendMessage("Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
+            MessageHelper.sendMessageToEventChannel(event, "Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
             return;
         }
 
@@ -94,7 +94,7 @@ public class SCPick extends PlayerSubcommandData {
         }
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
-            sendMessage("No SC picked.");
+            MessageHelper.sendMessageToEventChannel(event, "No SC picked.");
             return;
         }
         secondHalfOfSCPick(event, player, activeGame, scPicked);

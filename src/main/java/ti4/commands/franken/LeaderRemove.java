@@ -6,6 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class LeaderRemove extends LeaderAddRemove {
     public LeaderRemove() {
@@ -25,6 +26,6 @@ public class LeaderRemove extends LeaderAddRemove {
             sb.append("\n");
             player.removeLeader(leaderID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

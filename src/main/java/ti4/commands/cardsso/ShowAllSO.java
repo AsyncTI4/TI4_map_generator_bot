@@ -23,13 +23,13 @@ public class ShowAllSO extends SOCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         
         Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
-            sendMessage("Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
         showAll(player, player_, activeGame);
