@@ -26,12 +26,12 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         String trait = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
         if (trait == null || trait.isEmpty() || trait.isBlank()) {
-            sendMessage("Trait not found");
+            MessageHelper.sendMessageToEventChannel(event, "Trait not found");
             return;
         }
 
@@ -41,7 +41,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
         String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {
-            sendMessage(traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            MessageHelper.sendMessageToEventChannel(event, traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
         }
 
         StringBuilder sb = new StringBuilder();

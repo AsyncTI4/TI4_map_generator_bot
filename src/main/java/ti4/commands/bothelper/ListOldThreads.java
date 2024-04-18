@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class ListOldThreads extends BothelperSubcommandData {
     final public static Predicate<ThreadChannel> filter = c -> c.getLatestMessageIdLong() != 0 && !c.isArchived();
@@ -26,11 +27,11 @@ public class ListOldThreads extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         int channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 1000) {
-            sendMessage("Please choose a number between 1 and 1000");
+            MessageHelper.sendMessageToEventChannel(event, "Please choose a number between 1 and 1000");
             return;
         }
         Guild guild = event.getGuild();
-        sendMessage(getOldThreadsMessage(guild, channelCount));
+        MessageHelper.sendMessageToEventChannel(event, getOldThreadsMessage(guild, channelCount));
     }
 
     public static String getOldThreadsMessage(Guild guild, Integer channelCount) {

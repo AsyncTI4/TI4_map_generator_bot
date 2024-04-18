@@ -57,7 +57,7 @@ public class StasisInfantry extends SpecialSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             }
         } catch (Exception e) {
-            sendMessage("Could not parse number for: " + Constants.COUNT);
+            MessageHelper.sendMessageToEventChannel(event, "Could not parse number for: " + Constants.COUNT);
         }
     }
 

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map_ttpg.ConvertTTPGtoAsync;
+import ti4.message.MessageHelper;
 
 public class ImportTTPG extends BothelperSubcommandData {
     public ImportTTPG(){
@@ -22,9 +23,9 @@ public class ImportTTPG extends BothelperSubcommandData {
         String gameName = optionGameName.getAsString();
         Boolean imported = ConvertTTPGtoAsync.ImportTTPG(filepath, gameName);
         if (imported) {
-            sendMessage("TTPG File: `" + filepath + "` has been imported as game name: **" + gameName + "**");
+            MessageHelper.sendMessageToEventChannel(event, "TTPG File: `" + filepath + "` has been imported as game name: **" + gameName + "**");
         } else {
-            sendMessage("TTPG File: `" + filepath + "` failed to be imported");
+            MessageHelper.sendMessageToEventChannel(event, "TTPG File: `" + filepath + "` failed to be imported");
         }
     }
 }

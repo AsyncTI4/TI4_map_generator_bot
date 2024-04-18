@@ -29,12 +29,12 @@ public class ShowPN extends PNCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            sendMessage("Please select what Promissory Note to show");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to show");
             return;
         }
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
@@ -52,13 +52,13 @@ public class ShowPN extends PNCardsSubcommandData {
         }
 
         if (pnID == null) {
-            sendMessage("No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
             return;
         }
 
         Player targetPlayer = Helper.getPlayer(activeGame, null, event);
         if (targetPlayer == null) {
-            sendMessage("Target player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Target player not found");
             return;
         }
 
@@ -67,7 +67,7 @@ public class ShowPN extends PNCardsSubcommandData {
 
         String message = player.getRepresentation(false, false) + " showed you a promissory note:";
 
-        sendMessage("PN shown");
+        MessageHelper.sendMessageToEventChannel(event, "PN shown");
         PNInfo.sendPromissoryNoteInfo(activeGame, player, longPNDisplay);
         MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, targetPlayer, message, List.of(pnEmbed));
     }

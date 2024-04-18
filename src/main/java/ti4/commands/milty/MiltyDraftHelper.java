@@ -56,7 +56,7 @@ public class MiltyDraftHelper {
         if (fileUpload == null) {
             MessageHelper.sendMessageToChannel(mainGameChannel, "There was an error building the slices image.");
         } else {
-            MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload, true);
+            MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload);
         }
     }
 

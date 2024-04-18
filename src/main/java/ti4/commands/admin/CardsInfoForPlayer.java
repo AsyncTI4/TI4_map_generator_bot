@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class CardsInfoForPlayer extends AdminSubcommandData {
     public CardsInfoForPlayer() {
@@ -27,6 +28,6 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
             CardsInfo.sendCardsInfo(activeGame, player, event);
         }
         GameSaveLoadManager.saveMap(activeGame, event);
-        sendMessage("Cards Info sent");
+        MessageHelper.sendMessageToEventChannel(event, "Cards Info sent");
     }
 }

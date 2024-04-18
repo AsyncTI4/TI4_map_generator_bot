@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class RemoveTeamMate extends PlayerSubcommandData {
     public RemoveTeamMate() {
@@ -23,13 +24,13 @@ public class RemoveTeamMate extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if(addOption!= null){
             player.removeTeamMateID(addOption.getAsUser().getId());
         }
-        sendMessage("Removed "+addOption.getAsUser().getAsMention() + " from "+player.getFaction()+"'s team");
+        MessageHelper.sendMessageToEventChannel(event, "Removed "+addOption.getAsUser().getAsMention() + " from "+player.getFaction()+"'s team");
     }
 }

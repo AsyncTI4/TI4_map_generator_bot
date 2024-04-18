@@ -23,12 +23,12 @@ public class ShowSO extends SOCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select what Secret Objective to show");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Secret Objective to show");
             return;
         }
 
@@ -41,7 +41,7 @@ public class ShowSO extends SOCardsSubcommandData {
         }
 
         if (soID == null) {
-            sendMessage("No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
             return;
         }
 
@@ -53,11 +53,11 @@ public class ShowSO extends SOCardsSubcommandData {
 
         Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
-            sendMessage("Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
         
-        sendMessage("SO shown to player");
+        MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
         SOInfo.sendSecretObjectiveInfo(activeGame, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb);
     }

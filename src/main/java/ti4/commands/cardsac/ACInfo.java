@@ -35,11 +35,11 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         sendActionCardInfo(activeGame, player, event);
-        sendMessage("AC Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "AC Info Sent");
     }
 
     private static void sendTrapCardInfo(Game activeGame, Player player) {

@@ -7,6 +7,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class RefreshRelic extends ExhaustRelic {
 
@@ -20,6 +21,6 @@ public class RefreshRelic extends ExhaustRelic {
     protected void subAction(Player player, SlashCommandInteractionEvent event, String relicId) {
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
-        sendMessage("Refreshed " + Emojis.Relic + "Relic: " + relicName);
+        MessageHelper.sendMessageToEventChannel(event, "Refreshed " + Emojis.Relic + "Relic: " + relicName);
     }
 }

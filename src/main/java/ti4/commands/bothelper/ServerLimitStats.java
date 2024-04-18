@@ -2,12 +2,14 @@ package ti4.commands.bothelper;
 
 import java.text.NumberFormat;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class ServerLimitStats extends BothelperSubcommandData {
     public ServerLimitStats(){
@@ -63,7 +65,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
           "- " + publicThreadCount + "   " + getPercentage(publicThreadCount, threadCount) + "  public threads" + "\n" +
           " - " + botThreadCount + "   " + getPercentage(botThreadCount, threadCount) + "  '-bot-map-updates' threads" + "\n" +
           " - " + roundThreadCount + "   " + getPercentage(roundThreadCount, threadCount) + "  '-round-' threads (/sc play and combat)" + "\n";
-        sendMessage(sb);
+        MessageHelper.sendMessageToEventChannel(event, sb);
     }
 
     private String getPercentage(double numerator, double denominator) {

@@ -55,7 +55,7 @@ public class TurnEnd extends PlayerSubcommandData {
         mainPlayer = Helper.getPlayer(activeGame, mainPlayer, event);
 
         if (mainPlayer == null) {
-            sendMessage("Player/Faction/Color could not be found in map:" + activeGame.getName());
+            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
         pingNextPlayer(event, activeGame, mainPlayer);

@@ -91,7 +91,7 @@ public class DrawAgenda extends AgendaSubcommandData {
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         if (player == null) {
-            sendMessage("You are not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You are not a player of this game");
             return;
         }
         drawAgenda(event, count, fromBottom, activeGame, player);

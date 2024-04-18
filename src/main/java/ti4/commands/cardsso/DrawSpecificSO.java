@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
+import ti4.message.MessageHelper;
 
 import java.util.Map;
 
@@ -29,12 +30,12 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         OptionMapping option = event.getOption(Constants.SO_ID);
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);
         if (option == null) {
-            sendMessage("SO ID needs to be specified");
+            MessageHelper.sendMessageToEventChannel(event, "SO ID needs to be specified");
             return;
         }
         User user;
         if (playerOption == null) {
-          //  sendMessage("Player option was null");
+          //  MessageHelper.sendMessageToEventChannel(event, "Player option was null");
            // return;
            user = event.getUser();
         }
@@ -46,11 +47,11 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         {
             if(activeGame.purgeSpecificSecretObjective(option.getAsString()))
             {
-                sendMessage("Purged specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Purged specified SO");
             }
             else
             {
-                sendMessage("Failed to purge specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified SO");
             }
             return;
         }
@@ -58,11 +59,11 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         
         Map<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
         if (secrets == null){
-            sendMessage("SO not retrieved");
+            MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
         GameSaveLoadManager.saveMap(activeGame, event);
-        sendMessage("SO sent to user's hand - please check `/ac info`");
+        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
         SOInfo.sendSecretObjectiveInfo(activeGame, activeGame.getPlayer(user.getId()));
     }
 }

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
+import ti4.message.MessageHelper;
 
 import java.util.Map;
 
@@ -26,21 +27,21 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         if (option == null) {
-            sendMessage("SO ID needs to be specified");
+            MessageHelper.sendMessageToEventChannel(event, "SO ID needs to be specified");
             return;
         }
         if (playerOption == null) {
-            sendMessage("Player option was null");
+            MessageHelper.sendMessageToEventChannel(event, "Player option was null");
             return;
         }
 
         User user = playerOption.getAsUser();
         Map<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
         if (secrets == null){
-            sendMessage("SO not retrieved");
+            MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
         GameSaveLoadManager.saveMap(activeGame, event);
-        sendMessage("SO sent to user's hand - please check `/ac info`");
+        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
     }
 }
