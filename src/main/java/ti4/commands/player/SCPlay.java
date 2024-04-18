@@ -156,7 +156,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (scModel != null && scModel.hasImageFile()) {
-            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame), true);
+            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame));
         } else if (scModel != null) {
             baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
@@ -210,8 +210,7 @@ public class SCPlay extends PlayerSubcommandData {
                     for (ThreadChannel threadChannel_ : threadChannels) {
                         if (threadChannel_.getName().equals(threadName)) {
                             if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-                                MessageHelper.sendFileToChannel(threadChannel_,
-                                    Helper.getSCImageFile(scToPlay, activeGame), true);
+                                MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, activeGame));
                             }
                             if (scToPlay == 5) {
                                 Button transaction = Button.primary("transaction", "Transaction");
