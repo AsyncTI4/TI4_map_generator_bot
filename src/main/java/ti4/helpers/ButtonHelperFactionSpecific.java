@@ -1598,7 +1598,24 @@ public class ButtonHelperFactionSpecific {
             }
         }
         String message = "Use buttons to select which planet to terraform";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
+    public static void offerAutomatonsButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null
+                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+                buttons.add(Button.success("automatonsPlanet_" + planet,
+                    Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = "Use buttons to select which planet to place automatons on";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static void resolveOlradinPN(Player player, Game activeGame, GenericInteractionCreateEvent event) {
@@ -1637,7 +1654,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         String message = "Use buttons to select which planet to put a gledge base on";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static void resolveScour(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -1737,6 +1754,16 @@ public class ButtonHelperFactionSpecific {
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+
+    public static void automatonsPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
+        String planet = buttonID.replace("automatonsPlanet_", "");
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        planetReal.addToken("attachment_automatons.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached automatons to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 

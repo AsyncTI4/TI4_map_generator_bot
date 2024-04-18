@@ -900,6 +900,14 @@ public class AgendaHelper {
         }
         List<Player> riders = getWinningRiders(winner, activeGame, event);
         List<Player> voters = getWinningVoters(winner, activeGame);
+        for (Player voter : voters) {
+            if (voter.hasTech("dskyrog")) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), ButtonHelper.getIdent(voter) + " gets to drop 2 infantry on a planet due to Kyro green tech");
+                List<Button> buttons = new ArrayList<>();
+                buttons.addAll(Helper.getPlanetPlaceUnitButtons(voter, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), "Use buttons to drop 2 infantry on a planet", buttons);
+            }
+        }
         voters.addAll(riders);
         for (Player player : voters) {
             if (player.getLeaderIDs().contains("florzencommander") && !player.hasLeaderUnlocked("florzencommander")) {
@@ -926,6 +934,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
             }
         }
+
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Sent pings to all those who ridered");
         } else if (riders.size() > 0) {
