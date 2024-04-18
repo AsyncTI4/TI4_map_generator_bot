@@ -2781,6 +2781,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.flipIonStorm(activeGame, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame);
+        } else if (buttonID.startsWith("automatonsPlanet_")) {
+            ButtonHelperFactionSpecific.automatonsPlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("gledgeBasePlanet_")) {
             ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("veldyrAttach_")) {

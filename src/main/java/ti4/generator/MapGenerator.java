@@ -504,7 +504,7 @@ public class MapGenerator {
             }
         }
         if (finRun) {
-            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            // BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
         }
         if (debug) {
@@ -519,7 +519,7 @@ public class MapGenerator {
         String timeStamp = getTimeStamp();
         graphics.drawString(game.getName() + " " + game.getCreationDate() + " - " + timeStamp, 0, 34);
         if (finRun) {
-            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            //BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
         }
         int widthOfLine = width - 50;
@@ -565,7 +565,7 @@ public class MapGenerator {
             playerInfo(game);
         }
         if (finRun) {
-            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            // BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
         }
 
@@ -880,7 +880,7 @@ public class MapGenerator {
             }
         }
         if (finRun) {
-            BotLogger.log("Show game made it past checkpoint #" + checkpoint);
+            // BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
         }
         if (debug)

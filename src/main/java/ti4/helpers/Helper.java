@@ -1024,6 +1024,9 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
         for (String planet : planets) {
+            if (planet.contains("ghoti") || planet.contains("custodia")) {
+                continue;
+            }
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
                 getPlanetRepresentation(planet, activeGame));
             button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
@@ -2622,7 +2625,7 @@ public class Helper {
         List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
             if ("unitupgrade".equalsIgnoreCase(tech.getType().toString()) && tech.getFaction().isEmpty()
-                    && game.getTechnologyDeck().contains(tech.getAlias())) {
+                && game.getTechnologyDeck().contains(tech.getAlias())) {
                 techs.add(tech);
             }
         }
