@@ -3342,33 +3342,38 @@ public class ButtonHelper {
         }
         // System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
+        List<String> unitTypesCounted = new ArrayList<>();
         Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player);
         for (UnitModel unit : unitsByQuantity.keySet()) {
-            if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType())
-                || "mech".equalsIgnoreCase(unit.getBaseType())) {
+            if (!unitTypesCounted.contains(unit.getBaseType())) {
+                if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType())
+                    || "mech".equalsIgnoreCase(unit.getBaseType())) {
 
-                if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
-                    numFighter2s += unitsByQuantity.get(unit) - fightersIgnored;
-                    if (numFighter2s < 0) {
-                        numFighter2s = 0;
+                    if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
+                        numFighter2s += unitsByQuantity.get(unit) - fightersIgnored;
+                        if (numFighter2s < 0) {
+                            numFighter2s = 0;
+                        }
                     }
-                }
-                if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
-                    int numCountedFighters = unit.getCapacityUsed() * unitsByQuantity.get(unit) - fightersIgnored;
-                    if (numCountedFighters < 0) {
-                        numCountedFighters = 0;
-                    }
-                    numInfNFightersNMechs += numCountedFighters;
-                } else {
-                    numInfNFightersNMechs += unit.getCapacityUsed() * unitsByQuantity.get(unit);
-                }
-
-            } else {
-                if (unit.getIsShip()) {
-                    if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
-                        numOfCapitalShips += unitsByQuantity.get(unit);
+                    if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
+                        int numCountedFighters = unit.getCapacityUsed() * unitsByQuantity.get(unit) - fightersIgnored;
+                        if (numCountedFighters < 0) {
+                            numCountedFighters = 0;
+                        }
+                        numInfNFightersNMechs += numCountedFighters;
                     } else {
-                        numOfCapitalShips += unitsByQuantity.get(unit) * 2;
+                        numInfNFightersNMechs += unit.getCapacityUsed() * unitsByQuantity.get(unit);
+                    }
+                    unitTypesCounted.add(unit.getBaseType());
+
+                } else {
+                    if (unit.getIsShip()) {
+                        if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
+                            numOfCapitalShips += unitsByQuantity.get(unit);
+                        } else {
+                            numOfCapitalShips += unitsByQuantity.get(unit) * 2;
+                        }
+                        unitTypesCounted.add(unit.getBaseType());
                     }
                 }
             }
@@ -9221,7 +9226,10 @@ public class ButtonHelper {
         if ("terraform".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
         }
-        if ("dspngled".equalsIgnoreCase("id")) {
+        if ("dspnrohd".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
+        }
+        if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);
         }
         if ("iff".equalsIgnoreCase(id)) {
@@ -9494,7 +9502,7 @@ public class ButtonHelper {
         Player player) {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game), message, systemButtons);
     }
 
 }
