@@ -1,4 +1,4 @@
-package ti4.settings;
+package ti4.commands.user;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +58,7 @@ public class UserSettingsManager {
                     loadUserSetting(userSettingsPath + File.separator + file.getName());
                 } catch (Exception e) {
                     BotLogger.log("Could not import JSON Objects from File: " + userSettingsPath + "/" + file.getName(), e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -71,7 +72,7 @@ public class UserSettingsManager {
         if (filePath != null) {
             try {
                 InputStream input = new FileInputStream(filePath);
-                UserSettings userSetting = objectMapper.readValue(input, type);
+                UserSettings userSetting = objectMapper.readValue(input, UserSettings.class);
                 addUserSetting(userSetting);
             } catch (Exception e) {
                 BotLogger.log("Could not import JSON Objects from File: " + settingFilePath, e);

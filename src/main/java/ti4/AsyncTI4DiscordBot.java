@@ -69,6 +69,9 @@ import ti4.commands.units.RemoveAllUnitDamage;
 import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands.user.UserCommand;
+import ti4.commands.user.UserSettings;
+import ti4.commands.user.UserSettingsManager;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -82,8 +85,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 import ti4.selections.SelectionMenuListener;
-import ti4.settings.UserSettings;
-import ti4.settings.UserSettingsManager;
 
 public class AsyncTI4DiscordBot {
 
@@ -192,6 +193,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
         commandManager.addCommand(new SelectionBoxDemo());
+        commandManager.addCommand(new UserCommand());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -280,8 +282,6 @@ public class AsyncTI4DiscordBot {
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         UserSettingsManager.init();
-
-        Map<String, UserSettings> userSettings = UserSettingsManager.getInstance().getAllUserSettings();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
