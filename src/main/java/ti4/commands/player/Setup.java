@@ -63,19 +63,19 @@ public class Setup extends PlayerSubcommandData {
             factionOption = StringUtils.substringBefore(factionOption.toLowerCase().replace("the ", ""), " ");
         String faction = AliasHandler.resolveFaction(factionOption);
         if (!Mapper.isValidFaction(faction)) {
-            sendMessage("Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
+            MessageHelper.sendMessageToEventChannel(event, "Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
             return;
         }
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isValidColor(color)) {
-            sendMessage("Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
+            MessageHelper.sendMessageToEventChannel(event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
             return;
         }
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 

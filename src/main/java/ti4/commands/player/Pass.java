@@ -24,12 +24,12 @@ public class Pass extends PlayerSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
             return;
         }
 
         if (!activeGame.getPlayedSCs().containsAll(player.getSCs())) {
-            sendMessage("You have not played your strategy cards, you cannot pass.");
+            MessageHelper.sendMessageToEventChannel(event, "You have not played your strategy cards, you cannot pass.");
             return;
         }
         player.setPassed(true);
@@ -37,7 +37,7 @@ public class Pass extends PlayerSubcommandData {
             ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
         }
         String text = player.getRepresentation() + " PASSED";
-        sendMessage(text);
+        MessageHelper.sendMessageToEventChannel(event, text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);

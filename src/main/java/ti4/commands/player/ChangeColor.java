@@ -1,5 +1,13 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -9,9 +17,12 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-import ti4.map.*;
-
-import java.util.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
+import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 
 public class ChangeColor extends PlayerSubcommandData {
     public ChangeColor() {
@@ -26,14 +37,14 @@ public class ChangeColor extends PlayerSubcommandData {
 
         String newColor = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isValidColor(newColor)) {
-            sendMessage("Color not valid");
+            MessageHelper.sendMessageToEventChannel(event, "Color not valid");
             return;
         }
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
@@ -41,7 +52,7 @@ public class ChangeColor extends PlayerSubcommandData {
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (newColor.equals(playerInfo.getColor())) {
-                    sendMessage("Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
+                    MessageHelper.sendMessageToEventChannel(event, "Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
                     return;
                 }
             }

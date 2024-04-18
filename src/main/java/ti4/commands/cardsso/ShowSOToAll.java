@@ -9,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShowSOToAll extends SOCardsSubcommandData {
     public ShowSOToAll() {
@@ -22,12 +23,12 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select what Secret Objective to show to All");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Secret Objective to show to All");
             return;
         }
 
@@ -51,7 +52,7 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         }
 
         if (soID == null) {
-            sendMessage("No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
             return;
         }
 
@@ -67,6 +68,6 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         if (!scored) {
             player.setSecret(soID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

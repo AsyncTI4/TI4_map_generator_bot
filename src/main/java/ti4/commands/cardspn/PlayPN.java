@@ -34,12 +34,12 @@ public class PlayPN extends PNCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            sendMessage("Please select what Promissory Note to play");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to play");
             return;
         }
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
@@ -67,7 +67,7 @@ public class PlayPN extends PNCardsSubcommandData {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
                         if (foundSimilarName && !cardName.equals(pnName)) {
-                            sendMessage("Multiple cards with similar name founds, please use ID");
+                            MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID");
                             return;
                         }
                         pnID = pn.getKey();
@@ -79,7 +79,7 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         if (pnID == null) {
-            sendMessage("No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
             return;
         }
 

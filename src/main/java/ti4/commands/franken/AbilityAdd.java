@@ -1,9 +1,11 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 
 public class AbilityAdd extends AbilityAddRemove {
@@ -25,6 +27,6 @@ public class AbilityAdd extends AbilityAddRemove {
             sb.append("\n");
             player.addAbility(abilityID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

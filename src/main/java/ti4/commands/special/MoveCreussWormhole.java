@@ -18,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 
 public class MoveCreussWormhole extends SpecialSubcommandData {
 
@@ -34,26 +35,26 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null){
-            sendMessage("Specify a tile");
+            MessageHelper.sendMessageToEventChannel(event, "Specify a tile");
             return;
         }
         String tileID = AliasHandler.resolveTile(StringUtils.substringBefore(tileOption.getAsString().toLowerCase(), " "));
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
-            sendMessage("Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         String tokenName = event.getOption(Constants.CREUSS_TOKEN_NAME, null, OptionMapping::getAsString);
         tokenName = AliasHandler.resolveToken(tokenName);
         if (!isValidCreussWormhole(tokenName)) {
-            sendMessage("Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
+            MessageHelper.sendMessageToEventChannel(event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
             return;
         }
 
@@ -66,7 +67,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
                 break;
             }
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
         if(player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")){
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "ghost", event);
         }

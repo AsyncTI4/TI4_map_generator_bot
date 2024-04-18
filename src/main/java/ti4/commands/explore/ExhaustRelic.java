@@ -8,6 +8,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ExhaustRelic extends GenericRelicAction {
 
@@ -25,20 +26,20 @@ public class ExhaustRelic extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            sendMessage("Specify relic");
+            MessageHelper.sendMessageToEventChannel(event, "Specify relic");
             return;
         }
         String relicId = option.getAsString();
         if (player.hasRelic(relicId)) {
 			subAction(player, event, relicId);
 		} else {
-            sendMessage("Invalid relic or player does not have specified relic");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic");
         }
     }
 
 	protected void subAction(Player player, SlashCommandInteractionEvent event, String relicId) {
 		player.addExhaustedRelic(relicId);
 		String relicName = Mapper.getRelic(relicId).getName();
-		sendMessage("Exhausted " + Emojis.Relic + " relic: " + relicName);
+		MessageHelper.sendMessageToEventChannel(event, "Exhausted " + Emojis.Relic + " relic: " + relicName);
 	}
 }

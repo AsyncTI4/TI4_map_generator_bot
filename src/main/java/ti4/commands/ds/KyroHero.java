@@ -27,7 +27,7 @@ public class KyroHero extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         int dieResult = event.getOption(Constants.SC, 1, OptionMapping::getAsInt);
