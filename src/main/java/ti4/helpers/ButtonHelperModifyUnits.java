@@ -62,7 +62,7 @@ public class ButtonHelperModifyUnits {
         int numSustains = getNumberOfSustainableUnits(player, activeGame, unitHolder);
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         Player mentakHero = activeGame
-            .getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
+            .getPlayerFromColorOrFaction(activeGame.getStoredValue("mentakHero"));
         if (hits > 0 && unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
@@ -366,7 +366,7 @@ public class ButtonHelperModifyUnits {
         boolean noMechPowers = activeGame.getLaws().containsKey("articles_war");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         Player mentakHero = activeGame
-            .getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
+            .getPlayerFromColorOrFaction(activeGame.getStoredValue("mentakHero"));
         boolean usedDuraniumAlready = true;
         String duraniumMsg = "";
         if (player.hasTech("da")) {
@@ -411,10 +411,10 @@ public class ButtonHelperModifyUnits {
                     min = Math.min(totalUnits, (hits + 1) / 2);
                 }
                 String stuffNotToSustain = activeGame
-                    .getFactionsThatReactedToThis("stuffNotToSustainFor" + player.getFaction());
+                    .getStoredValue("stuffNotToSustainFor" + player.getFaction());
 
                 if (stuffNotToSustain.isEmpty()) {
-                    activeGame.setCurrentReacts("stuffNotToSustainFor" + player.getFaction(), "warsun");
+                    activeGame.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
                     stuffNotToSustain = "warsun";
                 }
                 if (unitModel.getSustainDamage() && min > 0 && (!stuffNotToSustain.contains(unitName.toLowerCase())
@@ -563,10 +563,10 @@ public class ButtonHelperModifyUnits {
                     min = Math.min(totalUnits, (hits + 1) / 2);
                 }
                 String stuffNotToSustain = activeGame
-                    .getFactionsThatReactedToThis("stuffNotToSustainFor" + player.getFaction());
+                    .getStoredValue("stuffNotToSustainFor" + player.getFaction());
 
                 if (stuffNotToSustain.isEmpty()) {
-                    activeGame.setCurrentReacts("stuffNotToSustainFor" + player.getFaction(), "warsun");
+                    activeGame.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
                     stuffNotToSustain = "warsun";
                 }
                 if (unitModel.getSustainDamage() && min > 0 && !(!stuffNotToSustain.contains(unitName.toLowerCase())
@@ -1032,12 +1032,27 @@ public class ButtonHelperModifyUnits {
                 String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                 if (!activeGame.isFoWMode()) {
                     StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player, player2,
-                        threadName, tile, event, "ground");
+                        threadName, tile, event, "ground", unitHolder.getName());
+                    if ((unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) < 1
+                        || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
+                        && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) < 1
+                        && unitHolder.getUnitCount(UnitType.Infantry, player2.getColor()) < 1
+                        && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
+                            || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
+                        String msg2 = player2.getRepresentation()
+                            + " you may want to remove structures if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(
+                            Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
+                                "Remove Structures"));
+                        buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                    }
                 } else {
                     StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2,
-                        threadName, tile, event, "ground");
+                        threadName, tile, event, "ground", unitHolder.getName());
                     StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player,
-                        threadName, tile, event, "ground");
+                        threadName, tile, event, "ground", unitHolder.getName());
                     for (Player player3 : activeGame.getRealPlayers()) {
                         if (player3 == player2 || player3 == player) {
                             continue;
@@ -1046,7 +1061,7 @@ public class ButtonHelperModifyUnits {
                             continue;
                         }
                         StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3, player3,
-                            threadName, tile, event, "ground");
+                            threadName, tile, event, "ground", unitHolder.getName());
                     }
                 }
                 if (player2.ownsUnit("keleres_mech")
@@ -1625,7 +1640,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "gledge", event);
-        if (player.hasAbility("necrophage")) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
@@ -1874,7 +1889,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "rohdhna", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "celdauri", event);
-        if (player.hasAbility("necrophage")) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
@@ -2156,7 +2171,7 @@ public class ButtonHelperModifyUnits {
         rest = rest.replace(pos + "_", "");
         Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         Player mentakHero = activeGame
-            .getPlayerFromColorOrFaction(activeGame.getFactionsThatReactedToThis("mentakHero"));
+            .getPlayerFromColorOrFaction(activeGame.getStoredValue("mentakHero"));
         if (rest.contains("All")) {
             String cID = Mapper.getColorID(player.getColor());
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {

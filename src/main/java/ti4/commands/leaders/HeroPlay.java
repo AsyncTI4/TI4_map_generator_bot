@@ -55,7 +55,7 @@ public class HeroPlay extends LeaderAction {
         player = Helper.getGamePlayer(activeGame, player, event, null);
 
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         action(event, "hero", activeGame, player);
@@ -75,18 +75,18 @@ public class HeroPlay extends LeaderAction {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
 
         if (playerLeader == null) {
-            sendMessage("Leader '" + leaderID + "'' could not be found. The leader might have been purged earlier.");
+            MessageHelper.sendMessageToEventChannel(event, "Leader '" + leaderID + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
 
         if (playerLeader.isLocked()) {
-            sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
-            sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
+            MessageHelper.sendMessageToEventChannel(event, "Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
+            MessageHelper.sendMessageToEventChannel(event, Helper.getLeaderLockedRepresentation(playerLeader));
             return;
         }
 
         if (!playerLeader.getType().equals(Constants.HERO)) {
-            sendMessage("Leader is not a hero");
+            MessageHelper.sendMessageToEventChannel(event, "Leader is not a hero");
             return;
         }
 
@@ -184,8 +184,8 @@ public class HeroPlay extends LeaderAction {
             }
             case "kyrohero" -> {
                 int dieResult = player.getLowestSC();
-                activeGame.setCurrentReacts("kyroHeroSC", dieResult + "");
-                activeGame.setCurrentReacts("kyroHeroPlayer", player.getFaction());
+                activeGame.setStoredValue("kyroHeroSC", dieResult + "");
+                activeGame.setStoredValue("kyroHeroPlayer", player.getFaction());
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Marked the Blex Hero Target as SC #"
                         + dieResult + " and the faction that played the hero as " + player.getFaction());
                 ListTurnOrder.turnOrder(event, activeGame);
@@ -323,13 +323,13 @@ public class HeroPlay extends LeaderAction {
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                         + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
-                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" -> {
                 if (!activeGame.getNaaluAgent()) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
                     AddCC.addCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()));
-                    activeGame.setCurrentReacts("vaylerianHeroActive", "true");
+                    activeGame.setStoredValue("vaylerianHeroActive", "true");
                 }
                 for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(activeGame)) {
                     List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event,
@@ -346,7 +346,7 @@ public class HeroPlay extends LeaderAction {
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                         + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
-                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "freesystemshero" -> {
                 ButtonHelperHeroes.offerFreeSystemsButtons(player, activeGame, event);

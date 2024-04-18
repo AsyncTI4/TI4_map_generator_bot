@@ -15,6 +15,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 
 public class UseExplore extends ExploreSubcommandData {
 
@@ -50,7 +51,7 @@ public class UseExplore extends ExploreSubcommandData {
                     }
                 }
                 if (tile == null) {
-                    sendMessage("System not found that contains planet");
+                    MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
                     return;
                 }
             }
@@ -59,7 +60,7 @@ public class UseExplore extends ExploreSubcommandData {
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
             resolveExplore(event, id, tile, planetName, messageText, player, activeGame);
         } else {
-            sendMessage("Invalid card ID");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid card ID");
         }
     }
 

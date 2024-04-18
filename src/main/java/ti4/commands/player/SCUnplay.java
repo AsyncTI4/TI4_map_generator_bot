@@ -12,6 +12,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class SCUnplay extends PlayerSubcommandData {
     public SCUnplay() {
@@ -28,18 +29,18 @@ public class SCUnplay extends PlayerSubcommandData {
         player = Helper.getPlayer(activeGame, player, event);
 
         if (player == null) {
-            sendMessage("You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
             return;
         }
 
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            sendMessage("No SC has been selected");
+            MessageHelper.sendMessageToEventChannel(event, "No SC has been selected");
             return;
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { //Only one SC selected
-            sendMessage("Player has more than one SC. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(event, "Player has more than one SC. Please try again, using the `strategy_card` option.");
             return;
         }
 
@@ -56,7 +57,7 @@ public class SCUnplay extends PlayerSubcommandData {
             player_.addFollowedSC(scToUnplay);
         }
 
-        sendMessage("SC has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
+        MessageHelper.sendMessageToEventChannel(event, "SC has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
     }
 
 }

@@ -2,6 +2,8 @@ package ti4.generator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.Storage;
@@ -81,6 +83,7 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
+                    .filter(file -> file.exists())
                     .filter(file -> !file.isDirectory())
                     .toList());
         }
@@ -91,10 +94,35 @@ public class TileHelper {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
+
+                if (isDraftTile(tile)) {
+                    duplicateDraftTiles(tile);
+                }
             } catch (Exception e) {
-                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                //BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
+    }
+
+    private static void duplicateDraftTiles(TileModel tile) {
+        String color = tile.getAlias().replaceAll("blank","");
+        String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
+
+        for (int i = 0; i < 13; i++) {
+            TileModel newTile = new TileModel();
+            newTile.setId(color + i);
+            newTile.setName(namePre + i);
+            newTile.setAliases(new ArrayList<>(List.of(color + i)));
+            newTile.setImagePath(tile.getImagePath());
+            newTile.setWormholes(Collections.emptySet());
+            newTile.setPlanets(Collections.emptyList());
+            allTiles.put(newTile.getId(), newTile);
+        }
+    }
+
+    public static boolean isDraftTile(TileModel tile) {
+        if (tile.getImagePath().startsWith("draft_")) return true;
+        return false;
     }
 
     public static void addNewTileToList(TileModel tile) {

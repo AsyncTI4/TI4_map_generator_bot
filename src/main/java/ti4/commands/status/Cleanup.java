@@ -73,10 +73,10 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
             
-            if (player.isRealPlayer() && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
-            && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
-                if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
-                    activeGame.setCurrentReacts("Pre Pass " + player.getFaction(), "");
+            if (player.isRealPlayer() && activeGame.getStoredValue("Pre Pass " + player.getFaction()) != null
+            && activeGame.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+                if (activeGame.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
+                    activeGame.setStoredValue("Pre Pass " + player.getFaction(), "");
                 }
             }
             List<Leader> leads = new ArrayList<>(player.getLeaders());
@@ -90,15 +90,15 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
-        activeGame.setCurrentReacts("absolMOW", "");
-        activeGame.setCurrentReacts("agendaCount", "0");
-        activeGame.setCurrentReacts("politicalStabilityFaction", "");
-        activeGame.setCurrentReacts("forcedScoringOrder", "");
-        activeGame.setCurrentReacts("Public Disgrace", "");
-        activeGame.setCurrentReacts("Public Disgrace Only", "");
-        activeGame.setCurrentReacts("edynAgentPreset", "");
-        activeGame.setCurrentReacts("Coup", "");
-        activeGame.setCurrentReacts("PublicExecution", "");
+        activeGame.setStoredValue("absolMOW", "");
+        activeGame.setStoredValue("agendaCount", "0");
+        activeGame.setStoredValue("politicalStabilityFaction", "");
+        activeGame.setStoredValue("forcedScoringOrder", "");
+        activeGame.setStoredValue("Public Disgrace", "");
+        activeGame.setStoredValue("Public Disgrace Only", "");
+        activeGame.setStoredValue("edynAgentPreset", "");
+        activeGame.setStoredValue("Coup", "");
+        activeGame.setStoredValue("PublicExecution", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
             new SpinTilesInFirstThreeRings().spinRings(activeGame);

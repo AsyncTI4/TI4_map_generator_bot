@@ -24,6 +24,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.TechnologyModel;
 
 public class ButtonHelperCommanders {
 
@@ -43,17 +44,17 @@ public class ButtonHelperCommanders {
             msg2 = "tg (" + oldThing + "->" + newThing + ")";
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "You cant afford Cheiran Commander cost right now. Get more money ya broke crab");
+                "You cant afford Cheiran Commander cost right now. Get more money ya broke crab");
             return;
         }
         String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " used Cheiran Commander to spend 1 " + msg2
-                + " to cancel 1 hit. They can do this once per round of combat";
+            + " to cancel 1 hit. They can do this once per round of combat";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     public static void kortaliCommanderBlock(Player player, Game activeGame, ButtonInteractionEvent event) {
         String msg = ButtonHelper.getIdentOrColor(player, activeGame)
-                + " used Kortali Commander to cancel 1 hit in the first round of combat.";
+            + " used Kortali Commander to cancel 1 hit in the first round of combat.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -66,16 +67,16 @@ public class ButtonHelperCommanders {
                 continue;
             }
             buttons.add(Button.success("olradinCommanderStep2_" + planet,
-                    Helper.getPlanetRepresentation(planet, activeGame)));
+                Helper.getPlanetRepresentation(planet, activeGame)));
         }
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String msg = player.getRepresentation(true, true)
-                + " you can exhaust 1 planet to gain tgs equal to its influence or resources";
+            + " you can exhaust 1 planet to gain tgs equal to its influence or resources";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
     public static void olradinCommanderStep2(Player player, Game activeGame, ButtonInteractionEvent event,
-            String buttonID) {
+        String buttonID) {
         String planet = buttonID.split("_")[1];
         int oldTg = player.getTg();
         int count = 0;
@@ -86,24 +87,48 @@ public class ButtonHelperCommanders {
         ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
         String msg = player.getRepresentation(true, true) + " used Olradin Commander to exhaust "
-                + Helper.getPlanetRepresentation(planet, activeGame) + " and gain " + count + " tgs (" + oldTg + "->"
-                + player.getTg() + ")";
+            + Helper.getPlanetRepresentation(planet, activeGame) + " and gain " + count + " tgs (" + oldTg + "->"
+            + player.getTg() + ")";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         event.getMessage().delete().queue();
     }
 
     public static void cymiaeCommanderRes(Player player, Game activeGame, ButtonInteractionEvent event,
-            String buttonID) {
+        String buttonID) {
         String planet = buttonID.split("_")[1];
         String msg = ButtonHelper.getIdent(player) + " will discard 1 AC to move or place a mech on "
-                + Helper.getPlanetRepresentation(planet, activeGame);
+            + Helper.getPlanetRepresentation(planet, activeGame);
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "mech " + planet,
-                activeGame);
+            activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+            player.getRepresentation(true, true) + " use buttons to discard",
+            ACInfo.getDiscardActionCardButtons(activeGame, player, false));
         event.getMessage().delete().queue();
+    }
+
+    public static void yinCommanderSummary(Player player, Game activeGame) {
+        if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
+            return;
+        }
+        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs:\n";
+        List<String> techsSummed = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            for (String tech : p2.getTechs()) {
+                if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
+                    TechnologyModel model = Mapper.getTech(tech);
+                    if (model.getFaction().isPresent() || !model.getFaction().isEmpty() || !model.getRequirements().isPresent() || model.getRequirements().isEmpty()) {
+                        continue;
+                    }
+                    techsSummed.add(tech);
+                    summary = summary + model.getRepresentation(false) + "\n";
+                }
+            }
+        }
+        if (techsSummed.size() > 0) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary);
+        }
+
     }
 
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
@@ -112,21 +137,21 @@ public class ButtonHelperCommanders {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     buttons
-                            .add(
-                                    Button.success(
-                                            "yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(),
-                                            "Remove Inf from "
-                                                    + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
+                        .add(
+                            Button.success(
+                                "yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(),
+                                "Remove Inf from "
+                                    + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
                 }
             }
         }
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                player.getRepresentation(true, true) + " use buttons to remove an infantry", buttons);
+            player.getRepresentation(true, true) + " use buttons to remove an infantry", buttons);
     }
 
     public static void resolveYinCommanderRemoval(Player player, Game activeGame, String buttonID,
-            ButtonInteractionEvent event) {
+        ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHName = buttonID.split("_")[2];
         Tile tile = activeGame.getTileByPosition(pos);
@@ -135,8 +160,8 @@ public class ButtonHelperCommanders {
             unitHName = "";
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getIdent(player) + " removed 1 infantry from "
-                        + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame) + " using Yin Commander");
+            ButtonHelper.getIdent(player) + " removed 1 infantry from "
+                + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame) + " using Yin Commander");
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, activeGame);
         event.getMessage().delete().queue();
     }
@@ -155,7 +180,7 @@ public class ButtonHelperCommanders {
     }
 
     public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game activeGame,
-            Player player, String ident) {
+        Player player, String ident) {
         int cTG = player.getTg();
         int fTG = cTG + 1;
         player.setTg(fTG);
@@ -169,41 +194,50 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveLetnevCommanderCheck(Player player, Game activeGame,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
-            int old = player.getTg();
-            int newTg = player.getTg() + 1;
-            player.setTg(player.getTg() + 1);
-            String mMessage = player.getRepresentation(true, true)
+            if (!ButtonHelperAbilities.canBePillaged(player, activeGame, player.getTg() + 1) || activeGame.isFoWMode()) {
+                int old = player.getTg();
+                int newTg = player.getTg() + 1;
+                player.setTg(player.getTg() + 1);
+                String mMessage = player.getRepresentation(true, true)
                     + " Since you have Barony commander unlocked, 1tg has been added automatically (" + old
                     + "->" + newTg + ")";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-            ButtonHelperAbilities.pillageCheck(player, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                ButtonHelperAbilities.pillageCheck(player, activeGame);
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+            } else {
+                String mMessage = player.getRepresentation(true, true)
+                    + " Since you have Barony commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
+            }
         }
     }
 
     public static void resolveGhostCommanderPlacement(Player player, Game activeGame, String buttonID,
-            ButtonInteractionEvent event) {
+        ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getIdent(player) + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using Ghost Commander");
+            ButtonHelper.getIdent(player) + " placed 1 fighter in " + tile.getRepresentation()
+                + " using Ghost Commander");
     }
 
     public static void resolveKhraskCommanderPlacement(Player player, Game activeGame, String buttonID,
-            ButtonInteractionEvent event) {
+        ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "inf", activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getIdent(player) + " placed 1 infantry in " + tile.getRepresentation()
-                        + " using Khrask Commander");
+            ButtonHelper.getIdent(player) + " placed 1 infantry in " + tile.getRepresentation()
+                + " using Khrask Commander");
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
-                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
     public static List<Button> resolveFlorzenCommander(Player player, Game activeGame) {
@@ -211,7 +245,7 @@ public class ButtonHelperCommanders {
         for (String planet : player.getExhaustedPlanets()) {
             Planet planetReal = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
             if (planetReal != null && planetReal.getOriginalPlanetType() != null
-                    && player.getPlanetsAllianceMode().contains(planet)) {
+                && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -221,26 +255,55 @@ public class ButtonHelperCommanders {
 
     public static void resolveMuaatCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
-            int old = player.getTg();
-            int newTg = player.getTg() + 1;
-            player.setTg(player.getTg() + 1);
-            String mMessage = player.getRepresentation(true, true)
+            if (!ButtonHelperAbilities.canBePillaged(player, activeGame, player.getTg() + 1) || activeGame.isFoWMode()) {
+                int old = player.getTg();
+                int newTg = player.getTg() + 1;
+                player.setTg(player.getTg() + 1);
+                String mMessage = player.getRepresentation(true, true)
                     + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
                     + "->" + newTg + ")";
-            if (activeGame.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
+                if (activeGame.isFoWMode()) {
+                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                }
+                ButtonHelperAbilities.pillageCheck(player, activeGame);
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+                String mMessage = player.getRepresentation(true, true)
+                    + " Since you have Muaat commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
-            ButtonHelperAbilities.pillageCheck(player, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+        }
+        if (player.hasUnit("kolume_mech")) {
+            for (Tile tile : activeGame.getTileMap().values()) {
+                for (UnitHolder uH : tile.getUnitHolders().values()) {
+                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                    }
+                }
+            }
+        }
+        if (player.hasUnit("kolume_mech")) {
+            for (Tile tile : activeGame.getTileMap().values()) {
+                for (UnitHolder uH : tile.getUnitHolders().values()) {
+                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                    }
+                }
+            }
         }
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game activeGame) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))
-                    || !player.hasAbility("technological_singularity")) {
+                || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
                     buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
@@ -249,9 +312,9 @@ public class ButtonHelperCommanders {
                 }
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true)
-                                + " You gained tech while having Nekro commander, use buttons to resolve. ",
-                        buttons);
+                    player.getRepresentation(true, true)
+                        + " You gained tech while having Nekro commander, use buttons to resolve. ",
+                    buttons);
             } else {
                 if (player.hasAbility("technological_singularity")) {
                     int count = 0;
@@ -266,8 +329,8 @@ public class ButtonHelperCommanders {
                     }
                     if (count > 2) {
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                                "# " + player.getRepresentation(true, true)
-                                        + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
+                            "# " + player.getRepresentation(true, true)
+                                + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
                     }
                 }
             }
@@ -275,17 +338,17 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveSolCommander(Player player, Game activeGame, String buttonID,
-            ButtonInteractionEvent event) {
+        ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         Tile tile = activeGame.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                ButtonHelper.getIdent(player) + " placed 1 infantry on "
-                        + Helper.getPlanetRepresentation(planet, activeGame) + " using Sol Commander");
+            ButtonHelper.getIdent(player) + " placed 1 infantry on "
+                + Helper.getPlanetRepresentation(planet, activeGame) + " using Sol Commander");
     }
 
     public static void yssarilCommander(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
-            String ident) {
+        String ident) {
         buttonID = buttonID.replace("yssarilcommander_", "");
         String enemyFaction = buttonID.split("_")[1];
         Player enemy = activeGame.getPlayerFromColorOrFaction(enemyFaction);
@@ -319,13 +382,13 @@ public class ButtonHelperCommanders {
         }
         ButtonHelper.commanderUnlockCheck(player, activeGame, "keleres", event);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getIdentOrColor(player, activeGame) + " paid 1tg to unlock commander " + "(" + oldTg + "->"
-                        + player.getTg() + ")");
+            ButtonHelper.getIdentOrColor(player, activeGame) + " paid 1tg to unlock commander " + "(" + oldTg + "->"
+                + player.getTg() + ")");
         event.getMessage().delete().queue();
     }
 
     public static void resolveSardakkCommander(Game activeGame, Player p1, String buttonID,
-            ButtonInteractionEvent event, String ident) {
+        ButtonInteractionEvent event, String ident) {
         String mechorInf = buttonID.split("_")[1];
         String planet1 = buttonID.split("_")[2];
         String planet2 = buttonID.split("_")[3];
@@ -333,13 +396,13 @@ public class ButtonHelperCommanders {
         String planetRepresentation = Helper.getPlanetRepresentation(planet1, activeGame);
 
         String message = ident + " moved 1 " + mechorInf + " from " + planetRepresentation2 + " to "
-                + planetRepresentation + " using Sardakk Commander";
+            + planetRepresentation + " using Sardakk Commander";
         new RemoveUnits().unitParsing(event, p1.getColor(),
-                activeGame.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2,
-                activeGame);
+            activeGame.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2,
+            activeGame);
         new AddUnits().unitParsing(event, p1.getColor(),
-                activeGame.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1,
-                activeGame);
+            activeGame.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1,
+            activeGame);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), message);
         String exhaustedMessage = event.getMessage().getContentRaw();
@@ -365,7 +428,7 @@ public class ButtonHelperCommanders {
     }
 
     public static List<Button> getSardakkCommanderButtons(Game activeGame, Player player,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
 
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
@@ -380,7 +443,7 @@ public class ButtonHelperCommanders {
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false, true)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
                 if (AddCC.hasCC(event, player.getColor(), tile2) && !activeGame.getDominusOrbStatus()
-                        && tile2 != tile) {
+                    && tile2 != tile) {
                     continue;
                 }
                 for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {
@@ -399,16 +462,16 @@ public class ButtonHelperCommanders {
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planetId2, activeGame);
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         buttons.add(Button
-                                .success("sardakkcommander_infantry_" + planetId + "_" + planetId2,
-                                        "Commit 1 infantry from " + planetRepresentation2 + " to "
-                                                + planetRepresentation)
-                                .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+                            .success("sardakkcommander_infantry_" + planetId + "_" + planetId2,
+                                "Commit 1 infantry from " + planetRepresentation2 + " to "
+                                    + planetRepresentation)
+                            .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
                     }
                     if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
                         buttons.add(Button
-                                .primary("sardakkcommander_mech_" + planetId + "_" + planetId2,
-                                        "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation)
-                                .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+                            .primary("sardakkcommander_mech_" + planetId + "_" + planetId2,
+                                "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation)
+                            .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
                     }
                 }
             }

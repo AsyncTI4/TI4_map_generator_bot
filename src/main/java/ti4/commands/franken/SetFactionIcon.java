@@ -8,12 +8,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-
-import java.lang.reflect.Field;
+import ti4.message.MessageHelper;
 
 public class SetFactionIcon extends FrankenSubcommandData {
 
@@ -28,12 +26,12 @@ public class SetFactionIcon extends FrankenSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         if (!activeGame.isFrankenGame()) {
-            sendMessage("This can only be run in Franken games.");
+            MessageHelper.sendMessageToEventChannel(event, "This can only be run in Franken games.");
             player.setFactionEmoji(null);
             return;
         }
@@ -42,12 +40,12 @@ public class SetFactionIcon extends FrankenSubcommandData {
 
         Emoji factionEmoji = Emoji.fromFormatted(factionEmojiString);
         if (!(factionEmoji instanceof CustomEmoji)) {
-            sendMessage(factionEmojiString + " is not a custom emoji. Resetting to default.");
+            MessageHelper.sendMessageToEventChannel(event, factionEmojiString + " is not a custom emoji. Resetting to default.");
             player.setFactionEmoji(null);
             return;
         }
         if (AsyncTI4DiscordBot.jda.getEmojiById(((CustomEmoji) factionEmoji).getId()) == null) {
-            sendMessage("The bot cannot load " + factionEmojiString + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
+            MessageHelper.sendMessageToEventChannel(event, "The bot cannot load " + factionEmojiString + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
             player.setFactionEmoji(null);
             return;
         }

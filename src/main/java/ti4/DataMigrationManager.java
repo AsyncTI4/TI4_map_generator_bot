@@ -502,27 +502,26 @@ public class DataMigrationManager {
 
     private static Boolean migrateRenameVeldyrAttachments_270923(Game game) {
         boolean mapNeededMigrating = false;
-        for (Entry<String, UnitHolder> entry : game.getPlanetsInfo().entrySet()) {
-            if (entry.getValue() instanceof Planet p) {
-                Set<String> tokens = new HashSet<>(p.getTokenList());
-                for (String token : tokens) {
-                    if ("attachment_veldyr1.png".equals(token)) {
-                        p.removeToken(token);
-                        p.addToken("attachment_veldyrtaxhaven.png");
-                        mapNeededMigrating = true;
-                    } else if ("attachment_veldyr2.png".equals(token)) {
-                        p.removeToken(token);
-                        p.addToken("attachment_veldyrbroadcasthub.png");
-                        mapNeededMigrating = true;
-                    } else if ("attachment_veldyr3.png".equals(token)) {
-                        p.removeToken(token);
-                        p.addToken("attachment_veldyrreservebank.png");
-                        mapNeededMigrating = true;
-                    } else if ("attachment_veldyr4.png".equals(token)) {
-                        p.removeToken(token);
-                        p.addToken("attachment_veldyrorbitalshipyard.png");
-                        mapNeededMigrating = true;
-                    }
+        for (Entry<String, Planet> entry : game.getPlanetsInfo().entrySet()) {
+            Planet p = entry.getValue();
+            Set<String> tokens = new HashSet<>(p.getTokenList());
+            for (String token : tokens) {
+                if ("attachment_veldyr1.png".equals(token)) {
+                    p.removeToken(token);
+                    p.addToken("attachment_veldyrtaxhaven.png");
+                    mapNeededMigrating = true;
+                } else if ("attachment_veldyr2.png".equals(token)) {
+                    p.removeToken(token);
+                    p.addToken("attachment_veldyrbroadcasthub.png");
+                    mapNeededMigrating = true;
+                } else if ("attachment_veldyr3.png".equals(token)) {
+                    p.removeToken(token);
+                    p.addToken("attachment_veldyrreservebank.png");
+                    mapNeededMigrating = true;
+                } else if ("attachment_veldyr4.png".equals(token)) {
+                    p.removeToken(token);
+                    p.addToken("attachment_veldyrorbitalshipyard.png");
+                    mapNeededMigrating = true;
                 }
             }
         }

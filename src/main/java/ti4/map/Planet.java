@@ -42,11 +42,20 @@ public class Planet extends UnitHolder {
         super(name, holderCenterPosition);
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
-            originalPlanetType = planetInfo.getPlanetType().toString();
+            if (planetInfo.getPlanetTypes() != null) {
+                planetType.addAll(planetInfo.getPlanetTypes().stream().map(x -> x.toString()).toList());
+            }
+            if (planetInfo.getPlanetType() == null && planetInfo.getPlanetTypes() != null && planetInfo.getPlanetTypes().size() > 0) {
+                originalPlanetType = planetInfo.getPlanetTypes().get(0).toString();
+            } else if (planetInfo.getPlanetType() != null) {
+                originalPlanetType = planetInfo.getPlanetType().toString();
+            }
+
             contrastColor = planetInfo.getContrastColor().orElse("");
-            if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
-                originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); // TODO: Make this support
-                                                                                            // multiple specialties
+            if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0) {
+                originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString();
+                techSpeciality.addAll(planetInfo.getTechSpecialties().stream().map(x -> x.toString()).toList());
+            }
             if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
                 hasAbility = true;
         }
@@ -72,16 +81,16 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(
-                token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
+            token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
     }
 
     @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-                .map(UnitKey::asyncID)
-                .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
-                .filter(Objects::nonNull)
-                .anyMatch(UnitModel::getIsGroundForce);
+            .map(UnitKey::asyncID)
+            .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+            .filter(Objects::nonNull)
+            .anyMatch(UnitModel::getIsGroundForce);
     }
 
     @Override
@@ -206,8 +215,11 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public Set<String> getPlanetTypes() {
         Set<String> types = new HashSet<String>();
-        types.add(originalPlanetType);
-        types.addAll(planetType);
+        List<String> three = List.of("hazardous", "cultural", "industrial");
+        for (String type : planetType) {
+            if (three.contains(type)) types.add(type);
+        }
+        if (three.contains(originalPlanetType)) types.add(originalPlanetType);
         return types;
     }
 

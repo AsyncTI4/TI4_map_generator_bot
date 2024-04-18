@@ -81,6 +81,7 @@ public class TechCommand implements Command {
         subcommands.add(new TechRefresh());
         subcommands.add(new TechInfo());
         subcommands.add(new TechButton());
+        subcommands.add(new TechChangeType());
 
         return subcommands;
     }
@@ -88,8 +89,8 @@ public class TechCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
-    
+
 }

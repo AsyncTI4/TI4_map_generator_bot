@@ -33,7 +33,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
@@ -41,7 +41,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         drawBlueBackTiles(event, activeGame, player, count, includeAllTiles);
     }
 
-    public void drawBlueBackTiles(GenericInteractionCreateEvent event, Game activeGame, Player player, int count, boolean includeAllTiles) {
+    public static void drawBlueBackTiles(GenericInteractionCreateEvent event, Game activeGame, Player player, int count, boolean includeAllTiles) {
         List<String> tilesToPullFrom = new ArrayList<>(List.of(
             //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
             //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx

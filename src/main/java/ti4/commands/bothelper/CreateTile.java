@@ -10,6 +10,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.*;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class CreateTile extends BothelperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        sendMessage("Creating tile " + event.getOption(Constants.TILE_NAME).getAsString());
+        MessageHelper.sendMessageToEventChannel(event, "Creating tile " + event.getOption(Constants.TILE_NAME).getAsString());
         String tileID = event.getOption(Constants.TILE_ID).getAsString().toLowerCase();
         TileModel tile = null;
         try {
@@ -60,27 +61,27 @@ public class CreateTile extends BothelperSubcommandData {
                     event.getOption(Constants.SOURCE, null, OptionMapping::getAsString)
             );
         } catch (Exception e) {
-            sendMessage("Something went wrong creating the tile: " + tileID);
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the tile: " + tileID);
             BotLogger.log("Something went wrong creating the tile: " + tileID, e);                    
         }
         if (Optional.ofNullable(tile).isPresent()) {
             try {
                 exportTileModelToJson(tile);
             } catch (Exception e) {
-                sendMessage("Something went wrong creating the tile: " + tileID);
+                MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the tile: " + tileID);
                 BotLogger.log("Something went wrong exporting the tile to json: " + tileID, e);                        
             }
             try {
                 TileHelper.addNewTileToList(tile);
                 AliasHandler.addNewTileAliases(tile);
             } catch (Exception e) {
-                sendMessage("Something went wrong creating the tile: " + tileID);
+                MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the tile: " + tileID);
                 BotLogger.log("Something went wrong adding the tile to the active tiles list: " + tileID, e);
             }
         }
         String message = "Created new tile! Please check and make sure everything generated properly. This is the model:\n" +
                 "```json\n" + TileHelper.getAllTiles().get(event.getOption(Constants.TILE_ID).getAsString()) + "\n```";
-        sendMessage(message);
+        MessageHelper.sendMessageToEventChannel(event, message);
     }
 
     private static TileModel createNewTile(String id,
@@ -104,7 +105,6 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setImagePath(image);
         tile.setPlanets(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
-        tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
         if(!"".equals(wormholes))
             tile.setWormholes(getWormholesFromString(wormholes));
         tile.setIsAsteroidField(isAsteroidField);

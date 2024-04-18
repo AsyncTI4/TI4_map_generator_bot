@@ -30,12 +30,12 @@ public class SendCommodities extends PlayerSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeGame, player, event);
         if (player_ == null) {
-            sendMessage("Player to send TG/Commodities could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to send TG/Commodities could not be found");
             return;
         }
         if (player.hasAbility("military_industrial_complex")) {
@@ -67,14 +67,14 @@ public class SendCommodities extends PlayerSubcommandData {
         String p2 = player_.getRepresentation();
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
         String message = p1 + " sent " + commString + " to " + p2;
-        sendMessage(message);
+        MessageHelper.sendMessageToEventChannel(event, message);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities);
         ButtonHelperAbilities.pillageCheck(player_, activeGame);
         ButtonHelperAbilities.pillageCheck(player, activeGame);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             ClearDebt.clearDebt(player_, player, sendCommodities);
-            sendMessage(player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
+            MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
         }
 
         if (activeGame.isFoWMode()) {

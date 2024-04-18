@@ -389,7 +389,7 @@ public class Emojis {
     public static final String Rahg = "<:Rahg:1159513660822130728>";
     public static final String Rarron = "<:Rarron:1159513662923477062>";
     public static final String Resculon = "<:Resculon:1159513664899006615>";
-    public static final String Retillon = "<:Retillon:1159513666232787045>";
+    public static final String Retillion = "<:Retillon:1159513666232787045>";
     public static final String RigelI = "<:RigelI:1159513668589981736>";
     public static final String RigelII = "<:RigelII:1159513693374124112>";
     public static final String RigelIII = "<:RigelIII:1159513695081222204>";
@@ -707,6 +707,7 @@ public class Emojis {
     public static final String Summer = "<:Summer:1070283656037412884>";
     public static final String Charlie = "<:Charlie:1096774713352650812>";
     public static final String Scout = "<:scout_face_2:1071965098639360081>";
+    public static final String scoutSpinner = "<a:spinner:1090392441477136434>";
 
     // LIST OF GOOD DOGS
     public static final List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie, Scout);
@@ -769,27 +770,50 @@ public class Emojis {
     public static final String d10red_7 = "<:d10red_7:1189667994977181796>";
     public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
-    
+
     // MILTY DRAFT
-    public static final String miltyA = "<:miltyA:1223132315476037773>";
-    public static final String miltyB = "<:miltyB:1223132318311387146>";
-    public static final String miltyC = "<:miltyC:1223132319947423787>";
-    public static final String miltyD = "<:miltyD:1223132322245640314>";
-    public static final String miltyE = "<:miltyE:1223132324175151174>";
-    public static final String miltyF = "<:miltyF:1223132325932699689>";
-    public static final String miltyG = "<:miltyG:1223132327744634982>";
-    public static final String miltyH = "<:miltyH:1223132330000912434>";
-    public static final String miltyI = "<:miltyI:1223132332547117086>";
+    public static final String sliceUnpicked = "<:sliceUnpicked:1225188657703682250>";
+    public static final String sliceA = "<:sliceA:1223132315476037773>";
+    public static final String sliceB = "<:sliceB:1223132318311387146>";
+    public static final String sliceC = "<:sliceC:1223132319947423787>";
+    public static final String sliceD = "<:sliceD:1223132322245640314>";
+    public static final String sliceE = "<:sliceE:1223132324175151174>";
+    public static final String sliceF = "<:sliceF:1223132325932699689>";
+    public static final String sliceG = "<:sliceG:1223132327744634982>";
+    public static final String sliceH = "<:sliceH:1223132330000912434>";
+    public static final String sliceI = "<:sliceI:1223132332547117086>";
+    public static final String sliceJ = "<:sliceJ:1227099602260463757>";
+    public static final String sliceK = "<:sliceK:1227099604244500604>";
+    public static final String sliceL = "<:sliceL:1227099605968097312>";
+    public static final String sliceM = "<:sliceM:1227099608774217788>";
+    public static final String sliceN = "<:sliceN:1227099610279837768>";
+    public static final String sliceO = "<:sliceO:1227099612645687368>";
+    public static final String sliceP = "<:sliceP:1227099614885314582>";
+    public static final String sliceQ = "<:sliceQ:1227099616823218306>";
+    public static final String sliceR = "<:sliceR:1227099618718908489>";
+    public static final String sliceS = "<:sliceS:1227099621453463573>";
+    public static final String sliceT = "<:sliceT:1227099623915524126>";
+    public static final String sliceU = "<:sliceU:1227099625610023004>";
+    public static final String sliceV = "<:sliceV:1227099631691763742>";
+    public static final String sliceW = "<:sliceW:1227099633789042709>";
+    public static final String sliceX = "<:sliceX:1227099636628721685>";
+    public static final String sliceY = "<:sliceY:1227099638616559686>";
+    public static final String sliceZ = "<:sliceZ:1227099640667701278>";
 
     // SPEAKER TOKENS
-    public static final String speakerPick1 = "<:pick1:1222754925105381416>";
-    public static final String speakerPick2 = "<:pick2:1222754926174666843>";
-    public static final String speakerPick3 = "<:pick3:1222754927294550076>";
-    public static final String speakerPick4 = "<:pick4:1222754928368422993>";
-    public static final String speakerPick5 = "<:pick5:1222754929219993601>";
-    public static final String speakerPick6 = "<:pick6:1222754930092146780>";
-    public static final String speakerPick7 = "<:pick7:1222754930922754099>";
-    public static final String speakerPick8 = "<:pick8:1222754932503875604>";
+    public static final String positionUnpicked = "<:positionUnpicked:1227093640313180160>";
+    public static final String speakerPick1 = "<:position1:1222754925105381416>";
+    public static final String speakerPick2 = "<:position2:1222754926174666843>";
+    public static final String speakerPick3 = "<:position3:1222754927294550076>";
+    public static final String speakerPick4 = "<:position4:1222754928368422993>";
+    public static final String speakerPick5 = "<:position5:1222754929219993601>";
+    public static final String speakerPick6 = "<:position6:1222754930092146780>";
+    public static final String speakerPick7 = "<:position7:1222754930922754099>";
+    public static final String speakerPick8 = "<:position8:1222754932503875604>";
+    public static final String speakerPick9 = "<:position9:1227093802963964025>";
+    public static final String speakerPick10 = "<:position10:1227093804595544106>";
+    public static final String speakerPick11 = "<:position11:1227093805963022398>";
+    public static final String speakerPick12 = "<:position12:1227093807372308550>";
 
     // OTHER
     public static final String WHalpha = "<:WHalpha:1159118794334146570>";
@@ -818,29 +842,23 @@ public class Emojis {
     // SOURCE ICONS
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
-    public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff
-                                                                       // https://discord.com/channels/743629929484386395/1023681580989939712
-    public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars
-                                                                              // https://discord.com/channels/743629929484386395/990061481238364160
-    public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2
-                                                                                   // mod
-                                                                                   // https://discord.com/channels/743629929484386395/1111799687184396338
-    public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff
-                                                                           // https://discord.com/channels/743629929484386395/1096820095470272582
+    public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
+    public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
+    public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
+    public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff https://discord.com/channels/743629929484386395/1096820095470272582
     public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff
-    public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus
-                                                                                   // https://discord.com/channels/743629929484386395/1027385712821149706
+    public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus https://discord.com/channels/743629929484386395/1027385712821149706
     public static final String ProjectPi = "<:ProjectPie:1128504084811481219>";
-    public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; // Symbol for Milty's mod
-                                                                             // https://discord.com/channels/743629929484386395/1087435266249207869
+    public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; // Symbol for Milty's mod https://discord.com/channels/743629929484386395/1087435266249207869
+    public static final String StrategicAlliance = "<:StrategicAlliance:1225473614946500680>"; // Symbol for Holytispoon's Strategic Alliance
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = Arrays.asList(
-            warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
-            CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
-            tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
-            PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
-            BortWindow);
+        warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
+        CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
+        tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, CyberneticTech,
+        PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
+        BortWindow);
 
     // private static List<String> testingEmoji =
     // Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
@@ -1019,13 +1037,13 @@ public class Emojis {
             case "loki" -> Loki;
             case "lor" -> Lor;
             case "maaluuk" -> Maaluuk;
-            case "mallice" -> Mallice;
+            case "mallice", "lockedmallice" -> Mallice;
             case "mr" -> Mecatol;
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
             case "mollprimus", "mollprimusk" -> MollPrimus;
-            case "mordai" -> Mordai;
+            case "mordaiii", "mordai" -> Mordai;
             case "muaat" -> PlanetMuaat;
             case "naazir" -> Naazir;
             case "nar" -> Nar;
@@ -1039,7 +1057,7 @@ public class Emojis {
             case "rahg" -> Rahg;
             case "rarron" -> Rarron;
             case "resculon" -> Resculon;
-            case "retillon" -> Retillon;
+            case "retillion", "retillon" -> Retillion;
             case "rigeli" -> RigelI;
             case "rigelii" -> RigelII;
             case "rigeliii" -> RigelIII;
@@ -1057,7 +1075,7 @@ public class Emojis {
             case "torkan" -> Torkan;
             case "trenlak" -> Trenlak;
             case "valk", "valkk" -> Valk;
-            case "vefut" -> Vefut;
+            case "vefutii", "vefut" -> Vefut;
             case "vegamajor" -> VegaMajor;
             case "vegaminor" -> VegaMinor;
             case "velnor" -> Velnor;
@@ -1373,30 +1391,64 @@ public class Emojis {
 
     public static String getMiltyDraftEmoji(int ord) {
         return switch (ord) {
-            case 1 -> miltyA;
-            case 2 -> miltyB;
-            case 3 -> miltyC;
-            case 4 -> miltyD;
-            case 5 -> miltyE;
-            case 6 -> miltyF;
-            case 7 -> miltyG;
-            case 8 -> miltyH;
-            case 9 -> miltyI;
+            case 1 -> sliceA;
+            case 2 -> sliceB;
+            case 3 -> sliceC;
+            case 4 -> sliceD;
+            case 5 -> sliceE;
+            case 6 -> sliceF;
+            case 7 -> sliceG;
+            case 8 -> sliceH;
+            case 9 -> sliceI;
+            case 10 -> sliceJ;
+            case 11 -> sliceK;
+            case 12 -> sliceL;
+            case 13 -> sliceM;
+            case 14 -> sliceN;
+            case 15 -> sliceO;
+            case 16 -> sliceP;
+            case 17 -> sliceQ;
+            case 18 -> sliceR;
+            case 19 -> sliceS;
+            case 20 -> sliceT;
+            case 21 -> sliceU;
+            case 22 -> sliceV;
+            case 23 -> sliceW;
+            case 24 -> sliceX;
+            case 25 -> sliceY;
+            case 26 -> sliceZ;
             default -> Integer.toString(ord);
         };
     }
 
     public static String getMiltyDraftEmoji(String ord) {
         return switch (ord.toLowerCase()) {
-            case "1", "a" -> miltyA;
-            case "2", "b" -> miltyB;
-            case "3", "c" -> miltyC;
-            case "4", "d" -> miltyD;
-            case "5", "e" -> miltyE;
-            case "6", "f" -> miltyF;
-            case "7", "g" -> miltyG;
-            case "8", "h" -> miltyH;
-            case "9", "i" -> miltyI;
+            case "1", "a" -> sliceA;
+            case "2", "b" -> sliceB;
+            case "3", "c" -> sliceC;
+            case "4", "d" -> sliceD;
+            case "5", "e" -> sliceE;
+            case "6", "f" -> sliceF;
+            case "7", "g" -> sliceG;
+            case "8", "h" -> sliceH;
+            case "9", "i" -> sliceI;
+            case "10", "j" -> sliceJ;
+            case "11", "k" -> sliceK;
+            case "12", "l" -> sliceL;
+            case "13", "m" -> sliceM;
+            case "14", "n" -> sliceN;
+            case "15", "o" -> sliceO;
+            case "16", "p" -> sliceP;
+            case "17", "q" -> sliceQ;
+            case "18", "r" -> sliceR;
+            case "19", "s" -> sliceS;
+            case "20", "t" -> sliceT;
+            case "21", "u" -> sliceU;
+            case "22", "v" -> sliceV;
+            case "23", "w" -> sliceW;
+            case "24", "x" -> sliceX;
+            case "25", "y" -> sliceY;
+            case "26", "z" -> sliceZ;
             default -> ord;
         };
     }
@@ -1411,6 +1463,10 @@ public class Emojis {
             case 6 -> speakerPick6;
             case 7 -> speakerPick7;
             case 8 -> speakerPick8;
+            case 9 -> speakerPick9;
+            case 10 -> speakerPick10;
+            case 11 -> speakerPick11;
+            case 12 -> speakerPick12;
             default -> getToesEmoji(ord);
         };
     }

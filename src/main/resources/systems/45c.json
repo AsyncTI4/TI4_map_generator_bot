@@ -2,10 +2,7 @@
     "id": "45c",
     "name": "Asteroids?",
     "aliases": [
-        "45",
-        "asteroids2",
-        "asteroidsfield2",
-        "af2"
+        "45c"
     ],
     "imagePath": "44_Asteroids_cu.png",
     "shipPositionsType": "TYPE08",
@@ -33,7 +30,7 @@
     ],
     "wormholes": [],
     "planets": [],
-    "isAsteroidField": true, 
-    "source": "base", 
+    "isAsteroidField": true,
+    "source": "other",
     "tileBack": "red"
 }

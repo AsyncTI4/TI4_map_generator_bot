@@ -348,7 +348,7 @@ public class ButtonHelperActionCards {
         String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
             + ". Use buttons to gain CCs";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-        activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         event.getMessage().delete().queue();
     }
 
@@ -742,7 +742,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveEBSStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
-        activeGame.setCurrentReacts("EBSFaction", player.getFaction());
+        activeGame.setStoredValue("EBSFaction", player.getFaction());
         ButtonHelper.resolveCombatRoll(player, activeGame, event,
             "combatRoll_" + activeGame.getActiveSystem() + "_space_spacecannonoffence");
         event.getMessage().delete().queue();
@@ -881,7 +881,7 @@ public class ButtonHelperActionCards {
 
     public static void resolvePSStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        activeGame.setCurrentReacts("politicalStabilityFaction", player.getFaction());
+        activeGame.setStoredValue("politicalStabilityFaction", player.getFaction());
         for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0)
                 continue; // some older games have a 0 in the list of SCs
@@ -1199,8 +1199,8 @@ public class ButtonHelperActionCards {
                 + ButtonHelper.getIdentOrColor(p2, activeGame));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             p2.getRepresentation(true, true) + " your representatives got sent to the headsman");
-        activeGame.setCurrentReacts("AssassinatedReps",
-            activeGame.getFactionsThatReactedToThis("AssassinatedReps") + p2.getFaction());
+        activeGame.setStoredValue("AssassinatedReps",
+            activeGame.getStoredValue("AssassinatedReps") + p2.getFaction());
     }
 
     public static void resolveSignalJammingStep2(Player player, Game activeGame, ButtonInteractionEvent event,
@@ -1391,7 +1391,7 @@ public class ButtonHelperActionCards {
             return;
         }
         if (player.getActionCards().containsKey("coup")) {
-            activeGame.setCurrentReacts("Coup", "");
+            activeGame.setStoredValue("Coup", "");
             String msg = player.getRepresentation()
                 + " you have the option to pre-assign which SC you will coup. Coup is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
             List<Button> scButtons = new ArrayList<>();
@@ -1775,7 +1775,7 @@ public class ButtonHelperActionCards {
             String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
                 + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-            activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         event.getMessage().delete().queue();
     }

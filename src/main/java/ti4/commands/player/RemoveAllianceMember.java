@@ -24,12 +24,12 @@ public class RemoveAllianceMember extends PlayerSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeGame, player, event);
         if (player_ == null) {
-            sendMessage("Player to remove from the alliance could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to remove from the alliance could not be found");
             return;
         }
         String currentMembers = player_.getAllianceMembers();
@@ -43,7 +43,7 @@ public class RemoveAllianceMember extends PlayerSubcommandData {
         player.getCardsInfoThread().removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player_.getUserID())).queue();
         player_.getCardsInfoThread().removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player.getUserID())).queue();
 
-        sendMessage("Removed " + player_.getFaction() + " as part of " + player.getFaction()
+        MessageHelper.sendMessageToEventChannel(event, "Removed " + player_.getFaction() + " as part of " + player.getFaction()
                 + "'s alliance. This worked both ways. You will have to /franken leader_remove to remove the commanders");
     }
 }

@@ -319,9 +319,9 @@ public class ButtonHelperTacticalAction {
             player = activeGame.getPlayer(activeGame.getActivePlayerID());
             activeGame.setNaaluAgent(false);
         }
-        activeGame.setCurrentReacts("tnelisCommanderTracker", "");
+        activeGame.setStoredValue("tnelisCommanderTracker", "");
         activeGame.setL1Hero(false);
-        activeGame.setCurrentReacts("vaylerianHeroActive", "");
+        activeGame.setStoredValue("vaylerianHeroActive", "");
         String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
         MessageChannel channel = event.getMessageChannel();
@@ -438,12 +438,12 @@ public class ButtonHelperTacticalAction {
                     String threadName = StartCombat.combatThreadName(activeGame, player, player2, tile);
                     if (!activeGame.isFoWMode()) {
                         StartCombat.findOrCreateCombatThread(activeGame, activeGame.getActionsChannel(), player,
-                            player2, threadName, tile, event, "space");
+                            player2, threadName, tile, event, "space", "space");
                     } else {
                         StartCombat.findOrCreateCombatThread(activeGame, player.getPrivateChannel(), player, player2,
-                            threadName, tile, event, "space");
+                            threadName, tile, event, "space", "space");
                         StartCombat.findOrCreateCombatThread(activeGame, player2.getPrivateChannel(), player2, player,
-                            threadName, tile, event, "space");
+                            threadName, tile, event, "space", "space");
                         for (Player player3 : activeGame.getRealPlayers()) {
                             if (player3 == player2 || player3 == player) {
                                 continue;
@@ -452,7 +452,7 @@ public class ButtonHelperTacticalAction {
                                 continue;
                             }
                             StartCombat.findOrCreateCombatThread(activeGame, player3.getPrivateChannel(), player3,
-                                player3, threadName, tile, event, "space");
+                                player3, threadName, tile, event, "space", "space");
                         }
                     }
                 } else {
@@ -522,9 +522,9 @@ public class ButtonHelperTacticalAction {
         }
         activeGame.setNaaluAgent(false);
         activeGame.setL1Hero(false);
-        activeGame.setCurrentReacts("vaylerianHeroActive", "");
-        activeGame.setCurrentReacts("tnelisCommanderTracker", "");
-        activeGame.setCurrentReacts("planetsTakenThisRound", "");
+        activeGame.setStoredValue("vaylerianHeroActive", "");
+        activeGame.setStoredValue("tnelisCommanderTracker", "");
+        activeGame.setStoredValue("planetsTakenThisRound", "");
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
 
@@ -643,7 +643,7 @@ public class ButtonHelperTacticalAction {
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
         }
-        List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
+
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(activeGame, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !activeGame.getL1Hero()) {
             String msg = player.getRepresentation(true, true) + " You can use buttons to resolve L1 Agent if you want";
@@ -658,6 +658,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
+        List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
             && !activeGame.getL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink",
@@ -666,16 +667,15 @@ public class ButtonHelperTacticalAction {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos),
                     event);
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "\n\nUse buttons to select the first system you want to move from", systemButtons);
         } else {
             if (player.hasAbility("awaken")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos),
                     event);
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to select the first system you want to move from", systemButtons);
+
         }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            "Use buttons to select the first system you want to move from", systemButtons);
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(activeGame, player);
             if (!buttons.isEmpty()) {

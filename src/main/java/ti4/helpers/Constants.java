@@ -2,9 +2,24 @@ package ti4.helpers;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import ti4.AsyncTI4DiscordBot;
+
 public class Constants {
+    // Staff Pings
+    public static final String chassitId = "183213554445320192";
+    public static final String tspId = "150809002974904321";
+    public static final String jazzId = "228999251328368640";
+
+    public static String jazzPing() {
+        return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
+    }
+
+    public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+
+    // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String PREFERS_DISTANCE = "prefers_distance";
@@ -334,11 +349,15 @@ public class Constants {
     public static final String FOW_FILTER_PINK = "Pink";
     public static final String FOW_FILTER_PURPLE = "Purple";
 
+    // milty draft stuff
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";
     public static final String FACTION_COUNT = "faction_count";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
+    public static final String INCLUDE_DS_TILES = "include_ds_tiles";
+    public static final String INCLUDE_DS_FACTIONS = "include_ds_factions";
+    public static final String USE_MAP_TEMPLATE = "use_map_template";
 
     // /custom command
     public static final String CUSTOM = "custom";
@@ -407,6 +426,7 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+    public static final String CHANGE_TYPE = "change_type";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
 
     public static final String FORCE_BAG_PASS = "franken_force_bag_pass";
@@ -471,6 +491,7 @@ public class Constants {
     public static final String PO_NO_SCORING = "po_no_scoring";
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String TECH_TYPE = "tech_type";
     public static final String FACTION_COLOR_1 = "faction_or_color_1";
     public static final String FACTION_COLOR_2 = "faction_or_color_2";
     public static final String STATS = "stats";
@@ -953,6 +974,7 @@ public class Constants {
     public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
     public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
     public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
+    public static final String MOD_ADJACENT_MECH = "adjacent_mech";
     public static final String MOD_OPPONENT_NON_FIGHTER_SHIP = "opponent_non_fighter_ship";
 
     public static final String MIGRATION_NAME = "migration_name";
@@ -1056,4 +1078,5 @@ public class Constants {
     public static final String SOURCE = "source";
     public static final String INJECT_RULES_LINKS = "inject_rules_links";
     public static final String FACTION_DISPLAY_NAME = "faction_display_name";
+    public static final String SEARCH_STRATEGY_CARDS = "strategy_cards";
 }

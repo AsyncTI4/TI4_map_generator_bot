@@ -2,15 +2,7 @@
     "id": "44c",
     "name": "Asteroids?",
     "aliases": [
-        "44",
-        "asteroids1",
-        "asteroidsfield1",
-        "af1",
-        "asteroids",
-        "asteroid",
-        "asteroidfield",
-        "asteroidsfield",
-        "pickle"
+        "44c"
     ],
     "imagePath": "44_Asteroids_cu.png",
     "shipPositionsType": "TYPE08",
@@ -38,7 +30,7 @@
     ],
     "wormholes": [],
     "planets": [],
-    "isAsteroidField": true, 
-    "source": "base", 
+    "isAsteroidField": true,
+    "source": "other",
     "tileBack": "red"
 }

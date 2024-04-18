@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -20,7 +19,6 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private String name;
     private List<String> aliases;
     private String imagePath;
-    private String tileBack;
     private List<String> planets;
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
@@ -30,6 +28,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private Boolean isNebula;
     private Boolean isGravityRift;
     private ComponentSource source;
+    private String tileBack;
 
     @Override
     @JsonIgnore
@@ -135,7 +134,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public Optional<String> getTileBack() {
+    public Optional<String> getTileBackOption() {
         return Optional.ofNullable(tileBack);
     }
 }

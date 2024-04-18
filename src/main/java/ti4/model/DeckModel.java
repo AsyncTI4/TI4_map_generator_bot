@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 
 public class DeckModel implements ModelInterface, EmbeddableModel {
@@ -17,6 +18,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
   private String type;
   private String description;
   private List<String> cardIDs;
+  private ComponentSource source;
 
   public boolean isValid() {
         return alias != null
@@ -105,6 +107,10 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     @Override
     public String getAutoCompleteName() {
       return StringUtils.left(StringUtils.substringBefore("[" + getType() + "] " + getName() + " --> " + getDescription(), "\n"), 100);
+    }
+
+    public ComponentSource getSource() {
+        return source;
     }
 
     private String getTypeEmoji() {

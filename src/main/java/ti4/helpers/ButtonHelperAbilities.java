@@ -396,8 +396,8 @@ public class ButtonHelperAbilities {
     public static List<String> getPlanetsWithTraps(Game activeGame) {
         List<String> trappedPlanets = new ArrayList<>();
         for (String trapName : getTrapNames()) {
-            if (!activeGame.getFactionsThatReactedToThis(trapName).isEmpty()) {
-                trappedPlanets.add(activeGame.getFactionsThatReactedToThis(trapName));
+            if (!activeGame.getStoredValue(trapName).isEmpty()) {
+                trappedPlanets.add(activeGame.getStoredValue(trapName));
             }
         }
         return trappedPlanets;
@@ -521,28 +521,28 @@ public class ButtonHelperAbilities {
 
     public static void addOmenDie(Game activeGame, int omenDie) {
         String omenDice;
-        if (!activeGame.getFactionsThatReactedToThis("OmenDice").isEmpty()) {
-            omenDice = activeGame.getFactionsThatReactedToThis("OmenDice");
+        if (!activeGame.getStoredValue("OmenDice").isEmpty()) {
+            omenDice = activeGame.getStoredValue("OmenDice");
             omenDice = omenDice + "_" + omenDie;
-            activeGame.setCurrentReacts("OmenDice", "" + omenDice);
+            activeGame.setStoredValue("OmenDice", "" + omenDice);
         } else {
-            activeGame.setCurrentReacts("OmenDice", "" + omenDie);
+            activeGame.setStoredValue("OmenDice", "" + omenDie);
         }
     }
 
     public static void removeOmenDie(Game activeGame, int omenDie) {
         String omenDice;
-        if (!activeGame.getFactionsThatReactedToThis("OmenDice").isEmpty()) {
-            omenDice = activeGame.getFactionsThatReactedToThis("OmenDice");
+        if (!activeGame.getStoredValue("OmenDice").isEmpty()) {
+            omenDice = activeGame.getStoredValue("OmenDice");
             omenDice = omenDice.replaceFirst("" + omenDie, "");
             omenDice = omenDice.replace("__", "_");
-            activeGame.setCurrentReacts("OmenDice", "" + omenDice);
+            activeGame.setStoredValue("OmenDice", "" + omenDice);
         }
     }
 
     public static List<Integer> getAllOmenDie(Game activeGame) {
         List<Integer> dice = new ArrayList<>();
-        for (String dieResult : activeGame.getFactionsThatReactedToThis("OmenDice").split("_")) {
+        for (String dieResult : activeGame.getStoredValue("OmenDice").split("_")) {
             if (!dieResult.isEmpty() && !dieResult.contains("_")) {
                 int die = Integer.parseInt(dieResult);
                 dice.add(die);
@@ -576,7 +576,7 @@ public class ButtonHelperAbilities {
     }
 
     public static void rollOmenDiceAtStartOfStrat(Game activeGame, Player myko) {
-        activeGame.setCurrentReacts("OmenDice", "");
+        activeGame.setStoredValue("OmenDice", "");
         StringBuilder msg = new StringBuilder(
             myko.getRepresentation(true, true) + " rolled 4 omen dice and rolled the following numbers: ");
         for (int x = 0; x < 4; x++) {
@@ -1101,31 +1101,38 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static void pillageCheck(Player player, Game activeGame) {
+    public static boolean canBePillaged(Player player, Game activeGame, int tg) {
         if (player.getPromissoryNotesInPlayArea().contains("pop")) {
-            return;
+            return false;
         }
         if (Helper.getPlayerFromAbility(activeGame, "pillage") != null && !Helper
             .getPlayerFromAbility(activeGame, "pillage").getFaction().equalsIgnoreCase(player.getFaction())) {
+            Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
+            if (tg > 2 && player.getNeighbouringPlayers().contains(pillager)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public static void pillageCheck(Player player, Game activeGame) {
+        if (canBePillaged(player, activeGame, player.getTg())) {
             Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
             String finChecker = "FFCC_" + pillager.getFaction() + "_";
-            if (player.getTg() > 2 && player.getNeighbouringPlayers().contains(pillager)) {
-                List<Button> buttons = new ArrayList<>();
-                String playerIdent = StringUtils.capitalize(player.getFaction());
-                MessageChannel channel = activeGame.getMainGameChannel();
-                if (activeGame.isFoWMode()) {
-                    playerIdent = StringUtils.capitalize(player.getColor());
-                    channel = pillager.getPrivateChannel();
-                }
-                String message = pillager.getRepresentation(true, true) + " you may have the opportunity to pillage "
-                    + playerIdent
-                    + ". Please check this is a valid pillage opportunity, and use buttons to resolve.";
-                buttons.add(Button.danger(finChecker + "pillage_" + player.getColor() + "_unchecked",
-                    "Pillage " + playerIdent));
-                buttons.add(Button.success(finChecker + "deleteButtons", "Decline Pillage Window"));
-                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+            List<Button> buttons = new ArrayList<>();
+            String playerIdent = StringUtils.capitalize(player.getFaction());
+            MessageChannel channel = activeGame.getMainGameChannel();
+            if (activeGame.isFoWMode()) {
+                playerIdent = StringUtils.capitalize(player.getColor());
+                channel = pillager.getPrivateChannel();
             }
+            String message = pillager.getRepresentation(true, true) + " you may have the opportunity to pillage "
+                + playerIdent
+                + ". Please check this is a valid pillage opportunity, and use buttons to resolve.";
+            buttons.add(Button.danger(finChecker + "pillage_" + player.getColor() + "_unchecked",
+                "Pillage " + playerIdent));
+            buttons.add(Button.success(finChecker + "deleteButtons", "Decline Pillage Window"));
+            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
     }
 
@@ -1392,7 +1399,7 @@ public class ButtonHelperAbilities {
             + "). Their next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls. ";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         player.setTg(player.getTg() - 2);
-        activeGame.setCurrentReacts("munitionsReserves", player.getFaction());
+        activeGame.setStoredValue("munitionsReserves", player.getFaction());
     }
 
     public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game activeGame,

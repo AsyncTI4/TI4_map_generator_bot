@@ -16,16 +16,30 @@ public class Source {
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi,
 
         // async homebrew
-        admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
+        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon,
+        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance,
 
         // catchall
         other;
 
         public String toString() {
             return super.toString().toLowerCase();
+        }
+
+        /**
+         * Converts a string identifier to the corresponding ComponentSource enum value.
+         * @param id the string identifier
+         * @return the ComponentSource enum value, or null if not found
+         */
+        public static ComponentSource fromString(String id) {
+            for (ComponentSource source : values()) {
+                if (source.toString().equals(id)) {
+                    return source;
+                }
+            }
+            return null;
         }
 
         public boolean isPok() {
@@ -54,6 +68,7 @@ public class Source {
                 case project_pi -> Emojis.ProjectPi;
                 case miltymod -> Emojis.MiltyMod;
                 case lazax -> Emojis.Lazax;
+                case salliance -> Emojis.StrategicAlliance;
                 default -> "";
             };
         }

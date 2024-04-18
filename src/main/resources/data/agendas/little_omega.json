@@ -243,7 +243,7 @@
         "alias": "little_omega_schematics",
         "name": "Publicize Weapon Schematics ω",
         "type": "Directive",
-        "target": "Elect Non-Flagship Unit, Non-Mech Unit",
+        "target": "Elect Non-Flagship, Non-Mech Unit",
         "text1": "Each player who owns a unit upgrade technology of the same type as the elected unit places 2 command tokens from their reinforcements in their strategy pool. Then, each other player gains a unit upgrade technology of the same type as the elected unit.",
         "text2": "",
         "source": "little_omega"
@@ -312,8 +312,8 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: Players choose strategy cards during the strategy phase in order from the player with the fewest victory points to the player with the most; on a tie, the order for those players starts with the speaker and proceeds clockwise.",
-        "text2": "Against: During the next strategy phase, when a player chooses a strategy card, they give that strategy card to another player who does not have 1.",
-        "mapText": "Players choose strategy cards during the strategy phase from fewest to most victory points; on a tie, start with the speaker and proceed clockwise.",
+        "text2": "Against: During the next strategy phase, when a player chooses a strategy card, they give that strategy card to another player who does not have one, if able.",
+        "mapText": "Players choose strategy cards in order of fewest to most victory points; on a tie, start with the speaker and proceed clockwise.",
         "source": "little_omega"
     },
     {

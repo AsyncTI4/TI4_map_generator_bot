@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class DealSO extends SOCardsSubcommandData {
     public DealSO() {
@@ -30,19 +31,19 @@ public class DealSO extends SOCardsSubcommandData {
 
         Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
-            sendMessage("Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
         User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
         if (user == null) {
-            sendMessage("User for faction not found. Report to ADMIN");
+            MessageHelper.sendMessageToEventChannel(event, "User for faction not found. Report to ADMIN");
             return;
         }
 
         for (int i = 0; i < count; i++) {
             activeGame.drawSecretObjective(player_.getUserID());
         }
-        sendMessage(count + " SO Dealt");
+        MessageHelper.sendMessageToEventChannel(event, count + " SO Dealt");
         SOInfo.sendSecretObjectiveInfo(activeGame, player_, event);
     }
 }
