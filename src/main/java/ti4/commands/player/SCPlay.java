@@ -59,18 +59,18 @@ public class SCPlay extends PlayerSubcommandData {
             : activeGame.getMainGameChannel();
 
         if (player == null) {
-            sendMessage("You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
             return;
         }
 
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            sendMessage("No SC has been selected");
+            MessageHelper.sendMessageToEventChannel(event, "No SC has been selected");
             return;
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { // Only one SC selected
-            sendMessage("Player has more than one SC. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(event, "Player has more than one SC. Please try again, using the `strategy_card` option.");
             return;
         }
 

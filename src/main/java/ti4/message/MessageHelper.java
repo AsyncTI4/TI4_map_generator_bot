@@ -54,6 +54,10 @@ public class MessageHelper {
 		splitAndSent(messageText, channel);
 	}
 
+	public static void sendMessageToEventChannel(GenericInteractionCreateEvent event, String messageText) {
+		sendMessageToChannel(event.getMessageChannel(), messageText);
+	}
+
 	public static void sendMessageToBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
 		splitAndSent(messageText, BotLogger.getBotLogChannel(event));
 	}

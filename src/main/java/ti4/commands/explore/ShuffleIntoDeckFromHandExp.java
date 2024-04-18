@@ -6,6 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
@@ -20,7 +21,7 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
         Player activePlayer = activeGame.getPlayer(getUser().getId());
         activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
         if (activePlayer == null) {
-            sendMessage("Player not found in game.");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
             return;
         }
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
@@ -35,6 +36,6 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

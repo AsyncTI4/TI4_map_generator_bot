@@ -35,11 +35,11 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         sendPromissoryNoteInfo(activeGame, player, true, event);
-        sendMessage("PN Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }
 
     public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, GenericInteractionCreateEvent event) {

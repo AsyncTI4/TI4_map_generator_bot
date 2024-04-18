@@ -47,13 +47,6 @@ public class AdminCommand implements Command {
         return false;
     }
 
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)) {
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();

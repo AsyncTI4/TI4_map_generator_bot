@@ -1,6 +1,7 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -27,7 +28,7 @@ public class LeaderAdd extends LeaderAddRemove {
             sb.append("\n");
             player.addLeader(leaderID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 
     public void addLeader(Player player, String leaderID, Game activeGame) {

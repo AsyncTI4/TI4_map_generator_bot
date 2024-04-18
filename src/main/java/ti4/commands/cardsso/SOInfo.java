@@ -36,11 +36,11 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         sendSecretObjectiveInfo(activeGame, player, event);
-        sendMessage("SO Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "SO Info Sent");
     }
 
     public static void sendSecretObjectiveInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {

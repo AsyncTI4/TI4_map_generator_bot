@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class SetStatsAnchor extends PlayerSubcommandData {
         public SetStatsAnchor() {
@@ -26,7 +27,7 @@ public class SetStatsAnchor extends PlayerSubcommandData {
 		player = Helper.getGamePlayer(activeGame, player, event, null);
 		player = Helper.getPlayer(activeGame, player, event);
 		if (player == null) {
-			sendMessage("Player could not be found");
+			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
 			return;
 		}
 
@@ -38,11 +39,11 @@ public class SetStatsAnchor extends PlayerSubcommandData {
         }
         
         if (!PositionMapper.isTilePositionValid(tileID)) {
-            sendMessage("Tile ID `" + tileID + "` is not valid");
+            MessageHelper.sendMessageToEventChannel(event, "Tile ID `" + tileID + "` is not valid");
             return;
         }
 
         player.setPlayerStatsAnchorPosition(tileID);
-        sendMessage(tileID + " is now your stats anchor");
+        MessageHelper.sendMessageToEventChannel(event, tileID + " is now your stats anchor");
     }
 }

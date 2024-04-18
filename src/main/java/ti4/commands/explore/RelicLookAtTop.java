@@ -18,7 +18,7 @@ public class RelicLookAtTop extends GenericRelicAction {
         Game activeGame = getActiveGame();
         List<String> relicDeck = activeGame.getAllRelics();
         if (relicDeck.isEmpty()) {
-            sendMessage("Relic deck is empty");
+            MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
             return;
         }
         String relicID = relicDeck.get(0);

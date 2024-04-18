@@ -8,6 +8,7 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class TechAdd extends TechAddRemove {
     public TechAdd() {
@@ -35,6 +36,6 @@ public class TechAdd extends TechAddRemove {
         if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
         }
-        sendMessage(message);
+        MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

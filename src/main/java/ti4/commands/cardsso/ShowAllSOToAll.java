@@ -1,12 +1,17 @@
 package ti4.commands.cardsso;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-
-import java.util.*;
+import ti4.message.MessageHelper;
 
 public class ShowAllSOToAll extends SOCardsSubcommandData {
     public ShowAllSOToAll() {
@@ -19,7 +24,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
@@ -49,6 +54,6 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
             sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SOInfo.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

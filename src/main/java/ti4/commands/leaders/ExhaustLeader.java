@@ -24,17 +24,17 @@ public class ExhaustLeader extends LeaderAction {
 	void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
 		Leader playerLeader = player.unsafeGetLeader(leaderID);
 		if (playerLeader == null) {
-			sendMessage("Leader '" + leaderID + "'' not found");
+			MessageHelper.sendMessageToEventChannel(event, "Leader '" + leaderID + "'' not found");
 			return;
 		}
 
 		if (playerLeader.isLocked()) {
-			sendMessage("Leader '" + playerLeader.getId() + "' is locked");
+			MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is locked");
 			return;
 		}
 
 		if (playerLeader.isExhausted()) {
-			sendMessage("Leader '" + playerLeader.getId() + "' is exhausted already");
+			MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is exhausted already");
 			return;
 		}
 

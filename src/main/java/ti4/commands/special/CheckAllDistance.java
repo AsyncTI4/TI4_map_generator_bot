@@ -66,7 +66,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
             }
             MessageHelper.sendFileToChannel(event.getChannel(), csv, true);
         } catch (Exception e) {
-            sendMessage("Something broke. Ping jazz");
+            MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
         }
     }
 }
