@@ -11,6 +11,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ChangeUnitDecal extends PlayerSubcommandData {
     public ChangeUnitDecal() {
@@ -27,28 +28,28 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         String newDecalSet = event.getOption(Constants.DECAL_SET).getAsString().toLowerCase();
         if ("none".equals(newDecalSet)) {
-            sendMessage("Decal Set removed: " + player.getDecalSet());
+            MessageHelper.sendMessageToEventChannel(event, "Decal Set removed: " + player.getDecalSet());
             player.setDecalSet(null);
             return;
         }
         if (!Mapper.isValidDecalSet(newDecalSet)) {
-            sendMessage("Decal Set not valid: " + newDecalSet);
+            MessageHelper.sendMessageToEventChannel(event, "Decal Set not valid: " + newDecalSet);
             player.setDecalSet(null);
             return;
         }
         if (!userMayUseDecal(player.getUserID(), newDecalSet)) {
-            sendMessage("This decal set may only be used by specific players.");
+            MessageHelper.sendMessageToEventChannel(event, "This decal set may only be used by specific players.");
             return;
         }
 
         player.setDecalSet(newDecalSet);
-        sendMessage(player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
+        MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
     }
 
     public static boolean userMayUseDecal(String userID, String decalID) {

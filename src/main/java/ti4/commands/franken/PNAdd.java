@@ -1,9 +1,11 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
 import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PNAdd extends PNAddRemove {
     public PNAdd() {
@@ -31,6 +33,6 @@ public class PNAdd extends PNAddRemove {
             sb.append("\n");
             player.addOwnedPromissoryNoteByID(pnID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

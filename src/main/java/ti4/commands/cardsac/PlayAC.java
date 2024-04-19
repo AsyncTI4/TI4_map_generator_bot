@@ -46,20 +46,20 @@ public class PlayAC extends ACCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            sendMessage("Please select what Action Card to discard");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Action Card to discard");
             return;
         }
 
         String reply = playAC(event, activeGame, player, option.getAsString().toLowerCase(), event.getChannel(),
             event.getGuild());
         if (reply != null) {
-            sendMessage(reply);
+            MessageHelper.sendMessageToEventChannel(event, reply);
         }
     }
 
@@ -96,7 +96,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
         }
         if (acID == null) {
-            // sendMessage();
+            // MessageHelper.sendMessageToEventChannel(event, );
             return "No such Action Card ID found, please retry";
         }
         ActionCardModel actionCard = Mapper.getActionCard(acID);

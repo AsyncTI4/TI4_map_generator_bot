@@ -8,6 +8,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
 public class PurgeRelic extends GenericRelicAction {
@@ -22,13 +23,13 @@ public class PurgeRelic extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         String relicId = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
         if (relicId == null || !player.hasRelic(relicId)) {
-            sendMessage("Invalid relic or player does not have specified relic: " + relicId);
+            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic: " + relicId);
             return;
         }
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
         RelicModel relicData = Mapper.getRelic(relicId);
-        sendMessage(player.getRepresentation() + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
         RelicInfo.sendRelicInfo(getActiveGame(), player, event);
     }
 }

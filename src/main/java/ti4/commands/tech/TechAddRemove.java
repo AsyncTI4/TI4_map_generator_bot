@@ -13,6 +13,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 
 public abstract class TechAddRemove extends TechSubcommandData {
@@ -34,13 +35,13 @@ public abstract class TechAddRemove extends TechSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null){
-            sendMessage("Player/Faction/Color could not be found in map:" + activeGame.getName());
+            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
 
@@ -67,10 +68,10 @@ public abstract class TechAddRemove extends TechSubcommandData {
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
                         .map(Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()){
-                    sendMessage("No matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "No matching Tech found");
                     return;
                 } else if (possibleTechs.size() > 1){
-                    sendMessage("More that one matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
                     return;
                 }
                 doAction(player, possibleTechs.get(0), event);

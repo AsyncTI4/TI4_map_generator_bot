@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class DrawSO extends SOCardsSubcommandData {
     public DrawSO() {
@@ -21,7 +22,7 @@ public class DrawSO extends SOCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.COUNT);
@@ -33,7 +34,7 @@ public class DrawSO extends SOCardsSubcommandData {
         for (int i = 0; i < count; i++) {
             activeGame.drawSecretObjective(player.getUserID());
         }
-        sendMessage("Drew " + count + " SO");
+        MessageHelper.sendMessageToEventChannel(event, "Drew " + count + " SO");
         SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
     }
 }

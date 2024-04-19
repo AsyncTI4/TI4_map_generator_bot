@@ -12,7 +12,6 @@ import ti4.message.MessageHelper;
 
 public abstract class PNCardsSubcommandData extends SubcommandData {
 
-    private SlashCommandInteractionEvent event;
     private Game activeGame;
     private User user;
 
@@ -32,18 +31,9 @@ public abstract class PNCardsSubcommandData extends SubcommandData {
         return user;
     }
 
-    /**
-     * Send a message to the event's channel, handles large text
-     * @param messageText new message
-     */
-    public void sendMessage(String messageText) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
-    }
-
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
-        this.event = event;
         user = event.getUser();
         activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
         Helper.checkThreadLimitAndArchive(event.getGuild());

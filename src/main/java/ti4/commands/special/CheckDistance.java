@@ -53,7 +53,7 @@ public class CheckDistance extends SpecialSubcommandData {
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 8, OptionMapping::getAsInt);
         Map<String, Integer> distances = getTileDistances(activeGame, player, tile.getPosition(), maxDistance);
 
-        sendMessage(distances.entrySet().stream()
+        MessageHelper.sendMessageToEventChannel(event, distances.entrySet().stream()
                 .map(entry -> entry.getKey() + ": " + entry.getValue())
                 .sorted()
                 .reduce("Distances: \n", (a, b) -> a + "\n" + b));

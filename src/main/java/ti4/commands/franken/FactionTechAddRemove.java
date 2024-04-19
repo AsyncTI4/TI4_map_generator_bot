@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public abstract class FactionTechAddRemove extends FrankenSubcommandData {
     public FactionTechAddRemove(String name, String description) {
@@ -38,7 +39,7 @@ public abstract class FactionTechAddRemove extends FrankenSubcommandData {
         techIDs.removeIf(id -> !Mapper.isValidTech(id));
 
         if (techIDs.isEmpty()) {
-            sendMessage("No valid techs were provided. Please see `/search techs` for available choices.");
+            MessageHelper.sendMessageToEventChannel(event, "No valid techs were provided. Please see `/search techs` for available choices.");
             return;
         }
         
@@ -47,7 +48,7 @@ public abstract class FactionTechAddRemove extends FrankenSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 

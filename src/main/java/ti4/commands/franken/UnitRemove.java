@@ -1,8 +1,10 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class UnitRemove extends UnitAddRemove {
     public UnitRemove() {
@@ -21,6 +23,6 @@ public class UnitRemove extends UnitAddRemove {
             sb.append("\n");
             player.removeOwnedUnitByID(unitID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

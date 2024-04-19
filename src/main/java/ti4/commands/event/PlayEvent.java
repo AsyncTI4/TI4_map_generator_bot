@@ -28,13 +28,13 @@ public class PlayEvent extends EventSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         String eventIDOption = StringUtils.substringBefore(event.getOption(Constants.EVENT_ID, "", OptionMapping::getAsString).toLowerCase(), " ");
         if (eventIDOption.isEmpty()) {
-            sendMessage("Please select what Event ID to play");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Event ID to play");
             return;
         }
 
@@ -42,12 +42,12 @@ public class PlayEvent extends EventSubcommandData {
         try {
             eventNumericalID = Integer.parseInt(eventIDOption);
         } catch (Exception e) {
-            sendMessage("Event ID must be numeric");
+            MessageHelper.sendMessageToEventChannel(event, "Event ID must be numeric");
             return;
         }
 
         if (!player.getEvents().containsValue(eventNumericalID)) {
-            sendMessage("Player does not have Event `" + eventNumericalID + "` in hand");
+            MessageHelper.sendMessageToEventChannel(event, "Player does not have Event `" + eventNumericalID + "` in hand");
             return;
         }
 
@@ -55,7 +55,7 @@ public class PlayEvent extends EventSubcommandData {
         String eventID = player.getEvents().entrySet().stream().filter(e -> numericID == e.getValue()).map(e -> e.getKey()).findFirst().orElse(null);
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel == null) {
-            sendMessage("Event ID `" + eventID + "` could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Event ID `" + eventID + "` could not be found");
             return;
         }
 

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
 public class RevealEvent extends EventSubcommandData {
@@ -33,7 +34,7 @@ public class RevealEvent extends EventSubcommandData {
         if (eventModel != null) {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
         } else {
-            sendMessage("Something went wrong");
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong");
         }
     }
 }

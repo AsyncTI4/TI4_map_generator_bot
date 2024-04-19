@@ -72,7 +72,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             gameName = getNextGameName();
         }
         if (gameOrRoleAlreadyExists(gameName)) {
-            sendMessage("Role or Game: **" + gameName
+            MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName
                 + "** already exists accross all supported servers. Try again with a new name.");
             return;
         }
@@ -83,10 +83,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (categoryChannelName != null && !categoryChannelName.isEmpty()) {
             List<Category> categoriesWithName = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false);
             if (categoriesWithName.size() > 1) {
-                sendMessage("Too many categories with this name!!");
+                MessageHelper.sendMessageToEventChannel(event, "Too many categories with this name!!");
                 return;
             } else if (categoriesWithName.isEmpty()) {
-                sendMessage("Category not found");
+                MessageHelper.sendMessageToEventChannel(event, "Category not found");
                 return;
             } else {
                 categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).get(0);
@@ -94,7 +94,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
-                sendMessage(
+                MessageHelper.sendMessageToEventChannel(event, 
                     "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
@@ -108,7 +108,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             if (categoryChannel == null)
                 categoryChannel = createNewCategory(categoryChannelName);
             if (categoryChannel == null) {
-                sendMessage("Could not automatically find a category that begins with **" + categoryChannelName
+                MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
                     + "** - Please create this category.");
                 return;
             }
@@ -116,7 +116,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CHECK IF CATEGORY EXISTS
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
-            sendMessage("Category: **" + categoryChannelName
+            MessageHelper.sendMessageToEventChannel(event, "Category: **" + categoryChannelName
                 + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         }
@@ -124,13 +124,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
         if (guild == null) {
-            sendMessage("Error: Guild is null");
+            MessageHelper.sendMessageToEventChannel(event, "Error: Guild is null");
             return;
         }
 
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            sendMessage(
+            MessageHelper.sendMessageToEventChannel(event, 
                 "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
@@ -138,7 +138,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF CATEGORY HAS ROOM
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
-            sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName()
+            MessageHelper.sendMessageToEventChannel(event, "Category: **" + category.getName() + "** is full on server **" + guild.getName()
                 + "**. Create a new category then try again.");
             return;
         }

@@ -40,7 +40,7 @@ public class SendFragments extends ExploreSubcommandData {
 
 		Player receiver = Helper.getPlayer(activeGame, null, event);
 		if (receiver == null) {
-			sendMessage("Target player could not be found in game:" + activeGame.getName());
+			MessageHelper.sendMessageToEventChannel(event, "Target player could not be found in game:" + activeGame.getName());
 			return;
 		}
 		String trait = event.getOption(Constants.TRAIT).getAsString();
@@ -72,7 +72,7 @@ public class SendFragments extends ExploreSubcommandData {
 				receiver.addFragment(fragID);
 			}
 		} else {
-			sendMessage("Not enough fragments of the specified trait");
+			MessageHelper.sendMessageToEventChannel(event, "Not enough fragments of the specified trait");
 			return;
 		}
 

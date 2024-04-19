@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class ListOldChannels extends BothelperSubcommandData {
     public ListOldChannels() {
@@ -23,11 +24,11 @@ public class ListOldChannels extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         int channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 500) {
-            sendMessage("Please choose a number between 1 and 500");
+            MessageHelper.sendMessageToEventChannel(event, "Please choose a number between 1 and 500");
             return;
         }
         Guild guild = event.getGuild();
-        sendMessage(getOldChannelsMessage(guild, channelCount));
+        MessageHelper.sendMessageToEventChannel(event, getOldChannelsMessage(guild, channelCount));
     }
 
     public static String getOldChannelsMessage(Guild guild, Integer channelCount) {

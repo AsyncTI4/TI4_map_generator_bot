@@ -14,6 +14,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class SendDebt extends PlayerSubcommandData {
     public SendDebt() {
@@ -43,19 +44,19 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         if (sendingPlayer == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         Player receivingPlayer = Helper.getPlayer(activeGame, sendingPlayer, event);
         if (receivingPlayer == null) {
-            sendMessage("Player to send Debt could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to send Debt could not be found");
             return;
         }
 
         int debtCountToSend = event.getOption(Constants.DEBT_COUNT, 0, OptionMapping::getAsInt);
         if (debtCountToSend <= 0) {
-            sendMessage("Debt count must be a positive integer");
+            MessageHelper.sendMessageToEventChannel(event, "Debt count must be a positive integer");
             return;
         }
 
@@ -63,7 +64,7 @@ public class SendDebt extends PlayerSubcommandData {
         
         ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, activeGame, "vaden", event);
         
-        sendMessage(sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
+        MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
 
     }
 

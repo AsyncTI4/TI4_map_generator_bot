@@ -29,12 +29,12 @@ public class SendTG extends PlayerSubcommandData {
 		Player player = activeGame.getPlayer(getUser().getId());
 		player = Helper.getGamePlayer(activeGame, player, event, null);
 		if (player == null) {
-			sendMessage("Player could not be found");
+			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
 			return;
 		}
 		Player player_ = Helper.getPlayer(activeGame, player, event);
 		if (player_ == null) {
-			sendMessage("Player to send TG/Commodities could not be found");
+			MessageHelper.sendMessageToEventChannel(event, "Player to send TG/Commodities could not be found");
 			return;
 		}
 
@@ -57,11 +57,11 @@ public class SendTG extends PlayerSubcommandData {
 		}
 		String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade goods";
 		String message = p1 + " sent " + tgString + " to " + p2;
-		sendMessage(message);
+		MessageHelper.sendMessageToEventChannel(event, message);
 
 		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
 			ClearDebt.clearDebt(player_, player, sendTG);
-			sendMessage(player_.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
+			MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
 		}
 
 		if (activeGame.isFoWMode()) {

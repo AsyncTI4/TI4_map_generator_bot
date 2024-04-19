@@ -8,6 +8,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class Speaker extends PlayerSubcommandData {
     public Speaker() {
@@ -24,11 +25,11 @@ public class Speaker extends PlayerSubcommandData {
         player = Helper.getPlayer(activeGame, player, event);
 
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         activeGame.setSpeaker(player.getUserID());
         String msg = Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
-        sendMessage(msg);
+        MessageHelper.sendMessageToEventChannel(event, msg);
     }
 }

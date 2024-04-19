@@ -26,7 +26,7 @@ public class DrawSpecificRelic extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
         if (relicID == null) {
-            sendMessage("Specify relic");
+            MessageHelper.sendMessageToEventChannel(event, "Specify relic");
             return;
         }
         boolean forced = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);

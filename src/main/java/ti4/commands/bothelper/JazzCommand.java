@@ -25,16 +25,16 @@ public class JazzCommand extends BothelperSubcommandData {
         Game game = getActiveGame();
         MiltyDraftManager man = game.getMiltyDraftManager();
         String s = man.superSaveMessage();
-        sendMessage(s);
+        MessageHelper.sendMessageToEventChannel(event, s);
 
         try {
             MiltyDraftManager man2 = new MiltyDraftManager();
             man2.init(game);
             man2.loadSuperSaveString(game, s);
             String s2 = man2.superSaveMessage();
-            sendMessage(s2);
+            MessageHelper.sendMessageToEventChannel(event, s2);
         } catch (Exception e) {
-            sendMessage("Unable to load data. Check log.");
+            MessageHelper.sendMessageToEventChannel(event, "Unable to load data. Check log.");
             BotLogger.log("Unable to load data", e);
         }
     }

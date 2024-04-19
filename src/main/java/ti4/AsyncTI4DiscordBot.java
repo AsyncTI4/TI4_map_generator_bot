@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -68,6 +69,9 @@ import ti4.commands.units.RemoveAllUnitDamage;
 import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands.user.UserCommand;
+import ti4.commands.user.UserSettings;
+import ti4.commands.user.UserSettingsManager;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -189,6 +193,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
         commandManager.addCommand(new SelectionBoxDemo());
+        commandManager.addCommand(new UserCommand());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -276,6 +281,7 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        UserSettingsManager.init();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
@@ -327,7 +333,7 @@ public class AsyncTI4DiscordBot {
      * Initializes the whitelisted roles for the bot, including admin, developer, and bothelper roles.
      * <ul>
      * <li>Admins can execute /admin, /developer, and /bothelper commands</li>
-     * <li>Developers can execute /developer and /bothelper commands</li>
+     * <li>Developers can execute /developer commands</li>
      * <li>Bothelpers can execute /bothelper commands</li>
      * </ul>
      *

@@ -55,7 +55,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
             if (gameOrRoleAlreadyExists(gameName)) {
-                sendMessage("Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
+                MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
                 return;
             }
         } else {
@@ -71,14 +71,14 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         //CHECK IF CATEGORY EXISTS
        
         if (guild == null) {
-            sendMessage("Guild was null");
+            MessageHelper.sendMessageToEventChannel(event, "Guild was null");
             return;
         }
      
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            sendMessage("Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -107,12 +107,12 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         boolean sendInviteLink = false;
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
-                sendMessage(member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
+                MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
                 sendInviteLink = true;
             }
         }
         if (sendInviteLink) {
-            sendMessage(Helper.getGuildInviteURL(guild));
+            MessageHelper.sendMessageToEventChannel(event, Helper.getGuildInviteURL(guild));
             return;
         }
         Role everyone = guild.getRolesByName("@everyone",true).get(0);
@@ -186,7 +186,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
             "> " + chatChannel.getAsMention() + "\n" +
             "> " + actionsChannel.getAsMention() + "\n";
-        sendMessage(message);
+        MessageHelper.sendMessageToEventChannel(event, message);
 
         GameSaveLoadManager.saveMap(newGame, event);
     }

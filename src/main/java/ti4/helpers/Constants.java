@@ -1079,4 +1079,5 @@ public class Constants {
     public static final String INJECT_RULES_LINKS = "inject_rules_links";
     public static final String FACTION_DISPLAY_NAME = "faction_display_name";
     public static final String SEARCH_STRATEGY_CARDS = "strategy_cards";
+    public static final String USER = "user";
 }

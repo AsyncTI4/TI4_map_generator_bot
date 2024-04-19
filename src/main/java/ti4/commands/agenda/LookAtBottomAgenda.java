@@ -7,6 +7,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class LookAtBottomAgenda extends AgendaSubcommandData {
 
@@ -29,7 +30,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("You are not a player in this game.");
+            MessageHelper.sendMessageToEventChannel(event, "You are not a player in this game.");
             return;
         }
         LookAtTopAgenda.lookAtAgendas(activeGame, player, count, true);

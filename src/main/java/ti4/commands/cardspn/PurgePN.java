@@ -9,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PurgePN extends PNCardsSubcommandData {
     public PurgePN() {
@@ -22,12 +23,12 @@ public class PurgePN extends PNCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            sendMessage("Please select what Promissory Note to send");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to send");
             return;
         }
 
@@ -40,12 +41,12 @@ public class PurgePN extends PNCardsSubcommandData {
         }
 
         if (id == null) {
-            sendMessage("No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
             return;
         }
         activeGame.setPurgedPN(id);
         player.removePromissoryNote(id);
-        sendMessage("PN Purged");
+        MessageHelper.sendMessageToEventChannel(event, "PN Purged");
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
     }
 }

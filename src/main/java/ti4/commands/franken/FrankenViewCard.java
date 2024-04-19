@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.draft.DraftItem;
+import ti4.message.MessageHelper;
 
 public class FrankenViewCard extends FrankenSubcommandData {
     public FrankenViewCard() {
@@ -20,6 +21,6 @@ public class FrankenViewCard extends FrankenSubcommandData {
 
         DraftItem item = DraftItem.GenerateFromAlias(alias);
 
-        sendMessage(item.getItemEmoji() + " " + item.getShortDescription() + "\n" + item.getLongDescription());
+        MessageHelper.sendMessageToEventChannel(event, item.getItemEmoji() + " " + item.getShortDescription() + "\n" + item.getLongDescription());
     }
 }
