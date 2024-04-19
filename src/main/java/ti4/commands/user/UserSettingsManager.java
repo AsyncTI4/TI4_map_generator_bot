@@ -51,6 +51,9 @@ public class UserSettingsManager {
 
     public void loadUserSettingsFromFolder() {
         File folder = new File(userSettingsPath);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
             if (file.isFile() && file.getName().endsWith(".json")) {
