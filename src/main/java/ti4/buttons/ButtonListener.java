@@ -13,6 +13,10 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -29,8 +33,6 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.agenda.DrawAgenda;
@@ -749,7 +751,7 @@ public class ButtonListener extends ListenerAdapter {
                                     buttonsToRemoveCC.add(Button.success(
                                         finChecker + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_"
                                             + tile.getPosition(),
-                                        "Remove CC from " + tile.getRepresentationForButtons(activeGame, player)));
+                                        tile.getRepresentationForButtons(activeGame, player)));
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(channel,
                                     trueIdentity + " Use buttons to remove a CC", buttonsToRemoveCC);
@@ -2999,19 +3001,7 @@ public class ButtonListener extends ListenerAdapter {
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
                     }
-                    Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
-                    if (player.hasAbility("mobile_command") && ButtonHelper
-                        .getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0) {
-                        tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship)
-                            .get(0);
-                    }
-                    if (tile == null) {
-                        tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
-                    }
-                    if (tile == null) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                            "Could not find a HS, sorry bro");
-                    }
+                    Tile tile = FoWHelper.getPlayerHS(activeGame, player);
                     buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "warfare", "place");
                     int val = Helper.getProductionValue(player, activeGame, tile, true);
                     String message = player.getRepresentation()
@@ -5029,6 +5019,9 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
 
                 }
+                // case "editUserSettings" -> UserButtonProvider.resolveEditUserSettingsButton(event);
+                // case "editUserSettingPreferredColours" -> UserButtonProvider.resolveEditPreferredColoursButton(event);
+                // case "editUserSettingFunEmoji" -> UserButtonProvider.resolveEditFunEmojiButton(event);
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }

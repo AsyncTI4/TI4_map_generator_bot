@@ -68,6 +68,7 @@ public class MessageListener extends ListenerAdapter {
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals(Constants.HELP)
             && !event.getInteraction().getName().equals(Constants.STATISTICS)
+            && !event.getInteraction().getName().equals(Constants.USER)
             && (event.getInteraction().getSubcommandName() == null
                 || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && !event.getInteraction().getName().equals(Constants.SEARCH)
