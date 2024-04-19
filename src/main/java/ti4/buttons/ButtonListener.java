@@ -5450,7 +5450,7 @@ public class ButtonListener extends ListenerAdapter {
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button
                             .danger("exhaustAgent_rohdhnaagent_" + player.getFaction(),
-                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Rond Bri’ay (Rohdhna Agent)")
+                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Rond Bri'ay (Rohdhna Agent)")
                             .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
                     buttons.add(winnuButton);
                 }
