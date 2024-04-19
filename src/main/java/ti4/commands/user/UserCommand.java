@@ -31,6 +31,7 @@ public class UserCommand implements Command {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
+                subcommand.postExecute(event);
                 break;
             }
         }
@@ -43,6 +44,7 @@ public class UserCommand implements Command {
     private Collection<UserSubcommandData> getSubcommands() {
         Collection<UserSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new ShowUserSettings());
+        subcommands.add(new SetPreferredColourList());
         return subcommands;
     }
 
