@@ -37,7 +37,7 @@
     },
     {
         "alias": "dsceldr",
-        "name": "Emergency Mobilization",
+        "name": "Emergency Mobilization Protocols",
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "celdauri",

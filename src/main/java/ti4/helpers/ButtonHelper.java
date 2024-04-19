@@ -1691,6 +1691,26 @@ public class ButtonHelper {
             "Use buttons to select a planet or tech to ready", buttons);
     }
 
+    public static void celdauriRedTech(Player player, Game game, GenericInteractionCreateEvent event) {
+        List<Button> buttonsToRemoveCC = new ArrayList<>();
+        if (player.getStrategicCC() > 0) {
+            player.setStrategicCC(player.getStrategicCC() - 1);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " spent a strat cc to remove a CC from a place they have a dock");
+        }
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        for (Tile tile : ButtonHelper.getTilesWithYourCC(player, game, event)) {
+            if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock).contains(tile)) {
+                buttonsToRemoveCC.add(Button.success(
+                    finChecker + "removeCCFromBoard_celdauriRedTech_"
+                        + tile.getPosition(),
+                    tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            "Use buttons to select the tile you'd like to remove a CC from", buttonsToRemoveCC);
+    }
+
     public static void sendAbsolX89NukeOptions(Game game, GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
@@ -1881,7 +1901,7 @@ public class ButtonHelper {
     public static int getNumberOfTilesPlayerIsInWithNoPlanets(Game game, Player player) {
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.getUnitHolders().values().size() == 1) {
+            if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.getPlanetUnitHolders().size() == 0) {
                 count++;
             }
         }
@@ -2729,7 +2749,7 @@ public class ButtonHelper {
                 "Delete These Buttons");
             redistributeButton.add(redistribute);
             redistributeButton.add(deleButton);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                 player.getRepresentation() + " click this after picking up a CC.", redistributeButton);
         }
     }
@@ -3627,6 +3647,10 @@ public class ButtonHelper {
         }
         if (player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
+        }
+        //dsceldr
+        if (player.getTechs().contains("dsceldr") && !player.getExhaustedTechs().contains("dsceldr") && player.getStrategicCC() > 0) {
+            endButtons.add(Button.success(finChecker + "exhaustTech_dsceldr", "Exhaust Emergency Mobilization Protocols"));
         }
         if (player.getTechs().contains("absol_bs") && !player.getExhaustedTechs().contains("absol_bs")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_absol_bs", "Exhaust Absol Bio-Stims"));
@@ -6696,7 +6720,6 @@ public class ButtonHelper {
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
                     if (model != null && model.getSpaceCannonDieCount() > 0
-                        && FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true).contains(adjTilePos)
                         && (model.getDeepSpaceCannon() || tilePos.equalsIgnoreCase(adjTilePos)
                             || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander"))) {
                         if (owningPlayer == player) {
@@ -9435,7 +9458,7 @@ public class ButtonHelper {
                     purgeFragButtons);
             }
         }
-        if (pn.getText().toLowerCase().contains("action:")) {
+        if (pn.getText().toLowerCase().contains("action:") && !id.equalsIgnoreCase("acq")) {
             serveNextComponentActionButtons(event, game, player);
         }
 

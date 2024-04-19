@@ -132,7 +132,8 @@ public class TurnEnd extends PlayerSubcommandData {
             try {
                 if (lastTransaction != null && !"".equals(lastTransaction)) {
                     activeGame.setLatestTransactionMsg("");
-                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {});
+                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
+                    });
                 }
             } catch (Exception e) {
                 //  Block of code to handle errors
@@ -371,7 +372,7 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setStoredValue(key3, "");
         activeGame.setStoredValue(key2b, "");
         activeGame.setStoredValue(key3b, "");
-        if (!activeGame.isFoWMode() && activeGame.getHighestScore() + 4 > activeGame.getVp()) {
+        if (activeGame.getHighestScore() + 4 > activeGame.getVp()) {
             activeGame.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
