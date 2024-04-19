@@ -174,7 +174,7 @@ public class PlanetAdd extends PlanetAddRemove {
             && player.hasUnexhaustedLeader("vaylerianagent")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_vaylerianagent_" + player.getFaction(),
-			                           "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)")
+                                       "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent) to draw an AC";

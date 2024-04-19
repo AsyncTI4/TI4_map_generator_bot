@@ -545,7 +545,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!activeGame.isFoWMode() && titans != null && titans.hasUnexhaustedLeader("titansagent")) {
             String finChecker = "FFCC_" + titans.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent",
-			                             "Use " + (titans.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tellurian (Ul Agent)")
+                                         "Use " + (titans.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tellurian (Ul Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
         if (p1.hasTechReady("sc") || (!activeGame.isFoWMode() && p2.hasTechReady("sc"))) {
@@ -560,7 +560,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!activeGame.isFoWMode() && ghemina != null && ghemina.hasUnexhaustedLeader("gheminaagent")) {
             String finChecker = "FFCC_" + ghemina.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_gheminaagent",
-			                             "Use " + (ghemina.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skarvald & Torvar (Ghemina Agents)")
+                                         "Use " + (ghemina.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skarvald & Torvar (Ghemina Agents)")
                     .withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
 
@@ -568,7 +568,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!activeGame.isFoWMode() && khal != null && khal.hasUnexhaustedLeader("kjalengardagent")) {
             String finChecker = "FFCC_" + khal.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kjalengardagent",
-			                             "Use " + (khal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Merkismathr Asvand (Kjalengard Agent)")
+                                         "Use " + (khal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Merkismathr Asvand (Kjalengard Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
         }
 
@@ -576,20 +576,20 @@ public class StartCombat extends CombatSubcommandData {
         if (!activeGame.isFoWMode() && sol != null && sol.hasUnexhaustedLeader("solagent") && isGroundCombat) {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent",
-			                             "Use " + (sol.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Evelyn Delouis (Sol Agent)")
+                                         "Use " + (sol.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Evelyn Delouis (Sol Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
             buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent",
-			                             (sol.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Evelyn Delouis (Sol Agent)")
+                                         (sol.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Evelyn Delouis (Sol Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
         Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "kyroagent");
         if (!activeGame.isFoWMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
             String finChecker = "FFCC_" + kyro.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_kyroagent",
-			                             "Use " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox (Kyro Agent)")
+                                         "Use " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox (Kyro Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.blex)));
             buttons.add(Button.secondary(finChecker + "getAgentSelection_kyroagent",
-			                            (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox (Kyro Agent)")
+                                        (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox (Kyro Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.blex)));
         }
 
@@ -598,7 +598,7 @@ public class StartCombat extends CombatSubcommandData {
             && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + letnev.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_letnevagent",
-			                             "Use " + (letnev.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Viscount Unlenn (Letnev Agent)")
+                                         "Use " + (letnev.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Viscount Unlenn (Letnev Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
@@ -607,7 +607,7 @@ public class StartCombat extends CombatSubcommandData {
             && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
             String finChecker = "FFCC_" + nomad.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian",
-			                             "Use " + (nomad.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "The Thundarian (Nomad Agent)")
+                                         "Use " + (nomad.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "The Thundarian (Nomad Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
         }
 
@@ -615,7 +615,7 @@ public class StartCombat extends CombatSubcommandData {
         if ((!activeGame.isFoWMode() || yin == p1) && yin != null && yin.hasUnexhaustedLeader("yinagent")) {
             String finChecker = "FFCC_" + yin.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "yinagent_" + pos,
-			                             "Use " + (yin.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Brother Milor (Yin Agent)")
+                                         "Use " + (yin.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Brother Milor (Yin Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
         }
 

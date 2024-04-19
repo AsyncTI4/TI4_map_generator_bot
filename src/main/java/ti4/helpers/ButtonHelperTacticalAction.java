@@ -298,7 +298,7 @@ public class ButtonHelperTacticalAction {
                 List<Button> buttons = new ArrayList<>();
                 Button hacanButton = Button
                         .secondary("exhaustAgent_celdauriagent_" + player.getFaction(),
-						           "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
+                                   "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
                         .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                 buttons.add(hacanButton);
                 buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -392,7 +392,7 @@ public class ButtonHelperTacticalAction {
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
                     && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
                 Button empyButton = Button.secondary("exhaustAgent_empyreanagent",
-				                                     "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)")
+                                                     "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)")
                         .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
                 empyButtons.add(empyButton);
                 empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
