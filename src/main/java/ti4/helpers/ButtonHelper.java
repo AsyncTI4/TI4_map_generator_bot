@@ -1192,7 +1192,7 @@ public class ButtonHelper {
         for (String law : game.getLaws().keySet()) {
             if (lawID.equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
-                    || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColorID())) {
+                    || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     return true;
                 }
             }
@@ -9227,7 +9227,7 @@ public class ButtonHelper {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
         }
         if ("dspnrohd".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
         }
         if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);

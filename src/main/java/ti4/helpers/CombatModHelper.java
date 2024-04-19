@@ -110,7 +110,7 @@ public class CombatModHelper {
         }
 
         List<AgendaModel> lawAgendasTargetingPlayer = activeGame.getLawsInfo().entrySet().stream()
-            .filter(entry -> entry.getValue().equals(player.getFaction()))
+            .filter(entry -> entry.getValue().equals(player.getFaction()) || entry.getValue().equals(player.getColor()))
             .map(entry -> Mapper.getAgenda(entry.getKey()))
             .toList();
         for (AgendaModel agenda : lawAgendasTargetingPlayer) {
