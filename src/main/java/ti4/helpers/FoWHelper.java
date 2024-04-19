@@ -213,8 +213,7 @@ public class FoWHelper {
 					return tile;
 				}
 			}
-			if (player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null
-				&& (faction.contains("ghost") || faction.contains("franken"))) {
+			if (player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
 				return tile;
 			}
 		}

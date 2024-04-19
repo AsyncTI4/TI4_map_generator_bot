@@ -751,7 +751,7 @@ public class ButtonListener extends ListenerAdapter {
                                     buttonsToRemoveCC.add(Button.success(
                                         finChecker + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_"
                                             + tile.getPosition(),
-                                        "Remove CC from " + tile.getRepresentationForButtons(activeGame, player)));
+                                        tile.getRepresentationForButtons(activeGame, player)));
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(channel,
                                     trueIdentity + " Use buttons to remove a CC", buttonsToRemoveCC);
@@ -3001,19 +3001,7 @@ public class ButtonListener extends ListenerAdapter {
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
                     }
-                    Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
-                    if (player.hasAbility("mobile_command") && ButtonHelper
-                        .getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0) {
-                        tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship)
-                            .get(0);
-                    }
-                    if (tile == null) {
-                        tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
-                    }
-                    if (tile == null) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                            "Could not find a HS, sorry bro");
-                    }
+                    Tile tile = FoWHelper.getPlayerHS(activeGame, player);
                     buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "warfare", "place");
                     int val = Helper.getProductionValue(player, activeGame, tile, true);
                     String message = player.getRepresentation()

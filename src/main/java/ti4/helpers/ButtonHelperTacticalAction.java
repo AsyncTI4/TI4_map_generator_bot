@@ -375,8 +375,8 @@ public class ButtonHelperTacticalAction {
         boolean needPDSCheck = false;
         if (activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
             && !activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
-            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) < 0
-            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Mech, player) < 0) {
+            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) < 1
+            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Mech, player) < 1) {
             message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             needPDSCheck = true;
@@ -389,7 +389,7 @@ public class ButtonHelperTacticalAction {
             }
             List<Button> empyButtons = new ArrayList<>();
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
-                && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
+                && (tile.getPlanetUnitHolders().size() == 0) && player.hasUnexhaustedLeader("empyreanagent")) {
                 Button empyButton = Button.secondary("exhaustAgent_empyreanagent", "Use Empyrean Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
                 empyButtons.add(empyButton);
