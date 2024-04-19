@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -1270,8 +1271,10 @@ public class Player {
 
         // DEFAULT REPRESENTATION
         StringBuilder sb = new StringBuilder(getFactionEmoji());
-        if (includePing)
+        if (includePing) {
             sb.append(getPing());
+            sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
+        }
         if (getColor() != null && !"null".equals(getColor())) {
             sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
         }
@@ -2191,6 +2194,7 @@ public class Player {
 
     public void setAutoSaboPassMedian(int median) {
         autoSaboPassMedian = median;
+        // setGlobalUserSetting("autoSaboPassMedianHours", String.valueOf(median));
     }
 
     public void setStasisInfantry(int stasisInfantry) {
@@ -2646,5 +2650,15 @@ public class Player {
     @JsonIgnore
     public List<String> getPreferredColours() {
         return UserSettingsManager.getInstance().getUserSettings(getUserID()).getPreferredColourList();
+    }
+
+    public Optional<String> getGlobalUserSetting(String setting) {
+        return UserSettingsManager.getInstance().getUserSettings(getUserID()).getStoredValue(setting);
+    }
+
+    public void setGlobalUserSetting(String setting, String value) {
+        UserSettings userSetting = UserSettingsManager.getInstance().getUserSettings(getUserID());
+        userSetting.putStoredValue(setting, value);
+        UserSettingsManager.getInstance().saveUserSetting(userSetting);
     }
 }

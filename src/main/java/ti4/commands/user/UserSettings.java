@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -56,12 +57,12 @@ public class UserSettings {
         return List.of(editSettings, Buttons.DONE_DELETE_BUTTONS);
     }
 
-    public void addStoredValue(String settingKey, String settingValue) {
+    public void putStoredValue(String settingKey, String settingValue) {
         storedValues.put(settingKey, settingValue);
     }
 
-    public String getStoredValue(String settingKey) {
-        return storedValues.get(settingKey);
+    public Optional<String> getStoredValue(String settingKey) {
+        return Optional.ofNullable(storedValues.get(settingKey));
     }
 
     public String removeStoredValue(String settingKey) {
