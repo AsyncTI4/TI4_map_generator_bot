@@ -547,6 +547,9 @@ public class CombatHelper {
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
             result = result + "\n" + player.getFactionEmoji() + " You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives";
         }
+        if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
+            result = result + "\n" + player.getFactionEmoji() + " You have shard volley and thus should produce an additional hit to the ones rolled above";
+        }
         if (!extra.isEmpty()) {
             result = result + "\n\n" + extra;
         }
