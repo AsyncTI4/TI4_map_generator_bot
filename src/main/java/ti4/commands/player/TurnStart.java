@@ -313,6 +313,11 @@ public class TurnStart extends PlayerSubcommandData {
                     .withEmoji(Emoji.fromFormatted(Emojis.Saar));
                 startButtons.add(chaos);
             }
+            if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
+                Button chaos = Button.secondary("exhaustTech_dscymiy", "Exhaust Recursive Worm")
+                    .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                startButtons.add(chaos);
+            }
             if (player.hasUnexhaustedLeader("florzenagent")
                 && ButtonHelperAgents.getAttachments(activeGame, player).size() > 0) {
                 startButtons.add(Button

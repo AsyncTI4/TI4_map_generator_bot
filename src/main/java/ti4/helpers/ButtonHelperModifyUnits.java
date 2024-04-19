@@ -110,7 +110,7 @@ public class ButtonHelperModifyUnits {
                 }
                 int totalUnits = unitEntry.getValue() - damagedUnits;
                 int min = Math.min(totalUnits, hits);
-                if (unitModel.getSustainDamage() && min > 0) {
+                if (unitModel.getSustainDamage() && min > 0 && unitModel.getIsShip()) {
                     msg = msg + "> Made " + min + " " + unitModel.getUnitEmoji() + " sustained\n";
                     hits = hits - min;
                     tile.addUnitDamage("space", unitKey, min);

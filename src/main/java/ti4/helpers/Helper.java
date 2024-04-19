@@ -437,6 +437,9 @@ public class Helper {
                     && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
+                    if (activeGame.isFoWMode()) {
+                        message = "Waiting on someone else before proceeding with scoring";
+                    }
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
@@ -445,6 +448,9 @@ public class Helper {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    if (activeGame.isFoWMode()) {
+                        message = "Waiting on someone else before proceeding with scoring";
+                    }
                     break;
                 }
             }
@@ -472,6 +478,9 @@ public class Helper {
                     && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                    if (activeGame.isFoWMode()) {
+                        message = "Waiting on someone else before proceeding with scoring";
+                    }
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
