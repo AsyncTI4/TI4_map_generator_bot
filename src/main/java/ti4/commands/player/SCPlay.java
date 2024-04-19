@@ -127,7 +127,7 @@ public class SCPlay extends PlayerSubcommandData {
             message.append(" by ").append(player.getRepresentation());
         }
         message.append(".\n\n");
-        
+
         String gamePing = activeGame.getPing();
         if (!gamePing.isEmpty()) {
             message.append(gamePing).append("\n");
@@ -269,7 +269,6 @@ public class SCPlay extends PlayerSubcommandData {
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
-            Button mahactA = Button.danger("mahactA_follow_" + scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
             for (Player player3 : activeGame.getRealPlayers()) {
                 if (player3 == player) {
                     continue;
@@ -284,13 +283,12 @@ public class SCPlay extends PlayerSubcommandData {
                             + " with the scepter of emelpar",
                         empNMahButtons);
                 }
-                if (player3.hasUnexhaustedLeader("mahactagent")
-                    && ButtonHelper.getTilesWithYourCC(player, activeGame, event).size() > 0 && !winnuHero) {
+                if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, activeGame, event).size() > 0 && !winnuHero) {
+					Button mahactA = Button.danger("mahactA_follow_" + scToPlay,
+					                               "Use " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You can follow SC #" + scToPlay
-                            + " with mahact agent",
-                        empNMahButtons);
+                        player3.getRepresentation(true, true) + " You can follow SC #" + scToPlay + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)", empNMahButtons);
                 }
             }
         }

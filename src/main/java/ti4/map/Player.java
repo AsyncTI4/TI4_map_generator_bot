@@ -1459,7 +1459,7 @@ public class Player {
      * @param leaderID
      * @return whether a player has access to this leader, typically by way of
      *         Yssaril Agent
-     */
+    */
     public boolean hasExternalAccessToLeader(String leaderID) {
         if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
             return getGame().isLeaderInGame(leaderID);
