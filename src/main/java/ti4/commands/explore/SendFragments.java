@@ -88,7 +88,9 @@ public class SendFragments extends ExploreSubcommandData {
 		String p2 = receiver.getRepresentation();
 		String fragString = count + " " + trait + " " + Emojis.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message = p1 + " sent " + fragString + " to " + p2;
-		MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeGame), message);
+    if (!activeGame.isFoWMode()) {
+		  MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeGame), message);
+    }
 		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
 			ButtonHelper.commanderUnlockCheck(receiver, activeGame, "kollecc", event);
 		}
