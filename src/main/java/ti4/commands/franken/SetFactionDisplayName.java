@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class SetFactionDisplayName extends FrankenSubcommandData {
 
@@ -24,16 +25,16 @@ public class SetFactionDisplayName extends FrankenSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         String displayName = event.getOption(Constants.FACTION_DISPLAY_NAME, null, OptionMapping::getAsString);
         if ("none".equals(displayName)) {
             player.setDisplayName(null);
-            sendMessage("Faction Display Name removed");
+            MessageHelper.sendMessageToEventChannel(event, "Faction Display Name removed");
             return;
         }
-        sendMessage(player.getFactionEmojiOrColor() + " Display Name set to: `" + displayName + "`");
+        MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " Display Name set to: `" + displayName + "`");
         player.setDisplayName(displayName);
     }
     

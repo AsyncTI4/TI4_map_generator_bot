@@ -48,18 +48,18 @@ public class ExpPlanet extends ExploreSubcommandData {
         String planetName = AliasHandler.resolvePlanet(StringUtils.substringBefore(planetOption.getAsString(), " ("));
         Game activeGame = getActiveGame();
         if (!activeGame.getPlanets().contains(planetName)) {
-            sendMessage("Planet not found in map");
+            MessageHelper.sendMessageToEventChannel(event, "Planet not found in map");
             return;
         }
         Tile tile = activeGame.getTileFromPlanet(planetName);
         if (tile == null) {
-            sendMessage("System not found that contains planet");
+            MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
             return;
         }
         planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
         PlanetModel planet = Mapper.getPlanet(planetName);
         if (Optional.ofNullable(planet).isEmpty()) {
-            sendMessage("Invalid planet");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid planet");
             return;
         }
         String drawColor = planet.getPlanetType() == null ? null : planet.getPlanetType().toString();
@@ -68,7 +68,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             drawColor = traitOption.getAsString();
         }
         if (drawColor == null) {
-            sendMessage("Cannot determine trait, please specify");
+            MessageHelper.sendMessageToEventChannel(event, "Cannot determine trait, please specify");
             return;
         }
         
@@ -245,7 +245,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             Tile tileWithPlanet = activeGame.getTileFromPlanet(planetName);
             if (tileWithPlanet == null) {
-                sendMessage("An error occurred while placing an infantry. Resolve manually.");
+                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing an infantry. Resolve manually.");
                 return;
             }
             tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);

@@ -47,30 +47,6 @@ public class CaptureCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         CaptureSubcommandData executedCommand = null;

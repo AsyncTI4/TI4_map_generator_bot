@@ -1,9 +1,11 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
@@ -36,6 +38,6 @@ public class FactionTechAdd extends FactionTechAddRemove {
                 });
             }
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

@@ -22,12 +22,12 @@ public class AddAllianceMember extends PlayerSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null || player.isNotRealPlayer()) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeGame, player, event);
         if (player_ == null || player_.isNotRealPlayer()) {
-            sendMessage("Player to add to the alliance could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to add to the alliance could not be found");
             return;
         }
         String currentMembers = player_.getAllianceMembers();
@@ -67,7 +67,7 @@ public class AddAllianceMember extends PlayerSubcommandData {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), msg);
 
-        sendMessage("Added " + player_.getFaction() + " as part of " + player.getFaction()
+        MessageHelper.sendMessageToEventChannel(event, "Added " + player_.getFaction() + " as part of " + player.getFaction()
                 + "'s alliance. This works 2 ways");
     }
 }

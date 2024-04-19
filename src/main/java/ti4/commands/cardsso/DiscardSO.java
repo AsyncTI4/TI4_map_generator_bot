@@ -32,7 +32,7 @@ public class DiscardSO extends SOCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);

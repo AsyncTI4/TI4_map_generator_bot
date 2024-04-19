@@ -69,7 +69,7 @@ public class RelicSend extends GenericRelicAction {
 
         List<String> player1Relics = player1.getRelics();
         if (!player1Relics.contains(relicID)) {
-            sendMessage(player1.getUserName() + " does not have relic: " + relicID);
+            MessageHelper.sendMessageToEventChannel(event, player1.getUserName() + " does not have relic: " + relicID);
             return;
         }
 
@@ -96,14 +96,14 @@ public class RelicSend extends GenericRelicAction {
         }
         
         if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {
-            sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
+            MessageHelper.sendMessageToEventChannel(event, "Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
             return;
         }
         RelicModel relicModel = Mapper.getRelic(relicID);
         String sb = player1.getRepresentation() +
         " sent a relic to " + player2.getRepresentation() +
         "\n" + relicModel.getSimpleRepresentation();
-        sendMessage(sb);
+        MessageHelper.sendMessageToEventChannel(event, sb);
         Helper.checkEndGame(activeGame, player2);
     }
 }

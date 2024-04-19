@@ -1,5 +1,14 @@
 package ti4.commands.planet;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,15 +21,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import ti4.message.MessageHelper;
 
 public abstract class PlanetAddRemove extends PlanetSubcommandData {
     public PlanetAddRemove(String id, String description) {
@@ -43,7 +44,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
@@ -57,7 +58,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
         Set<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        sendMessage(getActionHeaderMessage(activeGame, player) + ":");
+        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(activeGame, player) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeGame);
@@ -68,21 +69,21 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         try {
             if (Mapper.isValidPlanet(planetID)) {
                 doAction(player, planetID, activeGame);
-                sendMessage("> " + resolvePlanetMessage(planetID));
+                MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planetID));
             } else {
                 Set<String> planets = activeGame.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()){
-                    sendMessage("> No matching Planet '" + planetID + "'' found - please try again.");
+                    MessageHelper.sendMessageToEventChannel(event, "> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
-                    sendMessage("> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    MessageHelper.sendMessageToEventChannel(event, "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                     return;
                 }
                 String planet = possiblePlanets.get(0);
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
                 doAction(player, planet, activeGame);
-                sendMessage("> " + resolvePlanetMessage(planet));
+                MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
             BotLogger.log(event, "Error parsing planet: " + planetID);

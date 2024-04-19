@@ -76,7 +76,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 9 resources to gain 1 relic; you may purge 1 or more of your relic fragments to reduce the resources spent by 3 for each relic fragment you purged.",
+    "text": "Spend 9 resources and purge up to 3 relic fragments to gain 1 relic; for each relic fragment purged, reduce the resources spent by 3.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
     "source": "action_deck_2"
   },

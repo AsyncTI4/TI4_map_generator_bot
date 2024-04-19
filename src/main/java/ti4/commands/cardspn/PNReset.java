@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PNReset extends PNCardsSubcommandData {
     public PNReset() {
@@ -22,7 +23,7 @@ public class PNReset extends PNCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         String playerColor = AliasHandler.resolveColor(player.getColor());
@@ -35,6 +36,6 @@ public class PNReset extends PNCardsSubcommandData {
         }
         PNInfo.checkAndAddPNs(activeGame, player);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
-        sendMessage("PN Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }
 }
