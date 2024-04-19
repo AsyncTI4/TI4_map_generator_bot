@@ -2641,7 +2641,7 @@ public class Player {
     }
 
     /**
-     * @return a list of colours the user would prefer to play as, in order of preference
+     * @return a list of colours the user would prefer to play as, in order of preference - the colours should all be "valid"- colourIDs
      */
     @JsonIgnore
     public List<String> getPreferredColours() {
