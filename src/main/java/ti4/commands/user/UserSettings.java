@@ -1,5 +1,7 @@
 package ti4.commands.user;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +20,15 @@ import ti4.buttons.Buttons;
 @Data
 public class UserSettings {
     private String userId;
-    private List<String> preferredColourList;
-    private String funEmoji;
-    private Map<String, String> otherSettings;
+    private List<String> preferredColourList = new ArrayList<>();
+    private Map<String, String> storedValues = new HashMap<>();
+
+    public UserSettings(String userId) {
+        this.userId = userId;
+    }
+
+    public UserSettings() {
+    }
 
     @JsonIgnore
     public String getJSONRaw() {
@@ -45,11 +53,18 @@ public class UserSettings {
     @JsonIgnore
     public List<Button> getUserSettingsButtons() {
         Button editSettings = Buttons.green("editUserSettings", "Edit User Settings");
-        return List.of(editSettings);
+        return List.of(editSettings, Buttons.DONE_DELETE_BUTTONS);
     }
 
-    public void addOtherSetting(String settingKey, String settingValue) {
-        otherSettings.put(settingKey, settingValue);
+    public void addStoredValue(String settingKey, String settingValue) {
+        storedValues.put(settingKey, settingValue);
     }
 
+    public String getStoredValue(String settingKey) {
+        return storedValues.get(settingKey);
+    }
+
+    public String removeStoredValue(String settingKey) {
+        return storedValues.remove(settingKey);
+    }
 }

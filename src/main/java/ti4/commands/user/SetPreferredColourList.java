@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
@@ -20,6 +21,7 @@ public class SetPreferredColourList extends UserSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<String> colourList = Helper.getListFromCSV(event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
+        colourList = new ArrayList<>(colourList.stream().map(AliasHandler::resolveColor).toList());
         List<String> badColours = new ArrayList<>();
         for (String colour : colourList) {
             if (!Mapper.isValidColor(colour)) {

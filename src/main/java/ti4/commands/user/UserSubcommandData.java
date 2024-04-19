@@ -25,7 +25,7 @@ public abstract class UserSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId()).orElse(new UserSettings());
+        userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);

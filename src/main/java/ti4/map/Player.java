@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
@@ -2637,5 +2638,13 @@ public class Player {
 
     public void setEliminated(boolean eliminated) {
         this.eliminated = eliminated;
+    }
+
+    /**
+     * @return a list of colours the user would prefer to play as, in order of preference
+     */
+    @JsonIgnore
+    public List<String> getPreferredColours() {
+        return UserSettingsManager.getInstance().getUserSettings(getUserID()).getPreferredColourList();
     }
 }

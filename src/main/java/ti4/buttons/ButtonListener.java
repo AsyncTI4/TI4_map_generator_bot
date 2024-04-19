@@ -141,7 +141,7 @@ public class ButtonListener extends ListenerAdapter {
                 .setEphemeral(true).queue();
             return;
         }
-        event.deferReply().queue();
+        event.deferEdit().queue();
         BotLogger.logButton(event);
         long startTime = new Date().getTime();
         try {
