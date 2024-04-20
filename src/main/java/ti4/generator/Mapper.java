@@ -430,6 +430,10 @@ public class Mapper {
         return "control_" + property + ".png";
     }
 
+    public static String getPeakMarkerID(String color) {
+        return "peak_" + colors.getProperty(color) + ".png";
+    }
+
     public static String getSweepID(String color) {
         String property = colors.getProperty(color);
         return "sweep_" + property + ".png";
@@ -722,6 +726,11 @@ public class Mapper {
     @Nullable
     public static String getCCPath(String ccID) {
         return ResourceHelper.getInstance().getCCFile(ccID);
+    }
+
+    @Nullable
+    public static String getPeakMarkerPath(String markerID) {
+        return ResourceHelper.getInstance().getPeakMarkerFile(markerID);
     }
 
     @Nullable

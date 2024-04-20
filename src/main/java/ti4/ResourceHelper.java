@@ -16,6 +16,7 @@ public class ResourceHelper {
     private final Map<String, String> spoopyCache = new HashMap<>();
     private final Map<String, String> tileCache = new HashMap<>();
     private final Map<String, String> ccCache = new HashMap<>();
+    private final Map<String, String> peakMarkerCache = new HashMap<>();
     private final Map<String, String> attachmentCache = new HashMap<>();
     private final Map<String, String> tokenCache = new HashMap<>();
     private final Map<String, String> factionCache = new HashMap<>();
@@ -151,6 +152,17 @@ public class ResourceHelper {
         String cc = getResourceFromFolder("command_token/", name, "Could not find command token file");
         ccCache.put(name, cc);
         return cc;
+    }
+
+    @Nullable
+    public String getPeakMarkerFile(String name) {
+        String markerPath = peakMarkerCache.get(name);
+        if (markerPath != null) {
+            return markerPath;
+        }
+        String marker = getResourceFromFolder("peak_marker/", name, "Could not find peak marker file");
+        peakMarkerCache.put(name, marker);
+        return marker;
     }
 
     @Nullable

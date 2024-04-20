@@ -3225,27 +3225,58 @@ public class MapGenerator {
 
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
+            List <String> playerIDs;
             if (activeGame.getPublicObjectives1Peaked().containsKey(unRevealed)) {
-                List<String> playerIDs = activeGame.getPublicObjectives1Peaked().get(unRevealed);
+                playerIDs = activeGame.getPublicObjectives1Peaked().get(unRevealed);
 
-                int xPos = x + 750;
-                for (String id : playerIDs) {
-                    graphics.drawString("hi", xPos, y + 23);
-                    xPos -= 18;
-                }
             } else if (activeGame.getPublicObjectives2Peaked().containsKey(unRevealed)) {
-                List<String> playerIDs = activeGame.getPublicObjectives2Peaked().get(unRevealed);
-
-                int xPos = x + 750;
-                for (String id : playerIDs) {
-                    graphics.drawString("hi", xPos, y + 23);
-                    xPos -= 18;
-                }
+                playerIDs = activeGame.getPublicObjectives2Peaked().get(unRevealed);
+            } else {
+                y += 43;
+                continue;
             }
 
+            drawPeakedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             y += 43;
         }
         return y;
+    }
+
+    private void drawPeakedMarkers(int x, int y, Map<String, Player> players, List<String> peakedPlayerID) {
+        try {
+            for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
+                Player player = playerEntry.getValue();
+                String userID = player.getUserID();
+
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
+                    && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                if (peakedPlayerID.contains(userID)) {
+                    String markerID = convertToGeneric ? Mapper.getPeakMarkerID("gray")
+                        : Mapper.getPeakMarkerID(player.getColor());
+                    if (markerID.contains("null")) {
+                        continue;
+                    }
+
+                    // Todo: update getting/scaling peak markers once finalized assets are available.
+                    float scale = 0.35f;
+
+                    BufferedImage peakedMarkerImage = ImageHelper.readScaled(Mapper.getPeakMarkerPath(markerID), scale);
+                    if (peakedMarkerImage == null) {
+                        BotLogger.log(String.format("Failed to read peak marker with ID: %s", markerID));
+                        return;
+                    }
+
+                    int centreCustomTokenHorizontally = peakedMarkerImage.getWidth() / 2 - peakedMarkerImage.getWidth() / 2;
+                    int centreCustomTokenVertically = peakedMarkerImage.getHeight() / 2 - peakedMarkerImage.getHeight() / 2;
+
+                    graphics.drawImage(peakedMarkerImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
+
+                    x += peakedMarkerImage.getWidth() + 10;
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("Could not draw peak markers", e);
+        }
     }
 
     private void drawScoreControlMarkers(
