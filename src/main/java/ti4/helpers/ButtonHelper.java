@@ -4458,6 +4458,9 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
             buttons.add(ghostButton);
         }
+        if (player.getTechs().contains("dsgledb") && !player.getExhaustedTechs().contains("dsgledb")) {
+            buttons.add(Button.success(finChecker + "exhaustTech_dsgledb", "Exhaust Lightning Drives").withEmoji(Emoji.fromFormatted(Emojis.gledge)));
+        }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "vayleriancommander")) {
             Button ghostButton = Button.secondary("declareUse_Vaylerian Commander", "Use Vaylerian Commander")
@@ -9251,6 +9254,9 @@ public class ButtonHelper {
         }
         if ("dspnrohd".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
+        }
+        if ("dspnbent".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.offerBentorPNButtons(player, game, event);
         }
         if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game, event);

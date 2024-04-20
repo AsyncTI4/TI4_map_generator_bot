@@ -410,6 +410,9 @@ public class ButtonHelperActionCards {
         player.setFleetCC(player.getFleetCC() + 2);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         event.getMessage().delete().queue();
+        if (activeGame.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
+        }
     }
 
     public static List<Button> getArcExpButtons(Game activeGame, Player player) {

@@ -294,7 +294,7 @@ public class MessageHelper {
 		buttons = sanitizeButtons(buttons, channel);
 
 		Game game = getGameFromChannelName(channel.getName());
-		if (game != null && game.isInjectRulesLinks()) {
+		if (game != null && game.isInjectRulesLinks() && !game.isFoWMode()) {
 			messageText = injectRules(messageText);
 		}
 		final String message = messageText;

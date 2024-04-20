@@ -35,7 +35,7 @@ public class AddFrontierTokens implements Command {
         Collection<Tile> tileList = game.getTileMap().values();
         List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
-            if (((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size()==2) || frontierTileList.contains(tile.getTileID()) ) && !game.isBaseGameMode()) {
+            if (((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size() == 2) || Mapper.getFrontierTileIds().contains(tile.getTileID())) && !game.isBaseGameMode()) {
                 boolean hasMirage = false;
                 for (UnitHolder unitholder : tile.getUnitHolders().values()) {
                     if (unitholder.getName().equals(Constants.MIRAGE)) {
@@ -46,9 +46,9 @@ public class AddFrontierTokens implements Command {
                 if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, game);
             }
         }
-        if(game.getRound() == 1){
+        if (game.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("deal2SOToAll" , "Deal 2 SO To All"));
+            buttons.add(Button.success("deal2SOToAll", "Deal 2 SO To All"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after every player is setup", buttons);
         }
     }
@@ -72,9 +72,9 @@ public class AddFrontierTokens implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Add Frontier tokens to all possible tiles")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
-                                .setRequired(true))
+            Commands.slash(getActionID(), "Add Frontier tokens to all possible tiles")
+                .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
+                    .setRequired(true))
 
         );
     }
