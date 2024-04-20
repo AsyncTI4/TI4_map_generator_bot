@@ -2305,6 +2305,11 @@ public class AgendaHelper {
                             ButtonHelperAbilities.pillageCheck(winningR, activeGame);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 5);
                         }
+                        if (specificVote.contains("Relic Rider")) {
+                            MessageHelper.sendMessageToChannel(channel,
+                                identity + " due to having a winning Relic rider, you have gained a relic");
+                            DrawRelic.drawRelicAndNotify(winningR, event, activeGame);
+                        }
                         if (specificVote.contains("Radiance")) {
                             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, winningR,
                                 UnitType.Mech);
