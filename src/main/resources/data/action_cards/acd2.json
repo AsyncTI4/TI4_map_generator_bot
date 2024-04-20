@@ -337,7 +337,7 @@
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "After you commit units to land on another player's non-home planet",
-    "text": "Place 1 infantry on that planet. Then, if you have less units on that planet than that player, place 1 additional infantry.",
+    "text": "Place 1 infantry on that planet. Then, if you have less ground forces on that planet than that player, place 1 additional infantry.",
     "flavorText": "Harrugh had brought them supplies, lived among them, honored their traditions, and filled them with hope. On the promised day, they would repay him with their determination for liberation.",
     "source": "action_deck_2"
   },
