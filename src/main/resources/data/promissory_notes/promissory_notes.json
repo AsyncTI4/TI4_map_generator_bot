@@ -3,8 +3,7 @@
         "alias": "ambuscade",
         "name": "Strike Wing Ambuscade",
         "faction": "argent",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "pok",
         "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player."
     },
@@ -12,8 +11,7 @@
         "alias": "war_funding",
         "name": "War Funding",
         "faction": "letnev",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "After you and your opponent roll dice during space combat: You may reroll all of your opponent's dice. You may reroll any number of your dice. Then, return this card to the Letnev player."
     },
@@ -21,8 +19,7 @@
         "alias": "ragh",
         "name": "Raghs Call",
         "faction": "saar",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "After you commit 1 or more units to land on a planet: Remove all of the Saar player's ground forces from that planet and place them on a planet controlled by the Saar player. Then, return this card to the Saar player."
     },
@@ -30,8 +27,7 @@
         "alias": "fires",
         "name": "Fires of the Gashlai",
         "faction": "muaat",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player."
     },
@@ -39,8 +35,8 @@
         "alias": "convoys",
         "name": "Trade Convoys",
         "faction": "hacan",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "source": "base",
         "text": "Action: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor.  If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
     },
@@ -48,8 +44,8 @@
         "alias": "blood_pact",
         "name": "Blood Pact",
         "faction": "empyrean",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "source": "pok",
         "text": "Action: Place this card faceup in your play area. When you and the Empyrean player cast votes for the same outcome, cast 4 additional votes for that outcome. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
@@ -57,8 +53,7 @@
         "alias": "ms",
         "name": "Military Support",
         "faction": "sol",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "At the start of the Sol player's turn: Remove 1 token from the Sol player's strategy pool, if able, and return it to their reinforcements. Then, you may place 2 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player."
     },
@@ -66,8 +61,7 @@
         "alias": "iff",
         "name": "Creuss Iff",
         "faction": "ghost",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "At the start of your turn during the action phase: Place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships. Then, return this card to the Creuss player."
     },
@@ -75,8 +69,7 @@
         "alias": "ce",
         "name": "Cybernetic Enhancements",
         "faction": "l1z1x",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player."
     },
@@ -84,8 +77,7 @@
         "alias": "scepter",
         "name": "Scepter of Dominion",
         "faction": "mahact",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "pok",
         "text": "At the start of the strategy phase: Choose 1 non-home system that contains your units, each other player who has a token on the Mahact player's command sheet places a token from their reinforcements in that system. Then, return this card to the Mahact player."
     },
@@ -93,8 +85,8 @@
         "alias": "pop",
         "name": "Promise of Protection",
         "faction": "mentak",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "source": "base",
         "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you. If you activate a system that contains 1 or more of the Mentak player's units, return this card to the Mentak player."
     },
@@ -102,8 +94,8 @@
         "alias": "gift",
         "name": "Gift of Prescience",
         "faction": "naalu",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "source": "base",
         "text": "At the end of the Strategy Phase: Place this card faceup in your play area and place the Naalu '0' token on your strategy card, you are the first in initiative order. The Naalu player cannot use his Telepathic faction ability during this game round. Return this card to the Naalu player at the end of the status phase."
     },
@@ -111,8 +103,7 @@
         "alias": "bmf",
         "name": "Black Market Forgery",
         "faction": "naaz",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "pok",
         "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player."
     },
@@ -120,8 +111,8 @@
         "alias": "antivirus",
         "name": "Antivirus",
         "faction": "nekro",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "source": "base",
         "text": "At the start of a combat: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player."
     },
@@ -129,8 +120,7 @@
         "alias": "cavalry",
         "name": "The Cavalry",
         "faction": "nomad",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "pok",
         "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the Sustain Damage ability, combat value, and Anti-Fighter Barrage value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
     },
@@ -138,8 +128,7 @@
         "alias": "tekklar",
         "name": "Tekklar Legion",
         "faction": "sardakk",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "At the start of an invasion combat: Apply +1 to the result of each of your unit's combat rolls during this combat. If your opponent is the N'orr player, apply -1 to the result of each of their unit's combat rolls during this combat. Then, return this card to the N'orr player."
     },
@@ -147,8 +136,8 @@
         "alias": "terraform",
         "name": "Terraform",
         "faction": "titans",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "attachment": "titanspn",
         "source": "pok",
         "text": "Action: Attach this card to a non-home planet you control other than Mecatol Rex. Its resource and influence values are each increased by 1, and it is treated as having all 3 planet traits (cultural, hazardous, and industrial)."
@@ -157,8 +146,7 @@
         "alias": "ra",
         "name": "Research Agreement",
         "faction": "jolnar",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "After the Jol-Nar player researches a technology that is not a faction technology: Gain that technology. Then, return this card to the Jol-Nar player."
     },
@@ -166,8 +154,7 @@
         "alias": "crucible",
         "name": "Crucible",
         "faction": "cabal",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "pok",
         "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player."
     },
@@ -175,8 +162,7 @@
         "alias": "acq",
         "name": "Acquiescence",
         "faction": "winnu",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
     },
@@ -184,8 +170,7 @@
         "alias": "favor",
         "name": "Political Favor",
         "faction": "xxcha",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "When an agenda is revealed: Remove 1 token from the Xxcha player's strategy pool and return it to their reinforcements. Then, discard the revealed agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead. Then, return this card to the Xxcha player."
     },
@@ -193,8 +178,7 @@
         "alias": "greyfire",
         "name": "Greyfire Mutagen",
         "faction": "yin",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "At the start of a ground combat against 2 or more ground forces that are not controlled by the Yin player: Replace 1 of your opponent's infantry with 1 infantry from your reinforcements. Then, return this card to the Yin player."
     },
@@ -202,8 +186,7 @@
         "alias": "spynet",
         "name": "Spy Net",
         "faction": "yssaril",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "At the start of your turn: Look at the Yssaril player's hand of action cards. Choose 1 of those cards and add it to your hand. Then, return this card to the Yssaril player."
     },
@@ -211,8 +194,7 @@
         "alias": "stymie",
         "name": "Stymie",
         "faction": "arborec",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "base",
         "text": "After another player moves ships into a system that contains 1 or more of your units: You may place 1 command token from that player's reinforcements in any non-home system. Then, return this card to the Arborec player."
     },
@@ -220,8 +202,8 @@
         "alias": "dark_pact",
         "name": "Dark Pact",
         "faction": "empyrean",
-        "color": "",
-        "playArea": "true",
+        "playArea": true,
+        "playImmediately": false,
         "source": "pok",
         "text": "Action: Place this card faceup in your play area. When you give a number of commodities to the Empyrean player equal to your maximum commodity value, you each gain 1 trade good. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
@@ -229,8 +211,7 @@
         "alias": "rider",
         "name": "Keleres Rider",
         "faction": "keleres",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
@@ -238,8 +219,7 @@
         "alias": "ridera",
         "name": "Keleres Rider",
         "faction": "keleresa",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
@@ -247,8 +227,7 @@
         "alias": "riderm",
         "name": "Keleres Rider",
         "faction": "keleresm",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
@@ -256,8 +235,7 @@
         "alias": "riderx",
         "name": "Keleres Rider",
         "faction": "keleresx",
-        "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     }

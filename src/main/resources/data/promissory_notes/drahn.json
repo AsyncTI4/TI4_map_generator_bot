@@ -4,7 +4,7 @@
         "name": "Networking Officer",
         "faction": "drahn",
         "color": "",
-        "playArea": "false",
+        "playArea": false,
         "source": "keleresplus",
         "text": "This promissory note has the ability text of 1 of your faction promissory notes of your choice, replacing any reference to your faction with that of the Drahn player."
     }
