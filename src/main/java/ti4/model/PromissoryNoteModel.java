@@ -2,7 +2,6 @@ package ti4.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +20,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String faction;
     private String color;
     private Boolean playArea;
+    private Boolean playImmediately;
     private String attachment;
     private ComponentSource source;
     private String text;
@@ -100,13 +100,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (playArea == null) {
             return false;
         }
-        List<String> pnIDsToHoldInHandBeforePlayArea = Arrays.asList(
-            "gift", "antivirus", "convoys", "dark_pact", "blood_pact",
-            "pop", "terraform", "dspnauge", "dspnaxis", "dspnbent",
-            "dspndihm", "dspnghot", "dspngled", "dspnkolu", "dspnkort",
-            "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
-
-        return playArea && !pnIDsToHoldInHandBeforePlayArea.contains(alias);
+        if (playImmediately != null) return playArea && playImmediately;
+        
+        return playArea;
     }
 
     public MessageEmbed getRepresentationEmbed() {
