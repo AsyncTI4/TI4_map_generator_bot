@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -482,6 +484,9 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.PO2PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives2Peakable()));
         writer.write(System.lineSeparator());
+
+        savePeakedPublicObjectives(writer, Constants.PO1PEAKED, activeGame.getPublicObjectives1Peaked());
+        savePeakedPublicObjectives(writer, Constants.PO2PEAKED, activeGame.getPublicObjectives2Peaked());
 
         DisplayType displayTypeForced = activeGame.getDisplayTypeForced();
         if (displayTypeForced != null) {
@@ -1355,6 +1360,8 @@ public class GameSaveLoadManager {
                 case Constants.PO1PEAKABLE -> activeGame.setPublicObjectives1Peakable(getCardList(info));
                 case Constants.SAVED_BUTTONS -> activeGame.setSavedButtons(getCardList(info));
                 case Constants.PO2PEAKABLE -> activeGame.setPublicObjectives2Peakable(getCardList(info));
+                case Constants.PO1PEAKED -> activeGame.setPublicObjectives1Peaked(loadPeakedPublicObjectives(info));
+                case Constants.PO2PEAKED -> activeGame.setPublicObjectives2Peaked(loadPeakedPublicObjectives(info));
                 case Constants.SO_TO_PO -> activeGame.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> activeGame.setPurgedPNs(getCardList(info));
                 case Constants.REVEALED_PO -> activeGame.setRevealedPublicObjectives(getParsedCards(info));
@@ -2407,4 +2414,42 @@ public class GameSaveLoadManager {
         // todo implement token read
     }
 
+    private static void savePeakedPublicObjectives(FileWriter writer, final String constant, Map<String, List<String>> peakedPOs) {
+        try {
+            writer.write(constant + " ");
+
+            for (String po : peakedPOs.keySet()) {
+                writer.write(po + ":");
+
+                for (String playerID : peakedPOs.get(po)) {
+                    writer.write(playerID + ",");
+                }
+
+                writer.write(";");
+            }
+
+            writer.write(System.lineSeparator());
+        } catch (Exception e) {
+            BotLogger.log("Error trying to save peaked public objective(s): " + constant, e);
+        }
+    }
+
+    private static Map<String, List<String>> loadPeakedPublicObjectives(String data) {
+        Map<String, List<String>> peakedPublicObjectives = new LinkedHashMap<>();
+
+        if (data.isEmpty()) {
+            return peakedPublicObjectives;
+        }
+
+        Pattern pattern = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
+        Matcher matcher = pattern.matcher(data);
+
+        while (matcher.find()) {
+            String po = matcher.group(1);
+            List<String> playerIDs = List.of(matcher.group(2).split(","));
+            peakedPublicObjectives.put(po, playerIDs);
+        }
+
+        return peakedPublicObjectives;
+    }
 }

@@ -3226,19 +3226,19 @@ public class MapGenerator {
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
             if (activeGame.getPublicObjectives1Peaked().containsKey(unRevealed)) {
-                List<Player> players = activeGame.getPublicObjectives1Peaked().get(unRevealed);
+                List<String> playerIDs = activeGame.getPublicObjectives1Peaked().get(unRevealed);
 
                 int xPos = x + 750;
-                for (Player player : players) {
+                for (String id : playerIDs) {
                     graphics.drawString("hi", xPos, y + 23);
                     xPos -= 18;
                 }
             } else if (activeGame.getPublicObjectives2Peaked().containsKey(unRevealed)) {
-                List<Player> players = activeGame.getPublicObjectives2Peaked().get(unRevealed);
+                List<String> playerIDs = activeGame.getPublicObjectives2Peaked().get(unRevealed);
 
                 int xPos = x + 750;
-                for (Player player : players) {
-                    graphics.drawString(player.getDisplayName().substring(0, 0), xPos, y + 23);
+                for (String id : playerIDs) {
+                    graphics.drawString("hi", xPos, y + 23);
                     xPos -= 18;
                 }
             }

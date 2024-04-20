@@ -292,8 +292,12 @@ public class Game {
     private List<String> publicObjectives2;
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
-    private Map<String, List<Player>> publicObjectives1Peaked = new LinkedHashMap<>();
-    private Map<String, List<Player>> publicObjectives2Peaked = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private Map<String, List<String>> publicObjectives1Peaked = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private Map<String, List<String>> publicObjectives2Peaked = new LinkedHashMap<>();
     private List<String> savedButtons = new ArrayList<>();
     private List<String> soToPoList = new ArrayList<>();
     @JsonIgnore
@@ -1553,11 +1557,11 @@ public class Game {
     public String peakAtStage1(int place, Player player) {
         String objective = peakAtObjective(publicObjectives1Peakable, place);
 
-        if (publicObjectives1Peaked.containsKey(objective) && !publicObjectives1Peaked.get(objective).contains(player)) {
-            publicObjectives1Peaked.get(objective).add(player);
+        if (publicObjectives1Peaked.containsKey(objective) && !publicObjectives1Peaked.get(objective).contains(player.getUserID())) {
+            publicObjectives1Peaked.get(objective).add(player.getUserID());
         } else {
-            ArrayList<Player> list = new ArrayList<>();
-            list.add(player);
+            ArrayList<String> list = new ArrayList<>();
+            list.add(player.getUserID());
             publicObjectives1Peaked.put(objective, list);
         }
 
@@ -1567,11 +1571,11 @@ public class Game {
     public String peakAtStage2(int place, Player player) {
         String objective = peakAtObjective(publicObjectives2Peakable, place);
 
-        if (publicObjectives2Peaked.containsKey(objective) && !publicObjectives2Peaked.get(objective).contains(player)) {
-            publicObjectives2Peaked.get(objective).add(player);
+        if (publicObjectives2Peaked.containsKey(objective) && !publicObjectives2Peaked.get(objective).contains(player.getUserID())) {
+            publicObjectives2Peaked.get(objective).add(player.getUserID());
         } else {
-            ArrayList<Player> list = new ArrayList<>();
-            list.add(player);
+            ArrayList<String> list = new ArrayList<>();
+            list.add(player.getUserID());
             publicObjectives2Peaked.put(objective, list);
         }
 
