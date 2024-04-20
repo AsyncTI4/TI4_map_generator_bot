@@ -1702,7 +1702,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getJolNarHeroSwapInOptions(Player player, Game game, String buttonID) {
-        String tech = buttonID.split("_")[1];
+        String tech = buttonID.replace("jnHeroSwapOut_", "");
         TechnologyModel techM = Mapper.getTech(tech);
         List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techM.getType().toString(), player);
         return Helper.getTechButtons(techs, techM.getType().toString(), player, tech);
@@ -1719,8 +1719,8 @@ public class ButtonHelperHeroes {
 
     public static void resolveAJolNarSwapStep2(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
-        String techOut = buttonID.split("_")[1];
-        String techIn = buttonID.split("_")[2];
+        String techOut = buttonID.split("__")[1];
+        String techIn = buttonID.split("__")[2];
         TechnologyModel techM1 = Mapper.getTech(techOut);
         TechnologyModel techM2 = Mapper.getTech(techIn);
         player.addTech(techIn);

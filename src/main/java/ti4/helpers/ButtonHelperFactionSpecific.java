@@ -458,14 +458,14 @@ public class ButtonHelperFactionSpecific {
         techToGain.add("sdn");
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+            if (!player.getTechs().contains(tech)) {
                 techs.add(Button.success(
                     player.getFinsFactionCheckerPrefix() + "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                     Mapper.getTech(tech).getName()));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-            player.getRepresentation(true, true) + " use the buttons to get one of the starting winnu tech", techs);
+            player.getRepresentation(true, true) + " use the buttons to get a tech", techs);
     }
 
     public static void offerSpyNetOptions(Player player) {
@@ -1618,6 +1618,23 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
+    public static void offerBentorPNButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null
+                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+                buttons.add(Button.success("bentorPNPlanet_" + planet,
+                    Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = "Use buttons to select which planet to place encryption key on";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
     public static void resolveOlradinPN(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -1764,6 +1781,16 @@ public class ButtonHelperFactionSpecific {
         planetReal.addToken("attachment_automatons.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached automatons to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+
+    public static void bentorPNPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
+        String planet = buttonID.replace("bentorPNPlanet_", "");
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        planetReal.addToken("attachment_encryptionkey.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached encryption key to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 

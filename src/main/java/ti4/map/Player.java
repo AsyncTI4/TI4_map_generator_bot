@@ -1151,19 +1151,51 @@ public class Player {
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;
-                    hasFoundCulFrag = true;
+                    if (!hasFoundCulFrag) {
+                        hasFoundCulFrag = true;
+                        if (hasUnit("bentor_mech")) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                        }
+                    }
                 }
                 case Constants.INDUSTRIAL -> {
                     irf++;
-                    hasFoundIndFrag = true;
+                    if (!hasFoundIndFrag) {
+                        hasFoundIndFrag = true;
+                        if (hasUnit("bentor_mech")) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                        }
+                    }
                 }
                 case Constants.HAZARDOUS -> {
                     hrf++;
-                    hasFoundHazFrag = true;
+                    if (!hasFoundHazFrag) {
+                        hasFoundHazFrag = true;
+                        if (hasUnit("bentor_mech")) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                        }
+                    }
                 }
                 case Constants.FRONTIER -> {
                     vrf++;
-                    hasFoundUnkFrag = true;
+                    if (!hasFoundUnkFrag) {
+                        hasFoundUnkFrag = true;
+                        if (hasUnit("bentor_mech")) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                        }
+                    }
                 }
             }
         }

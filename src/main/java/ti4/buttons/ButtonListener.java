@@ -98,6 +98,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
+import ti4.helpers.ButtonHelperActionCardsWillHomebrew;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -355,6 +356,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("creussHeroStep1_")) {
             ButtonHelperHeroes.getGhostHeroTilesStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("spatialCollapseStep2_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("spatialCollapseStep3_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("resolveUpgrade_")) {
             ButtonHelperActionCards.resolveUpgrade(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resolveEmergencyRepairs_")) {
@@ -2108,6 +2113,9 @@ public class ButtonListener extends ListenerAdapter {
             if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "mahact", event);
             }
+            if (activeGame.getLaws().keySet().contains("regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
+            }
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("returnFFToSpace_")) {
             ButtonHelperFactionSpecific.returnFightersToSpace(player, activeGame, event, buttonID);
@@ -2490,6 +2498,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveABSStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("ghostShipStep2_")) {
             ButtonHelperActionCards.resolveGhostShipStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("strandedShipStep2_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveStrandedShipStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("tacticalBombardmentStep2_")) {
             ButtonHelperActionCards.resolveTacticalBombardmentStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("probeStep2_")) {
@@ -2783,8 +2793,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.flipIonStorm(activeGame, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame);
-        } else if (buttonID.startsWith("automatonsPlanet_")) {
+        } else if (buttonID.startsWith("automatonsPlanet_")) {//"bentorPNPlanet_"
             ButtonHelperFactionSpecific.automatonsPlanet(buttonID, event, activeGame);
+        } else if (buttonID.startsWith("bentorPNPlanet_")) {//"bentorPNPlanet_"
+            ButtonHelperFactionSpecific.bentorPNPlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("gledgeBasePlanet_")) {
             ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, activeGame);
         } else if (buttonID.startsWith("veldyrAttach_")) {
@@ -4229,6 +4241,9 @@ public class ButtonListener extends ListenerAdapter {
                     String editedMessage = player.getRepresentation() + " CCs have gone from " + originalCCs + " -> "
                         + player.getCCRepresentation() + ". Net gain of: " + netGain;
                     event.getMessage().editMessage(editedMessage).queue();
+                    if (activeGame.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
+                    }
                 }
                 case "decrease_strategy_cc" -> {
                     player.setStrategicCC(player.getStrategicCC() - 1);
@@ -4348,6 +4363,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "miningInitiative" -> ButtonHelperActionCards.miningInitiative(player, activeGame, event);
                 case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, activeGame, event, buttonID);
                 case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, activeGame, event);
+                case "technologicalBreakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveTechnologicalBreakthrough(player, activeGame, event);
                 case "getRepealLawButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                     "Use buttons to select Law to repeal",
                     ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
@@ -4390,6 +4406,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveEmergencyMeeting" -> ButtonHelperActionCards.resolveEmergencyMeeting(player, activeGame, event);
                 case "resolveSalvageStep1" -> ButtonHelperActionCards.resolveSalvageStep1(player, activeGame, event, buttonID);
                 case "resolveGhostShipStep1" -> ButtonHelperActionCards.resolveGhostShipStep1(player, activeGame, event, buttonID);
+                case "strandedShipStep1" -> ButtonHelperActionCardsWillHomebrew.resolveStrandedShipStep1(player, activeGame, event, buttonID);
+                case "spatialCollapseStep1" -> ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep1(player, activeGame, event, buttonID);
                 case "resolveTacticalBombardmentStep1" -> ButtonHelperActionCards.resolveTacticalBombardmentStep1(player, activeGame, event, buttonID);
                 case "resolveProbeStep1" -> ButtonHelperActionCards.resolveProbeStep1(player, activeGame, event, buttonID);
                 case "resolvePSStep1" -> ButtonHelperActionCards.resolvePSStep1(player, activeGame, event, buttonID);
@@ -4509,6 +4527,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "startArbiter" -> ButtonHelper.resolveImperialArbiter(event, activeGame, player);
+                case "resolveTombRaiders" -> ButtonHelperActionCardsWillHomebrew.resolveTombRaiders(player, activeGame, event);
                 case "pay1tgforKeleres" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, activeGame, event);
                 case "pay1tg" -> {
                     int oldTg = player.getTg();
@@ -5382,30 +5401,36 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
+                    Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                     buttons.add(sar);
                 }
                 if (player.hasTechReady("htp") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    Button sar = Button.danger("exhaustTech_htp", "Exhaust Hegemonic Trade Policy");
+                    Button sar = Button.danger("exhaustTech_htp", "Exhaust Hegemonic Trade Policy").withEmoji(Emoji.fromFormatted(Emojis.Winnu));
                     buttons.add(sar);
                 }
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
-                    Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander To Gain a TG");
+                    Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander").withEmoji(Emoji.fromFormatted(Emojis.Titans));
+                    buttons.add(sar2);
+                }
+                if (player.hasTechReady("dsbenty")
+                    && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
+                    && !buttonID.contains("integrated")) {
+                    Button sar2 = Button.success("exhaustTech_dsbenty", "Use Merged Replicators").withEmoji(Emoji.fromFormatted(Emojis.bentor));
                     buttons.add(sar2);
                 }
                 if (ButtonHelper.getNumberOfUnitUpgrades(player) > 0 && player.hasTechReady("aida")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
                     Button aiDEVButton = Button.danger("exhaustTech_aida",
-                        "Exhaust AIDEV (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)");
+                        "Exhaust AIDEV (" + ButtonHelper.getNumberOfUnitUpgrades(player) + "r)").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                     buttons.add(aiDEVButton);
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button sarweenButton = Button.danger("useTech_st", "Use Sarween");
+                    Button sarweenButton = Button.danger("useTech_st", "Use Sarween").withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                     buttons.add(sarweenButton);
                 }
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
