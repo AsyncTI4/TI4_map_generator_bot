@@ -1805,6 +1805,9 @@ public class Helper {
                         continue;
                     }
                 }
+                if ("tacticalAction".equalsIgnoreCase(warfareNOtherstuff) && getProductionValueOfUnitHolder(player, activeGame, tile, unitHolder) == 0 && getProductionValueOfUnitHolder(player, activeGame, tile, tile.getUnitHolders().get("space")) == 0) {
+                    continue;
+                }
                 if (warfareNOtherstuff.contains("integrated") && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
                     continue;
                 }
@@ -2524,7 +2527,7 @@ public class Helper {
                 if ("nekro".equalsIgnoreCase(jolNarHeroTech)) {
                     buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
                 } else {
-                    buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
+                    buttonID = "FFCC_" + player.getFaction() + "_swapTechs__" + jolNarHeroTech + "__" + tech.getAlias();
                 }
             } else {
                 buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;

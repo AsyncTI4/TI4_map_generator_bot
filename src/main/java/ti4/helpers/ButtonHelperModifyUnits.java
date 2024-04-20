@@ -309,6 +309,10 @@ public class ButtonHelperModifyUnits {
                             ButtonHelper.rollMykoMechRevival(activeGame, player);
                         }
                     }
+                    if (player.hasUnit("cheiran_mech")) {
+                        new AddUnits().unitParsing(event, player.getColor(), tile, min + " infantry " + unitHolder.getName(), activeGame);
+                        msg = msg + "> Added " + min + " infantry to the planet due to Cheiran mech trigger\n";
+                    }
                 }
 
             }
@@ -926,10 +930,11 @@ public class ButtonHelperModifyUnits {
         }
         List<String> checked = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)) {
-            if (pos1.equalsIgnoreCase(pos2)) {
+            Tile tile = activeGame.getTileByPosition(pos2);
+            if (pos1.equalsIgnoreCase(pos2) || checked.contains(pos2) || (!Mapper.getFrontierTileIds().contains(tile.getTileID()) && tile.getPlanetUnitHolders().size() == 0)) {
                 continue;
             }
-            if (checked.contains(pos2)) {
+            if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) || (tile.isSupernova() && !player.getTechs().contains("mr"))) {
                 continue;
             }
             checked.add(pos2);
@@ -2233,6 +2238,11 @@ public class ButtonHelperModifyUnits {
                                     ButtonHelper.rollMykoMechRevival(activeGame, player);
                                 }
                             }
+                            if (player.hasUnit("cheiran_mech")) {
+                                new AddUnits().unitParsing(event, player.getColor(), tile, amount + " infantry " + unitHolder.getName(), activeGame);
+                                String msg = "> Added " + amount + " infantry to the planet due to Cheiran mech trigger";
+                                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                            }
                         }
                     }
                 } else {
@@ -2332,6 +2342,11 @@ public class ButtonHelperModifyUnits {
                 for (int x = 0; x < amount; x++) {
                     ButtonHelper.rollMykoMechRevival(activeGame, player);
                 }
+            }
+            if (player.hasUnit("cheiran_mech") && !planetName.equalsIgnoreCase("space")) {
+                new AddUnits().unitParsing(event, player.getColor(), tile, amount + " infantry " + planetName, activeGame);
+                String msg = "> Added " + amount + " infantry to the planet due to Cheiran mech trigger";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             }
             if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))
                 && unitName.toLowerCase().contains("inf")) {
