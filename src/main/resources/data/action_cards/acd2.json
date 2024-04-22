@@ -135,24 +135,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "close_quarters",
-    "name": "Close Quarters",
-    "phase": "Action",
-    "window": "At the start of a combat",
-    "text": "During this combat, apply +3 to the result of your unit's combat rolls and your opponent's unit's combat rolls.",
-    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "concise_legal_text",
-    "name": "Concise Legal Text",
-    "phase": "Agenda",
-    "window": "When an agenda is revealed",
-    "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
-    "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
