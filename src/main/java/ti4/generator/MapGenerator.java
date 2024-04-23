@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.GlyphVector;
@@ -3226,23 +3225,23 @@ public class MapGenerator {
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
             List <String> playerIDs;
-            if (activeGame.getPublicObjectives1Peaked().containsKey(unRevealed)) {
-                playerIDs = activeGame.getPublicObjectives1Peaked().get(unRevealed);
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
 
-            } else if (activeGame.getPublicObjectives2Peaked().containsKey(unRevealed)) {
-                playerIDs = activeGame.getPublicObjectives2Peaked().get(unRevealed);
+            } else if (activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+                playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
             } else {
                 y += 43;
                 continue;
             }
 
-            drawPeakedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
+            drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             y += 43;
         }
         return y;
     }
 
-    private void drawPeakedMarkers(int x, int y, Map<String, Player> players, List<String> peakedPlayerID) {
+    private void drawPeekedMarkers(int x, int y, Map<String, Player> players, List<String> peekedPlayerID) {
         try {
             for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
                 Player player = playerEntry.getValue();
@@ -3250,32 +3249,32 @@ public class MapGenerator {
 
                 boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
                     && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-                if (peakedPlayerID.contains(userID)) {
-                    String markerID = convertToGeneric ? Mapper.getPeakMarkerID("gray")
-                        : Mapper.getPeakMarkerID(player.getColor());
+                if (peekedPlayerID.contains(userID)) {
+                    String markerID = convertToGeneric ? Mapper.getPeekMarkerID("gray")
+                        : Mapper.getPeekMarkerID(player.getColor());
                     if (markerID.contains("null")) {
                         continue;
                     }
 
-                    // Todo: update getting/scaling peak markers once finalized assets are available.
+                    // Todo: update getting/scaling peek markers once finalized assets are available.
                     float scale = 0.35f;
 
-                    BufferedImage peakedMarkerImage = ImageHelper.readScaled(Mapper.getPeakMarkerPath(markerID), scale);
-                    if (peakedMarkerImage == null) {
-                        BotLogger.log(String.format("Failed to read peak marker with ID: %s", markerID));
+                    BufferedImage peekedMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(markerID), scale);
+                    if (peekedMarkerImage == null) {
+                        BotLogger.log(String.format("Failed to read peek marker with ID: %s", markerID));
                         return;
                     }
 
-                    int centreCustomTokenHorizontally = peakedMarkerImage.getWidth() / 2 - peakedMarkerImage.getWidth() / 2;
-                    int centreCustomTokenVertically = peakedMarkerImage.getHeight() / 2 - peakedMarkerImage.getHeight() / 2;
+                    int centreCustomTokenHorizontally = peekedMarkerImage.getWidth() / 2 - peekedMarkerImage.getWidth() / 2;
+                    int centreCustomTokenVertically = peekedMarkerImage.getHeight() / 2 - peekedMarkerImage.getHeight() / 2;
 
-                    graphics.drawImage(peakedMarkerImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
+                    graphics.drawImage(peekedMarkerImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
 
-                    x += peakedMarkerImage.getWidth() + 10;
+                    x += peekedMarkerImage.getWidth() + 10;
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Could not draw peak markers", e);
+            BotLogger.log("Could not draw peek markers", e);
         }
     }
 

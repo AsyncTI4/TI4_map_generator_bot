@@ -430,7 +430,7 @@ public class Mapper {
         return "control_" + property + ".png";
     }
 
-    public static String getPeakMarkerID(String color) {
+    public static String getPeekMarkerID(String color) {
         return "peak_" + colors.getProperty(color) + ".png";
     }
 
@@ -729,8 +729,8 @@ public class Mapper {
     }
 
     @Nullable
-    public static String getPeakMarkerPath(String markerID) {
-        return ResourceHelper.getInstance().getPeakMarkerFile(markerID);
+    public static String getPeekMarkerPath(String markerID) {
+        return ResourceHelper.getInstance().getPeekMarkerFile(markerID);
     }
 
     @Nullable
