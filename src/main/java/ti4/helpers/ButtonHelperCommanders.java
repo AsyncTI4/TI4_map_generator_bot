@@ -405,26 +405,7 @@ public class ButtonHelperCommanders {
             activeGame);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), message);
-        String exhaustedMessage = event.getMessage().getContentRaw();
-        if ("".equalsIgnoreCase(exhaustedMessage)) {
-            exhaustedMessage = "Updated";
-        }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (buttonRow.size() > 0) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
-        if (actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")) {
-            event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
-        } else {
-            event.getMessage().delete().queue();
-        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getSardakkCommanderButtons(Game activeGame, Player player,

@@ -1086,7 +1086,7 @@ public class ButtonHelperAbilities {
                     + Helper.getPlanetRepresentation(planet, activeGame)
                     + " you can resolve the following ability: **The Environment - Plunder (-)**: Once per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition(),
+                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition() + "_remove",
                     "Remove units in "
                         + activeGame.getTileFromPlanet(planet).getRepresentationForButtons(activeGame, player));
                 buttons.add(remove);

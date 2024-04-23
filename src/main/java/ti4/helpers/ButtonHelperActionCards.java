@@ -1568,12 +1568,12 @@ public class ButtonHelperActionCards {
             p2.exhaustPlanet(planet);
         }
         int amountToKill = 3;
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+        if (amountToKill > 3) {
+            amountToKill = 3;
+        }
         if (p2.hasInf2Tech()) {
-            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-            amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
-            if (amountToKill > 3) {
-                amountToKill = 3;
-            }
             ButtonHelper.resolveInfantryDeath(activeGame, p2, amountToKill);
             boolean cabalMech = false;
             Tile tile = activeGame.getTileFromPlanet(planet);
@@ -1597,10 +1597,10 @@ public class ButtonHelperActionCards {
             amountToKill + " inf " + planet, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " you exhausted " + planetRep
-                + " and killed up to 3 infantry there");
+                + " and killed " + amountToKill + " infantry there");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
             p2.getRepresentation(true, true) + " your planet " + planetRep
-                + " was exhausted and up to 3 infantry were destroyed.");
+                + " was exhausted and " + amountToKill + " infantry were destroyed.");
     }
 
     public static void resolveSeizeArtifactStep3(Player player, Game activeGame, ButtonInteractionEvent event,
