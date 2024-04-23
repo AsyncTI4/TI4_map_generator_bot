@@ -377,7 +377,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); //Sigma's Server
-        bothelperRoles.add(jda.getRoleById("1225597399385374781")); //Sigma's Server
+        bothelperRoles.add(jda.getRoleById("1225597399385374781")); //ForlornGeas's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 
