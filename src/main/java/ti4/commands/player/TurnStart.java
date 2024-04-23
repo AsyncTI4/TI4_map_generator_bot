@@ -235,6 +235,14 @@ public class TurnStart extends PlayerSubcommandData {
 
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn,
         GenericInteractionCreateEvent event) {
+
+        if (!doneActionThisTurn) {
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if (!activeGame.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
+                    activeGame.setStoredValue(p2.getFaction() + "graviton", "");
+                }
+            }
+        }
         String finChecker = player.getFinsFactionCheckerPrefix();
         activeGame.setDominusOrb(false);
 

@@ -532,7 +532,7 @@ public class StartCombat extends CombatSubcommandData {
                 "Refresh Picture"));
             return buttons;
         }
-        buttons.add(Button.danger("getDamageButtons_" + pos, "Assign Hits"));
+        buttons.add(Button.danger("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
         // if (getButtonsForRepairingUnitsInASystem(p1, activeGame, tile).size() > 1 ||
         // getButtonsForRepairingUnitsInASystem(p2, activeGame, tile).size() > 1) {
         buttons.add(Button.success("getRepairButtons_" + pos, "Repair Damage"));

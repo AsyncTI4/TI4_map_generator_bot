@@ -995,6 +995,7 @@ public class ButtonHelperAgents {
             if ("".equalsIgnoreCase(exhaustedMessage)) {
                 exhaustedMessage = "Updated";
             }
+            int buttons = 0;
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event2.getMessage().getActionRows()) {
                 List<ItemComponent> buttonRow = row.getComponents();
@@ -1003,12 +1004,18 @@ public class ButtonHelperAgents {
                     buttonRow.remove(buttonIndex);
                 }
                 if (buttonRow.size() > 0) {
+                    buttons = buttons + buttonRow.size();
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
             if (actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")
                 && !exhaustedMessage.contains("choose the target of your agent")) {
-                event2.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
+                    event2.getMessage().delete().queue();
+                } else {
+                    event2.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                }
+
             } else {
                 event2.getMessage().delete().queue();
             }

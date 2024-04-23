@@ -2983,6 +2983,7 @@ public class ButtonHelper {
                 buttonRow.remove(buttonIndex);
             }
             if (buttonRow.size() > 0) {
+
                 buttons = buttons + buttonRow.size();
                 if (buttonRow.get(0) instanceof Button butt) {
                     id = butt.getId();
@@ -3034,13 +3035,11 @@ public class ButtonHelper {
             }
         }
         String msg = "New Thread for " + threadName;
-        if (msg.contains("undo-log")) {
-            msg = msg + activeGame.getPing();
-        }
+
         channel.sendMessage(msg).queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-            threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message));
+            threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message + activeGame.getPing()));
         });
     }
 
@@ -3452,7 +3451,7 @@ public class ButtonHelper {
         }
         //System.out.printf("%d %d %d %d%n", fleetCap, numOfCapitalShips, capacity, numInfNFightersNMechs);
         if (capacityViolated || fleetSupplyViolated) {
-            Button remove = Button.danger("getDamageButtons_" + tile.getPosition(),
+            Button remove = Button.danger("getDamageButtons_" + tile.getPosition() + "_remove",
                 "Remove units in " + tile.getRepresentationForButtons(game, player));
             MessageHelper.sendMessageToChannelWithButton(getCorrectChannel(player, game), message, remove);
         }
@@ -3636,7 +3635,7 @@ public class ButtonHelper {
         if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
             endButtons.add(Button.danger(finChecker + "exhaustTech_pi", "Exhaust Predictive Intelligence"));
         }
-        if (!player.hasAbility("arms_dealer")) {
+        if (!player.hasAbility("arms_dealers")) {
             for (String shipOrder : getPlayersShipOrders(player)) {
                 if (Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",
                     "placeOneNDone_skipbuild", null).size() > 0) {
@@ -5159,7 +5158,7 @@ public class ButtonHelper {
         Button concludeMove1;
 
         doAll = Button.secondary(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift all units");
-        concludeMove1 = Button.primary("getDamageButtons_" + tile.getPosition(), "Remove excess inf/ff");
+        concludeMove1 = Button.primary("getDamageButtons_" + tile.getPosition() + "_remove", "Remove excess inf/ff");
         concludeMove = Button.danger("deleteButtons", "Done rifting units and removing excess capacity");
 
         buttons.add(doAll);
@@ -5378,8 +5377,13 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Game game, Tile tile) {
+        return getButtonsForRemovingAllUnitsInSystem(player, game, tile, "combat");
+    }
+
+    public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Game game, Tile tile, String type) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
+        game.setStoredValue(player.getFaction() + "latestAssignHits", type);
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
@@ -5685,7 +5689,7 @@ public class ButtonHelper {
                     String finChecker = "FFCC_" + opponent.getFaction() + "_";
                     buttons.add(Button.success(finChecker + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                         "Auto-assign Hits"));
-                    buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis",
+                    buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis_spacecombat",
                         "Manually Assign Hits"));
                     buttons.add(Button.secondary(finChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h,
                         "Cancel a Hit"));
