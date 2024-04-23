@@ -277,7 +277,7 @@ public class ButtonHelperFactionSpecific {
                 AddCC.addCC(event, color, tile);
             }
             ButtonHelper.sendMessageToRightStratThread(player, activeGame,
-                ButtonHelper.getIdent(player) + " Placed A CC From Reinforcements In The "
+                ButtonHelper.getIdent(player) + " Placed a CC from reinforcements in the "
                     + Helper.getPlanetRepresentation(planet, activeGame) + " system",
                 "construction");
         }
@@ -1319,7 +1319,7 @@ public class ButtonHelperFactionSpecific {
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
-            Button transact1 = Button.success("resolveExp_Look_industrial", msg2);
+            Button transact1 = Button.success(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_industrial", msg2);
             deckType = "hazardous";
             deck = activeGame.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
@@ -1327,7 +1327,7 @@ public class ButtonHelperFactionSpecific {
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
-            Button transact2 = Button.success("resolveExp_Look_hazardous", msg2);
+            Button transact2 = Button.success(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_hazardous", msg2);
             deckType = "cultural";
             deck = activeGame.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
@@ -1335,7 +1335,7 @@ public class ButtonHelperFactionSpecific {
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
-            Button transact3 = Button.success("resolveExp_Look_cultural", msg2);
+            Button transact3 = Button.success(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_cultural", msg2);
             List<Button> buttons1 = new ArrayList<>();
             buttons1.add(transact1);
             buttons1.add(transact2);
@@ -1344,7 +1344,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg,
                 buttons1);
 
-            Button transact = Button.success("relic_look_top", "Look at top of Relic Deck");
+            Button transact = Button.success(player.getFinsFactionCheckerPrefix() + "relic_look_top", "Look at top of Relic Deck");
             msg2 = "Kollecc may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);

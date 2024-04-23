@@ -547,7 +547,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     Tile tile = activeGame.getTileFromPlanet(planet);
-                    if (tile != null && !tile.isHomeSystem()) {
+                    if (tile != null && (!tile.isHomeSystem() || tile.getTileID().equalsIgnoreCase("17"))) {
                         count++;
                     }
                 }
