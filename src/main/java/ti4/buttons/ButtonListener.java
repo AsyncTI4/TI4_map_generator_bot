@@ -996,6 +996,21 @@ public class ButtonListener extends ListenerAdapter {
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, activeGame, tile, h, event, true);
             event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
                 .queue();
+        } else if (buttonID.startsWith("cancelGroundHits_")) {
+            Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+            int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
+            Player opponent = player;
+            String msg = "\n" + opponent.getRepresentation(true, true) + " cancelled 1 hit with an ability";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            List<Button> buttons = new ArrayList<>();
+            String finChecker = "FFCC_" + opponent.getFaction() + "_";
+            buttons.add(Button.success(finChecker + "autoAssignGroundHits_" + tile.getPosition() + "_" + h,
+                "Auto-assign Hits"));
+            buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "_groundcombat", "Manually Assign Hits"));
+            buttons.add(Button.secondary("cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+            String msg2 = player.getRepresentation() + " you can autoassign " + h + " hit(s)";
+            event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue();
         } else if (buttonID.startsWith("cancelPdsOffenseHits_")) {
             Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
             int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
@@ -4471,6 +4486,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Use Buttons to decide what kind of component action you want to do";
                     List<Button> systemButtons = ButtonHelper.getAllPossibleCompButtons(activeGame, player, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+                    event.getMessage().delete().queue();
 
                 }
                 case "drawRelicFromFrag" -> {
