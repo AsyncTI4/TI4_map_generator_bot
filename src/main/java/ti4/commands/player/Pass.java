@@ -1,7 +1,9 @@
 package ti4.commands.player;
 
+import java.util.Collections;
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -20,48 +22,69 @@ public class Pass extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
             return;
         }
 
-        if (!activeGame.getPlayedSCs().containsAll(player.getSCs())) {
+        if (!game.getPlayedSCs().containsAll(player.getSCs())) {
             MessageHelper.sendMessageToEventChannel(event, "You have not played your strategy cards, you cannot pass.");
             return;
         }
+        
+        passPlayerForRound(event, game, player);
+    }
+
+    public static void passPlayerForRound(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setPassed(true);
-        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
-            ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
+            ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
+
         String text = player.getRepresentation() + " PASSED";
-        MessageHelper.sendMessageToEventChannel(event, text);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
             if (!player.hasAbility("propagation")) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(
+                    ButtonHelper.getCorrectChannel(player, game),
                     player.getRepresentation(true, true) + " you can use the button to get your tech",
-                    List.of(Buttons.GET_A_TECH));
+                    Collections.singletonList(Buttons.GET_A_TECH));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
         if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
-            String msg = player.getRepresentation()
-                + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            String msg = player.getRepresentation() + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
+            String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game), message2, buttons);
         }
-        TurnEnd.pingNextPlayer(event, activeGame, player, true);
+        if (player.hasTech("dskolug")) {
+            int oldComm = player.getCommodities();
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player) {
+                    continue;
+                }
+                if (p2.isPassed()) {
+                    player.setCommodities(
+                        Math.min(player.getCommoditiesTotal(), player.getCommodities() + 1));
+                }
+            }
+            if (player.getCommodities() > oldComm) {
+                String msg = player.getRepresentation() + " since you have Applied Biothermics, you gained 1 comm for each passed player (Comms went from " + oldComm + " -> " + player.getCommodities() + ")";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+            }
+        }
+        TurnEnd.pingNextPlayer(event, game, player, true);
+        ButtonHelper.updateMap(game, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
     }
 }
