@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,6 @@ public class DataMigrationManager {
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
-            //runMigration("migrateInitializeACD2_1", DataMigrationManager::migrateInitializeACD2_1); //name is formatted improperly and throwing errors
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -671,16 +669,6 @@ public class DataMigrationManager {
         BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
-    }
-
-    public static boolean migrateInitializeACD2_1(Game game) {
-        if (game.getName() == null || !game.getName().contains("pbd1913")) {
-            return false;
-        }
-        Map<String, String> replacements = new HashMap<>();
-        replacements.put("sensor_jam", "corruption");
-        List<String> decksToCheck = List.of("action_deck_2");
-        return replaceActionCards(game, decksToCheck, replacements);
     }
 
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {

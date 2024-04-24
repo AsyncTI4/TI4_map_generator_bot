@@ -69,6 +69,7 @@ import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetInfo;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.AbilityInfo;
+import ti4.commands.player.Pass;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
@@ -3155,64 +3156,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "ghotiAProd" -> ButtonHelperAgents.ghotiAgentForProduction(buttonID, event, activeGame, player);
                 case "getHomebrewButtons" -> ButtonHelper.offerHomeBrewButtons(activeGame, event);
                 case "passForRound" -> {
-                    player.setPassed(true);
-                    if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
-                        ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
-                    }
-
-                    String text = player.getRepresentation() + " PASSED";
-                    MessageHelper.sendMessageToChannel(event.getChannel(), text);
-                    if (player.hasTech("absol_aida")) {
-                        String msg = player.getRepresentation()
-                            + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                        if (!player.hasAbility("propagation")) {
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                ButtonHelper.getCorrectChannel(player, activeGame),
-                                player.getRepresentation(true, true) + " you can use the button to get your tech",
-                                Collections.singletonList(Buttons.GET_A_TECH));
-                        } else {
-                            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                            String message2 = player.getRepresentation() + "! Your current CCs are "
-                                + player.getCCRepresentation()
-                                + ". Use buttons to gain CCs";
-                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                            activeGame.setStoredValue("originalCCsFor" + player.getFaction(),
-                                player.getCCRepresentation());
-                        }
-                    }
-                    if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
-                        String msg = player.getRepresentation()
-                            + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                        String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-                            + ". Use buttons to gain CCs";
-                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons);
-                    }
-                    if (player.hasTech("dskolug")) {
-                        int oldComm = player.getCommodities();
-                        for (Player p2 : activeGame.getRealPlayers()) {
-                            if (p2 == player) {
-                                continue;
-                            }
-                            if (p2.isPassed()) {
-                                player.setCommodities(
-                                    Math.min(player.getCommoditiesTotal(), player.getCommodities() + 1));
-                            }
-                        }
-                        if (player.getCommodities() > oldComm) {
-                            String msg = player.getRepresentation()
-                                + " since you have Applied Biothermics, you gained 1 comm for each passed player (Comms went from "
-                                + oldComm + " -> "
-                                + player.getCommodities() + ")";
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                        }
-                    }
-                    TurnEnd.pingNextPlayer(event, activeGame, player, true);
-                    event.getMessage().delete().queue();
-                    ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round "
-                        + activeGame.getRound() + " for " + ButtonHelper.getIdent(player));
+                    Pass.passPlayerForRound(event, activeGame, player);
+                    event.getMessage().delete().queue(x -> {}, x -> {});
                 }
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(),

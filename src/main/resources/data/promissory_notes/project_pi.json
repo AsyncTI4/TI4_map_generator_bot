@@ -64,6 +64,7 @@
         "name": "Antivirus",
         "faction": "nekro",
         "playArea": true,
+        "playImmediately": false,
         "attachment": false,
         "source": "project_pi",
         "homebrewReplacesID": "antivirus",
