@@ -41,6 +41,7 @@ public abstract class FrankenSubcommandData extends SubcommandData {
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
         activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        this.event = event;
     }
 
     public void reply(SlashCommandInteractionEvent event) {

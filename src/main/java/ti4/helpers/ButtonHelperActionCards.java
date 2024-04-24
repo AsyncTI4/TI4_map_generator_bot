@@ -1200,7 +1200,7 @@ public class ButtonHelperActionCards {
             ButtonHelper.getIdentOrColor(player, activeGame)
                 + " successfully assassinated all the representatives of "
                 + ButtonHelper.getIdentOrColor(p2, activeGame));
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
             p2.getRepresentation(true, true) + " your representatives got sent to the headsman");
         activeGame.setStoredValue("AssassinatedReps",
             activeGame.getStoredValue("AssassinatedReps") + p2.getFaction());
