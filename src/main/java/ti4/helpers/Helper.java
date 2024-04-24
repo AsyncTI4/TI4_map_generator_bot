@@ -1044,6 +1044,25 @@ public class Helper {
         return planetButtons;
     }
 
+    public static List<Button> getHSPlanetPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
+        player.resetProducedUnits();
+        for (String planet : planets) {
+            if (planet.contains("ghoti") || planet.contains("custodia")) {
+                continue;
+            }
+            if (activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)) {
+                continue;
+            }
+            Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
+                getPlanetRepresentation(planet, activeGame));
+            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
+            planetButtons.add(button);
+        }
+        return planetButtons;
+    }
+
     public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Game activeGame, String unit,
         String prefix) {
         List<Button> planetButtons = new ArrayList<>();
