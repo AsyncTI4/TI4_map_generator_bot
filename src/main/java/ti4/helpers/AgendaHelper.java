@@ -644,7 +644,7 @@ public class AgendaHelper {
                         String message = player.getRepresentation()
                             + " Use buttons to drop a mech on a Home System Planet";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message,
-                            Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech",
+                            Helper.getHSPlanetPlaceUnitButtons(player, activeGame, "mech",
                                 "placeOneNDone_skipbuild"));
                     }
                 } else {
