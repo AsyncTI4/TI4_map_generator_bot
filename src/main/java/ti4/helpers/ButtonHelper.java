@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -853,6 +854,7 @@ public class ButtonHelper {
                 commanderUnlockCheck(player, game, "zealots", event);
             }
         }
+        player.addTech(techID);
         if (techM.getType() == TechnologyType.UNITUPGRADE) {
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
@@ -913,7 +915,7 @@ public class ButtonHelper {
                     + " you can use Zealots agent to produce 1 ship at home or in a system where you have a tech skip planet",
                 buttons);
         }
-        player.addTech(techID);
+
         ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         if ("iihq".equalsIgnoreCase(techID)) {
