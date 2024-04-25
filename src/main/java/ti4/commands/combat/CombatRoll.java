@@ -289,7 +289,7 @@ public class CombatRoll extends CombatSubcommandData {
                     String msg2 = opponent.getRepresentation(true, true) + " you can roll dice for Combat Round #" + round;
                     List<Button> buttons2 = new ArrayList<>();
                     if (round2 > round) {
-                        buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + round));
+                        buttons2.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + round));
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons2);
                     }
                 }
