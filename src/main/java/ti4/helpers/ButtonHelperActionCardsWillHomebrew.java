@@ -199,4 +199,29 @@ public class ButtonHelperActionCardsWillHomebrew {
         ButtonHelperFactionSpecific.offerWinnuStartingTech(player, game);
     }
 
+    public static void resolveBrutalOccupationStep1(Player player, Game game, ButtonInteractionEvent event) {
+
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Button.success("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation() + " choose the target of brutal occupation");
+    }
+
+    public static void resolveBrutalOccupationStep2(Player player, Game game, ButtonInteractionEvent event,
+        String buttonID) {
+        String planet = buttonID.split("_")[1];
+        player.refreshPlanet(planet);
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+        if (!buttons.isEmpty()) {
+            String message = player.getFactionEmoji() + " Click button to explore "
+                + Helper.getPlanetRepresentation(planet, game);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
+                message, buttons);
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentation(planet, game));
+    }
+
 }
