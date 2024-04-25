@@ -361,6 +361,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("spatialCollapseStep3_")) {
             ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep3(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("brutalOccupationStep2_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resolveUpgrade_")) {
             ButtonHelperActionCards.resolveUpgrade(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resolveEmergencyRepairs_")) {
@@ -3157,7 +3159,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "getHomebrewButtons" -> ButtonHelper.offerHomeBrewButtons(activeGame, event);
                 case "passForRound" -> {
                     Pass.passPlayerForRound(event, activeGame, player);
-                    event.getMessage().delete().queue(x -> {}, x -> {});
+                    event.getMessage().delete().queue(x -> {
+                    }, x -> {
+                    });
                 }
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -4347,6 +4351,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, activeGame, event, buttonID);
                 case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, activeGame, event);
                 case "technologicalBreakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveTechnologicalBreakthrough(player, activeGame, event);
+                case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, activeGame, event, buttonID);
+                case "brutalOccupation" -> ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep1(player, activeGame, event);
                 case "getRepealLawButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                     "Use buttons to select Law to repeal",
                     ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
