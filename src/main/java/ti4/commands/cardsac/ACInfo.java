@@ -166,7 +166,8 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         }
         acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
         if (player.hasUnexhaustedLeader("nekroagent")) {
-            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent")
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Nekro Malleon (Nekro Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             acButtons.add(nekroButton);
         }
@@ -176,7 +177,8 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             acButtons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
-            Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent", "Use Vaylerian Agent")
+            Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent",
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
             acButtons.add(nekroButton);
         }
@@ -195,12 +197,14 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             acButtons.add(ghostButton);
         }
         if (player.hasUnexhaustedLeader("kolleccagent")) {
-            Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent")
+            Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Captain Dust (Kollecc Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
             acButtons.add(nekroButton);
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
-            Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent", "Use Myko Agent")
+            Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent",
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Lactarius Indigo (Myko Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             acButtons.add(nekroButton);
         }

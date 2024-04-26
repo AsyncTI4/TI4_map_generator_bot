@@ -297,20 +297,21 @@ public class ButtonHelperTacticalAction {
             if (player.hasUnexhaustedLeader("celdauriagent")) {
                 List<Button> buttons = new ArrayList<>();
                 Button hacanButton = Button
-                    .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent")
-                    .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(),
+                                   "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                 buttons.add(hacanButton);
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    player.getRepresentation(true, true)
-                        + " you can use Celdauri agent to place an SD for 2tg/2comm",
-                    buttons);
+                        player.getRepresentation(true, true)
+                                + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2tg/2comm",
+                        buttons);
             }
         }
 
         if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
-            && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation() + " You can use the button to explore using crown of emphidia";
+                && !player.getExhaustedRelics().contains("emphidia")) {
+            String message = player.getRepresentation() + " You can use the button to explore using the crown of emphidia";
             List<Button> systemButtons2 = new ArrayList<>();
             systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
@@ -389,13 +390,14 @@ public class ButtonHelperTacticalAction {
             }
             List<Button> empyButtons = new ArrayList<>();
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
-                && (tile.getPlanetUnitHolders().size() == 0) && player.hasUnexhaustedLeader("empyreanagent")) {
-                Button empyButton = Button.secondary("exhaustAgent_empyreanagent", "Use Empyrean Agent")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
+                    && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
+                Button empyButton = Button.secondary("exhaustAgent_empyreanagent",
+                                                     "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
                 empyButtons.add(empyButton);
                 empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getRepresentation(true, true) + " use button to exhaust Empy agent", empyButtons);
+                        player.getRepresentation(true, true) + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)", empyButtons);
             }
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
                 && (tile.getUnitHolders().values().size() == 1) && player.getPlanets().contains("ghoti")) {
@@ -646,7 +648,7 @@ public class ButtonHelperTacticalAction {
 
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(activeGame, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !activeGame.getL1Hero()) {
-            String msg = player.getRepresentation(true, true) + " You can use buttons to resolve L1 Agent if you want";
+            String msg = player.getRepresentation(true, true) + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "I48S (L1Z1Z Agent) if you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
         Tile tile = activeGame.getTileByPosition(pos);
