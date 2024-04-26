@@ -3259,8 +3259,19 @@ public class MapGenerator {
                     float scale = 0.55f;
 
                     BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    if (controlTokenImage == null)
+                        return;
+                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(""), scale); // Only one marker imaged used right now.
+                    if (peekMarkerImage == null)
+                        return;
 
                     drawControlToken(graphics, controlTokenImage, player, x + tempX, y, true, scale);
+
+                    int centreCustomTokenHorizontally = controlTokenImage.getWidth() / 2 - peekMarkerImage.getWidth() / 2;
+                    int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
+
+                    graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
+
                     tempX += scoreTokenWidth;
                 }
             }
