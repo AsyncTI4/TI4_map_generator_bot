@@ -3227,7 +3227,6 @@ public class MapGenerator {
             List <String> playerIDs;
             if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
                 playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
-
             } else if (activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
                 playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
             } else {
@@ -3243,34 +3242,26 @@ public class MapGenerator {
 
     private void drawPeekedMarkers(int x, int y, Map<String, Player> players, List<String> peekedPlayerID) {
         try {
+            int tempX = 0;
+
             for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
-                    && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
                 if (peekedPlayerID.contains(userID)) {
-                    String markerID = convertToGeneric ? Mapper.getPeekMarkerID("gray")
-                        : Mapper.getPeekMarkerID(player.getColor());
-                    if (markerID.contains("null")) {
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
+
+                    if (controlID.contains("null")) {
                         continue;
                     }
 
-                    // Todo: update getting/scaling peek markers once finalized assets are available.
-                    float scale = 0.35f;
+                    float scale = 0.55f;
 
-                    BufferedImage peekedMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(markerID), scale);
-                    if (peekedMarkerImage == null) {
-                        BotLogger.log(String.format("Failed to read peek marker with ID: %s", markerID));
-                        return;
-                    }
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
 
-                    int centreCustomTokenHorizontally = peekedMarkerImage.getWidth() / 2 - peekedMarkerImage.getWidth() / 2;
-                    int centreCustomTokenVertically = peekedMarkerImage.getHeight() / 2 - peekedMarkerImage.getHeight() / 2;
-
-                    graphics.drawImage(peekedMarkerImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
-
-                    x += peekedMarkerImage.getWidth() + 10;
+                    drawControlToken(graphics, controlTokenImage, player, x + tempX, y, true, scale);
+                    tempX += scoreTokenWidth;
                 }
             }
         } catch (Exception e) {
