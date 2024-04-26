@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.GlyphVector;
@@ -3226,9 +3225,63 @@ public class MapGenerator {
 
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
+            List <String> playerIDs;
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
+            } else if (activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+                playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
+            } else {
+                y += 43;
+                continue;
+            }
+
+            drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             y += 43;
         }
         return y;
+    }
+
+    private void drawPeekedMarkers(int x, int y, Map<String, Player> players, List<String> peekedPlayerID) {
+        try {
+            int tempX = 0;
+
+            for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
+                Player player = playerEntry.getValue();
+                String userID = player.getUserID();
+
+                if (peekedPlayerID.contains(userID)) {
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    String ccColor = convertToGeneric ? "gray" : player.getColor();
+                    String controlID = Mapper.getControlID(ccColor);
+
+                    if (controlID.contains("null")) {
+                        continue;
+                    }
+
+                    float scale = 0.55f;
+
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    if (controlTokenImage == null)
+                        return;
+
+                    String peekID = "peek" + getBlackWhiteFileSuffix(Mapper.getColorID(ccColor));
+                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(peekID), scale);
+                    if (peekMarkerImage == null)
+                        return;
+
+                    drawControlToken(graphics, controlTokenImage, player, x + tempX, y, true, scale);
+
+                    int centreCustomTokenHorizontally = controlTokenImage.getWidth() / 2 - peekMarkerImage.getWidth() / 2;
+                    int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
+
+                    graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
+
+                    tempX += scoreTokenWidth;
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("Could not draw peek markers", e);
+        }
     }
 
     private void drawScoreControlMarkers(
