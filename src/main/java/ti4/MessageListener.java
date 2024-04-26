@@ -18,8 +18,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.forums.ForumPost;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -220,7 +222,7 @@ public class MessageListener extends ListenerAdapter {
             if (msg.getContentRaw().startsWith("[DELETE]")) {
                 msg.delete().queue();
             }
-            if (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before")) {
+            if (!msg.getAuthor().isBot() && (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before"))) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "https://discord.gg/RZ7qg9kbVZ");
             }
             //947310962485108816
@@ -231,6 +233,15 @@ public class MessageListener extends ListenerAdapter {
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary
                     .getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
+            }
+            if (event.getChannel() instanceof ForumPost post) {
+                if (post.getThreadChannel().getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+                    Game mapreference = GameManager.getInstance().getGame("finreference");
+                    if (mapreference.getStoredValue(post.getThreadChannel().getId()).isEmpty()) {
+                        mapreference.setStoredValue(post.getThreadChannel().getId(), "found");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will ping a bothelper to give you a final push to launch.");
+                    }
+                }
             }
 
             autoPingGames();

@@ -632,29 +632,29 @@ public class ButtonHelperAbilities {
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
                 Button winnuButton = Button
-                    .success(
-                        "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_"
-                            + pillaged.getFaction(),
-                        "Use Mentak Agent To Draw ACs for you and pillaged player")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
+                        .success(
+                                "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_"
+                                        + pillaged.getFaction(),
+                                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent) To Draw ACs for you and pillaged player")
+                        .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                 buttons.add(winnuButton);
                 buttons.add(Button.danger("deleteButtons", "Done"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use Mentak Agent?", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
             }
             for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 != pillaged && p2 != player && p2.hasUnexhaustedLeader("yssarilagent")
                     && player.hasLeader("mentakagent")) {
                     List<Button> buttons = new ArrayList<>();
                     Button winnuButton = Button
-                        .success(
-                            "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_"
-                                + pillaged.getFaction(),
-                            "Use Mentak Agent To Draw ACs for you and pillaged player")
-                        .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
+                            .success(
+                                    "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_"
+                                            + pillaged.getFaction(),
+                                    "Use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent) To Draw ACs for you and pillaged player")
+                            .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame),
-                        p2.getRepresentation() + " Wanna use Mentak Agent?", buttons);
+                            p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
                 }
             }
         }
@@ -1086,7 +1086,7 @@ public class ButtonHelperAbilities {
                     + Helper.getPlanetRepresentation(planet, activeGame)
                     + " you can resolve the following ability: **The Environment - Plunder (-)**: Once per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition(),
+                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition() + "_remove",
                     "Remove units in "
                         + activeGame.getTileFromPlanet(planet).getRepresentationForButtons(activeGame, player));
                 buttons.add(remove);

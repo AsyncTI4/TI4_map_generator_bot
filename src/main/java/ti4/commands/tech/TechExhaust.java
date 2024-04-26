@@ -62,6 +62,19 @@ public class TechExhaust extends TechAddRemove {
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "gls" -> { // Graviton
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted graviton. The auto assign hit buttons for PDS fire will now kill fighters last");
+                activeGame.setStoredValue(player.getFaction() + "graviton", "true");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsgledb" -> {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted lightning drives because they are applying +1 move value to ships transporting fighters or infantry");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsbenty" -> {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted merged replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             case "dsceldr" -> {
                 ButtonHelper.celdauriRedTech(player, activeGame, event);
                 deleteTheOneButtonIfButtonEvent(event);

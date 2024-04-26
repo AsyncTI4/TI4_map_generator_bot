@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -644,7 +645,7 @@ public class AgendaHelper {
                         String message = player.getRepresentation()
                             + " Use buttons to drop a mech on a Home System Planet";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message,
-                            Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech",
+                            Helper.getHSPlanetPlaceUnitButtons(player, activeGame, "mech",
                                 "placeOneNDone_skipbuild"));
                     }
                 } else {
@@ -1006,6 +1007,9 @@ public class AgendaHelper {
 
     public static void offerEveryonePrepassOnShenanigans(Game activeGame) {
         for (Player player : activeGame.getRealPlayers()) {
+            if (playerDoesNotHaveShenanigans(player)) {
+                continue;
+            }
             String msg = player.getRepresentation()
                 + " you have the option to prepass on agenda shenanigans here. Agenda shenanigans are the action cards known as bribery, deadly plot, and the confounding/confusing legal texts. Feel free not to pre-pass, this is simply an optional way to resolve agendas faster";
             List<Button> buttons = new ArrayList<>();
@@ -1014,6 +1018,12 @@ public class AgendaHelper {
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    private static boolean playerDoesNotHaveShenanigans(Player player) {
+        Set<String> shenanigans = Set.of("deadly_plot", "bribery", "confounding", "confusing");
+        return player.getActionCards().keySet().stream()
+            .noneMatch(shenanigans::contains);
     }
 
     public static boolean doesPlayerHaveAnyWhensOrAfters(Player player) {
@@ -1271,7 +1281,6 @@ public class AgendaHelper {
     }
 
     public static void checkForAssigningGeneticRecombination(Game activeGame) {
-
         for (Player player : activeGame.getRealPlayers()) {
             activeGame.setStoredValue("Genetic Recombination " + player.getFaction(), "");
             if (player.hasTechReady("gr")) {
@@ -2304,6 +2313,11 @@ public class AgendaHelper {
                                     + "->" + winningR.getTg() + ")");
                             ButtonHelperAbilities.pillageCheck(winningR, activeGame);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 5);
+                        }
+                        if (specificVote.contains("Relic Rider")) {
+                            MessageHelper.sendMessageToChannel(channel,
+                                identity + " due to having a winning Relic rider, you have gained a relic");
+                            DrawRelic.drawRelicAndNotify(winningR, event, activeGame);
                         }
                         if (specificVote.contains("Radiance")) {
                             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, winningR,

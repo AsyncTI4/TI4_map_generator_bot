@@ -269,6 +269,30 @@ public class PlayAC extends ACCardsSubcommandData {
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
+            codedName = "Spatial Collapse";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "spatialCollapseStep1",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Side Project";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "sideProject",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Brutal Occupation";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "brutalOccupation",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Stolen Prototype";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
 
             codedName = "Skilled Retreat";
             if (actionCardTitle.contains(codedName)) {
@@ -294,6 +318,18 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Uprising";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveUprisingStep1",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Tomb Raiders";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveTombRaiders",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Technological Breakthrough";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "technologicalBreakthrough",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
@@ -517,6 +553,12 @@ public class PlayAC extends ACCardsSubcommandData {
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
+            codedName = "Stranded Ship";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "strandedShipStep1",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
             codedName = "Tactical Bombardment";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons
@@ -695,12 +737,13 @@ public class PlayAC extends ACCardsSubcommandData {
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             List<Button> buttons2 = new ArrayList<>();
-            Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+            Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-                player.getRepresentation(true, true) + " you can use Cymiae agent to draw an AC",
-                buttons2);
+                    player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw an AC",
+                    buttons2);
         }
 
         ACInfo.sendActionCardInfo(game, player);

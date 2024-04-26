@@ -236,9 +236,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "jrResolution", null);
         player.getLeader("yssarilagent").get().setExhausted(true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " is using yssaril agent as JR");
+                player.getFactionEmoji() + " is using Clever Clever JR-XS455-O (Relic Agent)");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to decide who to use JR on", buttons2);
+                "Use buttons to decide who to use Clever Clever JR-XS455-O (Relic Agent) on", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
@@ -277,7 +277,7 @@ public class ButtonHelperFactionSpecific {
                 AddCC.addCC(event, color, tile);
             }
             ButtonHelper.sendMessageToRightStratThread(player, activeGame,
-                ButtonHelper.getIdent(player) + " Placed A CC From Reinforcements In The "
+                ButtonHelper.getIdent(player) + " Placed a CC from reinforcements in the "
                     + Helper.getPlanetRepresentation(planet, activeGame) + " system",
                 "construction");
         }
@@ -458,14 +458,14 @@ public class ButtonHelperFactionSpecific {
         techToGain.add("sdn");
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+            if (!player.getTechs().contains(tech)) {
                 techs.add(Button.success(
                     player.getFinsFactionCheckerPrefix() + "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                     Mapper.getTech(tech).getName()));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-            player.getRepresentation(true, true) + " use the buttons to get one of the starting winnu tech", techs);
+            player.getRepresentation(true, true) + " use the buttons to get a tech", techs);
     }
 
     public static void offerSpyNetOptions(Player player) {
@@ -1319,7 +1319,7 @@ public class ButtonHelperFactionSpecific {
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
-            Button transact1 = Button.success("resolveExp_Look_industrial", msg2);
+            Button transact1 = Button.success(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_industrial", msg2);
             deckType = "hazardous";
             deck = activeGame.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
@@ -1327,7 +1327,7 @@ public class ButtonHelperFactionSpecific {
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
-            Button transact2 = Button.success("resolveExp_Look_hazardous", msg2);
+            Button transact2 = Button.success(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_hazardous", msg2);
             deckType = "cultural";
             deck = activeGame.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
@@ -1335,7 +1335,7 @@ public class ButtonHelperFactionSpecific {
                 .equalsIgnoreCase(deck.get(0))) {
                 msg2 = msg2 + " (Same as last time)";
             }
-            Button transact3 = Button.success("resolveExp_Look_cultural", msg2);
+            Button transact3 = Button.success(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_cultural", msg2);
             List<Button> buttons1 = new ArrayList<>();
             buttons1.add(transact1);
             buttons1.add(transact2);
@@ -1344,7 +1344,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg,
                 buttons1);
 
-            Button transact = Button.success("relic_look_top", "Look at top of Relic Deck");
+            Button transact = Button.success(player.getFinsFactionCheckerPrefix() + "relic_look_top", "Look at top of Relic Deck");
             msg2 = "Kollecc may also look at the top card of the relic deck.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(transact);
@@ -1618,6 +1618,23 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
+    public static void offerBentorPNButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null
+                && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
+            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+                buttons.add(Button.success("bentorPNPlanet_" + planet,
+                    Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = "Use buttons to select which planet to place encryption key on";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
     public static void resolveOlradinPN(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -1764,6 +1781,16 @@ public class ButtonHelperFactionSpecific {
         planetReal.addToken("attachment_automatons.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached automatons to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+
+    public static void bentorPNPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame) {
+        String planet = buttonID.replace("bentorPNPlanet_", "");
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        planetReal.addToken("attachment_encryptionkey.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached encryption key to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 
