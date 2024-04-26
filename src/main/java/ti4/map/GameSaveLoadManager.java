@@ -2446,7 +2446,7 @@ public class GameSaveLoadManager {
 
         while (matcher.find()) {
             String po = matcher.group(1);
-            List<String> playerIDs = List.of(matcher.group(2).split(","));
+            List<String> playerIDs = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
             peekedPublicObjectives.put(po, playerIDs);
         }
 
