@@ -75,7 +75,7 @@ public class ButtonHelperAgents {
                     + ButtonHelper.getIdentOrColor(p2, activeGame) + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
                 buttons.add(Button.success("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(),
-                                           "Use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + " The Stillness of Stars (Vuil'raith Agent)"));
+                    "Use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + " The Stillness of Stars (Vuil'raith Agent)"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
@@ -462,7 +462,7 @@ public class ButtonHelperAgents {
             }
         }
         unitButtons.add(Button.danger("deleteButtons_spitItOut",
-                                      "Done Using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)"));
+            "Done Using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)"));
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " use buttons to place ground forces via " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)",
             unitButtons);
@@ -859,7 +859,7 @@ public class ButtonHelperAgents {
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos),
-                "2 GFs " + planetName, activeGame);
+                "2 gf " + planetName, activeGame);
             String successMessage = ident + " placed 2 " + Emojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), successMessage);
@@ -2135,7 +2135,7 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg,
-                                       "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Artuno the Betrayer (Nomad Agent) With " + tg + " TGs"));
+                "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Artuno the Betrayer (Nomad Agent) With " + tg + " TGs"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true)
