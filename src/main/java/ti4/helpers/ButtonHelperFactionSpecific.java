@@ -236,9 +236,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "jrResolution", null);
         player.getLeader("yssarilagent").get().setExhausted(true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " is using yssaril agent as JR");
+                player.getFactionEmoji() + " is using Clever Clever JR-XS455-O (Relic Agent)");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to decide who to use JR on", buttons2);
+                "Use buttons to decide who to use Clever Clever JR-XS455-O (Relic Agent) on", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);

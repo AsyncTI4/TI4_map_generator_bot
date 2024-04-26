@@ -329,12 +329,14 @@ public class TurnStart extends PlayerSubcommandData {
             if (player.hasUnexhaustedLeader("florzenagent")
                 && ButtonHelperAgents.getAttachments(activeGame, player).size() > 0) {
                 startButtons.add(Button
-                    .success(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent")
-                    .withEmoji(Emoji.fromFormatted(Emojis.florzen)));
+                        .success(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
+                                 "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Gavda (Florzen Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.florzen)));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                Button chaos = Button.secondary("exhaustAgent_vadenagent_" + player.getFaction(), "Use Vaden Agent")
-                    .withEmoji(Emoji.fromFormatted(Emojis.vaden));
+                Button chaos = Button.secondary("exhaustAgent_vadenagent_" + player.getFaction(),
+                                                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yudri Sukhov (Vaden Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.vaden));
                 startButtons.add(chaos);
             }
             if (player.hasAbility("laws_order") && !activeGame.getLaws().isEmpty()) {
@@ -348,13 +350,15 @@ public class TurnStart extends PlayerSubcommandData {
                 startButtons.add(transit);
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
-                Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent")
-                    .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
+                Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
+                                                      "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Captain Dust (Kollecc Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
                 startButtons.add(nekroButton);
             }
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
-            Button psycho = Button.success(finChecker + "getPsychoButtons", "Use Psychoarcheology");
+            Button psycho = Button.success(finChecker + "getPsychoButtons",
+                                           "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Psychoarcheology");
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             startButtons.add(psycho);
         }
@@ -364,16 +368,18 @@ public class TurnStart extends PlayerSubcommandData {
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
+            Button hacanButton = Button.secondary("exhaustAgent_hacanagent",
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Carth of Golden Sands (Hacan Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             startButtons.add(hacanButton);
         }
         if (player.hasRelicReady("e6-g0_network")) {
             startButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
-            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
+                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Nekro Malleon (Nekro Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             startButtons.add(nekroButton);
         }
 

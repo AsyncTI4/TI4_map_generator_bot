@@ -655,6 +655,8 @@ public class Constants {
     public static final String PO1PEAKABLE = "publicObjectives1peakable";
     public static final String SAVED_BUTTONS = "saved_buttons";
     public static final String PO2PEAKABLE = "publicObjectives2peakable";
+    public static final String PO1PEEKED = "publicObjectives1Peeked";
+    public static final String PO2PEEKED = "publicObjectives2Peeked";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
     public static final String INCLUDE_SCORED = "include_scored";
     public static final String SO_LIST_SCORED = "list_scored";
