@@ -51,13 +51,10 @@ import ti4.model.PlanetModel;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
-    private SlashCommandInteractionEvent event;
     private Game activeGame;
     private User user;
-    protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT,
-        "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
-    protected final OptionData idOption = new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID,
-        "Explore card id sent between (). Can include multiple comma-separated ids.");
+    protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
+    protected final OptionData idOption = new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card id sent between (). Can include multiple comma-separated ids.");
 
     public String getActionID() {
         return getName();
@@ -75,19 +72,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return user;
     }
 
-    /**
-     * Send a message to the event's channel, handles large text
-     * 
-     * @param messageText new message
-     */
-    public void sendMessage(String messageText) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
-    }
-
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
-        this.event = event;
         user = event.getUser();
         activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
@@ -541,7 +528,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 String trueIdentity = player.getRepresentation(true, true);
                 message += "\n" + trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain CCs";
-                activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "exp1", "exp2", "exp3" -> {

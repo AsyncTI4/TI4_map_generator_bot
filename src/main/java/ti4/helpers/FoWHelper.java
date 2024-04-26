@@ -191,7 +191,7 @@ public class FoWHelper {
 	private static void updatePlayerFogTiles(Game game, Player player) {
 		for (Tile tileToUpdate : game.getTileMap().values()) {
 			if (!tileToUpdate.hasFog(player)) {
-				player.updateFogTile(tileToUpdate, "Round " + game.getRound());
+				player.updateFogTile(tileToUpdate, "Rnd " + game.getRound());
 			}
 		}
 	}
@@ -213,8 +213,7 @@ public class FoWHelper {
 					return tile;
 				}
 			}
-			if (player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null
-				&& (faction.contains("ghost") || faction.contains("franken"))) {
+			if (player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
 				return tile;
 			}
 		}

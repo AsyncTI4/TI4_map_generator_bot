@@ -48,18 +48,18 @@ public class ExpPlanet extends ExploreSubcommandData {
         String planetName = AliasHandler.resolvePlanet(StringUtils.substringBefore(planetOption.getAsString(), " ("));
         Game activeGame = getActiveGame();
         if (!activeGame.getPlanets().contains(planetName)) {
-            sendMessage("Planet not found in map");
+            MessageHelper.sendMessageToEventChannel(event, "Planet not found in map");
             return;
         }
         Tile tile = activeGame.getTileFromPlanet(planetName);
         if (tile == null) {
-            sendMessage("System not found that contains planet");
+            MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
             return;
         }
         planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
         PlanetModel planet = Mapper.getPlanet(planetName);
         if (Optional.ofNullable(planet).isEmpty()) {
-            sendMessage("Invalid planet");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid planet");
             return;
         }
         String drawColor = planet.getPlanetType() == null ? null : planet.getPlanetType().toString();
@@ -68,9 +68,10 @@ public class ExpPlanet extends ExploreSubcommandData {
             drawColor = traitOption.getAsString();
         }
         if (drawColor == null) {
-            sendMessage("Cannot determine trait, please specify");
+            MessageHelper.sendMessageToEventChannel(event, "Cannot determine trait, please specify");
             return;
         }
+        
         boolean over = false;
         OptionMapping overRider = event.getOption(Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ);
         if (overRider != null && "YES".equalsIgnoreCase(overRider.getAsString())) {
@@ -89,7 +90,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
-        activeGame.setCurrentReacts(player.getFaction() + "planetsExplored", activeGame.getFactionsThatReactedToThis(player.getFaction() + "planetsExplored") + planetName + "*");
+        activeGame.setStoredValue(player.getFaction() + "planetsExplored", activeGame.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
@@ -244,7 +245,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             Tile tileWithPlanet = activeGame.getTileFromPlanet(planetName);
             if (tileWithPlanet == null) {
-                sendMessage("An error occurred while placing an infantry. Resolve manually.");
+                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing an infantry. Resolve manually.");
                 return;
             }
             tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);

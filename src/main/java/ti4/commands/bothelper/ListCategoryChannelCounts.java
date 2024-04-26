@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class ListCategoryChannelCounts extends BothelperSubcommandData {
     public ListCategoryChannelCounts(){
@@ -24,7 +25,7 @@ public class ListCategoryChannelCounts extends BothelperSubcommandData {
             int channelCount = category.getChannels().size();
             sb.append("> **").append(category.getName()).append("**: ").append(channelCount).append("/").append(maxChannels).append(getPercentage(channelCount, maxChannels)).append("\n");
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 
     private String getPercentage(double numerator, double denominator) {

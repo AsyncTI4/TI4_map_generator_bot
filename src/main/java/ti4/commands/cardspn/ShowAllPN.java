@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -26,12 +27,12 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         Player targetPlayer = Helper.getPlayer(activeGame, null, event);
         if (targetPlayer == null) {
-            sendMessage("Target player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Target player not found");
             return;
         }
 
@@ -53,7 +54,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Collections.shuffle(promissoryNotes);
         int index = 1;
         for (String id : promissoryNotes) {
-            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName()).append("\n");
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName() + " (original owner " + ButtonHelper.getIdentOrColor(activeGame.getPNOwner(id), activeGame) + ")").append("\n");
             index++;
         }
 

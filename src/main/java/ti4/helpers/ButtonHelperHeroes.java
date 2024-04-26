@@ -292,8 +292,8 @@ public class ButtonHelperHeroes {
 
         String key = "lanefirRelicReveal";
         for (int x = 1; x < 4; x++) {
-            if (!game.getFactionsThatReactedToThis(key + x).isEmpty()) {
-                relicsTotal.add(key + ";" + game.getFactionsThatReactedToThis(key + x));
+            if (!game.getStoredValue(key + x).isEmpty()) {
+                relicsTotal.add(key + ";" + game.getStoredValue(key + x));
             }
         }
         return relicsTotal;
@@ -356,7 +356,7 @@ public class ButtonHelperHeroes {
         String revealMsg = player.getRepresentation() + " you revealed the following 3 relics:\n";
         for (int x = 1; x < 4; x++) {
             String relic = game.drawRelic();
-            game.setCurrentReacts(key + x, relic);
+            game.setStoredValue(key + x, relic);
             revealMsg = revealMsg + x + ". " + Mapper.getRelic(relic).getName() + "\n";
         }
         int size = revealedRelics.size();
@@ -366,7 +366,7 @@ public class ButtonHelperHeroes {
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
             + ". Use buttons to gain CCs";
-        game.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons(
             ButtonHelper.getCorrectChannel(player, game), message2, buttons);
         revealedRelics = getAllRevealedRelics(game);
@@ -416,7 +416,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
             revealMsg);
         if (faction.contains("lanefirRelicReveal")) {
-            game.removeMessageIDFromCurrentReacts(faction);
+            game.removeStoredValue(faction);
         } else {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             String msg = p2.getRepresentation() + " your relic " + Mapper.getRelic(relic).getName()
@@ -427,7 +427,7 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg);
         }
         if (faction2.contains("lanefirRelicReveal")) {
-            game.removeMessageIDFromCurrentReacts(faction2);
+            game.removeStoredValue(faction2);
         } else {
             Player p2 = game.getPlayerFromColorOrFaction(faction2);
             String msg = p2.getRepresentation() + " your relic " + Mapper.getRelic(relic2).getName()
@@ -1051,7 +1051,7 @@ public class ButtonHelperHeroes {
 
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message.toString());
-        game.setCurrentReacts("mentakHero", player.getFaction());
+        game.setStoredValue("mentakHero", player.getFaction());
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1393,8 +1393,8 @@ public class ButtonHelperHeroes {
                 "Leader was not purged - something went wrong");
         }
         int dieResult = player.getLowestSC();
-        game.setCurrentReacts("kyroHeroSC", dieResult + "");
-        game.setCurrentReacts("kyroHeroPlayer", player.getFaction());
+        game.setStoredValue("kyroHeroSC", dieResult + "");
+        game.setStoredValue("kyroHeroPlayer", player.getFaction());
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
             "Marked the Blex Hero Target as SC #"
                 + dieResult + " and the faction that played the hero as " + player.getFaction());
@@ -1702,7 +1702,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getJolNarHeroSwapInOptions(Player player, Game game, String buttonID) {
-        String tech = buttonID.split("_")[1];
+        String tech = buttonID.replace("jnHeroSwapOut_", "");
         TechnologyModel techM = Mapper.getTech(tech);
         List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techM.getType().toString(), player);
         return Helper.getTechButtons(techs, techM.getType().toString(), player, tech);
@@ -1719,8 +1719,8 @@ public class ButtonHelperHeroes {
 
     public static void resolveAJolNarSwapStep2(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
-        String techOut = buttonID.split("_")[1];
-        String techIn = buttonID.split("_")[2];
+        String techOut = buttonID.split("__")[1];
+        String techIn = buttonID.split("__")[2];
         TechnologyModel techM1 = Mapper.getTech(techOut);
         TechnologyModel techM2 = Mapper.getTech(techIn);
         player.addTech(techIn);
@@ -1742,7 +1742,7 @@ public class ButtonHelperHeroes {
             player = players2.get(0);
         }
 
-        game.setCurrentReacts("mahactHeroTarget", player.getFaction());
+        game.setStoredValue("mahactHeroTarget", player.getFaction());
 
         UnitHolder unitHolder = tile1.getUnitHolders().get("space");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -1816,12 +1816,12 @@ public class ButtonHelperHeroes {
             }
             if (!game.isFoWMode()) {
                 StartCombat.findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
-                    threadName, tile2, event, "space");
+                    threadName, tile2, event, "space", "space");
             } else {
                 StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
-                    threadName, tile2, event, "space");
+                    threadName, tile2, event, "space", "space");
                 StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                    threadName, tile2, event, "space");
+                    threadName, tile2, event, "space", "space");
                 for (Player player3 : game.getRealPlayers()) {
                     if (player3 == player2 || player3 == player) {
                         continue;
@@ -1830,7 +1830,7 @@ public class ButtonHelperHeroes {
                         continue;
                     }
                     StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
-                        threadName, tile2, event, "space");
+                        threadName, tile2, event, "space", "space");
                 }
             }
         }

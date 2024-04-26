@@ -18,7 +18,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.search.ListMyTitles;
+import ti4.commands.search.SearchMyTitles;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.uncategorized.CardsInfo;
@@ -63,19 +63,19 @@ public class Setup extends PlayerSubcommandData {
             factionOption = StringUtils.substringBefore(factionOption.toLowerCase().replace("the ", ""), " ");
         String faction = AliasHandler.resolveFaction(factionOption);
         if (!Mapper.isValidFaction(faction)) {
-            sendMessage("Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
+            MessageHelper.sendMessageToEventChannel(event, "Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
             return;
         }
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isValidColor(color)) {
-            sendMessage("Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
+            MessageHelper.sendMessageToEventChannel(event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
             return;
         }
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
@@ -329,7 +329,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (!activeGame.isFoWMode()) {
-            StringBuilder sb = new ListMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
+            StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
             if (!sb.toString().contains("No titles yet")) {
                 String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
@@ -338,7 +338,7 @@ public class Setup extends PlayerSubcommandData {
         if (hsTile.equalsIgnoreCase("d11")) {
             AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
         }
-        if (activeGame.getFactionsThatReactedToThis("removeSupports").equalsIgnoreCase("true")) {
+        if (activeGame.getStoredValue("removeSupports").equalsIgnoreCase("true")) {
             Player p2 = player;
             p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
             p2.removePromissoryNote(p2.getColor() + "_sftt");

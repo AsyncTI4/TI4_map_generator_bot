@@ -5,9 +5,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
 
@@ -22,9 +25,13 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import ti4.commands.map.AddTileList;
+import ti4.commands.player.Setup;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -32,6 +39,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileModel;
 
 @Data
 public class MiltyDraftManager {
@@ -61,12 +69,12 @@ public class MiltyDraftManager {
         private MiltyDraftSlice slice = null;
         private Integer position = null;
 
-        public String summary() {
-            return String.join("/", factionEmoji(), sliceEmoji(), positionEmoji());
+        public String summary(String doggy) {
+            return String.join(" ", factionEmoji(doggy), sliceEmoji(), positionEmoji());
         }
 
-        private String factionEmoji() {
-            return faction == null ? Emojis.getRandomGoodDog() : Emojis.getFactionIconFromDiscord(faction);
+        private String factionEmoji(String doggy) {
+            return faction == null ? doggy : Emojis.getFactionIconFromDiscord(faction);
         }
 
         private String sliceEmoji() {
@@ -152,9 +160,9 @@ public class MiltyDraftManager {
         factionDraft.addAll(factions);
     }
 
-    public void init() {
+    public void init(Game game) {
         clear();
-        MiltyDraftHelper.initDraftTiles(this);
+        MiltyDraftHelper.initDraftTiles(this, game);
     }
 
     //TODO: Integrate this directly in the manager. For now, it's just dumb and hacky
@@ -286,8 +294,22 @@ public class MiltyDraftManager {
 
     private void finishDraft(Game game, ButtonInteractionEvent event) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
+        List<String> backupColors = Arrays.asList("black","bloodred","blue","chocolate","emerald","orange",
+            "ethereal","forest","gold","green","brown","lavender","lightbrown","navy","chrome","petrol",
+            "pink","purple","rainbow","red","rose","spring","sunset","tan","teal","turquoise","yellow");
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
+            for (String playerId : players) {
+                Player player = game.getPlayer(playerId);
+                PlayerDraft picks = getPlayerDraft(playerId);
+                String color = backupColors.get(picks.getPosition());
+                String faction = picks.getFaction();
+
+                if (playerId.equals(Constants.chassitId)) color = "lightgray";
+                String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, mapTemplate);
+
+                Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, picks.getPosition() == 1);
+            }
             AddTileList.finishSetup(game, event);
         } catch (Exception e) {
             String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
@@ -419,7 +441,8 @@ public class MiltyDraftManager {
     }
 
     private String getOverallSummaryString(Game game) {
-        int padding = String.format("%s", getPlayers().size()).length();
+        int padding = String.format("%s", getPlayers().size()).length() + 1;
+        String goodDogOfTheDay = Emojis.getRandomGoodDog();
         StringBuilder sb = new StringBuilder();
         sb.append("# **__Draft Picks So Far__**:");
         int pickNum = 1;
@@ -427,13 +450,13 @@ public class MiltyDraftManager {
             Player player = game.getPlayer(p);
             PlayerDraft picks = getPlayerDraft(p);
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
-            sb.append("[ ").append(picks.summary()).append(" ] ");
+            sb.append(picks.summary(goodDogOfTheDay)).append(" ");
 
             if (p.equals(getNextDraftPlayer())) sb.append("*");
             if (p.equals(getCurrentDraftPlayer())) sb.append("**__");
             sb.append(player.getUserName());
             if (p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
-            if (p.equals(getNextDraftPlayer())) sb.append("   <- up next");
+            if (p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
             if (p.equals(getCurrentDraftPlayer())) sb.append("__**");
             if (p.equals(getNextDraftPlayer())) sb.append("*");
 
@@ -609,6 +632,20 @@ public class MiltyDraftManager {
     }
 
     private MiltyDraftTile findTile(String tileId) {
-        return all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElseThrow();
+        MiltyDraftTile result = null;
+        result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
+        if (result == null) {
+            TileModel tileRequested = TileHelper.getTile(tileId);
+            Set<ComponentSource> currentsources = new HashSet<>(all.stream()
+                .map(t -> t.getTile().getTileModel().getSource())
+                .filter(x -> x != null)
+                .collect(Collectors.toSet()));
+            if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
+            if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.ds);
+            if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);
+            MiltyDraftHelper.initDraftTiles(this, new ArrayList<>(currentsources));
+            result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElseThrow();
+        }
+        return result;
     }
 }

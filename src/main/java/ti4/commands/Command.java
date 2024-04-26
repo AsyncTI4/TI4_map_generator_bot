@@ -21,26 +21,6 @@ public interface Command {
 
     void registerCommands(CommandListUpdateAction commands);
 
-    default void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null){
-            activeGame =  "Game: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + ". " +activeGame+ " " +
-                event.getName() + " " + event.getOptions().stream()
-                .map(OptionMapping::getAsString)
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    default boolean isChannelCommand() {
-        return true;
-    }
-
     default void postExecute(SlashCommandInteractionEvent event) {
         event.getHook().deleteOriginal().submit();
     }

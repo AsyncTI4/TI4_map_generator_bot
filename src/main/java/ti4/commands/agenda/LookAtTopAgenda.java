@@ -36,7 +36,7 @@ public class LookAtTopAgenda extends AgendaSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            sendMessage("You are not a player in this game.");
+            MessageHelper.sendMessageToEventChannel(event, "You are not a player in this game.");
             return;
         }
 

@@ -462,6 +462,10 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static int getPlayerProgressOnObjective(String objID, Game activeGame, Player player) {
+        int comms = 0;
+        if (player.hasUnexhaustedLeader("keleresagent")) {
+            comms = player.getCommodities();
+        }
         switch (objID) {
             case "push_boundaries" -> {
                 int aboveN = 0;
@@ -502,6 +506,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         counter++;
                     }
                 }
+                if (player.hasAbility("privileged_citizenry")) {
+                    counter = counter + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "pds", false);
+                }
                 return counter;
             }
             case "corner", "unify_colonies" -> {
@@ -530,9 +537,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return numAbove1;
             }
             case "monument", "golden_age" -> {
-                int x = Helper.getPlayerResourcesAvailable(player, activeGame) + player.getTg();
+                int x = Helper.getPlayerResourcesAvailable(player, activeGame) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
-                    x = x + player.getTg();
+                    x = x + player.getTg() + comms;
                 }
                 return x;
             }
@@ -540,7 +547,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     Tile tile = activeGame.getTileFromPlanet(planet);
-                    if (tile != null && !tile.isHomeSystem()) {
+                    if (tile != null && (!tile.isHomeSystem() || tile.getTileID().equalsIgnoreCase("17"))) {
                         count++;
                     }
                 }
@@ -574,11 +581,11 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return player.getTacticalCC() + player.getStrategicCC();
             }
             case "trade_routes", "centralize_trade" -> {
-                return player.getTg();
+                return player.getTg() + comms;
             }
             case "amass_wealth" -> {
-                int forTG = Math.min(3, player.getTg());
-                int leftOverTg = player.getTg() - forTG;
+                int forTG = Math.min(3, player.getTg() + comms);
+                int leftOverTg = player.getTg() + comms - forTG;
                 int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, activeGame));
                 int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, activeGame));
                 if (player.hasTech("mc")) {
@@ -620,9 +627,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return x;
             }
             case "sway_council", "manipulate_law" -> {
-                int x = Helper.getPlayerInfluenceAvailable(player, activeGame) + player.getTg();
+                int x = Helper.getPlayerInfluenceAvailable(player, activeGame) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
-                    x = x + player.getTg();
+                    x = x + player.getTg() + comms;
                 }
                 return x;
             }
@@ -648,8 +655,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return count;
             }
             case "vast_reserves" -> {
-                int forTG = Math.min(6, player.getTg());
-                int leftOverTg = player.getTg() - forTG;
+                int forTG = Math.min(6, player.getTg() + comms);
+                int leftOverTg = player.getTg() + comms - forTG;
                 int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, activeGame));
                 int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, activeGame));
                 if (player.hasTech("mc")) {

@@ -356,9 +356,7 @@ public class ButtonHelperAgents {
                 activeGame.purgeExplore(cardID);
             }
         }
-        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
-        }
+        ButtonHelper.fullCommanderUnlockCheck(player, activeGame, "kollecc", event);
         MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         event.getMessage().delete().queue();
@@ -586,7 +584,7 @@ public class ButtonHelperAgents {
             String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
                 + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
-            activeGame.setCurrentReacts("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         if ("mykomentoriagent".equalsIgnoreCase(agent)) {
             ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
@@ -615,7 +613,7 @@ public class ButtonHelperAgents {
             String trueIdentity2 = p2.getRepresentation(true, true);
             String message2 = trueIdentity2 + "! Your current CCs are " + p2.getCCRepresentation()
                 + ". Use buttons to gain CCs";
-            activeGame.setCurrentReacts("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
+            activeGame.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message2,
                 buttons);
         }
@@ -711,14 +709,14 @@ public class ButtonHelperAgents {
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 ButtonHelper.getIdentOrColor(p2, activeGame) + " will receive Sol agent on their next roll");
-            activeGame.setCurrentReacts("solagent", p2.getFaction());
+            activeGame.setStoredValue("solagent", p2.getFaction());
         }
         if ("letnevagent".equalsIgnoreCase(agent)) {
             String faction = rest.split("_")[1];
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 ButtonHelper.getIdentOrColor(p2, activeGame) + " will receive Letnev agent on their next roll");
-            activeGame.setCurrentReacts("letnevagent", p2.getFaction());
+            activeGame.setStoredValue("letnevagent", p2.getFaction());
         }
 
         if ("cymiaeagent".equalsIgnoreCase(agent)) {
@@ -997,6 +995,7 @@ public class ButtonHelperAgents {
             if ("".equalsIgnoreCase(exhaustedMessage)) {
                 exhaustedMessage = "Updated";
             }
+            int buttons = 0;
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event2.getMessage().getActionRows()) {
                 List<ItemComponent> buttonRow = row.getComponents();
@@ -1005,12 +1004,18 @@ public class ButtonHelperAgents {
                     buttonRow.remove(buttonIndex);
                 }
                 if (buttonRow.size() > 0) {
+                    buttons = buttons + buttonRow.size();
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
             if (actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")
                 && !exhaustedMessage.contains("choose the target of your agent")) {
-                event2.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
+                    event2.getMessage().delete().queue();
+                } else {
+                    event2.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                }
+
             } else {
                 event2.getMessage().delete().queue();
             }
@@ -1058,7 +1063,7 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
         String messageID = "edynAgentPreset";
         String part2 = faction1 + "_" + faction2 + "_" + player.getFaction();
-        activeGame.setCurrentReacts(messageID, part2);
+        activeGame.setStoredValue(messageID, part2);
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.danger("removePreset_" + messageID, "Remove The Preset"));
@@ -1071,14 +1076,14 @@ public class ButtonHelperAgents {
         GenericInteractionCreateEvent event) {
         Player edyn = Helper.getPlayerFromUnlockedLeader(activeGame, "edynagent");
         if (edyn != null && edyn.hasUnexhaustedLeader("edynagent")) {
-            String preset = activeGame.getFactionsThatReactedToThis("edynAgentPreset");
+            String preset = activeGame.getStoredValue("edynAgentPreset");
             if (!preset.isEmpty()) {
                 if (preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
                     Player edyn2 = activeGame.getPlayerFromColorOrFaction(preset.split("_")[2]);
                     Player newActivePlayer = activeGame.getPlayerFromColorOrFaction(preset.split("_")[0]);
                     exhaustAgent("exhaustAgent_edynagent", event, activeGame, edyn2, ButtonHelper.getIdent(edyn2));
-                    activeGame.setCurrentReacts("edynAgentPreset", "");
-                    activeGame.setCurrentReacts("edynAgentInAction",
+                    activeGame.setStoredValue("edynAgentPreset", "");
+                    activeGame.setStoredValue("edynAgentInAction",
                         newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, activeGame, true, event);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(newActivePlayer, activeGame),
@@ -1093,14 +1098,14 @@ public class ButtonHelperAgents {
     }
 
     public static boolean checkForEdynAgentActive(Game activeGame, GenericInteractionCreateEvent event) {
-        String preset = activeGame.getFactionsThatReactedToThis("edynAgentInAction");
+        String preset = activeGame.getStoredValue("edynAgentInAction");
         if (!preset.isEmpty()) {
             Player edyn2 = activeGame.getPlayerFromColorOrFaction(preset.split("_")[1]);
             if (edyn2 == null)
                 return false;
             new DrawAgenda().drawAgenda(1, false, activeGame, edyn2, true);
             Player newActivePlayer = activeGame.getPlayerFromColorOrFaction(preset.split("_")[2]);
-            activeGame.setCurrentReacts("edynAgentInAction", "");
+            activeGame.setStoredValue("edynAgentInAction", "");
             ButtonHelper.startMyTurn(event, activeGame, newActivePlayer);
             return true;
         }

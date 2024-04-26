@@ -28,7 +28,7 @@
         "id": "devour",
         "name": "Devour",
         "faction": "cabal",
-        "permanentEffect": "Capture your opponent's non-structure units that are destroyed during combat. (Add a special tile (S11 or cabalprison) to an empty corner location(TL,TR,BL,BR) to move captured units to)",
+        "permanentEffect": "Capture your opponent's non-structure units that are destroyed during combat.",
         "source": "pok"
     },
     {

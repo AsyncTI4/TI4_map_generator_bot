@@ -71,7 +71,7 @@ public class Stats extends PlayerSubcommandData {
 		player = Helper.getGamePlayer(activeGame, player, event, null);
 		player = Helper.getPlayer(activeGame, player, event);
 		if (player == null) {
-			sendMessage("Player could not be found");
+			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
 			return;
 		}
 
@@ -86,7 +86,7 @@ public class Stats extends PlayerSubcommandData {
 				MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
 					getPlayersCurrentStatsText(player, activeGame));
 			} else {
-				sendMessage(getPlayersCurrentStatsText(player, activeGame));
+				MessageHelper.sendMessageToEventChannel(event, getPlayersCurrentStatsText(player, activeGame));
 			}
 			return;
 		}
@@ -97,7 +97,7 @@ public class Stats extends PlayerSubcommandData {
 		OptionMapping optionF = event.getOption(Constants.FLEET);
 		OptionMapping optionS = event.getOption(Constants.STRATEGY);
 		if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
-			sendMessage("Use format 3/3/3 for command counters or individual values, not both");
+			MessageHelper.sendMessageToEventChannel(event, "Use format 3/3/3 for command counters or individual values, not both");
 		} else {
 			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/"
 				+ player.getStrategicCC();
@@ -105,7 +105,7 @@ public class Stats extends PlayerSubcommandData {
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
 				StringTokenizer tokenizer = new StringTokenizer(cc, "/");
 				if (tokenizer.countTokens() != 3) {
-					sendMessage("Wrong format for tokens count. Must be 3/3/3");
+					MessageHelper.sendMessageToEventChannel(event, "Wrong format for tokens count. Must be 3/3/3");
 				} else {
 					try {
 						setValue(event, activeGame, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
@@ -115,7 +115,7 @@ public class Stats extends PlayerSubcommandData {
 						setValue(event, activeGame, player, "Strategy CC", player::setStrategicCC,
 							player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
-						sendMessage("Not number entered, check CC count again");
+						MessageHelper.sendMessageToEventChannel(event, "Not number entered, check CC count again");
 					}
 				}
 				Helper.isCCCountCorrect(event, activeGame, player.getColor());
@@ -131,7 +131,7 @@ public class Stats extends PlayerSubcommandData {
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-				sendMessage(player.getRepresentation() + " updated CCs: " + originalCCString + " -> " + newCCString);
+				MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated CCs: " + originalCCString + " -> " + newCCString);
 			}
 			if (optionT != null || optionF != null || optionS != null) {
 				Helper.isCCCountCorrect(event, activeGame, player.getColor());
@@ -144,7 +144,7 @@ public class Stats extends PlayerSubcommandData {
 		if (optionMappings.isEmpty())
 			return;
 
-		sendMessage(player.getRepresentation(true, true) + " player stats changed:");
+		MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(true, true) + " player stats changed:");
 
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
@@ -213,11 +213,11 @@ public class Stats extends PlayerSubcommandData {
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
 		if (commoditiesTotalCount != null) {
 			if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-				sendMessage("**Warning:** Total Commodities count seems like a wrong value:");
+				MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
 			}
 			player.setCommoditiesTotal(commoditiesTotalCount);
 			String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
-			sendMessage(message);
+			MessageHelper.sendMessageToEventChannel(event, message);
 		}
 
 		Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
@@ -225,7 +225,7 @@ public class Stats extends PlayerSubcommandData {
 
 			player.setTurnCount(turnCount);
 			String message = ">  set **Turn Count** to " + turnCount;
-			sendMessage(message);
+			MessageHelper.sendMessageToEventChannel(event, message);
 		}
 
 		OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);
@@ -237,7 +237,7 @@ public class Stats extends PlayerSubcommandData {
 			} else {
 				message.append(", which is not a valid input. Please use one of: y/yes");
 			}
-			sendMessage(message.toString());
+			MessageHelper.sendMessageToEventChannel(event, message.toString());
 		}
 
 		OptionMapping optionPassed = event.getOption(Constants.PASSED);
@@ -255,7 +255,7 @@ public class Stats extends PlayerSubcommandData {
 			} else {
 				message.append(", which is not a valid input. Please use one of: y/yes/n/no");
 			}
-			sendMessage(message.toString());
+			MessageHelper.sendMessageToEventChannel(event, message.toString());
 		}
 
 		pickSC(event, activeGame, player, event.getOption(Constants.STRATEGY_CARD));
@@ -289,14 +289,14 @@ public class Stats extends PlayerSubcommandData {
 				message.append(
 					"> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
 			}
-			sendMessage(message.toString());
+			MessageHelper.sendMessageToEventChannel(event, message.toString());
 		}
 
 		OptionMapping optionDummy = event.getOption(Constants.DUMMY);
 		if (optionDummy != null) {
 			boolean value = optionDummy.getAsBoolean();
 			player.setDummy(value);
-			sendMessage(getGeneralMessage(event, player, optionDummy));
+			MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(event, player, optionDummy));
 		}
 
 	}
@@ -369,7 +369,7 @@ public class Stats extends PlayerSubcommandData {
 		return sb.toString();
 	}
 
-	public boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
+	public static boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
 		if (optionSC == null) {
 			return false;
 		}
@@ -377,7 +377,7 @@ public class Stats extends PlayerSubcommandData {
 		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
+	public static boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
 		Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
@@ -469,7 +469,7 @@ public class Stats extends PlayerSubcommandData {
 				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber,
 					explanation);
 				if (!suppressMessage)
-					sendMessage(messageToSend);
+					MessageHelper.sendMessageToEventChannel(event, messageToSend);
 				if (activeGame.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
@@ -480,13 +480,13 @@ public class Stats extends PlayerSubcommandData {
 				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber,
 					newNumber, explanation);
 				if (!suppressMessage)
-					sendMessage(messageToSend);
+					MessageHelper.sendMessageToEventChannel(event, messageToSend);
 				if (activeGame.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
 			}
 		} catch (Exception e) {
-			sendMessage("Could not parse number for: " + optionName);
+			MessageHelper.sendMessageToEventChannel(event, "Could not parse number for: " + optionName);
 		}
 	}
 

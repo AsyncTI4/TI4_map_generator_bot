@@ -3,6 +3,7 @@ package ti4.commands.franken;
 import java.util.List;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PNRemove extends PNAddRemove {
     public PNRemove() {
@@ -21,6 +22,6 @@ public class PNRemove extends PNAddRemove {
             sb.append("\n");
             player.removeOwnedPromissoryNoteByID(pnID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
     }
 }

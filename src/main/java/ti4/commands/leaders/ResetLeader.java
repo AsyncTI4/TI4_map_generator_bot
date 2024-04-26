@@ -7,6 +7,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ResetLeader extends LeaderSubcommandData {
     public ResetLeader() {
@@ -21,10 +22,10 @@ public class ResetLeader extends LeaderSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         player.initLeaders();
-        sendMessage("Leaders were reset: " + player.getLeaderIDs());
+        MessageHelper.sendMessageToEventChannel(event, "Leaders were reset: " + player.getLeaderIDs());
     }
 }

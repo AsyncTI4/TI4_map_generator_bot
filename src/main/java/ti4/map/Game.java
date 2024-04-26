@@ -339,8 +339,8 @@ public class Game {
 
     public void fixScrewedSOs() {
         MessageHelper.sendMessageToChannel(getActionsChannel(),
-                "The number of SOs in the deck before this operation is " + getNumberOfSOsInTheDeck()
-                        + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
+            "The number of SOs in the deck before this operation is " + getNumberOfSOsInTheDeck()
+                + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
 
         List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(secretObjectives);
@@ -363,8 +363,8 @@ public class Game {
             }
         }
         MessageHelper.sendMessageToChannel(getActionsChannel(),
-                "Fixed the SOs, the total amount of SOs in deck is " + getNumberOfSOsInTheDeck()
-                        + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
+            "Fixed the SOs, the total amount of SOs in deck is " + getNumberOfSOsInTheDeck()
+                + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
     }
 
     public int getNumberOfSOsInTheDeck() {
@@ -377,10 +377,10 @@ public class Game {
 
     public boolean hasBorderAnomalyOn(String tile, Integer direction) {
         List<BorderAnomalyHolder> anomaliesOnBorder = borderAnomalies.stream()
-                .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
-                .filter(anomaly -> anomaly.getTile().equals(tile))
-                .filter(anomaly -> anomaly.getDirection() == direction)
-                .collect(Collectors.toList());
+            .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
+            .filter(anomaly -> anomaly.getTile().equals(tile))
+            .filter(anomaly -> anomaly.getDirection() == direction)
+            .collect(Collectors.toList());
         return isNotEmpty(anomaliesOnBorder);
     }
 
@@ -585,7 +585,7 @@ public class Game {
         for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
 
             if (Mapper.getActionCard(ac.getKey()) != null
-                    && Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
+                && Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
                 return true;
             } else {
                 if (Mapper.getActionCard(ac.getKey()) == null) {
@@ -645,12 +645,12 @@ public class Game {
         return allianceMode;
     }
 
-    public boolean isHomeBrew() {
-        return homeBrew;
-    }
-
     public void setAllianceMode(boolean allianceMode) {
         this.allianceMode = allianceMode;
+    }
+
+    public boolean isHomeBrew() {
+        return homeBrew;
     }
 
     public void setHomeBrew(boolean homebrew) {
@@ -661,28 +661,28 @@ public class Game {
         return fowMode;
     }
 
-    public boolean isLightFogMode() {
-        return lightFogMode;
-    }
-
-    public boolean isRedTapeMode() {
-        return redTapeMode;
-    }
-
-    public boolean isBaseGameMode() {
-        return baseGameMode;
-    }
-
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+
+    public boolean isLightFogMode() {
+        return lightFogMode;
     }
 
     public void setLightFogMode(boolean lightFogMode) {
         this.lightFogMode = lightFogMode;
     }
 
+    public boolean isRedTapeMode() {
+        return redTapeMode;
+    }
+
     public void setRedTapeMode(boolean redTape) {
         redTapeMode = redTape;
+    }
+
+    public boolean isBaseGameMode() {
+        return baseGameMode;
     }
 
     public void setBaseGameMode(boolean baseGameMode) {
@@ -693,12 +693,12 @@ public class Game {
         return homebrewSCMode;
     }
 
-    public boolean isSpinMode() {
-        return spinMode;
-    }
-
     public void setHomeBrewSCMode(boolean homeBrewSCMode) {
         homebrewSCMode = homeBrewSCMode;
+    }
+
+    public boolean isSpinMode() {
+        return spinMode;
     }
 
     public void setSpinMode(boolean homeBrewSCMode) {
@@ -752,7 +752,7 @@ public class Game {
             }
         };
         return gameModes.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
-                .collect(Collectors.joining(", "));
+            .collect(Collectors.joining(", "));
     }
 
     public boolean isNormalGame() {
@@ -770,9 +770,9 @@ public class Game {
         } catch (Exception e) {
             TextChannel tableTalkChannel;
             List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
-                    .filter(c -> c.getName().startsWith(getName()))
-                    .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
-                    .toList();
+                .filter(c -> c.getName().startsWith(getName()))
+                .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                .toList();
             if (gameChannels.size() == 1) {
                 tableTalkChannel = gameChannels.get(0);
                 setTableTalkChannelID(tableTalkChannel.getId());
@@ -797,7 +797,7 @@ public class Game {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getMainGameChannelID());
         } catch (Exception e) {
             List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda
-                    .getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+                .getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.get(0);
                 setMainGameChannelID(mainGameChannel.getId());
@@ -853,7 +853,7 @@ public class Game {
         } catch (Exception e) {
             ThreadChannel threadChannel; // exists and is not locked
             List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda
-                    .getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                .getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
             if (getActionsChannel() == null)
                 return null;
             if (botChannels.size() != 1) { // can't find it, might be archived
@@ -925,6 +925,14 @@ public class Game {
         return currentAgendaVotes;
     }
 
+    public void setCurrentReacts(String messageID, String factionsWhoReacted) {
+        checkingForAllReacts.put(messageID, factionsWhoReacted);
+    }
+
+    public void removeMessageIDFromCurrentReacts(String messageID) {
+        checkingForAllReacts.remove(messageID);
+    }
+
     public Map<String, String> getMessagesThatICheckedForAllReacts() {
         return checkingForAllReacts;
     }
@@ -935,7 +943,18 @@ public class Game {
         } else {
             return "";
         }
+    }
 
+    public void setStoredValue(String key, String value) {
+        checkingForAllReacts.put(key, value);
+    }
+
+    public String getStoredValue(String key) {
+        return getFactionsThatReactedToThis(key);
+    }
+
+    public void removeStoredValue(String key) {
+        checkingForAllReacts.remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
@@ -945,7 +964,7 @@ public class Game {
     @JsonIgnore
     public Set<Integer> getPlayedSCs() {
         return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
+            .collect(Collectors.toSet());
     }
 
     public List<Integer> getPlayedSCsInOrder(Player player, Game activeGame) {
@@ -994,7 +1013,7 @@ public class Game {
             return 0;
         Map<String, Tile> tileMap = new HashMap<>(getTileMap());
         String highestPosition = tileMap.keySet().stream().filter(Helper::isInteger)
-                .max(Comparator.comparingInt(Integer::parseInt)).get();
+            .max(Comparator.comparingInt(Integer::parseInt)).get();
         String lastTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
         if (!Helper.isInteger(lastTwoDigits))
             return 0;
@@ -1111,14 +1130,6 @@ public class Game {
 
     public void setCurrentAgendaVote(String outcome, String voteInfo) {
         currentAgendaVotes.put(outcome, voteInfo);
-    }
-
-    public void setCurrentReacts(String messageID, String factionsWhoReacted) {
-        checkingForAllReacts.put(messageID, factionsWhoReacted);
-    }
-
-    public void removeMessageIDFromCurrentReacts(String messageID) {
-        checkingForAllReacts.remove(messageID);
     }
 
     public void removeOutcomeAgendaVote(String outcome) {
@@ -1423,14 +1434,14 @@ public class Game {
         if (Objects.isNull(tradeGoodCount))
             tradeGoodCount = 0;
         if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)) {
-            Player player = getPlayerFromColorOrFaction(getFactionsThatReactedToThis("kyroHeroPlayer"));
+            Player player = getPlayerFromColorOrFaction(getStoredValue("kyroHeroPlayer"));
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
                 ButtonHelperAbilities.pillageCheck(player, this);
                 ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The tgs that would be placed on the SC " + sc
-                        + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
+                    + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
@@ -2530,6 +2541,8 @@ public class Game {
             actionCards.addAll(discardActionCards.keySet());
             discardActionCards.clear();
             Collections.shuffle(actionCards);
+            String msg = getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
+            MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
             return drawActionCard(userID);
         }
         return null;
@@ -2591,7 +2604,7 @@ public class Game {
             shuffleDiscardsIntoExploreDeck(reqType);
             deck = getExplores(reqType, explore);
             BotLogger.log("Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
-                    + " deck was empty, shuffling discards into deck.");
+                + " deck was empty, shuffling discards into deck.");
         } // end of migration code
 
         if (!deck.isEmpty()) {
@@ -2725,17 +2738,17 @@ public class Game {
                 player.setSecret(id);
                 if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
                     String msg = player.getRepresentation(true, true) + " you have more SOs than the limit ("
-                            + player.getMaxSOCount()
-                            + ") and should discard one. If your game is playing with a higher SO limit, you can change that in /game setup.";
+                        + player.getMaxSOCount()
+                        + ") and should discard one. If your game is playing with a higher SO limit, you can change that in /game setup.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
                     String secretScoreMsg = "Click a button below to discard your Secret Objective";
                     List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
                     if (soButtons != null && !soButtons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
-                                soButtons);
+                            soButtons);
                     } else {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                "Something went wrong. Please report to Fin");
+                            "Something went wrong. Please report to Fin");
                     }
                 }
             }
@@ -3078,7 +3091,7 @@ public class Game {
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
-                    + deck.getName() + "** while there are revealed public objectives.");
+                + deck.getName() + "** while there are revealed public objectives.");
             return false;
         }
 
@@ -3090,7 +3103,7 @@ public class Game {
     public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
-                    + deck.getName() + "** while there are revealed public objectives.");
+                + deck.getName() + "** while there are revealed public objectives.");
             return false;
         }
 
@@ -3113,13 +3126,13 @@ public class Game {
         }
         if (getDiscardActionCards().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
+                "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
             shuffledExtrasIn = true;
         } else {
             for (Player player : getPlayers().values()) {
                 if (player.getActionCards().size() > 0) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
+                        "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
                     shuffledExtrasIn = true;
                     break;
                 }
@@ -3140,7 +3153,7 @@ public class Game {
         for (Player player : getPlayers().values()) {
             if (player.getRelics().size() > 0) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **"
-                        + deck.getName() + "** while there are relics in player hands.");
+                    + deck.getName() + "** while there are relics in player hands.");
                 return false;
             }
         }
@@ -3153,8 +3166,8 @@ public class Game {
         for (Player player : getPlayers().values()) {
             if (player.getSecrets().size() > 0) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Cannot change secret objective deck to **" + deck.getName()
-                                + "** while there are secret objectives in player hands.");
+                    "Cannot change secret objective deck to **" + deck.getName()
+                        + "** while there are secret objectives in player hands.");
                 return false;
             }
         }
@@ -3166,7 +3179,7 @@ public class Game {
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getAllExploreDiscard().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change explore deck to **"
-                    + deck.getName() + "** while there are explores in the discard pile.");
+                + deck.getName() + "** while there are explores in the discard pile.");
             return false;
         }
         setExplorationDeckID(deck.getAlias());
@@ -3177,7 +3190,7 @@ public class Game {
     public boolean validateAndSetAgendaDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardAgendas().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change agenda deck to **"
-                    + deck.getName() + "** while there are agendas in the discard pile.");
+                + deck.getName() + "** while there are agendas in the discard pile.");
             return false;
         }
         setAgendaDeckID(deck.getAlias());
@@ -3188,7 +3201,7 @@ public class Game {
     public boolean validateAndSetEventDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardedEvents().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change event deck to **"
-                    + deck.getName() + "** while there are events in the discard pile.");
+                + deck.getName() + "** while there are events in the discard pile.");
             return false;
         }
         setEventDeckID(deck.getAlias());
@@ -3285,7 +3298,7 @@ public class Game {
             for (Tile tile : tileMap.values()) {
                 for (UnitHolder uh : tile.getUnitHolders().values()) {
                     if (uh.getTokenList() != null && (uh.getTokenList().contains("mirage")
-                            || uh.getTokenList().contains("token_mirage.png"))) {
+                        || uh.getTokenList().contains("token_mirage.png"))) {
                         return tile;
                     }
                 }
@@ -3293,9 +3306,9 @@ public class Game {
         }
 
         return tileMap.values().stream()
-                .filter(tile -> tile.getTileID().equals(tileID))
-                .findFirst()
-                .orElse(null);
+            .filter(tile -> tile.getTileID().equals(tileID))
+            .findFirst()
+            .orElse(null);
     }
 
     public Tile getTileByPosition(String position) {
@@ -3304,8 +3317,8 @@ public class Game {
 
     public boolean isTileDuplicated(String tileID) {
         return tileMap.values().stream()
-                .filter(tile -> tile.getTileID().equals(tileID))
-                .count() > 1;
+            .filter(tile -> tile.getTileID().equals(tileID))
+            .count() > 1;
     }
 
     public void addPlayer(String id, String name) {
@@ -3331,20 +3344,20 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
         return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isDummy()))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedPlayers() {
         return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated()))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedAndDummyPlayers() {
         return getPlayers().values().stream()
-                .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
-                .collect(Collectors.toList());
+            .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
+            .collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -3510,13 +3523,13 @@ public class Game {
 
         LocalDate currentDate = LocalDate.now();
         LocalDate lastModifiedDate = (new Date(this.lastModifiedDate)).toInstant().atZone(ZoneId.systemDefault())
-                .toLocalDate();
+            .toLocalDate();
         Period period = Period.ofMonths(2); // TODO: CANDIDATE FOR GLOBAL VARIABLE
         LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate
-                    + " - the game flag `hasEnded` has been set to true");
+                + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
             GameSaveLoadManager.saveMap(this);
         }
@@ -3524,9 +3537,9 @@ public class Game {
 
     public void rebuildTilePositionAutoCompleteList() {
         setTileNameAutocompleteOptionsCache(getTileMap().values().stream()
-                .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
-                .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
-                .toList());
+            .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
+            .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
+            .toList());
     }
 
     @JsonIgnore
@@ -3539,7 +3552,7 @@ public class Game {
     }
 
     public void setTileNameAutocompleteOptionsCache(
-            List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
+        List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
         this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
 
@@ -3567,7 +3580,7 @@ public class Game {
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (Helper.findDuplicateInList(allPlayerHandPromissoryNotes).size() > 0) {
             BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
-                    + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
+                + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
         allPromissoryNotes.addAll(getPurgedPN());
@@ -3577,7 +3590,7 @@ public class Game {
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (unOwnedPromissoryNotes.size() > 0) {
             BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
-                    + unOwnedPromissoryNotes + "`");
+                + unOwnedPromissoryNotes + "`");
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
         }
 
@@ -3588,7 +3601,7 @@ public class Game {
                 if (unOwnedPromissoryNotes.contains(pnID)) {
                     player.removePromissoryNote(pnID);
                     BotLogger.log("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
-                            + player.getUserName() + "` because nobody 'owned' it");
+                        + player.getUserName() + "` because nobody 'owned' it");
                 }
             }
         }
@@ -3598,7 +3611,7 @@ public class Game {
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (missingPromissoryNotes.size() > 0) {
             BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
-                    + missingPromissoryNotes + "`");
+                + missingPromissoryNotes + "`");
         }
     }
 
@@ -3704,7 +3717,7 @@ public class Game {
      */
     public boolean usesStrategyCardAutomation(String scID) {
         return getStrategyCardSet().getStrategyCardModels().stream()
-                .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
+            .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
     }
 
     @JsonIgnore
@@ -3859,12 +3872,12 @@ public class Game {
 
     public int getPlayersTurnSCInitiative(Player player) {
         if ((player.hasAbility("telepathic") || player.ownsPromissoryNote("gift"))
-                && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { // Naalu
-                                                                                                                       // with
-                                                                                                                       // gift
-                                                                                                                       // in
-                                                                                                                       // their
-                                                                                                                       // hand
+            && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { // Naalu
+                                                                                                                                                                                              // with
+                                                                                                                                                                                              // gift
+                                                                                                                                                                                              // in
+                                                                                                                                                                                              // their
+                                                                                                                                                                                              // hand
             return 0;
         } else if (player.getPromissoryNotesInPlayArea().contains("gift")) { // Someone with gift in their play area
             return 0;
@@ -3901,8 +3914,8 @@ public class Game {
 
     public Optional<Player> getPlayerByColorID(String color) {
         return getRealPlayers().stream()
-                .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
-                .findFirst();
+            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
+            .findFirst();
     }
 
     public boolean isLeaderInGame(String leaderID) {
@@ -3949,7 +3962,7 @@ public class Game {
 
                 }
                 if (Objects.equals(factionColor, player_.getFaction()) ||
-                        Objects.equals(factionColor, player_.getColor())) {
+                    Objects.equals(factionColor, player_.getColor())) {
                     player = player_;
                     break;
                 }
@@ -3997,31 +4010,31 @@ public class Game {
             return null;
 
         return player.getUnitModels().stream()
-                .filter(unit -> unit.getImageFileSuffix().equals(imageFileSuffix))
-                .map(UnitModel::getName)
-                .findFirst()
-                .orElse(null);
+            .filter(unit -> unit.getImageFileSuffix().equals(imageFileSuffix))
+            .map(UnitModel::getName)
+            .findFirst()
+            .orElse(null);
     }
 
     public void swapInVariantUnits(String source) {
         List<UnitModel> variantUnits = Mapper.getUnits().values().stream()
-                .filter(unit -> source.equals(unit.getSource().toString())).toList();
+            .filter(unit -> source.equals(unit.getSource().toString())).toList();
         for (Player player : getPlayers().values()) {
             List<UnitModel> playersUnits = player.getUnitModels().stream()
-                    .filter(unit -> !source.equals(unit.getSource().toString())).toList();
+                .filter(unit -> !source.equals(unit.getSource().toString())).toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
                     if ((variantUnit.getHomebrewReplacesID().isPresent()
-                            && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant
-                            // unit replacing a
-                            // PoK unit
-                            || (playerUnit.getHomebrewReplacesID().isPresent()
-                                    && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK
-                                                                                                             // "variant"
-                                                                                                             // replacing
-                                                                                                             // a true
-                                                                                                             // variant
-                                                                                                             // unit
+                        && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant
+                        // unit replacing a
+                        // PoK unit
+                        || (playerUnit.getHomebrewReplacesID().isPresent()
+                            && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK
+                                                                                                                                                        // "variant"
+                                                                                                                                                        // replacing
+                                                                                                                                                        // a true
+                                                                                                                                                        // variant
+                                                                                                                                                        // unit
                     ) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
@@ -4038,7 +4051,7 @@ public class Game {
         if (deckModel == null)
             return;
         List<TechnologyModel> techsToReplace = deckModel.getNewDeck().stream().map(Mapper::getTech)
-                .filter(Objects::nonNull).filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
+            .filter(Objects::nonNull).filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
         for (Player player : getPlayers().values()) {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
@@ -4068,7 +4081,7 @@ public class Game {
         if (deckModel == null)
             return;
         List<TechnologyModel> techsToReplace = Mapper.getTechs().values().stream()
-                .filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
+            .filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
         for (Player player : getPlayers().values()) {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
@@ -4115,58 +4128,58 @@ public class Game {
     @JsonIgnore
     public boolean isLittleOmega() {
         return stage1PublicDeckID.contains("little_omega") || stage2PublicDeckID.contains("little_omega")
-                || agendaDeckID.contains("little_omega");
+            || agendaDeckID.contains("little_omega");
     }
 
     @JsonIgnore
     public boolean hasHomebrew() {
         // needs to check for homebrew tiles still
         return isExtraSecretMode()
-                || isHomeBrew()
-                || isFoWMode()
-                || isLightFogMode()
-                || isRedTapeMode()
-                || isDiscordantStarsMode()
-                || isFrankenGame()
-                || isMiltyModMode()
-                || isAbsolMode()
-                || isAllianceMode()
-                || isSpinMode()
-                || isHomeBrewSCMode()
-                || isCommunityMode()
-                || acDeckID != null && !List
-                        .of("action_cards_pok", "action_cards_basegame", "action_cards_basegame_and_codex1", "null")
-                        .contains(acDeckID)
-                || soDeckID != null
-                        && !List.of("secret_objectives_pok", "secret_objectives_base", "null").contains(soDeckID)
-                || stage1PublicDeckID != null
-                        && !List.of("public_stage_1_objectives_pok", "public_stage_1_objectives_base", "null")
-                                .contains(stage1PublicDeckID)
-                || stage2PublicDeckID != null
-                        && !List.of("public_stage_2_objectives_pok", "public_stage_2_objectives_base", "null")
-                                .contains(stage2PublicDeckID)
-                || relicDeckID != null && !List.of("relics_pok", "relics_base").contains(relicDeckID)
-                || agendaDeckID != null && !List.of("agendas_pok", "agendas_base_game", "null").contains(agendaDeckID)
-                || explorationDeckID != null
-                        && !List.of("explores_pok", "explores_base", "null").contains(explorationDeckID)
-                || technologyDeckID != null && !List.of("techs_pok", "techs_base", "null").contains(technologyDeckID)
-                || scSetID != null && !List.of("pok", "base_game", "base_game_codex1", "null").contains(scSetID)
-                || eventDeckID != null && !"null".equals(eventDeckID)
-                || Mapper.getFactions().stream()
-                        .filter(faction -> !faction.getSource().isPok())
-                        .anyMatch(faction -> getFactions().contains(faction.getAlias()))
-                || Mapper.getLeaders().values().stream()
-                        .filter(leader -> !leader.getSource().isPok())
-                        .anyMatch(leader -> isLeaderInGame(leader.getID()))
-                || publicObjectives1.size() < 5 && round >= 4
-                || publicObjectives2.size() < (round - 4)
-                || getRealPlayers().stream()
-                        .anyMatch(player -> player.getSecretVictoryPoints() > 3
-                                && !player.getRelics().contains("obsidian"))
-                || playerCountForMap < 3
-                || getRealAndEliminatedAndDummyPlayers().size() < 3
-                || playerCountForMap > 8
-                || getRealAndEliminatedAndDummyPlayers().size() > 8;
+            || isHomeBrew()
+            || isFoWMode()
+            || isLightFogMode()
+            || isRedTapeMode()
+            || isDiscordantStarsMode()
+            || isFrankenGame()
+            || isMiltyModMode()
+            || isAbsolMode()
+            || isAllianceMode()
+            || isSpinMode()
+            || isHomeBrewSCMode()
+            || isCommunityMode()
+            || acDeckID != null && !List
+                .of("action_cards_pok", "action_cards_basegame", "action_cards_basegame_and_codex1", "null")
+                .contains(acDeckID)
+            || soDeckID != null
+                && !List.of("secret_objectives_pok", "secret_objectives_base", "null").contains(soDeckID)
+            || stage1PublicDeckID != null
+                && !List.of("public_stage_1_objectives_pok", "public_stage_1_objectives_base", "null")
+                    .contains(stage1PublicDeckID)
+            || stage2PublicDeckID != null
+                && !List.of("public_stage_2_objectives_pok", "public_stage_2_objectives_base", "null")
+                    .contains(stage2PublicDeckID)
+            || relicDeckID != null && !List.of("relics_pok", "relics_base").contains(relicDeckID)
+            || agendaDeckID != null && !List.of("agendas_pok", "agendas_base_game", "null").contains(agendaDeckID)
+            || explorationDeckID != null
+                && !List.of("explores_pok", "explores_base", "null").contains(explorationDeckID)
+            || technologyDeckID != null && !List.of("techs_pok", "techs_base", "null").contains(technologyDeckID)
+            || scSetID != null && !List.of("pok", "base_game", "base_game_codex1", "null").contains(scSetID)
+            || eventDeckID != null && !"null".equals(eventDeckID)
+            || Mapper.getFactions().stream()
+                .filter(faction -> !faction.getSource().isPok())
+                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || Mapper.getLeaders().values().stream()
+                .filter(leader -> !leader.getSource().isPok())
+                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || publicObjectives1.size() < 5 && round >= 4
+            || publicObjectives2.size() < (round - 4)
+            || getRealPlayers().stream()
+                .anyMatch(player -> player.getSecretVictoryPoints() > 3
+                    && !player.getRelics().contains("obsidian"))
+            || playerCountForMap < 3
+            || getRealAndEliminatedAndDummyPlayers().size() < 3
+            || playerCountForMap > 8
+            || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 
     public void setStrategyCardSet(String scSetID) {

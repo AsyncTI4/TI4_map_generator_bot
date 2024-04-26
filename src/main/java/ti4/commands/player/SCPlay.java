@@ -59,18 +59,18 @@ public class SCPlay extends PlayerSubcommandData {
             : activeGame.getMainGameChannel();
 
         if (player == null) {
-            sendMessage("You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
             return;
         }
 
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            sendMessage("No SC has been selected");
+            MessageHelper.sendMessageToEventChannel(event, "No SC has been selected");
             return;
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { // Only one SC selected
-            sendMessage("Player has more than one SC. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(event, "Player has more than one SC. Please try again, using the `strategy_card` option.");
             return;
         }
 
@@ -94,10 +94,10 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         // HANDLE COUP
-        if (!winnuHero && activeGame.getFactionsThatReactedToThis("Coup") != null
-            && activeGame.getFactionsThatReactedToThis("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && activeGame.getStoredValue("Coup") != null
+            && activeGame.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : activeGame.getRealPlayers()) {
-                if (activeGame.getFactionsThatReactedToThis("Coup").contains(p2.getFaction())
+                if (activeGame.getStoredValue("Coup").contains(p2.getFaction())
                     && p2.getActionCards().containsKey("coup")) {
                     if (p2 == player) {
                         continue;
@@ -107,7 +107,7 @@ public class SCPlay extends PlayerSubcommandData {
                     activeGame.setJustPlayedComponentAC(true);
                     String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-                    activeGame.setCurrentReacts("Coup", "");
+                    activeGame.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player
                         .getRepresentation()
                         + " you have been couped. If this is a mistake or the coup is sabod, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
@@ -156,7 +156,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (scModel != null && scModel.hasImageFile()) {
-            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame), true);
+            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame));
         } else if (scModel != null) {
             baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
         }
@@ -185,13 +185,13 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay);
             }
-            activeGame.setCurrentReacts("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
-            activeGame.setCurrentReacts("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
-            activeGame.setCurrentReacts("scPlayMsgTime" + scToPlay, new Date().getTime() + "");
+            activeGame.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
+            activeGame.setStoredValue("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
+            activeGame.setStoredValue("scPlayMsgTime" + scToPlay, new Date().getTime() + "");
             for (Player p2 : activeGame.getRealPlayers()) {
-                if (!activeGame.getFactionsThatReactedToThis("scPlayPingCount" + scToPlay + p2.getFaction())
+                if (!activeGame.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction())
                     .isEmpty()) {
-                    activeGame.removeMessageIDFromCurrentReacts("scPlayPingCount" + scToPlay + p2.getFaction());
+                    activeGame.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
                 }
             }
             if (activeGame.isFoWMode()) {
@@ -210,8 +210,7 @@ public class SCPlay extends PlayerSubcommandData {
                     for (ThreadChannel threadChannel_ : threadChannels) {
                         if (threadChannel_.getName().equals(threadName)) {
                             if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-                                MessageHelper.sendFileToChannel(threadChannel_,
-                                    Helper.getSCImageFile(scToPlay, activeGame), true);
+                                MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, activeGame));
                             }
                             if (scToPlay == 5) {
                                 Button transaction = Button.primary("transaction", "Transaction");
@@ -239,7 +238,7 @@ public class SCPlay extends PlayerSubcommandData {
                 assignSpeakerMessage, assignSpeakerActionRow);
         }
         if (scToPlay == ButtonHelper.getKyroHeroSC(activeGame)
-            && !player.getFaction().equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("kyroHeroPlayer"))) {
+            && !player.getFaction().equalsIgnoreCase(activeGame.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation()
                     + " this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
@@ -373,19 +372,19 @@ public class SCPlay extends PlayerSubcommandData {
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        activeGame.setCurrentReacts(key, "");
-        activeGame.setCurrentReacts(key2, "");
-        activeGame.setCurrentReacts(key3, "");
+        activeGame.setStoredValue(key, "");
+        activeGame.setStoredValue(key2, "");
+        activeGame.setStoredValue(key3, "");
         if (activeGame.getQueueSO()) {
             for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
                     || player.getSoScored() == player.getMaxSOCount()
                     || (player == imperialHolder && player.getPlanets().contains("mr"))) {
-                    activeGame.setCurrentReacts(key,
-                        activeGame.getFactionsThatReactedToThis(key) + player.getFaction() + "*");
+                    activeGame.setStoredValue(key,
+                        activeGame.getStoredValue(key) + player.getFaction() + "*");
                 } else {
-                    activeGame.setCurrentReacts(key3,
-                        activeGame.getFactionsThatReactedToThis(key3) + player.getFaction() + "*");
+                    activeGame.setStoredValue(key3,
+                        activeGame.getStoredValue(key3) + player.getFaction() + "*");
                 }
             }
         }

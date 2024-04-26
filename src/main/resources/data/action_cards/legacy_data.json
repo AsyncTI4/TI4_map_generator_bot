@@ -583,5 +583,104 @@
     "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
     "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "forced_hand",
+    "name": "Forced Hand",
+    "phase": "Action",
+    "window": "After another player performs an action",
+    "text": "That player must perform an additional action this turn or pass.",
+    "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "escape_route",
+    "name": "Escape Route",
+    "phase": "Action",
+    "window": "At the start of the \"Announce Retreats\" step",
+    "text": "During this combat, you treat each system that contains 1 of your space docks as adjacent to this system when you announce or resolve a retreat. If you announce a retreat, you may reroll any die your opponent rolls.",
+    "flavorText": "These were ancient routes, forgotten by time and kept secret by the Argent for use during their migration protocols.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "sensor_jam",
+    "name": "Sensor Jam",
+    "phase": "Action",
+    "window": "At the start of a round of space combat",
+    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "grand_heist",
+    "name": "Heist",
+    "phase": "Action",
+    "window": "After you gain control of a planet that was controlled by another player",
+    "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
+    "flavorText": "Mot awoke in a pool of his own blood. He was no longer bound – S'Ula had granted him that courtesy at least – but he was too weak to stand. So, he laid in front of the empty vault and wept.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "garner_tribute",
+    "name": "Tributes",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Exhaust 1 planet you control to gain trade goods equal to the combined value of its resources and influence.",
+    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "proxy_war",
+    "name": "Proxy War",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "During this turn, until you activate another player's home system, players treat all promissory notes as blank.",
+    "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as an entire fleet of unmarked ships poured forth from the wormhole, raining destruction upon the unsuspecting convoy. Reports be damned, these were no mere pirates.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "unexpected_strategy",
+    "name": "Unexpected Strategy",
+    "phase": "Strategy",
+    "window": "When you choose a strategy card",
+    "text": "Gain 1 command token. Then, gain a number of additional command tokens equal to the number of trade goods on that strategy card.",
+    "flavorText": "Despite their best syllogisms and heuristics, they could not discern whether the Creuss operated based on reason or some strange mechanism of cause and effect.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "electromagnetic_pulse",
+    "name": "Electromagnetic Pulse",
+    "phase": "Action",
+    "window": "After the \"Move Ships\" step in a system that contains your units",
+    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "ancient_data_archive",
+    "name": "Data Archive",
+    "phase": "Agenda",
+    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
+    "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "close_quarters",
+    "name": "Close Quarters",
+    "phase": "Action",
+    "window": "At the start of a combat",
+    "text": "During this combat, apply +3 to the result of your unit's combat rolls and your opponent's unit's combat rolls.",
+    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "concise_legal_text",
+    "name": "Concise Legal Text",
+    "phase": "Agenda",
+    "window": "When an agenda is revealed",
+    "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
+    "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
+    "source": "action_deck_2"
   }
 ]

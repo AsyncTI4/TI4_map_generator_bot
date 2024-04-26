@@ -389,7 +389,7 @@ public class Emojis {
     public static final String Rahg = "<:Rahg:1159513660822130728>";
     public static final String Rarron = "<:Rarron:1159513662923477062>";
     public static final String Resculon = "<:Resculon:1159513664899006615>";
-    public static final String Retillon = "<:Retillon:1159513666232787045>";
+    public static final String Retillion = "<:Retillon:1159513666232787045>";
     public static final String RigelI = "<:RigelI:1159513668589981736>";
     public static final String RigelII = "<:RigelII:1159513693374124112>";
     public static final String RigelIII = "<:RigelIII:1159513695081222204>";
@@ -707,6 +707,7 @@ public class Emojis {
     public static final String Summer = "<:Summer:1070283656037412884>";
     public static final String Charlie = "<:Charlie:1096774713352650812>";
     public static final String Scout = "<:scout_face_2:1071965098639360081>";
+    public static final String scoutSpinner = "<a:spinner:1090392441477136434>";
 
     // LIST OF GOOD DOGS
     public static final List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie, Scout);
@@ -1036,13 +1037,13 @@ public class Emojis {
             case "loki" -> Loki;
             case "lor" -> Lor;
             case "maaluuk" -> Maaluuk;
-            case "mallice" -> Mallice;
+            case "mallice", "lockedmallice" -> Mallice;
             case "mr" -> Mecatol;
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
             case "mollprimus", "mollprimusk" -> MollPrimus;
-            case "mordai" -> Mordai;
+            case "mordaiii", "mordai" -> Mordai;
             case "muaat" -> PlanetMuaat;
             case "naazir" -> Naazir;
             case "nar" -> Nar;
@@ -1056,7 +1057,7 @@ public class Emojis {
             case "rahg" -> Rahg;
             case "rarron" -> Rarron;
             case "resculon" -> Resculon;
-            case "retillon" -> Retillon;
+            case "retillion", "retillon" -> Retillion;
             case "rigeli" -> RigelI;
             case "rigelii" -> RigelII;
             case "rigeliii" -> RigelIII;
@@ -1074,7 +1075,7 @@ public class Emojis {
             case "torkan" -> Torkan;
             case "trenlak" -> Trenlak;
             case "valk", "valkk" -> Valk;
-            case "vefut" -> Vefut;
+            case "vefutii", "vefut" -> Vefut;
             case "vegamajor" -> VegaMajor;
             case "vegaminor" -> VegaMinor;
             case "velnor" -> Velnor;

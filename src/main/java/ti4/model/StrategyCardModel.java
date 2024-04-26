@@ -17,7 +17,7 @@ import ti4.model.Source.ComponentSource;
 public class StrategyCardModel implements ModelInterface, EmbeddableModel {
 
     private String id;
-    private int initiative; // 0 though infinity
+    private int initiative; // 0 though integer max
     private String group; // used for grouped SC games (pbd100 style)
     private String name;
     private List<String> primaryTexts;
@@ -52,10 +52,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         // PRIMARY
-        eb.addField("Primary Ability", getPrimaryTextFormatted(), false);
+        eb.addField("__Primary Ability__", getPrimaryTextFormatted(), false);
 
         // SECONDARY
-        eb.addField("Secondary Ability", getSecondaryTextFormatted(), false);
+        eb.addField("__Secondary Ability__", getSecondaryTextFormatted(), false);
 
         // FLAVOUR
         if (getFlavourText().isPresent()) {
@@ -69,6 +69,9 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         if (includeID) {
             sb = new StringBuilder();
             sb.append("ID: ").append(id).append("  source: ").append(source.toString());
+            if (!getId().equals(getBotSCAutomationID())) {
+                sb.append("\nUses automation of SCID: ").append(getBotSCAutomationID());
+            }
             eb.setFooter(sb.toString());
         }
         return eb.build();
@@ -95,6 +98,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.contains(searchString)
+            || name.contains(searchString)
             || source.toString().contains(searchString);
     }
 
@@ -123,12 +127,17 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getColourHexCode() {
+        if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
+            return "#ffffff";
+        } else if (colourHexCode == null) {
+            return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
+        }
         return Optional.ofNullable(colourHexCode).orElse("#ffffff");
     }
 
     /**
      * SC ID used for automation - buttons/resolving/etc.
-     * Example: You have a Homebrew Leadership on Initiative 3 (instead of 1), 
+     * Example: You have a Homebrew Leadership on Initiative 3 (instead of 1),
      * but it can safely use the normal Leadership buttons.
      * Then set botSCAutomationID = "pok1leadership".
      */

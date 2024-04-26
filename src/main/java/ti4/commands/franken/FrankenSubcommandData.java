@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
 
 public abstract class FrankenSubcommandData extends SubcommandData {
 
@@ -37,20 +36,12 @@ public abstract class FrankenSubcommandData extends SubcommandData {
         return event;
     }
 
-    /**
-     * Send a message to the event's channel, handles large text
-     * @param messageText new message
-     */
-    public void sendMessage(String messageText) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
-    }
-
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
-        this.event = event;
         user = event.getUser();
         activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        this.event = event;
     }
 
     public void reply(SlashCommandInteractionEvent event) {

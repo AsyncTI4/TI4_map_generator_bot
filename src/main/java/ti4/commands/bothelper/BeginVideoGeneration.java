@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class BeginVideoGeneration extends BothelperSubcommandData {
     public BeginVideoGeneration (){
@@ -20,7 +21,7 @@ public class BeginVideoGeneration extends BothelperSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         String game = event.getOption(Constants.GAME_NAME).getAsString();
-        sendMessage("Launching Video Creation for:" + game);
+        MessageHelper.sendMessageToEventChannel(event, "Launching Video Creation for:" + game);
         AWSBatch client = AWSBatchClientBuilder.standard().withRegion("us-east-1").build();
         SubmitJobRequest sjr = new SubmitJobRequest();
         sjr.setJobName("video-" + game );
