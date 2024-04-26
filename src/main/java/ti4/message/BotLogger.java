@@ -63,8 +63,8 @@ public class BotLogger {
         System.out.println("[BOT-LOG] " + msg);
 
         //Adding so we don't cause an exception by attempting to log
-        if (msg.length() > 2000){
-            String ellipses = "...(log message too long)";
+        if (msg.length() > 2000) {
+            String ellipses = "...\n### Error message was too long and was truncated here\n"; //TODO: handle this better, don't truncate
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
 
