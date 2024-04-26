@@ -3250,7 +3250,8 @@ public class MapGenerator {
 
                 if (peekedPlayerID.contains(userID)) {
                     boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-                    String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
+                    String ccColor = convertToGeneric ? "gray" : player.getColor();
+                    String controlID = Mapper.getControlID(ccColor);
 
                     if (controlID.contains("null")) {
                         continue;
@@ -3261,7 +3262,9 @@ public class MapGenerator {
                     BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
                     if (controlTokenImage == null)
                         return;
-                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(""), scale); // Only one marker imaged used right now.
+
+                    String peekID = "peek" + getBlackWhiteFileSuffix(Mapper.getColorID(ccColor));
+                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(peekID), scale);
                     if (peekMarkerImage == null)
                         return;
 

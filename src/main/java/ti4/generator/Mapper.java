@@ -730,7 +730,7 @@ public class Mapper {
 
     @Nullable
     public static String getPeekMarkerPath(String markerID) {
-        return ResourceHelper.getInstance().getPeekMarkerFile("peek.png");
+        return ResourceHelper.getInstance().getPeekMarkerFile(markerID);
     }
 
     @Nullable
