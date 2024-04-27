@@ -450,15 +450,15 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
-        List<String> assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "nraShenanigans", "dreadnought", "flagship", "warsun"));
+        List<String> assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "nraShenanigans", "dreadnought", "carrier", "flagship", "warsun"));
         if (spaceCannonOffence) {
-            assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "dreadnought", "flagship", "warsun"));
+            assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "dreadnought", "carrier", "flagship", "warsun"));
             for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (!activeGame.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
-                    assignHitOrder = new ArrayList<String>(List.of("destroyer", "cruiser", "remainingSustains", "dreadnought", "flagship", "warsun", "fighter"));
+                    assignHitOrder = new ArrayList<String>(List.of("destroyer", "cruiser", "remainingSustains", "dreadnought", "carrier", "flagship", "warsun", "fighter"));
                 }
             }
         }
@@ -1383,8 +1383,8 @@ public class ButtonHelperModifyUnits {
                     finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
                     "Place A CC From Reinforcements In The System.");
                 Button placeConstructionCCInSystem = Button.secondary(
-                    finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
-                    "Place A CC Of The Construction Holder's because you used Mahact Agent");
+                        finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
+                        "Place A CC Of The Construction Holder's because you used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)");
                 Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
                     "Don't Place A CC In The System.");
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
@@ -1673,14 +1673,16 @@ public class ButtonHelperModifyUnits {
             buttons.add(sarweenButton);
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
-            Button winnuButton = Button.danger("exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+            Button winnuButton = Button.danger("exhaustAgent_ghotiagent_" + player.getFaction(),
+                                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(winnuButton);
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             Button winnuButton = Button
-                .danger("exhaustAgent_mortheusagent_" + player.getFaction(), "Use Mortheus Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
+                    .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
+                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Walik (Mortheus Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(winnuButton);
         }
         Button DoneExhausting;

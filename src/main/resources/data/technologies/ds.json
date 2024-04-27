@@ -293,7 +293,7 @@
         "requirements": "RRR",
         "faction": "kolume",
         "source": "ds",
-        "text": "Once per space combat, after 1 of your non-fighter ships is destroyed, you may produce 1 hit and assign it to 1 of your opponent's non-carrier ships."
+        "text": "After a system is activated, you may exhaust this card to choose 1 player. Apply +1 or -1 to all rolls that player makes during this tactical action."
     },
     {
         "alias": "dskortg",
