@@ -99,31 +99,30 @@ public class CreateGameButton extends GameSubcommandData {
                 counter++;
             }
             Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
-            buttonMsg = buttonMsg + "\n\n" + " A bothelper has been pinged to start the game";
+            buttonMsg = buttonMsg + "\n\n" + " Please hit this button after confirming that the members are the correct ones.";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg);
             // MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
-            // message_.getJumpUrl()
-            event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
-                String msg = bothelperRole.getAsMention() + " this game is ready for launching "
-                    + message_.getJumpUrl();
-                TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-                    .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-                if (bothelperLoungeChannel == null)
-                    return;
-                List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-                if (threadChannels.isEmpty())
-                    return;
-                String threadName = "game-starts-and-ends";
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        MessageHelper.sendMessageToChannel(threadChannel_, msg);
-                        break;
-                    }
-                }
-            });
+            // event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
+            //     String msg = bothelperRole.getAsMention() + " this game is ready for launching "
+            //         + message_.getJumpUrl();
+            //     TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
+            //         .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
+            //     if (bothelperLoungeChannel == null)
+            //         return;
+            //     List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+            //     if (threadChannels.isEmpty())
+            //         return;
+            //     String threadName = "game-starts-and-ends";
+            //     // SEARCH FOR EXISTING OPEN THREAD
+            //     for (ThreadChannel threadChannel_ : threadChannels) {
+            //         if (threadChannel_.getName().equals(threadName)) {
+            //             MessageHelper.sendMessageToChannel(threadChannel_, msg);
+            //             break;
+            //         }
+            //     }
+            // });
         }
     }
 
@@ -148,10 +147,12 @@ public class CreateGameButton extends GameSubcommandData {
                 }
             }
         }
-        if (!isAdmin) {
+        if (!isAdmin && !mapreference.getStoredValue("gameCreator" + member.getIdLong()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Only authorized users can press this button successfully.");
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed.");
             return;
+        } else {
+            mapreference.setStoredValue("gameCreator" + member.getIdLong(), "created");
         }
         event.editButton(null).queue();
 
