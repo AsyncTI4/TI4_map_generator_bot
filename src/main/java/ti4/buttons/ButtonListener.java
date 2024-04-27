@@ -2260,11 +2260,39 @@ public class ButtonListener extends ListenerAdapter {
                         PlayAC.playAC(event, activeGame, p2, "disgrace", activeGame.getMainGameChannel(),
                             event.getGuild());
                         activeGame.setStoredValue("Public Disgrace", "");
+                        Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+                        int scNumber = scpick;
+                        Integer tgCount = scTradeGoods.get(scNumber);
+                        String msg = player.getRepresentation(true, true) +
+                            "\n> Picked: " + Helper.getSCRepresentation(activeGame, scNumber);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                        if (tgCount != null && tgCount != 0) {
+                            int tg = player.getTg();
+                            tg += tgCount;
+                            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                                player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
+                            if (activeGame.isFoWMode()) {
+                                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
+                                    + " tgs from picking SC #" + scNumber;
+                                FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
+                            }
+                            player.setTg(tg);
+                            if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
+                                ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
+                            }
+                            ButtonHelperAbilities.pillageCheck(player, activeGame);
+                            if (scNumber == 2 && activeGame.isRedTapeMode()) {
+                                for (int x = 0; x < tgCount; x++) {
+                                    ButtonHelper.offerRedTapButtons(activeGame, player);
+                                }
+                            }
+                            activeGame.setScTradeGood(scNumber, 0);
+                        }
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                             player.getRepresentation()
                                 + " you have been public disgraced because someone preset it to occur when the number "
                                 + scpick
-                                + " was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
+                                + " was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC. (note, you keep any of the tgs that were on the card either way)");
                         return;
                     }
                 }
@@ -2682,8 +2710,8 @@ public class ButtonListener extends ListenerAdapter {
                 AddCC.addCC(event, color, tile);
             }
             String message = player.getRepresentation() + " Placed A " + StringUtils.capitalize(color) + "CC In The "
-                    + Helper.getPlanetRepresentation(planet, activeGame)
-                    + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)";
+                + Helper.getPlanetRepresentation(planet, activeGame)
+                + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)";
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "construction");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("greyfire_")) {
@@ -2963,7 +2991,7 @@ public class ButtonListener extends ListenerAdapter {
             AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getIdentOrColor(player, activeGame) + "discarded " + agendaName + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Allant (Edyn Agent)");
+                ButtonHelper.getIdentOrColor(player, activeGame) + "discarded " + agendaName + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Allant (Edyn Agent)");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(activeGame, buttonID, event, actionsChannel);
@@ -5192,15 +5220,15 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasUnexhaustedLeader("cymiaeagent")) {
                     List<Button> buttons2 = new ArrayList<>();
                     Button hacanButton = Button
-                            .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                                       "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                        .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
+                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
                     buttons2.add(hacanButton);
                     MessageHelper.sendMessageToChannelWithButtons(
-                            ButtonHelper.getCorrectChannel(player, activeGame),
-                            player.getRepresentation(true, true)
-                                    + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to make yourself draw an AC",
-                            buttons2);
+                        ButtonHelper.getCorrectChannel(player, activeGame),
+                        player.getRepresentation(true, true)
+                            + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to make yourself draw an AC",
+                        buttons2);
                 }
 
                 if ("Action".equalsIgnoreCase(Mapper.getActionCard(acID).getWindow())) {
@@ -5421,46 +5449,46 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(sarweenButton);
                 }
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                    && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button.danger("exhaustAgent_winnuagent",
-                                                       "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Berekar Berekon (Winnu Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.Winnu));
+                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Berekar Berekon (Winnu Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.Winnu));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("gledgeagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button
-                            .danger("exhaustAgent_gledgeagent_" + player.getFaction(),
-                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Durran (Gledge Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.gledge));
+                        .danger("exhaustAgent_gledgeagent_" + player.getFaction(),
+                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Durran (Gledge Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.gledge));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
                     Button winnuButton = Button
-                            .danger("exhaustAgent_ghotiagent_" + player.getFaction(),
-                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+                        .danger("exhaustAgent_ghotiagent_" + player.getFaction(),
+                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
                     Button winnuButton = Button
-                            .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
-                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Walik (Mortheus Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
+                        .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
+                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Walik (Mortheus Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("rohdhnaagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button
-                            .danger("exhaustAgent_rohdhnaagent_" + player.getFaction(),
-                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Rond Bri'ay (Rohdhna Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
+                        .danger("exhaustAgent_rohdhnaagent_" + player.getFaction(),
+                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Rond Bri'ay (Rohdhna Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
                     buttons.add(winnuButton);
                 }
                 if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                    && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button hacanButton = Button.danger("purgeHacanHero", "Purge Harrugh Gefhara (Hacan Hero)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
+                        .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
                     buttons.add(hacanButton);
                 }
                 Button doneExhausting;
@@ -5515,14 +5543,14 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasUnexhaustedLeader("celdauriagent")) {
                     List<Button> buttons = new ArrayList<>();
                     Button hacanButton = Button
-                            .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
+                        .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                     buttons.add(hacanButton);
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                            player.getRepresentation(true, true)
-                                    + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2TGs/2comm",
-                            buttons);
+                        player.getRepresentation(true, true)
+                            + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2TGs/2comm",
+                        buttons);
                 }
                 List<Button> systemButtons2 = new ArrayList<>();
                 if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
