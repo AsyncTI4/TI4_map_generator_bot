@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -131,6 +132,13 @@ public class CreateGameButton extends GameSubcommandData {
             .queue();
         Member member = event.getMember();
         boolean isAdmin = false;
+        Game mapreference = GameManager.getInstance().getGame("finreference");
+
+        if (mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when its fixed.");
+            return;
+        }
         if (member != null) {
             List<Role> roles = member.getRoles();
             for (Role role : AsyncTI4DiscordBot.bothelperRoles) {

@@ -213,6 +213,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (!activeGame.isFoWMode() && !action) {
             ButtonHelper.updateMap(activeGame, event,
                 "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+            activeGame.setStoredValue("startTimeOfRound" + activeGame.getRound() + "Agenda" + aCount, new Date().getTime() + "");
         }
     }
 }
