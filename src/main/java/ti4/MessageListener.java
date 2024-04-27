@@ -239,7 +239,7 @@ public class MessageListener extends ListenerAdapter {
                     Game mapreference = GameManager.getInstance().getGame("finreference");
                     if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
                         mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will ping a bothelper to give you a final push to launch.");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will create a button that you can press to launch the game after confirming the members are correct.");
                     }
                 }
             }
@@ -286,6 +286,13 @@ public class MessageListener extends ListenerAdapter {
                                                                                                                                           // minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
+            List<String> storedValues = new ArrayList<>();
+            storedValues.addAll(mapreference.getMessagesThatICheckedForAllReacts().keySet());
+            for (String value : storedValues) {
+                if (value.startsWith("gameCreator")) {
+                    mapreference.removeStoredValue(value);
+                }
+            }
             GameSaveLoadManager.saveMap(mapreference);
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
