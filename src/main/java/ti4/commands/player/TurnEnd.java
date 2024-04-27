@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -221,7 +222,8 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + activeGame.getPing();
 
-        activeGame.setCurrentPhase("status");
+        activeGame.setCurrentPhase("statusScoring");
+        activeGame.setStoredValue("startTimeOfRound" + activeGame.getRound() + "StatusScoring", new Date().getTime() + "");
         for (Player player : activeGame.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(activeGame, player);
             List<String> relics = new ArrayList<>(player.getRelics());

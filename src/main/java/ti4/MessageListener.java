@@ -234,11 +234,11 @@ public class MessageListener extends ListenerAdapter {
                     .getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
             }
-            if (event.getChannel() instanceof ForumPost post) {
-                if (post.getThreadChannel().getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
                     Game mapreference = GameManager.getInstance().getGame("finreference");
-                    if (mapreference.getStoredValue(post.getThreadChannel().getId()).isEmpty()) {
-                        mapreference.setStoredValue(post.getThreadChannel().getId(), "found");
+                    if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
+                        mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
                         MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will ping a bothelper to give you a final push to launch.");
                     }
                 }
@@ -394,6 +394,10 @@ public class MessageListener extends ListenerAdapter {
                     if (player != null && player.getPersonalPingInterval() > 0) {
                         spacer = player.getPersonalPingInterval();
                     }
+                }
+                if ("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase()) && spacer != 0) {
+                    spacer = spacer / 3;
+                    spacer = Math.max(spacer, 1);
                 }
                 if (activeGame.getAutoPingStatus() && spacer != 0 && !activeGame.getTemporaryPingDisable()) {
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
@@ -867,7 +871,7 @@ public class MessageListener extends ListenerAdapter {
                             .getStoredValue("futureMessageFor" + player.getFaction()) + ". ";
                     }
                     activeGame.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin"));
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         ButtonHelper.getIdent(player) + " sent themselves a future message");
                 } else {

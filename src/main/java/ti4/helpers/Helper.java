@@ -5,6 +5,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -551,10 +552,13 @@ public class Helper {
                         }
                         reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageID));
                     }
+
                     MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction == null && player.getCardsInfoThreadWithoutCompletes() != null) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThreadWithoutCompletes(),
-                            "Please react to this sabo window: " + mainMessage.getJumpUrl());
+                    if (reaction == null) {
+                        Calendar rightNow = Calendar.getInstance();
+                        if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
+                            activeGame.removeMessageIDForSabo(messageID);
+                        }
                     }
                 });
             }
@@ -1793,8 +1797,8 @@ public class Helper {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
                 Button argentButton = Button.success(
-                        "FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(),
-                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)");
+                    "FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(),
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.Argent));
                 unitButtons.add(argentButton);
             }

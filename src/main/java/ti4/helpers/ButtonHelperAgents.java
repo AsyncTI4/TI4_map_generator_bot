@@ -482,10 +482,8 @@ public class ButtonHelperAgents {
 
     public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game activeGame,
         Player player, String ident) {
-        System.out.println(buttonID);
         String agent = buttonID.replace("exhaustAgent_", "");
         String rest = agent;
-        System.out.println(agent);
         String trueIdentity = player.getRepresentation(true, true);
         if (agent.contains("_")) {
             agent = agent.substring(0, agent.indexOf("_"));
@@ -502,11 +500,13 @@ public class ButtonHelperAgents {
         }
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
+        MessageHelper.sendMessageToChannel(channel2, Emojis.getFactionLeaderEmoji(playerLeader));
         String ssruu = "";
         if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())) {
             ssruu = "Clever Clever ";
         }
+        String messageText2 = player.getRepresentation() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
+        MessageHelper.sendMessageToChannel(channel2, messageText2);
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Artuno the Betrayer (Nomad Agent)";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
@@ -1093,6 +1093,7 @@ public class ButtonHelperAgents {
             }
             int buttons = 0;
             List<ActionRow> actionRow2 = new ArrayList<>();
+
             for (ActionRow row : event2.getMessage().getActionRows()) {
                 List<ItemComponent> buttonRow = row.getComponents();
                 int buttonIndex = buttonRow.indexOf(event2.getButton());
