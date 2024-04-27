@@ -597,9 +597,9 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("olradinagent")) {
             Button hacanButton = Button
-                    .secondary("exhaustAgent_olradinagent_" + player.getFaction(),
-                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw (Olradin Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.olradin));
+                .secondary("exhaustAgent_olradinagent_" + player.getFaction(),
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw (Olradin Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.olradin));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
@@ -613,10 +613,10 @@ public class ButtonHelper {
             buttons.add(release);
         }
         if (player.hasUnexhaustedLeader("khraskagent")
-                && (whatIsItFor.contains("inf") || whatIsItFor.contains("both"))) {
+            && (whatIsItFor.contains("inf") || whatIsItFor.contains("both"))) {
             Button release = Button.secondary("exhaustAgent_khraskagent_" + player.getFaction(),
-                                              "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Udosh B'rtul (Khrask Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("khrask")));
+                "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Udosh B'rtul (Khrask Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("khrask")));
             buttons.add(release);
         }
         if (player.hasAbility("diplomats") && ButtonHelperAbilities.getDiplomatButtons(game, player).size() > 0) {
@@ -861,14 +861,14 @@ public class ButtonHelper {
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
                 Button hacanButton = Button
-                        .secondary("exhaustAgent_mirvedaagent_" + player.getFaction(),
-                                   "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina (Mirveda Agent)")
-                        .withEmoji(Emoji.fromFormatted(Emojis.mirveda));
+                    .secondary("exhaustAgent_mirvedaagent_" + player.getFaction(),
+                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina (Mirveda Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.mirveda));
                 buttons.add(hacanButton);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player
-                        .getRepresentation(true, true)
-                        + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina (Mirveda Agent) to spend a CC and research a tech of the same color as a prereq of the tech you just got",
-                        buttons);
+                    .getRepresentation(true, true)
+                    + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina (Mirveda Agent) to spend a CC and research a tech of the same color as a prereq of the tech you just got",
+                    buttons);
             }
             if (player.hasAbility("obsessive_designs") && paymentRequired
                 && "action".equalsIgnoreCase(game.getCurrentPhase())) {
@@ -910,14 +910,14 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
             Button hacanButton = Button
-                    .secondary("exhaustAgent_zealotsagent_" + player.getFaction(),
-                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealots Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.zealots));
+                .secondary("exhaustAgent_zealotsagent_" + player.getFaction(),
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealots Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.zealots));
             buttons.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentation(true, true)
-                            + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealots Agent) to produce 1 ship at home or in a system where you have a tech skip planet",
-                    buttons);
+                player.getRepresentation(true, true)
+                    + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealots Agent) to produce 1 ship at home or in a system where you have a tech skip planet",
+                buttons);
         }
 
         ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
@@ -1036,15 +1036,15 @@ public class ButtonHelper {
         }
         if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
             Button pT2 = Button.secondary("exhaustAgent_jolnaragent",
-                                          "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Doctor Sucaban (Jol-Nar Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Jolnar));
+                "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Doctor Sucaban (Jol-Nar Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.Jolnar));
             buttons.add(pT2);
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
             Button winnuButton = Button
-                    .danger("exhaustAgent_veldyragent_" + player.getFaction(),
-                            "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Solis Morden (Veldyr Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.veldyr));
+                .danger("exhaustAgent_veldyragent_" + player.getFaction(),
+                    "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Solis Morden (Veldyr Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.veldyr));
             buttons.add(winnuButton);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
@@ -3674,22 +3674,22 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent",
-                           "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Garv and Gunn (Naaz-Rokha Agents)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
+                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Garv and Gunn (Naaz-Rokha Agents)")
+                .withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
         }
         if (player.hasUnexhaustedLeader("cheiranagent")
             && ButtonHelperAgents.getCheiranAgentTiles(player, game).size() > 0) {
             endButtons.add(
-                    Button.success(finChecker + "exhaustAgent_cheiranagent_" + player.getFaction(),
-                                   "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+                Button.success(finChecker + "exhaustAgent_cheiranagent_" + player.getFaction(),
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
         }
 
         if (player.hasUnexhaustedLeader("freesystemsagent") && player.getReadiedPlanets().size() > 0
             && ButtonHelperAgents.getAvailableLegendaryAbilities(game).size() > 0) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_freesystemsagent_" + player.getFaction(),
-                                          "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Cordo Haved (Free Systems Agent)")
-                           .withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
+                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Cordo Haved (Free Systems Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
         }
         if (player.hasRelic("absol_tyrantslament") && !player.hasUnit("tyrantslament")) {
             endButtons.add(Button.success("deployTyrant", "Deploy The Tyrant's Lament")
@@ -3698,8 +3698,8 @@ public class ButtonHelper {
 
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_lizhoagent",
-                                          "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vasra Ivo (Li-zho Agent) on Yourself")
-                    .withEmoji(Emoji.fromFormatted(Emojis.lizho)));
+                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vasra Ivo (Li-zho Agent) on Yourself")
+                .withEmoji(Emoji.fromFormatted(Emojis.lizho)));
         }
 
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
@@ -4046,10 +4046,10 @@ public class ButtonHelper {
                 Button resolveExplore1 = Button.success(
                     "lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
                 Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_frontier_" + tile.getPosition(),
-                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent)");
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent)");
                 List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                 String message = player.getRepresentation(true, true)
-                        + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent), and thus can decline this explore to draw another one instead.";
+                    + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent), and thus can decline this explore to draw another one instead.";
                 if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
                     String pF = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(),
@@ -4443,8 +4443,8 @@ public class ButtonHelper {
 
         if (player.hasUnexhaustedLeader("saaragent")) {
             Button saarButton = Button.secondary("exhaustAgent_saaragent",
-                                                 "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Captain Mendosa (Saar Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Captain Mendosa (Saar Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.Saar));
             buttons.add(saarButton);
         }
 
@@ -4459,10 +4459,10 @@ public class ButtonHelper {
         }
 
         if (player.hasUnexhaustedLeader("ghostagent")
-                && FoWHelper.doesTileHaveWHs(game, game.getActiveSystem())) {
+            && FoWHelper.doesTileHaveWHs(game, game.getActiveSystem())) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Emissary Taivra (Creuss Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Emissary Taivra (Creuss Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
         if (player.hasTech("as")
@@ -4601,10 +4601,10 @@ public class ButtonHelper {
                 if (planet.getUnitCount(inf, colorID) > 0 || planet.getUnitCount(mech, colorID) > 0) {
                     if (player.hasUnexhaustedLeader("dihmohnagent")) {
                         Button dihmohn = Button
-                                .success("exhaustAgent_dihmohnagent_" + unitHolder.getName(),
-                                         "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jgin Faru (Dihmohn Agent) to land an extra Infantry on "
-                                                + Helper.getPlanetRepresentation(unitHolder.getName(), game))
-                                .withEmoji(Emoji.fromFormatted(Emojis.dihmohn));
+                            .success("exhaustAgent_dihmohnagent_" + unitHolder.getName(),
+                                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jgin Faru (Dihmohn Agent) to land an extra Infantry on "
+                                    + Helper.getPlanetRepresentation(unitHolder.getName(), game))
+                            .withEmoji(Emoji.fromFormatted(Emojis.dihmohn));
                         buttons.add(dihmohn);
                     }
                 }
@@ -4760,24 +4760,24 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("nokaragent") && FoWHelper.playerHasShipsInSystem(player, tile)) {
             Button chaos = Button
-                    .secondary("exhaustAgent_nokaragent_" + player.getFaction(),
-                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow (Nokar Agent) To Place A Destroyer")
-                    .withEmoji(Emoji.fromFormatted(Emojis.nokar));
+                .secondary("exhaustAgent_nokaragent_" + player.getFaction(),
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow (Nokar Agent) To Place A Destroyer")
+                .withEmoji(Emoji.fromFormatted(Emojis.nokar));
             buttons.add(chaos);
         }
         if (player.hasUnexhaustedLeader("tnelisagent") && FoWHelper.playerHasShipsInSystem(player, tile)
-                && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
             Button chaos = Button.secondary("exhaustAgent_tnelisagent_" + player.getFaction(),
-                                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Davish S'Norri (Tnelis Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.tnelis));
+                "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Davish S'Norri (Tnelis Agent)")
+                .withEmoji(Emoji.fromFormatted(Emojis.tnelis));
             buttons.add(chaos);
         }
         if (player.hasUnexhaustedLeader("zelianagent")
             && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             Button chaos = Button
-                    .secondary("exhaustAgent_zelianagent_" + player.getFaction(),
-                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A (Zelian Agent) Yourself")
-                    .withEmoji(Emoji.fromFormatted(Emojis.zelian));
+                .secondary("exhaustAgent_zelianagent_" + player.getFaction(),
+                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A (Zelian Agent) Yourself")
+                .withEmoji(Emoji.fromFormatted(Emojis.zelian));
             buttons.add(chaos);
         }
         if (player.hasLeaderUnlocked("muaathero") && !"18".equalsIgnoreCase(tile.getTileID())
@@ -7040,7 +7040,7 @@ public class ButtonHelper {
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
         game.setCurrentPhase("statusHomework");
-
+        game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", new Date().getTime() + "");
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
@@ -7298,6 +7298,7 @@ public class ButtonHelper {
             pickSCMsg = "Use Buttons to Pick the SC you want to give someone";
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
+        game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", new Date().getTime() + "");
         if (game.isFoWMode()) {
             if (!game.isHomeBrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
@@ -8044,57 +8045,57 @@ public class ButtonHelper {
                         String led = "muaatagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as Umbat (Muaat Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Umbat (Muaat Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "naaluagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as Z'eu (Naalu Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Z'eu (Naalu Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "arborecagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as Letani Ospha (Arborec Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Letani Ospha (Arborec Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "bentoragent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as C.O.O. Mgur (Bentor Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as C.O.O. Mgur (Bentor Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "kolumeagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as Disciple Fran (Kolume Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Disciple Fran (Kolume Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "axisagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as Shipmonger Zsknck (Axis Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Shipmonger Zsknck (Axis Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "xxchaagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
-                                    .secondary(finChecker + prefix + "leader_" + led,
-                                            "Use " + leaderName + " as Ggrocuto Rinn (Xxcha Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Ggrocuto Rinn (Xxcha Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "yssarilagent";
@@ -8105,9 +8106,9 @@ public class ButtonHelper {
                         compButtons.add(lButton);
                         if (ButtonHelperFactionSpecific.doesAnyoneElseHaveJr(game, p1)) {
                             Button jrButton = Button
-                                    .secondary(finChecker + "yssarilAgentAsJr",
-                                            "Use " + leaderName + " JR-XS455-O (Relic Agent)")
-                                    .withEmoji(Emoji.fromFormatted(factionEmoji));
+                                .secondary(finChecker + "yssarilAgentAsJr",
+                                    "Use " + leaderName + " JR-XS455-O (Relic Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(jrButton);
                         }
 
