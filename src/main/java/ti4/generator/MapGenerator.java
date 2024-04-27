@@ -550,7 +550,10 @@ public class MapGenerator {
         deltaY = 35;
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), 0, y);
+        String cname = game.getCustomName();
+        int length = Math.min(24, cname.length());
+        cname = cname.substring(0, length);
+        graphics.drawString(cname, 0, y);
 
         // STRATEGY CARDS
         y = strategyCards(y);
