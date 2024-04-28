@@ -1378,15 +1378,15 @@ public class ButtonHelperModifyUnits {
                     "construction");
             }
             if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
-                String message = playerRep + " Would you like to put a CC from reinforcements in the same system?";
+                String message = playerRep + " Please tell the bot if you used mahacts agent and should place the construction holders CC or if you followed normally and should place your own CC from reinforcements";
                 Button placeCCInSystem = Button.success(
                     finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
-                    "Place A CC From Reinforcements In The System.");
+                    "Place A CC From Reinforcements");
                 Button placeConstructionCCInSystem = Button.secondary(
-                        finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
-                        "Place A CC Of The Construction Holder's because you used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)");
+                    finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
+                    "Place A CC Of The Construction Holder's");
                 Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
-                    "Don't Place A CC In The System.");
+                    "Don't Place A CC");
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             } else {
@@ -1674,15 +1674,15 @@ public class ButtonHelperModifyUnits {
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_" + player.getFaction(),
-                                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+                "Use Ghoti Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(winnuButton);
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             Button winnuButton = Button
-                    .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
-                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Walik (Mortheus Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
+                .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
+                    "Use Mortheus Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(winnuButton);
         }
         Button DoneExhausting;
