@@ -875,7 +875,7 @@ public class MessageListener extends ListenerAdapter {
                     String previousThoughts = "";
                     if (!activeGame.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
                         previousThoughts = activeGame
-                            .getStoredValue("futureMessageFor" + player.getFaction()) + ". ";
+                            .getStoredValue("futureMessageFor" + player.getFaction()) + "; ";
                     }
                     activeGame.setStoredValue("futureMessageFor" + player.getFaction(),
                         previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));

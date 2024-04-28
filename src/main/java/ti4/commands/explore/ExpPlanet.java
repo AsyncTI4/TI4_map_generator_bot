@@ -196,7 +196,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             String name1 = exploreModel.getName();
             Button resolveExplore1 = Button.success("lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
             Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_" + drawColor + "_" + planetName,
-                                                    "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent)");
+                "Use Lanefir Agent");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent), and thus can decline this explore to draw another one instead.";
             if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
@@ -261,7 +261,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Button.success("exhaustAgent_augersagent_" + player.getFaction(),
-                                               "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Clodho (Augers Agent) on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
+                        "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Clodho (Augers Agent) on " + ButtonHelper.getIdentOrColor(player, activeGame) + " to give them 2tg";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);

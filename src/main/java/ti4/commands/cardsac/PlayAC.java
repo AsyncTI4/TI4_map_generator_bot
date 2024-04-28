@@ -738,12 +738,12 @@ public class PlayAC extends ACCardsSubcommandData {
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             List<Button> buttons2 = new ArrayList<>();
             Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                "Use Cymiae Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-                    player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw an AC",
-                    buttons2);
+                player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw an AC",
+                buttons2);
         }
 
         ACInfo.sendActionCardInfo(game, player);

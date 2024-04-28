@@ -92,6 +92,7 @@ import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -383,6 +384,11 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperCommanders.resolveKhraskCommanderPlacement(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
             String planet = buttonID.replace("yinHeroPlanet_", "");
+            if (planet.equalsIgnoreCase("lockedmallice")) {
+                Tile tile = activeGame.getTileFromPlanet("lockedmallice");
+                planet = "mallice";
+                tile = MoveUnits.flipMallice(event, tile, activeGame);
+            }
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 trueIdentity + " Chose to invade " + Helper.getPlanetRepresentation(planet, activeGame));
             List<Button> buttons = new ArrayList<>();
@@ -410,6 +416,9 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("yinHeroStart")) {
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "yinHeroTarget", null);
+            if (activeGame.getTileByPosition("tl").getTileID().equalsIgnoreCase("82a")) {
+                buttons.add(Button.success("yinHeroPlanet_lockedmallice", "Invade Mallice"));
+            }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                 "Use buttons to select which player owns the planet you want to land on", buttons);
         } else if (buttonID.startsWith("psychoExhaust_")) {
@@ -5221,7 +5230,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons2 = new ArrayList<>();
                     Button hacanButton = Button
                         .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent)")
+                            "Cymiae Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
                     buttons2.add(hacanButton);
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -5451,7 +5460,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button.danger("exhaustAgent_winnuagent",
-                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Berekar Berekon (Winnu Agent)")
+                        "Use Winnu Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.Winnu));
                     buttons.add(winnuButton);
                 }
@@ -5459,21 +5468,21 @@ public class ButtonListener extends ListenerAdapter {
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_gledgeagent_" + player.getFaction(),
-                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Durran (Gledge Agent)")
+                            "Use Gledge Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.gledge));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_ghotiagent_" + player.getFaction(),
-                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent)")
+                            "Use Ghoti Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
-                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Walik (Mortheus Agent)")
+                            "Use Mortheus Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
                     buttons.add(winnuButton);
                 }
@@ -5481,7 +5490,7 @@ public class ButtonListener extends ListenerAdapter {
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_rohdhnaagent_" + player.getFaction(),
-                            "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Rond Bri'ay (Rohdhna Agent)")
+                            "Use Rohdhna Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
                     buttons.add(winnuButton);
                 }
@@ -5543,7 +5552,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasUnexhaustedLeader("celdauriagent")) {
                     List<Button> buttons = new ArrayList<>();
                     Button hacanButton = Button
-                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
+                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                     buttons.add(hacanButton);
                     buttons.add(Button.danger("deleteButtons", "Decline"));
