@@ -297,20 +297,20 @@ public class ButtonHelperTacticalAction {
             if (player.hasUnexhaustedLeader("celdauriagent")) {
                 List<Button> buttons = new ArrayList<>();
                 Button hacanButton = Button
-                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(),
-                                   "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
-                        .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+                    .secondary("exhaustAgent_celdauriagent_" + player.getFaction(),
+                        "Use Celdauri Agent")
+                    .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                 buttons.add(hacanButton);
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        player.getRepresentation(true, true)
-                                + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2tg/2comm",
-                        buttons);
+                    player.getRepresentation(true, true)
+                        + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2tg/2comm",
+                    buttons);
             }
         }
 
         if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
-                && !player.getExhaustedRelics().contains("emphidia")) {
+            && !player.getExhaustedRelics().contains("emphidia")) {
             String message = player.getRepresentation() + " You can use the button to explore using the crown of emphidia";
             List<Button> systemButtons2 = new ArrayList<>();
             systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
@@ -342,16 +342,16 @@ public class ButtonHelperTacticalAction {
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         String message3 = "You have "
             + Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false)
-            + " PRODUCTION value in this system\n";
+            + " PRODUCTION value in this system";
         if (Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false) > 0
             && activeGame.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
+                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that dont count towards production limit";
         }
         if (Helper.getProductionValue(player, activeGame, activeGame.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(activeGame, player, "prophecy")) {
             message3 = message3
-                + "Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated\n";
+                + ". Reminder that you have prophecy of Ixth and should produce 2 " + Emojis.fighter + " if you want to keep it. Its removal is not automated\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame));
@@ -390,14 +390,14 @@ public class ButtonHelperTacticalAction {
             }
             List<Button> empyButtons = new ArrayList<>();
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
-                    && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
+                && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
                 Button empyButton = Button.secondary("exhaustAgent_empyreanagent",
-                                                     "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)")
-                        .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
+                    "Use Empyrean Agent")
+                    .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
                 empyButtons.add(empyButton);
                 empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                        player.getRepresentation(true, true) + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)", empyButtons);
+                    player.getRepresentation(true, true) + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Acamar (Empyrean Agent)", empyButtons);
             }
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
                 && (tile.getUnitHolders().values().size() == 1) && player.getPlanets().contains("ghoti")) {

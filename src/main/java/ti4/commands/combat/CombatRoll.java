@@ -239,18 +239,18 @@ public class CombatRoll extends CombatSubcommandData {
                 List<Button> buttons = new ArrayList<>();
 
                 if (round2 > round) {
-                    buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + round));
+                    buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + (round + 1)));
                 }
                 buttons.add(Button.success(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h, "Auto-assign Hits"));
                 buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hits"));
                 buttons.add(Button.secondary(opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
             } else {
-                String msg = opponent.getRepresentation(true, true) + " you can roll dice for Combat Round #" + round;
+                String msg = opponent.getRepresentation(true, true) + " you can roll dice for Combat Round #" + (round + 1);
                 List<Button> buttons = new ArrayList<>();
 
                 if (round2 > round) {
-                    buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + round));
+                    buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + (round + 1)));
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                 }
             }

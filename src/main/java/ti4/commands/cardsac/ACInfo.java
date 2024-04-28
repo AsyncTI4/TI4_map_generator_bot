@@ -108,9 +108,9 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         // AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                "_ _\nClick a button below to play an Action Card",
-                getPlayActionCardButtons(activeGame, player));
+            player.getCardsInfoThread(),
+            "_ _\nClick a button below to play an Action Card",
+            getPlayActionCardButtons(activeGame, player));
 
         sendTrapCardInfo(activeGame, player);
     }
@@ -152,60 +152,60 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty()
-                && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
-                && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
+            && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
+            && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
-                            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
         acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
         if (player.hasUnexhaustedLeader("nekroagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Nekro Malleon (Nekro Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
+                "Use Nekro Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             acButtons.add(nekroButton);
         }
         if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
             Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+                .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
             acButtons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
+                "Use Vaylerian Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
             acButtons.add(nekroButton);
         }
         if (player.ownsUnit("ghost_mech")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
-                && !activeGame.getLaws().containsKey("articles_war")) {
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
+            && !activeGame.getLaws().containsKey("articles_war")) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+                .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             acButtons.add(ghostButton);
         }
         if (player.ownsUnit("nivyn_mech2")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
-                && !activeGame.getLaws().containsKey("articles_war")) {
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
+            && !activeGame.getLaws().containsKey("articles_war")) {
             Button ghostButton = Button.secondary("nivynMechStep1_", "Use Nivyn Mech")
-                    .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
+                .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
             acButtons.add(ghostButton);
         }
         if (player.hasUnexhaustedLeader("kolleccagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Captain Dust (Kollecc Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
+                "Use Kollecc Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
             acButtons.add(nekroButton);
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Lactarius Indigo (Myko Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+                "Use Myko Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             acButtons.add(nekroButton);
         }
         if (player.hasAbility("cunning")) {
@@ -221,13 +221,13 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
             Button augers = Button.secondary("getOmenDice", "Use an omen die (" + omenDice + ")")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+                .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             acButtons.add(augers);
         }
         if (actionCards != null && !actionCards.isEmpty()
-                && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
-                && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")
-                        || actionCards.containsKey("investments") || actionCards.containsKey("summit"))) {
+            && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
+            && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")
+                || actionCards.containsKey("investments") || actionCards.containsKey("summit"))) {
             acButtons.add(Button.secondary("checkForAllACAssignments", "Pre assign ACs"));
         }
 
@@ -246,7 +246,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
-                            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
@@ -267,7 +267,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name)
-                            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
@@ -284,8 +284,8 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button
-                            .secondary("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name)
-                            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                        .secondary("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name)
+                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
@@ -302,7 +302,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Button.danger("takeAC_" + value + "_" + player.getFaction(), ac_name)
-                            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
