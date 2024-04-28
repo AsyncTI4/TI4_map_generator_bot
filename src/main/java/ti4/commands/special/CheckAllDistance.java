@@ -68,5 +68,10 @@ public class CheckAllDistance extends SpecialSubcommandData {
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
         }
+        if (!privateGame) {
+            sb.append("Map String: `").append(Helper.getMapString(activeGame)).append("`").append(NEW_LINE);
+        } else {
+            sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
+        }
     }
 }
