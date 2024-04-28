@@ -744,6 +744,9 @@ public class MapGenerator {
                         graphics.setColor(getSCColor(sc, game));
                         graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
                         xSpacer = xSpacer + 20;
+                        if (sc > 9) {
+                            xSpacer = xSpacer + 20;
+                        }
                     }
                 }
 
@@ -2614,21 +2617,22 @@ public class MapGenerator {
         if (!game.isFoWMode()) {
             String acImage2 = "pa_cardbacks_ac.png";
             String soImage2 = "pa_cardbacks_so.png";
-            graphics.setFont(Storage.getFont16());
+            graphics.setFont(Storage.getFont24());
             drawPAImage(x, y - 75, soImage2);
-            graphics.drawString(Integer.toString(game.getSecretObjectiveDeckSize()), x + 20, deltaY - 75);
+            graphics.drawString(Integer.toString(game.getSecretObjectiveDeckSize()), x + 15, deltaY - 75);
             drawPAImage(x + 75, y - 75, acImage2);
             int ac2 = game.getActionCards().size();
-            int acDelta2 = ac2 > 9 ? 0 : 10;
+            int acDelta2 = ac2 > 9 ? 0 : 5;
+            acDelta2 = ac2 > 99 ? -5 : 0;
             graphics.drawString(Integer.toString(ac2), x + 90 + acDelta2, deltaY - 75);
             drawPAImageScaledDown(x + 150, y - 75, "cultural.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("cultural").size()), x + 170, deltaY - 75);
+            graphics.drawString(Integer.toString(game.getExploreDeck("cultural").size()), x + 165, deltaY - 75);
             drawPAImageScaledDown(x + 225, y - 75, "industrial.back.jpg", (float) 0.12);
             graphics.drawString(Integer.toString(game.getExploreDeck("industrial").size()), x + 240, deltaY - 75);
             drawPAImageScaledDown(x + 300, y - 75, "hazardous.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("hazardous").size()), x + 320, deltaY - 75);
+            graphics.drawString(Integer.toString(game.getExploreDeck("hazardous").size()), x + 315, deltaY - 75);
             drawPAImageScaledDown(x + 375, y - 75, "frontier.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("frontier").size()), x + 395, deltaY - 75);
+            graphics.drawString(Integer.toString(game.getExploreDeck("frontier").size()), x + 388, deltaY - 75);
         }
 
         // TURN ORDER

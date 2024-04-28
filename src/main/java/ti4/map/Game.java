@@ -3510,9 +3510,15 @@ public class Game {
                 }
             }
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
+            if (getStoredValue("terraformedPlanet").equalsIgnoreCase("custodiavigilia")) {
+                planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+            }
             planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
             planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
             planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
+            if (getStoredValue("terraformedPlanet").equalsIgnoreCase("ghoti")) {
+                planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+            }
         }
         return planets.keySet();
     }

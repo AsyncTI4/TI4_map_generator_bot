@@ -79,10 +79,10 @@ public class CardsInfo implements Command, InfoThreadCommand {
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         sendVariousAdditionalButtons(activeGame, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame,
-                "You can whisper to people from here by starting a message with to[color] or to[faction]." +
-                        "\nYou can schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
-                        +
-                        "\nYou can schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
+            "You can whisper to people from here by starting a message with to[color] or to[faction]." +
+                "\nYou can schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
+                +
+                "\nYou can schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
 
     }
 
@@ -94,12 +94,12 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(modify);
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Naalu));
+                .withEmoji(Emoji.fromFormatted(Emojis.Naalu));
             buttons.add(naalu);
         }
         if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             Button augers = Button.secondary("initialPeak", "Peek At Next Objective")
-                    .withEmoji(Emoji.fromFormatted(Emojis.augers));
+                .withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
         }
         if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(activeGame).isEmpty()) {
@@ -109,142 +109,142 @@ public class CardsInfo implements Command, InfoThreadCommand {
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
             Button augers = Button.secondary("getOmenDice", "Use an omen die (" + omenDice + ")")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+                .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(augers);
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Lactarius Indigo (Myko Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+                "Use Myko Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(nekroButton);
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Carth of Golden Sands (Hacan Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
+                "Use Hacan Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
         if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
             Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+                .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("vadenagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_vadenagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yudri Sukhov (Vaden Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.vaden));
+                "Use Vaden Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.vaden));
             buttons.add(hacanButton);
         } // olradinagent
         if (player.hasUnexhaustedLeader("olradinagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_olradinagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw (Olradin Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.olradin));
+                "Use Olradin Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.olradin));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("edynagent")) {
-            Button hacanButton2 = Button.secondary("presetEdynAgentStep1", "Preset " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Allant (Edyn Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.edyn));
+            Button hacanButton2 = Button.secondary("presetEdynAgentStep1", "Preset Edyn Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.edyn));
             buttons.add(hacanButton2);
         }
         if (player.hasUnexhaustedLeader("celdauriagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_celdauriagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+                "Use Celdauri Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("cheiranagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_cheiranagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.cheiran));
+                "Use Cheiran Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.cheiran));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("freesystemsagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_freesystemsagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Cordo Haved (Free Systems Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.freesystems));
+                "Use Free Systems Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.freesystems));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("florzenagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_florzenagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Gavda (Florzen Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.florzen));
+                "Use Florzen Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.florzen));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("nokaragent")) {
             Button hacanButton = Button.secondary("getAgentSelection_nokaragent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow (Nokar Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.nokar));
+                "Use Nokar Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.nokar));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("zelianagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_zelianagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A (Zelian Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.zelian));
+                "Use Zelian Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.zelian));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("mirvedaagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_mirvedaagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina (Mirveda Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mirveda));
+                "Use Mirveda Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.mirveda));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("cymiaeagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_cymiaeagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                "Use Cymiae Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_mortheusagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Walik (Mortheus Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
+                "Use Mortheus Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_zealotsagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealot Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.zealots));
+                "Use Zealot Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.zealots));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("rohdhnaagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_rohdhnaagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Rond Bri'ay (Roh'Dhna Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
+                "Use Roh'Dhna Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
             Button hacanButton = Button.secondary("getAgentSelection_veldyragent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Solis Morden (Veldyr Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.veldyr));
+                "Use Veldyr Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.veldyr));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("gledgeagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_gledgeagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Durran (Gledge Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.gledge));
+                "Use Gledge Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.gledge));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("khraskagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_khraskagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Udosh B'rtul (Khrask Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.khrask));
+                "Use Khrask Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.khrask));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("nivynagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_nivynagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suldhan Wraeg (Nivyn Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
+                "Use Nivyn Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
             buttons.add(hacanButton);
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_ghotiagent",
-                                                  "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent)")
-                    .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+                "Use Ghoti Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(hacanButton);
         }
         if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0) {
             Button release = Button.secondary("getReleaseButtons", "Release captured units")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Cabal));
+                .withEmoji(Emoji.fromFormatted(Emojis.Cabal));
             buttons.add(release);
         }
         if (player.hasRelicReady("e6-g0_network")) {
@@ -270,7 +270,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(Buttons.REFRESH_INFO);
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                "_ _\nYou can use these buttons to do various things", buttons);
+            "_ _\nYou can use these buttons to do various things", buttons);
     }
 
     protected String getActionDescription() {
@@ -282,11 +282,11 @@ public class CardsInfo implements Command, InfoThreadCommand {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY,
-                                "Long promissory display, y or yes to show full promissory text").setRequired(false))
-                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO,
-                                "Set TRUE to get card info as direct message also").setRequired(false)));
+            Commands.slash(getActionID(), getActionDescription())
+                .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY,
+                    "Long promissory display, y or yes to show full promissory text").setRequired(false))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO,
+                    "Set TRUE to get card info as direct message also").setRequired(false)));
     }
 
 }
