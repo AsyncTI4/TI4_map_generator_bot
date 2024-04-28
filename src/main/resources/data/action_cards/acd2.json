@@ -1,6 +1,6 @@
 [
   {
-    "alias": "ancient_data_archive",
+    "alias": "data_archive",
     "name": "Data Archive",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
@@ -76,7 +76,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 9 resources and purge up to 3 relic fragments to gain 1 relic; for each relic fragment purged, reduce the resources spent by 3.",
+    "text": "Purge up to 3 relic fragments and spend 9 resources to gain 1 relic; for each relic fragment purged, reduce the resources spent by 3.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
     "source": "action_deck_2"
   },
@@ -132,24 +132,6 @@
     "window": "When 1 of your units makes a roll for a unit ability",
     "text": "That unit rolls 2 additional dice.",
     "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "close_quarters",
-    "name": "Close Quarters",
-    "phase": "Action",
-    "window": "At the start of a combat",
-    "text": "During this combat, apply +3 to the result of your unit's combat rolls and your opponent's unit's combat rolls.",
-    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "concise_legal_text",
-    "name": "Concise Legal Text",
-    "phase": "Agenda",
-    "window": "When an agenda is revealed",
-    "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
-    "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
   },
   {
@@ -288,8 +270,8 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "electromagnetic_pulse",
-    "name": "Electromagnetic Pulse",
+    "alias": "energy_pulse",
+    "name": "Energy Pulse",
     "phase": "Action",
     "window": "After the \"Move Ships\" step in a system that contains your units",
     "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
@@ -364,7 +346,7 @@
     "name": "Hidden Initiatives",
     "phase": "Action",
     "window": "Action",
-    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may return/shuffle the card you drew.]",
+    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
     "flavorText": "M'aban sighed at the man's pleas. How many others could mask their intentions so well? The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
     "source": "action_deck_2"
   },
@@ -409,7 +391,7 @@
     "name": "Last Minute Deliberation",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Each player readies up to 2 planets they control. Then, reveal and vote on the top card of the agenda deck.",
+    "text": "Ready up to 3 planets you control. Each other player may ready 1 planet they control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
     "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
     "source": "action_deck_2"
   },
@@ -454,7 +436,7 @@
     "name": "Overtime",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend between 1 and 3 trade goods to ready an equal number of non-home planets you control.",
+    "text": "Spend 1 or 2 trade goods to ready an equal number of non-home planets you control.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
     "source": "action_deck_2"
   },
@@ -490,7 +472,7 @@
     "name": "Propaganda",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to the planet's influence value.",
+    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to that planet's influence value.",
     "flavorText": "The Federation anthem accompanied Sara, Blake, and Nolad on the screen. \"They're doing their part. Are you? Join the Mobile Legion and save the galaxy. Service guarantees citizenship.\"",
     "source": "action_deck_2"
   },
@@ -724,7 +706,7 @@
     "name": "Tomb Raiders",
     "phase": "Action",
     "window": "Action",
-    "text": "For each exploration deck, look at the top card of that deck; gain that card if it is a relic fragment.",
+    "text": "For each exploration deck, look at the top card of that deck; if it is a relic fragment, gain that card.",
     "flavorText": "As her hostages hurled insults, S'Ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
     "source": "action_deck_2"
   },
@@ -741,7 +723,7 @@
     "alias": "virulent_gas",
     "name": "Virulent Gas",
     "phase": "Action",
-    "window": "After your SPACE CANNON or BOMBARDMENT roll produces hits against another player's ground forces on a planet",
+    "window": "After your SPACE CANNON or BOMBARDMENT roll produces hits against another player's units on a planet",
     "text": "Produce 1 additional hit. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
     "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
     "source": "action_deck_2"

@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.GlyphVector;
@@ -551,7 +550,10 @@ public class MapGenerator {
         deltaY = 35;
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), 0, y);
+        String cname = game.getCustomName();
+        int length = Math.min(24, cname.length());
+        cname = cname.substring(0, length);
+        graphics.drawString(cname, 0, y);
 
         // STRATEGY CARDS
         y = strategyCards(y);
@@ -2391,6 +2393,16 @@ public class MapGenerator {
         }
     }
 
+    private void drawPAImageScaledDown(int x, int y, String resourceName, float percent) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, percent);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
         try {
             String path = Tile.getUnitPath(unitKey);
@@ -2597,6 +2609,27 @@ public class MapGenerator {
         graphics.setFont(Storage.getFont64());
         x += 100;
         graphics.drawString("ROUND: " + game.getRound(), x, deltaY);
+
+        //Game deck info
+        if (!game.isFoWMode()) {
+            String acImage2 = "pa_cardbacks_ac.png";
+            String soImage2 = "pa_cardbacks_so.png";
+            graphics.setFont(Storage.getFont16());
+            drawPAImage(x, y - 75, soImage2);
+            graphics.drawString(Integer.toString(game.getSecretObjectiveDeckSize()), x + 20, deltaY - 75);
+            drawPAImage(x + 75, y - 75, acImage2);
+            int ac2 = game.getActionCards().size();
+            int acDelta2 = ac2 > 9 ? 0 : 10;
+            graphics.drawString(Integer.toString(ac2), x + 90 + acDelta2, deltaY - 75);
+            drawPAImageScaledDown(x + 150, y - 75, "cultural.back.jpg", (float) 0.12);
+            graphics.drawString(Integer.toString(game.getExploreDeck("cultural").size()), x + 170, deltaY - 75);
+            drawPAImageScaledDown(x + 225, y - 75, "industrial.back.jpg", (float) 0.12);
+            graphics.drawString(Integer.toString(game.getExploreDeck("industrial").size()), x + 240, deltaY - 75);
+            drawPAImageScaledDown(x + 300, y - 75, "hazardous.back.jpg", (float) 0.12);
+            graphics.drawString(Integer.toString(game.getExploreDeck("hazardous").size()), x + 320, deltaY - 75);
+            drawPAImageScaledDown(x + 375, y - 75, "frontier.back.jpg", (float) 0.12);
+            graphics.drawString(Integer.toString(game.getExploreDeck("frontier").size()), x + 395, deltaY - 75);
+        }
 
         // TURN ORDER
         String activePlayerUserID = game.getActivePlayerID();
@@ -3226,9 +3259,63 @@ public class MapGenerator {
 
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
+            List<String> playerIDs;
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
+            } else if (activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+                playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
+            } else {
+                y += 43;
+                continue;
+            }
+
+            drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             y += 43;
         }
         return y;
+    }
+
+    private void drawPeekedMarkers(int x, int y, Map<String, Player> players, List<String> peekedPlayerID) {
+        try {
+            int tempX = 0;
+
+            for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
+                Player player = playerEntry.getValue();
+                String userID = player.getUserID();
+
+                if (peekedPlayerID.contains(userID)) {
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    String ccColor = convertToGeneric ? "gray" : player.getColor();
+                    String controlID = Mapper.getControlID(ccColor);
+
+                    if (controlID.contains("null")) {
+                        continue;
+                    }
+
+                    float scale = 0.55f;
+
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    if (controlTokenImage == null)
+                        return;
+
+                    String peekID = "peek" + getBlackWhiteFileSuffix(Mapper.getColorID(ccColor));
+                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(peekID), scale);
+                    if (peekMarkerImage == null)
+                        return;
+
+                    drawControlToken(graphics, controlTokenImage, player, x + tempX, y, true, scale);
+
+                    int centreCustomTokenHorizontally = controlTokenImage.getWidth() / 2 - peekMarkerImage.getWidth() / 2;
+                    int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
+
+                    graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
+
+                    tempX += scoreTokenWidth;
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("Could not draw peek markers", e);
+        }
     }
 
     private void drawScoreControlMarkers(
@@ -3766,12 +3853,25 @@ public class MapGenerator {
                     drawControlToken(tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                         new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    if (player != null && player.isRealPlayer() && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getInstance().getResourceFromFolder("command_token/", "exhaustedControl.png", "Could not find command token file"), scale);
+                        drawControlToken(tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
+                        rectangles.add(
+                            new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    }
+
                 } else {
                     int imgX = TILE_PADDING + centerPosition.x + xDelta;
                     int imgY = TILE_PADDING + centerPosition.y;
                     drawControlToken(tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                         new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    if (player != null && player.isRealPlayer() && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getInstance().getResourceFromFolder("command_token/", "exhaustedControl", "Could not find command token file"), scale);
+                        drawControlToken(tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
+                        rectangles.add(
+                            new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    }
                     xDelta += 10;
                 }
             }

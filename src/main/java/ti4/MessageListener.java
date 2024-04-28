@@ -18,8 +18,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.forums.ForumPost;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -232,6 +234,15 @@ public class MessageListener extends ListenerAdapter {
                     .getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
             }
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+                    Game mapreference = GameManager.getInstance().getGame("finreference");
+                    if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
+                        mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will create a button that you can press to launch the game after confirming the members are correct.");
+                    }
+                }
+            }
 
             autoPingGames();
             handleFoWWhispersAndFowCombats(event, msg);
@@ -275,6 +286,13 @@ public class MessageListener extends ListenerAdapter {
                                                                                                                                           // minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
+            List<String> storedValues = new ArrayList<>();
+            storedValues.addAll(mapreference.getMessagesThatICheckedForAllReacts().keySet());
+            for (String value : storedValues) {
+                if (value.startsWith("gameCreator")) {
+                    mapreference.removeStoredValue(value);
+                }
+            }
             GameSaveLoadManager.saveMap(mapreference);
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
@@ -383,6 +401,10 @@ public class MessageListener extends ListenerAdapter {
                     if (player != null && player.getPersonalPingInterval() > 0) {
                         spacer = player.getPersonalPingInterval();
                     }
+                }
+                if ("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase()) && spacer != 0) {
+                    spacer = spacer / 3;
+                    spacer = Math.max(spacer, 1);
                 }
                 if (activeGame.getAutoPingStatus() && spacer != 0 && !activeGame.getTemporaryPingDisable()) {
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
@@ -856,7 +878,7 @@ public class MessageListener extends ListenerAdapter {
                             .getStoredValue("futureMessageFor" + player.getFaction()) + ". ";
                     }
                     activeGame.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin"));
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         ButtonHelper.getIdent(player) + " sent themselves a future message");
                 } else {

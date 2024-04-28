@@ -646,5 +646,41 @@
     "text": "Gain 1 command token. Then, gain a number of additional command tokens equal to the number of trade goods on that strategy card.",
     "flavorText": "Despite their best syllogisms and heuristics, they could not discern whether the Creuss operated based on reason or some strange mechanism of cause and effect.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "electromagnetic_pulse",
+    "name": "Electromagnetic Pulse",
+    "phase": "Action",
+    "window": "After the \"Move Ships\" step in a system that contains your units",
+    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "ancient_data_archive",
+    "name": "Data Archive",
+    "phase": "Agenda",
+    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
+    "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "close_quarters",
+    "name": "Close Quarters",
+    "phase": "Action",
+    "window": "At the start of a combat",
+    "text": "During this combat, apply +3 to the result of your unit's combat rolls and your opponent's unit's combat rolls.",
+    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "concise_legal_text",
+    "name": "Concise Legal Text",
+    "phase": "Agenda",
+    "window": "When an agenda is revealed",
+    "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
+    "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
+    "source": "action_deck_2"
   }
 ]
