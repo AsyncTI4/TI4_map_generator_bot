@@ -13,8 +13,20 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -105,7 +117,7 @@ public class Game {
     @ExportableField
     private boolean allianceMode;
     @ExportableField
-    private boolean homeBrew = false;
+    private boolean homeBrew;
     @ExportableField
     private boolean fowMode;
     @ExportableField
@@ -203,7 +215,7 @@ public class Game {
     private boolean testBetaFeaturesMode;
     @Getter
     @Setter
-    private boolean showFullComponentTextEmbeds = false;
+    private boolean showFullComponentTextEmbeds;
     private boolean hasEnded;
     private long endedDate;
     @Getter
@@ -654,7 +666,7 @@ public class Game {
     }
 
     public void setHomeBrew(boolean homebrew) {
-        this.homeBrew = homebrew;
+        homeBrew = homebrew;
     }
 
     public boolean isFoWMode() {
@@ -1500,7 +1512,7 @@ public class Game {
         return publicObjectives2Peakable;
     }
 
-    public Map.Entry<String, Integer> revealState1() {
+    public Map.Entry<String, Integer> revealStage1() {
         if (publicObjectives1Peakable.isEmpty() || getCurrentPhase().contains("agenda")) {
             return revealObjective(publicObjectives1);
         } else {
@@ -1508,7 +1520,7 @@ public class Game {
         }
     }
 
-    public Map.Entry<String, Integer> revealState2() {
+    public Map.Entry<String, Integer> revealStage2() {
         if (publicObjectives2Peakable.isEmpty() || getCurrentPhase().contains("agenda")) {
             return revealObjective(publicObjectives2);
         } else {
@@ -1571,7 +1583,7 @@ public class Game {
         if (publicObjectives1Peeked.containsKey(objective) && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
             publicObjectives1Peeked.get(objective).add(player.getUserID());
         } else {
-            ArrayList<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             list.add(player.getUserID());
             publicObjectives1Peeked.put(objective, list);
         }
@@ -1585,7 +1597,7 @@ public class Game {
         if (publicObjectives2Peeked.containsKey(objective) && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
             publicObjectives2Peeked.get(objective).add(player.getUserID());
         } else {
-            ArrayList<String> list = new ArrayList<>();
+            List<String> list = new ArrayList<>();
             list.add(player.getUserID());
             publicObjectives2Peeked.put(objective, list);
         }
@@ -1791,10 +1803,7 @@ public class Game {
 
     public boolean didPlayerScoreThisAlready(String userID, String id) {
         List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-        if (scoredPlayerList.contains(userID)) {
-            return true;
-        }
-        return false;
+        return scoredPlayerList.contains(userID);
     }
 
     public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
@@ -3120,9 +3129,7 @@ public class Game {
         setAcDeckID(deck.getAlias());
         newDeck.addAll(deck.getNewShuffledDeck());
         for (String ac : oldDeck) {
-            if (newDeck.contains(ac)) {
-                newDeck.remove(ac);
-            }
+            newDeck.remove(ac);
         }
         if (getDiscardActionCards().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -3510,13 +3517,13 @@ public class Game {
                 }
             }
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
-            if (getStoredValue("terraformedPlanet").equalsIgnoreCase("custodiavigilia")) {
+            if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             }
             planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
             planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
             planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
-            if (getStoredValue("terraformedPlanet").equalsIgnoreCase("ghoti")) {
+            if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             }
         }
@@ -3645,7 +3652,7 @@ public class Game {
                 if (player_.equals(player))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
-                    if (isAllianceMode() && player.getFaction().equalsIgnoreCase("mahact")) {
+                    if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
                         return leaderID.contains(player_.getFaction());
                     }
                     return true;

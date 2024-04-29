@@ -2,7 +2,6 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -436,7 +435,7 @@ public class HeroPlay extends LeaderAction {
                         buttons);
             }
             case "empyreanhero" -> {
-                new AddFrontierTokens().parsingForTile(event, activeGame);
+                AddFrontierTokens.parsingForTile(event, activeGame);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         "Use Buttons to explore empties", ButtonHelperHeroes.getEmpyHeroButtons(player, activeGame));
