@@ -733,6 +733,7 @@ public class MessageListener extends ListenerAdapter {
         boolean messageToFutureColor = false;
         boolean messageToMyself = false;
         boolean messageToJazz = false;
+        boolean endOfRoundSummery = false;
         for (String color : colors) {
             if (messageLowerCase.startsWith("to" + color)) {
                 messageToColor = true;
@@ -745,6 +746,9 @@ public class MessageListener extends ListenerAdapter {
         }
         if (messageLowerCase.startsWith("tofutureme")) {
             messageToMyself = true;
+        }
+        if (messageLowerCase.startsWith("endofround")) {
+            endOfRoundSummery = true;
         }
         if (messageLowerCase.startsWith("tojazz") || messageLowerCase.startsWith("tofuturejazz")) {
             messageToJazz = true;
@@ -817,9 +821,9 @@ public class MessageListener extends ListenerAdapter {
 
         }
 
-        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz) {
+        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz || endOfRoundSummery) {
             String messageContent = StringUtils.substringAfter(messageText, " ");
-
+            String messageBeginning = StringUtils.substringBefore(messageText, " ");
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -881,6 +885,16 @@ public class MessageListener extends ListenerAdapter {
                         previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         ButtonHelper.getIdent(player) + " sent themselves a future message");
+                } else if (endOfRoundSummery) {
+                    String previousThoughts = "";
+                    if (!activeGame.getStoredValue(messageBeginning.toLowerCase() + player.getFaction()).isEmpty()) {
+                        previousThoughts = activeGame
+                            .getStoredValue(messageBeginning.toLowerCase() + player.getFaction()) + "; ";
+                    }
+                    activeGame.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin"));
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                        ButtonHelper.getIdent(player) + " stored an end of round summery");
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);

@@ -277,8 +277,8 @@ public class ButtonHelperAbilities {
         List<Button> scButtons = new ArrayList<>();
         scButtons.add(Button.secondary("spendAStratCC", "Spend a Strategy CC"));
         if (scPlayed > 1 && (activeGame.getScPlayed().get(1) == null || !activeGame.getScPlayed().get(1))) {
-            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
-            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            // scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
         }
         if (scPlayed > 2 && (activeGame.getScPlayed().get(2) == null || !activeGame.getScPlayed().get(2))) {
             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
@@ -1235,6 +1235,17 @@ public class ButtonHelperAbilities {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
             ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
+            if (player.hasAbility("military_industrial_complex")
+                && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                    ButtonHelper.getCorrectChannel(player, activeGame),
+                    player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
+                    ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+            }
+            if (player.getLeaderIDs().contains("mykomentoricommander")
+                && !player.hasLeaderUnlocked("mykomentoricommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
+            }
         }
     }
 

@@ -42,7 +42,7 @@ public class CombatMessageHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
     }
 
-    public static String displayUnitRoll(UnitModel unit, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit){
+    public static String displayUnitRoll(UnitModel unit, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit) {
         String hitsSuffix = "";
         if (numHit > 1) {
             hitsSuffix = "s";
@@ -50,16 +50,16 @@ public class CombatMessageHelper {
 
         // Rolls str fragment
         String unitRollsTextInfo = "";
-        int totalRolls = (numRollsPerUnit*unitQuantity) + extraRolls;
+        int totalRolls = (numRollsPerUnit * unitQuantity) + extraRolls;
         if (totalRolls > 1) {
             unitRollsTextInfo = String.format("%s rolls,", numRollsPerUnit);
             if (extraRolls > 0 && numRollsPerUnit > 1) {
                 unitRollsTextInfo = String.format("%s rolls (+%s rolls),",
-                        numRollsPerUnit,
-                        extraRolls);
+                    numRollsPerUnit,
+                    extraRolls);
             } else if (extraRolls > 0) {
                 unitRollsTextInfo = String.format("(+%s rolls),",
-                        extraRolls);
+                    extraRolls);
             }
         }
 
@@ -72,10 +72,10 @@ public class CombatMessageHelper {
 
             if ((toHit - modifier) <= 1) {
                 unitTypeHitsInfo = String.format("always hits (%s mods)",
-                        modifierToHitString);
+                    modifierToHitString);
             } else {
                 unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifier),
-                        modifierToHitString);
+                    modifierToHitString);
             }
         }
         String upgradedUnitName = "";
@@ -84,19 +84,19 @@ public class CombatMessageHelper {
         }
 
         List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo,
-                unitTypeHitsInfo);
+            unitTypeHitsInfo);
         String optionalText = optionalInfoParts.stream().filter(StringUtils::isNotBlank)
-                .collect(Collectors.joining(" "));
+            .collect(Collectors.joining(" "));
 
         String unitEmoji = Emojis.getEmojiFromDiscord(unit.getBaseType());
 
         String resultRollsString = "[" + resultRolls.stream().map(die -> Integer.toString(die.getResult())).collect(Collectors.joining(", ")) + "]";
         return String.format("%s %s%s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText,
-                resultRollsString, numHit, hitsSuffix);
+            resultRollsString, numHit, hitsSuffix);
     }
 
     public static String displayModifiers(String prefixText, Map<UnitModel, Integer> units,
-            List<NamedCombatModifierModel> modifiers) {
+        List<NamedCombatModifierModel> modifiers) {
         String result = "";
         if (!modifiers.isEmpty()) {
 
@@ -107,7 +107,7 @@ public class CombatMessageHelper {
                 String unitScope = mod.getScope();
                 if (StringUtils.isNotBlank(unitScope)) {
                     Optional<UnitModel> unitScopeModel = units.keySet().stream()
-                            .filter(unit -> unit.getAsyncId().equals(mod.getScope())).findFirst();
+                        .filter(unit -> unit.getAsyncId().equals(mod.getScope())).findFirst();
                     if (unitScopeModel.isPresent()) {
                         unitScope = Emojis.getEmojiFromDiscord(unitScopeModel.get().getBaseType());
                     }
@@ -132,11 +132,11 @@ public class CombatMessageHelper {
         }
         return result;
     }
+
     public static String displayHitResults(int totalHits) {
         return String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
     }
 
-    
     public static String displayCombatSummary(Player player, Tile tile, UnitHolder combatOnHolder, CombatRollType rollType) {
         String holderName = combatOnHolder.getName();
         Planet holderPlanet = null;
@@ -147,37 +147,41 @@ public class CombatMessageHelper {
             PlanetModel planetModel = Mapper.getPlanet(holderPlanet.getName());
             holderName = planetModel.getName();
         }
-        
+
         String combatTypeName = StringUtils.capitalize(holderName) + " combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
             if (holderPlanet != null) {
                 combatTypeName += " on " + StringUtils.capitalize(holderName);
             }
-        }else{
+        } else {
             int round = 0;
             Game activeGame = player.getGame();
-            String combatName = "combatRoundTracker"+player.getFaction()+tile.getPosition()+combatOnHolder.getName();
-            if(activeGame.getStoredValue(combatName).isEmpty()){
+            String combatName = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
+            if (activeGame.getStoredValue(combatName).isEmpty()) {
                 round = 1;
-            }else{
-                if(activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
+            } else {
+                if (activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                     round = Integer.parseInt(activeGame.getStoredValue(combatName));
-                }else{
-                    round = Integer.parseInt(activeGame.getStoredValue(combatName))+1;
+                } else {
+                    round = Integer.parseInt(activeGame.getStoredValue(combatName)) + 1;
                 }
             }
-            activeGame.setStoredValue(combatName, ""+round);
-            if(activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")){
-                combatTypeName=combatTypeName+" (Thalnos Reroll for Combat Round #"+round+")";
-            }else{
-                combatTypeName=combatTypeName+" (Combat Round #"+round+")";
-                activeGame.setStoredValue("solagent","");
-                activeGame.setStoredValue("letnevagent", "");
+            activeGame.setStoredValue(combatName, "" + round);
+            if (activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                combatTypeName = combatTypeName + " (Thalnos Reroll for Combat Round #" + round + ")";
+            } else {
+                combatTypeName = combatTypeName + " (Combat Round #" + round + ")";
+                if (activeGame.getStoredValue("solagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+                    activeGame.setStoredValue("solagent", "");
+                }
+                if (activeGame.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+                    activeGame.setStoredValue("letnevagent", "");
+                }
             }
         }
         return String.format("**%s** rolls for %s on %s %s:  \n",
-                combatTypeName, player.getFactionEmoji(),
-                tile.getPosition(), Emojis.RollDice);
+            combatTypeName, player.getFactionEmoji(),
+            tile.getPosition(), Emojis.RollDice);
     }
 }
