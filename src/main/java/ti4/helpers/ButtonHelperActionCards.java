@@ -537,11 +537,14 @@ public class ButtonHelperActionCards {
 
     public static void resolveReparationsStep1(Player player, Game activeGame, ButtonInteractionEvent event,
         String buttonID) {
-        List<Button> buttons;
+
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to ready";
-        buttons = Helper.getPlanetRefreshButtons(event, player, activeGame);
-        Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
-        buttons.add(DoneRefreshing);
+
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Button.secondary("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
+                Helper.getPlanetRepresentation(planet, activeGame)));
+        }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message,
             buttons);
         buttons = new ArrayList<>();

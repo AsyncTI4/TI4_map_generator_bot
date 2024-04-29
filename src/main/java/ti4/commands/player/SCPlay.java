@@ -389,10 +389,10 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
-        Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Gain CCs");
-        Button exhaust = Button.danger("leadershipExhaust", "Spend");
+        Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs");
+        //Button exhaust = Button.danger("leadershipExhaust", "Spend");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
-        return List.of(exhaust, leadershipGenerateCCButtons, noFollowButton);
+        return List.of(leadershipGenerateCCButtons, noFollowButton);
     }
 
     private static List<Button> getDiplomacyButtons(int sc) {
