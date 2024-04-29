@@ -2047,8 +2047,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getNRAHeroButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
-            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
-            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            //scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));

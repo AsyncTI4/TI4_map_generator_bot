@@ -1984,14 +1984,14 @@ public class ButtonHelperAgents {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (player.getPlanetsAllianceMode().contains(planet)) {
-                String planetId = planetReal.getName();
-                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
-                buttons.add(Button
-                    .success("exhaustAgent_sardakkagent_" + activeGame.getActiveSystem() + "_" + planetId,
-                        "Use N'orr Agent on " + planetRepresentation)
-                    .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
-            }
+            //if (player.getPlanetsAllianceMode().contains(planet)) {
+            String planetId = planetReal.getName();
+            String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
+            buttons.add(Button
+                .success("exhaustAgent_sardakkagent_" + activeGame.getActiveSystem() + "_" + planetId,
+                    "Use Sardakk Agent Agent on " + planetRepresentation)
+                .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+            //}
         }
 
         return buttons;

@@ -8167,6 +8167,7 @@ public class ButtonHelper {
             PromissoryNoteModel prom = Mapper.getPromissoryNote(pn);
             if (pn != null && prom != null && prom.getOwner() != null
                 && !prom.getOwner().equalsIgnoreCase(p1.getFaction())
+                && !prom.getOwner().equalsIgnoreCase(p1.getColor())
                 && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
                 if (pnText.contains("Action:") && !"bmf".equalsIgnoreCase(pn)) {

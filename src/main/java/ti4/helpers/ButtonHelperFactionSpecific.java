@@ -2084,6 +2084,9 @@ public class ButtonHelperFactionSpecific {
             if (hs != null && hs.getPosition().equalsIgnoreCase(tile.getPosition())) {
                 return false;
             }
+            if (tile == null || tile.getRepresentationForButtons(activeGame, player).toLowerCase().contains("hyperlane")) {
+                return false;
+            }
         }
         return true;
     }
