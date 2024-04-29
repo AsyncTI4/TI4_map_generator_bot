@@ -141,7 +141,8 @@ public abstract class BagDraft {
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
 
         if (existingChannel != null) {
-            existingChannel.delete().queue();
+            existingChannel.getIterableHistory().forEach(message -> message.delete().queue());
+            return existingChannel;
         }
 
         // CREATE NEW THREAD
