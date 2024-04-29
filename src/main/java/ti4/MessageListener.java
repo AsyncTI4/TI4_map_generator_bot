@@ -894,7 +894,7 @@ public class MessageListener extends ListenerAdapter {
                     activeGame.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
                         previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        ButtonHelper.getIdent(player) + " stored an end of round summery");
+                        ButtonHelper.getIdent(player) + " stored an end of round summary");
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);
