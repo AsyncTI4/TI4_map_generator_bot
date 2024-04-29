@@ -859,8 +859,8 @@ public class AgendaHelper {
                     List<Button> scButtons = new ArrayList<>();
                     switch (winner) {
                         case "1" -> {
-                            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
-                            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+                            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+                            //scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
                         }
                         case "2" -> {
                             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));

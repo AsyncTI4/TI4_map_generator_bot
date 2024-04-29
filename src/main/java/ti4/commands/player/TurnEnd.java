@@ -363,6 +363,9 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ms2);
             }
+            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts if you'd like, and we'll share everyone's at the end of the game. You can share highlights or plots or theories/predictions or anything you want (or nothing). Simple start your message with endofround" + activeGame.getRound()
+                + " (capitalization doesnt matter) and then the rest of it will get recorded. You can do multiple messages if youd like, and theyll all get added onto eachother.";
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), endOfRoundMessage);
         }
 
         String key2 = "queueToScorePOs";
