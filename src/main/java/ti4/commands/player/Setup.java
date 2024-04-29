@@ -45,12 +45,9 @@ import ti4.model.Source.ComponentSource;
 public class Setup extends PlayerSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true)
-            .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true)
-            .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION,
-            "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SPEAKER, "True to set player as speaker."));
     }

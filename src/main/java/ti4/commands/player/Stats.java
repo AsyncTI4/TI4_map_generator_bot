@@ -32,35 +32,20 @@ public class Stats extends PlayerSubcommandData {
 	public Stats() {
 		super(Constants.STATS, "Player Stats: CC,TG,Commodities");
 		addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL,
-				"Tactical command counter count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.FLEET,
-				"Fleet command counter count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY,
-				"Strategy command counter count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.TG,
-				"Trade goods count - can use +1/-1 etc. to add/subtract"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES,
-				"Commodity count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "# turns this round"))
-			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED,
-				"Flip a Strategy Card's played status. Enter the SC #"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
-			// .addOptions(new OptionData(OptionType.INTEGER,
-			// Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto
-			// passes on sabo if they have none"))
-			// .addOptions(new OptionData(OptionType.INTEGER,
-			// Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral
-			// system for your turn specifically"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
 			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
-			// .addOptions(new OptionData(OptionType.BOOLEAN, Constants.PREFERS_DISTANCE,
-			// "Prefers distance based tile selection"))
 			.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
-				"Faction or Color for which you set stats").setAutoComplete(true));
+			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color").setAutoComplete(true));
 	}
 
 	@Override
@@ -212,12 +197,7 @@ public class Stats extends PlayerSubcommandData {
 
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
 		if (commoditiesTotalCount != null) {
-			if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-				MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
-			}
-			player.setCommoditiesTotal(commoditiesTotalCount);
-			String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
-			MessageHelper.sendMessageToEventChannel(event, message);
+			setTotalCommodities(event, player, commoditiesTotalCount);
 		}
 
 		Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
@@ -299,6 +279,15 @@ public class Stats extends PlayerSubcommandData {
 			MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(event, player, optionDummy));
 		}
 
+	}
+
+	public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
+		if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
+			MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
+		}
+		player.setCommoditiesTotal(commoditiesTotalCount);
+		String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
+		MessageHelper.sendMessageToEventChannel(event, message);
 	}
 
 	public String getPlayersCurrentStatsText(Player player, Game activeGame) {
