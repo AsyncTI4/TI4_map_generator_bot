@@ -4,12 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -108,6 +107,7 @@ public class FrankenCommand implements Command {
         subcommands.add(new FrankenEdit());
         subcommands.add(new ShowFrankenBag());
         subcommands.add(new FrankenViewCard());
+        subcommands.add(new ApplyDraftBags());
         return subcommands;
     }
 

@@ -38,6 +38,11 @@ public class SpeakerOrderDraftItem extends DraftItem {
         return Emojis.getResourceEmoji(Integer.parseInt(ItemId));
     }
 
+    @JsonIgnore
+    public int getSpeakerOrder() {
+        return Integer.parseInt(ItemId);
+    }
+
     public static List<DraftItem> buildAllDraftableItems(Game activeGame) {
         List<DraftItem> allItems = new ArrayList<>();
         for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
