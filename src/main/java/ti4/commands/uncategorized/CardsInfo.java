@@ -257,6 +257,8 @@ public class CardsInfo implements Command, InfoThreadCommand {
         }
         Button playerPref = Button.secondary("offerPlayerPref", "Change Player Settings");
         buttons.add(playerPref);
+        Button listGames = Button.secondary("searchMyGames", "List All My Games");
+        buttons.add(listGames);
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
             if (!activeGame.getPlayedSCs().contains(SC)) {
