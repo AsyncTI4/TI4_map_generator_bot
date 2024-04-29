@@ -34,8 +34,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        
-        
+
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
 
         List<String> data = new ArrayList<>();
@@ -47,7 +46,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
             sb.append(",").append(pos);
         }
         data.add(sb.toString());
-        
+
         for (String pos : positions) {
             Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance);
             String row = distances.entrySet().stream()
@@ -68,10 +67,10 @@ public class CheckAllDistance extends SpecialSubcommandData {
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
         }
-        if (!privateGame) {
-            sb.append("Map String: `").append(Helper.getMapString(activeGame)).append("`").append(NEW_LINE);
+        if (!game.isFoWMode()) {
+            sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append("\n");
         } else {
-            sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
+            sb.append("Map String: Cannot show map string for private games").append("\n");
         }
     }
 }
