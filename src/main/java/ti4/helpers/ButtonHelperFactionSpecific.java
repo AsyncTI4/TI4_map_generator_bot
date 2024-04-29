@@ -236,9 +236,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "jrResolution", null);
         player.getLeader("yssarilagent").get().setExhausted(true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getFactionEmoji() + " is using Clever Clever JR-XS455-O (Relic Agent)");
+            player.getFactionEmoji() + " is using Clever Clever JR-XS455-O (Relic Agent)");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to decide who to use Clever Clever JR-XS455-O (Relic Agent) on", buttons2);
+            "Use buttons to decide who to use Clever Clever JR-XS455-O (Relic Agent) on", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
@@ -998,9 +998,9 @@ public class ButtonHelperFactionSpecific {
                         String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                         String buttonID = "cabalRelease_" + player.getFaction() + "_" + unitName;
                         if (activeGame.isFoWMode()) {
-                            buttons.add(Button.secondary(buttonID, "Release 1 " + player.getColor() + " " + unitName));
+                            buttons.add(Button.secondary(buttonID, player.getColor() + " " + unitName));
                         } else {
-                            buttons.add(Button.secondary(buttonID, "Release 1 " + player.getFaction() + " " + unitName)
+                            buttons.add(Button.secondary(buttonID, unitName)
                                 .withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
                         }
                     }
@@ -1771,6 +1771,7 @@ public class ButtonHelperFactionSpecific {
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
+        activeGame.setStoredValue("terraformedPlanet", planet);
         event.getMessage().delete().queue();
     }
 
@@ -2081,6 +2082,9 @@ public class ButtonHelperFactionSpecific {
                 hs = ButtonHelper.getTileOfPlanetWithNoTrait(p2, activeGame);
             }
             if (hs != null && hs.getPosition().equalsIgnoreCase(tile.getPosition())) {
+                return false;
+            }
+            if (tile == null || tile.getRepresentationForButtons(activeGame, player).toLowerCase().contains("hyperlane")) {
                 return false;
             }
         }

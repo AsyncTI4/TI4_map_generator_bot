@@ -285,7 +285,7 @@ public class SCPlay extends PlayerSubcommandData {
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, activeGame, event).size() > 0 && !winnuHero) {
                     Button mahactA = Button.danger("mahactA_follow_" + scToPlay,
-                                                   "Use " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
+                        "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentation(true, true) + " You can follow SC #" + scToPlay + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)", empNMahButtons);
@@ -389,10 +389,10 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
-        Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Gain CCs");
-        Button exhaust = Button.danger("leadershipExhaust", "Spend");
+        Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs");
+        //Button exhaust = Button.danger("leadershipExhaust", "Spend");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
-        return List.of(exhaust, leadershipGenerateCCButtons, noFollowButton);
+        return List.of(leadershipGenerateCCButtons, noFollowButton);
     }
 
     private static List<Button> getDiplomacyButtons(int sc) {

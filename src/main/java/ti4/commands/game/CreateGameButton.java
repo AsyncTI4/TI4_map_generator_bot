@@ -149,7 +149,7 @@ public class CreateGameButton extends GameSubcommandData {
         }
         if (!isAdmin && !mapreference.getStoredValue("gameCreator" + member.getIdLong()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed.");
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed. You can have someone else in the game press the button instead. ");
             return;
         } else {
             mapreference.setStoredValue("gameCreator" + member.getIdLong(), "created");
