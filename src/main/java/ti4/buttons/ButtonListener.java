@@ -5853,7 +5853,9 @@ public class ButtonListener extends ListenerAdapter {
                 // Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status
                 // Cleanup");
                 List<Button> buttons = new ArrayList<>();
-
+                if (activeGame.isRedTapeMode()) {
+                    message2 = "All players have indicated scoring. This game is red tape mode, which means no objective is revealed at this stage. Please press one of the buttons below anyways though -- dont worry, it wont reveal anything, it will just run cleanup.";
+                }
                 if (activeGame.getRound() < 4) {
                     buttons.add(drawStage1);
                 }
