@@ -611,6 +611,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_MAP_SETUP + " " + activeGame.isShowMapSetup());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
@@ -1952,6 +1954,14 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.MILTYMOD_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setMiltyModMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setMiltyModMode(value);

@@ -59,6 +59,7 @@ public class MapCommand implements Command {
         subcommands.add(new RemoveBorderAnomaly());
         //subcommands.add(new InitTspmap());
         subcommands.add(new Preset());
+        subcommands.add(new ShowMapSetup());
         return subcommands;
     }
 

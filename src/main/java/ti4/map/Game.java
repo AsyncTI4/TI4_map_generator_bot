@@ -166,6 +166,9 @@ public class Game {
     private boolean extraSecretMode;
     @Getter
     @Setter
+    private boolean showMapSetup;
+    @Getter
+    @Setter
     private String acDeckID = "action_cards_pok";
     @Getter
     @Setter
