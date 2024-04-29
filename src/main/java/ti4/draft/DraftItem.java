@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -148,5 +151,15 @@ public abstract class DraftItem implements ModelInterface {
             return allOtherCategoriesAtHandLimit;
         }
         return true;
+    }
+
+    @JsonIgnore
+    public Button getAddButton() {
+        return Buttons.green("frankenItemAdd" + getAlias(), getShortDescription());
+    }
+
+    @JsonIgnore
+    public Button getRemoveButton() {
+        return Buttons.red("frankenItemRemove" + getAlias(), getShortDescription());
     }
 }
