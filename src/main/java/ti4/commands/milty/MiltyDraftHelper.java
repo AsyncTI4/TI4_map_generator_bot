@@ -79,7 +79,10 @@ public class MiltyDraftHelper {
         int deltaX = 0;
         int deltaY = 0;
         for (MiltyDraftSlice slice : slices) {
-            Player playerPicked = game.getPlayers().values().stream().filter(player -> slice.equals(manager.getPlayerDraft(player).getSlice())).findFirst().orElse(null);
+            Player playerPicked = game.getPlayers().values().stream()
+                .filter(player -> manager.getPlayerDraft(player) != null)
+                .filter(player -> slice.equals(manager.getPlayerDraft(player).getSlice()))
+                .findFirst().orElse(null);
             BufferedImage sliceImage = generateSliceImage(slice, manager, playerPicked);
             BufferedImage resizedSlice = ImageHelper.scale(sliceImage, scale);
             graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
