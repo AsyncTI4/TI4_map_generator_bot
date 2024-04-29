@@ -9,11 +9,15 @@ import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
 public class RevealStage1 extends StatusSubcommandData {
+
     public RevealStage1() {
         super(Constants.REVEAL_STAGE1, "Reveal Stage1 Public Objective");
     }
@@ -26,12 +30,12 @@ public class RevealStage1 extends StatusSubcommandData {
     public void revealS1(GenericInteractionCreateEvent event, MessageChannel channel) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
 
-        Map.Entry<String, Integer> objective = activeGame.revealState1();
+        Map.Entry<String, Integer> objective = activeGame.revealStage1();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if (activeGame.getCurrentPhase().equalsIgnoreCase("status")) {
+        if ("status".equalsIgnoreCase(activeGame.getCurrentPhase())) {
             // first do cleanup if necessary
             int playersWithSCs = 0;
             for (Player player : activeGame.getRealPlayers()) {
@@ -66,8 +70,8 @@ public class RevealStage1 extends StatusSubcommandData {
     public static void revealTwoStage1(GenericInteractionCreateEvent event, MessageChannel channel) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
 
-        Map.Entry<String, Integer> objective1 = activeGame.revealState1();
-        Map.Entry<String, Integer> objective2 = activeGame.revealState1();
+        Map.Entry<String, Integer> objective1 = activeGame.revealStage1();
+        Map.Entry<String, Integer> objective2 = activeGame.revealStage1();
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());

@@ -13,10 +13,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -33,6 +29,8 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.agenda.DrawAgenda;
@@ -323,7 +321,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("resolveAlliancePlanetTrade_")) {
             ButtonHelper.resolveAllianceMemberPlanetTrade(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("augersHeroStart_")) {
-            ButtonHelperHeroes.augersHeroResolution(player, activeGame, buttonID, event);
+            ButtonHelperHeroes.augersHeroResolution(player, activeGame, buttonID);
         } else if (buttonID.startsWith("augersPeak_")) {
             if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
                 new PeakAtStage1().secondHalfOfPeak(event, activeGame, player, 1);
@@ -2179,7 +2177,7 @@ public class ButtonListener extends ListenerAdapter {
             if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "mahact", event);
             }
-            if (activeGame.getLaws().keySet().contains("regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
+            if (activeGame.getLaws().containsKey("regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
             }
             ButtonHelper.deleteTheOneButton(event);
@@ -4276,7 +4274,7 @@ public class ButtonListener extends ListenerAdapter {
                     String editedMessage = player.getRepresentation() + " CCs have gone from " + originalCCs + " -> "
                         + player.getCCRepresentation() + ". Net gain of: " + netGain;
                     event.getMessage().editMessage(editedMessage).queue();
-                    if (activeGame.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
+                    if (activeGame.getLaws().containsKey("regulations") && player.getFleetCC() > 4) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
                     }
                 }
@@ -5858,7 +5856,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(drawStage1);
                 }
                 if (activeGame.getRound() > 2 || activeGame.getPublicObjectives1Peakable().size() == 0) {
-                    if (activeGame.getStoredValue("homebrewMode").equalsIgnoreCase("456")) {
+                    if ("456".equalsIgnoreCase(activeGame.getStoredValue("homebrewMode"))) {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);
