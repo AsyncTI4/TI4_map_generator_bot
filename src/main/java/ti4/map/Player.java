@@ -1233,6 +1233,11 @@ public class Player {
         return exhaustedRelics;
     }
 
+    @JsonIgnore
+    public User getUser() {
+        return AsyncTI4DiscordBot.jda.getUserById(userID);
+    }
+
     public String getUserID() {
         return userID;
     }
@@ -1266,6 +1271,11 @@ public class Player {
     @JsonIgnore
     public String getRepresentation() {
         return getRepresentation(false, true);
+    }
+
+    @JsonIgnore
+    public String getRepresentationNoPing() {
+        return getRepresentation(false, false);
     }
 
     public String getRepresentation(boolean overrideFow, boolean includePing) {
@@ -2692,5 +2702,10 @@ public class Player {
         UserSettings userSetting = UserSettingsManager.getInstance().getUserSettings(getUserID());
         userSetting.putStoredValue(setting, value);
         UserSettingsManager.getInstance().saveUserSetting(userSetting);
+    }
+
+    @JsonIgnore
+    public boolean isSpeaker() {
+        return getGame().getSpeaker().equals(getUserID());
     }
 }
