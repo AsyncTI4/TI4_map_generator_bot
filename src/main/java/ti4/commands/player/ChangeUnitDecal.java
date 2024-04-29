@@ -54,7 +54,8 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
 
     public static boolean userMayUseDecal(String userID, String decalID) {
         return switch (decalID) {
-            case "cb_10" -> userID.equals("228999251328368640");
+            case "cb_10" -> userID.equals("228999251328368640"); // jazz -> jazz
+            case "cb_52" -> userID.equals("214326507458396161"); // sigma -> void
             default -> true;
         };
     }
