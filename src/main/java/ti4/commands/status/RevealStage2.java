@@ -28,12 +28,12 @@ public class RevealStage2 extends StatusSubcommandData {
 
     public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        Map.Entry<String, Integer> objective = activeGame.revealState2();
+        Map.Entry<String, Integer> objective = activeGame.revealStage2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if (activeGame.getCurrentPhase().equalsIgnoreCase("status")) {
+        if ("status".equalsIgnoreCase(activeGame.getCurrentPhase())) {
             // first do cleanup if necessary
             int playersWithSCs = 0;
             for (Player player : activeGame.getRealPlayers()) {
@@ -68,8 +68,8 @@ public class RevealStage2 extends StatusSubcommandData {
     public void revealTwoStage2(GenericInteractionCreateEvent event, MessageChannel channel) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
 
-        Map.Entry<String, Integer> objective1 = activeGame.revealState2();
-        Map.Entry<String, Integer> objective2 = activeGame.revealState2();
+        Map.Entry<String, Integer> objective1 = activeGame.revealStage2();
+        Map.Entry<String, Integer> objective2 = activeGame.revealStage2();
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());

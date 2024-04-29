@@ -2,7 +2,6 @@ package ti4.commands.status;
 
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,6 +26,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ScorePublic extends StatusSubcommandData {
+
 	public ScorePublic() {
 		super(Constants.SCORE_OBJECTIVE, "Score Public Objective");
 		addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
