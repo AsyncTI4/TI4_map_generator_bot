@@ -96,6 +96,9 @@ public class ApplyDraftBags extends FrankenSubcommandData {
                     .filter(item -> item.ItemCategory == DraftItem.Category.DRAFTORDER)
                     .findFirst()
                     .get();
+                if (order.getSpeakerOrder() == 1) {
+                    game.setSpeaker(player.getUserID());
+                }
                 return order.getSpeakerOrder();
             }))
             .map(Player::getUser)
