@@ -4846,7 +4846,7 @@ public class ButtonHelper {
                         new AddUnits().unitParsing(event, player.getColor(), tile, numMechs + " infantry" + planetName,
                             game);
 
-                        successMessageBuilder.append("\n Put ").append(numMechs).append(" ").append(Emojis.infantry)
+                        successMessageBuilder.append("\n" + player.getFactionEmoji() + " placed ").append(numMechs).append(" ").append(Emojis.infantry)
                             .append(" with the mechs in ")
                             .append(tile.getRepresentationForButtons(game, player));
                     }
@@ -8695,7 +8695,7 @@ public class ButtonHelper {
 
                     List<Tile> tiles = getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun);
                     List<Button> buttons = new ArrayList<>();
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Chose to use the starforge ability");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), p1.getFactionEmoji() + " Chose to use the starforge ability");
                     String message = "Select the tile you would like to starforge in";
                     for (Tile tile : tiles) {
                         Button starTile = Button.success("starforgeTile_" + tile.getPosition(),
@@ -8704,7 +8704,7 @@ public class ButtonHelper {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
-                    String successMessage = "Reduced strategy pool CCs by 1 (" + (p1.getStrategicCC()) + "->"
+                    String successMessage = p1.getFactionEmoji() + " Spent 1 strategy token (" + (p1.getStrategicCC()) + "->"
                         + (p1.getStrategicCC() - 1) + ")";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
@@ -8714,7 +8714,7 @@ public class ButtonHelper {
                     buttons.add(Button.danger("orbitolDropFollowUp", "Done Dropping Infantry"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
-                    String successMessage = "Used Muaat FS ability. Reduced strategy pool CCs by 1 ("
+                    String successMessage = p1.getFactionEmoji() + " Spent 1 strategy token using Muaat FS ability ("
                         + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ") \n";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
