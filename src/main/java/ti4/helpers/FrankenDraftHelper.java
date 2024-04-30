@@ -71,12 +71,12 @@ public class FrankenDraftHelper {
                             draft.findExistingBagChannel(player).deleteMessages(m).queue();
                         }
                     });
+                    MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + getBagReceipt(player.getCurrentDraftBag()));
                     displayPlayerHand(activeGame, player);
                     if (draft.isDraftStageComplete()) {
-                        String categoryForPlayers = activeGame.getPing();
                         MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(),
-                            categoryForPlayers + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
+                            activeGame.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
                         return;
                     }
                     int passCounter = 0;
@@ -84,9 +84,8 @@ public class FrankenDraftHelper {
                         passBags(activeGame);
                         passCounter++;
                         if (passCounter > activeGame.getRealPlayers().size()) {
-                            String categoryForPlayers = activeGame.getPing();
                             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(),
-                                categoryForPlayers + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
+                                activeGame.getPing() + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
                             break;
                         }
                     }
@@ -163,12 +162,13 @@ public class FrankenDraftHelper {
     }
 
     public static void passBags(Game game) {
-        game.getActiveBagDraft().passBags();
         game.setBagDraftStatusMessageID(null); // Clear the status message so it will be regenerated
+        game.getActiveBagDraft().passBags();
         for (Player p2 : game.getRealPlayers()) {
             showPlayerBag(game, p2);
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Bags have been passed");
+        FrankenDraftHelper.updateDraftStatusMessage(game);
     }
 
     public static String getBagReceipt(DraftBag bag) {
@@ -304,12 +304,15 @@ public class FrankenDraftHelper {
     }
 
     public static void updateDraftStatusMessage(Game game) {
-        if (game.getBagDraftStatusMessageID() == null) {
-            game.getActionsChannel().sendMessage(game.getActiveBagDraft().getDraftStatusMessage()).queue(m -> game.setBagDraftStatusMessageID(m.getId()));
+        String statusMessage = game.getActiveBagDraft().getDraftStatusMessage();
+        if (game.getBagDraftStatusMessageID() == null || "null".equals(game.getBagDraftStatusMessageID())) {
+            // game.getActionsChannel().sendMessage(statusMessage).queue(m -> game.setBagDraftStatusMessageID(m.getId()));
+            String messageID = game.getActionsChannel().sendMessage(statusMessage).complete().getId();
+            game.setBagDraftStatusMessageID(messageID);
             return;
         }
         game.getActionsChannel().retrieveMessageById(game.getBagDraftStatusMessageID()).queue(
-            message -> message.editMessage(game.getActiveBagDraft().getDraftStatusMessage()).queue()
+            message -> message.editMessage(statusMessage).queue()
         );
     }
 }

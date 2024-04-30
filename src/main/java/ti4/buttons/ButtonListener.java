@@ -3040,39 +3040,9 @@ public class ButtonListener extends ListenerAdapter {
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("frankenItemAdd")) {
-            String frankenItem = buttonID.replace("frankenItemAdd", "");
-            DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
-            if (draftItem == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
-                return;
-            }
-            FrankenApplicator.applyFrankenItemToPlayer(event, draftItem, player);
-            event.editButton(draftItem.getRemoveButton()).queue();
-            // optional components
-            // additional components
-            if (draftItem.Errata != null) {
-                if (draftItem.Errata.AdditionalComponents != null) {
-                    // sb.append("\n>  - *Also adds: ");
-                    for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
-                        DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
-                        // sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
-                        // sb.append(", ");
-                    }
-                    // sb.append("*");
-                }
-                if (draftItem.Errata.OptionalSwaps != null) {
-                    // sb.append("\n>  - *Includes optional swaps: ");
-                    for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
-                        DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
-                        // sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
-                        // sb.append(", ");
-                    }
-                    // sb.append("*");
-                }
-            }
+            FrankenApplicator.resolveFrankenItemAddButton(event, buttonID, player);
         } else if (buttonID.startsWith("frankenItemRemove")) {
-            String frankenItem = buttonID.replace("frankenItemRemove", "");
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Removal via button is not supported yet. Please use `/franken *remove` commands for now.");
+            FrankenApplicator.resolveFrankenItemRemoveButton(event, buttonID, player);
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING

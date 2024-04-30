@@ -90,6 +90,7 @@ public abstract class BagDraft {
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
         if (ready && !player.isReadyToPassBag()) {
+            player.setReadyToPassBag(ready);
             MessageHelper.sendMessageToChannel(owner.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
             FrankenDraftHelper.updateDraftStatusMessage(owner);
         }
@@ -139,7 +140,7 @@ public abstract class BagDraft {
         if (existingChannel != null) {
             // Clear out all messages from the existing thread
             existingChannel.getHistory().retrievePast(100).queue(m -> {
-                if (!m.isEmpty()) {
+                if (m.size() > 1) {
                     existingChannel.deleteMessages(m).queue();
                 }
             });
@@ -240,15 +241,21 @@ public abstract class BagDraft {
     @JsonIgnore
     public String getDraftStatusMessage() {
         StringBuilder sb = new StringBuilder();
-        sb.append("### Draft Status:\n");
+        sb.append("### __Draft Status__:\n");
         for (Player player : owner.getRealPlayers()) {
             sb.append("> ");
             if (player.isReadyToPassBag()) {
-                sb.append("✔");
+                sb.append("✅");
             } else {
                 sb.append("❌");
             }
-            sb.append(player.getUserName()).append("\n");
+            sb.append(player.getUserName());
+            if (player.isReadyToPassBag()) {
+                // sb.append("");
+            } else {
+                sb.append(" (still drafting)");
+            }
+            sb.append("\n");
         }
         return sb.toString();
     }
