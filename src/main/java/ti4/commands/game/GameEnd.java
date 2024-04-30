@@ -145,9 +145,26 @@ public class GameEnd extends GameSubcommandData {
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
               m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
               m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                t -> t.sendMessage(message.toString()).queue(null,
-                  (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName()
-                    + "** in PBD Chronicles:\n> " + error.getMessage()))); // CREATE THREAD AND POST FOLLOW UP
+                t -> {
+                  t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()));
+                  String endOfGameSummary = "";
+
+                  for (int x = 1; x < activeGame.getRound() + 1; x++) {
+                    String summary = "";
+                    for (Player player : activeGame.getRealPlayers()) {
+                      if (!activeGame.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
+                        summary = summary + player.getFactionEmoji() + ": " + activeGame.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                      }
+                    }
+                    if (!summary.isEmpty()) {
+                      summary = "**__Round " + x + " Secret Summary__**\n" + summary;
+                      endOfGameSummary = endOfGameSummary + summary;
+                    }
+                  }
+                  if (!endOfGameSummary.isEmpty()) {
+                    MessageHelper.sendMessageToChannel(t, endOfGameSummary);
+                  }
+                }); // CREATE THREAD AND POST FOLLOW UP
               MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
             });

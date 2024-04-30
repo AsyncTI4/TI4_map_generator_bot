@@ -720,21 +720,23 @@ public class MapGenerator {
                 for (int sc : game.getPlayedSCsInOrder(player, game)) {
                     if (!player.hasFollowedSC(sc)) {
                         unfollowedSCs.add(sc);
+                        needToMsg = needToMsg + sc + " ";
                     }
+
                 }
                 if (unfollowedSCs.size() > 0) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.red);
                     graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
-                    int xSpacer = 20;
-                    for (int sc : unfollowedSCs) {
-                        graphics.setColor(getSCColor(sc, game));
-                        graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
-                        xSpacer = xSpacer + 20;
-                        if (sc > 9) {
-                            xSpacer = xSpacer + 20;
-                        }
-                    }
+                    // int xSpacer = 20;
+                    // for (int sc : unfollowedSCs) {
+                    //     graphics.setColor(getSCColor(sc, game));
+                    //     graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
+                    //     xSpacer = xSpacer + 20;
+                    //     if (sc > 9) {
+                    //         xSpacer = xSpacer + 10;
+                    //     }
+                    // }
                 }
 
                 graphics.setFont(Storage.getFont32());

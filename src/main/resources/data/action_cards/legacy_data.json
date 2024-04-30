@@ -682,5 +682,14 @@
     "text": "Ready up to 3 planets you control. Until the \"Resolve Outcome\" step, players cannot resolve abilities.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "brilliant_tactician",
+    "name": "Brilliant Tactician",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your tactic pool.",
+    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. Even he had his limits. The magnum opus Lazax war theory at his fingertips, and yet... it was the single most boring piece of literature he'd ever had the displeasure to read.",
+    "source": "action_deck_2"
   }
 ]

@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -20,12 +17,11 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.custom.PeakAtStage1;
-import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.franken.LeaderAdd;
 import ti4.commands.leaders.HeroPlay;
@@ -744,7 +740,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
                 && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                     || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
@@ -762,7 +758,7 @@ public class ButtonHelperHeroes {
         Player player) {
         String planet = buttonID.split("_")[1];
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = (Planet) unitHolder;
+        Planet planetReal = unitHolder;
         planetReal.addToken("token_dmz.png");
         unitHolder.removeAllUnits(player.getColor());
         if (player.getExhaustedPlanets().contains(planet)) {
@@ -1332,11 +1328,9 @@ public class ButtonHelperHeroes {
         event.getMessage().delete().queue();
     }
 
-    public static void augersHeroResolution(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void augersHeroResolution(Player player, Game game, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-
             for (int x = 0; x < 3; x++) {
                 String obj = game.getTopObjective(1);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
@@ -2048,8 +2042,8 @@ public class ButtonHelperHeroes {
     public static List<Button> getNRAHeroButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
-            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
-            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            //scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));

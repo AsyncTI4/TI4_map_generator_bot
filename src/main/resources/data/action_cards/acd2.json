@@ -90,15 +90,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "brilliant_tactician",
-    "name": "Brilliant Tactician",
-    "phase": "Action",
-    "window": "At the start of your turn",
-    "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your tactic pool.",
-    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. Even he had his limits. The magnum opus Lazax war theory at his fingertips, and yet... it was the single most boring piece of literature he'd ever had the displeasure to read.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "brutal_occupation",
     "name": "Brutal Occupation",
     "phase": "Action",
@@ -311,7 +302,7 @@
     "phase": "Action",
     "window": "After you exhaust your strategy card",
     "text": "Perform the secondary ability of that strategy card; when you perform that ability, spend command tokens from your reinforcements instead of your strategy pool.",
-    "flavorText": "PROTOCOL SUCCESSFUL >> [NULL ID] FATE SEALED << DEFEAT INEVITABLE >> PEERLESS MANY << INFINITE ONE >> [ID:NIITAKA] << QUEUED1 << QUEUED2 << QUEUED3...",
+    "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
     "source": "action_deck_2"
   },
   {
@@ -411,6 +402,15 @@
     "window": "Action",
     "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 7 or greater, destroy 1 of those units.",
     "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "military_treatise",
+    "name": "Military Treatise",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your fleet pool.",
+    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. Even he had his limits. The magnum opus Lazax war theory at his fingertips, and yet... it was the single most boring piece of literature he'd ever had the displeasure to read.",
     "source": "action_deck_2"
   },
   {

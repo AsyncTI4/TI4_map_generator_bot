@@ -13,10 +13,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -33,6 +29,8 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.agenda.DrawAgenda;
@@ -77,6 +75,7 @@ import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.player.UnitInfo;
+import ti4.commands.search.SearchMyGames;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
@@ -324,7 +323,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("resolveAlliancePlanetTrade_")) {
             ButtonHelper.resolveAllianceMemberPlanetTrade(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("augersHeroStart_")) {
-            ButtonHelperHeroes.augersHeroResolution(player, activeGame, buttonID, event);
+            ButtonHelperHeroes.augersHeroResolution(player, activeGame, buttonID);
         } else if (buttonID.startsWith("augersPeak_")) {
             if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
                 new PeakAtStage1().secondHalfOfPeak(event, activeGame, player, 1);
@@ -2180,7 +2179,7 @@ public class ButtonListener extends ListenerAdapter {
             if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "mahact", event);
             }
-            if (activeGame.getLaws().keySet().contains("regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
+            if (activeGame.getLaws().containsKey("regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
             }
             ButtonHelper.deleteTheOneButton(event);
@@ -3312,6 +3311,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "getOmenDice" -> ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
+                //wrapped into leadershipGenerateCCButtons now
                 case "leadershipExhaust" -> {
                     ButtonHelper.addReaction(event, false, false, "", "");
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
@@ -3354,6 +3354,7 @@ public class ButtonListener extends ListenerAdapter {
                     String msg = "Use buttons to do an end of turn ability";
                     List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, activeGame);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+                    ButtonHelper.deleteTheOneButton(event);
                 }
                 case "redistributeCCButtons" -> { // Buttons.REDISTRIBUTE_CCs
                     String message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
@@ -3433,8 +3434,17 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, leadershipInitiative, activeGame, event);
                     }
                     player.addFollowedSC(leadershipInitiative);
+                    String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
+                    Button doneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
+                    buttons.add(doneExhausting);
+                    if (!activeGame.isFoWMode()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                    } else {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
                     ButtonHelper.addReaction(event, false, false, "", "");
-                    String message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                    message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                     activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                     Button getTactic = Button.success(finsFactionCheckerPrefix + "increase_tactic_cc", "Gain 1 Tactic CC");
                     Button getFleet = Button.success(finsFactionCheckerPrefix + "increase_fleet_cc", "Gain 1 Fleet CC");
@@ -3446,11 +3456,11 @@ public class ButtonListener extends ListenerAdapter {
                         "Done Gaining CCs");
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
-                    List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
+                    List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
                     if (!activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons2);
                     } else {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons2);
                     }
                 }
                 case "spyNetYssarilChooses" -> ButtonHelperFactionSpecific.resolveSpyNetYssarilChooses(player, activeGame, event);
@@ -4272,7 +4282,7 @@ public class ButtonListener extends ListenerAdapter {
                     String editedMessage = player.getRepresentation() + " CCs have gone from " + originalCCs + " -> "
                         + player.getCCRepresentation() + ". Net gain of: " + netGain;
                     event.getMessage().editMessage(editedMessage).queue();
-                    if (activeGame.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
+                    if (activeGame.getLaws().containsKey("regulations") && player.getFleetCC() > 4) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
                     }
                 }
@@ -4397,9 +4407,12 @@ public class ButtonListener extends ListenerAdapter {
                 case "technologicalBreakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveTechnologicalBreakthrough(player, activeGame, event);
                 case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, activeGame, event, buttonID);
                 case "brutalOccupation" -> ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep1(player, activeGame, event);
-                case "getRepealLawButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                    "Use buttons to select Law to repeal",
-                    ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
+                case "getRepealLawButtons" -> {
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                        "Use buttons to select Law to repeal",
+                        ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
+                    event.getMessage().delete().queue();
+                }
                 case "resolveCounterStroke" -> ButtonHelperActionCards.resolveCounterStroke(activeGame, player, event);
                 case "getDivertFundingButtons" -> {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -4637,6 +4650,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "mitosisMech" -> ButtonHelperAbilities.resolveMitosisMech(buttonID, event, activeGame, player,
                     ident, finsFactionCheckerPrefix);
+                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, false, false, true, false);
                 case "cardsInfo" -> CardsInfo.sendCardsInfo(activeGame, player, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, activeGame, player, ident);
@@ -5846,12 +5860,14 @@ public class ButtonListener extends ListenerAdapter {
                 // Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status
                 // Cleanup");
                 List<Button> buttons = new ArrayList<>();
-
+                if (activeGame.isRedTapeMode()) {
+                    message2 = "All players have indicated scoring. This game is red tape mode, which means no objective is revealed at this stage. Please press one of the buttons below anyways though -- dont worry, it wont reveal anything, it will just run cleanup.";
+                }
                 if (activeGame.getRound() < 4) {
                     buttons.add(drawStage1);
                 }
                 if (activeGame.getRound() > 2 || activeGame.getPublicObjectives1Peakable().size() == 0) {
-                    if (activeGame.getStoredValue("homebrewMode").equalsIgnoreCase("456")) {
+                    if ("456".equalsIgnoreCase(activeGame.getStoredValue("homebrewMode"))) {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);
