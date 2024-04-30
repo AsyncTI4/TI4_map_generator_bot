@@ -733,8 +733,9 @@ public class MapGenerator {
                 for (int sc : game.getPlayedSCsInOrder(player, game)) {
                     if (!player.hasFollowedSC(sc)) {
                         unfollowedSCs.add(sc);
+                        needToMsg = needToMsg + sc + " ";
                     }
-                    needToMsg = needToMsg + sc + " ";
+
                 }
                 if (unfollowedSCs.size() > 0) {
                     graphics.setFont(Storage.getFont20());
