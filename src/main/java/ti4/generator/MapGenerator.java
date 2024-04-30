@@ -3252,30 +3252,33 @@ public class MapGenerator {
         List<String> unrevealedPublicObjectives,
         Integer objectiveWorth,
         Game activeGame) {
+
+        Integer index = 1;
+
         for (String unRevealed : unrevealedPublicObjectives) {
 
             String name = Mapper.getPublicObjective(unRevealed).getName();
 
             if (activeGame.isRedTapeMode()) {
-                graphics.drawString("(Unrevealed) " + name + " - " + objectiveWorth + " VP", x, y + 23);
+                graphics.drawString(String.format("(%d) <Unrevealed> %s - %d VP", index, name, objectiveWorth), x, y + 23);
             } else {
-                graphics.drawString("(Unrevealed) - " + objectiveWorth + " VP", x, y + 23);
+                graphics.drawString(String.format("(%d) <Unrevealed> - %d VP", index, objectiveWorth), x, y + 23);
             }
 
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
-            List<String> playerIDs;
-            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
-                playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
-            } else if (activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
-                playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
-            } else {
-                y += 43;
-                continue;
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed) || activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+                List<String> playerIDs;
+                if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                    playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
+                } else {
+                    playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
+                }
+                drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             }
 
-            drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             y += 43;
+            index++;
         }
         return y;
     }
