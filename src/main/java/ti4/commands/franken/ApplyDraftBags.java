@@ -29,7 +29,7 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force apply current bags, even if the bag draft is not complete.");
     }
 
-    final List<DraftItem.Category> categories = List.of(
+    final List<DraftItem.Category> componentCategories = List.of(
         Category.ABILITY,
         Category.TECH,
         Category.AGENT,
@@ -39,13 +39,14 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         Category.FLAGSHIP,
         Category.COMMODITIES,
         Category.PN,
+        Category.STARTINGTECH);
+
+    final List<DraftItem.Category> mapBuildCategories = List.of(
         Category.HOMESYSTEM,
-        Category.STARTINGTECH,
-        Category.STARTINGFLEET
-    // Category.BLUETILE,
-    // Category.REDTILE,
-    // Category.DRAFTORDER
-    );
+        Category.STARTINGFLEET,
+        Category.BLUETILE,
+        Category.REDTILE,
+        Category.DRAFTORDER);
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -63,7 +64,7 @@ public class ApplyDraftBags extends FrankenSubcommandData {
 
         for (Player player : game.getPlayers().values()) {
             DraftBag bag = player.getDraftHand();
-            for (DraftItem.Category category : categories) {
+            for (DraftItem.Category category : componentCategories) {
                 List<DraftItem> items = bag.Contents.stream().filter(item -> item.ItemCategory == category).toList();
                 if (items.isEmpty()) {
                     continue;
@@ -77,9 +78,13 @@ public class ApplyDraftBags extends FrankenSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
         }
-
-        //start building map // Category.BLUETILE, Category.REDTILE
         game.setShowMapSetup(true);
+
+        // start building map // Category.BLUETILE, Category.REDTILE, Category.HOMESYSTEM, Category.STARTINGFLEET
+        // pick home system
+        // pick starting fleet
+        // from map template, get available positions + limits
+        // pick tiles until done
     }
 
     private static void setSpeakerOrder(SlashCommandInteractionEvent event, Game game) {

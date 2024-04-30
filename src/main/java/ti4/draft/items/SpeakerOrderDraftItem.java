@@ -32,10 +32,11 @@ public class SpeakerOrderDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getItemEmoji() {
-        if ("1".equals(ItemId)) {
-            return Emojis.SpeakerToken;
+        try {
+            return Emojis.getSpeakerPickEmoji(getSpeakerOrder());
+        } catch (Exception e) {
+            return Emojis.getResourceEmoji(getSpeakerOrder());
         }
-        return Emojis.getResourceEmoji(Integer.parseInt(ItemId));
     }
 
     @JsonIgnore

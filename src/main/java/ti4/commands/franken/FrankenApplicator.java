@@ -7,12 +7,14 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.player.Stats;
+import ti4.commands.tech.TechAdd;
 import ti4.draft.DraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
 import ti4.generator.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
 
 public class FrankenApplicator {
 
@@ -23,10 +25,13 @@ public class FrankenApplicator {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
             return;
         }
+
+        int categoryLimit = player.getGame().getActiveBagDraft().getItemLimitForCategory(draftItem.ItemCategory);
+
         FrankenApplicator.applyFrankenItemToPlayer(event, draftItem, player);
         event.editButton(draftItem.getRemoveButton()).queue();
 
-        
+        // Handle Errata
         if (draftItem.Errata != null) {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
@@ -69,9 +74,7 @@ public class FrankenApplicator {
             case MECH, FLAGSHIP -> sendNotImplementedMessage(event, draftItem.getAlias());
             case COMMODITIES -> Stats.setTotalCommodities(event, player, ((CommoditiesDraftItem) draftItem).getCommodities());
             case PN -> sendNotImplementedMessage(event, draftItem.getAlias());
-            case HOMESYSTEM -> sendNotImplementedMessage(event, draftItem.getAlias());
-            case STARTINGTECH -> sendNotImplementedMessage(event, draftItem.getAlias());
-            case STARTINGFLEET -> sendNotImplementedMessage(event, draftItem.getAlias());
+            case STARTINGTECH -> addStartingTech(event, player, itemID);
         }
         DraftErrataModel errata = Mapper.getFrankenErrata().get(draftItem.getAlias());
         if (errata != null) {
@@ -79,7 +82,15 @@ public class FrankenApplicator {
         }
     }
 
+    private static void addStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {
+        FactionModel faction = Mapper.getFaction(itemID);
+        List<String> startingTech = faction.getStartingTech();
+        for (String tech : startingTech) {
+            TechAdd.addTech(event, player.getGame(), player, tech);
+        }
+    }
+
     private static void sendNotImplementedMessage(GenericInteractionCreateEvent event, String draftItemID) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Applying this item: `" + draftItemID + "`via button is not yet implemented - please use `/franken` commands");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Applying this item: `" + draftItemID + "` via button is not yet implemented - please use `/franken` commands");
     }
 }
