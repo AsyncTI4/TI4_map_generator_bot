@@ -6,15 +6,15 @@ import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 
-public class ShowFrankenBag extends FrankenSubcommandData {
-    public ShowFrankenBag() {
-        super(Constants.SHOW_BAG, "Shows your current FrankenDraft bag of cards left to draft.");
+public class ShowFrankenHand extends FrankenSubcommandData {
+    public ShowFrankenHand() {
+        super(Constants.SHOW_HAND, "Shows your current hand of drafted cards");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
-        FrankenDraftHelper.showPlayerBag(activeGame, player);
+        FrankenDraftHelper.displayPlayerHand(activeGame, player);
     }
 }

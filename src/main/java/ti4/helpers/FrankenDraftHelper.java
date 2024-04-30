@@ -111,7 +111,7 @@ public class FrankenDraftHelper {
         event.getMessage().delete().queue();
     }
 
-    private static void displayPlayerHand(Game activeGame, Player player) {
+    public static void displayPlayerHand(Game activeGame, Player player) {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             "Your current Hand of drafted cards: \n" + getCurrentHandRepresentation(activeGame, player));
     }
@@ -218,7 +218,7 @@ public class FrankenDraftHelper {
     private static void buildItemDescription(DraftItem item, StringBuilder sb) {
         try {
             sb.append("### ").append(item.getItemEmoji()).append(" ");
-            sb.append(item.getShortDescription()).append("\n - ");
+            sb.append(item.getShortDescription()).append("\n> ");
             sb.append(item.getLongDescription());
         } catch (Exception e) {
             sb.append("ERROR BUILDING DESCRIPTION FOR ").append(item.getAlias());
@@ -243,12 +243,12 @@ public class FrankenDraftHelper {
             showPlayerBag(activeGame, player);
         }
 
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing()
-            + " draft started. As a reminder, for the first bag you pick 3 items, and for " +
-            "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get"
-            +
-            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready.");
+        String message = activeGame.getPing() + " draft started. As a reminder, for the first bag you pick 3 items, and for " +
+            "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
+            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will" +
+            " automatically be passed once everyone is ready.";
 
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
         GameSaveLoadManager.saveMap(activeGame);
     }
 }
