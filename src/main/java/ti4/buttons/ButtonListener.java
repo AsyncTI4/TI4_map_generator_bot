@@ -93,6 +93,7 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
+import ti4.draft.DraftItem;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -128,6 +129,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.DraftErrataModel;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
@@ -3039,10 +3041,38 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("frankenItemAdd")) {
             String frankenItem = buttonID.replace("frankenItemAdd", "");
-            FrankenApplicator.applyFrankenItemIDToPlayer(event, frankenItem, player);
+            DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
+            if (draftItem == null) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
+                return;
+            }
+            FrankenApplicator.applyFrankenItemToPlayer(event, draftItem, player);
+            event.editButton(draftItem.getRemoveButton()).queue();
+            // optional components
+            // additional components
+            if (draftItem.Errata != null) {
+                if (draftItem.Errata.AdditionalComponents != null) {
+                    // sb.append("\n>  - *Also adds: ");
+                    for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
+                        DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
+                        // sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                        // sb.append(", ");
+                    }
+                    // sb.append("*");
+                }
+                if (draftItem.Errata.OptionalSwaps != null) {
+                    // sb.append("\n>  - *Includes optional swaps: ");
+                    for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
+                        DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
+                        // sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                        // sb.append(", ");
+                    }
+                    // sb.append("*");
+                }
+            }
         } else if (buttonID.startsWith("frankenItemRemove")) {
             String frankenItem = buttonID.replace("frankenItemRemove", "");
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Removal via button is not supported yet.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removal via button is not supported yet. Please use `/franken *remove` commands for now.");
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING

@@ -28,16 +28,20 @@ public class FrankenApplicator {
             case ABILITY -> AbilityAdd.addAbilities(event, player, List.of(itemID));
             case TECH -> FactionTechAdd.addFactionTechs(event, player, List.of(itemID));
             case AGENT, COMMANDER, HERO -> LeaderAdd.addLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP -> new MechDraftItem(itemID);
+            case MECH, FLAGSHIP -> sendNotImplementedMessage(event);
             case COMMODITIES -> Stats.setTotalCommodities(event, player, ((CommoditiesDraftItem) draftItem).getCommodities());
-            case PN -> new PNDraftItem(itemID);
-            case HOMESYSTEM -> new HomeSystemDraftItem(itemID);
-            case STARTINGTECH -> new StartingTechDraftItem(itemID);
-            case STARTINGFLEET -> new StartingFleetDraftItem(itemID);
+            case PN -> sendNotImplementedMessage(event);
+            case HOMESYSTEM -> sendNotImplementedMessage(event);
+            case STARTINGTECH -> sendNotImplementedMessage(event);
+            case STARTINGFLEET -> sendNotImplementedMessage(event);
         }
         DraftErrataModel errata = Mapper.getFrankenErrata().get(draftItem.getAlias());
         if (errata != null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Errata: " + errata.getAlias());
         }
+    }
+
+    public static void sendNotImplementedMessage(GenericInteractionCreateEvent event) {
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Applying this item via button is not yet implemented - please use `/franken` commands");
     }
 }

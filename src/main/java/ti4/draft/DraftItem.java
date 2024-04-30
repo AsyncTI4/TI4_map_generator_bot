@@ -155,11 +155,11 @@ public abstract class DraftItem implements ModelInterface {
 
     @JsonIgnore
     public Button getAddButton() {
-        return Buttons.green("frankenItemAdd" + getAlias(), getShortDescription());
+        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription());
     }
 
     @JsonIgnore
     public Button getRemoveButton() {
-        return Buttons.red("frankenItemRemove" + getAlias(), getShortDescription());
+        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription());
     }
 }
