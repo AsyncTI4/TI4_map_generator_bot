@@ -2003,8 +2003,9 @@ public class ButtonHelperHeroes {
     public static void resolveMykoHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String hero = buttonID.split("_")[1];
         HeroPlay.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
-        new LeaderAdd().addLeader(player, hero, game);
+        player.addLeader(hero);
         UnlockLeader.unlockLeader(event, hero, game, player);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), LeaderAdd.getAddLeaderText(player, hero));
         event.getMessage().delete().queue();
 
     }

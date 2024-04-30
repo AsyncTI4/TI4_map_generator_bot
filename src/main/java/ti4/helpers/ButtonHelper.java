@@ -4419,12 +4419,9 @@ public class ButtonHelper {
         }
     }
 
+    @Deprecated
     public static MessageChannel getCorrectChannel(Player player, Game game) {
-        if (game.isFoWMode()) {
-            return player.getPrivateChannel();
-        } else {
-            return game.getMainGameChannel();
-        }
+        return player.getCorrectChannel();
     }
 
     public static List<Button> getTilesToMoveFrom(Player player, Game game, GenericInteractionCreateEvent event) {

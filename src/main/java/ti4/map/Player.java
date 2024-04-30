@@ -2708,4 +2708,16 @@ public class Player {
     public boolean isSpeaker() {
         return getGame().getSpeaker().equals(getUserID());
     }
+
+    /**
+     * @return Player's private channel if Fog of War game, otherwise the main (action) game channel
+     */
+    @JsonIgnore
+    public MessageChannel getCorrectChannel() {
+        if (getGame().isFoWMode()) {
+            return getPrivateChannel();
+        } else {
+            return getGame().getMainGameChannel();
+        }
+    }
 }

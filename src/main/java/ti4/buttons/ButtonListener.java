@@ -59,6 +59,7 @@ import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.RelicInfo;
+import ti4.commands.franken.FrankenApplicator;
 import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
@@ -3037,6 +3038,12 @@ public class ButtonListener extends ListenerAdapter {
                     "Combat modifier will be applied next time you push the combat roll button.");
             }
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("frankenItemAdd")) {
+            String frankenItem = buttonID.replace("frankenItemAdd", "");
+            FrankenApplicator.applyFrankenItemIDToPlayer(event, frankenItem, player);
+        } else if (buttonID.startsWith("frankenItemRemove")) {
+            String frankenItem = buttonID.replace("frankenItemRemove", "");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removal via button is not supported yet.");
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING

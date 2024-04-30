@@ -1,5 +1,7 @@
 package ti4.commands.franken;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.commands.player.Stats;
 import ti4.draft.DraftItem;
@@ -23,18 +25,15 @@ public class FrankenApplicator {
     public static void applyFrankenItemToPlayer(GenericInteractionCreateEvent event, DraftItem draftItem, Player player) {
         String itemID = draftItem.ItemId;
         switch (draftItem.ItemCategory) {
-            case ABILITY -> new AbilityDraftItem(itemID);
-            case TECH -> new TechDraftItem(itemID);
-            case AGENT, COMMANDER, HERO -> new AgentDraftItem(itemID);
+            case ABILITY -> AbilityAdd.addAbilities(event, player, List.of(itemID));
+            case TECH -> FactionTechAdd.addFactionTechs(event, player, List.of(itemID));
+            case AGENT, COMMANDER, HERO -> LeaderAdd.addLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP -> new MechDraftItem(itemID);
             case COMMODITIES -> Stats.setTotalCommodities(event, player, ((CommoditiesDraftItem) draftItem).getCommodities());
             case PN -> new PNDraftItem(itemID);
             case HOMESYSTEM -> new HomeSystemDraftItem(itemID);
             case STARTINGTECH -> new StartingTechDraftItem(itemID);
             case STARTINGFLEET -> new StartingFleetDraftItem(itemID);
-            case BLUETILE -> new BlueTileDraftItem(itemID);
-            case REDTILE -> new RedTileDraftItem(itemID);
-            case DRAFTORDER -> new SpeakerOrderDraftItem(itemID);
         }
         DraftErrataModel errata = Mapper.getFrankenErrata().get(draftItem.getAlias());
         if (errata != null) {
