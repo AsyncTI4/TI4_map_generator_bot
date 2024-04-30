@@ -232,6 +232,9 @@ public class Game {
     private String savedMessage;
     @Nullable
     private String botMapUpdatesThreadID;
+    @Getter
+    @Setter
+    private String bagDraftStatusMessageID;
     private Map<String, Player> players = new LinkedHashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();

@@ -64,7 +64,13 @@ public class FrankenDraftHelper {
                     player.resetDraftQueue();
                     draft.setPlayerReadyToPass(player, true);
                     GameSaveLoadManager.saveMap(activeGame);
-                    draft.findExistingBagChannel(player).delete().queue();
+
+                    // Clear out all existing messages
+                    draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
+                        if (!m.isEmpty()) {
+                            draft.findExistingBagChannel(player).deleteMessages(m).queue();
+                        }
+                    });
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + getBagReceipt(player.getCurrentDraftBag()));
                     displayPlayerHand(activeGame, player);
                     if (draft.isDraftStageComplete()) {
@@ -156,13 +162,13 @@ public class FrankenDraftHelper {
 
     }
 
-    public static void passBags(Game activeGame) {
-        activeGame.getActiveBagDraft().passBags();
-
-        for (Player p2 : activeGame.getRealPlayers()) {
-            showPlayerBag(activeGame, p2);
+    public static void passBags(Game game) {
+        game.getActiveBagDraft().passBags();
+        game.setBagDraftStatusMessageID(null); // Clear the status message so it will be regenerated
+        for (Player p2 : game.getRealPlayers()) {
+            showPlayerBag(game, p2);
         }
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Bags have been passed");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Bags have been passed");
     }
 
     public static String getBagReceipt(DraftBag bag) {
@@ -295,5 +301,15 @@ public class FrankenDraftHelper {
         }
         String message = "You have all been set up as franken factions. These have similar zombie emojis as their default faction icon. You should personalize yours with `/franken set_faction_icon`. You can use any emoji the bot can use";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+    }
+
+    public static void updateDraftStatusMessage(Game game) {
+        if (game.getBagDraftStatusMessageID() == null) {
+            game.getActionsChannel().sendMessage(game.getActiveBagDraft().getDraftStatusMessage()).queue(m -> game.setBagDraftStatusMessageID(m.getId()));
+            return;
+        }
+        game.getActionsChannel().retrieveMessageById(game.getBagDraftStatusMessageID()).queue(
+            message -> message.editMessage(game.getActiveBagDraft().getDraftStatusMessage()).queue()
+        );
     }
 }

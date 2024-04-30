@@ -559,6 +559,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + activeGame.getBotMapUpdatesThreadID());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + activeGame.getBagDraftStatusMessageID());
+        writer.write(System.lineSeparator());
 
         // GAME MODES
         writer.write(Constants.TIGL_GAME + " " + activeGame.isCompetitiveTIGLGame());
@@ -1688,6 +1690,7 @@ public class GameSaveLoadManager {
                 case Constants.SAVED_CHANNEL -> activeGame.setSavedChannelID(info);
                 case Constants.SAVED_MESSAGE -> activeGame.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> activeGame.setBotMapUpdatesThreadID(info);
+                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> activeGame.setBagDraftStatusMessageID(info);
 
                 // GAME MODES
                 case Constants.TIGL_GAME -> {
