@@ -5809,34 +5809,6 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
-        int x = 1;
-        for (Player player : players) {
-            switch (x) {
-                case 1 -> Setup.secondHalfOfPlayerSetup(player, game, "black", "franken1", "301", event, false);
-                case 2 -> Setup.secondHalfOfPlayerSetup(player, game, "green", "franken2", "302", event, false);
-                case 3 -> Setup.secondHalfOfPlayerSetup(player, game, "purple", "franken3", "303", event, false);
-                case 4 -> Setup.secondHalfOfPlayerSetup(player, game, "orange", "franken4", "304", event, false);
-                case 5 -> Setup.secondHalfOfPlayerSetup(player, game, "pink", "franken5", "305", event, false);
-                case 6 -> Setup.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "306", event, false);
-                case 7 -> Setup.secondHalfOfPlayerSetup(player, game, "red", "franken7", "307", event, false);
-                case 8 -> Setup.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "308", event, false);
-                case 9 -> Setup.secondHalfOfPlayerSetup(player, game, "brown", "franken9", "309", event, false);
-                case 10 -> Setup.secondHalfOfPlayerSetup(player, game, "tan", "franken10", "310", event, false);
-                case 11 -> Setup.secondHalfOfPlayerSetup(player, game, "lime", "franken11", "311", event, false);
-                case 12 -> Setup.secondHalfOfPlayerSetup(player, game, "chocolate", "franken12", "312", event, false);
-                case 13 -> Setup.secondHalfOfPlayerSetup(player, game, "gold", "franken13", "313", event, false);
-                case 14 -> Setup.secondHalfOfPlayerSetup(player, game, "teal", "franken14", "314", event, false);
-                case 15 -> Setup.secondHalfOfPlayerSetup(player, game, "turquoise", "franken15", "315", event, false);
-                case 16 -> Setup.secondHalfOfPlayerSetup(player, game, "navy", "franken16", "316", event, false);
-            }
-            x++;
-        }
-        String message = "You have all been set up as franken factions. These have similar zombie emojis as their default faction icon. You should personalize yours with `/franken set_faction_icon`. You can use any emoji the bot can use";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-    }
-
     public static List<Button> getFactionSetupButtons(Game game, String buttonID) {
         String userId = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
