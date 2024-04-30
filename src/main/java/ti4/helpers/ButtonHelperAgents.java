@@ -783,7 +783,7 @@ public class ButtonHelperAgents {
             }
             if (p2.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(activeGame, p2, 1);
-                message = ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option";
+                successMessage2 += ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option";
             } else {
                 activeGame.drawActionCard(p2.getUserID());
             }

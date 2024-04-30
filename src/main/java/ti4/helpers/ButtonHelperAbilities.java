@@ -1272,7 +1272,7 @@ public class ButtonHelperAbilities {
         Tile tile = activeGame.getTileByPosition(pos);
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = "Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + "->"
+            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + "->"
                 + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
