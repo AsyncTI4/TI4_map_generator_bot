@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
@@ -155,11 +156,11 @@ public abstract class DraftItem implements ModelInterface {
 
     @JsonIgnore
     public Button getAddButton() {
-        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription());
+        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
     }
 
     @JsonIgnore
     public Button getRemoveButton() {
-        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription());
+        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
     }
 }
