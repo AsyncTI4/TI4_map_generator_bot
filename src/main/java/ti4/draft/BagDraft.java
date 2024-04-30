@@ -153,7 +153,6 @@ public abstract class BagDraft {
     }
 
     public ThreadChannel findExistingBagChannel(Player player) {
-
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
         if (owner.isFoWMode()) {
             threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";

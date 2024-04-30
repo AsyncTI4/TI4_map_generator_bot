@@ -287,7 +287,7 @@ public class MiltyDraftHelper {
 
             Tile tile = new Tile(tileID, "none");
             boolean sourceAllowed = false;
-            if (sources.contains(tile.getTileModel().getSource())) sourceAllowed = true;
+            if (sources.contains(tileModel.getSource())) sourceAllowed = true;
 
             // leaving these as a stop-gap for now until I can verify all sources are setup
             if (tileID.length() <= 2) sourceAllowed = true;

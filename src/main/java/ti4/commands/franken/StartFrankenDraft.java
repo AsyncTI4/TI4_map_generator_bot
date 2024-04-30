@@ -21,12 +21,12 @@ public class StartFrankenDraft extends FrankenSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
         if (activeGame.getRealPlayers().size() < (activeGame.getPlayers().size() - 2)) {
-            FrankenDraftHelper.setUpFrankenFactions(activeGame, event);
         }
+        FrankenDraftHelper.setUpFrankenFactions(activeGame, event);
         FrankenDraftHelper.clearPlayerHands(activeGame);
 
-        boolean stratPings = event.getOption(Constants.POWERED, false, OptionMapping::getAsBoolean);
-        if (stratPings) {
+        boolean powered = event.getOption(Constants.POWERED, false, OptionMapping::getAsBoolean);
+        if (powered) {
             activeGame.setBagDraft(new PoweredFrankenDraft(activeGame));
         } else {
             activeGame.setBagDraft(new FrankenDraft(activeGame));
