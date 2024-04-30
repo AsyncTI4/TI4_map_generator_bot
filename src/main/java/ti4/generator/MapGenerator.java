@@ -3314,9 +3314,10 @@ public class MapGenerator {
                     int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
 
                     graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
-
-                    tempX += scoreTokenWidth;
                 }
+
+                // This needs to be updated regardless if the player peeked or not to maintain marker alignment with PO score markers.
+                tempX += scoreTokenWidth;
             }
         } catch (Exception e) {
             BotLogger.log("Could not draw peek markers", e);
