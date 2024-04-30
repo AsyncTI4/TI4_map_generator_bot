@@ -268,7 +268,7 @@ public class MiltyDraftHelper {
         List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTiles().values());
         for (TileModel tileModel : allTiles) {
             String tileID = tileModel.getId();
-            if (isInvalid(tileModel, tileID)) {
+            if (isInvalid(tileModel)) {
                 continue;
             }
             Set<WormholeModel.Wormhole> wormholes = tileModel.getWormholes();
@@ -285,16 +285,16 @@ public class MiltyDraftHelper {
                 }
             }
 
-            Tile tile = new Tile(tileID, "none");
             boolean sourceAllowed = false;
             if (sources.contains(tileModel.getSource())) sourceAllowed = true;
-
+            
             // leaving these as a stop-gap for now until I can verify all sources are setup
             if (tileID.length() <= 2) sourceAllowed = true;
             if (tileID.matches("d\\d{1,3}") && sources.contains(ComponentSource.ds)) sourceAllowed = true;
-
+            
             if (!sourceAllowed) continue;
-
+            
+            Tile tile = new Tile(tileID, "none");
             if (tile.isHomeSystem() || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres")) {
                 continue;
             }
@@ -309,7 +309,7 @@ public class MiltyDraftHelper {
 
             if (tile.isAnomaly()) {
                 draftTile.setTierList(TierList.anomaly);
-            } else if (tile.getPlanetUnitHolders().size() == 0) {
+            } else if (tile.getPlanetUnitHolders().isEmpty()) {
                 draftTile.setTierList(TierList.red);
             } else {
                 draftTile.setTierList(TierList.high);
@@ -319,7 +319,7 @@ public class MiltyDraftHelper {
         }
     }
 
-    private static boolean isInvalid(TileModel tileModel, String tileID) {
+    private static boolean isInvalid(TileModel tileModel) {
         if (tileModel.getTileBackOption().isPresent()) {
             String back = tileModel.getTileBackOption().orElse("");
             if (back.equals("red") || back.equals("blue")) {
@@ -329,8 +329,8 @@ public class MiltyDraftHelper {
             }
         }
 
-        String id = tileID.toLowerCase();
-        String path = tileModel.getTilePath() == null ? "" : tileModel.getTilePath().toLowerCase();
+        String id = tileModel.getId().toLowerCase();
+        String path = tileModel.getImagePath() == null ? "" : tileModel.getImagePath().toLowerCase();
         List<String> disallowedTerms = List.of("corner", "lane", "mecatol", "blank", "border", "fow", "anomaly", "deltawh",
             "seed", "mr", "mallice", "ethan", "prison", "kwon", "home", "hs", "red", "blue", "green", "gray", "gate", "setup");
         return disallowedTerms.stream().anyMatch(term -> id.contains(term) || path.contains(term));
