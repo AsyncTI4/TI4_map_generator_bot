@@ -103,7 +103,7 @@ public abstract class DraftItem implements ModelInterface {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
         if (Errata != null) {
             if (Errata.AdditionalComponents != null) {
-                sb.append(" *Also adds: ");
+                sb.append("\n>  - *Also adds: ");
                 for (DraftErrataModel i : Errata.AdditionalComponents) {
                     DraftItem item = Generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
@@ -112,7 +112,7 @@ public abstract class DraftItem implements ModelInterface {
                 sb.append("*");
             }
             if (Errata.OptionalSwaps != null) {
-                sb.append(" *Includes optional swaps: ");
+                sb.append("\n>  - *Includes optional swaps: ");
                 for (DraftErrataModel i : Errata.OptionalSwaps) {
                     DraftItem item = Generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());

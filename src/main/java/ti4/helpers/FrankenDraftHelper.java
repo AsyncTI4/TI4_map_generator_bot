@@ -112,8 +112,8 @@ public class FrankenDraftHelper {
     }
 
     public static void displayPlayerHand(Game activeGame, Player player) {
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-            "Your current Hand of drafted cards: \n" + getCurrentHandRepresentation(activeGame, player));
+        String message = "Your current Hand of drafted cards:\n" + getCurrentHandRepresentation(activeGame, player);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
     }
 
     public static void showPlayerBag(Game activeGame, Player player) {
@@ -197,6 +197,21 @@ public class FrankenDraftHelper {
             }
         }
 
+        return sb.toString();
+    }
+
+    public static String getLongCategoryRepresentation(BagDraft draft, DraftBag bag, DraftItem.Category cat) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("### ").append(cat.toString()).append(" (");
+        sb.append(bag.getCategoryCount(cat)).append("/").append(draft.getItemLimitForCategory(cat));
+        sb.append("):\n");
+        for (DraftItem item : bag.Contents) {
+            if (item.ItemCategory != cat) {
+                continue;
+            }
+            sb.append("> ").append(item.getShortDescription()).append("\n");
+            sb.append("> - ").append(item.getLongDescription()).append("\n");
+        }
         return sb.toString();
     }
 

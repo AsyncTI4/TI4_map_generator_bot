@@ -111,16 +111,7 @@ public abstract class BagDraft {
     public String getLongBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append("### ").append(cat.toString()).append(" (");
-            sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
-            sb.append("):\n");
-            for (DraftItem item : bag.Contents) {
-                if (item.ItemCategory != cat) {
-                    continue;
-                }
-                sb.append("- ").append(item.getShortDescription()).append("\n");
-                sb.append(" - ").append(item.getLongDescription()).append("\n");
-            }
+            sb.append(FrankenDraftHelper.getLongCategoryRepresentation(this, bag, cat));
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();
