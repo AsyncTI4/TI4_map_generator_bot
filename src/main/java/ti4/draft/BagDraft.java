@@ -91,7 +91,6 @@ public abstract class BagDraft {
     public void setPlayerReadyToPass(Player player, boolean ready) {
         if (ready && !player.isReadyToPassBag()) {
             player.setReadyToPassBag(ready);
-            MessageHelper.sendMessageToChannel(owner.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
             FrankenDraftHelper.updateDraftStatusMessage(owner);
         }
         player.setReadyToPassBag(ready);
