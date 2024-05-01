@@ -7,6 +7,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -31,7 +32,7 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force apply current bags, even if the bag draft is not complete.");
     }
 
-    final List<DraftItem.Category> componentCategories = List.of(
+    static final List<DraftItem.Category> componentCategories = List.of(
         Category.ABILITY,
         Category.TECH,
         Category.AGENT,
@@ -43,7 +44,7 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         Category.PN,
         Category.STARTINGTECH);
 
-    final List<DraftItem.Category> mapBuildCategories = List.of(
+    static final List<DraftItem.Category> mapBuildCategories = List.of(
         Category.HOMESYSTEM,
         Category.STARTINGFLEET,
         Category.BLUETILE,
@@ -61,6 +62,12 @@ public class ApplyDraftBags extends FrankenSubcommandData {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             return;
         }
+
+        applyDraftBags(event, game);
+    }
+
+    public static void applyDraftBags(GenericInteractionCreateEvent event, Game game) {
+        BagDraft draft = game.getActiveBagDraft();
 
         setSpeakerOrder(event, game); // Category.DRAFTORDER
 
@@ -91,7 +98,7 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         // pick tiles until done
     }
 
-    private static void setSpeakerOrder(SlashCommandInteractionEvent event, Game game) {
+    private static void setSpeakerOrder(GenericInteractionCreateEvent event, Game game) {
         List<User> users = game.getPlayers().values().stream()
             .filter(player -> player.getDraftHand() != null)
             .filter(player -> player.getDraftHand().Contents.stream().anyMatch(item -> item.ItemCategory == DraftItem.Category.DRAFTORDER))

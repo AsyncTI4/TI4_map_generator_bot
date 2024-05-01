@@ -269,29 +269,41 @@ public class FrankenDraftHelper {
             showPlayerBag(activeGame, player);
         }
 
-        String message = activeGame.getPing() + " draft started. As a reminder, for the first bag you pick 3 items, and for " +
-            "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
-            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will" +
-            " automatically be passed once everyone is ready.";
+        String message = "# " + activeGame.getPing() + " Franken Draft has started!\n" +
+            "> As a reminder, for the first bag you pick 3 items, and for all the bags after that you pick 2 items.\n" + 
+            "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n" + 
+            "> Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready.";
 
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
         GameSaveLoadManager.saveMap(activeGame);
     }
 
-    public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
+    public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         int index = 1;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Automatically setting players up as Franken factions:");
+        boolean skipped = false;
         for (Player player : players) {
+            if (player.isRealPlayer() && !force) {
+                sb.append("\n> ").append(player.getRepresentationNoPing()).append(" appears to be set up already and was skipped.");
+                skipped = true;
+                continue;
+            }
             String faction = "franken" + index;
             String tempHomeSystemLocation = String.valueOf(300 + index);
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }
             Setup.secondHalfOfPlayerSetup(player, game, player.getNextAvailableColour(), faction, tempHomeSystemLocation, event, false);
+            sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }
-        String message = "You have all been set up as franken factions. These have similar zombie emojis as their default faction icon. You should personalize yours with `/franken set_faction_icon`. You can use any emoji the bot can use";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (skipped) {
+            sb.append("\nSome players were skipped. Please confirm they are set up as an empty franken shell faction before proceeding with the draft");
+        }
+        sb.append("\nFranken faction setup finished.\nUse `/franken set_faction_icon` to change your faction symbol. You can use any emoji the bot can use (`/search emojis`)");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     public static void updateDraftStatusMessage(Game game) {

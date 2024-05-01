@@ -1,7 +1,5 @@
 package ti4.commands.franken;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;

@@ -2723,7 +2723,7 @@ public class Player {
             return getColor();
         }
         return getPreferredColours().stream()
-            .filter(c -> !getGame().getUnusedColours().contains(c))
+            .filter(c -> getGame().getUnusedColours().contains(c))
             .findFirst()
             .orElse(getGame().getUnusedColours().stream().findFirst().orElse(null));
     }

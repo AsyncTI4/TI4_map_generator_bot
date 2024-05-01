@@ -6,16 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
-
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.search.SearchMyTitles;
@@ -35,7 +37,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -46,8 +47,8 @@ public class Setup extends PlayerSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SPEAKER, "True to set player as speaker."));
     }
@@ -55,19 +56,17 @@ public class Setup extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        String factionOption = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
-        if (factionOption != null)
-            factionOption = StringUtils.substringBefore(factionOption.toLowerCase().replace("the ", ""), " ");
-        String faction = AliasHandler.resolveFaction(factionOption);
+        String faction = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
+        if (faction != null) {
+            faction = StringUtils.substringBefore(faction.toLowerCase().replace("the ", ""), " ");
+        }
+        
+        faction = AliasHandler.resolveFaction(faction);
         if (!Mapper.isValidFaction(faction)) {
             MessageHelper.sendMessageToEventChannel(event, "Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
             return;
         }
-        String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.sendMessageToEventChannel(event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
-            return;
-        }
+
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
@@ -76,41 +75,37 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
+        String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR, player.getNextAvailableColour(), OptionMapping::getAsString).toLowerCase());
+        if (!Mapper.isValidColor(color)) {
+            MessageHelper.sendMessageToEventChannel(event, "Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
+            return;
+        }
+
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
-        String positionHS = StringUtils
-            .substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); // Substring
-                                                                                                                                               // to
-                                                                                                                                               // grab
-                                                                                                                                               // "305"
-                                                                                                                                               // from
-                                                                                                                                               // "305
-                                                                                                                                               // Moll
-                                                                                                                                               // Primus
-                                                                                                                                               // (Mentak)"
-                                                                                                                                               // autocomplete
+        String positionHS = StringUtils.substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
         secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
     }
 
-    public static void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS,
-        GenericInteractionCreateEvent event, boolean setSpeaker) {
+    public static void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
         Map<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Player:" + playerInfo.getUserName() + " already uses color:" + color);
+                    String newColor = player.getNextAvailableColour();
+                    String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color + " - changing color to " + newColor;
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     return;
                 } else if (faction.equals(playerInfo.getFaction())) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
             }
         }
         if (player.isRealPlayer() && player.getSo() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "You have SOs that would get lost to the void if you were setup again. If you wish to change color, use /player change_color. If you want to setup as another faction, discard your SOs first");
+            String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            SOInfo.sendSecretObjectiveInfo(activeGame, player);
             return;
         }
 
@@ -230,6 +225,11 @@ public class Setup extends PlayerSubcommandData {
         // STARTING OWNED UNITS
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
+
+        // Don't do special stuff if Franken Faction
+        if (faction.startsWith("franken")) {
+            return;
+        }
 
         // SEND STUFF
         AbilityInfo.sendAbilityInfo(activeGame, player, event);
