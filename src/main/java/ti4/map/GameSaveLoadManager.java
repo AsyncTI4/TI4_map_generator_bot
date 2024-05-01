@@ -652,6 +652,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + activeGame.getStage2PublicDeckID());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MAP_TEMPLATE + " " + activeGame.getMapTemplateID());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TECH_DECK_ID + " " + activeGame.getTechnologyDeckID());
         writer.write(System.lineSeparator());
         writer.write(Constants.RELIC_DECK_ID + " " + activeGame.getRelicDeckID());
@@ -1378,6 +1380,7 @@ public class GameSaveLoadManager {
                 case Constants.SO_DECK_ID -> activeGame.setSoDeckID(info);
                 case Constants.STAGE_1_PUBLIC_DECK_ID -> activeGame.setStage1PublicDeckID(info);
                 case Constants.STAGE_2_PUBLIC_DECK_ID -> activeGame.setStage2PublicDeckID(info);
+                case Constants.MAP_TEMPLATE -> activeGame.setMapTemplateID(info);
                 case Constants.TECH_DECK_ID -> activeGame.setTechnologyDeckID(info);
                 case Constants.RELIC_DECK_ID -> activeGame.setRelicDeckID(info);
                 case Constants.AGENDA_DECK_ID -> activeGame.setAgendaDeckID(info);

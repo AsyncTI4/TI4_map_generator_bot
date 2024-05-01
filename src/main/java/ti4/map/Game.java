@@ -208,6 +208,9 @@ public class Game {
     private String technologyDeckID = "techs_pok";
     @Getter
     @Setter
+    private String mapTemplateID;
+    @Getter
+    @Setter
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
