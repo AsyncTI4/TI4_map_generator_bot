@@ -10,6 +10,7 @@ public class Buttons {
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute CCs");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
+    public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
 
     // Cards Info Buttons
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
@@ -32,7 +33,8 @@ public class Buttons {
         REFRESH_LEADER_INFO,
         REFRESH_UNIT_INFO,
         REFRESH_TECH_INFO,
-        REFRESH_PLANET_INFO
+        REFRESH_PLANET_INFO,
+        FACTION_EMBED
     );
 
 

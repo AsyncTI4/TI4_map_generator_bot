@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.game.SetOrder;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -77,6 +79,8 @@ public class ApplyDraftBags extends FrankenSubcommandData {
                     "\nClick the buttons below to add or remove items from your faction.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
+            MessageEmbed embed = player.getRepresentationEmbed();
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(embed), List.of(Buttons.FACTION_EMBED));
         }
         game.setShowMapSetup(true);
 

@@ -4413,7 +4413,9 @@ public class ButtonHelper {
                 "This is a reminder that conventions of war is in play, so bombardment of cultural planets is illegal. Ignore this message if not relevant");
         }
     }
-
+    /**
+     * @deprecated use {@link Player#getCorrectChannel()} instead
+     */
     @Deprecated
     public static MessageChannel getCorrectChannel(Player player, Game game) {
         return player.getCorrectChannel();
