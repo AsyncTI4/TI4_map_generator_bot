@@ -6035,11 +6035,11 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         List<String> allColors = Mapper.getColors();
+        buttons.add(Buttons.green("setupStep3_" + userId + "_" + factionId + "_PickForMe", "Pick for Me"));
         for (String color : allColors) {
             if (game.getPlayerFromColorOrFaction(color) == null) {
                 Emoji colorEmoji = Emoji.fromFormatted(Emojis.getColorEmoji(color));
-                buttons.add(Button.success("setupStep3_" + userId + "_" + factionId + "_" + color, color)
-                    .withEmoji(colorEmoji));
+                buttons.add(Button.success("setupStep3_" + userId + "_" + factionId + "_" + color, color).withEmoji(colorEmoji));
             }
         }
         return buttons;
@@ -6341,6 +6341,9 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         String color = buttonID.split("_")[3];
+        if ("PickForMe".equals(color)) {
+            color = player.getNextAvailableColour();
+        }
         event.getMessage().delete().queue();
         if (color.contains("!")) {
             List<Button> buttons = getColorSetupButtons(game, buttonID);
