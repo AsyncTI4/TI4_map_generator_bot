@@ -1,8 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,9 +15,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -28,9 +37,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
@@ -47,8 +53,12 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AbilityModel;
+import ti4.model.ColorModel;
 import ti4.model.FactionModel;
+import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -726,6 +736,12 @@ public class Player {
         return promissoryNotesOwned;
     }
 
+    public Set<String> getSpecialPromissoryNotesOwned() {
+        return promissoryNotesOwned.stream()
+            .filter(pn -> Mapper.getPromissoryNotes().get(pn).isNotWellKnown())
+            .collect(Collectors.toSet());
+    }
+
     public void setPromissoryNotesOwned(Set<String> promissoryNotesOwned) {
         this.promissoryNotesOwned = promissoryNotesOwned;
     }
@@ -752,6 +768,12 @@ public class Player {
 
     public Set<String> getUnitsOwned() {
         return unitsOwned;
+    }
+
+    public Set<String> getSpecialUnitsOwned() {
+        return unitsOwned.stream()
+            .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
+            .collect(Collectors.toSet());
     }
 
     public boolean hasUnit(String unit) {
@@ -1157,7 +1179,7 @@ public class Player {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
                             String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
                 }
@@ -1233,6 +1255,11 @@ public class Player {
         return exhaustedRelics;
     }
 
+    @JsonIgnore
+    public User getUser() {
+        return AsyncTI4DiscordBot.jda.getUserById(userID);
+    }
+
     public String getUserID() {
         return userID;
     }
@@ -1266,6 +1293,11 @@ public class Player {
     @JsonIgnore
     public String getRepresentation() {
         return getRepresentation(false, true);
+    }
+
+    @JsonIgnore
+    public String getRepresentationNoPing() {
+        return getRepresentation(false, false);
     }
 
     public String getRepresentation(boolean overrideFow, boolean includePing) {
@@ -1491,7 +1523,7 @@ public class Player {
      * @param leaderID
      * @return whether a player has access to this leader, typically by way of
      *         Yssaril Agent
-    */
+     */
     public boolean hasExternalAccessToLeader(String leaderID) {
         if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
             return getGame().isLeaderInGame(leaderID);
@@ -1508,6 +1540,7 @@ public class Player {
     }
 
     public void setLeaders(List<Leader> leaders) {
+        leaders.sort(Leader.sortByType());
         this.leaders = leaders;
     }
 
@@ -2684,6 +2717,17 @@ public class Player {
         return UserSettingsManager.getInstance().getUserSettings(getUserID()).getPreferredColourList();
     }
 
+    @JsonIgnore
+    public String getNextAvailableColour() {
+        if (getColor() != null && !getColor().equals("null")) {
+            return getColor();
+        }
+        return getPreferredColours().stream()
+            .filter(c -> getGame().getUnusedColours().contains(c))
+            .findFirst()
+            .orElse(getGame().getUnusedColours().stream().findFirst().orElse(null));
+    }
+
     public Optional<String> getGlobalUserSetting(String setting) {
         return UserSettingsManager.getInstance().getUserSettings(getUserID()).getStoredValue(setting);
     }
@@ -2692,5 +2736,106 @@ public class Player {
         UserSettings userSetting = UserSettingsManager.getInstance().getUserSettings(getUserID());
         userSetting.putStoredValue(setting, value);
         UserSettingsManager.getInstance().saveUserSetting(userSetting);
+    }
+
+    @JsonIgnore
+    public boolean isSpeaker() {
+        return getGame().getSpeaker().equals(getUserID());
+    }
+
+    /**
+     * @return Player's private channel if Fog of War game, otherwise the main (action) game channel
+     */
+    @JsonIgnore
+    public MessageChannel getCorrectChannel() {
+        if (getGame().isFoWMode()) {
+            return getPrivateChannel();
+        } else {
+            return getGame().getMainGameChannel();
+        }
+    }
+
+    @JsonIgnore
+    public MessageEmbed getRepresentationEmbed() {
+        EmbedBuilder eb = new EmbedBuilder();
+        FactionModel faction = getFactionModel();
+
+        //TITLE
+        StringBuilder title = new StringBuilder();
+        title.append(getFactionEmoji()).append(" ");
+        if (!"null".equals(getDisplayName())) title.append(getDisplayName()).append(" ");
+        title.append(faction.getFactionNameWithSourceEmoji());
+        eb.setTitle(title.toString());
+
+        // // ICON
+        // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
+        // if (emoji instanceof CustomEmoji customEmoji) {
+        //     eb.setThumbnail(customEmoji.getImageUrl());
+        // }
+
+        //DESCRIPTION
+        StringBuilder desc = new StringBuilder();
+        desc.append(Emojis.getColorEmojiWithName(getColor()));
+        desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommoditiesTotal()));
+        eb.setDescription(desc.toString());
+
+        //FIELDS
+        // Abilities
+        StringBuilder sb = new StringBuilder();
+        for (String id : getAbilities()) {
+            AbilityModel model = Mapper.getAbility(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Abilities__", sb.toString(), true);
+
+        // Faction Tech
+        sb = new StringBuilder();
+        for (String id : getFactionTechs()) {
+            TechnologyModel model = Mapper.getTech(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Faction Technologies__", sb.toString(), true);
+
+        // Techs
+        sb = new StringBuilder();
+        for (String id : getTechs()) {
+            TechnologyModel model = Mapper.getTech(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Technologies__", sb.toString(), true);
+
+        // Special Units
+        sb = new StringBuilder();
+        for (String id : getSpecialUnitsOwned()) {
+            UnitModel model = Mapper.getUnit(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Units__", sb.toString(), true);
+
+        // Promissory Notes
+        sb = new StringBuilder();
+        for (String id : getSpecialPromissoryNotesOwned()) {
+            PromissoryNoteModel model = Mapper.getPromissoryNote(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Promissory Notes__", sb.toString(), true);
+
+        // Leaders
+        sb = new StringBuilder();
+        for (String id : getLeaderIDs()) {
+            LeaderModel model = Mapper.getLeader(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Leaders__", sb.toString(), false);
+
+        // Author (Player Avatar)
+        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
+
+        //FOOTER
+        StringBuilder foot = new StringBuilder();
+        eb.setFooter(foot.toString());
+
+        eb.setColor(ColorModel.primaryColor(color));
+        return eb.build();
     }
 }

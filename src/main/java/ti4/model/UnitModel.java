@@ -120,6 +120,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    public String getNameRepresentation() {
+        String factionEmoji = getFaction().isEmpty() ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
+        String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
+        String name = getName() == null ? "" : getName();
+        return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
+    }
+
     public String getSourceEmoji() {
         return source.emoji();
     }

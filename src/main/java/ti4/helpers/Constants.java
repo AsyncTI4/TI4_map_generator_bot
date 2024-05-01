@@ -1084,4 +1084,7 @@ public class Constants {
     public static final String FACTION_DISPLAY_NAME = "faction_display_name";
     public static final String SEARCH_STRATEGY_CARDS = "strategy_cards";
     public static final String USER = "user";
+    public static final String SHOW_MAP_SETUP = "show_map_setup";
+    public static final String SHOW_HAND = "show_hand";
+    public static final String BAG_DRAFT_STATUS_MESSAGE_ID = "bag_draft_status_message_id";
 }

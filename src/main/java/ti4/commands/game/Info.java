@@ -57,6 +57,7 @@ public class Info extends GameSubcommandData {
         sb.append("SO Count: ").append(activeGame.getMaxSOCountPerPlayer()).append(NEW_LINE);
         sb.append("Private Game: ").append(privateGame).append(NEW_LINE);
         sb.append("Game Modes: ").append(activeGame.getGameModesText()).append(NEW_LINE);
+        sb.append("Map Template: `").append(activeGame.getMapTemplateID()).append("`").append(NEW_LINE);
         if (!privateGame) {
             sb.append("Map String: `").append(Helper.getMapString(activeGame)).append("`").append(NEW_LINE);
         } else {
@@ -65,31 +66,21 @@ public class Info extends GameSubcommandData {
         sb.append("Strategy Card Set: `").append(activeGame.getScSetID()).append("`").append(NEW_LINE);
         sb.append("Strategy Cards: `").append(activeGame.getStrategyCardSet().getScIDs()).append("`").append(NEW_LINE);
         sb.append("Decks: ").append(NEW_LINE);
-        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ").append(activeGame.getActionCardDeckSize()).append("/")
-            .append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(activeGame.getSoDeckID()).append("` ").append(activeGame.getSecretObjectiveDeckSize()).append("/")
-            .append(activeGame.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(activeGame.getStage1PublicDeckID()).append("` ").append(activeGame.getPublicObjectives1DeckSize())
-            .append("/").append(activeGame.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(activeGame.getStage2PublicDeckID()).append("` ").append(activeGame.getPublicObjectives2DeckSize())
-            .append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/")
-            .append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
-        if (activeGame.getEventDeckID() != null && !"null".equals(activeGame.getEventDeckID()))
-            sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/")
-                .append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ").append(activeGame.getActionCardDeckSize()).append("/").append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(activeGame.getSoDeckID()).append("` ").append(activeGame.getSecretObjectiveDeckSize()).append("/").append(activeGame.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(activeGame.getStage1PublicDeckID()).append("` ").append(activeGame.getPublicObjectives1DeckSize()).append("/").append(activeGame.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(activeGame.getStage2PublicDeckID()).append("` ").append(activeGame.getPublicObjectives2DeckSize()).append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/").append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
+        if (activeGame.getEventDeckID() != null && !"null".equals(activeGame.getEventDeckID())) {
+            sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/").append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
+        }
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(activeGame.getTechnologyDeckID()).append("`").append(NEW_LINE);
-        sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/")
-            .append(activeGame.getRelicFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/").append(activeGame.getRelicFullDeckSize()).append(NEW_LINE);
         sb.append("- Exploration Deck: `").append(activeGame.getExplorationDeckID()).append("`").append(NEW_LINE);
-        sb.append(" - ").append(Emojis.IndustrialCard).append("Industrial Deck: ").append(activeGame.getIndustrialExploreDeckSize()).append("/").append(activeGame.getIndustrialExploreFullDeckSize())
-            .append(NEW_LINE);
-        sb.append(" - ").append(Emojis.HazardousCard).append("Hazardous Deck: ").append(activeGame.getHazardousExploreDeckSize()).append("/").append(activeGame.getHazardousExploreFullDeckSize())
-            .append(NEW_LINE);
-        sb.append(" - ").append(Emojis.CulturalCard).append("Cultural Deck: ").append(activeGame.getCulturalExploreDeckSize()).append("/").append(activeGame.getCulturalExploreFullDeckSize())
-            .append(NEW_LINE);
-        sb.append(" - ").append(Emojis.FrontierCard).append("Frontier Deck: ").append(activeGame.getFrontierExploreDeckSize()).append("/").append(activeGame.getFrontierExploreFullDeckSize())
-            .append(NEW_LINE);
+        sb.append(" - ").append(Emojis.IndustrialCard).append("Industrial Deck: ").append(activeGame.getIndustrialExploreDeckSize()).append("/").append(activeGame.getIndustrialExploreFullDeckSize()).append(NEW_LINE);
+        sb.append(" - ").append(Emojis.HazardousCard).append("Hazardous Deck: ").append(activeGame.getHazardousExploreDeckSize()).append("/").append(activeGame.getHazardousExploreFullDeckSize()).append(NEW_LINE);
+        sb.append(" - ").append(Emojis.CulturalCard).append("Cultural Deck: ").append(activeGame.getCulturalExploreDeckSize()).append("/").append(activeGame.getCulturalExploreFullDeckSize()).append(NEW_LINE);
+        sb.append(" - ").append(Emojis.FrontierCard).append("Frontier Deck: ").append(activeGame.getFrontierExploreDeckSize()).append("/").append(activeGame.getFrontierExploreFullDeckSize()).append(NEW_LINE);
 
         sb.append("### Settings: ").append(NEW_LINE);
         sb.append("Beta Test Mode: ").append(activeGame.isTestBetaFeaturesMode()).append(NEW_LINE);

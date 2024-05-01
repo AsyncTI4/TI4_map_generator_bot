@@ -57,6 +57,7 @@ import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.RelicInfo;
+import ti4.commands.franken.FrankenApplicator;
 import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
@@ -92,6 +93,7 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
+import ti4.draft.DraftItem;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -127,6 +129,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.DraftErrataModel;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
@@ -3036,6 +3039,10 @@ public class ButtonListener extends ListenerAdapter {
                     "Combat modifier will be applied next time you push the combat roll button.");
             }
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("frankenItemAdd")) {
+            FrankenApplicator.resolveFrankenItemAddButton(event, buttonID, player);
+        } else if (buttonID.startsWith("frankenItemRemove")) {
+            FrankenApplicator.resolveFrankenItemRemoveButton(event, buttonID, player);
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
@@ -3064,8 +3071,8 @@ public class ButtonListener extends ListenerAdapter {
                     }
 
                 }
-                case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null,
-                    Buttons.REFRESH_INFO_BUTTONS);
+                case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
+                case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
                 case "gameInfoButtons" -> ListPlayerInfoButton.offerInfoButtons(event);
                 case "refreshACInfo" -> ACInfo.sendActionCardInfo(activeGame, player, event);
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
