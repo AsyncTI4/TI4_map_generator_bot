@@ -94,10 +94,6 @@ public class FrankenApplicator {
             case PN -> PNAdd.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> addStartingTech(event, player, itemID);
         }
-        DraftErrataModel errata = Mapper.getFrankenErrata().get(draftItem.getAlias());
-        if (errata != null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Errata: " + errata.getAlias());
-        }
     }
 
     private static void removeFrankenItemFromPlayer(GenericInteractionCreateEvent event, DraftItem draftItem, Player player) {
@@ -110,10 +106,6 @@ public class FrankenApplicator {
             case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() - ((CommoditiesDraftItem) draftItem).getCommodities()));
             case PN -> PNRemove.removePromissoryNotes(event, player, List.of(itemID));
             case STARTINGTECH -> removeStartingTech(event, player, itemID);
-        }
-        DraftErrataModel errata = Mapper.getFrankenErrata().get(draftItem.getAlias());
-        if (errata != null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Errata: " + errata.getAlias());
         }
     }
 
