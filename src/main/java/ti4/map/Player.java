@@ -2719,7 +2719,7 @@ public class Player {
 
     @JsonIgnore
     public String getNextAvailableColour() {
-        if (getColor() != null || !getColor().equals("null")) {
+        if (getColor() != null && !getColor().equals("null")) {
             return getColor();
         }
         return getPreferredColours().stream()
