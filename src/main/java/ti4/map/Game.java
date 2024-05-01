@@ -4208,4 +4208,11 @@ public class Game {
         setScSetID(strategyCardModel.getAlias());
         strategyCardModel.getCardValues().keySet().forEach(scValue -> setScTradeGood(scValue, 0));
     }
+
+    @JsonIgnore
+    public List<String> getUnusedColours() {
+        return Mapper.getColors().stream()
+            .filter(colour -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(colour)))
+            .toList();
+    }
 }

@@ -2694,6 +2694,17 @@ public class Player {
         return UserSettingsManager.getInstance().getUserSettings(getUserID()).getPreferredColourList();
     }
 
+    @JsonIgnore
+    public String getNextAvailableColour() {
+        if (getColor() != null || !getColor().equals("null")) {
+            return getColor();
+        }
+        return getPreferredColours().stream()
+            .filter(c -> !getGame().getUnusedColours().contains(c))
+            .findFirst()
+            .orElse(getGame().getUnusedColours().stream().findFirst().orElse(null));
+    }
+
     public Optional<String> getGlobalUserSetting(String setting) {
         return UserSettingsManager.getInstance().getUserSettings(getUserID()).getStoredValue(setting);
     }
