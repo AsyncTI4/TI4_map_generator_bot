@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +58,7 @@ import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -734,6 +736,12 @@ public class Player {
         return promissoryNotesOwned;
     }
 
+    public Set<String> getSpecialPromissoryNotesOwned() {
+        return promissoryNotesOwned.stream()
+            .filter(pn -> Mapper.getPromissoryNotes().get(pn).isNotWellKnown())
+            .collect(Collectors.toSet());
+    }
+
     public void setPromissoryNotesOwned(Set<String> promissoryNotesOwned) {
         this.promissoryNotesOwned = promissoryNotesOwned;
     }
@@ -763,9 +771,9 @@ public class Player {
     }
 
     public Set<String> getSpecialUnitsOwned() {
-        return new HashSet<>(unitsOwned.stream()
+        return unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
-            .toList());
+            .collect(Collectors.toSet());
     }
 
     public boolean hasUnit(String unit) {
@@ -1515,7 +1523,7 @@ public class Player {
      * @param leaderID
      * @return whether a player has access to this leader, typically by way of
      *         Yssaril Agent
-    */
+     */
     public boolean hasExternalAccessToLeader(String leaderID) {
         if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
             return getGame().isLeaderInGame(leaderID);
@@ -2751,26 +2759,26 @@ public class Player {
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel faction = getFactionModel();
-        
+
         //TITLE
         StringBuilder title = new StringBuilder();
         title.append(getFactionEmoji()).append(" ");
         if (!"null".equals(getDisplayName())) title.append(getDisplayName()).append(" ");
         title.append(faction.getFactionNameWithSourceEmoji());
         eb.setTitle(title.toString());
-        
+
         // // ICON
         // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
         // if (emoji instanceof CustomEmoji customEmoji) {
         //     eb.setThumbnail(customEmoji.getImageUrl());
         // }
-        
+
         //DESCRIPTION
         StringBuilder desc = new StringBuilder();
         desc.append(Emojis.getColorEmojiWithName(getColor()));
-        desc.append("   ").append(StringUtils.repeat(Emojis.comm, getCommoditiesTotal()));
+        desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommoditiesTotal()));
         eb.setDescription(desc.toString());
-        
+
         //FIELDS
         // Abilities
         StringBuilder sb = new StringBuilder();
@@ -2796,14 +2804,6 @@ public class Player {
         }
         eb.addField("__Technologies__", sb.toString(), true);
 
-        // Leaders
-        sb = new StringBuilder();
-        for (String id : getLeaderIDs()) {
-            LeaderModel model = Mapper.getLeader(id);
-            sb.append(model.getNameRepresentation()).append("\n");
-        }
-        eb.addField("__Leaders__", sb.toString(), true);
-
         // Special Units
         sb = new StringBuilder();
         for (String id : getSpecialUnitsOwned()) {
@@ -2813,6 +2813,20 @@ public class Player {
         eb.addField("__Units__", sb.toString(), true);
 
         // Promissory Notes
+        sb = new StringBuilder();
+        for (String id : getSpecialPromissoryNotesOwned()) {
+            PromissoryNoteModel model = Mapper.getPromissoryNote(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Promissory Notes__", sb.toString(), true);
+
+        // Leaders
+        sb = new StringBuilder();
+        for (String id : getLeaderIDs()) {
+            LeaderModel model = Mapper.getLeader(id);
+            sb.append(model.getNameRepresentation()).append("\n");
+        }
+        eb.addField("__Leaders__", sb.toString(), false);
 
         // Author (Player Avatar)
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
