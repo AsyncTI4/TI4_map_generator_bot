@@ -75,7 +75,7 @@ public class ButtonHelperAgents {
                     + ButtonHelper.getIdentOrColor(p2, activeGame) + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
                 buttons.add(Button.success("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(),
-                    "Use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + " The Stillness of Stars (Vuil'raith Agent)"));
+                    "Use Cabal Agent"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
@@ -462,7 +462,7 @@ public class ButtonHelperAgents {
             }
         }
         unitButtons.add(Button.danger("deleteButtons_spitItOut",
-            "Done Using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)"));
+            "Done With Argent Agent"));
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " use buttons to place ground forces via " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)",
             unitButtons);
@@ -783,7 +783,7 @@ public class ButtonHelperAgents {
             }
             if (p2.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(activeGame, p2, 1);
-                message = ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option";
+                successMessage2 += ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option";
             } else {
                 activeGame.drawActionCard(p2.getUserID());
             }
@@ -1984,14 +1984,14 @@ public class ButtonHelperAgents {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (player.getPlanetsAllianceMode().contains(planet)) {
-                String planetId = planetReal.getName();
-                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
-                buttons.add(Button
-                    .success("exhaustAgent_sardakkagent_" + activeGame.getActiveSystem() + "_" + planetId,
-                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "T'ro (N'orr Agent) on " + planetRepresentation)
-                    .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
-            }
+            //if (player.getPlanetsAllianceMode().contains(planet)) {
+            String planetId = planetReal.getName();
+            String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
+            buttons.add(Button
+                .success("exhaustAgent_sardakkagent_" + activeGame.getActiveSystem() + "_" + planetId,
+                    "Use Sardakk Agent Agent on " + planetRepresentation)
+                .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+            //}
         }
 
         return buttons;
@@ -2012,7 +2012,7 @@ public class ButtonHelperAgents {
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button
                     .success("exhaustAgent_nomadagentmercer_" + activeGame.getActiveSystem() + "_" + planetId,
-                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Field Marshal Mercer (Nomad Agent) on " + planetRepresentation)
+                        "Use Mercer (Nomad Agent) on " + planetRepresentation)
                     .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
             }
         }
@@ -2035,7 +2035,7 @@ public class ButtonHelperAgents {
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button
                     .success("exhaustAgent_l1z1xagent_" + activeGame.getActiveSystem() + "_" + planetId,
-                        "Use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "I48S (L1Z1X Agent) on " + planetRepresentation)
+                        "Use L1Z1X Agent on " + planetRepresentation)
                     .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
             }
         }
@@ -2136,7 +2136,7 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Artuno the Betrayer (Nomad Agent) With " + tg + " TGs"));
+                "Exhaust Artuno (Nomad Agent) With " + tg + " TGs"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true)
