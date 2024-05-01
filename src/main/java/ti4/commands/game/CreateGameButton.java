@@ -3,32 +3,25 @@ package ti4.commands.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class CreateGameButton extends GameSubcommandData {
@@ -133,7 +126,7 @@ public class CreateGameButton extends GameSubcommandData {
         boolean isAdmin = false;
         Game mapreference = GameManager.getInstance().getGame("finreference");
 
-        if (mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
+        if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when its fixed.");
             return;
@@ -147,11 +140,11 @@ public class CreateGameButton extends GameSubcommandData {
                 }
             }
         }
-        if (!isAdmin && !mapreference.getStoredValue("gameCreator" + member.getIdLong()).isEmpty()) {
+        if (!isAdmin && mapreference != null && !mapreference.getStoredValue("gameCreator" + member.getIdLong()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed. You can have someone else in the game press the button instead. ");
             return;
-        } else {
+        } else if (mapreference != null) {
             mapreference.setStoredValue("gameCreator" + member.getIdLong(), "created");
         }
         event.editButton(null).queue();

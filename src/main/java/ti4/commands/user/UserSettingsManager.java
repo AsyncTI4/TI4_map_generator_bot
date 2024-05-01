@@ -38,7 +38,12 @@ public class UserSettingsManager {
     }
 
     public UserSettings getUserSettings(String userID) {
-        return Optional.ofNullable(userSettingList.get(userID)).orElse(new UserSettings(userID));
+        UserSettings userSettings = userSettingList.get(userID);
+        if (userSettings == null) {
+            userSettings = new UserSettings(userID);
+            userSettingList.put(userID, userSettings);
+        }
+        return userSettings;
     }
 
     public Map<String, UserSettings> getAllUserSettings() {

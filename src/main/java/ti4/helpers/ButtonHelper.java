@@ -4413,13 +4413,12 @@ public class ButtonHelper {
                 "This is a reminder that conventions of war is in play, so bombardment of cultural planets is illegal. Ignore this message if not relevant");
         }
     }
-
+    /**
+     * @deprecated use {@link Player#getCorrectChannel()} instead
+     */
+    @Deprecated
     public static MessageChannel getCorrectChannel(Player player, Game game) {
-        if (game.isFoWMode()) {
-            return player.getPrivateChannel();
-        } else {
-            return game.getMainGameChannel();
-        }
+        return player.getCorrectChannel();
     }
 
     public static List<Button> getTilesToMoveFrom(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -5812,31 +5811,6 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
-        int x = 1;
-        for (Player player : players) {
-            if (x < 9) {
-                switch (x) {
-                    case 1 -> Setup.secondHalfOfPlayerSetup(player, game, "black", "franken1", "201", event, false);
-                    case 2 -> Setup.secondHalfOfPlayerSetup(player, game, "green", "franken2", "202", event, false);
-                    case 3 -> Setup.secondHalfOfPlayerSetup(player, game, "purple", "franken3", "203", event, false);
-                    case 4 -> Setup.secondHalfOfPlayerSetup(player, game, "orange", "franken4", "204", event, false);
-                    case 5 -> Setup.secondHalfOfPlayerSetup(player, game, "pink", "franken5", "205", event, false);
-                    case 6 -> Setup.secondHalfOfPlayerSetup(player, game, "yellow", "franken6", "206", event, false);
-                    case 7 -> Setup.secondHalfOfPlayerSetup(player, game, "red", "franken7", "207", event, false);
-                    case 8 -> Setup.secondHalfOfPlayerSetup(player, game, "blue", "franken8", "208", event, false);
-                    default -> {
-
-                    }
-                }
-            }
-            x++;
-        }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "You have all been set up as franken factions. These have similar zombie emojis as their default faction icon. You should personalize yours with /franken set_faction_icon. You can use any emoji the bot can use");
-    }
-
     public static List<Button> getFactionSetupButtons(Game game, String buttonID) {
         String userId = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
@@ -6061,11 +6035,11 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         List<String> allColors = Mapper.getColors();
+        buttons.add(Buttons.green("setupStep3_" + userId + "_" + factionId + "_PickForMe", "Pick for Me"));
         for (String color : allColors) {
             if (game.getPlayerFromColorOrFaction(color) == null) {
                 Emoji colorEmoji = Emoji.fromFormatted(Emojis.getColorEmoji(color));
-                buttons.add(Button.success("setupStep3_" + userId + "_" + factionId + "_" + color, color)
-                    .withEmoji(colorEmoji));
+                buttons.add(Button.success("setupStep3_" + userId + "_" + factionId + "_" + color, color).withEmoji(colorEmoji));
             }
         }
         return buttons;
@@ -6367,6 +6341,9 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         String color = buttonID.split("_")[3];
+        if ("PickForMe".equals(color)) {
+            color = player.getNextAvailableColour();
+        }
         event.getMessage().delete().queue();
         if (color.contains("!")) {
             List<Button> buttons = getColorSetupButtons(game, buttonID);

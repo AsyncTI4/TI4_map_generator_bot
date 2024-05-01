@@ -1,5 +1,6 @@
 package ti4.commands.tech;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -13,6 +14,10 @@ public class TechRemove extends TechAddRemove {
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
+        removeTech(event, player, techID);
+    }
+
+    public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed tech: " + Mapper.getTech(techID).getRepresentation(false));
     }

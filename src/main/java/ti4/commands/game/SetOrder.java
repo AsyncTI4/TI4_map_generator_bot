@@ -1,17 +1,22 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.LinkedHashMap;
 
 public class SetOrder extends GameSubcommandData {
 
@@ -29,45 +34,60 @@ public class SetOrder extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        List<User> users = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            if (Objects.nonNull(event.getOption("player" + i))) {
+                User member = event.getOption("player" + i).getAsUser();
+                users.add(member);
+            } else {
+                break;
+            }
+        }
+        setPlayerOrder(event, getActiveGame(), users);
+    }
+
+    public static void setPlayerOrder(GenericInteractionCreateEvent event, Game game, List<User> users) {
         Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        Map<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
-        Map<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
+        Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
+        Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
         try {
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER1));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER2));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER3));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER4));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER5));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER6));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER7));
-            setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER8));
+            for (User user : users) {
+                setPlayerOrder(newPlayerOrder, players, user);
+            }
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);
             }
-            activeGame.setPlayers(newPlayerOrder);
+            game.setPlayers(newPlayerOrder);
         } catch (Exception e){
-            activeGame.setPlayers(playersBackup);
+            game.setPlayers(playersBackup);
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
+        GameSaveLoadManager.saveMap(game, event);
+        StringBuilder sb = new StringBuilder("Player order set:");
+        for (Player player : game.getPlayers().values()) {
+            sb.append("\n> ").append(player.getRepresentationNoPing());
+            if (player.isSpeaker()) {
+                sb.append(Emojis.SpeakerToken);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    public void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, OptionMapping option1) {
-        if (option1 != null) {
-            String id = option1.getAsUser().getId();
+    public static void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, User user) {
+        if (user != null) {
+            String id = user.getId();
             Player player = players.get(id);
-            if (player != null){
+            if (player != null) {
                 newPlayerOrder.put(id, player);
                 players.remove(id);
             }
         }
     }
+
     public void setPlayerOrder(Map<String, Player> newPlayerOrder, Map<String, Player> players, Player player) {
-        if (player != null){
+        if (player != null) {
             newPlayerOrder.put(player.getUserID(), player);
             players.remove(player.getUserID());
         }
-        
+
     }
 }

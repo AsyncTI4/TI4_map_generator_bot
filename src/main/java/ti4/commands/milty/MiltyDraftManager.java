@@ -294,18 +294,17 @@ public class MiltyDraftManager {
 
     private void finishDraft(Game game, ButtonInteractionEvent event) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
-        List<String> backupColors = Arrays.asList("black","bloodred","blue","chocolate","emerald","orange",
-            "ethereal","forest","gold","green","brown","lavender","lightbrown","navy","chrome","petrol",
-            "pink","purple","rainbow","red","rose","spring","sunset","tan","teal","turquoise","yellow");
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
             for (String playerId : players) {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = getPlayerDraft(playerId);
-                String color = backupColors.get(picks.getPosition());
+                String color = player.getNextAvailableColour();
+                if (playerId.equals(Constants.chassitId) && game.getUnusedColours().contains("lightgray")) {
+                    color = "lightgray";
+                }
                 String faction = picks.getFaction();
 
-                if (playerId.equals(Constants.chassitId)) color = "lightgray";
                 String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, mapTemplate);
 
                 Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, picks.getPosition() == 1);

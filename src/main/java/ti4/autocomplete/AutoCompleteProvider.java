@@ -768,7 +768,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.USE_MAP_TEMPLATE -> {
+            case Constants.USE_MAP_TEMPLATE, Constants.MAP_TEMPLATE -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<MapTemplateModel> templates = Mapper.getMapTemplates();
                 List<Command.Choice> options = templates.stream()

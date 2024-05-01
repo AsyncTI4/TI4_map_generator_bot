@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -90,5 +91,10 @@ public class Leader {
     @JsonIgnore
     public Optional<LeaderModel> getLeaderModel() {
         return Optional.ofNullable(Mapper.getLeader(getId()));
+    }
+
+    @JsonIgnore
+    public static Comparator<Leader> sortByType() {
+        return Comparator.comparing(Leader::getType);
     }
 }

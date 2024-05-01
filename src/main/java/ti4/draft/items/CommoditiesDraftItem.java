@@ -36,6 +36,11 @@ public class CommoditiesDraftItem extends DraftItem {
     }
 
     @JsonIgnore
+    public int getCommodities() {
+        return getFaction().getCommodities();
+    }
+
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.comm;

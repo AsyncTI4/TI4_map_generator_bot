@@ -78,6 +78,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    public String getNameRepresentation() {
+        return getFactionEmoji() + " " + getName() + " " + getSource().emoji();
+    }
+
     public String getRepresentation() {
         String abilityName = getName();
         String abilitySourceFaction = getFaction();

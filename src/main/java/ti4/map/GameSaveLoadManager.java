@@ -559,6 +559,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + activeGame.getBotMapUpdatesThreadID());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + activeGame.getBagDraftStatusMessageID());
+        writer.write(System.lineSeparator());
 
         // GAME MODES
         writer.write(Constants.TIGL_GAME + " " + activeGame.isCompetitiveTIGLGame());
@@ -611,6 +613,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_MAP_SETUP + " " + activeGame.isShowMapSetup());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
@@ -647,6 +651,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + " " + activeGame.getStage1PublicDeckID());
         writer.write(System.lineSeparator());
         writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + activeGame.getStage2PublicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MAP_TEMPLATE + " " + activeGame.getMapTemplateID());
         writer.write(System.lineSeparator());
         writer.write(Constants.TECH_DECK_ID + " " + activeGame.getTechnologyDeckID());
         writer.write(System.lineSeparator());
@@ -1374,6 +1380,7 @@ public class GameSaveLoadManager {
                 case Constants.SO_DECK_ID -> activeGame.setSoDeckID(info);
                 case Constants.STAGE_1_PUBLIC_DECK_ID -> activeGame.setStage1PublicDeckID(info);
                 case Constants.STAGE_2_PUBLIC_DECK_ID -> activeGame.setStage2PublicDeckID(info);
+                case Constants.MAP_TEMPLATE -> activeGame.setMapTemplateID(info);
                 case Constants.TECH_DECK_ID -> activeGame.setTechnologyDeckID(info);
                 case Constants.RELIC_DECK_ID -> activeGame.setRelicDeckID(info);
                 case Constants.AGENDA_DECK_ID -> activeGame.setAgendaDeckID(info);
@@ -1686,6 +1693,7 @@ public class GameSaveLoadManager {
                 case Constants.SAVED_CHANNEL -> activeGame.setSavedChannelID(info);
                 case Constants.SAVED_MESSAGE -> activeGame.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> activeGame.setBotMapUpdatesThreadID(info);
+                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> activeGame.setBagDraftStatusMessageID(info);
 
                 // GAME MODES
                 case Constants.TIGL_GAME -> {
@@ -1952,6 +1960,14 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.MILTYMOD_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setMiltyModMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setMiltyModMode(value);
