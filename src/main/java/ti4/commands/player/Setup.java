@@ -235,7 +235,7 @@ public class Setup extends PlayerSubcommandData {
         AbilityInfo.sendAbilityInfo(activeGame, player, event);
         TechInfo.sendTechInfo(activeGame, player, event);
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
-        UnitInfo.sendUnitInfo(activeGame, player, event);
+        UnitInfo.sendUnitInfo(activeGame, player, event, true);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {

@@ -1071,6 +1071,7 @@ public class Constants {
     public static final String REFRESH_RELIC_INFO = "refreshRelicInfo";
     public static final String REFRESH_LEADER_INFO = "refreshLeaderInfo";
     public static final String REFRESH_UNIT_INFO = "refreshUnitInfo";
+    public static final String REFRESH_ALL_UNIT_INFO = "refreshUnitInfoAll";
     public static final String REFRESH_TECH_INFO = "refreshTechInfo";
     public static final String REFRESH_PLANET_INFO = "refreshPlanetInfo";
     public static final String SERVER_GAME_STATS = "server_game_stats";
@@ -1087,4 +1088,5 @@ public class Constants {
     public static final String SHOW_MAP_SETUP = "show_map_setup";
     public static final String SHOW_HAND = "show_hand";
     public static final String BAG_DRAFT_STATUS_MESSAGE_ID = "bag_draft_status_message_id";
+    public static final String SHOW_ALL_UNITS = "show_all_units";
 }

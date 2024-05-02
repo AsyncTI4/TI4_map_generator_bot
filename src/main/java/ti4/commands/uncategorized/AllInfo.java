@@ -102,7 +102,7 @@ public class AllInfo implements Command {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event) + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         AbilityInfo.sendAbilityInfo(activeGame, player);
-        UnitInfo.sendUnitInfo(activeGame, player);
+        UnitInfo.sendUnitInfo(activeGame, player, true);
         LeaderInfo.sendLeadersInfo(activeGame, player);
         TechInfo.sendTechInfo(activeGame, player);
         RelicInfo.sendRelicInfo(activeGame, player);

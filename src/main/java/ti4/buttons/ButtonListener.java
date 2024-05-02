@@ -3080,7 +3080,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(activeGame, player, event);
                 case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(activeGame, player, event);
                 case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
-                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
+                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event, false);
+                case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event, true);
                 case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
                 case Constants.REFRESH_PLANET_INFO -> PlanetInfo.sendPlanetInfo(player);
                 case "warfareBuild" -> {
