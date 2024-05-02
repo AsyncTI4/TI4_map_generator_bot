@@ -97,9 +97,15 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
+        FactionModel factionModel = Mapper.getFaction(getFaction());
+        String factionEmoji = Emojis.getFactionIconFromDiscord(getFaction());
+        if (factionModel != null) factionEmoji = Emojis.getFactionIconFromDiscord(factionModel.getAlias());
+
+        String factionName = getFaction();
+        if (factionModel != null) factionName = factionModel.getFactionName();
 
         //TITLE
-        String title = getLeaderEmoji() + " __**" + getName() + "**__" + " - " + getTitle() + getSource().emoji();
+        String title = factionEmoji + " __**" + getName() + "**__ " + Emojis.getLeaderTypeEmoji(type) + " " + getTitle() + getSource().emoji();
         eb.setTitle(title);
 
         Emoji emoji = Emoji.fromFormatted(getLeaderEmoji());
@@ -110,19 +116,16 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
         if (includeFactionType) {
-            FactionModel faction = Mapper.getFaction(getFaction());
-            if (faction != null) {
-                description.append(Emojis.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
-            } else {
-                description.append(Emojis.getFactionIconFromDiscord(getFaction())).append(" ").append(getFaction());
-            }
+            description.append(factionEmoji).append(" ").append(factionName).append(" ");
             description.append(" ").append(StringUtils.capitalize(getType()));
         }
         if (showUnlockConditions && !"agent".equals(getType())) description.append("\n*Unlock: ").append(getUnlockCondition()).append("*");
         eb.setDescription(description.toString());
 
         //FIELDS
-        eb.addField(getAbilityName().orElse(" "), "**" + getAbilityWindow() + "**\n> " + getAbilityText(), false);
+        String fieldTitle = getAbilityName().orElse(" ") + "\n**" + getAbilityWindow() + "**";
+        String fieldContent = getAbilityText();
+        eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 
         //FOOTER

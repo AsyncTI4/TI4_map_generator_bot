@@ -45,3 +45,5 @@ public class StartFrankenDraft extends FrankenSubcommandData {
         GameSaveLoadManager.saveMap(game, event);
     }
 }
+
+
