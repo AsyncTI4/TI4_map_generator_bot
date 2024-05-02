@@ -91,6 +91,12 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         }
         game.setShowMapSetup(true);
 
+        // String mapTemplateID = game.getMapTemplateID();
+        // if (mapTemplateID == null || "null".equals(mapTemplateID)) {
+        //     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No map template selected. Please select a map template to continue.");
+        //     return;
+        // }
+
         // start building map // Category.BLUETILE, Category.REDTILE, Category.HOMESYSTEM, Category.STARTINGFLEET
         // pick home system
         // pick starting fleet

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
@@ -36,8 +36,8 @@ public class SetOrder extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         List<User> users = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
-            if (Objects.nonNull(event.getOption("player" + i))) {
-                User member = event.getOption("player" + i).getAsUser();
+            User member = event.getOption("player" + i, null, OptionMapping::getAsUser);
+            if (member != null) {
                 users.add(member);
             } else {
                 break;

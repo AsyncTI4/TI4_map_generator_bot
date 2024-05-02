@@ -1300,7 +1300,7 @@ public class Player {
         return getRepresentation(false, false);
     }
 
-    public String getRepresentation(boolean overrideFow, boolean includePing) {
+    public String getRepresentation(boolean overrideFow, boolean ping) {
         Game activeGame = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(activeGame);
         if (privateGame && !overrideFow) {
@@ -1309,16 +1309,17 @@ public class Player {
 
         if (activeGame != null && activeGame.isCommunityMode()) {
             Role roleForCommunity = getRoleForCommunity();
-            if (roleForCommunity == null && getTeamMateIDs().size() >= 1) {
+            if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder(getFactionEmoji());
-                if (includePing) {
-                    for (String userID : getTeamMateIDs()) {
-                        User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
-                        if (userById == null) {
-                            continue;
-                        }
-                        String mention = userById.getAsMention();
-                        sb.append(" ").append(mention);
+                for (String userID : getTeamMateIDs()) {
+                    User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                    if (userById == null) {
+                        continue;
+                    }
+                    if (ping) {
+                        sb.append(" ").append(userById.getAsMention());
+                    } else {
+                        sb.append(" ").append(userById.getEffectiveName());
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor())) {
@@ -1335,10 +1336,12 @@ public class Player {
 
         // DEFAULT REPRESENTATION
         StringBuilder sb = new StringBuilder(getFactionEmoji());
-        if (includePing) {
+        if (ping) {
             sb.append(getPing());
-            sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
+        } else {
+            sb.append(getUserName());
         }
+        sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
         if (getColor() != null && !"null".equals(getColor())) {
             sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
         }
