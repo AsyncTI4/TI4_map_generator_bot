@@ -2706,10 +2706,7 @@ public class Game {
     }
 
     public String drawRelic() {
-        if (relics.isEmpty()) {
-            return "";
-        }
-        return relics.remove(0);
+        return drawRelic(0);
     }
 
     public String drawRelic(int location) {
