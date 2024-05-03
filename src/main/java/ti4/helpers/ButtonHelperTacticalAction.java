@@ -604,7 +604,7 @@ public class ButtonHelperTacticalAction {
         } else {
             List<Player> playersAdj = FoWHelper.getAdjacentPlayers(activeGame, pos, true);
             for (Player player_ : playersAdj) {
-                String playerMessage = player_.getRepresentation(true, true) + " - System " + pos
+                String playerMessage = player_.getRepresentation(true, true) + " - System " + activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player_)
                     + " has been activated ";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
             }

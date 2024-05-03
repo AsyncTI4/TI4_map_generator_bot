@@ -62,6 +62,7 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.setStoredValue(player.getFaction() + "planetsExplored", "");
         activeGame.setNaaluAgent(false);
         activeGame.setL1Hero(false);
+        activeGame.checkSOLimit(player);
         activeGame.setStoredValue("vaylerianHeroActive", "");
         activeGame.setStoredValue("tnelisCommanderTracker", "");
         activeGame.setStoredValue("planetsTakenThisRound", "");
