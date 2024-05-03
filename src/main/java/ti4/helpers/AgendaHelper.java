@@ -1550,71 +1550,59 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), summary2 + "\n \n");
         activeGame.setCurrentPhase("agendaEnd");
         activeGame.setActivePlayer(null);
-        String resMessage3 = "Current winner is " + StringUtils.capitalize(winner) + ". " + activeGame.getPing();
+        StringBuilder message = new StringBuilder();
+        message.append(activeGame.getPing()).append("\n");
+        message.append("### Current winner is ").append(StringUtils.capitalize(winner)).append("\n");
         if (!"action_deck_2".equals(activeGame.getAcDeckID())) {
             handleShenanigans(event, activeGame, winner);
-            resMessage3 += "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.";
+            message.append("When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.");
         }
-        Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with current winner");
+        Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with Current Winner");
         Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
         List<Button> resolutions = List.of(autoResolve, manualResolve);
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), resMessage3);
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Resolve", resolutions);
     }
 
     private static void handleShenanigans(GenericInteractionCreateEvent event, Game activeGame, String winner) {
         List<Player> losers = getLosers(winner, activeGame);
-        String resMessage = "You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans -- "
-            + losers.size()
-            + " players have the opportunity to play deadly plot.";
-        if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot"))
-            && (losers.size() > 0 || activeGame.isAbsolMode())) {
+        
+        if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot")) && (losers.size() > 0 || activeGame.isAbsolMode())) {
+            StringBuilder message = new StringBuilder("You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans\n");
             Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
-            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage,
-                activeGame, deadlyActionRow, "shenanigans");
-            // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
-            // resMessage, deadlyActionRow);
             if (!activeGame.isFoWMode()) {
-                StringBuilder loseMessage = new StringBuilder();
-                for (Player los : losers) {
-                    if (los != null) {
-                        loseMessage.append(los.getRepresentation(true, true));
-                    }
+                message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
+                for (Player loser : losers) {
+                    message.append("> ").append(loser.getRepresentation(true, true)).append("\n");
                 }
-                event.getMessageChannel().sendMessage(loseMessage + " Please respond to bribery/deadly plot window")
-                    .queue();
+                message.append("Please confirm you will not be playing Bribery or Deadly Plot");
+                event.getMessageChannel().sendMessage(message.toString()).queue();
             } else {
-                MessageHelper.privatelyPingPlayerList(losers, activeGame,
-                    "Please respond to bribery/deadly plot window");
+                message.append(losers.size() + " players have the opportunity to play " + Emojis.ActionCard + "Deadly Plot.\n");
+                MessageHelper.privatelyPingPlayerList(losers, activeGame, "Please respond to bribery/deadly plot window");
             }
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), message.toString(), activeGame, deadlyActionRow, "shenanigans");
         } else {
-            String messageShen = "Either both bribery and deadly plot were in the discard or noone could legally play them.";
-
-            if (!activeGame.getCurrentAgendaInfo().contains("Elect Player") ||
-                (activeGame.isACInDiscard("Confounding") && activeGame.isACInDiscard("Confusing"))) {
-                messageShen = messageShen + " There are no shenanigans possible. Please resolve the agenda. ";
-            }
-            activeGame.getMainGameChannel().sendMessage(messageShen).queue();
+            String message = "Either both Bribery and Deadly Plot were in the discard or no player could legally play them.";
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
         }
-        if (activeGame.getCurrentAgendaInfo().contains("Elect Player")
-            && (!activeGame.isACInDiscard("Confounding") || !activeGame.isACInDiscard("Confusing"))) {
-            String resMessage2 = activeGame.getPing()
-                + " please react to no confusing/confounding";
-            Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
-            Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
-            List<Button> buttons = List.of(noConfounding, noConfusing);
-            // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
-            // resMessage2, buttons);
-            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage2,
-                activeGame, buttons, "shenanigans");
-        } else {
-            if (activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
-                activeGame.getMainGameChannel()
-                    .sendMessage("Both confounding and confusing are in the discard pile. ").queue();
 
+        // Confounding & Confusing Legal Text
+        if (activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
+            if (!activeGame.isACInDiscard("Confounding") || !activeGame.isACInDiscard("Confusing")) {
+                String message = activeGame.getPing() + " please confirm no confusing/confounding";
+                Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
+                Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
+                List<Button> buttons = List.of(noConfounding, noConfusing);
+                MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), message, activeGame, buttons, "shenanigans");
+            } else {
+                String message = "Both *Confounding Legal Text* and *Confusing Legal Text* are in the discard pile.\nThere are no shenanigans possible. Please resolve the agenda.";
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
             }
+        } else {
+            String message = "There are no shenanigans possible. Please resolve the agenda.";
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
         }
     }
 
@@ -2409,16 +2397,12 @@ public class AgendaHelper {
         for (String outcome : outcomes.keySet()) {
             if (!outcome.equalsIgnoreCase(winner)) {
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
-
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     Player loser = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
-                    if (loser != null) {
-                        if (!losers.contains(loser)) {
-                            losers.add(loser);
-                        }
-
+                    if (loser != null && !losers.contains(loser)) {
+                        losers.add(loser);
                     }
                 }
             }
