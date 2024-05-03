@@ -220,6 +220,19 @@ public class ButtonHelper {
         return space.getUnitCount(UnitType.Flagship, player.getColor()) > 0;
     }
 
+    public static boolean doesPlayerHaveMechHere(String mechID, Player player, Tile tile) {
+        if (!player.hasUnit(mechID) || tile == null) {
+            return false;
+        }
+        for (UnitHolder uH : tile.getUnitHolders().values()) {
+            if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static void resolveInfantryDeath(Game game, Player player, int amount) {
         if (player.hasInf2Tech()) {
             for (int x = 0; x < amount; x++) {
@@ -5405,7 +5418,10 @@ public class ButtonHelper {
             }
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet planet) {
+            if (unitHolder instanceof Planet) {
+                if ((type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannon")) && !ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)) {
+                    continue;
+                }
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                         continue;
@@ -5453,6 +5469,9 @@ public class ButtonHelper {
                     }
                 }
             } else {
+                if (type.equalsIgnoreCase("groundcombat")) {
+                    continue;
+                }
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                         continue;
@@ -5917,11 +5936,27 @@ public class ButtonHelper {
                         // INFORM PLAYERS
                         pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                             m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
-                            m.createThreadChannel(name).queueAfter(2, TimeUnit.SECONDS,
-                                t -> t.sendMessage(message.toString()).queue(null,
-                                    (error) -> BotLogger.log("Failure to create Game End thread for **"
-                                        + game.getName() + "** in PBD Chronicles:\n> "
-                                        + error.getMessage()))); // CREATE THREAD AND POST FOLLOW UP
+                            m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS,
+                                t -> {
+                                    t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + game.getName() + "** in PBD Chronicles:\n> " + error.getMessage()));
+                                    String endOfGameSummary = "";
+
+                                    for (int x = 1; x < game.getRound() + 1; x++) {
+                                        String summary = "";
+                                        for (Player player : game.getRealPlayers()) {
+                                            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
+                                                summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                                            }
+                                        }
+                                        if (!summary.isEmpty()) {
+                                            summary = "**__Round " + x + " Secret Summary__**\n" + summary;
+                                            endOfGameSummary = endOfGameSummary + summary;
+                                        }
+                                    }
+                                    if (!endOfGameSummary.isEmpty()) {
+                                        MessageHelper.sendMessageToChannel(t, endOfGameSummary);
+                                    }
+                                }); // CREATE THREAD AND POST FOLLOW UP
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                                 "Game summary has been posted in the " + channelMention + " channel: "
                                     + m.getJumpUrl());
@@ -7235,8 +7270,7 @@ public class ButtonHelper {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
                     }
-                    if (game.getTileFromPlanet(planet).isHomeSystem()
-                        && isPlanetLegendaryOrHome(planet, game, true, p2)) {
+                    if (game.getTileFromPlanet(planet) == FoWHelper.getPlayerHS(game, p2)) {
                         p2.exhaustPlanet(planet);
                     }
                 }
