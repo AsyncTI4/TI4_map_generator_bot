@@ -311,7 +311,7 @@ public class ButtonHelperTacticalAction {
 
         if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
             && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation() + " You can use the button to explore using the crown of emphidia";
+            String message = player.getRepresentation() + " You can use the button to explore using the " + Emojis.Relic + "Crown of Emphidia";
             List<Button> systemButtons2 = new ArrayList<>();
             systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);

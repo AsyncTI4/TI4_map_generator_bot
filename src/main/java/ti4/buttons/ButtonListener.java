@@ -4623,11 +4623,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "crownofemphidiaexplore" -> {
                     player.addExhaustedRelic("emphidia");
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        ident + " Exhausted crown of emphidia");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),                        ident + " Exhausted " + Emojis.Relic + "Crown of Emphidia");
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",
-                        buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",                        buttons);
                     event.getMessage().delete().queue();
                 }
                 case "doneWithTacticalAction" -> {
@@ -5585,7 +5583,7 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> systemButtons2 = new ArrayList<>();
                 if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
                     && !player.getExhaustedRelics().contains("emphidia")) {
-                    String message = trueIdentity + " You can use the button to explore using crown of emphidia";
+                    String message = trueIdentity + " You can use the button to explore using " + Emojis.Relic + "Crown of Emphidia";
                     systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
                     systemButtons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
