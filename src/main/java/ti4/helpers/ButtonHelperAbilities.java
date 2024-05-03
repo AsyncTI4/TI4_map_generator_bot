@@ -1272,13 +1272,12 @@ public class ButtonHelperAbilities {
         Tile tile = activeGame.getTileByPosition(pos);
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + "->"
-                + (player.getStrategicCC() - 1) + ")";
+            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + " -> "                + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, Emojis.Muaat + "Starforge");
         } else {
             player.addExhaustedRelic("emelpar");
-            successMessage = "Exhausted scepter of emelpar";
+            successMessage = "Exhausted Scepter of Emelpar";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);

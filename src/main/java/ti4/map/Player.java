@@ -1772,8 +1772,10 @@ public class Player {
     }
 
     @JsonIgnore
-    public void gainTg(int tg) {
-        this.tg += tg;
+    public String gainTG(int count) {
+        String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
+        this.tg += count;
+        return message;
     }
 
     public void setTurnCount(int turn) {
