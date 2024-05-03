@@ -57,24 +57,22 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
-            && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.")
-                .setEphemeral(true).queue();
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
+            event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
+
         long startTime = new Date().getTime();
 
         String userID = event.getUser().getId();
-
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals(Constants.HELP)
             && !event.getInteraction().getName().equals(Constants.STATISTICS)
             && !event.getInteraction().getName().equals(Constants.USER)
+            && !event.getInteraction().getName().equals(Constants.SEARCH)
             && (event.getInteraction().getSubcommandName() == null
                 || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
-            && !event.getInteraction().getName().equals(Constants.SEARCH)
-            && event.getOption(Constants.GAME_NAME) == null) { // SKIP /help COMMANDS
+            && event.getOption(Constants.GAME_NAME) == null) {
 
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
@@ -88,7 +86,6 @@ public class MessageListener extends ListenerAdapter {
                 if (userActiveGame != null) {
                     userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
-
             }
         }
 

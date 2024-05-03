@@ -80,14 +80,11 @@ public class DrawRelic extends GenericRelicAction {
         relicID = relicID.replace("extra1", "");
         relicID = relicID.replace("extra2", "");
         player.addRelic(relicID);
-        RelicModel relicData = Mapper.getRelic(relicID);
-        StringBuilder message = new StringBuilder();
-        message.append(player.getRepresentation()).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText())
-            .append("\n");
-
+        RelicModel relicModel = Mapper.getRelic(relicID);
+        StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> message.append("Run the following commands to use Nanoforge:\n")
+            case "nanoforge" -> helpMessage.append("Run the following commands to use Nanoforge:\n")
                 .append("     `/explore relic_purge relic: nanoforge`\n")
                 .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {
@@ -97,17 +94,17 @@ public class DrawRelic extends GenericRelicAction {
                     FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew SO");
                 }
 
-                message.append("\nAn SO has been automatically drawn");
+                helpMessage.append("\nAn SO has been automatically drawn");
                 if (player.hasAbility("plausible_deniability")) {
                     activeGame.drawSecretObjective(player.getUserID());
-                    message.append(". Drew a second SO due to plausible deniability");
+                    helpMessage.append(". Drew a second SO due to plausible deniability");
                 }
                 SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
             }
             case "shard" -> {
                 Integer poIndex = activeGame.addCustomPO("Shard of the Throne", 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
-                message.append("Custom PO 'Shard of the Throne' has been added.\n")
+                helpMessage.append("Custom PO 'Shard of the Throne' has been added.\n")
                     .append(player.getRepresentation()).append(" scored 'Shard of the Throne'");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
@@ -115,14 +112,17 @@ public class DrawRelic extends GenericRelicAction {
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";
                 Integer poIndex = activeGame.addCustomPO(customPOName, 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
-                message.append("Custom PO '").append(customPOName).append("' has been added.\n")
+                helpMessage.append("Custom PO '").append(customPOName).append("' has been added.\n")
                     .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
             }
         }
+
+        String message = player.getRepresentation() + " drew a Relic:";
         if (activeGame.isFoWMode()) {
-            FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message.toString());
+            FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message);
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message.toString());
+        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         if (checked) {
             activeGame.shuffleRelics();
         }

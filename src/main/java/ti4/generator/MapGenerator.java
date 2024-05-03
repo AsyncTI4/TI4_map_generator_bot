@@ -258,48 +258,35 @@ public class MapGenerator {
             debugStartTime = System.nanoTime();
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
-        String setup = tileMap.keySet().stream()
-            .filter("0"::equals)
-            .findFirst()
-            .orElse(null);
-        if (setup != null) {
-            if ("setup".equals(tileMap.get(setup).getTileID())) {
-                int ringCount = game.getRingCount();
-                ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-                minX = 10000;
-                minY = 10000;
-                maxX = -1;
-                maxY = -1;
-                Set<String> filledPositions = new HashSet<>();
-                for (String position : PositionMapper.getTilePositions()) {
-                    String tileRing = "0";
-                    if (position.length() == 3) {
-                        tileRing = position.substring(0, 1);
-                    } else if (position.length() == 4) {
-                        tileRing = position.substring(0, 2);
-                    }
-                    int tileRingNumber = -1;
-                    try {
-                        tileRingNumber = Integer.parseInt(tileRing);
-                    } catch (Exception e) {
-                        BotLogger.log("Hitting an error");
-                    }
-
-                    if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
-                        addTile(new Tile("0gray", position), TileStep.Tile);
-                        filledPositions.add(position);
-                    }
+        if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
+            int ringCount = game.getRingCount();
+            ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+            minX = 10000;
+            minY = 10000;
+            maxX = -1;
+            maxY = -1;
+            Set<String> filledPositions = new HashSet<>();
+            for (String position : PositionMapper.getTilePositions()) {
+                String tileRing = "0";
+                if (position.length() == 3) {
+                    tileRing = position.substring(0, 1);
+                } else if (position.length() == 4) {
+                    tileRing = position.substring(0, 2);
                 }
-                for (String position : PositionMapper.getTilePositions()) {
-                    if (!tileMap.containsKey(position) || !filledPositions.contains(position)) {
-                        addTile(new Tile("0border", position), TileStep.Tile, true);
-                    }
+                int tileRingNumber = -1;
+                try {
+                    tileRingNumber = Integer.parseInt(tileRing);
+                } catch (Exception e) {
+                    BotLogger.log("Hitting an error");
                 }
 
-            } else {
-                addTile(tileMap.get(setup), TileStep.Tile);
+                if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
+                    addTile(new Tile("0gray", position), TileStep.Tile);
+                }
+                if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
+                    addTile(new Tile("0border", position), TileStep.Tile, true);
+                }
             }
-            tileMap.remove(setup);
         }
 
         tileMap.remove(null);
@@ -3253,30 +3240,33 @@ public class MapGenerator {
         List<String> unrevealedPublicObjectives,
         Integer objectiveWorth,
         Game activeGame) {
+
+        Integer index = 1;
+
         for (String unRevealed : unrevealedPublicObjectives) {
 
             String name = Mapper.getPublicObjective(unRevealed).getName();
 
             if (activeGame.isRedTapeMode()) {
-                graphics.drawString("(Unrevealed) " + name + " - " + objectiveWorth + " VP", x, y + 23);
+                graphics.drawString(String.format("(%d) <Unrevealed> %s - %d VP", index, name, objectiveWorth), x, y + 23);
             } else {
-                graphics.drawString("(Unrevealed) - " + objectiveWorth + " VP", x, y + 23);
+                graphics.drawString(String.format("(%d) <Unrevealed> - %d VP", index, objectiveWorth), x, y + 23);
             }
 
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
-            List<String> playerIDs;
-            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
-                playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
-            } else if (activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
-                playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
-            } else {
-                y += 43;
-                continue;
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed) || activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+                List<String> playerIDs;
+                if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                    playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
+                } else {
+                    playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
+                }
+                drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             }
 
-            drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             y += 43;
+            index++;
         }
         return y;
     }
@@ -3315,9 +3305,10 @@ public class MapGenerator {
                     int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
 
                     graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
-
-                    tempX += scoreTokenWidth;
                 }
+
+                // This needs to be updated regardless if the player peeked or not to maintain marker alignment with PO score markers.
+                tempX += scoreTokenWidth;
             }
         } catch (Exception e) {
             BotLogger.log("Could not draw peek markers", e);

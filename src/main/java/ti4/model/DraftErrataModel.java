@@ -7,16 +7,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class DraftErrataModel implements ModelInterface{
+public class DraftErrataModel implements ModelInterface {
     @Override
     public boolean isValid() {
-        return true;
+        return ItemCategory != null
+            && ItemId != null;
     }
 
     @Override
     public String getAlias() {
-        return ItemCategory.toString()+":"+ItemId;
+        return ItemCategory.toString() + ":" + ItemId;
     }
+
     // The type of item to be drafted
     public DraftItem.Category ItemCategory;
 

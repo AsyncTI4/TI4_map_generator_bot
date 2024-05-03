@@ -178,6 +178,9 @@ public class Game {
     private boolean extraSecretMode;
     @Getter
     @Setter
+    private boolean showMapSetup;
+    @Getter
+    @Setter
     private String acDeckID = "action_cards_pok";
     @Getter
     @Setter
@@ -205,6 +208,9 @@ public class Game {
     private String technologyDeckID = "techs_pok";
     @Getter
     @Setter
+    private String mapTemplateID;
+    @Getter
+    @Setter
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
@@ -229,6 +235,9 @@ public class Game {
     private String savedMessage;
     @Nullable
     private String botMapUpdatesThreadID;
+    @Getter
+    @Setter
+    private String bagDraftStatusMessageID;
     private Map<String, Player> players = new LinkedHashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
@@ -2697,10 +2706,7 @@ public class Game {
     }
 
     public String drawRelic() {
-        if (relics.isEmpty()) {
-            return "";
-        }
-        return relics.remove(0);
+        return drawRelic(0);
     }
 
     public String drawRelic(int location) {
@@ -4205,5 +4211,12 @@ public class Game {
         setScTradeGoods(new LinkedHashMap<>());
         setScSetID(strategyCardModel.getAlias());
         strategyCardModel.getCardValues().keySet().forEach(scValue -> setScTradeGood(scValue, 0));
+    }
+
+    @JsonIgnore
+    public List<String> getUnusedColours() {
+        return Mapper.getColors().stream()
+            .filter(colour -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(colour)))
+            .toList();
     }
 }

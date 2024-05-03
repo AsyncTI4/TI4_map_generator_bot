@@ -8,7 +8,7 @@ import ti4.map.Player;
 
 public class ShowFrankenBag extends FrankenSubcommandData {
     public ShowFrankenBag() {
-        super(Constants.SHOW_BAG, "Shows your current FrankenDraft bag");
+        super(Constants.SHOW_BAG, "Shows your current FrankenDraft bag of cards left to draft.");
     }
 
     @Override

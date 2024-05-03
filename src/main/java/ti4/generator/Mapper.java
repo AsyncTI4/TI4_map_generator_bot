@@ -799,7 +799,7 @@ public class Mapper {
     public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {
         MapTemplateModel mapTemplate = null;
         List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(players);
-        if (templates.size() == 0) {
+        if (templates.isEmpty()) {
             return null;
         } else if (templates.size() == 1) {
             mapTemplate = templates.get(0);
@@ -824,6 +824,10 @@ public class Mapper {
             }
         }
         return mapTemplate;
+    }
+
+    public static boolean isValidMapTemplate(String id) {
+        return mapTemplates.containsKey(id);
     }
 
     public static boolean isValidPlanet(String id) {

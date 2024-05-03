@@ -124,6 +124,16 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    public String getNameRepresentation() {
+        StringBuilder title = new StringBuilder();
+        String factionEmoji = "";
+        String techFaction = getFaction().orElse("");
+        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
+        title.append(factionEmoji).append(techEmoji).append(" ").append(getName()).append(" ").append(getSource().emoji());
+        return title.toString();
+    }
+
     private Color getEmbedColor() {
         return switch (getType()) {
             case PROPULSION -> Color.blue; //Color.decode("#00FF00");
