@@ -951,7 +951,7 @@ public class ButtonHelperModifyUnits {
     public static void startDevotion(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
-        String msg = player.getRepresentation() + " choose which unit of yours to destroy";
+        String msg = player.getRepresentation() + " choose which unit of yours to destroy to";
         List<Button> buttons = getUnitsToDevote(player, activeGame, event, tile, "devote");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
@@ -973,8 +973,6 @@ public class ButtonHelperModifyUnits {
             if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "yin", event);
             }
-        } else {
-
         }
     }
 
@@ -1015,7 +1013,7 @@ public class ButtonHelperModifyUnits {
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName + "damaged"
                         + "_" + unitKey.getColor();
-                    Button validTile2 = Button.danger(buttonID, "Hit A Damaged " + prettyName);
+                    Button validTile2 = Button.danger(buttonID, "Damaged " + prettyName);
                     validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
@@ -1046,7 +1044,7 @@ public class ButtonHelperModifyUnits {
         if (activeGame.isFoWMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit (shields holding, titans agent) somehow or accept the lost of the unit";
+        String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit (shields holding, titans agent, sustain) somehow or accept the lost of the unit";
         List<Button> buttons = new ArrayList<>();
 
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
@@ -1321,7 +1319,7 @@ public class ButtonHelperModifyUnits {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 ff", activeGame);
                     successMessage = "Produced 2 " + Emojis.fighter + " in tile "
-                        + AliasHandler.resolveTile(planetName) + ".";
+                        + activeGame.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(activeGame, player) + ".";
                     player.produceUnit(producedInput);
                     Tile tile2 = activeGame.getTileByPosition(planetName);
                     if (player.hasAbility("cloaked_fleets")) {
@@ -1346,14 +1344,14 @@ public class ButtonHelperModifyUnits {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 destroyer", activeGame);
                     successMessage = "Produced 2 " + Emojis.destroyer + " in tile "
-                        + AliasHandler.resolveTile(planetName) + ".";
+                        + activeGame.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(activeGame, player) + ".";
                     player.produceUnit(producedInput);
 
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         unit, activeGame);
                     successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
-                        + AliasHandler.resolveTile(planetName) + ".";
+                        + activeGame.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(activeGame, player) + ".";
                     if (player.hasAbility("cloaked_fleets")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(Button.success("cloakedFleets_" + tile.getPosition() + "_" + unit + "",
@@ -1617,17 +1615,17 @@ public class ButtonHelperModifyUnits {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 ff", activeGame);
                     successMessage = producedOrPlaced + " 2 " + Emojis.fighter + " in tile "
-                        + AliasHandler.resolveTile(planetName) + ".";
+                        + activeGame.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(activeGame, player) + ".";
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 destroyer", activeGame);
                     successMessage = producedOrPlaced + " 2 " + Emojis.destroyer + " in tile "
-                        + AliasHandler.resolveTile(planetName) + ".";
+                        + activeGame.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(activeGame, player) + ".";
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName), unit,
                         activeGame);
                     successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
-                        + AliasHandler.resolveTile(planetName) + ".";
+                        + activeGame.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(activeGame, player) + ".";
                     Tile tile2 = activeGame.getTileByPosition(planetName);
                     if (player.hasAbility("cloaked_fleets")) {
                         List<Button> shroadedFleets = new ArrayList<>();
@@ -1812,11 +1810,12 @@ public class ButtonHelperModifyUnits {
             msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
                 + " used Dihmohn Commander to generate a hit against you. Please assign it with buttons";
         } else if (cause.contains("ds")) {
-            msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
-                + " used Dimensional Splicer to assign a hit of their choice. They should declare the target now, and if you dont cancel it somehow, you should assign it with buttons";
+            buttons = getOpposingUnitsToHit(player, activeGame, event, tile);
+            msg = player.getRepresentation() + " choose which opposing unit to hit";
         } else {
             msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
                 + " used assault cannon to force you to destroy a non fighter ship. Please assign it with buttons";
+            buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, activeGame, tile, "assaultcannon");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
 

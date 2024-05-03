@@ -1293,12 +1293,12 @@ public class AgendaHelper {
                     }
                     if (!activeGame.isFoWMode()) {
                         buttons2.add(Button.secondary(
-                            "resolvePreassignment_Genetic Recombination " + p2.getFaction() + "_"
+                            "resolvePreassignment_Genetic Recombination " + player.getFaction() + "_"
                                 + p2.getFaction(),
                             p2.getFaction()));
                     } else {
                         buttons2.add(Button.secondary(
-                            "resolvePreassignment_Genetic Recombination " + p2.getFaction() + "_"
+                            "resolvePreassignment_Genetic Recombination " + player.getFaction() + "_"
                                 + p2.getFaction(),
                             p2.getColor()));
                     }
