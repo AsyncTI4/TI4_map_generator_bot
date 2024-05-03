@@ -285,6 +285,11 @@ public class Emojis {
     public static final String KjalengardAgent = "<:KjalengardAgent:1162423340141658112>";
     public static final String KjalengardCommander = "<:KjalengardCommander:1162423346768646266>";
     public static final String KjalengardHero = "<:KjalengardHero:1162423348828065932>";
+
+    public static final String Agent = "<:Agent:1235272542030270614>";
+    public static final String Commander = "<:Commander:1235272679838453801>";
+    public static final String Hero = "<:Hero:1235272815511601353>";
+    public static final String Envoy = "<:Envoy:1235272315357495339>";
     // END OF EMOJI FARM 6
 
     // RESOURCE AND INFLUENCE SYMBOLS
@@ -883,6 +888,13 @@ public class Emojis {
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(GoodDogs);
         Random seed = ThreadLocalRandom.current();
+        Collections.shuffle(goodDogs, seed);
+        return goodDogs.get(0);
+    }
+
+    public static String getRandomGoodDog(String randomSeed) {
+        List<String> goodDogs = new ArrayList<>(GoodDogs);
+        Random seed = new Random(randomSeed.hashCode());
         Collections.shuffle(goodDogs, seed);
         return goodDogs.get(0);
     }
@@ -1700,7 +1712,7 @@ public class Emojis {
             case "warfaretech" -> WarfareTech;
             case "unitupgradetech" -> UnitUpgradeTech;
 
-            default -> getRandomGoodDog();
+            default -> getRandomGoodDog(emojiName);
         };
     }
 
@@ -1718,5 +1730,16 @@ public class Emojis {
         if (activeGame == null)
             return tg;
         return activeGame.getNomadCoin() ? nomadcoin : tg;
+    }
+
+    public static String getLeaderTypeEmoji(String type) {
+        type = type.toLowerCase();
+        return switch (type) {
+            case "agent" -> Agent;
+            case "commander" -> Commander;
+            case "hero" -> Hero;
+            case "envoy" -> Envoy;
+            default -> getRandomGoodDog(type);
+        };
     }
 }

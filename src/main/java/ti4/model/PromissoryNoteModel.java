@@ -157,6 +157,29 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         return eb.build();
     }
 
+    public String getNameRepresentation() {
+        StringBuilder sb = new StringBuilder();
+        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        sb.append(Emojis.PN);
+        sb.append(" ").append(getName()).append("");
+        if (!StringUtils.isBlank(getColor().orElse(""))) {
+            sb.append(" (");
+            if (color.equals("<color>")) {
+                sb.append("generic");
+            } else {
+                sb.append(color);
+            }
+            sb.append(")");
+        }
+        sb.append(getSource().emoji());
+        return sb.toString();
+    }
+
+    public boolean isNotWellKnown() {
+        return getFaction().isPresent()
+            || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
+    }
+
     /**
      * @deprecated This only exists to simulate the old text based promissory note .property files
      */

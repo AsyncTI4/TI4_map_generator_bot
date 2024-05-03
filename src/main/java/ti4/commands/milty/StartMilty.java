@@ -78,6 +78,7 @@ public class StartMilty extends MiltySubcommandData {
         draftManager.init(tileSources);
         draftManager.setFactionDraft(factionDraft);
         draftManager.setMapTemplate(template.getAlias());
+        game.setMapTemplateID(template.getAlias());
         initDraftOrder(draftManager, game);
 
         // Slice count ----------------------------------------------------------------------------

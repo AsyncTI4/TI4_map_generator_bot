@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -32,25 +36,11 @@ public abstract class DraftItem implements ModelInterface {
 
     @Override
     public String getAlias() {
-        return ItemCategory.toString()+":"+ItemId;
+        return ItemCategory.toString() + ":" + ItemId;
     }
 
-    public enum Category{
-        ABILITY,
-        TECH,
-        AGENT,
-        COMMANDER,
-        HERO,
-        MECH,
-        FLAGSHIP,
-        COMMODITIES,
-        PN,
-        HOMESYSTEM,
-        STARTINGTECH,
-        STARTINGFLEET,
-        BLUETILE,
-        REDTILE,
-        DRAFTORDER
+    public enum Category {
+        ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET, BLUETILE, REDTILE, DRAFTORDER
     }
 
     public final Category ItemCategory;
@@ -64,21 +54,21 @@ public abstract class DraftItem implements ModelInterface {
         DraftItem item = null;
         switch (category) {
 
-            case ABILITY -> item =  new AbilityDraftItem(itemId);
-            case TECH -> item =  new TechDraftItem(itemId);
-            case AGENT -> item =  new AgentDraftItem(itemId);
-            case COMMANDER -> item =  new CommanderDraftItem(itemId);
-            case HERO -> item =  new HeroDraftItem(itemId);
-            case MECH -> item =  new MechDraftItem(itemId);
-            case FLAGSHIP -> item =  new FlagshipDraftItem(itemId);
-            case COMMODITIES -> item =  new CommoditiesDraftItem(itemId);
-            case PN -> item =  new PNDraftItem(itemId);
-            case HOMESYSTEM -> item =  new HomeSystemDraftItem(itemId);
-            case STARTINGTECH -> item =  new StartingTechDraftItem(itemId);
-            case STARTINGFLEET -> item =  new StartingFleetDraftItem(itemId);
-            case BLUETILE -> item =  new BlueTileDraftItem(itemId);
-            case REDTILE -> item =  new RedTileDraftItem(itemId);
-            case DRAFTORDER -> item =  new SpeakerOrderDraftItem(itemId);
+            case ABILITY -> item = new AbilityDraftItem(itemId);
+            case TECH -> item = new TechDraftItem(itemId);
+            case AGENT -> item = new AgentDraftItem(itemId);
+            case COMMANDER -> item = new CommanderDraftItem(itemId);
+            case HERO -> item = new HeroDraftItem(itemId);
+            case MECH -> item = new MechDraftItem(itemId);
+            case FLAGSHIP -> item = new FlagshipDraftItem(itemId);
+            case COMMODITIES -> item = new CommoditiesDraftItem(itemId);
+            case PN -> item = new PNDraftItem(itemId);
+            case HOMESYSTEM -> item = new HomeSystemDraftItem(itemId);
+            case STARTINGTECH -> item = new StartingTechDraftItem(itemId);
+            case STARTINGFLEET -> item = new StartingFleetDraftItem(itemId);
+            case BLUETILE -> item = new BlueTileDraftItem(itemId);
+            case REDTILE -> item = new RedTileDraftItem(itemId);
+            case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
         }
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;
@@ -92,7 +82,7 @@ public abstract class DraftItem implements ModelInterface {
     public static List<DraftItem> GetAlwaysIncludeItems(Category type) {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
-        for(DraftErrataModel errataItem : frankenErrata) {
+        for (DraftErrataModel errataItem : frankenErrata) {
             if (errataItem.ItemCategory == type && errataItem.AlwaysAddToPool) {
                 alwaysInclude.add(GenerateFromAlias(errataItem.getAlias()));
             }
@@ -101,8 +91,7 @@ public abstract class DraftItem implements ModelInterface {
         return alwaysInclude;
     }
 
-    protected DraftItem(Category category, String itemId)
-    {
+    protected DraftItem(Category category, String itemId) {
         ItemCategory = category;
         ItemId = itemId;
     }
@@ -115,8 +104,8 @@ public abstract class DraftItem implements ModelInterface {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
         if (Errata != null) {
             if (Errata.AdditionalComponents != null) {
-                sb.append(" *Also adds: ");
-                for (DraftErrataModel i: Errata.AdditionalComponents) {
+                sb.append("\n>  - *Also adds: ");
+                for (DraftErrataModel i : Errata.AdditionalComponents) {
                     DraftItem item = Generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
@@ -124,8 +113,8 @@ public abstract class DraftItem implements ModelInterface {
                 sb.append("*");
             }
             if (Errata.OptionalSwaps != null) {
-                sb.append(" *Includes optional swaps: ");
-                for (DraftErrataModel i: Errata.OptionalSwaps) {
+                sb.append("\n>  - *Includes optional swaps: ");
+                for (DraftErrataModel i : Errata.OptionalSwaps) {
                     DraftItem item = Generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
@@ -165,5 +154,13 @@ public abstract class DraftItem implements ModelInterface {
         return true;
     }
 
+    @JsonIgnore
+    public Button getAddButton() {
+        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
+    }
 
+    @JsonIgnore
+    public Button getRemoveButton() {
+        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
+    }
 }

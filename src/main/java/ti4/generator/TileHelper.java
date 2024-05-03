@@ -1,24 +1,24 @@
 package ti4.generator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.apache.commons.collections4.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class TileHelper {
 
@@ -26,9 +26,9 @@ public class TileHelper {
     private static final Map<String, PlanetModel> allPlanets = new HashMap<>();
 
     public static void init() {
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  Initiating Planets");
+        BotLogger.logWithTimestamp("Initiating Planets");
         initPlanetsFromJson();
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  Initiating Tiles");
+        BotLogger.logWithTimestamp("Initiating Tiles");
         initTilesFromJson();
     }
 
