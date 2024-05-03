@@ -1560,7 +1560,7 @@ public class AgendaHelper {
         Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with Current Winner");
         Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
         List<Button> resolutions = List.of(autoResolve, manualResolve);
-        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Resolve", resolutions);
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message.toString(), resolutions);
     }
 
     private static void handleShenanigans(GenericInteractionCreateEvent event, Game activeGame, String winner) {
