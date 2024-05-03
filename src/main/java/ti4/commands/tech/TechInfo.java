@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -44,7 +45,8 @@ public class TechInfo extends TechSubcommandData {
     public static void sendTechInfo(Game activeGame, Player player) {
         MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Technologies Researched:**__", getTechMessageEmbeds(player));
         MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Faction Technologies (Not Yet Researched)**__", getFactionTechMessageEmbeds(player));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), null, getTechButtons(player));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), null, getTechButtons(player)); 
+        ButtonHelper.getUnresearchedTech(player);
     }
 
     private static List<Button> getTechButtons(Player player) {
@@ -60,6 +62,96 @@ public class TechInfo extends TechSubcommandData {
             messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;
+    }
+
+    public static void sendNotResearchedPropulsionTechInfo(Game activeGame, Player player) {
+        // Get the list of not researched propulsion technologies for the player
+        List<String> propulsion = player.getNotResearchedTechs().getOrDefault("propulsion", List.of());
+
+        // Create a list to hold message embeds
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        
+        // Iterate over each propulsion technology, retrieve its model, sort by requirements, and add to the list of message embeds
+        for (TechnologyModel techModel : propulsion.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            // Generate a representation embed for the technology model and add it to the list of message embeds
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false,true);
+            messageEmbeds.add(representationEmbed);
+        }
+
+        // Send the message embeds to the player's cards info thread
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, null, messageEmbeds);
+    }
+
+    public static void sendNotResearchedBioticTechInfo(Game activeGame, Player player) {
+        // Get the list of not researched biotic technologies for the player
+        List<String> biotic = player.getNotResearchedTechs().getOrDefault("biotic", List.of());
+
+        // Create a list to hold message embeds
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+
+        // Iterate over each propulsion technology, retrieve its model, sort by requirements, and add to the list of message embeds
+        for (TechnologyModel techModel : biotic.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            // Generate a representation embed for the technology model and add it to the list of message embeds
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false,true);
+            messageEmbeds.add(representationEmbed);
+        }
+
+        // Send the message embeds to the player's cards info thread
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, null, messageEmbeds);
+    }
+
+    public static void sendNotResearchedCyberneticTechInfo(Game activeGame, Player player) {
+        // Get the list of not researched cybernetic technologies for the player
+        List<String> cybernetic = player.getNotResearchedTechs().getOrDefault("cybernetic", List.of());
+
+        // Create a list to hold message embeds
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+
+        // Iterate over each propulsion technology, retrieve its model, sort by requirements, and add to the list of message embeds
+        for (TechnologyModel techModel : cybernetic.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            // Generate a representation embed for the technology model and add it to the list of message embeds
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false,true);
+            messageEmbeds.add(representationEmbed);
+        }
+
+        // Send the message embeds to the player's cards info thread
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, null, messageEmbeds);
+    }
+
+    public static void sendNotResearchedWarfareTechInfo(Game activeGame, Player player) {
+        // Get the list of not researched warfare technologies for the player
+        List<String> warfare = player.getNotResearchedTechs().getOrDefault("warfare", List.of());
+
+        // Create a list to hold message embeds
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+
+        // Iterate over each propulsion technology, retrieve its model, sort by requirements, and add to the list of message embeds
+        for (TechnologyModel techModel : warfare.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            // Generate a representation embed for the technology model and add it to the list of message embeds
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false,true);
+            messageEmbeds.add(representationEmbed);
+        }
+
+        // Send the message embeds to the player's cards info thread
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, null, messageEmbeds);
+    }
+
+    public static void sendNotResearchedUnitTechInfo(Game activeGame, Player player) {
+        // Get the list of not researched unit upgrade technologies for the player
+        List<String> unitupgrade = player.getNotResearchedTechs().getOrDefault("unitupgrade", List.of());
+
+        // Create a list to hold message embeds
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+
+        // Iterate over each propulsion technology, retrieve its model, sort by requirements, and add to the list of message embeds
+        for (TechnologyModel techModel : unitupgrade.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            // Generate a representation embed for the technology model and add it to the list of message embeds
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false,true);
+            messageEmbeds.add(representationEmbed);
+        }
+
+        // Send the message embeds to the player's cards info thread
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, null, messageEmbeds);
     }
 
     private static List<MessageEmbed> getFactionTechMessageEmbeds(Player player) {

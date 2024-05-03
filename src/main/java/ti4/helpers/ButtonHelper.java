@@ -8602,6 +8602,44 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    public static void getUnresearchedTech(Player player) {
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+
+        // Create a list to hold buttons
+        List<Button> buttons = new ArrayList<>();
+
+        // Create a message indicating unresearched technologies
+        String message = "_ _\n__**Technologies (Not Yet Researched):**__";
+
+        // Create buttons for different types of technologies and add them to the list
+        Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllUnresearchedTechOfType_propulsion",
+        "Show Blue Techs");
+        buttons.add(propulsionTech);
+
+        Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllUnresearchedTechOfType_biotic",
+            "Show Green Techs");
+        bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+        buttons.add(bioticTech);
+
+        Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllUnresearchedTechOfType_cybernetic",
+            "Show Yellow Techs");
+        cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
+        buttons.add(cyberneticTech);
+        
+        Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllUnresearchedTechOfType_warfare",
+            "Show Red Techs");
+        warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
+        buttons.add(warfareTech);
+
+        Button unitupgradesTech = Button.secondary(finsFactionCheckerPrefix + "getAllUnresearchedTechOfType_unitupgrade",
+            "Show Unit Upgrade Techs");
+        unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
+        buttons.add(unitupgradesTech);
+
+        // Send the message along with buttons to the player's cards info thread
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
     public static void acquireATech(Player player, Game activeGame, ButtonInteractionEvent event, String messageID,
         boolean sc) {
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();

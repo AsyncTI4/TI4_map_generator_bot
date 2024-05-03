@@ -1867,6 +1867,50 @@ public class Player {
         return getFactionTechs().stream().filter(tech -> !hasTech(tech)).toList();
     }
 
+    public Map<String, List<String>> getNotResearchedTechs() {
+        // Get the active game
+        Game activeGame = getGame();
+
+        // Get the technology deck from the active game and filter out researched technologies
+        List<String> technologyDeck = activeGame.getTechnologyDeck().stream().filter(tech -> !hasTech(tech)).toList();
+
+        // Create a map to store technologies separated by their types
+        Map<String, List<String>> techsByType = new HashMap<>();
+        
+        // Loop through each technology in the filtered technology deck
+        for (String techID : technologyDeck) {
+            // Get the TechnologyModel corresponding to the techID
+            TechnologyModel techModel = Mapper.getTech(techID);
+
+            // Get the type of the technology as a string
+            String type = techModel.getType().toString();
+
+            // Get the faction of the technology as an Optional
+            Optional<String> factionOptional = techModel.getFaction();
+
+             // If the faction is present (i.e., not empty), skip this technology
+            if (factionOptional.isPresent()) {
+                continue; // Skip this technology
+            }
+
+            // If the type is not already in the map, create a new list for it
+            techsByType.putIfAbsent(type, new ArrayList<>());
+            
+            // Add the techID to the list corresponding to its type
+            techsByType.get(type).add(techID);
+        }
+        
+        // Print the technologies separated by their types to the console
+        // for (Map.Entry<String, List<String>> entry : techsByType.entrySet()) {
+        //     String type = entry.getKey();
+        //     List<String> techsOfType = entry.getValue();
+        //     System.out.println("Technologies of type " + type + ": " + techsOfType);
+        // }
+        
+        // Return the map containing technologies separated by their types
+        return techsByType;
+    }
+
     public DraftBag getDraftHand() {
         return draftHand;
     }

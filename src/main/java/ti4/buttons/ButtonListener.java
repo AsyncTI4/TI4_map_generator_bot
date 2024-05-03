@@ -3073,6 +3073,11 @@ public class ButtonListener extends ListenerAdapter {
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(activeGame, player, event);
                 case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(activeGame, player, event);
                 case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
+                case "getAllUnresearchedTechOfType_propulsion" -> TechInfo.sendNotResearchedPropulsionTechInfo(activeGame, player);
+                case "getAllUnresearchedTechOfType_biotic" -> TechInfo.sendNotResearchedBioticTechInfo(activeGame, player);
+                case "getAllUnresearchedTechOfType_cybernetic" -> TechInfo.sendNotResearchedCyberneticTechInfo(activeGame, player);
+                case "getAllUnresearchedTechOfType_warfare" -> TechInfo.sendNotResearchedWarfareTechInfo(activeGame, player);
+                case "getAllUnresearchedTechOfType_unitupgrade" -> TechInfo.sendNotResearchedUnitTechInfo(activeGame, player);
                 case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
                 case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
                 case Constants.REFRESH_PLANET_INFO -> PlanetInfo.sendPlanetInfo(player);
