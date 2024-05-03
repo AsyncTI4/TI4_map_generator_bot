@@ -4542,7 +4542,9 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Use Buttons to decide what kind of component action you want to do";
                     List<Button> systemButtons = ButtonHelper.getAllPossibleCompButtons(activeGame, player, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-                    event.getMessage().delete().queue();
+                    if (!activeGame.isFoWMode()) {
+                        event.getMessage().delete().queue();
+                    }
 
                 }
                 case "drawRelicFromFrag" -> {

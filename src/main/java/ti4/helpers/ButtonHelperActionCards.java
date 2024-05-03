@@ -233,7 +233,7 @@ public class ButtonHelperActionCards {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), damaged, activeGame);
         String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " owned by "
-            + ButtonHelper.getIdentOrColor(p2, activeGame) + " in tile " + tile.getRepresentation()
+            + ButtonHelper.getIdentOrColor(p2, activeGame) + " in tile " + tile.getRepresentationForButtons(activeGame, player)
             + " was removed via the Lucky Shot AC";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         if (activeGame.isFoWMode()) {

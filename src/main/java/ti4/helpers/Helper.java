@@ -1483,7 +1483,11 @@ public class Helper {
                     || player.ownsUnit("mykomentori_spacedock2")
                     || player.ownsUnit("miltymod_spacedock2"))) {
                     if (uH instanceof Planet planet) {
-                        productionValue = planet.getResources() + productionValue;
+                        if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
+                            productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
+                        } else {
+                            productionValue = planet.getResources() + productionValue;
+                        }
                     }
                     if (ButtonHelper.isPlayerElected(activeGame, player, "absol_minsindus")) {
                         productionValue = productionValue + 4;
@@ -1583,7 +1587,11 @@ public class Helper {
                             || player.ownsUnit("mykomentori_spacedock2")
                             || player.ownsUnit("miltymod_spacedock2"))) {
                             if (uH instanceof Planet planet) {
-                                productionValue = planet.getResources() + productionValue;
+                                if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
+                                    productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
+                                } else {
+                                    productionValue = planet.getResources() + productionValue;
+                                }
                             }
                         }
                         if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {

@@ -204,8 +204,10 @@ public class StartCombat extends CombatSubcommandData {
         activeGame.setStoredValue("letnevagent", "");
 
         // AFB
-        sendAFBButtonsToThread(event, threadChannel, activeGame,
-            ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
+        if (isSpaceCombat) {
+            sendAFBButtonsToThread(event, threadChannel, activeGame,
+                ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
+        }
 
         // General Space Combat
         sendGeneralCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile, spaceOrGround, event);
@@ -238,6 +240,11 @@ public class StartCombat extends CombatSubcommandData {
         pdsMessage.append("Buttons for Space Cannon Offence:");
         List<Button> spaceCannonButtons = getSpaceCannonButtons(activeGame, activePlayer, tile);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
+        for (Player player : activeGame.getRealPlayers()) {
+            if (ButtonHelper.doesPlayerHaveFSHere("argent_flagship", player, tile)) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use space cannon offense against " + ButtonHelper.getIdentOrColor(player, activeGame) + " due to their FS power");
+            }
+        }
     }
 
     private static void sendStartOfSpaceCombatButtonsToThread(ThreadChannel threadChannel, Game activeGame,
@@ -412,6 +419,12 @@ public class StartCombat extends CombatSubcommandData {
         afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb",
             "Roll " + CombatRollType.AFB.getValue()));
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
+        for (Player player : combatPlayers) {
+            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !activeGame.getLaws().containsKey("articles_war")) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + ButtonHelper.getIdentOrColor(player, activeGame) + " due to their mech power");
+            }
+        }
+
     }
 
     private static List<Button> getSpaceCannonButtons(Game activeGame, Player activePlayer, Tile tile) {
