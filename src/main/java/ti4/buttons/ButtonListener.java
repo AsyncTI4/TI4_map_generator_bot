@@ -820,7 +820,7 @@ public class ButtonListener extends ListenerAdapter {
             boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
             if (!used) {
                 if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed SC#" + scNum);
                 }
                 String message = deductCC(player, event);
 
@@ -1901,7 +1901,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.addFollowedSC(scModel.getInitiative());
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), activeGame, event);
                 if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed construction");
                 }
                 String message = deductCC(player, event);
                 ButtonHelper.addReaction(event, false, false, message, "");
@@ -2646,7 +2646,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.addFollowedSC(scModel.getInitiative());
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), activeGame, event);
                 if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed construction");
                 }
                 String message = deductCC(player, event);
                 ButtonHelper.addReaction(event, false, false, message, "");
@@ -3093,7 +3093,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed warfare");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3245,7 +3245,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed tech");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3281,7 +3281,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed diplomacy");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3483,7 +3483,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed Politics");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3577,13 +3577,12 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, activeGame, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed Imperial");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
                     }
-                    boolean used2 = addUsedSCPlayer(messageID + "so", activeGame, player, event,
-                        " Drew a " + Emojis.SecretObjective);
+                    boolean used2 = addUsedSCPlayer(messageID + "so", activeGame, player, event, " Drew a " + Emojis.SecretObjective);
                     if (used2) {
                         break;
                     }
@@ -3656,7 +3655,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
 
                     if (player.getStrategicCC() > 0) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed Trade");
                     }
                     String message = deductCC(player, event);
                     if (!player.getFollowedSCs().contains(5)) {
@@ -3819,7 +3818,6 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = deductCC(player, event);
 
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
                     int scnum = 1;
                     boolean setstatus = true;
                     try {
@@ -3837,6 +3835,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         player.addFollowedSC(scnum);
                     }
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "followed SC#" + scnum);
                     ButtonHelper.addReaction(event, false, false, message, "");
 
                 }
@@ -4624,11 +4623,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "crownofemphidiaexplore" -> {
                     player.addExhaustedRelic("emphidia");
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        ident + " Exhausted crown of emphidia");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),                        ident + " Exhausted " + Emojis.Relic + "Crown of Emphidia");
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",
-                        buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",                        buttons);
                     event.getMessage().delete().queue();
                 }
                 case "doneWithTacticalAction" -> {
@@ -4873,9 +4870,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "quash" -> {
                     int stratCC = player.getStrategicCC();
                     player.setStrategicCC(stratCC - 1);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Quashed agenda. Strategic CCs went from " + stratCC + " -> " + (stratCC - 1));
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Quashed agenda. Strategic CCs went from " + stratCC + " -> " + (stratCC - 1));
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Quash");
                     String agendaCount = activeGame.getStoredValue("agendaCount");
                     int aCount = 0;
                     if (agendaCount.isEmpty()) {
@@ -4890,8 +4886,7 @@ public class ButtonListener extends ListenerAdapter {
                         Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
                         AgendaModel agendaDetails = Mapper.getAgenda(id2);
                         String agendaName = agendaDetails.getName();
-                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# The hidden agenda was " + agendaName
-                            + "! You can find it in the discard.");
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# The hidden agenda was " + agendaName + "! You can find it in the discard.");
                     }
                     new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
                     event.getMessage().delete().queue();
@@ -5588,7 +5583,7 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> systemButtons2 = new ArrayList<>();
                 if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
                     && !player.getExhaustedRelics().contains("emphidia")) {
-                    String message = trueIdentity + " You can use the button to explore using crown of emphidia";
+                    String message = trueIdentity + " You can use the button to explore using " + Emojis.Relic + "Crown of Emphidia";
                     systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
                     systemButtons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);

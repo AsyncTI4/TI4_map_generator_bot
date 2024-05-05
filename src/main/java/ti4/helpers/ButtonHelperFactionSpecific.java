@@ -654,18 +654,15 @@ public class ButtonHelperFactionSpecific {
         String buttonID) {
         Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, activeGame),
-                "Could not resolve target player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
         int oldTg = player.getTg();
         player.setTg(oldTg + 2);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-            ButtonHelper.getIdentOrColor(player, activeGame) + " gained 2tg due to production biomes (" + oldTg
-                + "->" + player.getTg() + ")");
+        String message = player.getFactionEmojiOrColor() + " gained " + Emojis.tg(2) + " due to " + Emojis.Hacan + Emojis.BioticTech + "Production Biomes (" + oldTg + "->" + player.getTg() + ")";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         if (activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-                ButtonHelper.getIdentOrColor(player, activeGame) + " gained 2tg due to production biomes");
+            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message);
         }
         ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 2);
@@ -676,8 +673,7 @@ public class ButtonHelperFactionSpecific {
         GenericInteractionCreateEvent event) {
         int oldStratCC = hacan.getStrategicCC();
         if (oldStratCC < 1) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-                ButtonHelper.getIdent(hacan) + " did not have enough strategy CCs. #rejected");
+            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), hacan.getFactionEmoji() + " did not have enough strategy CCs. #rejected");
             return;
         }
 
@@ -685,9 +681,7 @@ public class ButtonHelperFactionSpecific {
         hacan.setTg(oldTg + 4);
         hacan.setStrategicCC(oldStratCC - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(hacan, activeGame, event);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame),
-            ButtonHelper.getIdent(hacan) + " lost a strategy CC and gained 4tg (" + oldTg + "->" + hacan.getTg()
-                + ")");
+        MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), hacan.getFactionEmoji() + " spent a strategy CC and gained " + Emojis.tg(4) + " (" + oldTg + "->" + hacan.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(hacan, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(hacan, activeGame, 4);
 
