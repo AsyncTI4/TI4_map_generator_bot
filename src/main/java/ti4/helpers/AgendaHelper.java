@@ -1577,7 +1577,6 @@ public class AgendaHelper {
                     message.append("> ").append(loser.getRepresentation(true, true)).append("\n");
                 }
                 message.append("Please confirm you will not be playing Bribery or Deadly Plot");
-                event.getMessageChannel().sendMessage(message.toString()).queue();
             } else {
                 message.append(losers.size() + " players have the opportunity to play " + Emojis.ActionCard + "Deadly Plot.\n");
                 MessageHelper.privatelyPingPlayerList(losers, activeGame, "Please respond to bribery/deadly plot window");
