@@ -311,7 +311,7 @@ public class ButtonHelperTacticalAction {
 
         if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia")
             && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation() + " You can use the button to explore using the crown of emphidia";
+            String message = player.getRepresentation() + " You can use the button to explore using the " + Emojis.Relic + "Crown of Emphidia";
             List<Button> systemButtons2 = new ArrayList<>();
             systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
@@ -518,8 +518,7 @@ public class ButtonHelperTacticalAction {
 
     public static void selectRingThatActiveSystemIsIn(Player player, Game activeGame, ButtonInteractionEvent event) {
         if (player.getTacticalCC() < 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                ButtonHelper.getIdent(player) + " does not have any tactical CC.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " does not have any tactical CC.");
             return;
         }
         activeGame.setNaaluAgent(false);
@@ -530,8 +529,7 @@ public class ButtonHelperTacticalAction {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
 
-        if (player.doesPlayerPreferDistanceBasedTacticalActions() && !activeGame.isFoWMode()
-            && activeGame.getRingCount() < 5) {
+        if (player.doesPlayerPreferDistanceBasedTacticalActions() && !activeGame.isFoWMode() && activeGame.getRingCount() < 5) {
             alternateWayOfOfferingTiles(player, activeGame);
         } else {
             String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
@@ -541,8 +539,7 @@ public class ButtonHelperTacticalAction {
     }
 
     public static void alternateWayOfOfferingTiles(Player player, Game activeGame) {
-        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(activeGame,
-            player);
+        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(activeGame, player);
         List<String> initialOffering = new ArrayList<>();
         initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances, 0));
         int maxDistance = 0;
@@ -557,46 +554,36 @@ public class ButtonHelperTacticalAction {
             message = message + "0 tiles away";
         }
         for (String pos : initialOffering) {
-            buttons.add(Button.success("ringTile_" + pos,
-                activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player)));
+            buttons.add(Button.success("ringTile_" + pos, activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player)));
         }
-        buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1),
-            "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
-
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message,
-            buttons);
+        buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
+        if ("481860200169472030".equals(player.getUserID())) buttons.addAll(ButtonHelper.getPossibleRings(player, activeGame)); //TODO: Add option for this
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
-    public static void getTilesThisFarAway(Player player, Game activeGame, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void getTilesThisFarAway(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         int desiredDistance = Integer.parseInt(buttonID.split("_")[1]);
-        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(activeGame,
-            player);
+        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(activeGame, player);
         int maxDistance = desiredDistance;
         List<Button> buttons = new ArrayList<>();
         if (desiredDistance > 0) {
-            buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance - 1),
-                "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
+            buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance - 1), "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
         }
-        for (String pos : CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances,
-            desiredDistance)) {
+        for (String pos : CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances, desiredDistance)) {
             Tile tile = activeGame.getTileByPosition(pos);
             String tileRepresentation = tile.getRepresentationForButtons(activeGame, player);
             if (!tileRepresentation.contains("Hyperlane")) {
                 buttons.add(Button.success("ringTile_" + pos, tileRepresentation));
             }
         }
-        buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1),
-            "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
+        buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message,
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         event.getMessage().delete().queue();
     }
 
-    public static void selectActiveSystem(Player player, Game activeGame, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void selectActiveSystem(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
         activeGame.setActiveSystem(pos);
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeGame, event);
@@ -617,7 +604,7 @@ public class ButtonHelperTacticalAction {
         } else {
             List<Player> playersAdj = FoWHelper.getAdjacentPlayers(activeGame, pos, true);
             for (Player player_ : playersAdj) {
-                String playerMessage = player_.getRepresentation(true, true) + " - System " + pos
+                String playerMessage = player_.getRepresentation(true, true) + " - System " + activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player_)
                     + " has been activated ";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
             }

@@ -254,26 +254,21 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        resolveMuaatCommanderCheck(player, activeGame, event, "unknown trigger");
+    }
+
+    public static void resolveMuaatCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event, String reason) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, activeGame, player.getTg() + 1) || activeGame.isFoWMode()) {
-                int old = player.getTg();
-                int newTg = player.getTg() + 1;
-                player.setTg(player.getTg() + 1);
-                String mMessage = player.getRepresentation(true, true)
-                    + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
-                    + "->" + newTg + ")";
-                if (activeGame.isFoWMode()) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-                }
+                String message = player.getRepresentation(true, true) + " you gained a " + Emojis.tg + " from " + Emojis.MuaatCommander + "Muaat Commander " + player.gainTG(1) + " (" + reason + ")";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, activeGame);
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             } else {
                 String mMessage = player.getRepresentation(true, true)
-                    + " Since you have Muaat commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
+                    + " you have Muaat commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg"));
+                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg").withEmoji(Emoji.fromFormatted(Emojis.tg)));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }

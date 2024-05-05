@@ -13,8 +13,8 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 
-public class FrankenDraft extends BagDraft {
-    public FrankenDraft(Game owner) {
+public class StandardBagDraft extends BagDraft {
+    public StandardBagDraft(Game owner) {
         super(owner);
     }
 
@@ -22,30 +22,30 @@ public class FrankenDraft extends BagDraft {
     public int getItemLimitForCategory(DraftItem.Category category) {
         int limit = 0;
         switch (category) {
-            case ABILITY, BLUETILE -> limit = 3;
-            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> limit = 2;
-            case DRAFTORDER -> limit = 1;
+            case BLUETILE -> limit = 3;
+            case REDTILE -> limit = 2;
+            case DRAFTORDER, HOMESYSTEM -> limit = 1;
         }
         return limit;
     }
 
     @Override
     public String getSaveString() {
-        return "franken";
+        return "standard_bag_draft";
     }
 
     private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane" };
 
 
     public static List<FactionModel> getDraftableFactionsForGame(Game activeGame) {
-        List<FactionModel> factionSet = getAllFrankenLegalFactions();
+        List<FactionModel> factionSet = getAllLegalFactions();
         if (!activeGame.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         return factionSet;
     }
 
-    public static List<FactionModel> getAllFrankenLegalFactions() {
+    public static List<FactionModel> getAllLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactions();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()){
@@ -65,20 +65,7 @@ public class FrankenDraft extends BagDraft {
     public List<DraftBag> generateBags(Game game) {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
-
-        allDraftableItems.put(DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.AGENT, AgentDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.COMMANDER, CommanderDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.HERO, HeroDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.COMMODITIES, CommoditiesDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.FLAGSHIP, FlagshipDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.MECH, MechDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.PN, PNDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.STARTINGFLEET, StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.STARTINGTECH, StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions));
-
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
@@ -115,6 +102,6 @@ public class FrankenDraft extends BagDraft {
 
     @Override
     public int getBagSize() {
-        return 31;
+        return 7;
     }
 }

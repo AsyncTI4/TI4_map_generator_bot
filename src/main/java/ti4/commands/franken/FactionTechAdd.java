@@ -2,6 +2,7 @@ package ti4.commands.franken;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
@@ -17,6 +18,10 @@ public class FactionTechAdd extends FactionTechAddRemove {
 
     @Override
     public void doAction(Player player, List<String> techIDs) {
+        addFactionTechs(getEvent(), player, techIDs);
+    }
+
+    public static void addFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added techs:\n");
         for (String techID : techIDs) {
             if (player.getFactionTechs().contains(techID)) {
@@ -38,6 +43,6 @@ public class FactionTechAdd extends FactionTechAddRemove {
                 });
             }
         }
-        MessageHelper.sendMessageToEventChannel(getEvent(), sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

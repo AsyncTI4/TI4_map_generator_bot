@@ -256,31 +256,26 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static void resolveAbsolHyperAgentReady(String buttonID, ButtonInteractionEvent event, Game activeGame,
-        Player player) {
-        buttonID = buttonID.replace("absol_jr", "absoljr");
-        String agent = buttonID.split("_")[1];
+    public static void resolveAbsolHyperAgentReady(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String agent = StringUtils.substringAfterLast(buttonID, "_");
         player.setStrategicCC(player.getStrategicCC() - 1);
-        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, Emojis.BioticTech + "Hypermetabolism" + Emojis.Absol);
         event.getMessage().delete().queue();
         Leader playerLeader = player.getLeader(agent).orElse(null);
         if (playerLeader == null) {
             if (agent.contains("titanprototype")) {
                 player.removeExhaustedRelic("titanprototype");
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getIdent(player) + " spent a strat CC and readied " + agent);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " spent a strat CC and readied " + agent);
             }
             if (agent.contains("absol")) {
                 player.removeExhaustedRelic("absol_jr");
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getIdent(player) + "  spent a strat CC and readied " + agent);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + "  spent a strat CC and readied " + agent);
             }
             return;
         }
         RefreshLeader.refreshLeader(player, playerLeader, activeGame);
 
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-            ButtonHelper.getIdent(player) + " used absol hypermetabolism to spend a strat CC and ready " + agent);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),  player.getFactionEmoji() + " used " + Emojis.BioticTech + "Hypermetabolism" + Emojis.Absol + " to spend a strat CC and ready " + agent);
     }
 
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player,
@@ -1006,8 +1001,8 @@ public class ButtonHelperAgents {
             buttons.add(Buttons.GET_A_TECH);
             buttons.add(Button.danger("deleteButtons", "Delete This"));
             p2.setStrategicCC(p2.getStrategicCC() - 1);
-            MessageChannel channel = ButtonHelper.getCorrectChannel(p2, activeGame);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, activeGame, event);
+            MessageChannel channel = p2.getCorrectChannel();
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, activeGame, event, Emojis.mirveda + " Agent");
             String message0 = p2.getRepresentation(true, true)
                 + "A cc has been subtracted from your strat pool due to use of " + ssruu + "Logic Machina (Mirveda  Agent). You can add it back if you didn't agree to the agent";
             String message = p2.getRepresentation(true, true)

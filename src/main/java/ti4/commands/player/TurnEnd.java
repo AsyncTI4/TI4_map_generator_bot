@@ -335,23 +335,15 @@ public class TurnEnd extends PlayerSubcommandData {
                         continue;
                     }
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                    if (unitHolder != null && unitHolder.getTokenList() != null
-                        && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
-
+                    if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation()
-                                    + "Reminder this is not the window to use Crown of Emphidia. You can purge crown of emphidia in the status homework phase, which is when buttons will appear");
+                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You can purge " +
+                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation()
-                                    + "Reminder this is the window to use Crown of Emphidia.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                                player.getRepresentation()
-                                    + " You can use these buttons to resolve Crown of Emphidia",
-                                ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You can use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia", ButtonHelper.getCrownButtons());
                         }
-
                     }
                 }
             }
