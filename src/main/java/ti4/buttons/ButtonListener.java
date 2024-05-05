@@ -3080,13 +3080,12 @@ public class ButtonListener extends ListenerAdapter {
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(activeGame, player, event);
                 case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(activeGame, player, event);
                 case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(activeGame, player, event);
-                case "getAllUnresearchedTechOfType_propulsion" -> TechInfo.sendNotResearchedPropulsionTechInfo(activeGame, player);
-                case "getAllUnresearchedTechOfType_biotic" -> TechInfo.sendNotResearchedBioticTechInfo(activeGame, player);
-                case "getAllUnresearchedTechOfType_cybernetic" -> TechInfo.sendNotResearchedCyberneticTechInfo(activeGame, player);
-                case "getAllUnresearchedTechOfType_warfare" -> TechInfo.sendNotResearchedWarfareTechInfo(activeGame, player);
-                case "getAllUnresearchedTechOfType_unitupgrade" -> TechInfo.sendNotResearchedUnitTechInfo(activeGame, player);
-                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event, false);
-                case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event, true);
+                case "getAllUnresearchedTechOfType_propulsion" -> TechInfo.sendNotResearchedTechInfo(activeGame, player, "propulsion");
+                case "getAllUnresearchedTechOfType_biotic" -> TechInfo.sendNotResearchedTechInfo(activeGame, player, "biotic");
+                case "getAllUnresearchedTechOfType_cybernetic" -> TechInfo.sendNotResearchedTechInfo(activeGame, player, "cybernetic");
+                case "getAllUnresearchedTechOfType_warfare" -> TechInfo.sendNotResearchedTechInfo(activeGame, player, "warfare");
+                case "getAllUnresearchedTechOfType_unitupgrade" -> TechInfo.sendNotResearchedTechInfo(activeGame, player, "unitupgrade");
+                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(activeGame, player, event);
                 case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(activeGame, player, event);
                 case Constants.REFRESH_PLANET_INFO -> PlanetInfo.sendPlanetInfo(player);
                 case "warfareBuild" -> {
