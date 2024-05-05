@@ -66,7 +66,7 @@ public class TechInfo extends TechSubcommandData {
 
     public static void sendNotResearchedPropulsionTechInfo(Game activeGame, Player player) {
         // Get the list of not researched propulsion technologies for the player
-        List<String> propulsion = player.getNotResearchedTechs().getOrDefault("propulsion", List.of());
+        List<String> propulsion = player.getTechnologyTypeMap(false).getOrDefault("propulsion", List.of());
 
         // Create a list to hold message embeds
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
@@ -84,7 +84,7 @@ public class TechInfo extends TechSubcommandData {
 
     public static void sendNotResearchedBioticTechInfo(Game activeGame, Player player) {
         // Get the list of not researched biotic technologies for the player
-        List<String> biotic = player.getNotResearchedTechs().getOrDefault("biotic", List.of());
+        List<String> biotic = player.getTechnologyTypeMap(false).getOrDefault("biotic", List.of());
 
         // Create a list to hold message embeds
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
@@ -102,7 +102,7 @@ public class TechInfo extends TechSubcommandData {
 
     public static void sendNotResearchedCyberneticTechInfo(Game activeGame, Player player) {
         // Get the list of not researched cybernetic technologies for the player
-        List<String> cybernetic = player.getNotResearchedTechs().getOrDefault("cybernetic", List.of());
+        List<String> cybernetic = player.getTechnologyTypeMap(false).getOrDefault("cybernetic", List.of());
 
         // Create a list to hold message embeds
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
@@ -120,7 +120,7 @@ public class TechInfo extends TechSubcommandData {
 
     public static void sendNotResearchedWarfareTechInfo(Game activeGame, Player player) {
         // Get the list of not researched warfare technologies for the player
-        List<String> warfare = player.getNotResearchedTechs().getOrDefault("warfare", List.of());
+        List<String> warfare = player.getTechnologyTypeMap(false).getOrDefault("warfare", List.of());
 
         // Create a list to hold message embeds
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
@@ -138,7 +138,7 @@ public class TechInfo extends TechSubcommandData {
 
     public static void sendNotResearchedUnitTechInfo(Game activeGame, Player player) {
         // Get the list of not researched unit upgrade technologies for the player
-        List<String> unitupgrade = player.getNotResearchedTechs().getOrDefault("unitupgrade", List.of());
+        List<String> unitupgrade = player.getTechnologyTypeMap(false).getOrDefault("unitupgrade", List.of());
 
         // Create a list to hold message embeds
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
