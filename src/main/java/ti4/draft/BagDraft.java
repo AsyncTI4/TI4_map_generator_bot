@@ -248,12 +248,8 @@ public abstract class BagDraft {
             } else {
                 sb.append("❌");
             }
-            sb.append(player.getUserName());
-            if (player.isReadyToPassBag()) {
-                // sb.append("");
-            } else {
-                sb.append(" (still drafting)");
-            }
+            sb.append(player.getRepresentationNoPing());
+            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getActiveBagDraft().getBagSize()).append(")");
             sb.append("\n");
         }
         return sb.toString();
