@@ -142,7 +142,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a round of space combat, you may spend 1 trade good to apply +1 to combat dice rolled by your non-fighter ships.",
+        "ability": "At the start of a round combat, you may spend 1 trade good to place 1 trade good on this ship's unit card. If that ships generates a hit in that round of combat, add to this ship's unit card a number of trade goods equal to the number of players who control units in this ship's system or adjacent systems. When this ships is repaired, gain the trade goods on its unit card.",
         "homebrewReplacesID": "hacan_flagship"
     },
     {
