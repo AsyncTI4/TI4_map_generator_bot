@@ -1,11 +1,14 @@
 package ti4.message;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -26,6 +29,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.messages.MessagePoll.LayoutType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -33,6 +37,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -128,7 +133,8 @@ public class MessageHelper {
 	private static void addFactionReactToMessage(Game activeGame, Player player, Message message) {
 		Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player, message);
 		if (reactionEmoji != null) {
-			message.addReaction(reactionEmoji).queue();
+			message.addReaction(reactionEmoji).queue(null,
+				error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
 		}
 		String messageId = message.getId();
 		if (activeGame.getStoredValue(messageId) != null
@@ -205,7 +211,8 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
-		MessageFunction pin = (msg) -> msg.pin().queue();
+		MessageFunction pin = (msg) -> msg.pin().queue(null,
+			error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to pin message", null, error)));
 		splitAndSentWithAction(messageText, channel, pin);
 	}
 
@@ -777,5 +784,25 @@ public class MessageHelper {
 		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
 		gameName = StringUtils.substringBefore(gameName, "-");
 		return GameManager.getInstance().getGame(gameName);
+	}
+
+	/**
+	 * @param channel
+	 * @param messageText message above the poll
+	 * @param pollTitle title of the poll
+	 * @param duration 1h to 168h (7d)
+	 * @param multiAnswer allow multiple answers
+	 * @param answerAndEmojiPair Map of answer and emoji, use LinkedHashMap to control order
+	 */
+	public static void sendPollToChannel(MessageChannel channel, String messageText, String pollTitle, int durationHours, boolean multiAnswer, Map<String, Emoji> answerAndEmojiPair) {
+		MessagePollBuilder poll = new MessagePollBuilder(pollTitle);
+		poll.setDuration(Duration.ofHours(durationHours));
+		poll.setLayout(LayoutType.DEFAULT);
+		poll.setMultiAnswer(multiAnswer);
+		for (Entry<String, Emoji> pair : answerAndEmojiPair.entrySet()) {
+			poll.addAnswer(pair.getKey(), pair.getValue());
+		}
+		channel.sendMessage(messageText).setPoll(poll.build()).queue(null,
+			error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send Poll to Channel", null, error)));
 	}
 }
