@@ -193,7 +193,7 @@ public class ButtonListener extends ListenerAdapter {
             activeGame.increaseButtonPressCount();
 
             if (activeGame.isFoWMode()) {
-                if (player != null && player.getPrivateChannel() == null) {
+                if (player != null && player.isRealPlayer() && player.getPrivateChannel() == null) {
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Private channels are not set up for this game. Messages will be suppressed.");
                     privateChannel = null;
