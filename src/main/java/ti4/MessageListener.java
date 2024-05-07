@@ -303,8 +303,14 @@ public class MessageListener extends ListenerAdapter {
                     for (Player player : activeGame.getRealPlayers()) {
                         for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
                             if (!player.hasFollowedSC(sc)) {
-                                long twelveHrs = 12 * 60 * 60 * multiplier;
-                                long twentyFourhrs = 24 * 60 * 60 * multiplier;
+                                int twenty4 = 24;
+                                int half = 12;
+                                if (!activeGame.getStoredValue("fastSCFollows").isEmpty()) {
+                                    twenty4 = Integer.parseInt(activeGame.getStoredValue("fastSCFollows"));
+                                    half = twenty4 / 2;
+                                }
+                                long twelveHrs = half * 60 * 60 * multiplier;
+                                long twentyFourhrs = twenty4 * 60 * 60 * multiplier;
                                 String scTime = activeGame.getStoredValue("scPlayMsgTime" + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
@@ -319,7 +325,7 @@ public class MessageListener extends ListenerAdapter {
                                             sb.append(p2.getRepresentation(true, true));
                                             sb.append(" You are getting this ping because SC #").append(sc)
                                                 .append(
-                                                    " has been played and now it has been 12 hrs and you havent reacted. Please do so, or after another 12 hrs you will be marked as not following. \nTIP: Double check that you paid the command counter to follow\n");
+                                                    " has been played and now it has been half the alloted time and you havent reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ")
                                                     .append(activeGame.getStoredValue("scPlay" + sc)
@@ -343,10 +349,9 @@ public class MessageListener extends ListenerAdapter {
                                             sb.append(p2.getRepresentation(true, true));
                                             sb.append(" SC #").append(sc)
                                                 .append(
-                                                    " has been played and now it has been 24 hrs and they havent reacted, so they have been marked as not following\n");
+                                                    " has been played and now it has been the allotted time and they havent reacted, so they have been marked as not following\n");
 
-                                            MessageHelper.sendMessageToChannel(
-                                                ButtonHelper.getCorrectChannel(p2, activeGame), sb.toString());
+                                            //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), sb.toString());
                                             ButtonHelper.sendMessageToRightStratThread(player, activeGame,
                                                 sb.toString(), ButtonHelper.getStratName(sc));
                                             player.addFollowedSC(sc);
@@ -892,6 +897,8 @@ public class MessageListener extends ListenerAdapter {
                         previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin"));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         ButtonHelper.getIdent(player) + " stored an end of round summary");
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+                        "Someone stored an end of round summary");
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);

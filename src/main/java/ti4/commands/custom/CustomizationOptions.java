@@ -12,39 +12,39 @@ public class CustomizationOptions extends CustomSubcommandData {
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options");
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)")
-                .setAutoComplete(true));
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS,
-                "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
+            "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT,
-                "Show full text of components when using/exhausting"));
+            "Show full text of components when using/exhausting"));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY,
-                "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
+            "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT,
-                "Pings for exceeding limits. ON to turn on. OFF to turn off"));
+            "Pings for exceeding limits. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS,
-                "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
+            "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE,
-                "Automatically spin inner three rings at status cleanup. ON to turn on. OFF to turn off"));
+            "Automatically spin inner three rings at status cleanup. ON to turn on. OFF to turn off"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
+            new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE,
-                "Reveal all objectives and diplo gets the power to pre-reveal"));
+            "Reveal all objectives and diplo gets the power to pre-reveal"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
+            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES,
-                "Show the bubbles around anti-bombardment planets"));
+            "Show the bubbles around anti-bombardment planets"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+            new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS,
-                "Have the bot inject helpful links to rules within it's output"));
+            "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FAST_SC_FOLLOW,
-                "Consider People To Pass on SCs if they dont respond with 24hrs"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW,
+            "Consider People To Pass on SCs if they dont respond with X hours. Set X to 0 to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
-                "Swap player's owned units to units from another source").setAutoComplete(true));
+            "Swap player's owned units to units from another source").setAutoComplete(true));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class CustomizationOptions extends CustomSubcommandData {
             getActiveGame().setTextSize(textSize);
 
         Boolean showFullTextComponents = event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null,
-                OptionMapping::getAsBoolean);
+            OptionMapping::getAsBoolean);
         if (showFullTextComponents != null)
             activeGame.setShowFullComponentTextEmbeds(showFullTextComponents);
 
@@ -146,9 +146,16 @@ public class CustomizationOptions extends CustomSubcommandData {
         if (undo != null)
             activeGame.setUndoButton(undo);
 
-        Boolean fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsBoolean);
-        if (fast != null)
-            activeGame.setFastSCFollowMode(fast);
+        Integer fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsInt);
+        if (fast != null) {
+            activeGame.setStoredValue("fastSCFollow", "" + fast);
+            if (fast == 0) {
+                activeGame.setFastSCFollowMode(false);
+            } else {
+                activeGame.setFastSCFollowMode(true);
+            }
+
+        }
 
         String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
         if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity))
