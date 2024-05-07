@@ -525,7 +525,7 @@ public class Player {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }

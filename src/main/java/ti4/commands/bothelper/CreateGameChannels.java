@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
@@ -92,8 +93,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
-                MessageHelper.sendMessageToEventChannel(event, 
-                    "Category could not be automatically determined. Please provide a category name for this game.");
+                MessageHelper.sendMessageToEventChannel(event, "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
             List<Category> categories = getAllAvailablePBDCategories();
@@ -128,8 +128,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            MessageHelper.sendMessageToEventChannel(event, 
-                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -236,7 +235,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName).complete();
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
@@ -315,10 +316,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
-            thread.getManager()
-                .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
-                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                .queue();
+            if (!thread.getParentMessageChannel().getName().equals("making-new-games")) {
+                newGame.setLaunchPostThreadID(thread.getId());
+                ThreadChannelManager manager = thread.getManager()
+                    .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR);
+                if (missingMembers.isEmpty()) {
+                    manager.setArchived(true);
+                }
+                manager.queue();
+            }
         }
     }
 

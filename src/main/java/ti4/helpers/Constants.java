@@ -1089,4 +1089,5 @@ public class Constants {
     public static final String SHOW_HAND = "show_hand";
     public static final String BAG_DRAFT_STATUS_MESSAGE_ID = "bag_draft_status_message_id";
     public static final String SHOW_ALL_UNITS = "show_all_units";
+    public static final String GAME_LAUNCH_THREAD_ID = "game_launch_thread_id";
 }

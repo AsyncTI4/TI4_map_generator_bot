@@ -29,9 +29,14 @@ public class UserJoinServerListener extends ListenerAdapter {
             if (game.getGuild() != null && game.getGuild().equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
                 Helper.fixGameChannelPermissions(guild, game);
+                checkIfCanCloseGameLaunchThread(game);
                 game.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
             }
         }
         if (!mapsJoined.isEmpty()) BotLogger.log("User: *" + user.getName() + "* joined server: **" + guild.getName() + "**. Maps joined: " + mapsJoined.stream().map(Game::getName).toList());
+    }
+
+    private void checkIfCanCloseGameLaunchThread(Game game) {
+        // TODO: Implement this
     }
 }
