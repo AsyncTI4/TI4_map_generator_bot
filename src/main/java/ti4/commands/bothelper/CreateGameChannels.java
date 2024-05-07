@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
@@ -315,10 +316,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
-            thread.getManager()
-                .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
-                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                .queue();
+            if (!thread.getParentMessageChannel().getName().equals("making-new-games")) {
+                newGame.setLaunchPostThreadID(thread.getId());
+                ThreadChannelManager manager = thread.getManager()
+                    .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR);
+                if (missingMembers.isEmpty()) {
+                    manager.setArchived(true);
+                }
+                manager.queue();
+            }
         }
     }
 
