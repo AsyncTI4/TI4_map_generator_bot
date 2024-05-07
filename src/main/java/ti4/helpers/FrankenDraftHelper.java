@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import ti4.commands.franken.ApplyDraftBags;
 import ti4.commands.player.Setup;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -79,6 +80,7 @@ public class FrankenDraftHelper {
                     displayPlayerHand(game, player);
                     if (draft.isDraftStageComplete()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
+                        ApplyDraftBags.applyDraftBags(event, game);
                         return;
                     }
                     int passCounter = 0;
