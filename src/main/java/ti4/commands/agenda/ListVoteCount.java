@@ -28,7 +28,12 @@ public class ListVoteCount extends AgendaSubcommandData {
 
     public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel) {
         List<Player> orderList = AgendaHelper.getVotingOrder(activeGame);
-        StringBuilder sb = new StringBuilder("**__Vote Count:__**\n");
+        int votes = 0;
+        for (Player player : orderList) {
+            votes = votes + AgendaHelper.getTotalVoteCount(activeGame, player);
+        }
+        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + votes);
+        sb.append("):__**\n");
         int itemNo = 1;
         for (Player player : orderList) {
             sb.append("`").append(itemNo).append(".` ");
@@ -38,6 +43,6 @@ public class ListVoteCount extends AgendaSubcommandData {
             sb.append("\n");
             itemNo++;
         }
-        MessageHelper.sendMessageToChannel(channel, sb.toString());   
+        MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
 }

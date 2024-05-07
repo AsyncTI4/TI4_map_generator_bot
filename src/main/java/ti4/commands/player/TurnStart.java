@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
+import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
@@ -24,8 +25,10 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
 
 public class TurnStart extends PlayerSubcommandData {
     public TurnStart() {
@@ -362,6 +365,44 @@ public class TurnStart extends PlayerSubcommandData {
                 "Use Psychoarcheology");
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             startButtons.add(psycho);
+        }
+        Player p1 = player;
+        String prefix = "componentActionRes_";
+        for (Leader leader : p1.getLeaders()) {
+            if (!leader.isExhausted() && !leader.isLocked()) {
+                String leaderID = leader.getId();
+                LeaderModel leaderModel = Mapper.getLeader(leaderID);
+                if (leaderModel == null) {
+                    continue;
+                }
+                String leaderName = leaderModel.getName();
+                String leaderAbilityWindow = leaderModel.getAbilityWindow();
+                String factionEmoji = Emojis.getFactionLeaderEmoji(leader);
+                if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
+                    if (leaderName.contains("Ssruu")) {
+                        String led = "naaluagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Button
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Z'eu (Naalu Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            startButtons.add(lButton);
+                        }
+                    } else {
+                        if (leaderID.equalsIgnoreCase("naaluagent")) {
+                            Button lButton = Button
+                                .secondary(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName)
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            startButtons.add(lButton);
+                        }
+                    }
+                } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
+                    && ButtonHelper.getTilesWithYourCC(p1, activeGame, event).size() > 0) {
+                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use " + leaderName)
+                        .withEmoji(Emoji.fromFormatted(factionEmoji));
+                    startButtons.add(lButton);
+                }
+            }
         }
 
         Button transaction = Button.primary("transaction", "Transaction");
