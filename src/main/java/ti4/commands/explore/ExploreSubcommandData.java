@@ -620,14 +620,16 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
 
-        if (player.hasAbility("fortune_seekers")) {
+        if (player.hasAbility("fortune_seekers") && activeGame.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            gainComm.add(Button.danger("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
             sb.append(ButtonHelper.getIdent(player)).append(" can use their **Fortune Seekers** ability\n");
             sb.append(player.getRepresentation(true, true)).append(
                 " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);
+            activeGame.setStoredValue("fortuneSeekers", "Used");
         }
 
         if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {

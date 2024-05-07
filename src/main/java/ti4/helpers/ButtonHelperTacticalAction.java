@@ -526,6 +526,7 @@ public class ButtonHelperTacticalAction {
         activeGame.setStoredValue("vaylerianHeroActive", "");
         activeGame.setStoredValue("tnelisCommanderTracker", "");
         activeGame.setStoredValue("planetsTakenThisRound", "");
+        activeGame.setStoredValue("fortuneSeekers", "");
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
 
