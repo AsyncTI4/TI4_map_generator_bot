@@ -158,8 +158,17 @@ public class MessageHelper {
 		boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(activeGame, player, msg);
-			if (saboable)
+			if (saboable) {
 				activeGame.addMessageIDForSabo(msg.getId());
+				for (Player p2 : activeGame.getRealPlayers()) {
+					if (p2 == player) {
+						continue;
+					}
+					if (p2.getAc() == 0 && !p2.hasUnit("empyrean_mech") && !p2.hasTechReady("it")) {
+						addFactionReactToMessage(activeGame, p2, msg);
+					}
+				}
+			}
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}
@@ -303,7 +312,7 @@ public class MessageHelper {
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
 			if (iterator.hasNext()) { // not last message
-				channel.sendMessage(messageCreateData).queue(null, 
+				channel.sendMessage(messageCreateData).queue(null,
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {

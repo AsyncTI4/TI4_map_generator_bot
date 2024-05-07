@@ -111,7 +111,7 @@ public class ButtonHelperCommanders {
         if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             return;
         }
-        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs:\n";
+        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs (the bot did not check if you have the pre-reqs otherwise):\n";
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             for (String tech : p2.getTechs()) {

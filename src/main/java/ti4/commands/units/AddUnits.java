@@ -18,6 +18,7 @@ public class AddUnits extends AddRemoveUnits {
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         tile.addUnit(planetName, unitID, count);
+        actionAfterAll(event, tile, color, activeGame);
     }
 
     @Override
@@ -25,7 +26,7 @@ public class AddUnits extends AddRemoveUnits {
         tile.addUnit(planetName, unitID, count);
     }
 
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
+    public void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
         OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null) {
             String value = option.getAsString().toLowerCase();

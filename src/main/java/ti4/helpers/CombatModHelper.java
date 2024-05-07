@@ -394,6 +394,16 @@ public class CombatModHelper {
                         .filter(unit -> !unit.getBaseType().equals("fighter"))
                         .count();
                 }
+                case "combat_round" -> {
+                    int round = 0;
+                    String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + "space";
+                    if (activeGame.getStoredValue(combatName).isEmpty()) {
+                        round = 0;
+                    } else {
+                        round = Integer.parseInt(activeGame.getStoredValue(combatName)) - 1;
+                    }
+                    scalingCount += round;
+                }
                 case "adjacent_mech" -> {
                     for (String pos : FoWHelper.getAdjacentTiles(activeGame, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = activeGame.getTileByPosition(pos);

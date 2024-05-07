@@ -1428,6 +1428,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
                     if (player.getStrategicCC() > 0) {
                         player.setStrategicCC(player.getStrategicCC() - 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
                     }
                     event.getMessage().delete().queue();
                 } else {
@@ -1598,12 +1599,14 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("useTech_")) {
             String tech = buttonID.replace("useTech_", "");
             TechnologyModel techModel = Mapper.getTech(tech);
-            String useMessage = player.getRepresentation() + " used tech: " + techModel.getRepresentation(false);
-            if (activeGame.isShowFullComponentTextEmbeds()) {
-                MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), useMessage,
-                    techModel.getRepresentationEmbed());
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), useMessage);
+            if (!tech.equalsIgnoreCase("st")) {
+                String useMessage = player.getRepresentation() + " used tech: " + techModel.getRepresentation(false);
+                if (activeGame.isShowFullComponentTextEmbeds()) {
+                    MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), useMessage,
+                        techModel.getRepresentationEmbed());
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), useMessage);
+                }
             }
             switch (tech) {
                 case "st" -> { // Sarween Tools
