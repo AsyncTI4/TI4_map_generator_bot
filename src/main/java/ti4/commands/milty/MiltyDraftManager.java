@@ -179,6 +179,7 @@ public class MiltyDraftManager {
     @JsonIgnore
     public void clear() {
         clearSlices();
+        all.clear();
         blue.clear();
         red.clear();
         draft.clear();
