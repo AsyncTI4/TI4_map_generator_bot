@@ -72,6 +72,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "betrayal",
+    "name": "Betrayal",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Choose another player. That player gives you 1 random action card from their hand. During this turn, they cannot play promissory notes or action cards.",
+    "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "black_market_raid",
     "name": "Black Market Raid",
     "phase": "Action",
@@ -158,7 +167,7 @@
     "phase": "Action",
     "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
     "text": "Remove your command token from the active system.",
-    "flavorText": "The Letnev fleet had sliced through the blockade in an instant. Their survival was owed solely to T'ro's prudent decision to retreat.",
+    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
   },
   {
@@ -193,7 +202,7 @@
     "name": "Deflection",
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
-    "text": "Choose 1 strategy card. Other players must spend 1 token from their strategy pool to choose that strategy card during this strategy phase, if they have another choice.",
+    "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if they have another choice.",
     "flavorText": "The Tribe elder's eyes flickered in the light of the campfire. \"The greatest form of persuasion lies in coercing another to believe the course of action you wish for them to take was their idea all along.\"",
     "source": "action_deck_2"
   },
@@ -211,7 +220,7 @@
     "name": "Discord",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
+    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
     "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
     "source": "action_deck_2"
   },
@@ -220,17 +229,8 @@
     "name": "Diverse Strategies",
     "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of up to 2 other different strategy cards instead; when you perform those abilities, spend command tokens from your reinforcements instead of your strategy pool.",
+    "text": "Perform the secondary ability of any 2 strategy cards instead; do not spend or place a command token to resolve those abilities.",
     "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "double_agents",
-    "name": "Double Agents",
-    "phase": "Any",
-    "window": "When a non-active player plays an action card other than \"Sabotage\"",
-    "text": "Cancel and take that action card.",
-    "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
     "source": "action_deck_2"
   },
   {
@@ -247,7 +247,7 @@
     "name": "Early Voting",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player. That player votes first on this agenda. If you and that player cast votes for the same outcome, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+    "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -274,7 +274,7 @@
     "name": "Espionage",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 other player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
+    "text": "Choose another player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
   },
@@ -301,7 +301,7 @@
     "name": "Flawless Strategy",
     "phase": "Action",
     "window": "After you exhaust your strategy card",
-    "text": "Perform the secondary ability of that strategy card; when you perform that ability, spend command tokens from your reinforcements instead of your strategy pool.",
+    "text": "Perform the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
     "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
     "source": "action_deck_2"
   },
@@ -373,7 +373,7 @@
     "name": "Joint Research",
     "phase": "Any",
     "window": "After you research a non-faction technology",
-    "text": "Choose 1 other player. That player gains that technology.",
+    "text": "Choose another player. That player gains that technology.",
     "flavorText": "Rin had received multiple warnings to avoid working with the Vuil'Raith. However, existential threats to the galaxy had never done much to stifle her curiosity.",
     "source": "action_deck_2"
   },
@@ -391,7 +391,7 @@
     "name": "Mercenary Contract",
     "phase": "Action",
     "window": "After a player activates a system that contains your units",
-    "text": "Produce up to 2 units in that system; you may spend influence as if it were resources to produce those units.",
+    "text": "Produce up to 2 ships in that system; you may spend influence as if it were resources to produce those units.",
     "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
     "source": "action_deck_2"
   },
@@ -517,7 +517,7 @@
     "name": "Relay Connection",
     "phase": "Action",
     "window": "After 1 of your units uses PRODUCTION to produce a ship in a system",
-    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION.",
+    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of those units by 2.",
     "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns my soul alight! This is our freedom!\"",
     "source": "action_deck_2"
   },
@@ -616,7 +616,7 @@
     "name": "Sister Ship",
     "phase": "Any",
     "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce 1 ship of that type in your home system; reduce the cost of that unit by half, rounded up.",
+    "text": "Produce 1 ship of that type in a system that contains 1 of your units with Production; reduce the cost of that unit by half, rounded up.",
     "flavorText": "The production of the Van Hauge VI had finished in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
