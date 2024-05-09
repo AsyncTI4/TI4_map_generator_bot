@@ -880,20 +880,22 @@ public class Game {
 
         // FIND BY NAME
         List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
-        if (getActionsChannel() == null)
-            return null;
-        if (botChannels.size() > 1) {
+        if (botChannels.size() == 1) {
+            return botChannels.get(0);
+        } else if (botChannels.size() > 1) {
             BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
             return botChannels.get(0);
         }
 
         // CHECK IF ARCHIVED
-        if (botChannels.isEmpty()) { // can't find it, might be archived
-            for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
-                if (archivedChannel.getId().equals(getBotMapUpdatesThreadID()) || archivedChannel.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
-                    setBotMapUpdatesThreadID(archivedChannel.getId());
-                    return archivedChannel;
-                }
+        if (getActionsChannel() == null) {
+            BotLogger.log(getName() + " does not have an actions channel and therefore can't find the bot-map-updates channel");
+            return null;
+        }
+        for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
+            if (archivedChannel.getId().equals(getBotMapUpdatesThreadID()) || archivedChannel.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                setBotMapUpdatesThreadID(archivedChannel.getId());
+                return archivedChannel;
             }
         }
         return null;
