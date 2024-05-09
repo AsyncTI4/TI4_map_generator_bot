@@ -873,6 +873,9 @@ public class Game {
     @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
         // FIND BY ID
+        if (isFoWMode()) {
+            return null;
+        }
         ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
         if (threadChannel != null) {
             return threadChannel;

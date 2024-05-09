@@ -1474,7 +1474,7 @@ public class MapGenerator {
                 } else {
                     if (remainingReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
                         String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for "
-                            + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID));
+                            + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID)) + ". Use buttons to remove";
                         if (game.isFoWMode()) {
                             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage,
                                 ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game,

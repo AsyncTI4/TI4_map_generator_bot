@@ -98,10 +98,10 @@ public class ShowGame implements Command {
             buttons.add(Button.success("cardsInfo", "Cards Info"));
             buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
             buttons.add(Button.secondary("showGameAgain", "Show Game"));
-            
+
             // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
             MessageChannel channel = event.getMessageChannel();
-            if (activeGame.getActionsChannel() != null && activeGame.getBotMapUpdatesThread() != null && channel.equals(activeGame.getActionsChannel())) {
+            if (!activeGame.isFoWMode() && activeGame.getActionsChannel() != null && activeGame.getBotMapUpdatesThread() != null && channel.equals(activeGame.getActionsChannel())) {
                 channel = activeGame.getBotMapUpdatesThread();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + activeGame.getBotMapUpdatesThread().getJumpUrl());
             }

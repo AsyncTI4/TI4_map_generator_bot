@@ -3024,6 +3024,8 @@ public class ButtonHelper {
         } else {
             if (deleteMsg) {
                 event.getMessage().delete().queue();
+            } else if (actionRow2.size() > 0) {
+                event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
             }
         }
     }
