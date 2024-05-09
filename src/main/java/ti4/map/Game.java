@@ -872,24 +872,27 @@ public class Game {
 
     @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
-        try {
-            return AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
-        } catch (Exception e) {
-            ThreadChannel threadChannel; // exists and is not locked
-            List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
-            if (getActionsChannel() == null)
-                return null;
-            if (botChannels.size() > 1) {
-                BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
-                return botChannels.get(0);
-            }
-            if (botChannels.isEmpty()) { // can't find it, might be archived
-                for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
-                    if (threadChannel_.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
-                        threadChannel = threadChannel_;
-                        setBotMapUpdatesThreadID(threadChannel.getId());
-                        return threadChannel;
-                    }
+        // FIND BY ID
+        ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+        if (threadChannel != null) {
+            return threadChannel;
+        }
+
+        // FIND BY NAME
+        List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+        if (getActionsChannel() == null)
+            return null;
+        if (botChannels.size() > 1) {
+            BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+            return botChannels.get(0);
+        }
+
+        // CHECK IF ARCHIVED
+        if (botChannels.isEmpty()) { // can't find it, might be archived
+            for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
+                if (archivedChannel.getId().equals(getBotMapUpdatesThreadID()) || archivedChannel.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                    setBotMapUpdatesThreadID(archivedChannel.getId());
+                    return archivedChannel;
                 }
             }
         }
