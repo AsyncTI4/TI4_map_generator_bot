@@ -184,13 +184,12 @@ public class ButtonHelperActionCardsWillHomebrew {
         String buttonID) {
         Player p1 = player;
         if (p1.getStrategicCC() > 0) {
-            String successMessage = ButtonHelper.getIdent(p1) + " Reduced strategy pool CCs by 1 ("
-                + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
+            String successMessage = p1.getFactionEmoji() + " Reduced strategy pool CCs by 1 ("                + (p1.getStrategicCC()) + " -> " + (p1.getStrategicCC() - 1) + ")";
             p1.setStrategicCC(p1.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, Emojis.ActionCard + "Side Project");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
         } else {
-            String successMessage = ButtonHelper.getIdent(p1) + " Exhausted Scepter";
+            String successMessage = p1.getFactionEmoji() + " Exhausted Scepter of Emelpar";
             p1.addExhaustedRelic("emelpar");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
         }

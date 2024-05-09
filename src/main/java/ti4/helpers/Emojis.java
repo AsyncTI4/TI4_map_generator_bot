@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import org.jetbrains.annotations.NotNull;
+
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.map.Game;
 import ti4.map.Leader;
 
@@ -1741,5 +1743,13 @@ public class Emojis {
             case "envoy" -> Envoy;
             default -> getRandomGoodDog(type);
         };
+    }
+
+    public static String tg(int count) {
+        return StringUtils.repeat(Emojis.tg, count);
+    }
+
+    public static String comm(int count) {
+        return StringUtils.repeat(Emojis.comm, count);
     }
 }

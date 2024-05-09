@@ -83,7 +83,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         tgGainMsg.append(" gained ").append(resourcesSum).append("tg from Celestial Impact (");
         tgGainMsg.append(player.getTg()).append("->").append(player.getTg() + resourcesSum).append(").");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg.toString());
-        player.gainTg(resourcesSum);
+        player.gainTG(resourcesSum);
         ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, resourcesSum);
 
