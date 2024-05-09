@@ -1700,7 +1700,7 @@ public class ButtonHelperActionCards {
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
             for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(6);
+                Die d1 = new Die(7);
                 msg.append(d1.getResult()).append(", ");
                 if (d1.isSuccess()) {
                     hits++;
