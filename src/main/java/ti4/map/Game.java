@@ -876,11 +876,14 @@ public class Game {
             return AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
         } catch (Exception e) {
             ThreadChannel threadChannel; // exists and is not locked
-            List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda
-                .getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+            List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
             if (getActionsChannel() == null)
                 return null;
-            if (botChannels.size() != 1) { // can't find it, might be archived
+            if (botChannels.size() > 1) {
+                BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+                return botChannels.get(0);
+            }
+            if (botChannels.isEmpty()) { // can't find it, might be archived
                 for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
                     if (threadChannel_.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
                         threadChannel = threadChannel_;
