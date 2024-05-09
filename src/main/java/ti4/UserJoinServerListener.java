@@ -4,7 +4,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.helpers.Helper;
@@ -29,14 +31,33 @@ public class UserJoinServerListener extends ListenerAdapter {
             if (game.getGuild() != null && game.getGuild().equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
                 Helper.fixGameChannelPermissions(guild, game);
-                checkIfCanCloseGameLaunchThread(game);
                 game.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+                checkIfCanCloseGameLaunchThread(game);
             }
         }
-        if (!mapsJoined.isEmpty()) BotLogger.log("User: *" + user.getName() + "* joined server: **" + guild.getName() + "**. Maps joined: " + mapsJoined.stream().map(Game::getName).toList());
+        if (!mapsJoined.isEmpty()) {
+            BotLogger.log("User: *" + user.getName() + "* joined server: **" + guild.getName() + "**. Maps joined: " + mapsJoined.stream().map(Game::getName).toList());
+        }
     }
 
     private void checkIfCanCloseGameLaunchThread(Game game) {
-        // TODO: Implement this
+        Guild guild = game.getGuild();
+        if (guild == null) {
+            return;
+        }
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
+        for (String playerIDs : game.getPlayerIDs()) {
+            if (!guildMemberIDs.contains(playerIDs)) {
+                return;
+            }
+        }
+        String threadID = game.getLaunchPostThreadID();
+        if (threadID == null) {
+            return;
+        }
+        if (AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID) instanceof ThreadChannel thread) {
+            thread.getManager().setArchived(true).queue();
+            BotLogger.log("`UserJoinServerListener.checkIfCanCloseGameLaunchThread()` closed launch thread: `" + thread.getName() + "` for game: `" + game.getName() + "`");
+        }
     }
 }
