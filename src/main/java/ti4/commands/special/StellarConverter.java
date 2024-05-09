@@ -11,8 +11,11 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -70,6 +73,22 @@ public class StellarConverter extends SpecialSubcommandData {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
                     p2.getRepresentation(true, true) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been stellar converted");
+                int amountToKill = 0;
+                amountToKill = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
+                if (p2.hasInf2Tech()) {
+                    ButtonHelper.resolveInfantryDeath(activeGame, p2, amountToKill);
+                    boolean cabalMech = false;
+                    if (unitHolder.getUnitCount(UnitType.Mech,
+                        p2.getColor()) > 0
+                        && p2.hasUnit("cabal_mech")
+                        && !activeGame.getLaws().containsKey("articles_war")) {
+                        cabalMech = true;
+                    }
+                    if (p2.hasAbility("amalgamation")
+                        && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)) {
+                        ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, amountToKill, "infantry", event);
+                    }
+                }
             }
         }
         activeGame.removePlanet(unitHolder);
