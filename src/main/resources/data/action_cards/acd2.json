@@ -616,7 +616,7 @@
     "name": "Sister Ship",
     "phase": "Any",
     "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce 1 ship of that type in a system that contains 1 of your units with Production; reduce the cost of that unit by half, rounded up.",
+    "text": "Produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the cost of that unit by half, rounded up.",
     "flavorText": "The production of the Van Hauge VI had finished in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
