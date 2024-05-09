@@ -655,8 +655,8 @@ public class ButtonHelperModifyUnits {
                         .add(Button.danger(
                             "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                 + uH.getName(),
-                            "Remove 1 " + type.humanReadableName() + " from tile " +
-                                tile.getPosition() + " in location: " + uH.getName()));
+                            type.humanReadableName() + " from " +
+                                tile.getRepresentation() + " in " + uH.getName()));
                 }
             }
         }
