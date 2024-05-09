@@ -525,7 +525,7 @@ public class Player {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
@@ -1772,8 +1772,10 @@ public class Player {
     }
 
     @JsonIgnore
-    public void gainTg(int tg) {
-        this.tg += tg;
+    public String gainTG(int count) {
+        String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
+        this.tg += count;
+        return message;
     }
 
     public void setTurnCount(int turn) {

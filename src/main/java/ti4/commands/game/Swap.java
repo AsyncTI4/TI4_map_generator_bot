@@ -1,6 +1,9 @@
 package ti4.commands.game;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -9,20 +12,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.player.TurnStart;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
 
 public class Swap extends GameSubcommandData {
 
@@ -78,10 +74,10 @@ public class Swap extends GameSubcommandData {
     }
 
     public void secondHalfOfSwap(Game activeGame, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
-        String message;
+        StringBuilder message = new StringBuilder("Users have swapped factions:\n");
+        message.append("> **Before:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
         Collection<Player> players = activeGame.getPlayers().values();
         if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
-            message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
             Player player = activeGame.getPlayer(removedPlayer.getUserID());
             Map<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
             for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
@@ -132,6 +128,7 @@ public class Swap extends GameSubcommandData {
         GameSaveLoadManager.reload(activeGame);
         // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
         // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        message.append("> **After:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
     }
 }
