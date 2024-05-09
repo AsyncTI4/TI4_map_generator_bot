@@ -55,9 +55,11 @@ public class UserJoinServerListener extends ListenerAdapter {
         if (threadID == null) {
             return;
         }
-        if (AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID) instanceof ThreadChannel thread) {
-            thread.getManager().setArchived(true).queue();
-            BotLogger.log("`UserJoinServerListener.checkIfCanCloseGameLaunchThread()` closed launch thread: `" + thread.getName() + "` for game: `" + game.getName() + "`");
+        ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
+        if (threadChannel == null) {
+            return;
         }
+        threadChannel.getManager().setArchived(true).queue();
+        BotLogger.log("`UserJoinServerListener.checkIfCanCloseGameLaunchThread()` closed launch thread: `" + threadChannel.getName() + "` for game: `" + game.getName() + "`"); 
     }
 }
