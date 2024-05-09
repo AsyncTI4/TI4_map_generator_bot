@@ -316,7 +316,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
-            if (!thread.getParentChannel().getName().equals("making-new-games")) {
+            if (thread.getParentChannel().getName().equals("making-new-games")) {
                 newGame.setLaunchPostThreadID(thread.getId());
                 ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
