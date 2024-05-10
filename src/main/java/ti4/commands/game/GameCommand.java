@@ -60,13 +60,13 @@ public class GameCommand implements Command {
         }
         CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(activeGame, event);
         if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
-                && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
-                && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
+            && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
+            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
             fileFuture.thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
                 if (!activeGame.isFoWMode()) {
                     Button linkToWebsite = Button.link(
-                            "https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
+                        "https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
                     buttons.add(linkToWebsite);
                     buttons.add(Button.success("gameInfoButtons", "Player Info"));
                 }
@@ -102,7 +102,9 @@ public class GameCommand implements Command {
         subcommands.add(new SetDeck());
         // subcommands.add(new GameCreate());
         subcommands.add(new CreateGameButton());
+        subcommands.add(new WeirdGameSetup());
         subcommands.add(new Swap());
+        subcommands.add(new Observer());
         // subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }
@@ -110,7 +112,7 @@ public class GameCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

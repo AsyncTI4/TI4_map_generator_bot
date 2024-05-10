@@ -255,10 +255,70 @@ public class CardsInfo implements Command, InfoThreadCommand {
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             buttons.add(psycho);
         }
+        if (player.hasUnexhaustedLeader("nekroagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
+                "Use Nekro Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
+            buttons.add(nekroButton);
+        }
+        if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
+            Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace")
+                .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("vaylerianagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent",
+                "Use Vaylerian Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
+            buttons.add(nekroButton);
+        }
+        if (player.ownsUnit("ghost_mech")
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
+            && !activeGame.getLaws().containsKey("articles_war")) {
+            Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech")
+                .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            buttons.add(ghostButton);
+        }
+        if (player.ownsUnit("nivyn_mech2")
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
+            && !activeGame.getLaws().containsKey("articles_war")) {
+            Button ghostButton = Button.secondary("nivynMechStep1_", "Use Nivyn Mech")
+                .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
+            buttons.add(ghostButton);
+        }
+        if (player.hasUnexhaustedLeader("kolleccagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
+                "Use Kollecc Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
+            buttons.add(nekroButton);
+        }
+        if (player.hasUnexhaustedLeader("mykomentoriagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent",
+                "Use Myko Agent")
+                .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            buttons.add(nekroButton);
+        }
+        if (player.hasAbility("cunning")) {
+            buttons.add(Button.success("setTrapStep1", "Set a Trap"));
+            buttons.add(Button.danger("revealTrapStep1", "Reveal a Trap"));
+            buttons.add(Button.secondary("removeTrapStep1", "Remove a Trap"));
+        }
+
+        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
+            StringBuilder omenDice = new StringBuilder();
+            for (int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)) {
+                omenDice.append(" ").append(omenDie);
+            }
+            omenDice = new StringBuilder(omenDice.toString().trim());
+            Button augers = Button.secondary("getOmenDice", "Use an omen die (" + omenDice + ")")
+                .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            buttons.add(augers);
+        }
         Button playerPref = Button.secondary("offerPlayerPref", "Change Player Settings");
         buttons.add(playerPref);
         Button listGames = Button.secondary("searchMyGames", "List All My Games");
         buttons.add(listGames);
+        buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
             if (!activeGame.getPlayedSCs().contains(SC)) {
@@ -272,7 +332,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(Buttons.REFRESH_INFO);
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            "_ _\nYou can use these buttons to do various things", buttons);
+            "You can use these buttons to do various things", buttons);
     }
 
     protected String getActionDescription() {

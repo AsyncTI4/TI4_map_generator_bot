@@ -13,78 +13,28 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Setup extends GameSubcommandData {
-    public Setup() {
-        super(Constants.SETUP, "Game Setup");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game VP count. Default is 10"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets. Default 1"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of SO's per player. Default 3"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
+public class WeirdGameSetup extends GameSubcommandData {
+    public WeirdGameSetup() {
+        super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games");
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to base game mode."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with Base Game Mode)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-        OptionMapping playerCount = event.getOption(Constants.PLAYER_COUNT_FOR_MAP);
-        if (playerCount != null) {
-            int count = playerCount.getAsInt();
-            if (count < 1 || count > 30) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify between 1 or 30 players.");
-            } else {
-                activeGame.setPlayerCountForMap(count);
-            }
+        Boolean communityMode = event.getOption(Constants.COMMUNITY_MODE, null, OptionMapping::getAsBoolean);
+        if (communityMode != null) activeGame.setCommunityMode(communityMode);
 
-        }
-
-        OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
-        if (vpOption != null) {
-            int count = vpOption.getAsInt();
-            if (count < 1) {
-                count = 1;
-            } else if (count > 20) {
-                count = 20;
-            }
-            activeGame.setVp(count);
-        }
-
-        Integer maxSOCount = event.getOption(Constants.MAX_SO_COUNT, null, OptionMapping::getAsInt);
-        if (maxSOCount != null && maxSOCount >= 0) {
-            activeGame.setMaxSOCountPerPlayer(maxSOCount);
-
-            String key = "factionsThatAreNotDiscardingSOs";
-            String key2 = "queueToDrawSOs";
-            String key3 = "potentialBlockers";
-            activeGame.setStoredValue(key, "");
-            activeGame.setStoredValue(key2, "");
-            activeGame.setStoredValue(key3, "");
-            if (activeGame.getRound() > 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
-            }
-
-        }
-
-        Integer scCountPerPlayer = event.getOption(Constants.SC_COUNT_FOR_MAP, null, OptionMapping::getAsInt);
-        if (scCountPerPlayer != null) {
-            int maxSCsPerPlayer;
-            if (activeGame.getRealPlayers().isEmpty()) {
-                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
-            } else {
-                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
-            }
-
-            if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
-
-            if (scCountPerPlayer < 1) {
-                scCountPerPlayer = 1;
-            } else if (scCountPerPlayer > maxSCsPerPlayer) {
-                scCountPerPlayer = maxSCsPerPlayer;
-            }
-            activeGame.setStrategyCardsPerPlayer(scCountPerPlayer);
-        }
+        Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
+        if (fowMode != null) activeGame.setFoWMode(fowMode);
 
         Integer pingHours = event.getOption(Constants.AUTO_PING, null, OptionMapping::getAsInt);
         if (pingHours != null) {
@@ -108,6 +58,12 @@ public class Setup extends GameSubcommandData {
         if (!setGameMode(event, activeGame)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the game modes could not be set, please see error above.");
         }
+
+        Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
+        if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
+
+        Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
+        if (extraSecretMode != null) activeGame.setExtraSecretMode(extraSecretMode);
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
