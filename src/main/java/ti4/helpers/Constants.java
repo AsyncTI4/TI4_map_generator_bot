@@ -234,6 +234,8 @@ public class Constants {
     public static final String ADD_ADJACENCY_OVERRIDE = "add_adjacency_override";
     public static final String REMOVE_ADJACENCY_OVERRIDE = "remove_adjacency_override";
     public static final String REMOVE_ALL_ADJACENCY_OVERRIDES = "remove_all_adjacency_overrides";
+    public static final String ADD_ADJACENCY_OVERRIDE_LIST = "add_adjacency_override_list";
+    public static final String ADJACENCY_OVERRIDES_LIST = "adjacency_list";
     public static final String REMOVE_FOG_TILE = "remove_fog_tile";
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
