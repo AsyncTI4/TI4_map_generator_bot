@@ -876,7 +876,10 @@ public class Game {
         if (isFoWMode()) {
             return null;
         }
-        ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+        ThreadChannel threadChannel = null;
+        if (getBotMapUpdatesThreadID() != null) {
+            threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+        }
         if (threadChannel != null) {
             return threadChannel;
         }
@@ -2573,7 +2576,7 @@ public class Game {
             actionCards.addAll(discardActionCards.keySet());
             discardActionCards.clear();
             Collections.shuffle(actionCards);
-            String msg = getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
+            String msg = "# " + getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
             MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
             return drawActionCard(userID);
         }

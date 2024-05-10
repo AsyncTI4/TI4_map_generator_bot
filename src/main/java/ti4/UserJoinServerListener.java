@@ -15,7 +15,7 @@ import ti4.map.GameManager;
 import ti4.message.BotLogger;
 
 public class UserJoinServerListener extends ListenerAdapter {
-    
+
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
@@ -31,7 +31,9 @@ public class UserJoinServerListener extends ListenerAdapter {
             if (game.getGuild() != null && game.getGuild().equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
                 Helper.fixGameChannelPermissions(guild, game);
-                game.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+                if (game.getBotMapUpdatesThread() != null) {
+                    game.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+                }
                 checkIfCanCloseGameLaunchThread(game);
             }
         }
@@ -60,6 +62,6 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         threadChannel.getManager().setArchived(true).queue();
-        BotLogger.log("`UserJoinServerListener.checkIfCanCloseGameLaunchThread()` closed launch thread: `" + threadChannel.getName() + "` for game: `" + game.getName() + "`"); 
+        BotLogger.log("`UserJoinServerListener.checkIfCanCloseGameLaunchThread()` closed launch thread: `" + threadChannel.getName() + "` for game: `" + game.getName() + "`");
     }
 }
