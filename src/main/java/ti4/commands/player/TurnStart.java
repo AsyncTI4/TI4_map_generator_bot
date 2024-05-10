@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -71,6 +72,7 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.setStoredValue("planetsTakenThisRound", "");
         activeGame.setStoredValue("absolLux", "");
         activeGame.setStoredValue("mentakHero", "");
+        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
         boolean goingToPass = false;
         if (activeGame.getStoredValue("Pre Pass " + player.getFaction()) != null
             && activeGame.getStoredValue("Pre Pass " + player.getFaction())

@@ -67,6 +67,9 @@ public class Whisper extends FOWSubcommandData {
         if (!activeGame.isFoWMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
+        for (Player player2 : activeGame.getRealPlayers()) {
+            msg = msg.replace(player2.getPing(), player2.getUserName());
+        }
 
         if (anonY.compareToIgnoreCase("y") == 0) {
             message = "[REDACTED] says: " + msg;
