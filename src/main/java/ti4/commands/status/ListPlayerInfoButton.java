@@ -273,12 +273,13 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game activeGame) {
-        event.getMessage().delete().queue();
+
         String extent = buttonID.split("_")[1];
         if (extent.equalsIgnoreCase("both")) {
             ListPlayerInfoButton.displayerScoringProgression(activeGame, true, event, "both");
         } else {
             ListPlayerInfoButton.displayerScoringProgression(activeGame, false, event, extent);
+            event.getMessage().delete().queue();
         }
     }
 
@@ -411,10 +412,6 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     public static void displayerScoringProgression(Game activeGame, boolean onlyThisGameObj,
         GenericInteractionCreateEvent event, String stage1sOrTwos) {
-        if (activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), " This doesnt work in fog");
-            return;
-        }
         String msg = "";
         int x = 1;
         if (onlyThisGameObj) {
@@ -448,14 +445,16 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         } else {
             representation = model.getRepresentation() + "\n> ";
         }
-        for (Player player : activeGame.getRealPlayers()) {
-            representation = representation + player.getFactionEmoji() + ": ";
-            if (activeGame.getRevealedPublicObjectives().containsKey(objID)
-                && activeGame.didPlayerScoreThisAlready(player.getUserID(), objID)) {
-                representation = representation + "✅  ";
-            } else {
-                representation = representation + getPlayerProgressOnObjective(objID, activeGame, player) + "/"
-                    + getObjectiveThreshold(objID) + "  ";
+        if (!activeGame.isFoWMode()) {
+            for (Player player : activeGame.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": ";
+                if (activeGame.getRevealedPublicObjectives().containsKey(objID)
+                    && activeGame.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                    representation = representation + "✅  ";
+                } else {
+                    representation = representation + getPlayerProgressOnObjective(objID, activeGame, player) + "/"
+                        + getObjectiveThreshold(objID) + "  ";
+                }
             }
         }
         return representation;
