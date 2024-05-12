@@ -582,10 +582,16 @@ public class MapGenerator {
                 graphics.setColor(Color.WHITE);
 
                 StringBuilder userName = new StringBuilder();
+                String playerName = player.getUserName();
+                userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
+
+                // PAINT FACTION OR DISPLAY NAME
+                String factionText = player.getFaction();
                 if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
-                    userName.append("[").append(player.getDisplayName()).append("] ");
+                    factionText = player.getDisplayName();
                 }
-                userName.append(player.getUserName());
+                userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+
                 if (!"null".equals(player.getColor())) {
                     userName.append(" (").append(player.getColor()).append(")");
                 }
@@ -2756,6 +2762,10 @@ public class MapGenerator {
                 factionText = player.getDisplayName();
             }
             graphics.drawString(StringUtils.capitalize(factionText), point.x + deltaX, point.y + deltaY);
+
+            // PAINT COLOR
+            point = PositionMapper.getPlayerStats(Constants.STATS_COLOR);
+            graphics.drawString(player.getColor(), point.x + deltaX, point.y + deltaY);
 
             // PAIN VICTORY POINTS
             int vpCount = player.getTotalVictoryPoints();
