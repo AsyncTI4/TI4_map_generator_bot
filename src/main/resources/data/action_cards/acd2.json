@@ -238,7 +238,7 @@
     "name": "Diverse Strategies",
     "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of that strategy card and 2 others instead; do not spend or place a command token to resolve those abilities.",
+    "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place a command token to resolve those abilities.",
     "flavorText": "\"We will win this war, Qanoj, based on how we adapt to it,\" Clair said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
     "source": "action_deck_2"
   },
