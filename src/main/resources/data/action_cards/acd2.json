@@ -40,8 +40,8 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "End that player's turn and return their command token in the active system to their tactic pool.",
-    "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
+    "text": "End that player's turn. Then, they may discard 1 random action card from their hand to return their command token in that system to their tactic pool.",
+    "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
     "source": "action_deck_2"
   },
   {
@@ -148,7 +148,7 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that cast 5 or more votes for that outcome gains 2 trade goods.",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
     "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },
@@ -207,6 +207,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "demoralization",
+    "name": "Demoralization",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome destroys 3 of their infantry on the game board.",
+    "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "derelict_space_station",
     "name": "Derelict Station",
     "phase": "Action",
@@ -221,7 +230,7 @@
     "phase": "Action",
     "window": "When you perform a strategic action",
     "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
-    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
+    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped them. Panic filled the Federation airwaves. Their human minions had done well.",
     "source": "action_deck_2"
   },
   {
@@ -229,8 +238,8 @@
     "name": "Diverse Strategies",
     "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of any 2 strategy cards instead; do not spend or place a command token to resolve those abilities.",
-    "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
+    "text": "Perform the secondary ability of that strategy card and 2 others instead; do not spend or place a command token to resolve those abilities.",
+    "flavorText": "\"We will win this war, Qanoj, based on how we adapt to it,\" Clair said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
     "source": "action_deck_2"
   },
   {
@@ -297,6 +306,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "final_mission",
+    "name": "Final Mission",
+    "phase": "Action",
+    "window": "After 1 of your mechs is destroyed during a ground combat",
+    "text": "Choose up to 3 of your opponent's ground forces. Roll 1 die for each of those units; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
+    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "flawless_strategy",
     "name": "Flawless Strategy",
     "phase": "Action",
@@ -339,6 +357,15 @@
     "window": "Action",
     "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
     "flavorText": "M'aban sighed at the man's pleas. How many others could mask their intentions so well? The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "hijacked_signal",
+    "name": "Hijacked Signal",
+    "phase": "Any",
+    "window": "When a command token from your reinforcements or strategy pool would be spent and/or placed on the game board",
+    "text": "Spend and/or place a command token from another player's reinforcements instead.",
+    "flavorText": "Threats of death accompanied the many conflicting commands. The Stillness of Stars' eyes rolled back in pleasure at the palpable confusion.",
     "source": "action_deck_2"
   },
   {
@@ -441,6 +468,78 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "outgun1",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun2",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun3",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun4",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver1",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver2",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship to port. “Zat would've cut us in half,” he muttered.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver3",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "T'esla checked her wingman, relieved to see that he had followed her evasive maneuver. \"Jam zem!\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver4",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "patronage",
     "name": "Patronage",
     "phase": "Status",
@@ -535,8 +634,8 @@
     "name": "Rendezvous Point",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport units during this movement.]",
-    "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your units in adjacent systems that do not contain 1 of your command tokens into the chosen system; ground forces may be moved to the space area or to planets you control.",
+    "flavorText": "\"A logistical nightmare, aye?\" Alastair leaned back in his chair. \"I recommend you get to it then.\"",
     "source": "action_deck_2"
   },
   {
@@ -567,15 +666,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "safety_overrides",
-    "name": "Safety Overrides",
-    "phase": "Action",
-    "window": "After 1 of your mechs is destroyed during a ground combat",
-    "text": "Choose up to 3 of your opponent's ground forces. Roll 1 die for each of those units; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
-    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "schematics_rider",
     "name": "Schematics Rider",
     "phase": "Agenda",
@@ -590,7 +680,7 @@
     "phase": "Action",
     "window": "At the start of your turn",
     "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted, and is readied at the end of this turn.",
-    "flavorText": "Commandeering the genetic spinner for the task was arduous and the creature it produced quickly became unpredictable.",
+    "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that Spinner after all. This galaxy can barely handle one of me.\"",
     "source": "action_deck_2"
   },
   {
