@@ -19,12 +19,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "targeted_acquisition",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "military_industrial_complex",
         "OptionalSwaps": [
             "HERO:axishero",
@@ -86,6 +80,12 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "decree",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "radiance",
         "Undraftable": true,
         "source": "ds"
@@ -102,6 +102,12 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "free_people",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "freesystems",
         "Undraftable": true,
         "source": "ds"
     },
@@ -243,6 +249,18 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "ABILITY",
+        "ItemId": "heroism",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "valor",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "AGENT",
         "ItemId": "kjalengardagent",
         "Undraftable": true,
@@ -263,6 +281,12 @@
     {
         "ItemCategory": "MECH",
         "ItemId": "kjalengard_mech",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "kjalengard_flagship",
         "Undraftable": true,
         "source": "ds"
     },
@@ -308,6 +332,30 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "plague_reservoir",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "subversive",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "a_new_edifice",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "lanefircommander",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "subterfuge",
         "Undraftable": true,
         "source": "ds"
@@ -338,6 +386,12 @@
         ],
         "source": "ds"
     },
+    {   
+        "ItemCategory": "STARTINGFLEET",
+        "ItemId": "khrask",
+        "Undraftable": true,
+        "source": "ds"
+    },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "combat_drones",
@@ -346,7 +400,19 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "privileged_citizenry",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "divination",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMODITIES",
+        "ItemId": "mykomentori",
         "Undraftable": true,
         "source": "ds"
     },
@@ -453,6 +519,12 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "TECH",
+        "ItemId": "tnelis",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "MECH",
         "ItemId": "tnelis_mech",
         "AdditionalComponents": [
@@ -530,6 +602,12 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "targeted_acquisition",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "holding_company",
         "Undraftable": true,
         "source": "ds"
@@ -543,6 +621,12 @@
     {
         "ItemCategory": "HERO",
         "ItemId": "veldyrhero",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "veldyr",
         "Undraftable": true,
         "source": "ds"
     },
