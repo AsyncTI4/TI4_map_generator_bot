@@ -53,6 +53,12 @@ public class CommanderDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
@@ -63,7 +69,6 @@ public class CommanderDraftItem extends DraftItem {
             }
             allItems.add(DraftItem.Generate(Category.COMMANDER, leaders.get(0)));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
         return allItems;
     }
 }

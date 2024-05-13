@@ -65,6 +65,12 @@ public class MechDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, UnitModel> allUnits = Mapper.getUnits();
         for (FactionModel faction : factions) {
@@ -72,7 +78,6 @@ public class MechDraftItem extends DraftItem {
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
             allItems.add(DraftItem.Generate(Category.MECH, units.get(0)));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
         return allItems;
     }
 }

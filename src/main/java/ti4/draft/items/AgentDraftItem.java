@@ -54,6 +54,12 @@ public class AgentDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.AGENT);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
@@ -66,7 +72,6 @@ public class AgentDraftItem extends DraftItem {
             }
             allItems.add(DraftItem.Generate(Category.AGENT, agents.get(0)));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.AGENT);
         return allItems;
     }
 }

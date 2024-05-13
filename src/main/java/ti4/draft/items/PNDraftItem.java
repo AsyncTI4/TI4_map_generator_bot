@@ -42,11 +42,16 @@ public class PNDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.PN);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             allItems.add(DraftItem.Generate(Category.PN,faction.getPromissoryNotes().get(0)));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.PN);
         return allItems;
     }
 }

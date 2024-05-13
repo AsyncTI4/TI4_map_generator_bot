@@ -56,6 +56,12 @@ public class HeroDraftItem extends DraftItem {
 
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.HERO);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
@@ -66,7 +72,6 @@ public class HeroDraftItem extends DraftItem {
             }
             allItems.add(DraftItem.Generate(Category.HERO, leaders.get(0)));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.HERO);
         return allItems;
     }
 }
