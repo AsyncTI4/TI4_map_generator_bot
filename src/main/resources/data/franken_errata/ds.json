@@ -40,7 +40,7 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "bentoragent",
+        "ItemId": "bentorcommander",
         "Undraftable": true,
         "source": "ds"
     },
@@ -292,7 +292,7 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "for_glory",
+        "ItemId": "glory",
         "OptionalSwaps": [
             "TECH:dskjalg",
             "AGENT:kjalengardagent",
@@ -520,7 +520,7 @@
     },
     {
         "ItemCategory": "TECH",
-        "ItemId": "tnelis",
+        "ItemId": "dstnely",
         "Undraftable": true,
         "source": "ds"
     },

@@ -146,6 +146,18 @@
         "source": "pok"
     },
     {
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentartuno",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentthundarian",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "the_company",
         "AdditionalComponents": [
