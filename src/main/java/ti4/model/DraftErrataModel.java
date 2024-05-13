@@ -2,6 +2,7 @@ package ti4.model;
 
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
+import ti4.model.Source.ComponentSource;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +12,8 @@ public class DraftErrataModel implements ModelInterface {
     @Override
     public boolean isValid() {
         return ItemCategory != null
-            && ItemId != null;
+            && ItemId != null
+            && source != null;
     }
 
     @Override
@@ -31,6 +33,8 @@ public class DraftErrataModel implements ModelInterface {
 
     public boolean AlwaysAddToPool;
 
+    private ComponentSource source;
+
     public DraftErrataModel(String alias) {
         String[] split = alias.split(":");
         ItemCategory = DraftItem.Category.valueOf(split[0]);
@@ -46,5 +50,17 @@ public class DraftErrataModel implements ModelInterface {
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
         Collections.shuffle(items);
+    }
+
+    public List<DraftErrataModel> getAdditionalComponents() {
+        return List.of(AdditionalComponents);
+    }
+
+    public List<DraftErrataModel> getOptionalSwaps() {
+        return List.of(OptionalSwaps);
+    }
+
+    public ComponentSource getSource() {
+        return source;
     }
 }
