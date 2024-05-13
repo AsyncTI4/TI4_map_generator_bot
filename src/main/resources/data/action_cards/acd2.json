@@ -49,7 +49,7 @@
     "name": "Arms Deal",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 of your neighbors. That player places up to a total of 2 cruisers and/or destroyers from their reinforcements in a system that contains their ships.",
+    "text": "Choose 1 of your neighbors. That player places up to 1 cruiser and destroyer from their reinforcements in a system that contains their ships.",
     "flavorText": "Ipswitch smirked when the Commander asked for the ships' documentation, \"Probably burned... with the bodies.\"",
     "source": "action_deck_2"
   },
@@ -138,7 +138,7 @@
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
-    "window": "At the start of a round of space combat, other than the first",
+    "window": "At the start of the second round of a space combat",
     "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
     "source": "action_deck_2"
@@ -634,7 +634,7 @@
     "name": "Rendezvous Point",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your units in adjacent systems that do not contain 1 of your command tokens into the chosen system; ground forces may be moved to the space area or to planets you control.",
+    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your units in adjacent systems that do not contain 1 of your command tokens into the chosen system; ground forces must be moved to planets you control. [Note: You can transport units during this movement. Ground forces may be transported to the space area.]",
     "flavorText": "\"A logistical nightmare, aye?\" Alastair leaned back in his chair. \"I recommend you get to it then.\"",
     "source": "action_deck_2"
   },
