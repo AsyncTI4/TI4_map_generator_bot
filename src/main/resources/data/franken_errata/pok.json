@@ -1,0 +1,275 @@
+[
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "amalgamation",
+        "AdditionalComponents": [
+            "ABILITY:devour"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "awaken",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "coalescence",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "creuss_gate",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "dark_whispers",
+        "OptionalSwaps": [
+            "PN:dark_pact"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "devour",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "fragile",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "galactic_threat",
+        "OptionalSwaps": [
+            "TECH:vay"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "hubris",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "indoctrination",
+        "OptionalSwaps": [
+            "MECH:yin_mech"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "mitosis",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "orbital_drop",
+        "OptionalSwaps": [
+            "MECH:sol_mech"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "pillage",
+        "OptionalSwaps": [
+            "AGENT:mentakagent"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "propagation",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "riftmeld",
+        "AdditionalComponents": [
+            "ABILITY:devour"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "stall_tactics",
+        "OptionalSwaps": [
+            "MECH:yssaril_mech"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "star_forge",
+        "OptionalSwaps": [
+            "MECH:muaat_mech"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "technological_singularity",
+        "OptionalSwaps": [
+            "PN:antivirus",
+            "TECH:vax"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "telepathic",
+        "OptionalSwaps": [
+            "PN:gift"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "terragenesis",
+        "AdditionalComponents": [
+            "ABILITY:coalescence",
+            "ABILITY:awaken"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_company",
+        "AdditionalComponents": [
+            "AGENT:nomadagentartuno",
+            "AGENT:nomadagentthundarian"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_tribuni",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "keleresagent",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "keleresa",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "mentakagent",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "cabalcommander",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "nomad_flagship",
+        "OptionalSwaps": [
+            "TECH:m2"
+        ]
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "cabalhero",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "keleresheroodlynn",
+        "AlwaysAddToPool": true
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "keleresheroharka",
+        "AlwaysAddToPool": true
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghost",
+        "AdditionalComponents": [
+            "ABILITY:creuss_gate"
+        ]
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "muaat_mech",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "sol_mech",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "yin_mech",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "yssaril_mech",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "dark_pact",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "pop",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "gift",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "antivirus",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "STARTINGTECH",
+        "ItemId": "sardakk",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dt2",
+        "OptionalSwaps": [
+            "HERO:cabalhero",
+            "COMMANDER:cabalcommander"
+        ]
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "m2",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "vax",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "vay",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "jolnar_mech",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "mahactcommander",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "imperia",
+        "OptionalSwaps": [
+            "COMMANDER:mahactcommander"
+        ]
+    }
+]
