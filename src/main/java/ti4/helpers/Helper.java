@@ -3001,11 +3001,7 @@ public class Helper {
                 count = 1;
                 alias = split[0];
             }
-
-            for (int i = 1; i <= count; i++) {
-                sb.append(
-                    Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))));
-            }
+            sb.append(StringUtils.repeat(Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))), count));
         }
         return sb.toString();
     }
