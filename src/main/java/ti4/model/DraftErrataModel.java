@@ -33,7 +33,7 @@ public class DraftErrataModel implements ModelInterface {
 
     public boolean AlwaysAddToPool;
 
-    public ComponentSource source;
+    private ComponentSource source;
 
     public DraftErrataModel(String alias) {
         String[] split = alias.split(":");
@@ -50,5 +50,17 @@ public class DraftErrataModel implements ModelInterface {
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
         Collections.shuffle(items);
+    }
+
+    public List<DraftErrataModel> getAdditionalComponents() {
+        return List.of(AdditionalComponents);
+    }
+
+    public List<DraftErrataModel> getOptionalSwaps() {
+        return List.of(OptionalSwaps);
+    }
+
+    public ComponentSource getSource() {
+        return source;
     }
 }
