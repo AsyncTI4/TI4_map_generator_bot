@@ -67,10 +67,9 @@ public class AgentDraftItem extends DraftItem {
             agents.removeIf((String leader) -> {
                return !"agent".equals(allLeaders.get(leader).getType());
             });
-            if (agents.isEmpty()) {
-                continue;
+            for (String agent : agents) {
+                allItems.add(DraftItem.Generate(Category.AGENT, agent));
             }
-            allItems.add(DraftItem.Generate(Category.AGENT, agents.get(0)));
         }
         return allItems;
     }
