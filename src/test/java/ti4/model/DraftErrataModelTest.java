@@ -43,7 +43,7 @@ public class DraftErrataModelTest extends BaseTi4Test {
             return true;
         }
 
-        System.out.println("FrankenErrata **" + model.getAlias() + "** failed validation due to at least one invalid AdditionalComponents: `" + additionalComponents + "`");
+        System.out.println("FrankenErrata **" + model.getAlias() + "** failed validation due to at least one invalid AdditionalComponent: `" + additionalComponents + "`");
         return false;
     }
 
