@@ -2,6 +2,7 @@ package ti4.model;
 
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
+import ti4.model.Source.ComponentSource;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +12,8 @@ public class DraftErrataModel implements ModelInterface {
     @Override
     public boolean isValid() {
         return ItemCategory != null
-            && ItemId != null;
+            && ItemId != null
+            && source != null;
     }
 
     @Override
@@ -30,6 +32,8 @@ public class DraftErrataModel implements ModelInterface {
     public boolean Undraftable;
 
     public boolean AlwaysAddToPool;
+
+    public ComponentSource source;
 
     public DraftErrataModel(String alias) {
         String[] split = alias.split(":");
