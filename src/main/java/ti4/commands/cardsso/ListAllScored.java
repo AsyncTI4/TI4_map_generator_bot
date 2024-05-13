@@ -23,9 +23,10 @@ public class ListAllScored extends SOCardsSubcommandData{
         List<Player> players = game.getPlayers().values().stream().toList();
         Player currentPlayer = game.getPlayer(getUser().getId());
         for (Player player : players) {
-          if (!game.isFoWMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
-            for (var objective : player.getSecretsScored().keySet()) {
-                sb.append(player.getFactionEmoji()).append(SOInfo.getSecretObjectiveRepresentation(objective));
+          if (!game.isFoWMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer)) {
+              for (String objective : player.getSecretsScored().keySet()) {
+                  sb.append(player.getFactionEmoji()).append(SOInfo.getSecretObjectiveRepresentation(objective));
+                }
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
