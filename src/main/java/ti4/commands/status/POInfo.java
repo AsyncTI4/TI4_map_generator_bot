@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 
 public class POInfo extends StatusSubcommandData {
@@ -26,6 +27,7 @@ public class POInfo extends StatusSubcommandData {
             .map(id -> Mapper.getPublicObjective(id.getKey()))
             .toList();
 
+        var currentPlayer = game.getPlayer(getUser().getId());
         var stringBuilder = new StringBuilder();
         stringBuilder.append("__**Current Public Objectives**__\n");
         int publicObjectiveNumber = 1;
@@ -39,6 +41,7 @@ public class POInfo extends StatusSubcommandData {
                 var playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
                     .map(player -> game.getPlayer(player))
                     .filter(player -> player != null)
+                    .filter(player -> !game.isFoWMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
                     .toList();
 
                 if (!playersWhoHaveScoredObjective.isEmpty()) {
