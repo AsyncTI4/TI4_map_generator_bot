@@ -99,7 +99,7 @@ public abstract class DraftItem implements ModelInterface {
     }
 
     public static List<DraftItem> generateAllCards() {
-        List<FactionModel> factions = FrankenDraft.getAllFrankenLegalFactions();
+        List<FactionModel> factions = Mapper.getFactions();
         List<DraftItem> items = new ArrayList<>();
         items.addAll(AbilityDraftItem.buildAllItems(factions));
         items.addAll(TechDraftItem.buildAllItems(factions));

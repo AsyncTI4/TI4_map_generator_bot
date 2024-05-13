@@ -53,7 +53,7 @@ public class AbilityDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            for (var ability : faction.getAbilities()) {
+            for (String ability : faction.getAbilities()) {
                 allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
             }
         }
