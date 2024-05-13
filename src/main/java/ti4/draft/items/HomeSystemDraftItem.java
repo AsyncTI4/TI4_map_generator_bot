@@ -54,11 +54,16 @@ public class HomeSystemDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.HOMESYSTEM);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             allItems.add(DraftItem.Generate(Category.HOMESYSTEM, faction.getAlias()));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.HOMESYSTEM);
         return allItems;
     }
 }

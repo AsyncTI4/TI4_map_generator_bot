@@ -82,6 +82,7 @@ public class FOWCommand implements Command {
         Collection<FOWSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AddCustomAdjacentTile());
         subcommands.add(new AddAdjacencyOverride());
+        subcommands.add(new AddAdjacencyOverrideList());
         subcommands.add(new AddFogTile());
         subcommands.add(new CheckChannels());
         subcommands.add(new PingActivePlayer());

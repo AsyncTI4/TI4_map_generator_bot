@@ -500,6 +500,7 @@
       "ghoti"
     ],
     "abilities": [
+      "abyssal_embrace",
       "mobile_command",
       "spawning_grounds"
     ],
@@ -802,7 +803,8 @@
     ],
     "abilities": [
       "contagion",
-      "plague_reservoir"
+      "plague_reservoir",
+      "subversive"
     ],
     "leaders": [
       "kyroagent",

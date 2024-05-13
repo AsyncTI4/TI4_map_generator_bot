@@ -1,37 +1,32 @@
 package ti4.draft;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import ti4.draft.items.*;
-import ti4.model.FactionModel;
-import ti4.testUtils.BaseTi4Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import ti4.testUtils.BaseTi4Test;
 
 public class FrankenItemTest extends BaseTi4Test {
     @Test
     public void testAllCardsGenerateSuccessfully() {
-        var factions = FrankenDraft.getAllFrankenLegalFactions();
-        assertDoesNotThrow(() -> generateAllCards(factions));
+        assertDoesNotThrow(() -> DraftItem.generateAllDraftableCards());
     }
 
     @Test
     public void testAllCardsHaveValidShortNames() {
-        var factions = FrankenDraft.getAllFrankenLegalFactions();
-        var cards = generateAllCards(factions);
-        for (var card: cards) {
+        List<DraftItem> cards = DraftItem.generateAllDraftableCards();
+        for (DraftItem card: cards) {
             assert !card.getShortDescription().isEmpty() : card.getAlias();
         }
     }
 
     @Test
     public void testAllCardsHaveValidLongNames() {
-        var factions = FrankenDraft.getAllFrankenLegalFactions();
-        var cards = generateAllCards(factions);
-        for (var card: cards) {
+        List<DraftItem> cards = DraftItem.generateAllDraftableCards();
+        for (DraftItem card: cards) {
             try {
                 assert !card.getLongDescription().isEmpty() : card.getAlias();
             }
@@ -44,18 +39,16 @@ public class FrankenItemTest extends BaseTi4Test {
 
     @Test
     public void testAllCardsHaveValidEmoji() {
-        var factions = FrankenDraft.getAllFrankenLegalFactions();
-        var cards = generateAllCards(factions);
-        for (var card: cards) {
+        List<DraftItem> cards = DraftItem.generateAllDraftableCards();
+        for (DraftItem card: cards) {
             assert !card.getItemEmoji().isEmpty() : card.getAlias();
         }
     }
 
     @Test
     public void errataFileSanityTest() {
-        var factions = FrankenDraft.getAllFrankenLegalFactions();
-        var cards = generateAllCards(factions);
-        for (var card: cards) {
+        List<DraftItem> cards = DraftItem.generateAllDraftableCards();
+        for (DraftItem card: cards) {
             // PoK
             assert(!card.getAlias().equals("ABILITY:mitosis"));
             assert(!card.getAlias().equals("ABILITY:hubris"));
@@ -72,23 +65,5 @@ public class FrankenItemTest extends BaseTi4Test {
             assert(!card.getAlias().equals("AGENT:mykomentoriagent"));
             assert(!card.getAlias().equals("ABILITY:stealth_insertion"));
         }
-    }
-
-    private List<DraftItem> generateAllCards(List<FactionModel> factions) {
-        List<DraftItem> items = new ArrayList<>();
-        items.addAll(AbilityDraftItem.buildAllDraftableItems(factions));
-        items.addAll(TechDraftItem.buildAllDraftableItems(factions));
-        items.addAll(AgentDraftItem.buildAllDraftableItems(factions));
-        items.addAll(CommanderDraftItem.buildAllDraftableItems(factions));
-        items.addAll(HeroDraftItem.buildAllDraftableItems(factions));
-        items.addAll(HomeSystemDraftItem.buildAllDraftableItems(factions));
-        items.addAll(PNDraftItem.buildAllDraftableItems(factions));
-        items.addAll(CommoditiesDraftItem.buildAllDraftableItems(factions));
-        items.addAll(StartingTechDraftItem.buildAllDraftableItems(factions));
-        items.addAll(StartingFleetDraftItem.buildAllDraftableItems(factions));
-        items.addAll(FlagshipDraftItem.buildAllDraftableItems(factions));
-        items.addAll(MechDraftItem.buildAllDraftableItems(factions));
-
-        return items;
     }
 }

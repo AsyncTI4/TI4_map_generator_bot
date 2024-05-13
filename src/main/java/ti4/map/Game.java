@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -872,16 +873,16 @@ public class Game {
 
     @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
-        // FIND BY ID
         if (isFoWMode()) {
             return null;
         }
-        ThreadChannel threadChannel = null;
-        if (getBotMapUpdatesThreadID() != null) {
-            threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
-        }
-        if (threadChannel != null) {
-            return threadChannel;
+
+        // FIND BY ID
+        if (StringUtils.isNumeric(getBotMapUpdatesThreadID())) {
+            ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+            if (threadChannel != null) {
+                return threadChannel;
+            }
         }
 
         // FIND BY NAME
@@ -904,6 +905,7 @@ public class Game {
                 return archivedChannel;
             }
         }
+        setBotMapUpdatesThreadID(null);
         return null;
     }
 
