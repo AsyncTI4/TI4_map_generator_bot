@@ -26,6 +26,7 @@ import ti4.draft.items.TechDraftItem;
 import ti4.generator.Mapper;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
 import ti4.model.ModelInterface;
 
 public abstract class DraftItem implements ModelInterface {
@@ -77,6 +78,42 @@ public abstract class DraftItem implements ModelInterface {
     public static DraftItem GenerateFromAlias(String alias) {
         String[] split = alias.split(":");
         return Generate(Category.valueOf(split[0]), split[1]);
+    }
+
+    public static List<DraftItem> generateAllDraftableCards() {
+        List<FactionModel> factions = FrankenDraft.getAllFrankenLegalFactions();
+        List<DraftItem> items = new ArrayList<>();
+        items.addAll(AbilityDraftItem.buildAllDraftableItems(factions));
+        items.addAll(TechDraftItem.buildAllDraftableItems(factions));
+        items.addAll(AgentDraftItem.buildAllDraftableItems(factions));
+        items.addAll(CommanderDraftItem.buildAllDraftableItems(factions));
+        items.addAll(HeroDraftItem.buildAllDraftableItems(factions));
+        items.addAll(HomeSystemDraftItem.buildAllDraftableItems(factions));
+        items.addAll(PNDraftItem.buildAllDraftableItems(factions));
+        items.addAll(CommoditiesDraftItem.buildAllDraftableItems(factions));
+        items.addAll(StartingTechDraftItem.buildAllDraftableItems(factions));
+        items.addAll(StartingFleetDraftItem.buildAllDraftableItems(factions));
+        items.addAll(FlagshipDraftItem.buildAllDraftableItems(factions));
+        items.addAll(MechDraftItem.buildAllDraftableItems(factions));
+        return items;
+    }
+
+    public static List<DraftItem> generateAllCards() {
+        List<FactionModel> factions = Mapper.getFactions();
+        List<DraftItem> items = new ArrayList<>();
+        items.addAll(AbilityDraftItem.buildAllItems(factions));
+        items.addAll(TechDraftItem.buildAllItems(factions));
+        items.addAll(AgentDraftItem.buildAllItems(factions));
+        items.addAll(CommanderDraftItem.buildAllItems(factions));
+        items.addAll(HeroDraftItem.buildAllItems(factions));
+        items.addAll(HomeSystemDraftItem.buildAllItems(factions));
+        items.addAll(PNDraftItem.buildAllItems(factions));
+        items.addAll(CommoditiesDraftItem.buildAllItems(factions));
+        items.addAll(StartingTechDraftItem.buildAllItems(factions));
+        items.addAll(StartingFleetDraftItem.buildAllItems(factions));
+        items.addAll(FlagshipDraftItem.buildAllItems(factions));
+        items.addAll(MechDraftItem.buildAllItems(factions));
+        return items;
     }
 
     public static List<DraftItem> GetAlwaysIncludeItems(Category type) {

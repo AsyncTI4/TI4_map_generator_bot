@@ -319,7 +319,7 @@
     },
     {
         "id": "glory",
-        "name": "For Glory",
+        "name": "Glory",
         "faction": "kjalengard",
         "window": "After you win a combat",
         "windowEffect": "You may place or move a Glory token into the active system, or spend 1 token from your strategy pool to research a unit upgrade technology of the same type as 1 of your units that participated in that combat.",
@@ -336,7 +336,7 @@
     },
     {
         "id": "heroism",
-        "name": "Heroic Tales",
+        "name": "Heroism",
         "faction": "kjalengard",
         "permanentEffect": "Capture your infantry and fighters that are destroyed during combat.",
         "window": "When you pass",

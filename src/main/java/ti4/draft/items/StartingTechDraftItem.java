@@ -87,11 +87,16 @@ public class StartingTechDraftItem extends DraftItem {
 
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGTECH);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             allItems.add(DraftItem.Generate(Category.STARTINGTECH, faction.getAlias()));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGTECH);
         return allItems;
     }
 }
