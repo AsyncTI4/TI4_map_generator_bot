@@ -19,6 +19,12 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "targeted_acquisition",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "military_industrial_complex",
         "OptionalSwaps": [
             "HERO:axishero",
