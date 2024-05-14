@@ -4,6 +4,7 @@ import static ti4.helpers.StringHelper.ordinal;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -206,6 +207,17 @@ public class GameEnd extends GameSubcommandData {
           if (actionsChannel != null) { // MOVE ACTIONS CHANNEL
             actionsChannel.getManager().setParent(inLimboCategory).queue();
             MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
+          }
+        }
+        if (activeGame.isFoWMode()) {
+          Category fogCategory = event.getGuild().getCategoriesByName(activeGame.getName(), true).get(0);
+          if (fogCategory != null) {
+            List<TextChannel> channels = new ArrayList<>();
+            channels.addAll(fogCategory.getTextChannels());
+            for (TextChannel channel : channels) {
+              channel.delete().queue();
+            }
+            fogCategory.delete().queue();
           }
         }
 

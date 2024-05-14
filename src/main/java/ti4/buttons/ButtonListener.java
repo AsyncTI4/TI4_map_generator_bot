@@ -4626,9 +4626,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "crownofemphidiaexplore" -> {
                     player.addExhaustedRelic("emphidia");
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),                        ident + " Exhausted " + Emojis.Relic + "Crown of Emphidia");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " Exhausted " + Emojis.Relic + "Crown of Emphidia");
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore",                        buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
                     event.getMessage().delete().queue();
                 }
                 case "doneWithTacticalAction" -> {
@@ -4748,6 +4748,11 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "rematch" -> {
                     ButtonHelper.rematch(activeGame, event);
+                }
+                case "enableAidReacts" -> {
+                    activeGame.setBotFactionReactions(true);
+                    event.getMessage().delete().queue();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Reacts have been enabled");
                 }
                 case "purgeHacanHero" -> {
                     Leader playerLeader = player.unsafeGetLeader("hacanhero");
