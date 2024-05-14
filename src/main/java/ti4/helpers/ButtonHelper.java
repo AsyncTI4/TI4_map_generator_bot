@@ -1618,7 +1618,7 @@ public class ButtonHelper {
                         nonActivePlayer.setPromissoryNote(pn);
                         PNInfo.sendPromissoryNoteInfo(game, nonActivePlayer, false);
                         PNInfo.sendPromissoryNoteInfo(game, player, false);
-                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                        MessageHelper.sendMessageToChannel(channel, nonActivePlayer.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                         if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
                             player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                         }

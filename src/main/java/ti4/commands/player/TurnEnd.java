@@ -309,7 +309,7 @@ public class TurnEnd extends PlayerSubcommandData {
                     pnOwner.setPromissoryNote(pn);
                     PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
                     PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
