@@ -894,7 +894,7 @@ public class MessageListener extends ListenerAdapter {
                             .getStoredValue(messageBeginning.toLowerCase() + player.getFaction()) + "; ";
                     }
                     activeGame.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin"));
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin").replace("\n", ". "));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         ButtonHelper.getIdent(player) + " stored an end of round summary");
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
