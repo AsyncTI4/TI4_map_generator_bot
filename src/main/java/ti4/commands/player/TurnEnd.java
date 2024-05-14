@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -46,6 +47,7 @@ public class TurnEnd extends PlayerSubcommandData {
     public TurnEnd() {
         super(Constants.TURN_END, "End Turn");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player").setRequired(false));
     }
 
     @Override
@@ -59,6 +61,15 @@ public class TurnEnd extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
+
+        if (activeGame.isFoWMode() && !mainPlayer.equals(activeGame.getActivePlayer())) {
+          OptionMapping confirm = event.getOption(Constants.CONFIRM);
+          if (confirm == null || !"YES".equals(confirm.getAsString())) {
+            MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
+            return;
+          }
+        }
+
         pingNextPlayer(event, activeGame, mainPlayer);
         mainPlayer.resetOlradinPolicyFlags();
     }
@@ -107,7 +118,8 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setStoredValue("mahactHeroTarget", "");
         activeGame.setActiveSystem("");
         if (activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
+            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
+              + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
         }

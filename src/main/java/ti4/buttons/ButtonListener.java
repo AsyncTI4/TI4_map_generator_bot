@@ -4735,6 +4735,11 @@ public class ButtonListener extends ListenerAdapter {
                     playerUsedSC.put(messageID, players);
                 }
                 case "turnEnd" -> {
+                    if (activeGame.isFoWMode() && !player.equals(activeGame.getActivePlayer())) {
+                      MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+                      return;
+                    }
+
                     TurnEnd.pingNextPlayer(event, activeGame, player);
                     event.getMessage().delete().queue();
 
