@@ -1565,7 +1565,7 @@ public class AgendaHelper {
 
     private static void handleShenanigans(GenericInteractionCreateEvent event, Game activeGame, String winner) {
         List<Player> losers = getLosers(winner, activeGame);
-        
+
         if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot")) && (losers.size() > 0 || activeGame.isAbsolMode())) {
             StringBuilder message = new StringBuilder("You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans\n");
             Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
@@ -1765,7 +1765,7 @@ public class AgendaHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.kyro));
             afterButtons.add(playKeleresAfter);
         }
-        if (Helper.getPlayerFromAbility(activeGame, "galactic_threat") != null && !activeGame.isFoWMode()) {
+        if (Helper.getPlayerFromAbility(activeGame, "galactic_threat") != null) {
             Player nekroProbably = Helper.getPlayerFromAbility(activeGame, "galactic_threat");
             String finChecker = "FFCC_" + nekroProbably.getFaction() + "_";
             Button playNekroAfter = Button

@@ -5910,6 +5910,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
+        ButtonHelper.offerEveryoneTitlePossibilities(game);
         String name = game.getName();
         MapGenerator.saveImage(game, DisplayType.all, event)
             .thenAccept(fileUpload -> {
@@ -6767,11 +6768,14 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
-                    if (owningPlayer == null || playersWithPds2.contains(owningPlayer)) {
+                    if (owningPlayer == null || playersWithPds2.contains(owningPlayer) || !FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true).contains(adjTilePos)) {
                         continue;
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
+                    if (model == null || (model.getId().equalsIgnoreCase("xxcha_mech") && game.getLaws().containsKey("articles_war"))) {
+                        continue;
+                    }
                     if (model != null && model.getSpaceCannonDieCount() > 0
                         && (model.getDeepSpaceCannon() || tilePos.equalsIgnoreCase(adjTilePos)
                             || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander"))) {

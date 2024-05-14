@@ -814,6 +814,36 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus_x_frag_always_flagship_spacecannon",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_x_frag_always_flagship_bombardment",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
         "alias": "miltymod_cruiser2_bonus_hits_9_10",
         "type": "bonus_hits",
         "value": "+1",

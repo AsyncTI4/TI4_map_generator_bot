@@ -41,6 +41,7 @@ public class StartPhase extends GameSubcommandData {
             // case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);
             // case "unleashTheNamesEnded" -> OtherStats.showGameLengths(event, 120);
             case "ixthian" -> AgendaHelper.rollIxthian(activeGame, false);
+            case "gameTitles" -> ButtonHelper.offerEveryoneTitlePossibilities(activeGame);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(activeGame);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
@@ -65,7 +66,7 @@ public class StartPhase extends GameSubcommandData {
                     }
                 }
                 if (!endOfGameSummary.isEmpty()) {
-                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), endOfGameSummary);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), endOfGameSummary);
                 }
             }
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, activeGame);

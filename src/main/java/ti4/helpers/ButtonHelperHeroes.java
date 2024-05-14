@@ -278,10 +278,9 @@ public class ButtonHelperHeroes {
         List<String> relicsTotal = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             for (String relic : player.getRelics()) {
-                if (relic.contains("axisorder") || relic.contains("enigmatic")) {
+                if (relic.contains("axisorder") || relic.contains("enigmatic") || relic.contains("shiporder") || relic.contains("starchart")) {
                     continue;
                 }
-                System.out.println(relic);
                 relicsTotal.add(player.getFaction() + ";" + relic);
             }
         }
