@@ -38,7 +38,7 @@ public class PlayerCommand implements Command {
             Game userActiveGame = gameManager.getUserActiveGame(userID);
             if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
                 MessageHelper.replyToMessage(event,
-                        "You're not a player of the game, please call function /join gameName");
+                    "You're not a player of the game, please call function /join gameName");
                 return false;
             }
             return true;
@@ -95,6 +95,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new SendDebt());
         subcommands.add(new ClearDebt());
         subcommands.add(new ChangeColor());
+        subcommands.add(new CorrectFaction());
         subcommands.add(new ChangeUnitDecal());
         subcommands.add(new UnitInfo());
         subcommands.add(new AddAllianceMember());
@@ -109,7 +110,7 @@ public class PlayerCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

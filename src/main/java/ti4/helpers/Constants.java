@@ -505,6 +505,7 @@ public class Constants {
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
     public static final String CUSTOMIZATION = "customization";
     public static final String CHANGE_COLOR = "change_color";
+    public static final String CORRECT_FACTION = "correct_faction";
     public static final String GAME_CHANNEL_SETUP = "game_channel_setup";
     public static final String PLANETS = "planets";
     public static final String PLANETS_EXHAUSTED = "planets_exhausted";

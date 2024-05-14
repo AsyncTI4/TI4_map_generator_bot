@@ -204,7 +204,7 @@ public class FoWHelper {
 			}
 			return ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
 		}
-		if (!player.getFaction().contains("franken")) {
+		if (!player.getFaction().contains("franken") && game.getTile(AliasHandler.resolveTile(player.getFaction())) != null) {
 			return game.getTile(AliasHandler.resolveTile(player.getFaction()));
 		}
 		for (Tile tile : game.getTileMap().values()) {

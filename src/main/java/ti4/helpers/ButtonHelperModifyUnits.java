@@ -384,7 +384,7 @@ public class ButtonHelperModifyUnits {
         }
         boolean usedDuraniumAlready = true;
         String duraniumMsg = "";
-        if (player.hasTech("da")) {
+        if (player.hasTech("da") && !spaceCannonOffence) {
             usedDuraniumAlready = false;
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))

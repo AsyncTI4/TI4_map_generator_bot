@@ -2575,12 +2575,14 @@ public class Game {
                 return player.getActionCards();
             }
         } else {
-            actionCards.addAll(discardActionCards.keySet());
-            discardActionCards.clear();
-            Collections.shuffle(actionCards);
-            String msg = "# " + getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
-            MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
-            return drawActionCard(userID);
+            if (!discardActionCards.keySet().isEmpty()) {
+                actionCards.addAll(discardActionCards.keySet());
+                discardActionCards.clear();
+                Collections.shuffle(actionCards);
+                String msg = "# " + getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
+                MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
+                return drawActionCard(userID);
+            }
         }
         return null;
     }
