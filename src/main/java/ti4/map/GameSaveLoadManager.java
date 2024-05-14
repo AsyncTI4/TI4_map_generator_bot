@@ -397,7 +397,7 @@ public class GameSaveLoadManager {
         Map<String, String> currentCheckingForAllReacts = activeGame.getMessagesThatICheckedForAllReacts();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
-            sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
+            sb2.append(entry.getKey()).append(",").append(entry.getValue().replace("\n", ". ")).append(":");
         }
         writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
