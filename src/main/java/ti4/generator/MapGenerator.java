@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.imageio.IIOImage;
@@ -509,6 +510,8 @@ public class MapGenerator {
         int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
         int x = 10;
+        Coord coord = coord(x, y);
+
         int deltaX = 0;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         int yDelta = 0;
@@ -535,14 +538,25 @@ public class MapGenerator {
         deltaY = 35;
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        String cname = game.getCustomName();
-        int length = Math.min(24, cname.length());
-        cname = cname.substring(0, length);
-        graphics.drawString(cname, 0, y);
+        graphics.drawString(game.getCustomName(), 0, y);
+        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName());
 
         // STRATEGY CARDS
-        y = strategyCards(y);
+        coord = drawStrategyCards(coord(x, y));
 
+        // ROUND
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont64());
+        graphics.drawString("ROUND: " + game.getRound(), coord.x + 100, coord.y);
+
+        // CARD DECKS
+        drawCardDecks(Math.max(x + deltaX, coord.x + 100), y - 75);
+
+        // TURN ORDER
+        coord = drawTurnOrderTracker(coord.x + 150, coord.y);
+
+        y = coord.y + 30;
+        x = 10;
         int tempY = y;
         y = objectives(y + 180);
         y = laws(y);
@@ -2179,6 +2193,10 @@ public class MapGenerator {
     private record Coord(int x, int y) {
     }
 
+    private static Coord coord(int x, int y) {
+        return new Coord(x, y);
+    }
+
     private static Coord getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {
         asyncId = AliasHandler.resolveUnit(asyncId);
         switch (asyncId) {
@@ -2252,7 +2270,7 @@ public class MapGenerator {
         for (String u : player.getUnitsOwned()) {
             UnitModel unit = Mapper.getUnit(u);
             if (unit == null) {
-                System.out.println("error:" + u);
+                System.out.println("Invalid unitID found:" + u);
             } else if (unit.getFaction().isPresent()) {
                 // ONLY PAINT FACTION IF IS FRANKEN OR IS NOT A UNIT THAT UPGRADES OR WAS
                 // UPGRADED TO (indicating faction tech)
@@ -2380,9 +2398,13 @@ public class MapGenerator {
     }
 
     private void drawPAImageScaled(int x, int y, String resourceName, int size) {
+        drawPAImageScaled(x, y, resourceName, size, size);
+    }
+
+    private void drawPAImageScaled(int x, int y, String resourceName, int width, int height) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, size, size);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
             BotLogger.log("Could not display play area: " + resourceName, e);
@@ -2439,26 +2461,28 @@ public class MapGenerator {
     /**
      * 
      * @param g graphics object
-     * @param txt text to print
-     * @param x Leftmost x-position of the string. If rightAlign=true, then this is the right edge of the string
-     * @param y
+     * @param txt string to print
+     * @param x x-position of the string (Left side, unless horizontalAlignment is set)
+     * @param y y-position of the string (Bottom side, unless verticalAlignment is set)
      * @param textColor
-     * @param rightAlign
-     * @param outlineSize
+     * @param horizontalAlignment location of the provided x relative to the (default = Left)
+     * @param verticalAlignment location of the provided y relative to the text (default = Bottom)
+     * @param outlineSize use global variable "strokeX" where X = outline size e.g. stroke1 for 1px outline
      * @param outlineColor
      */
-    private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
-        if (h != null) {
-            switch (h) {
-                case Center -> x -= g.getFontMetrics().stringWidth(txt) / 2.0;
-                case Right -> x -= g.getFontMetrics().stringWidth(txt);
+    private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign horizontalAlignment, VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
+        if (horizontalAlignment != null) {
+            double width = g.getFontMetrics().stringWidth(txt);
+            switch (horizontalAlignment) {
+                case Center -> x -= width / 2.0;
+                case Right -> x -= width;
                 case Left -> {
                 }
             }
         }
-        if (v != null) {
+        if (verticalAlignment != null) {
             double height = g.getFontMetrics().getStringBounds(txt, g).getHeight();
-            switch (v) {
+            switch (verticalAlignment) {
                 case Center -> y += height / 2.0;
                 case Top -> y += height;
                 case Bottom -> {
@@ -2554,7 +2578,9 @@ public class MapGenerator {
         return y;
     }
 
-    private int strategyCards(int y) {
+    private Coord drawStrategyCards(Coord coord) {
+        int x = 20;
+        int y = coord.y;
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         int deltaY = y + 80;
         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
@@ -2564,26 +2590,27 @@ public class MapGenerator {
             scPicked.addAll(player.getSCs());
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        int x = 20;
-        int horizontalSpacingIncrement = 70;
+
         for (Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
             Integer sc = scTGs.getKey();
             if (sc == 0) {
                 continue;
             }
-            if (sc > 9)
-                horizontalSpacingIncrement = 80;
-            if (sc > 19)
-                horizontalSpacingIncrement = 100;
+            graphics.setFont(Storage.getFont64());
+            int textWidth = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
+
             if (!convertToGenericSC && !scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc, game));
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
-                    graphics.setFont(Storage.getFont26());
+                    graphics.setFont(Storage.getFont24());
                     graphics.setColor(Color.WHITE);
-                    graphics.drawString("TG:" + tg, x, deltaY + 30);
+                    String tgMsg = "TG:" + tg;
+                    int tgMsgTextWidth = graphics.getFontMetrics().stringWidth(tgMsg);
+                    graphics.drawString(tgMsg, x + textWidth / 2 - tgMsgTextWidth / 2, deltaY + 30);
+                    textWidth = Math.max(textWidth, tgMsgTextWidth);
                 }
             }
             if (convertToGenericSC && scPlayed.getOrDefault(sc, false)) {
@@ -2591,54 +2618,30 @@ public class MapGenerator {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
             }
-            x += horizontalSpacingIncrement;
+            x += textWidth + 25;
+
+            // Drop down a level if there are a lot of SC cards
+            if (x > mapWidth - 100) {
+                x = 20;
+                deltaY += 100;
+            }
         }
 
-        // NEXTLINE IF LOTS OF SC CARDS
-        if (game.getScTradeGoods().size() > 32) {
-            x = 20;
-            deltaY += 100;
-        }
+        return coord(x, deltaY);
+    }
 
-        // ROUND
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont64());
-        x += 100;
-        graphics.drawString("ROUND: " + game.getRound(), x, deltaY);
-
-        //Game deck info
-        if (!game.isFoWMode()) {
-            String acImage2 = "pa_cardbacks_ac.png";
-            String soImage2 = "pa_cardbacks_so.png";
-            graphics.setFont(Storage.getFont24());
-            drawPAImage(x, y - 75, soImage2);
-            graphics.drawString(Integer.toString(game.getSecretObjectiveDeckSize()), x + 15, deltaY - 75);
-            drawPAImage(x + 75, y - 75, acImage2);
-            int ac2 = game.getActionCards().size();
-            int acDelta2 = ac2 > 9 ? 0 : 5;
-            acDelta2 = ac2 > 99 ? -5 : 0;
-            graphics.drawString(Integer.toString(ac2), x + 90 + acDelta2, deltaY - 75);
-            drawPAImageScaledDown(x + 150, y - 75, "cultural.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("cultural").size()), x + 165, deltaY - 75);
-            drawPAImageScaledDown(x + 225, y - 75, "industrial.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("industrial").size()), x + 240, deltaY - 75);
-            drawPAImageScaledDown(x + 300, y - 75, "hazardous.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("hazardous").size()), x + 315, deltaY - 75);
-            drawPAImageScaledDown(x + 375, y - 75, "frontier.back.jpg", (float) 0.12);
-            graphics.drawString(Integer.toString(game.getExploreDeck("frontier").size()), x + 388, deltaY - 75);
-        }
-
-        // TURN ORDER
+    private Coord drawTurnOrderTracker(int x, int y) {
+        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getCurrentPhase())) {
             x += 450;
 
             graphics.setFont(Storage.getFont20());
             graphics.setColor(new Color(50, 230, 80));
-            graphics.drawString("ACTIVE", x + 10, deltaY + 35);
+            graphics.drawString("ACTIVE", x + 10, y + 35);
             graphics.setFont(Storage.getFont16());
             graphics.setColor(Color.LIGHT_GRAY);
-            graphics.drawString("NEXT UP", x + 112, deltaY + 34);
+            graphics.drawString("NEXT UP", x + 112, y + 34);
 
             Player activePlayer = game.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(game.getRealPlayers());
@@ -2655,13 +2658,50 @@ public class MapGenerator {
                 if (faction != null) {
                     BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
-                        graphics.drawImage(bufferedImage, x, deltaY - 70, null);
+                        graphics.drawImage(bufferedImage, x, y - 70, null);
                         x += 100;
                     }
                 }
             }
         }
-        return deltaY + 40;
+        return coord(x, y);
+    }
+
+    private int drawCardDecks(int x, int y) {
+        if (!game.isFoWMode()) {
+            int cardWidth = 60;
+            int cardHeight = 90;
+            int horSpacing = cardWidth + 15;
+            int textY = y + cardHeight - 10;
+            Stroke outline = stroke2;
+
+            graphics.setFont(Storage.getFont24());
+
+            drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+        }
+        return x;
     }
 
     private void playerInfo(Game game) {
