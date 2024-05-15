@@ -543,14 +543,21 @@ public class MapGenerator {
 
         // STRATEGY CARDS
         coord = drawStrategyCards(coord(x, y));
+        coord = coord(coord.x + 100, coord.y);
 
         // ROUND
         graphics.setColor(Color.WHITE);
         graphics.setFont(Storage.getFont64());
-        graphics.drawString("ROUND: " + game.getRound(), coord.x + 100, coord.y);
+        String roundString = "ROUND: " + game.getRound();
+        int roundLen = graphics.getFontMetrics().stringWidth(roundString);
+        if (coord.x > mapWidth - roundLen) {
+            coord = coord(20, coord.y + 100);
+        }
+        graphics.drawString(roundString, coord.x, coord.y);
+        coord = coord(coord.x + roundLen + 20, coord.y);
 
         // CARD DECKS
-        drawCardDecks(Math.max(x + deltaX, coord.x + 100), y - 75);
+        drawCardDecks(Math.max(x + deltaX, coord.x), y - 75);
 
         // TURN ORDER
         coord = drawTurnOrderTracker(coord.x + 150, coord.y);
