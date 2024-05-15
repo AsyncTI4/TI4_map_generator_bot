@@ -1,12 +1,14 @@
 package ti4.model;
 
-import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.model.Source.ComponentSource;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import ti4.draft.DraftItem;
+import ti4.generator.Mapper;
+import ti4.model.Source.ComponentSource;
 
 public class DraftErrataModel implements ModelInterface {
     @Override
@@ -52,10 +54,12 @@ public class DraftErrataModel implements ModelInterface {
         Collections.shuffle(items);
     }
 
+    @JsonIgnore
     public List<DraftErrataModel> getAdditionalComponents() {
         return List.of(AdditionalComponents);
     }
 
+    @JsonIgnore
     public List<DraftErrataModel> getOptionalSwaps() {
         return List.of(OptionalSwaps);
     }

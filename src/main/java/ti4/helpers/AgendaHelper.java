@@ -1565,7 +1565,8 @@ public class AgendaHelper {
 
     private static void handleShenanigans(GenericInteractionCreateEvent event, Game activeGame, String winner) {
         List<Player> losers = getLosers(winner, activeGame);
-
+        boolean shenanigans = false;
+        
         if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot")) && (losers.size() > 0 || activeGame.isAbsolMode())) {
             StringBuilder message = new StringBuilder("You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans\n");
             Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
@@ -1582,6 +1583,7 @@ public class AgendaHelper {
                 MessageHelper.privatelyPingPlayerList(losers, activeGame, "Please respond to bribery/deadly plot window");
             }
             MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), message.toString(), activeGame, deadlyActionRow, "shenanigans");
+            shenanigans = true;
         } else {
             String message = "Either both Bribery and Deadly Plot were in the discard or no player could legally play them.";
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
@@ -1595,11 +1597,14 @@ public class AgendaHelper {
                 Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
                 List<Button> buttons = List.of(noConfounding, noConfusing);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), message, activeGame, buttons, "shenanigans");
+                shenanigans = true;
             } else {
                 String message = "Both *Confounding Legal Text* and *Confusing Legal Text* are in the discard pile.\nThere are no shenanigans possible. Please resolve the agenda.";
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
             }
-        } else {
+        }
+        
+        if (!shenanigans) {
             String message = "There are no shenanigans possible. Please resolve the agenda.";
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
         }
