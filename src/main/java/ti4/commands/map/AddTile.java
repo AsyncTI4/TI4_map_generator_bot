@@ -11,7 +11,6 @@ import java.util.Map;
 public class AddTile extends AddRemoveTile {
     public AddTile() {
         super(Constants.ADD_TILE, "Add tile to map");
-        //addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
     }
 
     @Override

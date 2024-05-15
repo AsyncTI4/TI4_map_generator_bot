@@ -225,20 +225,18 @@ public class MapGenerator {
         return saveImage(game, null, event);
     }
 
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType,
-        @Nullable GenericInteractionCreateEvent event) {
+    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
         return AsyncTI4DiscordBot.completeAsync(() -> new MapGenerator(game, displayType).saveImage(event));
     }
 
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType,
-        @Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord) {
-        return AsyncTI4DiscordBot
-            .completeAsync(() -> new MapGenerator(game, displayType, uploadToDiscord).saveImage(event));
+    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord) {
+        return AsyncTI4DiscordBot.completeAsync(() -> new MapGenerator(game, displayType, uploadToDiscord).saveImage(event));
     }
 
     private FileUpload saveImage(@Nullable GenericInteractionCreateEvent event) {
-        if (debug)
+        if (debug) {
             debugAbsoluteStartTime = System.nanoTime();
+        }
 
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
