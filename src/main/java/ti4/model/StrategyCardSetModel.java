@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,9 +42,11 @@ public class StrategyCardSetModel implements ModelInterface {
     @JsonIgnore
     @Deprecated
     public Map<Integer, String> getCardValues() {
-        return scIDs.stream()
-            .map(Mapper::getStrategyCard)
-            .collect(Collectors.toMap(StrategyCardModel::getInitiative, StrategyCardModel::getName));
+        Map<Integer, String> cardValues = new LinkedHashMap<>();
+        for (String scID : scIDs) {
+            cardValues.put(Mapper.getStrategyCard(scID).getInitiative(), Mapper.getStrategyCard(scID).getName());
+        }
+        return cardValues;
     }
 
     @JsonIgnore

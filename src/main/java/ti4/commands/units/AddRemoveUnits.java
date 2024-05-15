@@ -92,7 +92,7 @@ abstract public class AddRemoveUnits implements Command {
 
     public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Game activeGame) {
         if (activeGame.isTileDuplicated(tileID)) {
-            MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+            MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileID + "` found, please use position coordinates");
             return null;
         }
         Tile tile = activeGame.getTile(tileID);
@@ -100,7 +100,7 @@ abstract public class AddRemoveUnits implements Command {
             tile = activeGame.getTileByPosition(tileID);
         }
         if (tile == null) {
-            MessageHelper.replyToMessage(event, "Tile in map not found");
+            MessageHelper.replyToMessage(event, "Tile in map not found: " + tileID);
             return null;
         }
         return tile;
