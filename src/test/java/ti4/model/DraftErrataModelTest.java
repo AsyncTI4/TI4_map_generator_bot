@@ -14,7 +14,7 @@ public class DraftErrataModelTest extends BaseTi4Test {
     @Test
     public void testDraftErrata() {
         for (DraftErrataModel model : Mapper.getFrankenErrata().values()) {
-            assertTrue(model.isValid(), model.getAlias() + ": invalid");
+            assertTrue(model.isValid(), model.getAlias() + ": object is invalid");
             assertTrue(validateAlias(model), model.getAlias() + ": invalid Alias: ");
             assertTrue(validateAdditionalComponents(model), model.getAlias() + ": invalid Additional Components");
             assertTrue(validateOptionalComponents(model), model.getAlias() + ": invalid Optional Components");
