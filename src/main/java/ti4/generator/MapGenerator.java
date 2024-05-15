@@ -550,17 +550,16 @@ public class MapGenerator {
         graphics.setFont(Storage.getFont64());
         String roundString = "ROUND: " + game.getRound();
         int roundLen = graphics.getFontMetrics().stringWidth(roundString);
-        if (coord.x > mapWidth - roundLen) {
+        if (coord.x > mapWidth - roundLen - 100 * game.getRealPlayers().size()) {
             coord = coord(20, coord.y + 100);
         }
         graphics.drawString(roundString, coord.x, coord.y);
-        coord = coord(coord.x + roundLen + 20, coord.y);
 
         // CARD DECKS
         drawCardDecks(Math.max(x + deltaX, coord.x), y - 75);
 
         // TURN ORDER
-        coord = drawTurnOrderTracker(coord.x + 150, coord.y);
+        coord = drawTurnOrderTracker(coord.x + roundLen + 100, coord.y);
 
         y = coord.y + 30;
         x = 10;
@@ -2641,8 +2640,6 @@ public class MapGenerator {
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getCurrentPhase())) {
-            x += 450;
-
             graphics.setFont(Storage.getFont20());
             graphics.setColor(new Color(50, 230, 80));
             graphics.drawString("ACTIVE", x + 10, y + 35);
