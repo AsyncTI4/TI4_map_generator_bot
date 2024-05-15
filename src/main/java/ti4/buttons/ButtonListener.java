@@ -194,8 +194,7 @@ public class ButtonListener extends ListenerAdapter {
 
             if (activeGame.isFoWMode()) {
                 if (player != null && player.isRealPlayer() && player.getPrivateChannel() == null) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Private channels are not set up for this game. Messages will be suppressed.");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
                     privateChannel = null;
                 } else if (player != null) {
                     privateChannel = player.getPrivateChannel();
@@ -206,8 +205,6 @@ public class ButtonListener extends ListenerAdapter {
         if (activeGame != null && activeGame.getMainGameChannel() != null) {
             mainGameChannel = activeGame.getMainGameChannel();
         }
-
-        MessageChannel actionsChannel = activeGame.getActionsChannel();
 
         if (buttonID.startsWith("FFCC_")) {
             buttonID = buttonID.replace("FFCC_", "");
@@ -261,13 +258,13 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
-            acPlayFromHand(event, buttonID, activeGame, player, actionsChannel, fowIdentity);
+            acPlayFromHand(event, buttonID, activeGame, player, mainGameChannel, fowIdentity);
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
-            acDiscardFromHand(event, buttonID, activeGame, player, actionsChannel);
+            acDiscardFromHand(event, buttonID, activeGame, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
-            soScoreFromHand(event, buttonID, activeGame, player, privateChannel, mainGameChannel, actionsChannel);
+            soScoreFromHand(event, buttonID, activeGame, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith("SODISCARD_")) {
-            soDiscard(event, buttonID, activeGame, player, privateChannel, mainGameChannel, actionsChannel, ident);
+            soDiscard(event, buttonID, activeGame, player, privateChannel, mainGameChannel, mainGameChannel, ident);
         } else if (buttonID.startsWith("mantleCrack_")) {
             ButtonHelperAbilities.mantleCracking(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("umbatTile_")) {
@@ -882,7 +879,7 @@ public class ButtonListener extends ListenerAdapter {
                 activeGame, 1, false);
             if (dsdihmy) {
                 player.exhaustPlanet(info[1]);
-                MessageHelper.sendMessageToChannel(actionsChannel, info[1] + " was exhausted by Impressment Programs!");
+                MessageHelper.sendMessageToChannel(mainGameChannel, info[1] + " was exhausted by Impressment Programs!");
             }
             if (player.getTechs().contains("dsdihmy")) {
                 List<Button> produce = new ArrayList<>();
@@ -1866,7 +1863,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("deleteButtons")) {
-            deleteButtons(event, buttonID, buttonLabel, activeGame, player, actionsChannel, trueIdentity);
+            deleteButtons(event, buttonID, buttonLabel, activeGame, player, mainGameChannel, trueIdentity);
         } else if (buttonID.startsWith("reverse_")) {
             AgendaHelper.reverseRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("moveGlory_")) {
@@ -3002,7 +2999,7 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.getIdentOrColor(player, activeGame) + "discarded " + agendaName + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Allant (Edyn Agent)");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("agendaResolution_")) {
-            AgendaHelper.resolveAgenda(activeGame, buttonID, event, actionsChannel);
+            AgendaHelper.resolveAgenda(activeGame, buttonID, event, mainGameChannel);
         } else if (buttonID.startsWith("rollIxthian")) {
             if (activeGame.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
                 AgendaHelper.rollIxthian(activeGame, true);
@@ -3896,7 +3893,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> whenButtons = AgendaHelper.getWhenButtons(activeGame);
                     Date newTime = new Date();
                     activeGame.setLastActivePlayerPing(newTime);
-                    MessageHelper.sendMessageToChannelWithPersistentReacts(actionsChannel,
+                    MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
                         "Please indicate no whens again.", activeGame, whenButtons, "when");
                     List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
                     MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
@@ -4009,7 +4006,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
+                        MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                     }
 
                 }
@@ -4040,7 +4037,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
+                        MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                     }
                 }
                 case "convert_1_comms" -> {
@@ -4083,7 +4080,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
+                        MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                     }
                 }
                 case "startPlayerSetup" -> ButtonHelper.resolveSetupStep0(player, activeGame, event);
@@ -4149,7 +4146,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
+                        MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                     }
                 }
                 case "comm_for_mech" -> {
@@ -4174,7 +4171,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(actionsChannel,
+                        MessageHelper.sendMessageToChannel(mainGameChannel,
                             pF + " Spent 1 " + commOrTg + " for a mech on " + planetName);
                     }
                 }
@@ -4330,7 +4327,7 @@ public class ButtonListener extends ListenerAdapter {
                         event.getMessage().delete().queue();
                         if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                             String pF = player.getFactionEmoji();
-                            MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
+                            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                         }
                     }
                 }
@@ -4339,7 +4336,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
-                    MessageHelper.sendMessageToChannel(actionsChannel, message);
+                    MessageHelper.sendMessageToChannel(mainGameChannel, message);
                     event.getMessage().delete().queue();
                 }
                 case "mallice_2_tg" -> {
@@ -4378,7 +4375,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
-                        MessageHelper.sendMessageToChannel(actionsChannel, pF + " declined explore");
+                        MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined explore");
                     }
                 }
                 case "temporaryPingDisable" -> {
@@ -4730,8 +4727,8 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "turnEnd" -> {
                     if (activeGame.isFoWMode() && !player.equals(activeGame.getActivePlayer())) {
-                      MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
-                      return;
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+                        return;
                     }
 
                     TurnEnd.pingNextPlayer(event, activeGame, player);
@@ -5068,7 +5065,7 @@ public class ButtonListener extends ListenerAdapter {
                         event.getMessage().delete().queue();
                         if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
                             String pF = player.getFactionEmoji();
-                            MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
+                            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                         }
                     }
                 }
