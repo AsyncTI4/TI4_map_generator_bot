@@ -207,13 +207,7 @@ public class ButtonListener extends ListenerAdapter {
             mainGameChannel = activeGame.getMainGameChannel();
         }
 
-        MessageChannel actionsChannel = null;
-        for (TextChannel textChannel_ : AsyncTI4DiscordBot.jda.getTextChannels()) {
-            if (textChannel_.getName().equals(gameName + Constants.ACTIONS_CHANNEL_SUFFIX)) {
-                actionsChannel = textChannel_;
-                break;
-            }
-        }
+        MessageChannel actionsChannel = activeGame.getActionsChannel();
 
         if (buttonID.startsWith("FFCC_")) {
             buttonID = buttonID.replace("FFCC_", "");

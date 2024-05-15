@@ -87,7 +87,7 @@ public class ShowGame implements Command {
         simpleShowGame(activeGame, event, DisplayType.all);
     }
 
-    private static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
+    public static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapGenerator.saveImage(activeGame, displayType, event).thenAccept(fileUpload -> {
             List<Button> buttons = new ArrayList<>();
             if (!activeGame.isFoWMode()) {
