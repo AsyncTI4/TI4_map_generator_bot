@@ -21,7 +21,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
     public AddRemoveTile(@NotNull String name, @NotNull String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true));
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true).setAutoComplete(true));
     }
 
     abstract protected void tileAction(Tile tile, String position, Game userActiveGame);
