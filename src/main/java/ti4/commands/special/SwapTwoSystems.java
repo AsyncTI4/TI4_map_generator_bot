@@ -46,16 +46,18 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
         Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, activeGame);
 
-        String position = tile1.getPosition();
+        String positionFrom = tile1.getPosition();
         String positionTo = tile2ID; //need to validate position
 
         if (tile2 != null) { // tile exists, so swap
             positionTo = tile2.getPosition();
-            tile2.setPosition(position);
+            tile2.setPosition(positionFrom);
             activeGame.setTile(tile2);
         } else if (!PositionMapper.isTilePositionValid(positionTo)) { // tile does not exist, so validate the TO position
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Tile To position: " + positionTo);
             return;
+        } else {
+            activeGame.removeTile(positionFrom);
         }
 
         tile1.setPosition(positionTo);
