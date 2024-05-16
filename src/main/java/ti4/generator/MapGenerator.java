@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.imageio.IIOImage;
@@ -43,6 +42,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -567,7 +567,7 @@ public class MapGenerator {
         y = objectives(y + 180);
         y = laws(y);
         y = events(y);
-        tempY = scoreTrack(tempY + 20);
+        tempY = drawScoreTrack(tempY + 20);
         if (displayType != DisplayType.stats) {
             playerInfo(game);
         }
@@ -2523,62 +2523,64 @@ public class MapGenerator {
         g2.setTransform(originalTileTransform);
     }
 
-    private int scoreTrack(int y) {
+    private int drawScoreTrack(int y) {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke5);
         graphics.setFont(Storage.getFont50());
-        int height = 140;
-        int width = 150;
-        if (14 < game.getVp()) {
-            width = 120;
+        int boxHeight = 140;
+        int boxWidth = 150;
+        int boxBuffer = -1;
+        if (game.getVp() > 14) {
+            boxWidth = 120;
         }
         for (int i = 0; i <= game.getVp(); i++) {
             graphics.setColor(Color.WHITE);
-            graphics.drawString(Integer.toString(i), i * width + 55, y + (height / 2) + 25);
+            Rectangle rect = new Rectangle(i * boxWidth, y, boxWidth, boxHeight);
+            drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
             g2.setColor(Color.RED);
-            g2.drawRect(i * width, y, width, height);
+            g2.drawRect(i * boxWidth, y, boxWidth, boxHeight);
         }
 
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
-        int tempCounter = 0;
-        int tempX = 0;
-        int tempWidth = 0;
-        int tempHeight;
-
+        List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (isFoWPrivate != null && isFoWPrivate) {
             Collections.shuffle(players);
         }
-        for (Player player : players) {
-            if (!player.isRealPlayer())
-                continue;
-            try {
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
-                    && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-                String controlID = convertToGeneric ? Mapper.getControlID("gray")
-                    : Mapper.getControlID(player.getColor());
 
-                float scale = 0.7f;
+        int row = 0;
+        int col = 0;
+        int tokenWidth = 0;
+        int tokenHeight = 0;
+        int playerCount = players.size();
+        int rowCount = (int) Math.max(2, Math.ceil(Math.sqrt(1.0 + playerCount) + 0.1));
+        List<List<Player>> playerChunks = ListUtils.partition(players, rowCount);
+        int colCount = (int) Math.max(2, Math.ceil(1.0 * playerCount / rowCount));
+        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerRow = (boxHeight - boxBuffer * 2) / rowCount;
+        float scale = 0.7f;
+        for (List<Player> playerChunk : playerChunks) {
+            for (Player player : playerChunk) {
+                try {
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 
-                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                tempWidth = controlTokenImage == null ? 20 : controlTokenImage.getWidth();
-                tempHeight = controlTokenImage == null ? 20 : controlTokenImage.getHeight();
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); //51
+                    tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); //33
+                    int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
+                    int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) / 2);
 
-                int vpCount = player.getTotalVictoryPoints();
-                int x = vpCount * width + 5 + tempX;
-
-                drawControlToken(graphics, controlTokenImage,
-                    getPlayerByControlMarker(game.getPlayers().values(), controlID), x,
-                    y + (tempCounter * tempHeight),
-                    convertToGeneric, scale);
-            } catch (Exception e) {
-                // nothing
-                BotLogger.log("Could not display player: " + player.getUserName(), e);
+                    int vpCount = player.getTotalVictoryPoints();
+                    int tokenX = vpCount * boxWidth + Math.min(boxBuffer + (availableSpacePerColumn * col) + centreHorizontally, boxWidth - tokenWidth - boxBuffer);
+                    int tokenY = y + boxBuffer + (availableSpacePerRow * row) + centreVertically;
+                    drawControlToken(graphics, controlTokenImage, getPlayerByControlMarker(game.getPlayers().values(), controlID), tokenX, tokenY, convertToGeneric, scale);
+                } catch (Exception e) {
+                    // nothing
+                    BotLogger.log("Could not display player: " + player.getUserName(), e);
+                }
+                row++;
             }
-            tempCounter++;
-            if (tempCounter >= 4) {
-                tempCounter = 0;
-                tempX = tempWidth;
-            }
+            row = 0;
+            col++;
         }
         y += 180;
         return y;
