@@ -18,7 +18,7 @@ public class SpinTilesInRings extends CustomSubcommandData {
 
     public SpinTilesInRings() {
         super(Constants.SPIN_TILES_IN_RINGS, "Rotate the map according to fin logic or give custom rotations");
-        addOptions(new OptionData(OptionType.STRING, Constants.CUSTOM, "Custom rotation RingDirectionSteps 1cw1 2ccw2"));
+        addOptions(new OptionData(OptionType.STRING, Constants.CUSTOM, "Custom rotation Ring:Direction:Steps 1:cw:1 2:ccw:2"));
         addOptions(new OptionData(OptionType.STRING, Constants.MESSAGE, "Flavour message to send to main channel after spins"));
     }
 
