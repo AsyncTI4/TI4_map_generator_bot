@@ -3251,8 +3251,6 @@ public class MapGenerator {
         Integer objectiveWorth,
         Map<String, Integer> customPublicVP) {
 
-        System.out.println("x:" + x + " y:" + y);
-
         Set<String> keysToRemove = new HashSet<>();
         int objectiveBoxHeight = 38;
         int spacingBetweenBoxes = 5;

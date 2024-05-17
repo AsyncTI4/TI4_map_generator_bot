@@ -60,7 +60,7 @@ public class Setup extends PlayerSubcommandData {
         if (faction != null) {
             faction = StringUtils.substringBefore(faction.toLowerCase().replace("the ", ""), " ");
         }
-        
+
         faction = AliasHandler.resolveFaction(faction);
         if (!Mapper.isValidFaction(faction)) {
             MessageHelper.sendMessageToEventChannel(event, "Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
@@ -123,23 +123,24 @@ public class Setup extends PlayerSubcommandData {
         FactionModel setupInfo = player.getFactionSetupInfo();
 
         if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !activeGame.isMiltyModMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
 
         // HOME SYSTEM
         if (!PositionMapper.isTilePositionValid(positionHS)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
         }
 
         String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
-        if (!StringUtils.isBlank(hsTile))
+        if (!StringUtils.isBlank(hsTile)) {
             activeGame.setTile(tile);
-        player.setPlayerStatsAnchorPosition(positionHS);
+        }
+
+        String statsAnchor = PositionMapper.getEquivalentPositionAtRing(activeGame.getRingCount(), positionHS);
+        player.setPlayerStatsAnchorPosition(statsAnchor);
 
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
@@ -195,8 +196,7 @@ public class Setup extends PlayerSubcommandData {
 
         if (setSpeaker) {
             activeGame.setSpeaker(player.getUserID());
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs
