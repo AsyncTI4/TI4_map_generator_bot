@@ -21,10 +21,10 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -32,35 +32,35 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
 
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         OptionMapping planetOption2 = event.getOption(Constants.PLANET2);
-        if (planetOption == null || planetOption2 == null){
+        if (planetOption == null || planetOption2 == null) {
             return;
         }
         String planetName = planetOption.getAsString();
-        if (!activeGame.getPlanets().contains(planetName)) {
+        if (!game.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
         String planetName2 = planetOption2.getAsString();
-        if (!activeGame.getPlanets().contains(planetName2)) {
+        if (!game.getPlanets().contains(planetName2)) {
             MessageHelper.replyToMessage(event, "Planet2 not found in map");
             return;
         }
 
-        UnitHolder unitHolder = getUnitHolder(event, activeGame, planetName);
-        if (unitHolder == null){
+        UnitHolder unitHolder = getUnitHolder(event, game, planetName);
+        if (unitHolder == null) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
-        UnitHolder unitHolder2 = getUnitHolder(event, activeGame, planetName2);
-        if (unitHolder2 == null){
+        UnitHolder unitHolder2 = getUnitHolder(event, game, planetName2);
+        if (unitHolder2 == null) {
             MessageHelper.replyToMessage(event, "Planet2 not found in map");
             return;
         }
 
         if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG) &&
-                unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
+            unitHolder2.getTokenList().contains(Constants.LIZHO_TRAP_PNG)) {
 
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap1 = null;
@@ -75,7 +75,7 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
                     trap2 = trap;
                 }
             }
-            if (trap1 != null && trap2 != null){
+            if (trap1 != null && trap2 != null) {
                 player.setTrapCardPlanet(trap1, planetName2);
                 player.setTrapCardPlanet(trap2, planetName);
             }
@@ -85,10 +85,10 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
     }
 
     @Nullable
-    private static UnitHolder getUnitHolder(SlashCommandInteractionEvent event, Game activeGame, String planetName) {
+    private static UnitHolder getUnitHolder(SlashCommandInteractionEvent event, Game game, String planetName) {
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : activeGame.getTileMap().values()) {
+        for (Tile tile_ : game.getTileMap().values()) {
             if (tile != null) {
                 break;
             }

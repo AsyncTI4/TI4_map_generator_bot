@@ -16,18 +16,18 @@ public class RemoveCustomAdjacentTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
-        if (primaryTileOption == null){
+        if (primaryTileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");
             return;
         }
         String primaryTile = primaryTileOption.getAsString().toLowerCase();
-        if (primaryTile.isBlank()){
+        if (primaryTile.isBlank()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again. Example: primary:0a");
             return;
         }
 
-        activeGame.removeCustomAdjacentTiles(primaryTile);
+        game.removeCustomAdjacentTiles(primaryTile);
     }
 }

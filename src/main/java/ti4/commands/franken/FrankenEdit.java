@@ -18,42 +18,43 @@ public class FrankenEdit extends FrankenSubcommandData {
     public FrankenEdit() {
         super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands");
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_EDIT_ACTION, "add/remove/swap/view")
-                .addChoice("Force Bag Swap", "forceSwap")
-                .addChoice("Add Card To Bag", "addBag").addChoice("Remove Card From Bag", "removeBag")
-                .addChoice("Swap Cards In Bag", "swapBag").addChoice("View Bag", "viewBag")
-                .addChoice("Add Card To Hand", "addHand").addChoice("Remove Card From Hand", "removeHand")
-                .addChoice("Swap Cards In Hand", "swapHand").addChoice("View Hand", "viewHand")
-                .addChoice("Add Card To Queue", "addQueue").addChoice("Remove Card From Queue", "removeQueue")
-                .addChoice("Swap Cards In Queue", "swapQueue").addChoice("View Queue", "viewQueue")
-                .addChoice("View All", "viewAll")
-                .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM+"1", "The card to edit"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM+"2", "Use with 'swap'. The card to swap Arg1 with."));
+            .addChoice("Force Bag Swap", "forceSwap")
+            .addChoice("Add Card To Bag", "addBag").addChoice("Remove Card From Bag", "removeBag")
+            .addChoice("Swap Cards In Bag", "swapBag").addChoice("View Bag", "viewBag")
+            .addChoice("Add Card To Hand", "addHand").addChoice("Remove Card From Hand", "removeHand")
+            .addChoice("Swap Cards In Hand", "swapHand").addChoice("View Hand", "viewHand")
+            .addChoice("Add Card To Queue", "addQueue").addChoice("Remove Card From Queue", "removeQueue")
+            .addChoice("Swap Cards In Queue", "swapQueue").addChoice("View Queue", "viewQueue")
+            .addChoice("View All", "viewAll")
+            .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "1", "The card to edit"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "2", "Use with 'swap'. The card to swap Arg1 with."));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername"));
 
     }
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping editOption = event.getOption(Constants.FRANKEN_EDIT_ACTION);
-        OptionMapping card1 = event.getOption(Constants.FRANKEN_ITEM+"1");
-        OptionMapping card2 = event.getOption(Constants.FRANKEN_ITEM+"2");
+        OptionMapping card1 = event.getOption(Constants.FRANKEN_ITEM + "1");
+        OptionMapping card2 = event.getOption(Constants.FRANKEN_ITEM + "2");
         String command = editOption.getAsString();
 
         if ("viewAll".equals(command)) {
-            MessageHelper.sendMessageToUser("====================\n" + activeGame.getName() +
-                    " Frankendraft Status\n====================", getUser());
-            for (var player: activeGame.getRealPlayers()) {
-                dmPlayerBag(activeGame, player, player.getCurrentDraftBag(), "Held Bag");
-                dmPlayerBag(activeGame, player, player.getDraftHand(), "Hand");
-                dmPlayerBag(activeGame, player, player.getDraftQueue(), "Queue");
+            MessageHelper.sendMessageToUser("====================\n" + game.getName() +
+                " Frankendraft Status\n====================", getUser());
+            for (var player : game.getRealPlayers()) {
+                dmPlayerBag(game, player, player.getCurrentDraftBag(), "Held Bag");
+                dmPlayerBag(game, player, player.getDraftHand(), "Hand");
+                dmPlayerBag(game, player, player.getDraftQueue(), "Queue");
             }
             return;
         }
 
         if ("forceSwap".equals(command)) {
-            FrankenDraftHelper.passBags(activeGame);
-            GameSaveLoadManager.saveMap(activeGame, event);
+            FrankenDraftHelper.passBags(game);
+            GameSaveLoadManager.saveMap(game, event);
             return;
         }
 
@@ -62,7 +63,7 @@ public class FrankenEdit extends FrankenSubcommandData {
             MessageHelper.replyToMessage(event, "That command requires a player argument.");
             return;
         }
-        Player editingPlayer = activeGame.getPlayer(playerOption.getAsUser().getId());
+        Player editingPlayer = game.getPlayer(playerOption.getAsUser().getId());
 
         DraftBag editingBag = null;
         String bagName = "";
@@ -95,10 +96,10 @@ public class FrankenEdit extends FrankenSubcommandData {
                 }
             }
 
-            dmPlayerBag(activeGame, editingPlayer, editingBag, bagName);
+            dmPlayerBag(game, editingPlayer, editingBag, bagName);
         }
 
-        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName) {

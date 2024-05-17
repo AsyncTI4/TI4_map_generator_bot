@@ -74,7 +74,7 @@ public class GameStats extends StatisticsSubcommandData {
             case GAME_COUNT -> showGameCount(event);
             case WINNING_PATH -> showWinningPath(event);
             case SUPPORT_WIN_COUNT -> showWinsWithSupport(event);
-            
+
             // case WINNING_PATH_NAMES
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statisticToShow);
         }
@@ -86,28 +86,19 @@ public class GameStats extends StatisticsSubcommandData {
      */
     public enum GameStatistics {
         // Add your new statistic here
-        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"),
-        HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"),
-        GAME_LENGTH("Game Length", "Show game lengths"),
-        GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"),
-        FACTIONS_PLAYED("Plays per Faction", "Show faction play count"),
-        COLOURS_PLAYED("Plays per Colour", "Show colour play count"),
-        FACTION_WINS("Wins per Faction", "Show the wins per faction"),
-        FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"),
-        COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
-       // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 pt was scored but no winner was declared"),
-        WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
-        SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"),
-        GAME_COUNT("Total game count", "Shows the total game count");
-    
+        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour", "Show colour play count"), FACTION_WINS("Wins per Faction",
+            "Show the wins per faction"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 pt was scored but no winner was declared"),
+        WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"), SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"), GAME_COUNT("Total game count", "Shows the total game count");
+
         private final String name;
         private final String description;
-    
+
         GameStatistics(String name, String description) {
             this.name = name;
             this.description = description;
         }
-    
+
         @Override
         public String toString() {
             return super.toString().toLowerCase();
@@ -115,6 +106,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
+         * 
          * @param id the string identifier
          * @return the SimpleStatistics enum value, or null if not found
          */
@@ -126,9 +118,10 @@ public class GameStats extends StatisticsSubcommandData {
             }
             return null;
         }
-    
+
         /**
          * Gets the name and description of the statistic for auto-complete suggestions.
+         * 
          * @return the auto-complete name
          */
         public String getAutoCompleteName() {
@@ -137,6 +130,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         /**
          * Searches for a given string within the name, description, or string representation of the statistic.
+         * 
          * @param searchString the string to search for
          * @return true if the string is found, false otherwise
          */
@@ -166,29 +160,29 @@ public class GameStats extends StatisticsSubcommandData {
         int gamesWhereHighestWon = 0;
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
-            if(game.getWinner().isEmpty()){
+            if (game.getWinner().isEmpty()) {
                 continue;
             }
-            
+
             int highest = 0;
             Player winner = game.getWinner().get();
             Player highestP = null;
-            for(Player player : game.getRealAndEliminatedAndDummyPlayers()){
-                if(player.getTotalExpenses() > highest){
+            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+                if (player.getTotalExpenses() > highest) {
                     highestP = player;
                     highest = player.getTotalExpenses();
                 }
-                if(player.getTotalExpenses() < 20){
+                if (player.getTotalExpenses() < 20) {
                     highestP = null;
                     break;
                 }
             }
-            if(highestP != null){
+            if (highestP != null) {
                 num++;
                 names.append(num).append(". ").append(game.getName());
                 names.append(" - Winner was ").append(winner.getFactionEmoji()).append(" (").append("Highest was ").append(highestP.getFactionEmoji()).append(" at ").append(highestP.getTotalExpenses()).append(")");
                 names.append("\n");
-                if(highestP == winner){
+                if (highestP == winner) {
                     gamesWhereHighestWon++;
                 }
             }
@@ -197,11 +191,11 @@ public class GameStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
-    public static boolean hasPlayerFinishedAGame(Player player){
+    public static boolean hasPlayerFinishedAGame(Player player) {
         String userID = player.getUserID();
 
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-        Predicate<Game> endedGamesFilter = game ->  game.getWinner().isPresent();
+        Predicate<Game> endedGamesFilter = game -> game.getWinner().isPresent();
         Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
@@ -213,7 +207,7 @@ public class GameStats extends StatisticsSubcommandData {
         return games.size() > 0;
     }
 
-    public static int numberOfPlayersUnfinishedGames(String userID){
+    public static int numberOfPlayersUnfinishedGames(String userID) {
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
         Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && game.getWinner().isEmpty() && game.getHighestScore() > 0;
         Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
@@ -244,8 +238,8 @@ public class GameStats extends StatisticsSubcommandData {
             if (isNotBlank(game.getCustomName())) {
                 names.append(" (").append(game.getCustomName()).append(")");
             }
-            for(Player player : game.getRealAndEliminatedAndDummyPlayers()){
-                if(!hasPlayerFinishedAGame(player)){
+            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+                if (!hasPlayerFinishedAGame(player)) {
                     names.append(" ").append(player.getUserName()).append(" had not finished any games and had ").append(numberOfPlayersUnfinishedGames(player.getUserID())).append(" unfinished games. ");
                 }
             }
@@ -260,12 +254,12 @@ public class GameStats extends StatisticsSubcommandData {
         int num = 0;
         int total = 0;
         Map<String, Integer> endedGames = new HashMap<>();
-        for (Game activeGame : filteredGames) {
-            if (activeGame.isHasEnded() && activeGame.getWinner().isPresent() && activeGame.getPlayerCountForMap() > 2
-                && Helper.getDateDifference(activeGame.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
+        for (Game game : filteredGames) {
+            if (game.isHasEnded() && game.getWinner().isPresent() && game.getPlayerCountForMap() > 2
+                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
-                int dif = Helper.getDateDifference(activeGame.getCreationDate(), activeGame.getEndedDateString());
-                endedGames.put(activeGame.getName() + " ("+activeGame.getPlayerCountForMap()+"p, "+activeGame.getVp()+"pt)", dif);
+                int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
+                endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);
                 total = total + dif;
             }
         }
@@ -278,7 +272,7 @@ public class GameStats extends StatisticsSubcommandData {
                 .append(sortedMapAsc.get(command)).append(" \n");
         }
         longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths" , longMsg.toString());
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());
     }
 
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
@@ -298,14 +292,12 @@ public class GameStats extends StatisticsSubcommandData {
             .filter(entry -> Mapper.isValidFaction(entry.getKey()))
             .sorted(Map.Entry.comparingByValue())
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-            .forEach(entry -> 
-                sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("x` ")
-                    .append(entry.getKey().getFactionEmoji()).append(" ")
-                    .append(entry.getKey().getFactionNameWithSourceEmoji())
-                    .append("\n")
-                );
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(entry.getKey().getFactionEmoji()).append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
 
@@ -332,14 +324,12 @@ public class GameStats extends StatisticsSubcommandData {
             .filter(entry -> Mapper.isValidFaction(entry.getKey()))
             .sorted(Map.Entry.comparingByValue())
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
-            .forEach(entry -> 
-                sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("x` ")
-                    .append(entry.getKey().getFactionEmoji()).append(" ")
-                    .append(entry.getKey().getFactionNameWithSourceEmoji())
-                    .append("\n")
-                );
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(entry.getKey().getFactionEmoji()).append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Faction", sb.toString());
     }
 
@@ -373,16 +363,14 @@ public class GameStats extends StatisticsSubcommandData {
             })
             .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
             .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
-            .forEach(entry ->
-                sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("%` (")
-                    .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
-                    .append(" games) ")
-                    .append(entry.getKey().getFactionEmoji()).append(" ")
-                    .append(entry.getKey().getFactionNameWithSourceEmoji())
-                    .append("\n")
-            );
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("%` (")
+                .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
+                .append(" games) ")
+                .append(entry.getKey().getFactionEmoji()).append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
     }
 
@@ -401,13 +389,11 @@ public class GameStats extends StatisticsSubcommandData {
         colorCount.entrySet().stream()
             .filter(e -> Mapper.isValidColor(e.getKey()))
             .sorted(Map.Entry.comparingByValue())
-            .forEach(entry -> 
-                sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("x` ")
-                    .append(Emojis.getColorEmojiWithName(entry.getKey()))
-                    .append("\n")
-                );
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(Emojis.getColorEmojiWithName(entry.getKey()))
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Colour", sb.toString());
     }
 
@@ -428,13 +414,11 @@ public class GameStats extends StatisticsSubcommandData {
         winnerColorCount.entrySet().stream()
             .filter(e -> Mapper.isValidColor(e.getKey()))
             .sorted(Map.Entry.comparingByValue())
-            .forEach(entry -> 
-                sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("x` ")
-                    .append(Emojis.getColorEmojiWithName(entry.getKey()))
-                    .append("\n")
-                );
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(Emojis.getColorEmojiWithName(entry.getKey()))
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Wins per Colour", sb.toString());
     }
 
@@ -447,16 +431,14 @@ public class GameStats extends StatisticsSubcommandData {
         sb.append("__**Winning Paths Count:**__").append("\n");
         winningPathCount.entrySet().stream()
             .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .forEach(entry ->
-                sb.append(atomicInteger.incrementAndGet())
-                    .append(". `")
-                    .append(entry.getValue().toString())
-                    .append(" (")
-                    .append(Math.round(100 * entry.getValue() / (double) gamesWithWinnerCount))
-                    .append("%)` ")
-                    .append(entry.getKey())
-                    .append("\n")
-            );
+            .forEach(entry -> sb.append(atomicInteger.incrementAndGet())
+                .append(". `")
+                .append(entry.getValue().toString())
+                .append(" (")
+                .append(Math.round(100 * entry.getValue() / (double) gamesWithWinnerCount))
+                .append("%)` ")
+                .append(entry.getKey())
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Paths", sb.toString());
     }
 
@@ -558,17 +540,15 @@ public class GameStats extends StatisticsSubcommandData {
         sb.append("__**Winning Paths With SftT Count:**__").append("\n");
         supportWinCount.entrySet().stream()
             .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-            .forEach(entry ->
-                sb.append(atomicInteger.getAndIncrement() + 1)
-                    .append(". `")
-                    .append(entry.getValue().toString())
-                    .append(" (")
-                    .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
-                    .append("%)` ")
-                    .append(entry.getKey())
-                    .append(" SftT wins")
-                    .append("\n")
-            );
+            .forEach(entry -> sb.append(atomicInteger.getAndIncrement() + 1)
+                .append(". `")
+                .append(entry.getValue().toString())
+                .append(" (")
+                .append(Math.round(100 * entry.getValue() / (double) gameWithWinnerCount.get()))
+                .append("%)` ")
+                .append(entry.getKey())
+                .append(" SftT wins")
+                .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "SftT wins", sb.toString());
     }
 

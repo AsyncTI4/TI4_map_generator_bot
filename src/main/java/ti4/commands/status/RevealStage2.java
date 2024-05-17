@@ -27,76 +27,76 @@ public class RevealStage2 extends StatusSubcommandData {
     }
 
     public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        Map.Entry<String, Integer> objective = activeGame.revealStage2();
+        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Map.Entry<String, Integer> objective = game.revealStage2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        if ("status".equalsIgnoreCase(activeGame.getCurrentPhase())) {
+        if ("status".equalsIgnoreCase(game.getCurrentPhase())) {
             // first do cleanup if necessary
             int playersWithSCs = 0;
-            for (Player player : activeGame.getRealPlayers()) {
+            for (Player player : game.getRealPlayers()) {
                 if (player.getSCs() != null && player.getSCs().size() > 0 && !player.getSCs().contains(0)) {
                     playersWithSCs++;
                 }
             }
 
             if (playersWithSCs > 0) {
-                new Cleanup().runStatusCleanup(activeGame);
-                if (!activeGame.isFoWMode()) {
+                new Cleanup().runStatusCleanup(game);
+                if (!game.isFoWMode()) {
                     MessageHelper.sendMessageToChannel(channel,
-                            ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+                        ListPlayerInfoButton.representScoring(game, objective.getKey(), 0));
                 }
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
-                        activeGame.getPing() + "Status Cleanup Run!");
-                if (!activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                    game.getPing() + "Status Cleanup Run!");
+                if (!game.isFoWMode()) {
                     DisplayType displayType = DisplayType.map;
-                    MapGenerator.saveImage(activeGame, displayType, event)
-                            .thenAccept(fileUpload -> MessageHelper
-                                    .sendFileUploadToChannel(activeGame.getActionsChannel(), fileUpload));
+                    MapGenerator.saveImage(game, displayType, event)
+                        .thenAccept(fileUpload -> MessageHelper
+                            .sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
                 }
             }
         } else {
-            if (!activeGame.isFoWMode()) {
+            if (!game.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(channel,
-                        ListPlayerInfoButton.representScoring(activeGame, objective.getKey(), 0));
+                    ListPlayerInfoButton.representScoring(game, objective.getKey(), 0));
             }
         }
     }
 
     public void revealTwoStage2(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
 
-        Map.Entry<String, Integer> objective1 = activeGame.revealStage2();
-        Map.Entry<String, Integer> objective2 = activeGame.revealStage2();
+        Map.Entry<String, Integer> objective1 = game.revealStage2();
+        Map.Entry<String, Integer> objective2 = game.revealStage2();
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
-        MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objectives Revealed**");
+        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 2 Public Objectives Revealed**");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
-                .queue(m -> m.pin().queue());
+            .queue(m -> m.pin().queue());
 
         int maxSCsPerPlayer;
-        if (activeGame.getRealPlayers().isEmpty()) {
-            maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
+        if (game.getRealPlayers().isEmpty()) {
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getPlayers().size());
         } else {
-            maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
+            maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
         }
 
         if (maxSCsPerPlayer == 0)
             maxSCsPerPlayer = 1;
 
-        if (activeGame.getRealPlayers().size() == 1) {
+        if (game.getRealPlayers().size() == 1) {
             maxSCsPerPlayer = 1;
         }
-        activeGame.setStrategyCardsPerPlayer(maxSCsPerPlayer);
+        game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
     }
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

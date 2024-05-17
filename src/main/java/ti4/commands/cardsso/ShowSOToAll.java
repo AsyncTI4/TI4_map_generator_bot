@@ -19,9 +19,9 @@ public class ShowSOToAll extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -41,7 +41,7 @@ public class ShowSOToAll extends SOCardsSubcommandData {
                 break;
             }
         }
-        if (soID == null){
+        if (soID == null) {
             for (Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
                 if (so.getValue().equals(soIndex)) {
                     soID = so.getKey();
@@ -57,9 +57,9 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
+        sb.append("Game: ").append(game.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        if (scored){
+        if (scored) {
             sb.append("Showed Scored Secret Objectives:").append("\n");
         } else {
             sb.append("Showed Secret Objectives:").append("\n");

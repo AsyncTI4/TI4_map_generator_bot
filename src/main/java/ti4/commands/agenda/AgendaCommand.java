@@ -45,9 +45,9 @@ public class AgendaCommand implements Command {
             }
         }
 
-        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        if (activeGame != null) {
-            GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        if (game != null) {
+            GameSaveLoadManager.saveMap(game, event);
         }
         if (executedCommand != null) {
             // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());
@@ -86,7 +86,7 @@ public class AgendaCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

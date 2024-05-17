@@ -32,13 +32,13 @@ public class SelectFaction implements Selection {
 
     @Override
     public void execute(StringSelectInteractionEvent event) {
-        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        if (activeGame == null) {
+        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        if (game == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
             return;
         }
-        Player player = activeGame.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Player player = game.getPlayer(event.getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
@@ -46,7 +46,7 @@ public class SelectFaction implements Selection {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().get(0).getLabel());
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().get(0);
-        ButtonHelper.resolveSetupStep2(player, activeGame, event, fakeButtonID);
+        ButtonHelper.resolveSetupStep2(player, game, event, fakeButtonID);
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {
@@ -61,7 +61,7 @@ public class SelectFaction implements Selection {
                 SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
                     .withDescription(faction.getAlias())
                     .withLabel(faction.getAutoCompleteName());
-              option = option.withEmoji(emojiToUse);
+                option = option.withEmoji(emojiToUse);
                 menuBuilder.addOptions(option);
             }
             menuBuilder.setRequiredRange(1, 1);

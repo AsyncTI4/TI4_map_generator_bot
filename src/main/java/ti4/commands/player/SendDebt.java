@@ -26,16 +26,16 @@ public class SendDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player sendingPlayer = activeGame.getPlayer(getUser().getId());
-        sendingPlayer = Helper.getGamePlayer(activeGame, sendingPlayer, event, null);
+        Game game = getActiveGame();
+        Player sendingPlayer = game.getPlayer(getUser().getId());
+        sendingPlayer = Helper.getGamePlayer(game, sendingPlayer, event, null);
 
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeGame.getPlayers().values()) {
+            for (Player player_ : game.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     sendingPlayer = player_;
                     break;
@@ -48,7 +48,7 @@ public class SendDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player receivingPlayer = Helper.getPlayer(activeGame, sendingPlayer, event);
+        Player receivingPlayer = Helper.getPlayer(game, sendingPlayer, event);
         if (receivingPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to send Debt could not be found");
             return;
@@ -61,9 +61,9 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
-        
-        ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, activeGame, "vaden", event);
-        
+
+        ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, game, "vaden", event);
+
         MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
 
     }

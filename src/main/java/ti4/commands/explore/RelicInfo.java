@@ -18,10 +18,10 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
-public class RelicInfo extends ExploreSubcommandData implements InfoThreadCommand{
+public class RelicInfo extends ExploreSubcommandData implements InfoThreadCommand {
     public RelicInfo() {
-		super(Constants.RELIC_INFO, "Send relic information to your Cards Info channel");
-	}
+        super(Constants.RELIC_INFO, "Send relic information to your Cards Info channel");
+    }
 
     public boolean accept(SlashCommandInteractionEvent event) {
         return acceptEvent(event, getActionID());
@@ -29,29 +29,29 @@ public class RelicInfo extends ExploreSubcommandData implements InfoThreadComman
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendRelicInfo(activeGame, player, event);
+        sendRelicInfo(game, player, event);
     }
 
-    public static void sendRelicInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+    public static void sendRelicInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendRelicInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendRelicInfo(game, player);
     }
 
-    public static void sendRelicInfo(Game activeGame, Player player) {
+    public static void sendRelicInfo(Game game, Player player) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                player.getCardsInfoThread(),
-                null,
-                getRelicEmbeds(player),
-                getRelicButtons(player));
+            player.getCardsInfoThread(),
+            null,
+            getRelicEmbeds(player),
+            getRelicButtons(player));
     }
 
     private static List<MessageEmbed> getRelicEmbeds(Player player) {
@@ -64,7 +64,7 @@ public class RelicInfo extends ExploreSubcommandData implements InfoThreadComman
             }
         }
         return messageEmbeds;
-    
+
     }
 
     private static List<Button> getRelicButtons(Player player) {

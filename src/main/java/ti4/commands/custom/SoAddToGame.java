@@ -17,8 +17,8 @@ public class SoAddToGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        String soID = event.getOption(Constants.SO_ID,null, OptionMapping::getAsString);
+        Game game = getActiveGame();
+        String soID = event.getOption(Constants.SO_ID, null, OptionMapping::getAsString);
         if (soID == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");
             return;
@@ -28,8 +28,8 @@ public class SoAddToGame extends CustomSubcommandData {
             return;
         }
 
-        activeGame.addSOToGame(soID);
-        if (activeGame.getSecretObjectives().contains(soID)) {
+        game.addSOToGame(soID);
+        if (game.getSecretObjectives().contains(soID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "SO added to game deck");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "SO was not added for an unknown reason");

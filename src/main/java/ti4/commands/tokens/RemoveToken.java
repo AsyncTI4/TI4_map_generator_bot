@@ -19,7 +19,7 @@ import java.util.*;
 
 public class RemoveToken extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
 
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
@@ -30,7 +30,7 @@ public class RemoveToken extends AddRemoveToken {
             String tokenPath = tile.getAttachmentPath(tokenID);
             if (tokenPath != null) {
                 removeToken(event, tile, tokenID, true);
-                activeGame.clearPlanetsCache();
+                game.clearPlanetsCache();
             } else {
                 tokenID = Mapper.getTokenID(tokenName);
                 tokenPath = tile.getTokenPath(tokenID);
@@ -43,7 +43,7 @@ public class RemoveToken extends AddRemoveToken {
                     removeToken(event, tile, tokenID, false);
                 }
                 removeToken(event, tile, tokenID, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
-                activeGame.clearPlanetsCache();
+                game.clearPlanetsCache();
             }
         } else {
             MessageHelper.replyToMessage(event, "Token not specified.");
@@ -82,9 +82,9 @@ public class RemoveToken extends AddRemoveToken {
                 continue;
             }
             tile.removeToken(tokenID, planet);
-            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)){
+            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)) {
                 Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-                if (unitHolders.get(Constants.MIRAGE) != null){
+                if (unitHolders.get(Constants.MIRAGE) != null) {
                     unitHolders.remove(Constants.MIRAGE);
                 }
             }
@@ -106,10 +106,10 @@ public class RemoveToken extends AddRemoveToken {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
+            Commands.slash(getActionID(), getActionDescription())
+                .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
 
         );
     }

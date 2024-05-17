@@ -11,12 +11,12 @@ public class Join extends JoinLeave {
     }
 
     @Override
-    protected String getResponseMessage(Game activeGame, User user) {
-        return "Joined map: " + activeGame.getName() + " successful";
+    protected String getResponseMessage(Game game, User user) {
+        return "Joined map: " + game.getName() + " successful";
     }
 
     @Override
-    protected void action(Game activeGame, User user) {
-        activeGame.addPlayer(user.getId(), user.getName());
+    protected void action(Game game, User user) {
+        game.addPlayer(user.getId(), user.getName());
     }
 }

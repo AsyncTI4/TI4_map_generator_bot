@@ -35,8 +35,8 @@ public class Replace extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         User callerUser = event.getUser();
 
-        Game activeGame = getActiveGame();
-        Collection<Player> players = activeGame.getPlayers().values();
+        Game game = getActiveGame();
+        Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
@@ -60,7 +60,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
 
-        Player removedPlayer = Helper.getPlayer(activeGame, null, event);
+        Player removedPlayer = Helper.getPlayer(game, null, event);
         if (removedPlayer == null) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
@@ -68,15 +68,15 @@ public class Replace extends GameSubcommandData {
         User addedUser = addOption.getAsUser();
         boolean notRealPlayer = players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()));
         if (!notRealPlayer) {
-            if (activeGame.getPlayer(addedUser.getId()).getFaction() == null) {
-                activeGame.removePlayer(addedUser.getId());
+            if (game.getPlayer(addedUser.getId()).getFaction() == null) {
+                game.removePlayer(addedUser.getId());
             }
         }
 
         //REMOVE ROLE
         Guild guild = event.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
-        List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
+        List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
         }
@@ -93,9 +93,9 @@ public class Replace extends GameSubcommandData {
             return;
         }
 
-        message = "Game: " + activeGame.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
-        Player player = activeGame.getPlayer(removedPlayer.getUserID());
-        Map<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+        message = "Game: " + game.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
+        Player player = game.getPlayer(removedPlayer.getUserID());
+        Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
 
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
@@ -108,24 +108,24 @@ public class Replace extends GameSubcommandData {
         player.setUserID(addedUser.getId());
         player.setTotalTurnTime(0);
         player.setNumberTurns(0);
-        if (removedPlayer.getUserID().equals(activeGame.getSpeaker())) {
-            activeGame.setSpeaker(addedUser.getId());
+        if (removedPlayer.getUserID().equals(game.getSpeaker())) {
+            game.setSpeaker(addedUser.getId());
         }
-        if (removedPlayer.getUserID().equals(activeGame.getActivePlayerID())) {
+        if (removedPlayer.getUserID().equals(game.getActivePlayerID())) {
             // do not update stats for this action
-            activeGame.setActivePlayer(addedUser.getId());
+            game.setActivePlayer(addedUser.getId());
         }
 
-        Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
-        if (activeGame.getBotMapUpdatesThread() != null) {
-            activeGame.getBotMapUpdatesThread().addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
+        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        if (game.getBotMapUpdatesThread() != null) {
+            game.getBotMapUpdatesThread().addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
-        GameSaveLoadManager.reload(activeGame);
-        if (FoWHelper.isPrivateGame(activeGame)) {
+        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.reload(game);
+        if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message);
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
     }
 }

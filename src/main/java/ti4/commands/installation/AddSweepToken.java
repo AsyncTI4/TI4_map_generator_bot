@@ -25,18 +25,18 @@ public class AddSweepToken extends InstallationSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
 
         OptionMapping option = event.getOption(Constants.TILE_NAME);
         String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
         String tileID = AliasHandler.resolveTile(tileOption);
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) return;
 
         String sweepToken = Mapper.getSweepID(player.getColor());

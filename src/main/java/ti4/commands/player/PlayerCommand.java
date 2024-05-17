@@ -67,10 +67,10 @@ public class PlayerCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
 
-        MapGenerator.saveImageToWebsiteOnly(activeGame, event);
+        MapGenerator.saveImageToWebsiteOnly(game, event);
     }
 
     protected String getActionDescription() {

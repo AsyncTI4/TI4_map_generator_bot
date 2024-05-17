@@ -17,13 +17,12 @@ public class PutAgendaBottom extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 
-
-    public void putBottom(GenericInteractionCreateEvent event, int agendaID, Game activeGame) {
-        boolean success = activeGame.putAgendaBottom(agendaID);
-        if (success && !activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on bottom");
-            List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-          String threadName = activeGame.getName()+"-round-"+ activeGame.getRound()+"-politics";
+    public void putBottom(GenericInteractionCreateEvent event, int agendaID, Game game) {
+        boolean success = game.putAgendaBottom(agendaID);
+        if (success && !game.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom");
+            List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
+            String threadName = game.getName() + "-round-" + game.getRound() + "-politics";
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
@@ -31,21 +30,21 @@ public class PutAgendaBottom extends AgendaSubcommandData {
                 }
             }
 
-
         } else {
-            if (!activeGame.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Agenda ID found");
+            if (!game.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             }
         }
     }
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        putBottom(event, option.getAsInt(), activeGame);
+        putBottom(event, option.getAsInt(), game);
     }
 }

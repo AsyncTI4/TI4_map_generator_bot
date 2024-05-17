@@ -33,14 +33,14 @@ public class SendFragments extends ExploreSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveGame();
+		Game game = getActiveGame();
 		User activeUser = getUser();
-		Player sender = activeGame.getPlayers().get(activeUser.getId());
-		sender = Helper.getGamePlayer(activeGame, sender, event, null);
+		Player sender = game.getPlayers().get(activeUser.getId());
+		sender = Helper.getGamePlayer(game, sender, event, null);
 
-		Player receiver = Helper.getPlayer(activeGame, null, event);
+		Player receiver = Helper.getPlayer(game, null, event);
 		if (receiver == null) {
-			MessageHelper.sendMessageToEventChannel(event, "Target player could not be found in game:" + activeGame.getName());
+			MessageHelper.sendMessageToEventChannel(event, "Target player could not be found in game:" + game.getName());
 			return;
 		}
 		String trait = event.getOption(Constants.TRAIT).getAsString();
@@ -49,13 +49,13 @@ public class SendFragments extends ExploreSubcommandData {
 		if (countOption != null) {
 			count = countOption.getAsInt();
 		}
-		ButtonHelperAbilities.pillageCheck(sender, activeGame);
-		ButtonHelperAbilities.pillageCheck(receiver, activeGame);
-		sendFrags(event, sender, receiver, trait, count, activeGame);
+		ButtonHelperAbilities.pillageCheck(sender, game);
+		ButtonHelperAbilities.pillageCheck(receiver, game);
+		sendFrags(event, sender, receiver, trait, count, game);
 
 	}
 
-	public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game activeGame) {
+	public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
 
 		List<String> fragments = new ArrayList<>();
 		for (String cardID : sender.getFragments()) {
@@ -88,27 +88,27 @@ public class SendFragments extends ExploreSubcommandData {
 		String p2 = receiver.getRepresentation();
 		String fragString = count + " " + trait + " " + Emojis.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message = p1 + " sent " + fragString + " to " + p2;
-    if (!activeGame.isFoWMode()) {
-		  MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeGame), message);
-    }
+		if (!game.isFoWMode()) {
+			MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, game), message);
+		}
 		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
-			ButtonHelper.commanderUnlockCheck(receiver, activeGame, "kollecc", event);
+			ButtonHelper.commanderUnlockCheck(receiver, game, "kollecc", event);
 		}
 		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorcommander")) {
-			ButtonHelper.commanderUnlockCheck(receiver, activeGame, "bentor", event);
+			ButtonHelper.commanderUnlockCheck(receiver, game, "bentor", event);
 		}
-		if (activeGame.isFoWMode()) {
+		if (game.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";
-			MessageHelper.sendPrivateMessageToPlayer(receiver, activeGame, event, message, fail, success);
+			MessageHelper.sendPrivateMessageToPlayer(receiver, game, event, message, fail, success);
 
 			// Add extra message for transaction visibility
-			FoWHelper.pingPlayersTransaction(activeGame, event, sender, receiver, fragString, null);
+			FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
 		}
-		ButtonHelper.checkTransactionLegality(activeGame, sender, receiver);
+		ButtonHelper.checkTransactionLegality(game, sender, receiver);
 		Player player = receiver;
 		if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
-        }
+			ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
+		}
 	}
 }

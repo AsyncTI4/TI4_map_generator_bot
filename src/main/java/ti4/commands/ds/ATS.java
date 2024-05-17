@@ -18,8 +18,8 @@ public class ATS extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
         int count = Math.max(event.getOption("count").getAsInt(), 0);
         if (count > 0) {
             player.setAtsCount(count);

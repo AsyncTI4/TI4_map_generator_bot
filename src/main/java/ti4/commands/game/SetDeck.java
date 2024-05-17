@@ -36,7 +36,7 @@ public class SetDeck extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         Map<String, DeckModel> changedDecks = new HashMap<>();
 
@@ -44,10 +44,10 @@ public class SetDeck extends GameSubcommandData {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
                 if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
-                    activeGame.setStrategyCardSet(value);
+                    game.setStrategyCardSet(value);
                 } else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
-                    if (setDeck(event, activeGame, deckType, deckModel)) {
+                    if (setDeck(event, game, deckType, deckModel)) {
                         changedDecks.put(deckModel.getType(), deckModel);
                     } else {
                         MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -55,8 +55,8 @@ public class SetDeck extends GameSubcommandData {
                     }
                 }
                 if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
-                    activeGame.swapOutVariantTechs();
-                    activeGame.swapInVariantTechs();
+                    game.swapOutVariantTechs();
+                    game.swapInVariantTechs();
                 }
             }
         });
@@ -73,43 +73,43 @@ public class SetDeck extends GameSubcommandData {
         deckTypes.add(constantName);
     }
 
-    public static boolean setDeck(SlashCommandInteractionEvent event, Game activeGame, String deckType, DeckModel deckModel) {
+    public static boolean setDeck(SlashCommandInteractionEvent event, Game game, String deckType, DeckModel deckModel) {
         if (Optional.ofNullable(deckModel).isPresent()) {
             switch (deckType) {
                 case Constants.AC_DECK -> {
-                    return activeGame.validateAndSetActionCardDeck(event, deckModel);
+                    return game.validateAndSetActionCardDeck(event, deckModel);
                 }
                 case Constants.SO_DECK -> {
-                    return activeGame.validateAndSetSecretObjectiveDeck(event, deckModel);
+                    return game.validateAndSetSecretObjectiveDeck(event, deckModel);
                 }
                 case Constants.STAGE_1_PUBLIC_DECK -> {
-                    activeGame.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
-                    activeGame.setStage1PublicDeckID(deckModel.getAlias());
+                    game.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                    game.setStage1PublicDeckID(deckModel.getAlias());
                     return true;
                 }
                 case Constants.STAGE_2_PUBLIC_DECK -> {
-                    activeGame.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
-                    activeGame.setStage2PublicDeckID(deckModel.getAlias());
+                    game.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                    game.setStage2PublicDeckID(deckModel.getAlias());
                     return true;
                 }
                 case Constants.RELIC_DECK -> {
-                    return activeGame.validateAndSetRelicDeck(event, deckModel);
+                    return game.validateAndSetRelicDeck(event, deckModel);
                 }
                 case Constants.AGENDA_DECK -> {
-                    return activeGame.validateAndSetAgendaDeck(event, deckModel);
+                    return game.validateAndSetAgendaDeck(event, deckModel);
                 }
                 case Constants.EVENT_DECK -> {
-                    return activeGame.validateAndSetEventDeck(event, deckModel);
+                    return game.validateAndSetEventDeck(event, deckModel);
                 }
                 case Constants.EXPLORATION_DECKS -> {
-                    activeGame.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
-                    activeGame.setExplorationDeckID(deckModel.getAlias());
+                    game.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                    game.setExplorationDeckID(deckModel.getAlias());
                     return true;
                 }
                 case Constants.TECHNOLOGY_DECK -> {
-                    activeGame.setTechnologyDeckID(deckModel.getAlias());
+                    game.setTechnologyDeckID(deckModel.getAlias());
                     if (deckModel.getAlias().contains("absol")) {
-                        for (Player player : activeGame.getRealPlayers()) {
+                        for (Player player : game.getRealPlayers()) {
                             List<String> techs = new ArrayList<>();
                             techs.addAll(player.getTechs());
                             for (String tech : techs) {

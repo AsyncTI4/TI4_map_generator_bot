@@ -20,31 +20,31 @@ public class IonFlip extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
+        if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
         UnitHolder spaceUnitHolder = tile.getUnitHolders().get(Constants.SPACE);
-        if (spaceUnitHolder == null){
+        if (spaceUnitHolder == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No valid Space found");
             return;
         }
-        if (spaceUnitHolder.getTokenList().contains(Constants.TOKEN_ION_ALPHA_PNG)){
+        if (spaceUnitHolder.getTokenList().contains(Constants.TOKEN_ION_ALPHA_PNG)) {
             tile.removeToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
-        } else if (spaceUnitHolder.getTokenList().contains(Constants.TOKEN_ION_BETA_PNG)){
+        } else if (spaceUnitHolder.getTokenList().contains(Constants.TOKEN_ION_BETA_PNG)) {
             tile.removeToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
         }
-        ShowGame.simpleShowGame(activeGame, event);
+        ShowGame.simpleShowGame(game, event);
     }
 }

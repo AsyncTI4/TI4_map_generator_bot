@@ -55,7 +55,7 @@ public class Setup extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         String faction = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         if (faction != null) {
             faction = StringUtils.substringBefore(faction.toLowerCase().replace("the ", ""), " ");
@@ -67,9 +67,9 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -84,11 +84,11 @@ public class Setup extends PlayerSubcommandData {
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
         String positionHS = StringUtils.substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); // Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
-        secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
+        secondHalfOfPlayerSetup(player, game, color, faction, positionHS, event, setSpeaker);
     }
 
-    public static void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
-        Map<String, Player> players = activeGame.getPlayers();
+    public static void secondHalfOfPlayerSetup(Player player, Game game, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
+        Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
@@ -105,7 +105,7 @@ public class Setup extends PlayerSubcommandData {
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            SOInfo.sendSecretObjectiveInfo(activeGame, player);
+            SOInfo.sendSecretObjectiveInfo(game, player);
             return;
         }
 
@@ -116,13 +116,13 @@ public class Setup extends PlayerSubcommandData {
         player.getTechs().clear();
         player.getFactionTechs().clear();
 
-        if (activeGame.isBaseGameMode()) {
+        if (game.isBaseGameMode()) {
             player.setLeaders(new ArrayList<>());
         }
 
         FactionModel setupInfo = player.getFactionSetupInfo();
 
-        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !activeGame.isMiltyModMode()) {
+        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
@@ -136,17 +136,17 @@ public class Setup extends PlayerSubcommandData {
         String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
         if (!StringUtils.isBlank(hsTile)) {
-            activeGame.setTile(tile);
+            game.setTile(tile);
         }
 
-        String statsAnchor = PositionMapper.getEquivalentPositionAtRing(activeGame.getRingCount(), positionHS);
+        String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
         player.setPlayerStatsAnchorPosition(statsAnchor);
 
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             tile = new Tile("51", "tr");
-            activeGame.setTile(tile);
+            game.setTile(tile);
         }
 
         // STARTING COMMODITIES
@@ -158,7 +158,7 @@ public class Setup extends PlayerSubcommandData {
                 continue;
             }
             String planetResolved = AliasHandler.resolvePlanet(planet.toLowerCase());
-            new PlanetAdd().doAction(player, planetResolved, activeGame);
+            new PlanetAdd().doAction(player, planetResolved, game);
             player.refreshPlanet(planetResolved);
         }
 
@@ -174,7 +174,7 @@ public class Setup extends PlayerSubcommandData {
             }
             player.addTech(tech);
         }
-        if (activeGame.getTechnologyDeckID().contains("absol")) {
+        if (game.getTechnologyDeckID().contains("absol")) {
             List<String> techs = new ArrayList<>();
             techs.addAll(player.getTechs());
             for (String tech : techs) {
@@ -195,7 +195,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (setSpeaker) {
-            activeGame.setSpeaker(player.getUserID());
+            game.setSpeaker(player.getUserID());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
@@ -204,7 +204,7 @@ public class Setup extends PlayerSubcommandData {
         Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         playerPNs.addAll(setupInfo.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
-        if (activeGame.isBaseGameMode()) {
+        if (game.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
                 if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
@@ -212,7 +212,7 @@ public class Setup extends PlayerSubcommandData {
                 }
             }
         }
-        if (activeGame.isAbsolMode()) {
+        if (game.isAbsolMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
                 if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNote(pnID).getName())) {
@@ -232,11 +232,11 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // SEND STUFF
-        AbilityInfo.sendAbilityInfo(activeGame, player, event);
-        TechInfo.sendTechInfo(activeGame, player, event);
-        LeaderInfo.sendLeadersInfo(activeGame, player, event);
-        UnitInfo.sendUnitInfo(activeGame, player, event, false);
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
+        AbilityInfo.sendAbilityInfo(game, player, event);
+        TechInfo.sendTechInfo(game, player, event);
+        LeaderInfo.sendLeadersInfo(game, player, event);
+        UnitInfo.sendUnitInfo(game, player, event, false);
+        PNInfo.sendPromissoryNoteInfo(game, player, false, event);
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
@@ -248,9 +248,9 @@ public class Setup extends PlayerSubcommandData {
                         + " after every other faction gets their tech, press this button to resolve Keleres tech",
                     buttons);
             } else if (player.getFaction().contains("winnu")) {
-                ButtonHelperFactionSpecific.offerWinnuStartingTech(player, activeGame);
+                ButtonHelperFactionSpecific.offerWinnuStartingTech(player, game);
             } else if (player.getFaction().contains("argent")) {
-                ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
+                ButtonHelperFactionSpecific.offerArgentStartingTech(player, game);
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you can use the button to get your starting tech",
@@ -259,14 +259,14 @@ public class Setup extends PlayerSubcommandData {
         }
 
         for (String fTech : player.getFactionTechs()) {
-            if (!activeGame.getTechnologyDeck().contains(fTech) && fTech.contains("ds")) {
-                activeGame.setTechnologyDeckID("techs_ds");
+            if (!game.getTechnologyDeck().contains(fTech) && fTech.contains("ds")) {
+                game.setTechnologyDeckID("techs_ds");
                 break;
             }
         }
 
         if (player.hasAbility("diplomats")) {
-            ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
+            ButtonHelperAbilities.resolveFreePeopleAbility(game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set up free people ability markers. " + player.getRepresentation(true, true)
                     + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
@@ -294,7 +294,7 @@ public class Setup extends PlayerSubcommandData {
                     + " due to the teeming ability");
         }
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
-            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame,
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
@@ -302,10 +302,10 @@ public class Setup extends PlayerSubcommandData {
                 player.getRepresentation(true, true)
                     + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded");
         }
-        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
+        CardsInfo.sendVariousAdditionalButtons(game, player);
 
-        if (!activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+        if (!game.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "Player: " + player.getRepresentation() + " has been set up");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
@@ -325,17 +325,17 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        if (!activeGame.isFoWMode()) {
+        if (!game.isFoWMode()) {
             StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
             if (!sb.toString().contains("No titles yet")) {
                 String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
             }
         }
         if (hsTile.equalsIgnoreCase("d11")) {
-            AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
+            AddToken.addToken(event, tile, Constants.FRONTIER, game);
         }
-        if (activeGame.getStoredValue("removeSupports").equalsIgnoreCase("true")) {
+        if (game.getStoredValue("removeSupports").equalsIgnoreCase("true")) {
             Player p2 = player;
             p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
             p2.removePromissoryNote(p2.getColor() + "_sftt");

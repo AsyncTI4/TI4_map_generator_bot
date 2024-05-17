@@ -22,23 +22,23 @@ public class RunManualDataMigration extends DeveloperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        
+
         String migrationName = event.getOption(Constants.MIGRATION_NAME).getAsString();
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
-        Game activeGame = GameManager.getInstance().getGame(gameName);
-        if(activeGame == null){
+        Game game = GameManager.getInstance().getGame(gameName);
+        if (game == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cant find map for game name" + gameName);
             return;
         }
-        
+
         try {
-            Class<?>[] paramTypes = {Game.class};
+            Class<?>[] paramTypes = { Game.class };
             Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
-            Boolean changesMade = (Boolean) method.invoke(null, activeGame);
-            if(changesMade){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + activeGame.getName());
-            }else{
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + activeGame.getName() + " but no changes were required.");
+            Boolean changesMade = (Boolean) method.invoke(null, game);
+            if (changesMade) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + game.getName());
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + game.getName() + " but no changes were required.");
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             BotLogger.log("failed to run data migration", e);

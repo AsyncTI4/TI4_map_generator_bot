@@ -22,16 +22,16 @@ public class AddLaw extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
 
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
 
         String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
@@ -41,12 +41,12 @@ public class AddLaw extends AgendaSubcommandData {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
 
-        Player electedPlayer = activeGame.getPlayerFromColorOrFaction(optionText);
+        Player electedPlayer = game.getPlayerFromColorOrFaction(optionText);
         if (electedPlayer != null) {
             optionText = electedPlayer.getFaction();
         }
 
-        boolean success = activeGame.addLaw(option.getAsInt(), optionText);
+        boolean success = game.addLaw(option.getAsInt(), optionText);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law added");
         } else {
