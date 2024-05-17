@@ -118,23 +118,30 @@ public class ButtonHelper {
             String msg = player.getRepresentation()
                 + " you have the opportunity to anonymously bestow one title on someone else in this game. Titles are just for fun, and have no real significance, but could a nice way to take something away from this game. Feel free to not. If you choose to, its a 2 button process. First select the title, then the player you want to bestow it upon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("bestowTitleStep1_A Kind Soul", "A Kind Soul"));
-            buttons.add(Button.success("bestowTitleStep1_A Worthy Opponent", "A Worthy Opponent"));
-            buttons.add(Button.success("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
-            buttons.add(Button.success("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
-            buttons.add(Button.success("bestowTitleStep1_A Good Ally", "A Good Ally"));
-            buttons.add(Button.success("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
-
-            buttons.add(Button.success("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
-            buttons.add(Button.success("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
-            buttons.add(Button.success("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
             buttons.add(Button.success("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
-
             buttons.add(Button.success("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));
             buttons.add(Button.success("bestowTitleStep1_Trustworthy To A Fault", "Trustworthy To A Fault"));
             buttons.add(Button.success("bestowTitleStep1_You Made The Game Better", "You Made The Game Better"));
-            buttons.add(Button.success("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            buttons.add(Button.success("bestowTitleStep1_A Kind Soul", "A Kind Soul"));
+            buttons.add(Button.success("bestowTitleStep1_A Good Ally", "A Good Ally"));
+
+            buttons.add(Button.primary("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
+            buttons.add(Button.primary("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
+            buttons.add(Button.primary("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
+            buttons.add(Button.primary("bestowTitleStep1_A Worthy Opponent", "A Worthy Opponent"));
+            buttons.add(Button.primary("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
+            buttons.add(Button.primary("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
+            buttons.add(Button.primary("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
+
+            buttons.add(Button.danger("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
+            buttons.add(Button.danger("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
+            buttons.add(Button.danger("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
+            buttons.add(Button.danger("bestowTitleStep1_Space Risker", "Space Risker"));
+            buttons.add(Button.danger("bestowTitleStep1_A Warlord", "A Warlord"));
+            buttons.add(Button.danger("bestowTitleStep1_Traitor", "Traitor"));
+
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tiles here", buttons);
         }
     }
 
@@ -1790,7 +1797,7 @@ public class ButtonHelper {
         }
         if (game.getLaws().containsKey("absol_sanctions")) {
             limit = 3;
-            if (game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
+            if (game.getLawsInfo().get("absol_sanctions") != null && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
                 limit = 5;
             }
         }
@@ -4421,8 +4428,17 @@ public class ButtonHelper {
         new CombatRoll().secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos),
             unitHolderName, rollType);
         if (buttonID.contains("bombardment") && game.getLaws().containsKey("conventions")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "This is a reminder that conventions of war is in play, so bombardment of cultural planets is illegal. Ignore this message if not relevant");
+            boolean relevant = false;
+            for (UnitHolder unitHolder : game.getTileByPosition(pos).getPlanetUnitHolders()) {
+                String planet = unitHolder.getName();
+                if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
+                    relevant = true;
+                }
+            }
+            if (relevant) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "This is a reminder that conventions of war is in play, so bombardment of cultural planets is illegal.");
+            }
         }
     }
 

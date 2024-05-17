@@ -1706,7 +1706,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distinguished_")) {
-            String voteMessage = "You added 5 votes to your total. Please select from the available buttons to vote.";
+            String voteMessage = "Please select from the available buttons your total vote amount. If your desired amount is not available, you can use the buttons to increase or decrease by multiples of 5 until you arrive at it.";
             String vote = buttonID.substring(buttonID.indexOf("_") + 1);
             int votes = Integer.parseInt(vote);
             List<Button> voteActionRow = AgendaHelper.getVoteButtonsVersion2(votes, votes + 5);
@@ -1714,7 +1714,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distinguishedReverse_")) {
-            String voteMessage = "You subtracted 5 votes to your total. Please select from the available buttons to vote.";
+            String voteMessage = "Please select from the available buttons your total vote amount. If your desired amount is not available, you can use the buttons to increase or decrease by multiples of 5 until you arrive at it.";
             String vote = buttonID.substring(buttonID.indexOf("_") + 1);
             int votes = Integer.parseInt(vote);
             List<Button> voteActionRow = AgendaHelper.getVoteButtonsVersion2(votes - 5, votes);
@@ -1941,6 +1941,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReverse(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("showObjInfo_")) {
             ListPlayerInfoButton.showObjInfo(event, buttonID, activeGame);
+        } else if (buttonID.startsWith("meteorSlings_")) {
+            ButtonHelperAbilities.meteorSlings(player, buttonID, activeGame, event);
         } else if (buttonID.startsWith("offerInfoButtonStep2_")) {
             ListPlayerInfoButton.resolveOfferInfoButtonStep2(event, buttonID, activeGame);
         } else if (buttonID.startsWith("offerInfoButtonStep3_")) {
@@ -4736,8 +4738,8 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "turnEnd" -> {
                     if (activeGame.isFoWMode() && !player.equals(activeGame.getActivePlayer())) {
-                      MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
-                      return;
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+                        return;
                     }
 
                     TurnEnd.pingNextPlayer(event, activeGame, player);

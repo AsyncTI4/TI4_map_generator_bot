@@ -27,6 +27,7 @@ import ti4.helpers.CombatRollType;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -322,6 +323,38 @@ public class CombatRoll extends CombatSubcommandData {
                 String msg2 = opponent.getFactionEmoji() + " can automatically assign hits. The hits would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, activeGame, tile, h, event, true, true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
+        }
+        if (!activeGame.isFoWMode() && rollType == CombatRollType.bombardment && h > 0) {
+
+            List<Button> buttons = new ArrayList<>();
+
+            buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hits"));
+
+            String msg2 = " you can use this button to assign bombardment hits";
+            boolean someone = false;
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if (p2 == player) {
+                    continue;
+                }
+                if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
+                    msg2 = p2.getRepresentation() + msg2;
+                    someone = true;
+                }
+            }
+            if (someone) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+            }
+
+        }
+        if (rollType == CombatRollType.bombardment && h > 0 && player.hasAbility("meteor_slings") || player.getPromissoryNotes().keySet().contains("dspnkhra")) {
+            List<Button> buttons = new ArrayList<>();
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(), "Inf on " + Helper.getPlanetRepresentation(uH.getName(), activeGame)));
+            }
+            buttons.add(Button.danger("deleteButtons", "Done"));
+            String msg2 = player.getRepresentation() + " you could potentially cancel some bombardment hits to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+
         }
 
     }

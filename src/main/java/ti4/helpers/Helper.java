@@ -2797,6 +2797,17 @@ public class Helper {
         if (!activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
         }
+        List<Tile> tiles = new ArrayList<>();
+        tiles.addAll(activeGame.getTileMap().values());
+        for (Tile tile : tiles) {
+            if (tile == null) {
+                continue;
+            }
+            if (tile.getTileID().equals("0g") || tile.getTileID().equals("-1") || tile.getTileID().equals("0gray")) {
+                activeGame.removeTile(tile.getPosition());
+            }
+        }
+
     }
 
     public static void checkEndGame(Game activeGame, Player player) {

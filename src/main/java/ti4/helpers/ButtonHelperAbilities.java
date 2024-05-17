@@ -1115,6 +1115,13 @@ public class ButtonHelperAbilities {
         return false;
     }
 
+    public static void meteorSlings(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        String msg = player.getRepresentation() + " cancelled one bombardment hit to place one infantry on " + Helper.getPlanetRepresentation(planet, game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "1 inf " + planet, game);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+
     public static void pillageCheck(Player player, Game activeGame) {
         if (canBePillaged(player, activeGame, player.getTg())) {
             Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
@@ -1272,7 +1279,7 @@ public class ButtonHelperAbilities {
         Tile tile = activeGame.getTileByPosition(pos);
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + " -> "                + (player.getStrategicCC() - 1) + ")";
+            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, Emojis.Muaat + "Starforge");
         } else {

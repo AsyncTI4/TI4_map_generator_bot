@@ -101,7 +101,7 @@ public class DiscordantStarsHelper {
     }
 
     public static void handleOlradinPoliciesWhenExhaustingPlanets(Game activeGame, Player player, String planet) {
-        if (activeGame == null || !activeGame.isDiscordantStarsMode() || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player == null || !player.hasOlradinPolicies()) return;
+        if (activeGame == null || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player == null || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
