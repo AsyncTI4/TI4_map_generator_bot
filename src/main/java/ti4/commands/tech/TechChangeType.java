@@ -28,11 +28,11 @@ public class TechChangeType extends TechSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        parseParameter(event, event.getOption(Constants.TECH), event.getOption(Constants.TECH_TYPE), activeGame);
-        parseParameter(event, event.getOption(Constants.TECH2), event.getOption(Constants.TECH_TYPE), activeGame);
-        parseParameter(event, event.getOption(Constants.TECH3), event.getOption(Constants.TECH_TYPE), activeGame);
-        parseParameter(event, event.getOption(Constants.TECH4), event.getOption(Constants.TECH_TYPE), activeGame);
+        Game game = getActiveGame();
+        parseParameter(event, event.getOption(Constants.TECH), event.getOption(Constants.TECH_TYPE), game);
+        parseParameter(event, event.getOption(Constants.TECH2), event.getOption(Constants.TECH_TYPE), game);
+        parseParameter(event, event.getOption(Constants.TECH3), event.getOption(Constants.TECH_TYPE), game);
+        parseParameter(event, event.getOption(Constants.TECH4), event.getOption(Constants.TECH_TYPE), game);
 
     }
 

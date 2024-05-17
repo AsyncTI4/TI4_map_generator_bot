@@ -19,9 +19,9 @@ public class PutEventTop extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -31,16 +31,16 @@ public class PutEventTop extends EventSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        putTop(event, numericalID, activeGame, player);
+        putTop(event, numericalID, game, player);
     }
 
-    public void putTop(GenericInteractionCreateEvent event, int eventID, Game activeGame, Player player) {
-        boolean success = activeGame.putEventTop(eventID, player);
+    public void putTop(GenericInteractionCreateEvent event, int eventID, Game game, Player player) {
+        boolean success = game.putEventTop(eventID, player);
 
         if (success) {
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Event put on top");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on top");
         } else {
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Event ID found");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Event ID found");
         }
     }
 }

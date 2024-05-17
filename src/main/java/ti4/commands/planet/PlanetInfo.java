@@ -41,9 +41,9 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getUser();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        Game game = GameManager.getInstance().getUserActiveGame(user.getId());
 
-        Player player = activeGame.getPlayer(user.getId());
+        Player player = game.getPlayer(user.getId());
         sendPlanetInfo(player);
     }
 
@@ -57,10 +57,10 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
     }
 
     private static MessageEmbed getPlanetEmbed(Player player, String planetID) {
-        Game activeGame = player.getGame();
-        Planet planet = activeGame.getPlanetsInfo().get(planetID);
+        Game game = player.getGame();
+        Planet planet = game.getPlanetsInfo().get(planetID);
         PlanetModel planetModel = Mapper.getPlanet(planetID);
-        Tile tile = activeGame.getTileFromPlanet(planetID);
+        Tile tile = game.getTileFromPlanet(planetID);
 
         EmbedBuilder eb = new EmbedBuilder();
 

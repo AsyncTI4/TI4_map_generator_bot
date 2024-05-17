@@ -20,10 +20,9 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do draw SO").setRequired(true));
     }
 
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         if (option == null) {
@@ -36,12 +35,12 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         }
 
         User user = playerOption.getAsUser();
-        Map<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
-        if (secrets == null){
+        Map<String, Integer> secrets = game.drawSpecificSecretObjective(option.getAsString(), user.getId());
+        if (secrets == null) {
             MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(game, event);
         MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
     }
 }

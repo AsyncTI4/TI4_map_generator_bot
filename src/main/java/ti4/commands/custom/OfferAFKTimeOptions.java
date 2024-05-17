@@ -15,15 +15,15 @@ public class OfferAFKTimeOptions extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player mainPlayer = activeGame.getPlayer(getUser().getId());
-        mainPlayer = Helper.getGamePlayer(activeGame, mainPlayer, event, null);
-        mainPlayer = Helper.getPlayer(activeGame, mainPlayer, event);
+        Game game = getActiveGame();
+        Player mainPlayer = game.getPlayer(getUser().getId());
+        mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
+        mainPlayer = Helper.getPlayer(game, mainPlayer, event);
         if (mainPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player/Faction/Color could not be found in map:" + activeGame.getName());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player/Faction/Color could not be found in map:" + game.getName());
             return;
         }
-        ButtonHelper.offerAFKTimeOptions(activeGame, mainPlayer);
+        ButtonHelper.offerAFKTimeOptions(game, mainPlayer);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to " + ButtonHelper.getIdent(mainPlayer));
     }
 }

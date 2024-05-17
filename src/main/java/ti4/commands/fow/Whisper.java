@@ -27,19 +27,19 @@ public class Whisper extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(activeGame, player, event);
+        Player player_ = Helper.getPlayer(game, player, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;
         }
-        if (!activeGame.isFoWMode()) {
+        if (!game.isFoWMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
             return;
         }
@@ -53,21 +53,21 @@ public class Whisper extends FOWSubcommandData {
         if (anon != null) {
             anonY = anon.getAsString();
         }
-        sendWhisper(activeGame, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
+        sendWhisper(game, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
     }
 
-    public static void sendWhisper(Game activeGame, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
+    public static void sendWhisper(Game game, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
-        if (!activeGame.isFoWMode() && !(feedbackChannel instanceof ThreadChannel)) {
+        if (!game.isFoWMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
             MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
         }
-        if (!activeGame.isFoWMode()) {
+        if (!game.isFoWMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
-        for (Player player2 : activeGame.getRealPlayers()) {
+        for (Player player2 : game.getRealPlayers()) {
             msg = msg.replace(player2.getPing(), player2.getUserName());
         }
 
@@ -76,7 +76,7 @@ public class Whisper extends FOWSubcommandData {
         } else {
             message = "Attention " + realIdentity + "! " + player1 + " says: " + msg;
         }
-        if (activeGame.isFoWMode()) {
+        if (game.isFoWMode()) {
             String fail = "Could not notify receiving player.";
             String success;
             String player2 = Emojis.getColorEmojiWithName(player_.getColor());
@@ -85,7 +85,7 @@ public class Whisper extends FOWSubcommandData {
             } else {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
-            MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, feedbackChannel, message, fail, success);
+            MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
         } else {
             String fail = "Could not notify receiving player.";
             String success;
@@ -96,19 +96,19 @@ public class Whisper extends FOWSubcommandData {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
-            String whisperHistory = activeGame.getStoredValue(key);
+            String whisperHistory = game.getStoredValue(key);
             if (whisperHistory.isEmpty()) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " is whispering for the first time this turn to " + ButtonHelper.getIdent(player_));
-                activeGame.setStoredValue(key, "1");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), ButtonHelper.getIdent(player) + " is whispering for the first time this turn to " + ButtonHelper.getIdent(player_));
+                game.setStoredValue(key, "1");
             } else {
                 int num = Integer.parseInt(whisperHistory);
                 num = num + 1;
-                activeGame.setStoredValue(key, "" + num);
+                game.setStoredValue(key, "" + num);
                 if (num == 5 || num == 10) {
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " is sending whisper #" + num + " of this turn to " + ButtonHelper.getIdent(player_));
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), ButtonHelper.getIdent(player) + " is sending whisper #" + num + " of this turn to " + ButtonHelper.getIdent(player_));
                 }
             }
-            MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, feedbackChannel, message, fail, success);
+            MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
         }
     }
 

@@ -18,9 +18,9 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -29,12 +29,12 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
         int ac = player.getAc();
         if (option != null) {
             String providedID = option.getAsString();
-            activeGame.drawSpecificActionCard(providedID, player.getUserID());
+            game.drawSpecificActionCard(providedID, player.getUserID());
         }
-        if(ac == player.getAc()){
+        if (ac == player.getAc()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID. Remember, you need the word ID (i.e scramble for scramble frequency) and not the number ID. You can find the word ID by proper usage of the /search command");
             return;
         }
-        ACInfo.sendActionCardInfo(activeGame, player);
+        ACInfo.sendActionCardInfo(game, player);
     }
 }

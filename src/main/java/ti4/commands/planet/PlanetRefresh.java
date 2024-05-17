@@ -12,9 +12,9 @@ public class PlanetRefresh extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Game activeGame) {
-        if(!player.getPlanets().contains(planet)){
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" the bot doesnt think you have a planet by the name of "+planet);
+    public void doAction(Player player, String planet, Game game) {
+        if (!player.getPlanets().contains(planet)) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation() + " the bot doesnt think you have a planet by the name of " + planet);
         }
         player.refreshPlanet(planet);
     }

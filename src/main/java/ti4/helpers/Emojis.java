@@ -1728,10 +1728,10 @@ public class Emojis {
         return getEmojiFromDiscord(scEmojiName);
     }
 
-    public static String getTGorNomadCoinEmoji(Game activeGame) {
-        if (activeGame == null)
+    public static String getTGorNomadCoinEmoji(Game game) {
+        if (game == null)
             return tg;
-        return activeGame.getNomadCoin() ? nomadcoin : tg;
+        return game.getNomadCoin() ? nomadcoin : tg;
     }
 
     public static String getLeaderTypeEmoji(String type) {

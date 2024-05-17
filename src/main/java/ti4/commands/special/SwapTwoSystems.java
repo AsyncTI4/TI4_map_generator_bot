@@ -22,7 +22,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
@@ -35,14 +35,14 @@ public class SwapTwoSystems extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         String tileIDTo = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, activeGame);
+        Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, game);
         if (tileTo == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileIDTo:  `" + tileID + "`. Tile not found");
             return;
@@ -52,11 +52,11 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         String positionTo = tileTo.getPosition();
         tile.setPosition(positionTo);
         tileTo.setPosition(position);
-        activeGame.setTile(tile);
-        activeGame.setTile(tileTo);
-        activeGame.rebuildTilePositionAutoCompleteList();
+        game.setTile(tile);
+        game.setTile(tileTo);
+        game.rebuildTilePositionAutoCompleteList();
         DisplayType displayType = DisplayType.map;
-        MapGenerator.saveImage(activeGame, displayType, event)
-                .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+        MapGenerator.saveImage(game, displayType, event)
+            .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
     }
 }

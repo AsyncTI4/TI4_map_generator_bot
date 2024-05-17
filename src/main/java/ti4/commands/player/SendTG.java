@@ -25,14 +25,14 @@ public class SendTG extends PlayerSubcommandData {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 
-		Game activeGame = getActiveGame();
-		Player player = activeGame.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeGame, player, event, null);
+		Game game = getActiveGame();
+		Player player = game.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(game, player, event, null);
 		if (player == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
 			return;
 		}
-		Player player_ = Helper.getPlayer(activeGame, player, event);
+		Player player_ = Helper.getPlayer(game, player, event);
 		if (player_ == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player to send TG/Commodities could not be found");
 			return;
@@ -43,19 +43,19 @@ public class SendTG extends PlayerSubcommandData {
 		sendTG = Math.min(sendTG, tg);
 		tg -= sendTG;
 		player.setTg(tg);
-		ButtonHelperAbilities.pillageCheck(player, activeGame);
+		ButtonHelperAbilities.pillageCheck(player, game);
 
 		int targetTG = player_.getTg();
 		targetTG += sendTG;
 		player_.setTg(targetTG);
-		ButtonHelperAbilities.pillageCheck(player_, activeGame);
+		ButtonHelperAbilities.pillageCheck(player_, game);
 
 		String p1 = player.getRepresentation();
 		String p2 = player_.getRepresentation();
 		if (player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")) {
-			ButtonHelper.commanderUnlockCheck(player_, activeGame, "hacan", event);
+			ButtonHelper.commanderUnlockCheck(player_, game, "hacan", event);
 		}
-		String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade goods";
+		String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(game) + " trade goods";
 		String message = p1 + " sent " + tgString + " to " + p2;
 		MessageHelper.sendMessageToEventChannel(event, message);
 
@@ -64,15 +64,15 @@ public class SendTG extends PlayerSubcommandData {
 			MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
 		}
 
-		if (activeGame.isFoWMode()) {
+		if (game.isFoWMode()) {
 			String fail = "Could not notify receiving player.";
 			String success = "The other player has been notified";
-			MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, event.getChannel(), message, fail, success);
+			MessageHelper.sendPrivateMessageToPlayer(player_, game, event.getChannel(), message, fail, success);
 
 			// Add extra message for transaction visibility
-			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, tgString, null);
+			FoWHelper.pingPlayersTransaction(game, event, player, player_, tgString, null);
 		}
-		ButtonHelper.checkTransactionLegality(activeGame, player, player_);
+		ButtonHelper.checkTransactionLegality(game, player, player_);
 
 	}
 }
