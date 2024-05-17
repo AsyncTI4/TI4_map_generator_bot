@@ -73,7 +73,7 @@ public class ScorePublic extends StatusSubcommandData {
 			int threshold = ListPlayerInfoButton.getObjectiveThreshold(id);
 			int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(id, activeGame, player);
 			if (playerProgress < threshold) {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
 						+ poName + ", The bot has you at " + playerProgress + "/" + threshold
 						+ ". If this is a mistake, please report and then you can manually score via /status po_score with the number ID of "
@@ -149,18 +149,18 @@ public class ScorePublic extends StatusSubcommandData {
 			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "both");
 			Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
 			buttons.add(DoneExhausting);
-			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2,
+			MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2,
 				buttons);
 		}
 		if (poName.contains("Negotiate Trade Routes")) {
 			int oldtg = player.getTg();
 			if (oldtg > 4) {
 				player.setTg(oldtg - 5);
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					player.getRepresentation() + " Automatically deducted 5tg (" + oldtg + "->" + player.getTg()
 						+ ")");
 			} else {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					"Did not deduct 5tg because you didn't have that");
 			}
 		}
@@ -168,11 +168,11 @@ public class ScorePublic extends StatusSubcommandData {
 			int oldtg = player.getTg();
 			if (oldtg > 9) {
 				player.setTg(oldtg - 10);
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					player.getRepresentation() + " Automatically deducted 10tg (" + oldtg + "->" + player.getTg()
 						+ ")");
 			} else {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					"Did not deduct 10tg because you didn't have that");
 			}
 		}

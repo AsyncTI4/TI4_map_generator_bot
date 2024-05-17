@@ -86,7 +86,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                     }
                     String message2 = player.getRepresentation() + " purged fragments: "
                     + fragmentsToPurge;
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 }else{
                     Player p1 = player;
                     String finChecker = p1.getFinsFactionCheckerPrefix();
@@ -112,7 +112,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                     Button transact2 = Button.success(finChecker + "deleteButtons", "Done purging");
                     purgeFragButtons.add(transact2);
                     
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Purge 2 fragments please", purgeFragButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Purge 2 fragments please", purgeFragButtons);
                 }
             }
         }

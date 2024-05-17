@@ -35,7 +35,7 @@ public class Constants {
     public static final String REMOVE_ALLIANCE_MEMBER = "remove_alliance_member";
     public static final String ADD_TEAMMATE = "add_teammate";
     public static final String REMOVE_TEAMMATE = "remove_teammate";
-    public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";
+    public static final String SPIN_TILES_IN_RINGS = "spin_tiles_in_rings";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
     public static final String ALLIANCE_MEMBERS = "alliance_members";

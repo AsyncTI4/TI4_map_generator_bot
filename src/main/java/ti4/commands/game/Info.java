@@ -40,7 +40,7 @@ public class Info extends GameSubcommandData {
     }
 
     public static StringBuilder getGameInfo(Game activeGame, SlashCommandInteractionEvent event) {
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
+        boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## Game Info:").append(NEW_LINE);
@@ -58,7 +58,7 @@ public class Info extends GameSubcommandData {
         sb.append("Private Game: ").append(privateGame).append(NEW_LINE);
         sb.append("Game Modes: ").append(activeGame.getGameModesText()).append(NEW_LINE);
         sb.append("Map Template: `").append(activeGame.getMapTemplateID()).append("`").append(NEW_LINE);
-        if (!privateGame) {
+        if (!privateGame || activeGame.isHasEnded()) {
             sb.append("Map String: `").append(Helper.getMapString(activeGame)).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);

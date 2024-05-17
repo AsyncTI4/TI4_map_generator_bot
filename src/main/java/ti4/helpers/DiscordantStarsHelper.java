@@ -141,10 +141,10 @@ public class DiscordantStarsHelper {
         if (!player.getHasUsedEconomyExploitAbility() && player.hasAbility("policy_the_economy_exploit")) { //add a fighter with ships
             player.setHasUsedEconomyExploitAbility(true);
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The Economy - Exploit (+)**: You may place 1 " + Emojis.fighter + "Fighter from your reinforcements in a system that contains 1 or more of your ships.";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = new ArrayList<>();
             buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "ff", "placeOneNDone_skipbuild"));
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
 
@@ -153,9 +153,9 @@ public class DiscordantStarsHelper {
 
         if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on " + planetModel.getName() + " to another planet you control.";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, activeGame, planetModel.getId());
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
 
@@ -163,10 +163,10 @@ public class DiscordantStarsHelper {
         if (!player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
                 .withEmoji(Emoji.fromFormatted(Emojis.comm));
-            MessageHelper.sendMessageToChannelWithButton(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", getCommButton);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve ability", getCommButton);
         }
     }
 
@@ -175,8 +175,8 @@ public class DiscordantStarsHelper {
             List<Button> buttons = ButtonHelperAbilities.getOlradinPreserveButtons(activeGame, player, planetModel.getId());
             if (buttons.size() > 0) {
                 String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The Environment - Preserve (+)**: You may reveal the top card of the planets types exploration deck; if it is a relic fragment, gain it, otherwise discard that card.";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Resolve ability", buttons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
             }
         }
     }

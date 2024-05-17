@@ -51,10 +51,10 @@ public class TechExhaust extends TechAddRemove {
         TechnologyModel techModel = Mapper.getTech(tech);
         String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
         if (activeGame.isShowFullComponentTextEmbeds()) {
-            MessageHelper.sendMessageToChannelWithEmbed(ButtonHelper.getCorrectChannel(player, activeGame), exhaustMessage,
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage,
                 techModel.getRepresentationEmbed());
         } else {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), exhaustMessage);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), exhaustMessage);
         }
         player.exhaustTech(tech);
         switch (tech) {
@@ -63,16 +63,16 @@ public class TechExhaust extends TechAddRemove {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "gls" -> { // Graviton
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted graviton. The auto assign hit buttons for PDS fire will now kill fighters last");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted graviton. The auto assign hit buttons for PDS fire will now kill fighters last");
                 activeGame.setStoredValue(player.getFaction() + "graviton", "true");
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsgledb" -> {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted lightning drives because they are applying +1 move value to ships transporting fighters or infantry");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted lightning drives because they are applying +1 move value to ships transporting fighters or infantry");
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsbenty" -> {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted merged replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted merged replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsceldr" -> {
@@ -123,7 +123,7 @@ public class TechExhaust extends TechAddRemove {
                     String tileRep = tile.getRepresentationForButtons(activeGame, player);
                     String ident = player.getFactionEmoji();
                     String msg = ident + " removed CC from " + tileRep;
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     RemoveCC.removeCC(event, player.getColor(), tile, activeGame);
                 }
             }
@@ -232,7 +232,7 @@ public class TechExhaust extends TechAddRemove {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                 String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
@@ -240,9 +240,9 @@ public class TechExhaust extends TechAddRemove {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                 String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, activeGame, player);
             }
@@ -256,11 +256,11 @@ public class TechExhaust extends TechAddRemove {
                     deleteIfButtonEvent(event);
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet("mr"), "inf mr",
                         activeGame);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, activeGame, player);
                 } else {
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentation() + " You do not control Mecatol Rex");
                     player.refreshTech("lgf");
                 }

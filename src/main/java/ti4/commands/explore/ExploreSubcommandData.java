@@ -329,7 +329,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
                 if (player.hasAbility("military_industrial_complex")
                     && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
                         ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                 }
@@ -372,7 +372,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     saarButton.add(Button.success("saarMechRes_" + "mirage",
                         "Pay 1tg for mech on " + Helper.getPlanetRepresentation("mirage", activeGame)));
                     saarButton.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
                             + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
                         saarButton);
@@ -420,7 +420,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     if (player.hasAbility("military_industrial_complex")
                         && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
                         MessageHelper.sendMessageToChannelWithButtons(
-                            ButtonHelper.getCorrectChannel(player, activeGame),
+                            player.getCorrectChannel(),
                             player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
                             ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                     }
@@ -428,7 +428,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         && !player.hasLeaderUnlocked("mykomentoricommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
                     }
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getFactionEmoji() + " " + message2);
                 }
             }
@@ -460,7 +460,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 discardButtons.add(
                     Button.secondary("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
                 discardButtons.add(Button.danger("deleteButtons", "Done Resolving"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation()
                         + " you can use the buttons to discard the top of the explore decks if you choose",
                     discardButtons);
@@ -477,10 +477,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                 }
                 String msg = "Click button to explore a planet after resolving any discards";
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     msg, buttonsAll);
 
-                MessageHelper.sendMessageToChannelWithButton(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
                     "Use this button to shuffle explore decks once youre done with the rest",
                     Button.danger("shuffleExplores", "Shuffle Explore Decks"));
 
@@ -606,7 +606,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int tgGain = tile.getUnitHolders().size() - 1;
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     ButtonHelper.getIdentOrColor(player, activeGame) + " gained " + tgGain
                         + "tg due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, activeGame);

@@ -142,11 +142,9 @@ public class GameSaveLoadManager {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON),
-                activeGame);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
         } catch (IOException e) {
-            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something",
-                e);
+            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }

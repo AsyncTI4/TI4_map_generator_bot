@@ -290,7 +290,7 @@ public class ButtonHelperTacticalAction {
                 String msg = player.getRepresentation(true, true)
                     + " you can use the buttons to place a trap on a planet";
                 if (trapButtons.size() > 1) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         msg, trapButtons);
                 }
             }
@@ -302,7 +302,7 @@ public class ButtonHelperTacticalAction {
                     .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                 buttons.add(hacanButton);
                 buttons.add(Button.danger("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2tg/2comm",
                     buttons);
@@ -402,7 +402,7 @@ public class ButtonHelperTacticalAction {
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()
                 && (tile.getUnitHolders().values().size() == 1) && player.getPlanets().contains("ghoti")) {
                 player.setCommodities(player.getCommodities() + 1);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation()
                         + " gained 1 commodity due to ghoti planet card. Your commodities are now "
                         + player.getCommodities());
@@ -413,7 +413,7 @@ public class ButtonHelperTacticalAction {
                 && player.hasUnit("dihmohn_flagship")) {
                 List<Button> produce = new ArrayList<>();
                 produce.add(Button.primary("dihmohnfs_" + activeGame.getActiveSystem(), "Produce (2) Units"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation()
                         + " Your Dih-Mohn Flagship moved into the active system and you can produce 2 units with a combined cost of 4.",
                     produce);
@@ -481,7 +481,7 @@ public class ButtonHelperTacticalAction {
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         if (needPDSCheck && !activeGame.getL1Hero() && playersWithPds2.size() > 0) {
-            StartCombat.sendSpaceCannonButtonsToThread(ButtonHelper.getCorrectChannel(player, activeGame), activeGame,
+            StartCombat.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), activeGame,
                 player, tile);
         }
         event.getMessage().delete().queue();
@@ -559,7 +559,7 @@ public class ButtonHelperTacticalAction {
         }
         buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
         if ("481860200169472030".equals(player.getUserID())) buttons.addAll(ButtonHelper.getPossibleRings(player, activeGame)); //TODO: Add option for this
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void getTilesThisFarAway(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -580,7 +580,7 @@ public class ButtonHelperTacticalAction {
         buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
 
@@ -621,7 +621,7 @@ public class ButtonHelperTacticalAction {
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
                 + " you have Celdauri Commander and activated a system with your SD. Please hit button to get a commodity";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         }
 
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, pos);
@@ -651,7 +651,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
             && !activeGame.getL1Hero()) {
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Please resolve scanlink",
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Please resolve scanlink",
                 button2);
             if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos),
