@@ -608,7 +608,9 @@ public class MapGenerator {
                 if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
                     factionText = player.getDisplayName();
                 }
-                userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+                if (factionText != null) {
+                  userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+                }
 
                 if (!"null".equals(player.getColor())) {
                     userName.append(" (").append(player.getColor()).append(")");
