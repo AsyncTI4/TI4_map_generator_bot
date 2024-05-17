@@ -377,7 +377,7 @@ public class Helper {
                 SOInfo.sendSecretObjectiveInfo(activeGame, player);
                 activeGame.setStoredValue(key2,
                     activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (!activeGame.isFoWMode()) {
                     ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
                 }
@@ -388,7 +388,7 @@ public class Helper {
                     message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (!activeGame.isFoWMode()) {
                     ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
                 }
@@ -441,14 +441,14 @@ public class Helper {
                     if (activeGame.isFoWMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     break;
                 }
                 if (activeGame.getStoredValue(key3b).contains(player.getFaction() + "*")
                     && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if (activeGame.isFoWMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
@@ -482,7 +482,7 @@ public class Helper {
                     if (activeGame.isFoWMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     break;
                 }
             }
@@ -1056,7 +1056,7 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
-            if (activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)) {
+            if (activeGame.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
                 continue;
             }
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
@@ -1919,7 +1919,7 @@ public class Helper {
                 List<Button> unitButtons2 = new ArrayList<>();
                 unitButtons2.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you can use this to Yin Spin", unitButtons2);
             } else {
                 unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
@@ -2098,7 +2098,7 @@ public class Helper {
             }
 
             msg += "(" + color + ") is over the CC limit of 16. CC used: " + ccCount;
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
 

@@ -479,7 +479,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int edge = 0;
                 for (Tile tile : activeGame.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(activeGame)
-                        && tile != FoWHelper.getPlayerHS(activeGame, player)) {
+                        && tile != player.getHomeSystemTile()) {
                         edge++;
                     }
                 }
@@ -499,7 +499,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int counter = 0;
                 for (String planet : player.getPlanets()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-                    if (uH != null && activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)
+                    if (uH != null && activeGame.getTileFromPlanet(planet) != player.getHomeSystemTile()
                         && (uH.getUnitCount(UnitType.Spacedock, player) > 0
                             || uH.getUnitCount(UnitType.Pds, player) > 0)) {
                         counter++;
@@ -636,7 +636,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     Tile tile = activeGame.getTileFromPlanet(planet);
-                    if (tile != null && tile.isHomeSystem() && tile != FoWHelper.getPlayerHS(activeGame, player)) {
+                    if (tile != null && tile.isHomeSystem() && tile != player.getHomeSystemTile()) {
                         count++;
                     }
                 }
@@ -646,7 +646,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship,
                     UnitType.Warsun, UnitType.Lady)) {
-                    if ((tile.isHomeSystem() && tile != FoWHelper.getPlayerHS(activeGame, player))
+                    if ((tile.isHomeSystem() && tile != player.getHomeSystemTile())
                         || tile.getTileID().equalsIgnoreCase("18")) {
                         count++;
                     }
@@ -669,7 +669,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     if (p2 == player) {
                         continue;
                     }
-                    Tile tile = FoWHelper.getPlayerHS(activeGame, p2);
+                    Tile tile = p2.getHomeSystemTile();
                     if (tile == null) {
                         continue;
                     }

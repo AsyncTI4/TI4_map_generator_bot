@@ -476,7 +476,7 @@ public class CombatHelper {
                             if (player.hasTech("sar")) {
                                 for (int x = 0; x < misses; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
                                         + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                                 }

@@ -196,33 +196,9 @@ public class FoWHelper {
 		}
 	}
 
-	public static Tile getPlayerHS(Game game, Player player) {
-		String faction = player.getFaction();
-		if (player.hasAbility("mobile_command")) {
-			if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).isEmpty()) {
-				return null;
-			}
-			return ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
-		}
-		if (!player.getFaction().contains("franken") && game.getTile(AliasHandler.resolveTile(player.getFaction())) != null) {
-			return game.getTile(AliasHandler.resolveTile(player.getFaction()));
-		}
-		for (Tile tile : game.getTileMap().values()) {
-			if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition())) {
-				if (tile.isHomeSystem()) {
-					return tile;
-				}
-			}
-			if (player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
-				return tile;
-			}
-		}
-		return ButtonHelper.getTileOfPlanetWithNoTrait(player, game);
-	}
-
 	private static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
 		@NotNull Player viewingPlayer) {
-		Tile tile = getPlayerHS(game, player);
+		Tile tile = player.getHomeSystemTile();
 		if (tile != null && !tile.hasFog(viewingPlayer)) {
 			return true;
 		}

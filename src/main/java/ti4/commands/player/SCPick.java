@@ -167,7 +167,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " chose which player to give this SC", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " chose which player to give this SC", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -179,7 +179,7 @@ public class SCPick extends PlayerSubcommandData {
         boolean pickSuccessful = Stats.secondHalfOfPickSC(event, activeGame, p2, scpick);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " was given SC #" + scpick + " by " + player.getFactionEmoji());
         if (activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), p2.getColor() + " was given SC #" + scpick);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given SC #" + scpick);
 
         }
         event.getMessage().delete().queue();

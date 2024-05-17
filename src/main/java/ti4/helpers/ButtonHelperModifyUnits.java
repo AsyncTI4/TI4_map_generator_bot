@@ -297,7 +297,7 @@ public class ButtonHelperModifyUnits {
                     if (player.hasTech("sar")) {
                         for (int x = 0; x < min; x++) {
                             player.setTg(player.getTg() + 1);
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
                                     + "->" + player.getTg()
                                     + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
@@ -493,7 +493,7 @@ public class ButtonHelperModifyUnits {
                                     if (player.hasTech("sar")) {
                                         for (int x = 0; x < min; x++) {
                                             player.setTg(player.getTg() + 1);
-                                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                                 player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
                                                     + "->" + player.getTg()
                                                     + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
@@ -740,7 +740,7 @@ public class ButtonHelperModifyUnits {
         HashSet<String> adjTiles = new HashSet();
         adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos1, player, false));
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
-            Tile hs = FoWHelper.getPlayerHS(activeGame, player);
+            Tile hs = player.getHomeSystemTile();
             if (hs != null) {
                 adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, hs.getPosition(), player, false));
             }
@@ -891,9 +891,9 @@ public class ButtonHelperModifyUnits {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "inf");
                     Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentation(true, true) + " you must pay influence due to Keleres mech(s)");
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         "Click the names of the planets you wish to exhaust", buttons);
                 }
             }
@@ -1371,7 +1371,7 @@ public class ButtonHelperModifyUnits {
             && event.getMessage().getContentRaw().contains("for construction")) {
 
             if (activeGame.isFoWMode() || (!"action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !"statusScoring".equalsIgnoreCase(activeGame.getCurrentPhase()))) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), playerRep + " " + successMessage);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
             } else {
                 ButtonHelper.sendMessageToRightStratThread(player, activeGame, playerRep + " " + successMessage,
                     "construction");
@@ -1507,7 +1507,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), false, activeGame);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " captured 1 newly produced " + ButtonHelper.getUnitName(unit)
                 + " in " + tile.getRepresentationForButtons(activeGame, player)
                 + " using the Cloaked Fleets abiility (limit of 2 ships can be captured per build)");
@@ -1521,7 +1521,7 @@ public class ButtonHelperModifyUnits {
         String planet = buttonID.split("_")[1];
         Tile tile = activeGame.getTileFromPlanet(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, unit + " " + planet, activeGame);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " captured 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, activeGame) + " using the Kollecc Mech abiility");
         new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, activeGame);
@@ -1659,7 +1659,7 @@ public class ButtonHelperModifyUnits {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "tnelis", event);
             }
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             playerRep + " " + successMessage);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "res");
@@ -1695,7 +1695,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(DoneExhausting);
         if (!"skipbuild".equalsIgnoreCase(skipbuild)) {
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2,
                 buttons);
         }
 
@@ -1934,7 +1934,7 @@ public class ButtonHelperModifyUnits {
             }
         }
         buttons.add(Button.danger("deleteButtons", "Delete These"));
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " choose how many fighters you want to convert to infantry",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
@@ -1954,7 +1954,7 @@ public class ButtonHelperModifyUnits {
             }
         }
         buttons.add(Button.danger("deleteButtons", "Delete These"));
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " choose how many infantry you wish to convert to fighters",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
@@ -2046,7 +2046,7 @@ public class ButtonHelperModifyUnits {
                                 for (int x = 0; x < amount; x++) {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
-                                        ButtonHelper.getCorrectChannel(player, activeGame),
+                                        player.getCorrectChannel(),
                                         player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
@@ -2155,7 +2155,7 @@ public class ButtonHelperModifyUnits {
             if (unitKey.getUnitType() == UnitType.Mech && player.hasTech("sar")) {
                 for (int x = 0; x < amount; x++) {
                     player.setTg(player.getTg() + 1);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation() + " you gained 1tg (" + (player.getTg() - 1) + "->"
                         + player.getTg()
                         + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain");

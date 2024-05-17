@@ -295,7 +295,7 @@ public class TurnEnd extends PlayerSubcommandData {
                     ButtonHelperAgents.resolveArtunoCheck(player, activeGame, numScoredSOs);
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you gained " + numScoredSOs + " tg and " + numScoredPos + " commodities due to Vaden Commander");
             }
         }
@@ -321,11 +321,11 @@ public class TurnEnd extends PlayerSubcommandData {
                     pnOwner.setPromissoryNote(pn);
                     PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
                     PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
