@@ -44,10 +44,10 @@ public class SpinTilesInRings extends CustomSubcommandData {
           return;
         }
 
-        int ring = Integer.parseInt(spinSettings[0]);
+        int ring = parseInt(spinSettings[0]);
         String direction = spinSettings[1];
-        int steps = Integer.parseInt(spinSettings[2]);
-        if (ring <= 0 || (!CW.equals(direction) && !CCW.equals(direction)) || steps > ring * 6 - 1) {
+        int steps = parseInt(spinSettings[2]);
+        if (ring <= 0 || steps <= 0 || (!CW.equals(direction) && !CCW.equals(direction)) || steps > ring * 6 - 1) {
           MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid spin settings: " + spinString);
           return;
         }
@@ -79,6 +79,14 @@ public class SpinTilesInRings extends CustomSubcommandData {
       activeGame.rebuildTilePositionAutoCompleteList();
       OptionMapping flavourMsg = event.getOption(Constants.MESSAGE);
       MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), flavourMsg != null ? flavourMsg.getAsString() : "Spun the rings");
+    }
+
+    private static int parseInt(String number) {
+      try {
+        return Integer.parseInt(number);
+      } catch (NumberFormatException e) {
+        return -1;
+      }
     }
 
     //the original spin logic which does
