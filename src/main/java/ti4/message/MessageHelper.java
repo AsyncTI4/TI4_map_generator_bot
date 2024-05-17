@@ -350,7 +350,7 @@ public class MessageHelper {
 		}
 	}
 
-	private static String getRestActionFailureMessage(MessageChannel channel, String errorHeader, MessageCreateData messageCreateData, Throwable error) {
+	public static String getRestActionFailureMessage(MessageChannel channel, String errorHeader, MessageCreateData messageCreateData, Throwable error) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(channel.getAsMention()).append("\nRestAction Failure within MessageHelper.splitAndSentWithAction: ");
 		sb.append(errorHeader);
