@@ -39,7 +39,7 @@ public class CombatModHelper {
     public static List<NamedCombatModifierModel> GetModifiers(Player player, Player opponent,
         Map<UnitModel, Integer> unitsByQuantity,
         TileModel tile,
-        Game activeGame,
+        Game game,
         CombatRollType rollType,
         String modifierType) {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
@@ -59,7 +59,7 @@ public class CombatModHelper {
 
             if (relevantMod.isPresent()
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                    activeGame)) {
+                    game)) {
                 AbilityModel abilityModel = Mapper.getAbility(ability);
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), abilityModel.getRepresentation()));
             }
@@ -72,7 +72,7 @@ public class CombatModHelper {
 
             if (relevantMod.isPresent()
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                    activeGame)) {
+                    game)) {
                 TechnologyModel technologyModel = Mapper.getTech(tech);
                 modifiers
                     .add(new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
@@ -80,8 +80,8 @@ public class CombatModHelper {
         }
 
         if (opponent != null && opponent != player
-            && ((player != activeGame.getActivePlayer() && opponent == activeGame.getActivePlayer())
-                || player == activeGame.getActivePlayer())) {
+            && ((player != game.getActivePlayer() && opponent == game.getActivePlayer())
+                || player == game.getActivePlayer())) {
             for (String tech : opponent.getTechs()) {
                 Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo("opponent_tech", tech))
@@ -89,7 +89,7 @@ public class CombatModHelper {
 
                 if (relevantMod.isPresent()
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                        activeGame)) {
+                        game)) {
                     TechnologyModel technologyModel = Mapper.getTech(tech);
                     modifiers.add(
                         new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
@@ -103,13 +103,13 @@ public class CombatModHelper {
                 .findFirst();
 
             if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent,
-                unitsByQuantity, activeGame)) {
+                unitsByQuantity, game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
             }
         }
 
-        List<AgendaModel> lawAgendasTargetingPlayer = activeGame.getLawsInfo().entrySet().stream()
+        List<AgendaModel> lawAgendasTargetingPlayer = game.getLawsInfo().entrySet().stream()
             .filter(entry -> entry.getValue().equals(player.getFaction()) || entry.getValue().equals(player.getColor()))
             .map(entry -> Mapper.getAgenda(entry.getKey()))
             .toList();
@@ -120,7 +120,7 @@ public class CombatModHelper {
 
             if (relevantMod.isPresent()
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                    activeGame)) {
+                    game)) {
                 modifiers
                     .add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
             }
@@ -134,7 +134,7 @@ public class CombatModHelper {
 
             if (relevantMod.isPresent()
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                    activeGame)) {
+                    game)) {
                 modifiers.add(
                     new NamedCombatModifierModel(relevantMod.get(),
                         Emojis.getEmojiFromDiscord(unit.getBaseType()) + " "
@@ -142,7 +142,7 @@ public class CombatModHelper {
             }
         }
 
-        for (Leader leader : activeGame.playerUnlockedLeadersOrAlliance(player)) {
+        for (Leader leader : game.playerUnlockedLeadersOrAlliance(player)) {
             if (leader.isExhausted() || leader.isLocked()) {
                 continue;
             }
@@ -152,7 +152,7 @@ public class CombatModHelper {
 
             if (relevantMod.isPresent()
                 && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
-                    activeGame)) {
+                    game)) {
                 modifiers.add(
                     new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
             }
@@ -163,7 +163,7 @@ public class CombatModHelper {
             .toList();
         for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
             if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
-                activeGame)) {
+                game)) {
                 modifiers.add(
                     new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
             }
@@ -174,13 +174,13 @@ public class CombatModHelper {
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
         List<NamedCombatModifierModel> modifiers, Player player,
-        Player opponent, Game activeGame, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
+        Player opponent, Game game, List<UnitModel> playerUnits, List<UnitModel> opponentUnits,
         CombatRollType rollType, Tile tile) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits, unit, tile);
+                Integer modValue = GetVariableModValue(modifier, player, opponent, game, opponentUnits, unit, tile);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -337,12 +337,12 @@ public class CombatModHelper {
     /// or how many POs the opponent has scored that you havent etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-        Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
-        return GetVariableModValue(mod, player, opponent, activeGame, opponentUnitsInCombat, origUnit, null);
+        Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
+        return GetVariableModValue(mod, player, opponent, game, opponentUnitsInCombat, origUnit, null);
     }
 
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-        Game activeGame, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
+        Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         Long scalingCount = (long) 0;
@@ -365,12 +365,12 @@ public class CombatModHelper {
                         scalingCount += 1;
                     }
                 }
-                case Constants.LAW -> scalingCount = (long) activeGame.getLaws().size();
+                case Constants.LAW -> scalingCount = (long) game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {
-                        var customPublicVPList = activeGame.getCustomPublicVP();
+                        var customPublicVPList = game.getCustomPublicVP();
                         List<List<String>> scoredPOUserLists = new ArrayList<>();
-                        for (Entry<String, List<String>> entry : activeGame.getScoredPublicObjectives().entrySet()) {
+                        for (Entry<String, List<String>> entry : game.getScoredPublicObjectives().entrySet()) {
                             // Ensure its actually a revealed PO not imperial or a relic
                             if (!customPublicVPList.containsKey(entry.getKey())) {
                                 scoredPOUserLists.add(entry.getValue());
@@ -387,7 +387,7 @@ public class CombatModHelper {
                     .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
                     .count();
                 case Constants.MOD_DESTROYERS -> {
-                    scalingCount = (long) ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer", false);
+                    scalingCount = (long) ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
                     scalingCount += opponentUnitsInCombat.stream()
@@ -397,16 +397,16 @@ public class CombatModHelper {
                 case "combat_round" -> {
                     int round = 0;
                     String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + "space";
-                    if (activeGame.getStoredValue(combatName).isEmpty()) {
+                    if (game.getStoredValue(combatName).isEmpty()) {
                         round = 0;
                     } else {
-                        round = Integer.parseInt(activeGame.getStoredValue(combatName)) - 1;
+                        round = Integer.parseInt(game.getStoredValue(combatName)) - 1;
                     }
                     scalingCount += round;
                 }
                 case "adjacent_mech" -> {
-                    for (String pos : FoWHelper.getAdjacentTiles(activeGame, activeSystem.getPosition(), player, false, true)) {
-                        Tile tile = activeGame.getTileByPosition(pos);
+                    for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = game.getTileByPosition(pos);
                         for (UnitHolder uH : tile.getUnitHolders().values()) {
                             scalingCount += uH.getUnitCount(UnitType.Mech, player);
                         }

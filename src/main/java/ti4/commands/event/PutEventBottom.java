@@ -19,9 +19,9 @@ public class PutEventBottom extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -31,15 +31,15 @@ public class PutEventBottom extends EventSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Event ID defined");
             return;
         }
-        putBottom(event, numericalID, activeGame, player);
+        putBottom(event, numericalID, game, player);
     }
 
-    public void putBottom(GenericInteractionCreateEvent event, int eventID, Game activeGame, Player player) {
-        boolean success = activeGame.putEventBottom(eventID, player);
+    public void putBottom(GenericInteractionCreateEvent event, int eventID, Game game, Player player) {
+        boolean success = game.putEventBottom(eventID, player);
         if (success) {
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Event put on bottom");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Event put on bottom");
         } else {
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Event ID found");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Event ID found");
         }
     }
 }

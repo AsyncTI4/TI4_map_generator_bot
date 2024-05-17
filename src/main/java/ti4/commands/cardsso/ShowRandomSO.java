@@ -1,4 +1,5 @@
 package ti4.commands.cardsso;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,9 +21,9 @@ public class ShowRandomSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -36,21 +37,21 @@ public class ShowRandomSO extends SOCardsSubcommandData {
         Collections.shuffle(secrets);
         String soID = secrets.get(0);
 
-        String sb = "Game: " + activeGame.getName() + "\n" +
+        String sb = "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
             "Showed Secret Objectives:" + "\n" +
             SOInfo.getSecretObjectiveRepresentation(soID) + "\n";
 
         player.setSecret(soID);
 
-        Player player_ = Helper.getPlayer(activeGame, null, event);
+        Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
-        
+
         MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
-        SOInfo.sendSecretObjectiveInfo(activeGame, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb);
+        SOInfo.sendSecretObjectiveInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb);
     }
 }

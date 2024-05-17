@@ -55,7 +55,7 @@ public class ACCardsCommand implements Command {
                 }
             }
             Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (userActiveGame.isCommunityMode()){
+            if (userActiveGame.isCommunityMode()) {
                 Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
@@ -65,7 +65,7 @@ public class ACCardsCommand implements Command {
                 MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }
-            if (!event.getChannel().getName().startsWith(userActiveGame.getName()+"-")){
+            if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
                 MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
                 return false;
             }
@@ -87,11 +87,10 @@ public class ACCardsCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
         MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
-
 
     protected String getActionDescription() {
         return "Action Cards";
@@ -126,7 +125,7 @@ public class ACCardsCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

@@ -267,8 +267,8 @@ public class Tile {
     public boolean hasFog(Player player) {
         Boolean hasFog = fog.get(player);
 
-        Game activeGame = player.getGame();
-        if (activeGame.isLightFogMode() && player.getFogTiles().containsKey(getPosition())) {
+        Game game = player.getGame();
+        if (game.isLightFogMode() && player.getFogTiles().containsKey(getPosition())) {
             return false;
         }
         // default all tiles to being foggy to prevent unintended info leaks
@@ -347,13 +347,13 @@ public class Tile {
     }
 
     @JsonIgnore
-    public String getRepresentationForButtons(Game activeGame, Player player) {
+    public String getRepresentationForButtons(Game game, Player player) {
         try {
-            if (activeGame.isFoWMode()) {
+            if (game.isFoWMode()) {
                 if (player == null)
                     return getPosition();
 
-                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeGame, player);
+                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(game, player);
                 if (tilesToShow.contains(getPosition())) {
                     return getPosition() + " (" + getRepresentation() + ")";
                 } else {
@@ -426,13 +426,13 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean isGravityRift(Game activeGame) {
+    public boolean isGravityRift(Game game) {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
                 return true;
             }
         }
-        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(activeGame);
+        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(game);
     }
 
     @JsonIgnore
@@ -441,7 +441,7 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean hasCabalSpaceDockOrGravRiftToken(Game activeGame) {
+    public boolean hasCabalSpaceDockOrGravRiftToken(Game game) {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             Set<String> tokenList = unitHolder.getTokenList();
             if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
@@ -451,8 +451,8 @@ public class Tile {
                 if (unit.getUnitType() == UnitType.CabalSpacedock) {
                     return true;
                 }
-                if (unit.getUnitType() == UnitType.Spacedock && activeGame != null) {
-                    Player player = activeGame.getPlayerFromColorOrFaction(unit.getColor());
+                if (unit.getUnitType() == UnitType.Spacedock && game != null) {
+                    Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                     if (player != null && (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2"))) {
                         return true;
                     }
@@ -477,7 +477,7 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean isEdgeOfBoard(Game activeGame) {
+    public boolean isEdgeOfBoard(Game game) {
         List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             // adjacency file for this tile is not filled in
@@ -486,7 +486,7 @@ public class Tile {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
-            if (activeGame.getTileByPosition(position_) == null) {
+            if (game.getTileByPosition(position_) == null) {
                 return true;
             }
         }
@@ -494,8 +494,8 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean isAnomaly(Game activeGame) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(activeGame)) {
+    public boolean isAnomaly(Game game) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game)) {
             return true;
         }
         for (UnitHolder unitHolder : getUnitHolders().values()) {

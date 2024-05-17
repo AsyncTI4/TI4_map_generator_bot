@@ -29,64 +29,63 @@ public class CheckDistance extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
+        if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 8, OptionMapping::getAsInt);
-        Map<String, Integer> distances = getTileDistances(activeGame, player, tile.getPosition(), maxDistance);
+        Map<String, Integer> distances = getTileDistances(game, player, tile.getPosition(), maxDistance);
 
         MessageHelper.sendMessageToEventChannel(event, distances.entrySet().stream()
-                .map(entry -> entry.getKey() + ": " + entry.getValue())
-                .sorted()
-                .reduce("Distances: \n", (a, b) -> a + "\n" + b));
+            .map(entry -> entry.getKey() + ": " + entry.getValue())
+            .sorted()
+            .reduce("Distances: \n", (a, b) -> a + "\n" + b));
     }
 
-    public static int getDistanceBetweenTwoTiles(Game activeGame, Player player, String tilePosition1, String tilePosition2){
-         Map<String, Integer> distances = getTileDistances(activeGame, player, tilePosition1, 8);
-         if(distances.get(tilePosition2) != null){
+    public static int getDistanceBetweenTwoTiles(Game game, Player player, String tilePosition1, String tilePosition2) {
+        Map<String, Integer> distances = getTileDistances(game, player, tilePosition1, 8);
+        if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
-         }
-         return 100;
+        }
+        return 100;
     }
 
-
-    public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game activeGame, Player player){
+    public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game game, Player player) {
         Map<String, Integer> distances = new HashMap<>();
         List<Tile> originTiles = new ArrayList<>();
-        for(Tile tile : activeGame.getTileMap().values()){
-            if(!AddCC.hasCC(player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)){
+        for (Tile tile : game.getTileMap().values()) {
+            if (!AddCC.hasCC(player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 distances.put(tile.getPosition(), 0);
                 originTiles.add(tile);
             }
         }
-        for(Tile tile : originTiles){
-            Map<String, Integer> someDistances = getTileDistances(activeGame, player, tile.getPosition(), 8);
-            for(String tilePos : someDistances.keySet()){
-                if(AddCC.hasCC(player, activeGame.getTileByPosition(tilePos))){
+        for (Tile tile : originTiles) {
+            Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 8);
+            for (String tilePos : someDistances.keySet()) {
+                if (AddCC.hasCC(player, game.getTileByPosition(tilePos))) {
                     continue;
                 }
-                if(distances.get(tilePos) == null){
+                if (distances.get(tilePos) == null) {
                     distances.put(tilePos, someDistances.get(tilePos));
-                }else{
-                    if(distances.get(tilePos) > someDistances.get(tilePos)){
+                } else {
+                    if (distances.get(tilePos) > someDistances.get(tilePos)) {
                         distances.put(tilePos, someDistances.get(tilePos));
                     }
                 }
@@ -95,10 +94,10 @@ public class CheckDistance extends SpecialSubcommandData {
         return distances;
     }
 
-    public static List<String> getAllTilesACertainDistanceAway(Game activeGame, Player player, Map<String, Integer> distances, int target){
+    public static List<String> getAllTilesACertainDistanceAway(Game game, Player player, Map<String, Integer> distances, int target) {
         List<String> tiles = new ArrayList<>();
-        for(String pos : distances.keySet()){
-            if(distances.get(pos) != null && distances.get(pos)== target){
+        for (String pos : distances.keySet()) {
+            if (distances.get(pos) != null && distances.get(pos) == target) {
                 tiles.add(pos);
             }
         }
@@ -106,31 +105,31 @@ public class CheckDistance extends SpecialSubcommandData {
         return tiles;
     }
 
-    public static Map<String, Integer> getTileDistances(Game activeGame, Player player, String tilePosition, int maxDistance) {
+    public static Map<String, Integer> getTileDistances(Game game, Player player, String tilePosition, int maxDistance) {
         Map<String, Integer> distances = new HashMap<>();
         distances.put(tilePosition, 0);
 
         for (int i = 1; i <= maxDistance; i++) {
             Map<String, Integer> distancesCopy = new HashMap<>(distances);
             for (String existingPosition : distancesCopy.keySet()) {
-                addAdjacentPositionsIfNotThereYet(activeGame, existingPosition, distances, player, i);
+                addAdjacentPositionsIfNotThereYet(game, existingPosition, distances, player, i);
             }
         }
 
-        for (String otherTilePosition : activeGame.getTileMap().keySet()) {
+        for (String otherTilePosition : game.getTileMap().keySet()) {
             distances.putIfAbsent(otherTilePosition, null);
         }
 
         return distances;
     }
 
-    private static void addAdjacentPositionsIfNotThereYet(Game activeGame, String position, Map<String, Integer> distances, Player player, int distance) {
-        for (String tilePosition : adjacentPositions(activeGame, position, player)) {
+    private static void addAdjacentPositionsIfNotThereYet(Game game, String position, Map<String, Integer> distances, Player player, int distance) {
+        for (String tilePosition : adjacentPositions(game, position, player)) {
             distances.putIfAbsent(tilePosition, distance);
         }
     }
 
-    private static Set<String> adjacentPositions(Game activeGame, String position, Player player) {
-        return FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, position, player, false);
+    private static Set<String> adjacentPositions(Game game, String position, Player player) {
+        return FoWHelper.getAdjacentTilesAndNotThisTile(game, position, player, false);
     }
 }

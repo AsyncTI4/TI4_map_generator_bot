@@ -17,14 +17,14 @@ public class PoRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.PO_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify PO");
             return;
         }
-        boolean removed = activeGame.removePOFromGame(soOption.getAsString());
+        boolean removed = game.removePOFromGame(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "PO removed from game deck");
         } else {

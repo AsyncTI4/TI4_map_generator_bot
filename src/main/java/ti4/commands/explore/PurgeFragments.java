@@ -28,10 +28,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveGame();
-		Player activePlayer = activeGame.getPlayer(getUser().getId());
-		activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
-		activePlayer = Helper.getPlayer(activeGame, activePlayer, event);
+		Game game = getActiveGame();
+		Player activePlayer = game.getPlayer(getUser().getId());
+		activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
+		activePlayer = Helper.getPlayer(game, activePlayer, event);
 		if (activePlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
 			return;
@@ -68,14 +68,14 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
-			activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
+			game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
 		}
 
-		Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
+		Player lanefirPlayer = game.getPlayers().values().stream().filter(
 			p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
 
 		if (lanefirPlayer != null) {
-			ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, "lanefir", event);
+			ButtonHelper.commanderUnlockCheck(activePlayer, game, "lanefir", event);
 		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		MessageHelper.sendMessageToEventChannel(event, message);
@@ -88,7 +88,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {
 			if (drawRelicOption.getAsBoolean()) {
-				DrawRelic.drawRelicAndNotify(activePlayer, event, activeGame);
+				DrawRelic.drawRelicAndNotify(activePlayer, event, game);
 			}
 		}
 	}

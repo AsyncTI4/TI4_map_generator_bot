@@ -19,24 +19,24 @@ public class AddTeamMate extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
-        if(addOption!= null){
-            if(player.getTeamMateIDs().contains(addOption.getAsUser().getId())){
-                MessageHelper.sendMessageToEventChannel(event, "User "+addOption.getAsUser().getAsMention() + " is already a part of "+player.getFaction()+"'s team.");
+        if (addOption != null) {
+            if (player.getTeamMateIDs().contains(addOption.getAsUser().getId())) {
+                MessageHelper.sendMessageToEventChannel(event, "User " + addOption.getAsUser().getAsMention() + " is already a part of " + player.getFaction() + "'s team.");
                 return;
             }
             player.addTeamMateID(addOption.getAsUser().getId());
         }
-        
-        activeGame.setCommunityMode(true);
-        MessageHelper.sendMessageToEventChannel(event, "Added "+addOption.getAsUser().getAsMention() + " as part of "+player.getFaction()+"'s team.");
+
+        game.setCommunityMode(true);
+        MessageHelper.sendMessageToEventChannel(event, "Added " + addOption.getAsUser().getAsMention() + " as part of " + player.getFaction() + "'s team.");
     }
 }

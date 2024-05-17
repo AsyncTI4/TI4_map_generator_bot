@@ -13,8 +13,8 @@ public class DrawRandomBlueTile extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Helper.getRandomBlueTile(activeGame, event);
+        Game game = getActiveGame();
+        Helper.getRandomBlueTile(game, event);
     }
 
 }

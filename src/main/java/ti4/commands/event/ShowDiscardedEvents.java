@@ -16,11 +16,11 @@ public class ShowDiscardedEvents extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         StringBuilder sb = new StringBuilder();
         sb.append("__**Discarded Events:**__\n");
         int index = 1;
-        for (Entry<String, Integer> eventEntry : activeGame.getDiscardedEvents().entrySet()) {
+        for (Entry<String, Integer> eventEntry : game.getDiscardedEvents().entrySet()) {
             EventModel eventModel = Mapper.getEvent(eventEntry.getKey());
             if (eventModel == null) continue;
             sb.append(index).append(". ").append(eventModel.getRepresentation(eventEntry.getValue()));

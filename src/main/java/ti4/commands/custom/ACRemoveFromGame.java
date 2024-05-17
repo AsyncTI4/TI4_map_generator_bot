@@ -16,14 +16,14 @@ public class ACRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.AC_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify AC");
             return;
         }
-        boolean removed = activeGame.removeACFromGame(soOption.getAsString());
+        boolean removed = game.removeACFromGame(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "AC removed from game deck");
         } else {

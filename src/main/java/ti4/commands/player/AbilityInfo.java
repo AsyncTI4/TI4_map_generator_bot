@@ -18,30 +18,30 @@ import ti4.model.AbilityModel;
 
 public class AbilityInfo extends PlayerSubcommandData {
     public AbilityInfo() {
-		super(Constants.ABILITY_INFO, "Send faction abilities information to your Cards Info channel");
-	}
+        super(Constants.ABILITY_INFO, "Send faction abilities information to your Cards Info channel");
+    }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendAbilityInfo(activeGame, player, event);
+        sendAbilityInfo(game, player, event);
     }
 
-    public static void sendAbilityInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+    public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendAbilityInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendAbilityInfo(game, player);
     }
 
-    public static void sendAbilityInfo(Game activeGame, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
+    public static void sendAbilityInfo(Game game, Player player) {
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getAbilityMessageEmbeds(Player player) {

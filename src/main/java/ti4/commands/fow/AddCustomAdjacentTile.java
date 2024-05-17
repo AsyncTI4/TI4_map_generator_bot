@@ -23,21 +23,21 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
-        if (primaryTileOption == null){
+        if (primaryTileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");
             return;
         }
 
         OptionMapping adjacentTilesOption = event.getOption(Constants.ADJACENT_TILES);
-        if (adjacentTilesOption == null){
+        if (adjacentTilesOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Adjacent tiles");
             return;
         }
         String primaryTile = primaryTileOption.getAsString().toLowerCase();
         String adjacentTiles = adjacentTilesOption.getAsString().toLowerCase();
-        if (primaryTile.isBlank() || adjacentTiles.isBlank()){
+        if (primaryTile.isBlank() || adjacentTiles.isBlank()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again. Example: primary:0a adjacent:1a,1b,1c,1d");
             return;
         }
@@ -45,18 +45,18 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         adjacentTiles = adjacentTiles.replace(" ", "");
         String[] tilesSplit = adjacentTiles.split(",");
         List<String> tiles = Arrays.asList(tilesSplit);
-        activeGame.addCustomAdjacentTiles(primaryTile, tiles);
+        game.addCustomAdjacentTiles(primaryTile, tiles);
         OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);
-        if (twoWayOption != null && twoWayOption.getAsBoolean()){
+        if (twoWayOption != null && twoWayOption.getAsBoolean()) {
             for (String tile : tiles) {
-                Map<String, List<String>> customAdjacentTiles = activeGame.getCustomAdjacentTiles();
+                Map<String, List<String>> customAdjacentTiles = game.getCustomAdjacentTiles();
                 List<String> customTiles = customAdjacentTiles.get(tile);
-                if (customTiles == null){
+                if (customTiles == null) {
                     customTiles = new ArrayList<>();
                 }
-                if (!customTiles.contains(primaryTile)){
+                if (!customTiles.contains(primaryTile)) {
                     customTiles.add(primaryTile);
-                    activeGame.addCustomAdjacentTiles(tile, customTiles);
+                    game.addCustomAdjacentTiles(tile, customTiles);
                 }
             }
         }

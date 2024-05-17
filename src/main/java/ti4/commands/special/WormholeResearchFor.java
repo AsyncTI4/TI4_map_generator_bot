@@ -22,34 +22,34 @@ public class WormholeResearchFor extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        doResearch(event, activeGame);
+        Game game = getActiveGame();
+        doResearch(event, game);
     }
 
-    public static void doResearch(GenericInteractionCreateEvent event, Game activeGame) {
+    public static void doResearch(GenericInteractionCreateEvent event, Game game) {
 
         List<Player> players = new ArrayList<>();
-        for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition())) {
-                for (Player p2 : activeGame.getRealPlayers()) {
+        for (Tile tile : game.getTileMap().values()) {
+            if (FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+                for (Player p2 : game.getRealPlayers()) {
                     if (FoWHelper.playerHasShipsInSystem(p2, tile) && !players.contains(p2)) {
                         players.add(p2);
                     }
                 }
             }
-            if (FoWHelper.doesTileHaveAlphaOrBeta(activeGame, tile.getPosition())) {
+            if (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition())) {
                 UnitHolder uH = tile.getUnitHolders().get(Constants.SPACE);
-                for (Player player : activeGame.getRealPlayers()) {
+                for (Player player : game.getRealPlayers()) {
                     uH.removeAllShips(player);
                 }
             }
         }
-        for (Player p2 : activeGame.getRealPlayers()) {
-            ButtonHelper.checkFleetInEveryTile(p2, activeGame, event);
+        for (Player p2 : game.getRealPlayers()) {
+            ButtonHelper.checkFleetInEveryTile(p2, game, event);
         }
-        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Removed all ships from alphas/betas\nYou can use the button to get your tech", List.of(Buttons.GET_A_TECH));
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Removed all ships from alphas/betas\nYou can use the button to get your tech", List.of(Buttons.GET_A_TECH));
         String msg = " can get tech due to wormhole research";
-        if (activeGame.isFoWMode()) {
+        if (game.isFoWMode()) {
             for (Player p2 : players) {
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), p2.getRepresentation() + msg);
             }
@@ -57,7 +57,7 @@ public class WormholeResearchFor extends SpecialSubcommandData {
             for (Player p2 : players) {
                 msg = p2.getRepresentation() + msg;
             }
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         }
     }
 

@@ -26,9 +26,9 @@ public class DiscardACRandom extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -46,11 +46,12 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
             return;
         }
-        discardRandomAC(event, activeGame, player, count);
-        
+        discardRandomAC(event, game, player, count);
+
     }
-    public void discardRandomAC(GenericInteractionCreateEvent event, Game activeGame, Player player, int count){
-        if(count < 1){
+
+    public void discardRandomAC(GenericInteractionCreateEvent event, Game game, Player player, int count) {
+        if (count < 1) {
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -61,7 +62,7 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
             Collections.shuffle(cards_);
             String acID = cards_.get(0);
-            boolean removed = activeGame.discardActionCard(player.getUserID(), actionCards_.get(acID));
+            boolean removed = game.discardActionCard(player.getUserID(), actionCards_.get(acID));
             if (!removed) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Cards found, please retry");
                 return;
@@ -70,6 +71,6 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             count--;
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
-        ACInfo.sendActionCardInfo(activeGame, player);
+        ACInfo.sendActionCardInfo(game, player);
     }
 }

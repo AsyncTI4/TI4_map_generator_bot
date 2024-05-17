@@ -139,62 +139,64 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount();
         };
     }
-    public int getCombatDieCountForAbility(CombatRollType rollType, Player player, Game activeGame) {
+
+    public int getCombatDieCountForAbility(CombatRollType rollType, Player player, Game game) {
         return switch (rollType) {
             case combatround -> getCombatDieCount();
-            case AFB -> getAfbDieCount(player, activeGame);
+            case AFB -> getAfbDieCount(player, game);
             case bombardment -> getBombardDieCount();
-            case SpaceCannonOffence -> getSpaceCannonDieCount(player, activeGame);
+            case SpaceCannonOffence -> getSpaceCannonDieCount(player, game);
             case SpaceCannonDefence -> getSpaceCannonDieCount();
         };
     }
 
-    public int getAfbDieCount(Player player, Game activeGame){
-        if(!activeGame.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")){
+    public int getAfbDieCount(Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return getAfbDieCount();
-        }else{
-            if(getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))){
+        } else {
+            if (getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
                 return 1;
-            }else{
+            } else {
                 return getAfbDieCount();
             }
         }
     }
-    public int getSpaceCannonDieCount(Player player, Game activeGame){
-        if(!activeGame.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())){
+
+    public int getSpaceCannonDieCount(Player player, Game game) {
+        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             return getSpaceCannonDieCount();
-        }else{
-            if(getBaseType().equalsIgnoreCase("spacedock")){
+        } else {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
                 return 3;
-            }else{
+            } else {
                 return getSpaceCannonDieCount();
             }
         }
     }
 
-    public int getAfbHitsOn(Player player, Game activeGame){
-        if(!activeGame.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")){
+    public int getAfbHitsOn(Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return getAfbHitsOn();
-        }else{
-            if(getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))){
+        } else {
+            if (getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
                 return 5;
-            }else{
+            } else {
                 return getAfbHitsOn();
             }
         }
     }
-    public int getSpaceCannonHitsOn(Player player, Game activeGame){
-        if(!activeGame.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())){
+
+    public int getSpaceCannonHitsOn(Player player, Game game) {
+        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             return getSpaceCannonHitsOn();
-        }else{
-            if(getBaseType().equalsIgnoreCase("spacedock")){
+        } else {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
                 return 5;
-            }else{
+            } else {
                 return getSpaceCannonHitsOn();
             }
         }
     }
-    
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType) {
         return switch (rollType) {
@@ -204,12 +206,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn();
         };
     }
-    public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player, Game activeGame) {
+
+    public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player, Game game) {
         return switch (rollType) {
             case combatround -> getCombatHitsOn();
-            case AFB -> getAfbHitsOn(player, activeGame);
+            case AFB -> getAfbHitsOn(player, game);
             case bombardment -> getBombardHitsOn();
-            case SpaceCannonOffence -> getSpaceCannonHitsOn(player, activeGame);
+            case SpaceCannonOffence -> getSpaceCannonHitsOn(player, game);
             case SpaceCannonDefence -> getSpaceCannonHitsOn();
         };
     }

@@ -18,15 +18,15 @@ public class SCUnplay extends PlayerSubcommandData {
     public SCUnplay() {
         super(Constants.SC_UNPLAY, "Unplay an SC");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
@@ -45,10 +45,10 @@ public class SCUnplay extends PlayerSubcommandData {
         }
 
         Integer scToUnplay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
-        activeGame.setSCPlayed(scToUnplay, false);
+        game.setSCPlayed(scToUnplay, false);
 
         //fix sc reminders for all players
-        for (Player player_ : activeGame.getPlayers().values()) {
+        for (Player player_ : game.getPlayers().values()) {
             if (!player_.isRealPlayer()) {
                 continue;
             }

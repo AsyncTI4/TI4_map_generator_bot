@@ -31,15 +31,15 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game activeGame = gameManager.getUserActiveGame(userID);
-        String color = Helper.getColor(activeGame, event);
+        Game game = gameManager.getUserActiveGame(userID);
+        String color = Helper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");
             return;
         }
 
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event.getMember(), getUser().getId());
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event.getMember(), getUser().getId());
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
@@ -53,7 +53,7 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
         subExecute(event, tile);
     }
 
-    public String getPlayerColor(GenericInteractionCreateEvent event){
+    public String getPlayerColor(GenericInteractionCreateEvent event) {
         Player player = getActiveGame().getPlayer(getUser().getId());
         return player.getColor();
     }

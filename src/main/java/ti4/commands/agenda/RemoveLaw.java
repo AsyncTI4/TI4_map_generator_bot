@@ -16,13 +16,13 @@ public class RemoveLaw extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        boolean success = activeGame.removeLaw(option.getAsInt());
+        boolean success = game.removeLaw(option.getAsInt());
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law removed");
         } else {

@@ -14,9 +14,9 @@ public class FixGameChannelPermissions extends BothelperSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
-        Game activeGame = getActiveGame();
-        if (guild != null && activeGame != null) {
-            Helper.fixGameChannelPermissions(guild, activeGame);
+        Game game = getActiveGame();
+        if (guild != null && game != null) {
+            Helper.fixGameChannelPermissions(guild, game);
         }
         MessageHelper.sendMessageToEventChannel(event, "Channel Permissions Fixed");
     }

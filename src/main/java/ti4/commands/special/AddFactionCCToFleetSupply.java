@@ -9,20 +9,20 @@ import ti4.map.Player;
 
 import java.util.List;
 
-public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet{
+public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
     public AddFactionCCToFleetSupply() {
         super(Constants.ADD_CC_TO_FS, "Add Faction CC to Fleet Supply");
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, List<String> colors, Game activeGame, Player player) {
+    void action(SlashCommandInteractionEvent event, List<String> colors, Game game, Player player) {
         for (String color : colors) {
             player.addMahactCC(color);
         }
-        if(player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")){
-                ButtonHelper.commanderUnlockCheck(player, activeGame, "mahact", event);
+        if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "mahact", event);
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(game, event);
 
     }
 }

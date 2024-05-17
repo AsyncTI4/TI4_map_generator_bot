@@ -15,20 +15,20 @@ import ti4.map.UnitHolder;
 public class RemoveAllUnits extends AddRemoveUnits {
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game activeGame) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
         tile.removeAllUnits(color);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder.getName(), activeGame);
+            addPlanetToPlayArea(event, tile, unitHolder.getName(), game);
         }
     }
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
         //No need for this action
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
         //No need for this action
     }
 
