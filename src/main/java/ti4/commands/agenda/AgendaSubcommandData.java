@@ -9,7 +9,7 @@ import ti4.map.GameManager;
 
 public abstract class AgendaSubcommandData extends SubcommandData {
 
-    private Game activeGame;
+    private Game game;
     private User user;
 
     public String getActionID() {
@@ -21,7 +21,7 @@ public abstract class AgendaSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return activeGame;
+        return game;
     }
 
     public User getUser() {
@@ -32,6 +32,6 @@ public abstract class AgendaSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 }

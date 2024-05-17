@@ -30,18 +30,18 @@ public abstract class TechAddRemove extends TechSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
-        player = Helper.getPlayer(activeGame, player, event);
-        if (player == null){
-            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
+        player = Helper.getPlayer(game, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
             return;
         }
 
@@ -49,13 +49,13 @@ public abstract class TechAddRemove extends TechSubcommandData {
         parseParameter(event, player, event.getOption(Constants.TECH2));
         parseParameter(event, player, event.getOption(Constants.TECH3));
         parseParameter(event, player, event.getOption(Constants.TECH4));
-        
-        if(player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeGame, "nekro", event);
+
+        if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "nekro", event);
         }
-        if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeGame, "jolnar", event);
-            }
+        if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "jolnar", event);
+        }
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {
@@ -66,16 +66,16 @@ public abstract class TechAddRemove extends TechSubcommandData {
             } else {
                 Map<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
-                        .map(Map.Entry::getKey).toList();
-                if (possibleTechs.isEmpty()){
+                    .map(Map.Entry::getKey).toList();
+                if (possibleTechs.isEmpty()) {
                     MessageHelper.sendMessageToEventChannel(event, "No matching Tech found");
                     return;
-                } else if (possibleTechs.size() > 1){
+                } else if (possibleTechs.size() > 1) {
                     MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
                     return;
                 }
                 doAction(player, possibleTechs.get(0), event);
-                
+
             }
         }
     }

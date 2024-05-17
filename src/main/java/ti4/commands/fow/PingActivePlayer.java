@@ -18,20 +18,20 @@ public class PingActivePlayer extends FOWSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
-        String playerID = activeGame.getActivePlayerID();
+        String playerID = game.getActivePlayerID();
         if (playerID == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player player = activeGame.getPlayer(playerID);
+        Player player = game.getPlayer(playerID);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player playerOrig = Helper.getGamePlayer(activeGame, player, event, null);
-        long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
+        Player playerOrig = Helper.getGamePlayer(game, player, event, null);
+        long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
         if (playerOrig != null) {
             samePlayer = playerOrig.getUserID().equalsIgnoreCase(player.getUserID());
@@ -41,14 +41,14 @@ public class PingActivePlayer extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
             String ping = player.getRepresentation(true, true) + " this is a gentle reminder that it is your turn.";
-            if (activeGame.isFoWMode()) {
+            if (game.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
-                MessageHelper.sendPrivateMessageToPlayer(player, activeGame, ping);
+                MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
-            activeGame.setLastActivePlayerPing(new Date());
-            GameSaveLoadManager.saveMap(activeGame);
+            game.setLastActivePlayerPing(new Date());
+            GameSaveLoadManager.saveMap(game);
         }
     }
 

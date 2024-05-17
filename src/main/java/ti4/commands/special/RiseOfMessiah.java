@@ -28,24 +28,24 @@ public class RiseOfMessiah extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        doRise(player, event, activeGame);
+        doRise(player, event, game);
 
     }
 
-    public static void doRise(Player player, GenericInteractionCreateEvent event, Game activeGame) {
+    public static void doRise(Player player, GenericInteractionCreateEvent event, Game game) {
         List<String> planets = player.getPlanetsAllianceMode();
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationNoPing()).append(" added one ").append(Emojis.infantry).append(" to each of: ");
         int count = 0;
-        for (Tile tile : activeGame.getTileMap().values()) {
+        for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
@@ -59,7 +59,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
                     if (ignorePlanet) {
                         continue;
                     }
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), activeGame);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
                     PlanetModel planetModel = Mapper.getPlanet(unitHolder.getName());
                     if (planetModel != null) {
                         sb.append("\n> ").append(Helper.getPlanetRepresentationPlusEmoji(unitHolder.getName()));

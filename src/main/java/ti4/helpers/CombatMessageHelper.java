@@ -156,27 +156,27 @@ public class CombatMessageHelper {
             }
         } else {
             int round = 0;
-            Game activeGame = player.getGame();
+            Game game = player.getGame();
             String combatName = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
-            if (activeGame.getStoredValue(combatName).isEmpty()) {
+            if (game.getStoredValue(combatName).isEmpty()) {
                 round = 1;
             } else {
-                if (activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                    round = Integer.parseInt(activeGame.getStoredValue(combatName));
+                if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                    round = Integer.parseInt(game.getStoredValue(combatName));
                 } else {
-                    round = Integer.parseInt(activeGame.getStoredValue(combatName)) + 1;
+                    round = Integer.parseInt(game.getStoredValue(combatName)) + 1;
                 }
             }
-            activeGame.setStoredValue(combatName, "" + round);
-            if (activeGame.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+            game.setStoredValue(combatName, "" + round);
+            if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                 combatTypeName = combatTypeName + " (Thalnos Reroll for Combat Round #" + round + ")";
             } else {
                 combatTypeName = combatTypeName + " (Combat Round #" + round + ")";
-                if (activeGame.getStoredValue("solagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
-                    activeGame.setStoredValue("solagent", "");
+                if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+                    game.setStoredValue("solagent", "");
                 }
-                if (activeGame.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
-                    activeGame.setStoredValue("letnevagent", "");
+                if (game.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+                    game.setStoredValue("letnevagent", "");
                 }
             }
         }

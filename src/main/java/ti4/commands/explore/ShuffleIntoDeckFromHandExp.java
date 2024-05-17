@@ -17,9 +17,9 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player activePlayer = activeGame.getPlayer(getUser().getId());
-        activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
+        Game game = getActiveGame();
+        Player activePlayer = game.getPlayer(getUser().getId());
+        activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
         if (activePlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
             return;
@@ -31,7 +31,7 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
             if (Mapper.getExplore(id) != null) {
                 activePlayer.removeFragment(id);
                 sb.append("Fragment discarded: ").append(displayExplore(id)).append(System.lineSeparator());
-                activeGame.addExplore(id);
+                game.addExplore(id);
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }

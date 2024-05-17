@@ -31,23 +31,23 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        doSwords(player, event, activeGame);
+        doSwords(player, event, game);
     }
 
-    public void doSwords(Player player, GenericInteractionCreateEvent event, Game activeGame) {
+    public void doSwords(Player player, GenericInteractionCreateEvent event, Game game) {
         List<String> planets = player.getPlanets();
         String ident = player.getFactionEmoji();
         StringBuilder message = new StringBuilder();
         int oldTg = player.getTg();
-        for (Tile tile : activeGame.getTileMap().values()) {
+        for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())) {
                     int numInf = 0;
@@ -63,15 +63,15 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                         int cTG = player.getTg();
                         int fTG = cTG + numTG;
                         player.setTg(fTG);
-                        message.append(ident).append(" removed ").append(numTG).append(" infantry from ").append(Helper.getPlanetRepresentation(unitHolder.getName(), activeGame))
+                        message.append(ident).append(" removed ").append(numTG).append(" infantry from ").append(Helper.getPlanetRepresentation(unitHolder.getName(), game))
                             .append(" and gained that many tg (").append(cTG).append("->").append(fTG).append("). \n");
                         tile.removeUnit(unitHolder.getName(), infKey, numTG);
                         if (player.hasInf2Tech()) {
-                            ButtonHelper.resolveInfantryDeath(activeGame, player, numTG);
+                            ButtonHelper.resolveInfantryDeath(game, player, numTG);
                         }
-                        boolean cabalMech = player.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasUnit("cabal_mech") && !activeGame.getLaws().containsKey("articles_war");
+                        boolean cabalMech = player.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasUnit("cabal_mech") && !game.getLaws().containsKey("articles_war");
                         if (player.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {
-                            ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, player, numTG, "infantry", event);
+                            ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, numTG, "infantry", event);
                         }
 
                     }
@@ -79,15 +79,15 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
             }
         }
         if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))) {
-            ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);
+            ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
         }
-        MessageChannel channel = activeGame.getMainGameChannel();
-        if (activeGame.isFoWMode()) {
+        MessageChannel channel = game.getMainGameChannel();
+        if (game.isFoWMode()) {
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannel(channel, message.toString());
-        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, player.getTg() - oldTg);
-        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
+        ButtonHelperAbilities.pillageCheck(player, game);
 
     }
 

@@ -24,9 +24,9 @@ public class SentAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -50,7 +50,7 @@ public class SentAC extends ACCardsSubcommandData {
             return;
         }
 
-        Player player_ = Helper.getPlayer(activeGame, null, event);
+        Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
@@ -61,14 +61,14 @@ public class SentAC extends ACCardsSubcommandData {
             return;
         }
 
-		// FoW specific pinging
-		if (activeGame.isFoWMode()) {
-			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, Emojis.ActionCard + " Action Card", null);
-		}
+        // FoW specific pinging
+        if (game.isFoWMode()) {
+            FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
+        }
 
         player.removeActionCard(acIndex);
         player_.setActionCard(acID);
-        ACInfo.sendActionCardInfo(activeGame, player_);
-        ACInfo.sendActionCardInfo(activeGame, player);
+        ACInfo.sendActionCardInfo(game, player_);
+        ACInfo.sendActionCardInfo(game, player);
     }
 }

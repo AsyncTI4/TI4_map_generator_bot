@@ -21,16 +21,16 @@ public class SetUnitCap extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        String unit =event.getOption(Constants.UNIT_NAME).getAsString();
+        Game game = getActiveGame();
+        String unit = event.getOption(Constants.UNIT_NAME).getAsString();
         int unitCap = event.getOption(Constants.UNIT_CAP).getAsInt();
         if (unitCap > 14) {
             unitCap = 14;
         }
-        Player player = Helper.getPlayer(activeGame, null, event);
+        Player player = Helper.getPlayer(game, null, event);
         String unitID = AliasHandler.resolveUnit(unit);
         player.setUnitCap(unitID, unitCap);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set "+ unit+ " max to "+unitCap+" for "+player.getRepresentation());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation());
 
     }
 }

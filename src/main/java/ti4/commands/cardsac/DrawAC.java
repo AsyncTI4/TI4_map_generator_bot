@@ -19,9 +19,9 @@ public class DrawAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -36,12 +36,12 @@ public class DrawAC extends ACCardsSubcommandData {
             }
         }
         for (int i = 0; i < count; i++) {
-            activeGame.drawActionCard(player.getUserID());
+            game.drawActionCard(player.getUserID());
         }
-        ACInfo.sendActionCardInfo(activeGame, player);
-        ButtonHelper.checkACLimit(activeGame, event, player);
+        ACInfo.sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, event, player);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
         }
     }
 }

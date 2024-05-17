@@ -24,9 +24,9 @@ public class AddFogTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
 
         MessageChannel channel = event.getChannel();
         if (player == null) {
@@ -65,6 +65,6 @@ public class AddFogTile extends FOWSubcommandData {
 
         //add the custom tile to the player
         player.addFogTile(planetTileName, position, label);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }
