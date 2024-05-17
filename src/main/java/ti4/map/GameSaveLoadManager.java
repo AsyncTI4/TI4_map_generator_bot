@@ -571,6 +571,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + activeGame.isFoWMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.FOW_OPTION_HIDE_NAMES + " " + activeGame.isFowOptionHideNames());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
         writer.write(Constants.L1_HERO + " " + activeGame.getL1Hero());
@@ -1769,6 +1771,14 @@ public class GameSaveLoadManager {
                     } catch (Exception e) {
                         // Do nothing
                     }
+                }
+                case Constants.FOW_OPTION_HIDE_NAMES -> {
+                  try {
+                      boolean value = Boolean.parseBoolean(info);
+                      activeGame.setFowOptionHideNames(value);
+                  } catch (Exception e) {
+                      // Do nothing
+                  }
                 }
                 case Constants.NAALU_AGENT -> {
                     try {

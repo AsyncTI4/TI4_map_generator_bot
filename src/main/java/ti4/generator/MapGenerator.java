@@ -593,15 +593,16 @@ public class MapGenerator {
                 }
 
                 // PAINT AVATAR AND USERNAME
-                graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
+                StringBuilder userName = new StringBuilder();
+                String playerName = player.getUserName();
+                if (!game.isFowOptionHideNames()) {
+                  graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
+                  userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
+                }
                 y += 34;
                 graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
-
-                StringBuilder userName = new StringBuilder();
-                String playerName = player.getUserName();
-                userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
 
                 // PAINT FACTION OR DISPLAY NAME
                 String factionText = player.getFaction();
@@ -619,7 +620,7 @@ public class MapGenerator {
                     userName.append(" -- AFK");
                 }
 
-                graphics.drawString(userName.toString(), x + 34, y);
+                graphics.drawString(userName.toString(), !game.isFowOptionHideNames() ? x + 34 : x, y);
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
@@ -2798,8 +2799,10 @@ public class MapGenerator {
 
             // PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
-            graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
-                point.y + deltaY);
+            if (!game.isFowOptionHideNames()) {
+              graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
+                  point.y + deltaY);
+            }
 
             // PAINT FACTION
             point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);

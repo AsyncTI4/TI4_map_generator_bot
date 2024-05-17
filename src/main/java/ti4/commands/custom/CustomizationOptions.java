@@ -45,6 +45,7 @@ public class CustomizationOptions extends CustomSubcommandData {
             "Consider People To Pass on SCs if they dont respond with X hours. Set X to 0 to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
             "Swap player's owned units to units from another source").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_OPTION_HIDE_NAMES, "Completely hide player discord names."));
     }
 
     @Override
@@ -164,5 +165,9 @@ public class CustomizationOptions extends CustomSubcommandData {
         String unitSource = event.getOption(Constants.UNIT_SOURCE, null, OptionMapping::getAsString);
         if (unitSource != null && Mapper.getUnitSources().contains(unitSource))
             activeGame.swapInVariantUnits(unitSource);
+
+        Boolean fowHideNames = event.getOption(Constants.FOW_OPTION_HIDE_NAMES, null, OptionMapping::getAsBoolean);
+        if (fowHideNames != null)
+            activeGame.setFowOptionHideNames(fowHideNames);
     }
 }
