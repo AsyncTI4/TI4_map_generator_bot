@@ -157,7 +157,7 @@
     "name": "Crisis Management",
     "phase": "Action",
     "window": "After you pass",
-    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that card is readied, spend command tokens from your reinforcements instead of your strategy pool when performing that ability.",
+    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
     "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
