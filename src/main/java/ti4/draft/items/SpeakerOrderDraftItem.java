@@ -44,9 +44,9 @@ public class SpeakerOrderDraftItem extends DraftItem {
         return Integer.parseInt(ItemId);
     }
 
-    public static List<DraftItem> buildAllDraftableItems(Game game) {
+    public static List<DraftItem> buildAllDraftableItems(Game activeGame) {
         List<DraftItem> allItems = new ArrayList<>();
-        for (int i = 0; i < game.getRealPlayers().size(); i++) {
+        for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
             allItems.add(DraftItem.Generate(DraftItem.Category.DRAFTORDER, Integer.toString(i + 1)));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.DRAFTORDER);

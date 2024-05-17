@@ -28,18 +28,18 @@ public class UseExplore extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
         id = StringUtils.substringBefore(id, " ");
-        if (game.pickExplore(id) != null) {
+        if (activeGame.pickExplore(id) != null) {
             OptionMapping planetOption = event.getOption(Constants.PLANET);
             String planetName = null;
             if (planetOption != null) {
                 planetName = planetOption.getAsString();
             }
             Tile tile = null;
-            if (game.getPlanets().contains(planetName)) {
-                for (Tile tile_ : game.getTileMap().values()) {
+            if (activeGame.getPlanets().contains(planetName)) {
+                for (Tile tile_ : activeGame.getTileMap().values()) {
                     if (tile != null) {
                         break;
                     }
@@ -55,10 +55,10 @@ public class UseExplore extends ExploreSubcommandData {
                     return;
                 }
             }
-            Player player = game.getPlayer(event.getUser().getId());
-            player = Helper.getGamePlayer(game, player, event, null);
+            Player player = activeGame.getPlayer(event.getUser().getId());
+            player = Helper.getGamePlayer(activeGame, player, event, null);
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
-            resolveExplore(event, id, tile, planetName, messageText, player, game);
+            resolveExplore(event, id, tile, planetName, messageText, player, activeGame);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Invalid card ID");
         }

@@ -24,78 +24,78 @@ public class Info extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         GameManager gameManager = GameManager.getInstance();
-        Game game = getActiveGame();
-        if (game == null) {
+        Game activeGame = getActiveGame();
+        if (activeGame == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found.");
             return;
         }
 
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
-        if (gameNameOption != null && !game.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase())) {
-            game = gameManager.getGame(gameNameOption.getAsString().toLowerCase());
+        if (gameNameOption != null && !activeGame.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase())) {
+            activeGame = gameManager.getGame(gameNameOption.getAsString().toLowerCase());
         }
 
-        StringBuilder sb = getGameInfo(game, event);
+        StringBuilder sb = getGameInfo(activeGame, event);
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(Game game, SlashCommandInteractionEvent event) {
-        Boolean privateGame = FoWHelper.isPrivateGame(game, event);
+    public static StringBuilder getGameInfo(Game activeGame, SlashCommandInteractionEvent event) {
+        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## Game Info:").append(NEW_LINE);
-        sb.append("### Name: ").append(game.getName()).append(NEW_LINE);
-        sb.append("Owner: ").append(game.getOwnerName()).append(NEW_LINE);
-        sb.append("Created: ").append(game.getCreationDate()).append(NEW_LINE);
-        sb.append("Last Modified: ").append(Helper.getDateRepresentation(game.getLastModifiedDate())).append(NEW_LINE);
-        sb.append("Ended: `").append(game.isHasEnded()).append("`").append(NEW_LINE);
-        if (game.isHasEnded()) sb.append("> Date Ended: ").append(Helper.getDateRepresentation(game.getEndedDate())).append(NEW_LINE);
-        sb.append("Game Completed: `").append(game.getWinner().isPresent()).append("`").append(NEW_LINE);
+        sb.append("### Name: ").append(activeGame.getName()).append(NEW_LINE);
+        sb.append("Owner: ").append(activeGame.getOwnerName()).append(NEW_LINE);
+        sb.append("Created: ").append(activeGame.getCreationDate()).append(NEW_LINE);
+        sb.append("Last Modified: ").append(Helper.getDateRepresentation(activeGame.getLastModifiedDate())).append(NEW_LINE);
+        sb.append("Ended: `").append(activeGame.isHasEnded()).append("`").append(NEW_LINE);
+        if (activeGame.isHasEnded()) sb.append("> Date Ended: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(NEW_LINE);
+        sb.append("Game Completed: `").append(activeGame.getWinner().isPresent()).append("`").append(NEW_LINE);
 
         sb.append("### Setup: ").append(NEW_LINE);
-        sb.append("VP Count: ").append(game.getVp()).append(NEW_LINE);
-        sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append(NEW_LINE);
+        sb.append("VP Count: ").append(activeGame.getVp()).append(NEW_LINE);
+        sb.append("SO Count: ").append(activeGame.getMaxSOCountPerPlayer()).append(NEW_LINE);
         sb.append("Private Game: ").append(privateGame).append(NEW_LINE);
-        sb.append("Game Modes: ").append(game.getGameModesText()).append(NEW_LINE);
-        sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append(NEW_LINE);
+        sb.append("Game Modes: ").append(activeGame.getGameModesText()).append(NEW_LINE);
+        sb.append("Map Template: `").append(activeGame.getMapTemplateID()).append("`").append(NEW_LINE);
         if (!privateGame) {
-            sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append(NEW_LINE);
+            sb.append("Map String: `").append(Helper.getMapString(activeGame)).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
         }
-        sb.append("Strategy Card Set: `").append(game.getScSetID()).append("`").append(NEW_LINE);
-        sb.append("Strategy Cards: `").append(game.getStrategyCardSet().getScIDs()).append("`").append(NEW_LINE);
+        sb.append("Strategy Card Set: `").append(activeGame.getScSetID()).append("`").append(NEW_LINE);
+        sb.append("Strategy Cards: `").append(activeGame.getStrategyCardSet().getScIDs()).append("`").append(NEW_LINE);
         sb.append("Decks: ").append(NEW_LINE);
-        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(game.getAcDeckID()).append("` ").append(game.getActionCardDeckSize()).append("/").append(game.getActionCardFullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(game.getSoDeckID()).append("` ").append(game.getSecretObjectiveDeckSize()).append("/").append(game.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(game.getStage1PublicDeckID()).append("` ").append(game.getPublicObjectives1DeckSize()).append("/").append(game.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(game.getStage2PublicDeckID()).append("` ").append(game.getPublicObjectives2DeckSize()).append("/").append(game.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
-        sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(game.getAgendaDeckID()).append("` ").append(game.getAgendaDeckSize()).append("/").append(game.getAgendaFullDeckSize()).append(NEW_LINE);
-        if (game.getEventDeckID() != null && !"null".equals(game.getEventDeckID())) {
-            sb.append("- ").append("Event Deck: `").append(game.getEventDeckID()).append("` ").append(game.getEventDeckSize()).append("/").append(game.getEventFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ").append(activeGame.getActionCardDeckSize()).append("/").append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(activeGame.getSoDeckID()).append("` ").append(activeGame.getSecretObjectiveDeckSize()).append("/").append(activeGame.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(activeGame.getStage1PublicDeckID()).append("` ").append(activeGame.getPublicObjectives1DeckSize()).append("/").append(activeGame.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(activeGame.getStage2PublicDeckID()).append("` ").append(activeGame.getPublicObjectives2DeckSize()).append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/").append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
+        if (activeGame.getEventDeckID() != null && !"null".equals(activeGame.getEventDeckID())) {
+            sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/").append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
         }
-        sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(game.getTechnologyDeckID()).append("`").append(NEW_LINE);
-        sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(game.getRelicDeckID()).append("` ").append(game.getRelicDeckSize()).append("/").append(game.getRelicFullDeckSize()).append(NEW_LINE);
-        sb.append("- Exploration Deck: `").append(game.getExplorationDeckID()).append("`").append(NEW_LINE);
-        sb.append(" - ").append(Emojis.IndustrialCard).append("Industrial Deck: ").append(game.getIndustrialExploreDeckSize()).append("/").append(game.getIndustrialExploreFullDeckSize()).append(NEW_LINE);
-        sb.append(" - ").append(Emojis.HazardousCard).append("Hazardous Deck: ").append(game.getHazardousExploreDeckSize()).append("/").append(game.getHazardousExploreFullDeckSize()).append(NEW_LINE);
-        sb.append(" - ").append(Emojis.CulturalCard).append("Cultural Deck: ").append(game.getCulturalExploreDeckSize()).append("/").append(game.getCulturalExploreFullDeckSize()).append(NEW_LINE);
-        sb.append(" - ").append(Emojis.FrontierCard).append("Frontier Deck: ").append(game.getFrontierExploreDeckSize()).append("/").append(game.getFrontierExploreFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(activeGame.getTechnologyDeckID()).append("`").append(NEW_LINE);
+        sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/").append(activeGame.getRelicFullDeckSize()).append(NEW_LINE);
+        sb.append("- Exploration Deck: `").append(activeGame.getExplorationDeckID()).append("`").append(NEW_LINE);
+        sb.append(" - ").append(Emojis.IndustrialCard).append("Industrial Deck: ").append(activeGame.getIndustrialExploreDeckSize()).append("/").append(activeGame.getIndustrialExploreFullDeckSize()).append(NEW_LINE);
+        sb.append(" - ").append(Emojis.HazardousCard).append("Hazardous Deck: ").append(activeGame.getHazardousExploreDeckSize()).append("/").append(activeGame.getHazardousExploreFullDeckSize()).append(NEW_LINE);
+        sb.append(" - ").append(Emojis.CulturalCard).append("Cultural Deck: ").append(activeGame.getCulturalExploreDeckSize()).append("/").append(activeGame.getCulturalExploreFullDeckSize()).append(NEW_LINE);
+        sb.append(" - ").append(Emojis.FrontierCard).append("Frontier Deck: ").append(activeGame.getFrontierExploreDeckSize()).append("/").append(activeGame.getFrontierExploreFullDeckSize()).append(NEW_LINE);
 
         sb.append("### Settings: ").append(NEW_LINE);
-        sb.append("Beta Test Mode: ").append(game.isTestBetaFeaturesMode()).append(NEW_LINE);
-        sb.append("Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
-        sb.append("Text Size: ").append(game.getTextSize()).append(NEW_LINE);
-        sb.append("Full Text Output: ").append(game.isShowFullComponentTextEmbeds()).append(NEW_LINE);
-        sb.append("Output Verbosity: ").append(game.getOutputVerbosity()).append(NEW_LINE);
-        if (game.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(game.getTableTalkChannel().getAsMention()).append(NEW_LINE);
-        if (game.getActionsChannel() != null) sb.append("Actions Channel: ").append(game.getActionsChannel().getAsMention()).append(NEW_LINE);
-        if (game.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(game.getBotMapUpdatesThread().getAsMention()).append(NEW_LINE);
+        sb.append("Beta Test Mode: ").append(activeGame.isTestBetaFeaturesMode()).append(NEW_LINE);
+        sb.append("Auto-Ping Time Interval (hrs): ").append(activeGame.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Text Size: ").append(activeGame.getTextSize()).append(NEW_LINE);
+        sb.append("Full Text Output: ").append(activeGame.isShowFullComponentTextEmbeds()).append(NEW_LINE);
+        sb.append("Output Verbosity: ").append(activeGame.getOutputVerbosity()).append(NEW_LINE);
+        if (activeGame.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(activeGame.getTableTalkChannel().getAsMention()).append(NEW_LINE);
+        if (activeGame.getActionsChannel() != null) sb.append("Actions Channel: ").append(activeGame.getActionsChannel().getAsMention()).append(NEW_LINE);
+        if (activeGame.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(activeGame.getBotMapUpdatesThread().getAsMention()).append(NEW_LINE);
 
         if (!privateGame) {
             sb.append("### Players: ").append(NEW_LINE);
             int index = 1;
-            for (Player player : game.getRealPlayers()) {
+            for (Player player : activeGame.getRealPlayers()) {
                 sb.append("> `").append(index).append(".` ").append(player.getFactionEmoji()).append(player.getUserName()).append(Emojis.getColorEmojiWithName(player.getColor()));
                 if (player.getRoleForCommunity() != null) sb.append(" - Community Role: ").append(player.getRoleForCommunity().getName());
                 sb.append(NEW_LINE);
@@ -103,7 +103,7 @@ public class Info extends GameSubcommandData {
             }
 
             sb.append("### Other Players: ").append(NEW_LINE);
-            for (Player player : game.getNotRealPlayers()) {
+            for (Player player : activeGame.getNotRealPlayers()) {
                 sb.append("> `").append(index).append(".` ").append(player.getUserName());
                 sb.append(NEW_LINE);
                 index++;
@@ -113,19 +113,19 @@ public class Info extends GameSubcommandData {
         }
 
         sb.append("### Other Stats: ").append(NEW_LINE);
-        sb.append("Current Phase: ").append(game.getCurrentPhase()).append(NEW_LINE);
-        sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append(NEW_LINE);
-        sb.append("Game Real Player Count: ").append(game.getRealPlayers().size()).append(NEW_LINE);
-        sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append(NEW_LINE);
-        sb.append("Map Images Generated: ").append(game.getMapImageGenerationCount()).append(NEW_LINE);
-        sb.append("SC Trade Goods: `").append(game.getScTradeGoods()).append("`").append(NEW_LINE);
-        sb.append("Public Objectives: `").append(game.getRevealedPublicObjectives()).append("`").append(NEW_LINE);
-        sb.append("Laws: `").append(game.getLaws()).append("`").append(NEW_LINE);
-        sb.append("Laws Info: `").append(game.getLawsInfo()).append("`").append(NEW_LINE);
-        sb.append("Events: `").append(game.getEventsInEffect()).append("`").append(NEW_LINE);
-        sb.append("Migrations Run: `").append(game.getRunMigrations()).append("`").append(NEW_LINE);
-        sb.append("Buttons pressed: `").append(game.getButtonPressCount()).append("`").append(NEW_LINE);
-        sb.append("SlashCommands used: `").append(game.getSlashCommandsRunCount()).append("`").append(NEW_LINE);
+        sb.append("Current Phase: ").append(activeGame.getCurrentPhase()).append(NEW_LINE);
+        sb.append("Game Player Count: ").append(activeGame.getPlayerCountForMap()).append(NEW_LINE);
+        sb.append("Game Real Player Count: ").append(activeGame.getRealPlayers().size()).append(NEW_LINE);
+        sb.append("SCs per player: ").append(activeGame.getStrategyCardsPerPlayer()).append(NEW_LINE);
+        sb.append("Map Images Generated: ").append(activeGame.getMapImageGenerationCount()).append(NEW_LINE);
+        sb.append("SC Trade Goods: `").append(activeGame.getScTradeGoods()).append("`").append(NEW_LINE);
+        sb.append("Public Objectives: `").append(activeGame.getRevealedPublicObjectives()).append("`").append(NEW_LINE);
+        sb.append("Laws: `").append(activeGame.getLaws()).append("`").append(NEW_LINE);
+        sb.append("Laws Info: `").append(activeGame.getLawsInfo()).append("`").append(NEW_LINE);
+        sb.append("Events: `").append(activeGame.getEventsInEffect()).append("`").append(NEW_LINE);
+        sb.append("Migrations Run: `").append(activeGame.getRunMigrations()).append("`").append(NEW_LINE);
+        sb.append("Buttons pressed: `").append(activeGame.getButtonPressCount()).append("`").append(NEW_LINE);
+        sb.append("SlashCommands used: `").append(activeGame.getSlashCommandsRunCount()).append("`").append(NEW_LINE);
 
         return sb;
     }

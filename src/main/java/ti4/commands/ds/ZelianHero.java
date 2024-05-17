@@ -33,10 +33,10 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -49,21 +49,21 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         }
 
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
-        secondHalfOfCelestialImpact(player, event, tile, game);
+        secondHalfOfCelestialImpact(player, event, tile, activeGame);
     }
 
-    public void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
-        String message1 = "Moments before disaster in game " + game.getName();
-        StellarConverter.postTileInDisasterWatch(game, tile, 1, message1);
+    public void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game activeGame) {
+        String message1 = "Moments before disaster in game " + activeGame.getName();
+        StellarConverter.postTileInDisasterWatch(activeGame, tile, 1, message1);
 
         //Remove all other players ground force units from the tile in question
-        for (Player player_ : game.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (!unitHolder.getName().equals(Constants.SPACE)) {
@@ -84,21 +84,21 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         tgGainMsg.append(player.getTg()).append("->").append(player.getTg() + resourcesSum).append(").");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg.toString());
         player.gainTG(resourcesSum);
-        ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, resourcesSum);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, resourcesSum);
 
         //Add the zelian asteroid field to the map and copy over the space unitholder
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        game.removeTile(tile.getPosition());
+        activeGame.removeTile(tile.getPosition());
         Tile asteroidTile = new Tile(AliasHandler.resolveTile("D36"), tile.getPosition(), space);
-        game.setTile(asteroidTile);
+        activeGame.setTile(asteroidTile);
 
         //After shot to disaster channel
         StringBuilder message2 = new StringBuilder();
         message2.append(tile.getRepresentation());
         message2.append(" has been celestially impacted by ");
         message2.append(player.getRepresentation());
-        StellarConverter.postTileInDisasterWatch(game, asteroidTile, 1, message2.toString());
+        StellarConverter.postTileInDisasterWatch(activeGame, asteroidTile, 1, message2.toString());
 
         if (player.hasLeaderUnlocked("zelianhero")) {
             Leader playerLeader = player.getLeader("zelianhero").orElse(null);

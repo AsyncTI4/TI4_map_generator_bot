@@ -14,20 +14,20 @@ public class ListDiceLuck extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
         }
 
         StringBuilder message = new StringBuilder();
-        message.append("**__Average dice luck in ").append(game.getName());
-        if (!game.getCustomName().isEmpty()) {
-            message.append(" - ").append(game.getCustomName());
+        message.append("**__Average dice luck in ").append(activeGame.getName());
+        if (!activeGame.getCustomName().isEmpty()) {
+            message.append(" - ").append(activeGame.getCustomName());
         }
         message.append("__**");
 
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : activeGame.getPlayers().values()) {
             if (!player.isRealPlayer()) continue;
             String turnString = playerAverageDiceLuck(player);
             message.append("\n").append(turnString);
@@ -37,17 +37,18 @@ public class ListDiceLuck extends StatusSubcommandData {
     }
 
     private String playerAverageDiceLuck(Player player) {
-        double expectedHits = player.getExpectedHitsTimes10() / 10.0;
+        double expectedHits = player.getExpectedHitsTimes10()/10.0;
         int actualHits = player.getActualHits();
         if (expectedHits == 0) {
             return "> " + player.getUserName() + " has not rolled dice yet.";
         }
 
         double total = actualHits / expectedHits;
+        
 
-        return "> " + player.getUserName() + ": `" +
-            String.format("%.2f", total) +
-            "` (" + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)";
+      return "> " + player.getUserName() + ": `" +
+          String.format("%.2f", total) +
+          "` (" + actualHits + "/"+String.format("%.1f", expectedHits) +" actual/expected)";
     }
 
     @Override

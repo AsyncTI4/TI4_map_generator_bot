@@ -21,17 +21,17 @@ public class AddOmenDie extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         int dieResult = event.getOption(Constants.RESULT, 1, OptionMapping::getAsInt);
-        ButtonHelperAbilities.addOmenDie(game, dieResult);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Added an Omen Die with value " + dieResult);
+        ButtonHelperAbilities.addOmenDie(activeGame, dieResult);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Added an Omen Die with value "+dieResult);
     }
-
+    
 }

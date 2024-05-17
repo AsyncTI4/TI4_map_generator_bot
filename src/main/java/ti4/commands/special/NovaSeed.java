@@ -22,10 +22,10 @@ public class NovaSeed extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -37,21 +37,21 @@ public class NovaSeed extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
-        secondHalfOfNovaSeed(player, event, tile, game);
+        secondHalfOfNovaSeed(player, event, tile, activeGame);
     }
 
-    public void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
-        String message1 = "Moments before disaster in game " + game.getName();
-        StellarConverter.postTileInDisasterWatch(game, tile, 1, message1);
+    public void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game activeGame) {
+        String message1 = "Moments before disaster in game " + activeGame.getName();
+        StellarConverter.postTileInDisasterWatch(activeGame, tile, 1, message1);
 
         //Remove all other players units from the tile in question
-        for (Player player_ : game.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 tile.removeAllUnits(player_.getColor());
                 tile.removeAllUnitDamage(player_.getColor());
@@ -60,17 +60,17 @@ public class NovaSeed extends SpecialSubcommandData {
 
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         space.removeAllTokens();
-        game.removeTile(tile.getPosition());
+        activeGame.removeTile(tile.getPosition());
 
         //Add the muaat supernova to the map and copy over the space unitholder
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
-        game.setTile(novaTile);
+        activeGame.setTile(novaTile);
 
         StringBuilder message2 = new StringBuilder();
         message2.append(tile.getRepresentation());
         message2.append(" has been nova seeded by ");
         message2.append(player.getRepresentation());
-        StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2.toString());
+        StellarConverter.postTileInDisasterWatch(activeGame, novaTile, 1, message2.toString());
 
         if (player.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = player.getLeader("muaathero").orElse(null);

@@ -52,21 +52,21 @@ public class GameCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        if (game == null)
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        if (activeGame == null)
             return;
         if (!undoCommand) {
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
-        CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(game, event);
+        CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(activeGame, event);
         if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
             && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
             && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
             fileFuture.thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
-                if (!game.isFoWMode()) {
+                if (!activeGame.isFoWMode()) {
                     Button linkToWebsite = Button.link(
-                        "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
+                        "https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
                     buttons.add(linkToWebsite);
                     buttons.add(Button.success("gameInfoButtons", "Player Info"));
                 }

@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 public abstract class PNCardsSubcommandData extends SubcommandData {
 
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -24,7 +24,7 @@ public abstract class PNCardsSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -35,7 +35,7 @@ public abstract class PNCardsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
         Helper.checkThreadLimitAndArchive(event.getGuild());
     }
 

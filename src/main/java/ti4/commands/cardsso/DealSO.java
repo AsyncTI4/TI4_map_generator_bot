@@ -21,7 +21,7 @@ public class DealSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.COUNT);
         int count = 1;
         if (option != null) {
@@ -29,7 +29,7 @@ public class DealSO extends SOCardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player_ = Helper.getPlayer(game, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
@@ -41,9 +41,9 @@ public class DealSO extends SOCardsSubcommandData {
         }
 
         for (int i = 0; i < count; i++) {
-            game.drawSecretObjective(player_.getUserID());
+            activeGame.drawSecretObjective(player_.getUserID());
         }
         MessageHelper.sendMessageToEventChannel(event, count + " SO Dealt");
-        SOInfo.sendSecretObjectiveInfo(game, player_, event);
+        SOInfo.sendSecretObjectiveInfo(activeGame, player_, event);
     }
 }

@@ -52,14 +52,14 @@ public class ShowGame implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        Game game;
+        Game activeGame;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            activeGame = gameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            activeGame = gameManager.getUserActiveGame(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
@@ -73,25 +73,25 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                MapGenerator.saveImage(game, displayType, event)
+                MapGenerator.saveImage(activeGame, displayType, event)
                     .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.system.getValue())) {
                 displayType = DisplayType.system;
             }
         }
-        simpleShowGame(game, event, displayType);
+        simpleShowGame(activeGame, event, displayType);
     }
 
-    public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
-        simpleShowGame(game, event, DisplayType.all);
+    public static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event) {
+        simpleShowGame(activeGame, event, DisplayType.all);
     }
 
-    private static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapGenerator.saveImage(game, displayType, event).thenAccept(fileUpload -> {
+    private static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
+        MapGenerator.saveImage(activeGame, displayType, event).thenAccept(fileUpload -> {
             List<Button> buttons = new ArrayList<>();
-            if (!game.isFoWMode()) {
-                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
+            if (!activeGame.isFoWMode()) {
+                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
                 buttons.add(linkToWebsite);
                 buttons.add(Button.success("gameInfoButtons", "Player Info"));
             }
@@ -101,9 +101,9 @@ public class ShowGame implements Command {
 
             // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
             MessageChannel channel = event.getMessageChannel();
-            if (!game.isFoWMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
-                channel = game.getBotMapUpdatesThread();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+            if (!activeGame.isFoWMode() && activeGame.getActionsChannel() != null && activeGame.getBotMapUpdatesThread() != null && channel.equals(activeGame.getActionsChannel())) {
+                channel = activeGame.getBotMapUpdatesThread();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + activeGame.getBotMapUpdatesThread().getJumpUrl());
             }
 
             MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);

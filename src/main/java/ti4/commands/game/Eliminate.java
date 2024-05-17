@@ -31,24 +31,24 @@ public class Eliminate extends AddRemovePlayer {
         super(Constants.ELIMINATE, "Eliminate player from game");
     }
 
-    protected String getResponseMessage(Game game, User user) {
+    protected String getResponseMessage(Game activeGame, User user) {
         return sb.toString();
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Game game, User user) {
+    protected void action(SlashCommandInteractionEvent event, Game activeGame, User user) {
         sb = new StringBuilder();
-        removeUser(event, game, Constants.PLAYER1);
-        removeUser(event, game, Constants.PLAYER2);
-        removeUser(event, game, Constants.PLAYER3);
-        removeUser(event, game, Constants.PLAYER4);
-        removeUser(event, game, Constants.PLAYER5);
-        removeUser(event, game, Constants.PLAYER6);
-        removeUser(event, game, Constants.PLAYER7);
-        removeUser(event, game, Constants.PLAYER8);
+        removeUser(event, activeGame, Constants.PLAYER1);
+        removeUser(event, activeGame, Constants.PLAYER2);
+        removeUser(event, activeGame, Constants.PLAYER3);
+        removeUser(event, activeGame, Constants.PLAYER4);
+        removeUser(event, activeGame, Constants.PLAYER5);
+        removeUser(event, activeGame, Constants.PLAYER6);
+        removeUser(event, activeGame, Constants.PLAYER7);
+        removeUser(event, activeGame, Constants.PLAYER8);
     }
 
-    private void removeUser(SlashCommandInteractionEvent event, Game game, String playerID) {
+    private void removeUser(SlashCommandInteractionEvent event, Game activeGame, String playerID) {
         OptionMapping option;
         option = event.getOption(playerID);
 
@@ -67,16 +67,16 @@ public class Eliminate extends AddRemovePlayer {
             //     return;
             // }
 
-            // Player player = Helper.getPlayer(game, null, event);
+            // Player player = Helper.getPlayer(activeGame, null, event);
             User extraUser = option.getAsUser();
-            Player player = game.getPlayer(extraUser.getId());
+            Player player = activeGame.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
-            if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
-                if (player.getPlanets().size() > 0) {
+            if (player != null  && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction())&& player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
+                if(player.getPlanets().size() > 0){
                     Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
-                    if (bothelperRole != null) {
-                        msg = msg + " Pinging bothelper for assistance: " + bothelperRole.getAsMention();
+                    if(bothelperRole != null){
+                        msg = msg +  " Pinging bothelper for assistance: "+ bothelperRole.getAsMention();
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     return;
@@ -87,35 +87,35 @@ public class Eliminate extends AddRemovePlayer {
 
                     PromissoryNoteModel pn = promissoryNotes.get(pnID);
                     if (pn != null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())) {
-                        Player p2 = game.getPlayerFromColorOrFaction(pn.getOwner());
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(pn.getOwner());
                         player.removePromissoryNote(pnID);
                         p2.setPromissoryNote(pnID);
-                        PNInfo.sendPromissoryNoteInfo(game, p2, false);
+                        PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
                     }
                 }
 
                 //Purge all the PNs of the eliminated player that other players were holding
-                for (Player p2 : game.getPlayers().values()) {
+                for (Player p2 : activeGame.getPlayers().values()) {
                     pns = new HashSet<>(p2.getPromissoryNotes().keySet());
                     for (String pnID : pns) {
                         PromissoryNoteModel pn = promissoryNotes.get(pnID);
                         if (pn != null && (pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
                             p2.removePromissoryNote(pnID);
-                            PNInfo.sendPromissoryNoteInfo(game, p2, false);
+                            PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
                         }
                     }
                 }
                 //Remove all of the players units and ccs from the board
-                for (Tile tile : game.getTileMap().values()) {
+                for (Tile tile : activeGame.getTileMap().values()) {
                     tile.removeAllUnits(player.getColor());
                     if (!"null".equalsIgnoreCase(player.getColor()) && AddCC.hasCC(event, player.getColor(), tile)) {
-                        RemoveCC.removeCC(event, player.getColor(), tile, game);
+                        RemoveCC.removeCC(event, player.getColor(), tile, activeGame);
                     }
                 }
                 //discard all of a players ACs
                 Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
                 for (Map.Entry<String, Integer> ac : acs.entrySet()) {
-                    boolean removed = game.discardActionCard(player.getUserID(), ac.getValue());
+                    boolean removed = activeGame.discardActionCard(player.getUserID(), ac.getValue());
                     String sb = "Player: " + player.getUserName() + " - " +
                         "Discarded Action Card:" + "\n" +
                         Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
@@ -124,13 +124,13 @@ public class Eliminate extends AddRemovePlayer {
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());
                 for (int so : acs.values()) {
-                    boolean scored = game.unscoreSecretObjective(player.getUserID(), so);
+                    boolean scored = activeGame.unscoreSecretObjective(player.getUserID(), so);
                 }
                 //discard all of a players SOs
 
                 acs = new LinkedHashMap<>(player.getSecrets());
                 for (int so : acs.values()) {
-                    game.discardSecretObjective(player.getUserID(), so);
+                    activeGame.discardSecretObjective(player.getUserID(), so);
                 }
                 //return SCs
                 Set<Integer> scs = new HashSet<>(player.getSCs());
@@ -139,17 +139,17 @@ public class Eliminate extends AddRemovePlayer {
                 }
                 player.setEliminated(true);
                 player.setDummy(true);
-            } else {
-                game.removePlayer(player.getUserID());
+            }else{
+                activeGame.removePlayer(player.getUserID());
             }
-
+            
             Guild guild = event.getGuild();
             Member removedMember = guild.getMemberById(player.getUserID());
-            List<Role> roles = guild.getRolesByName(game.getName(), true);
+            List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
             if (removedMember != null && roles.size() == 1) {
                 guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
             }
-            sb.append("Eliminated player: ").append(player.getUserName()).append(" from game: ").append(game.getName()).append("\n");
+            sb.append("Eliminated player: ").append(player.getUserName()).append(" from game: ").append(activeGame.getName()).append("\n");
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         }
     }

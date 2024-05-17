@@ -17,7 +17,7 @@ public class PutDiscardBackIntoDeckEvents extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.EVENT_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No EVENT ID defined");
@@ -27,11 +27,11 @@ public class PutDiscardBackIntoDeckEvents extends EventSubcommandData {
         boolean shuffleEvents = event.getOption(Constants.SHUFFLE_EVENTS, true, OptionMapping::getAsBoolean);
         boolean success;
         if (shuffleEvents) {
-            success = game.shuffleEventBackIntoDeck(option.getAsInt());
+            success = activeGame.shuffleEventBackIntoDeck(option.getAsInt());
         } else {
-            success = game.putEventBackIntoDeckOnTop(option.getAsInt());
+            success = activeGame.putEventBackIntoDeckOnTop(option.getAsInt());
         }
-
+                
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event put back into deck");
         } else {

@@ -18,7 +18,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
@@ -28,7 +28,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (Map.Entry<String, Integer> so : game.getDiscardActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> so : activeGame.getDiscardActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -37,15 +37,15 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        boolean picked = game.shuffleActionCardBackIntoDeck(acIndex);
+        boolean picked = activeGame.shuffleActionCardBackIntoDeck(acIndex);
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        String sb = "Game: " + game.getName() + " " +
-            "Player: " + getUser().getName() + "\n" +
-            "Card shuffled back into deck from discards: " +
-            Mapper.getActionCard(acID).getRepresentation() + "\n";
+      String sb = "Game: " + activeGame.getName() + " " +
+          "Player: " + getUser().getName() + "\n" +
+          "Card shuffled back into deck from discards: " +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

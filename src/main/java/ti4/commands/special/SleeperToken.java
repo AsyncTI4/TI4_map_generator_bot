@@ -29,40 +29,39 @@ public class SleeperToken extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
-        sleeperForPlanet(event, game, Constants.PLANET, player);
-        sleeperForPlanet(event, game, Constants.PLANET2, player);
-        sleeperForPlanet(event, game, Constants.PLANET3, player);
-        sleeperForPlanet(event, game, Constants.PLANET4, player);
-        sleeperForPlanet(event, game, Constants.PLANET5, player);
-        sleeperForPlanet(event, game, Constants.PLANET6, player);
+        sleeperForPlanet(event, activeGame, Constants.PLANET, player);
+        sleeperForPlanet(event, activeGame, Constants.PLANET2, player);
+        sleeperForPlanet(event, activeGame, Constants.PLANET3, player);
+        sleeperForPlanet(event, activeGame, Constants.PLANET4, player);
+        sleeperForPlanet(event, activeGame, Constants.PLANET5, player);
+        sleeperForPlanet(event, activeGame, Constants.PLANET6, player);
     }
 
-    private void sleeperForPlanet(SlashCommandInteractionEvent event, Game game, String planet, Player player) {
+    private void sleeperForPlanet(SlashCommandInteractionEvent event, Game activeGame, String planet, Player player) {
         OptionMapping planetOption = event.getOption(planet);
-        if (planetOption == null) {
+        if (planetOption == null){
             return;
         }
         String planetName = planetOption.getAsString();
-        addOrRemoveSleeper(event, game, planetName, player);
+        addOrRemoveSleeper(event, activeGame, planetName, player);
     }
-
-    public void addOrRemoveSleeper(GenericInteractionCreateEvent event, Game game, String planetName, Player player) {
-        if (!game.getPlanets().contains(planetName)) {
+    public void addOrRemoveSleeper(GenericInteractionCreateEvent event, Game activeGame, String planetName, Player player) {
+        if (!activeGame.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : game.getTileMap().values()) {
+        for (Tile tile_ : activeGame.getTileMap().values()) {
             if (tile != null) {
                 break;
             }
@@ -84,12 +83,13 @@ public class SleeperToken extends SpecialSubcommandData {
         } else {
             tile.addToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
             String ident = player.getFactionEmoji();
-            if (game.getSleeperTokensPlacedCount() > 5) {
+            if (activeGame.getSleeperTokensPlacedCount() > 5) {
                 String message2 = ident + " has more than 5 sleepers out. Use buttons to remove a sleeper token";
-                List<Button> buttons = ButtonHelper.getButtonsForRemovingASleeper(player, game);
+                List<Button> buttons = ButtonHelper.getButtonsForRemovingASleeper(player, activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
             }
         }
     }
+
 
 }

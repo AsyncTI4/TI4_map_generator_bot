@@ -41,9 +41,9 @@ public class MapCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        if (game == null) return;
-        ShowGame.simpleShowGame(game, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        if (activeGame == null) return;
+        ShowGame.simpleShowGame(activeGame, event);
     }
 
     protected String getActionDescription() {

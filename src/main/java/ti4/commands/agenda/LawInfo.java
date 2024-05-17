@@ -12,14 +12,14 @@ public class LawInfo extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        var game = getActiveGame();
+        var activeGame = getActiveGame();
         var stringBuilder = new StringBuilder();
 
         stringBuilder.append("__**Laws Currently in Play:**__\n");
         int lawNumber = 1;
-        for (var law : game.getLaws().entrySet()) {
+        for (var law : activeGame.getLaws().entrySet()) {
             var agenda = Mapper.getAgenda(law.getKey());
-            var agendaText = game.getLawsInfo().get(law.getKey());
+            var agendaText = activeGame.getLawsInfo().get(law.getKey());
             stringBuilder.append(lawNumber)
                 .append(". ")
                 .append(agenda.getRepresentation(null));
@@ -45,6 +45,7 @@ public class LawInfo extends AgendaSubcommandData {
         }
         MessageHelper.sendMessageToChannel(
             event.getMessageChannel(),
-            stringBuilder.toString());
+            stringBuilder.toString()
+        );
     }
 }

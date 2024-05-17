@@ -11,7 +11,7 @@ import ti4.map.GameSaveLoadManager;
 
 public abstract class SpecialSubcommandData extends SubcommandData {
 
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -23,7 +23,7 @@ public abstract class SpecialSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -34,11 +34,11 @@ public abstract class SpecialSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        GameSaveLoadManager.saveMap(game, event);
-        MapGenerator.saveImageToWebsiteOnly(game, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
+        MapGenerator.saveImageToWebsiteOnly(activeGame, event);
     }
 }

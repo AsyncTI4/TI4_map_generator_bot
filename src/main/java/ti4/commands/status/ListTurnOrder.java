@@ -22,33 +22,33 @@ public class ListTurnOrder extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        turnOrder(event, game, false);
+        Game activeGame = getActiveGame();
+        turnOrder(event, activeGame, false);
     }
 
-    public static void turnOrder(GenericInteractionCreateEvent event, Game game) {
-        turnOrder(event, game, true);
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame) {
+        turnOrder(event, activeGame, true);
     }
 
-    public static void turnOrder(GenericInteractionCreateEvent event, Game game, boolean pingPeople) {
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame, boolean pingPeople) {
 
-        if (game.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
             return;
         }
 
         HashMap<Integer, String> order = new HashMap<>();
         int naaluSC = 0;
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
             int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }
             boolean passed = player.isPassed();
 
             Set<Integer> SCs = player.getSCs();
-            Map<Integer, Boolean> scPlayed = game.getScPlayed();
+            Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
             StringBuilder textBuilder = new StringBuilder();
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
@@ -57,7 +57,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 if (isPlayed) {
                     textBuilder.append("~~");
                 }
-                textBuilder.append(scEmoji).append(Helper.getSCAsMention(sc_, game));
+                textBuilder.append(scEmoji).append(Helper.getSCAsMention(sc_, activeGame));
                 if (isPlayed) {
                     textBuilder.append("~~");
                 }
@@ -66,17 +66,17 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~";
             }
-            if (pingPeople || game.isFoWMode()) {
+            if(pingPeople || activeGame.isFoWMode()){
                 text += player.getRepresentation();
-            } else {
-                text += ButtonHelper.getIdent(player) + " " + player.getUserName();
+            }else{
+                text += ButtonHelper.getIdent(player) + " "+player.getUserName();
             }
-
+            
             if (passed) {
                 text += "~~ - PASSED";
             }
 
-            if (player.getUserID().equals(game.getSpeaker())) {
+            if (player.getUserID().equals(activeGame.getSpeaker())) {
                 text += " " + Emojis.SpeakerToken;
             }
 
@@ -89,9 +89,9 @@ public class ListTurnOrder extends StatusSubcommandData {
             String text = order.get(naaluSC);
             msg.append("`").append(0).append(".`").append(text).append("\n");
         }
-        Integer max = Collections.max(game.getScTradeGoods().keySet());
-        if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            max = max + 1;
+        Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if(ButtonHelper.getKyroHeroSC(activeGame) != 1000){
+            max = max+1;
         }
         for (int i = 1; i <= max; i++) {
             if (naaluSC != 0 && i == naaluSC) {
@@ -103,9 +103,9 @@ public class ListTurnOrder extends StatusSubcommandData {
             }
         }
         msg.append("_ _"); // forced extra line
-
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg.toString());
-
+        
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg.toString());
+        
     }
 
     @Override

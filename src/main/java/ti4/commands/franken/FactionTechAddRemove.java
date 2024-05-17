@@ -42,11 +42,11 @@ public abstract class FactionTechAddRemove extends FrankenSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "No valid techs were provided. Please see `/search techs` for available choices.");
             return;
         }
-
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -54,9 +54,9 @@ public abstract class FactionTechAddRemove extends FrankenSubcommandData {
 
         doAction(player, techIDs);
 
-        TechInfo.sendTechInfo(game, player, event);
+        TechInfo.sendTechInfo(activeGame, player, event);
     }
 
     public abstract void doAction(Player player, List<String> leaderIDs);
-
+    
 }

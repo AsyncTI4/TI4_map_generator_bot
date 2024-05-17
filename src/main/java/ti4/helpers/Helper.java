@@ -85,9 +85,9 @@ import ti4.model.Source.ComponentSource;
 public class Helper {
 
     @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, GenericInteractionCreateEvent event,
+    public static Player getGamePlayer(Game activeGame, Player initialPlayer, GenericInteractionCreateEvent event,
         String userID) {
-        return getGamePlayer(game, initialPlayer, event.getMember(), userID);
+        return getGamePlayer(activeGame, initialPlayer, event.getMember(), userID);
     }
 
     public static int getCurrentHour() {
@@ -99,16 +99,16 @@ public class Helper {
     }
 
     @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, Member member, String userID) {
-        Collection<Player> players = game.getPlayers().values();
-        if (!game.isCommunityMode()) {
-            Player player = game.getPlayer(userID);
+    public static Player getGamePlayer(Game activeGame, Player initialPlayer, Member member, String userID) {
+        Collection<Player> players = activeGame.getPlayers().values();
+        if (!activeGame.isCommunityMode()) {
+            Player player = activeGame.getPlayer(userID);
             if (player != null)
                 return player;
             return initialPlayer;
         }
         if (member == null) {
-            Player player = game.getPlayer(userID);
+            Player player = activeGame.getPlayer(userID);
             if (player != null)
                 return player;
             return initialPlayer;
@@ -122,17 +122,17 @@ public class Helper {
                 return player;
             }
         }
-        return initialPlayer != null ? initialPlayer : game.getPlayer(userID);
+        return initialPlayer != null ? initialPlayer : activeGame.getPlayer(userID);
     }
 
     @Nullable
-    public static Player getPlayer(Game game, Player player, SlashCommandInteractionEvent event) {
+    public static Player getPlayer(Game activeGame, Player player, SlashCommandInteractionEvent event) {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (playerOption != null) {
             String playerID = playerOption.getAsUser().getId();
-            if (game.getPlayer(playerID) != null) {
-                player = game.getPlayers().get(playerID);
+            if (activeGame.getPlayer(playerID) != null) {
+                player = activeGame.getPlayers().get(playerID);
             } else {
                 player = null;
             }
@@ -140,7 +140,7 @@ public class Helper {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor())) {
                     player = player_;
@@ -151,19 +151,19 @@ public class Helper {
         return player;
     }
 
-    public static boolean isSaboAllowed(Game game, Player player) {
-        if ("pbd100".equalsIgnoreCase(game.getName())) {
+    public static boolean isSaboAllowed(Game activeGame, Player player) {
+        if ("pbd100".equalsIgnoreCase(activeGame.getName())) {
             return true;
         }
-        if (game.getDiscardActionCards().containsKey("sabo1")
-            && game.getDiscardActionCards().containsKey("sabo2")
-            && game.getDiscardActionCards().containsKey("sabo3")
-            && game.getDiscardActionCards().containsKey("sabo4")) {
+        if (activeGame.getDiscardActionCards().containsKey("sabo1")
+            && activeGame.getDiscardActionCards().containsKey("sabo2")
+            && activeGame.getDiscardActionCards().containsKey("sabo3")
+            && activeGame.getDiscardActionCards().containsKey("sabo4")) {
             return false;
         }
-        if (player.hasTech("tp") && game.getActivePlayerID() != null
-            && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-            for (Player p2 : game.getRealPlayers()) {
+        if (player.hasTech("tp") && activeGame.getActivePlayerID() != null
+            && activeGame.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+            for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
@@ -176,8 +176,8 @@ public class Helper {
         return true;
     }
 
-    public static boolean doesAnyoneOwnPlanet(Game game, String planet) {
-        for (Player player : game.getRealPlayers()) {
+    public static boolean doesAnyoneOwnPlanet(Game activeGame, String planet) {
+        for (Player player : activeGame.getRealPlayers()) {
             if (player.getPlanets().contains(planet)) {
                 return true;
             }
@@ -185,8 +185,8 @@ public class Helper {
         return false;
     }
 
-    public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
-        for (Player player : game.getRealPlayers()) {
+    public static boolean doesAllianceMemberOwnPlanet(Game activeGame, String planet, Player p1) {
+        for (Player player : activeGame.getRealPlayers()) {
             if (player.getPlanets().contains(planet) && p1.getAllianceMembers().contains(player.getFaction())) {
                 return true;
             }
@@ -194,10 +194,10 @@ public class Helper {
         return false;
     }
 
-    public static Player getPlayerFromAbility(Game game, String ability) {
+    public static Player getPlayerFromAbility(Game activeGame, String ability) {
         Player player = null;
         if (ability != null) {
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_.isRealPlayer() && player_.hasAbility(ability)) {
                     player = player_;
                     break;
@@ -239,18 +239,18 @@ public class Helper {
         }
     }
 
-    public static boolean canPlayerConceivablySabo(Player player, Game game) {
+    public static boolean canPlayerConceivablySabo(Player player, Game activeGame) {
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return true;
         }
         if (player.hasUnit("empyrean_mech")
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size() > 0) {
+            && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
             return true;
         }
         return player.getAc() > 0;
     }
 
-    public static boolean shouldPlayerLeaveAReact(Player player, Game game, String messageID) {
+    public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID) {
 
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return false;
@@ -258,17 +258,17 @@ public class Helper {
         if ((player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds")
             || player.getActionCards().containsKey("sabo2") ||
             player.getActionCards().containsKey("sabo3") || player.getActionCards().containsKey("sabo4")
-            || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+            || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180)
+            && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
+            && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
             return false;
         }
         if (player.hasUnit("empyrean_mech")
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size() > 0) {
+            && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
             return false;
         }
         if (player.getAc() == 0) {
-            return !ButtonListener.checkForASpecificPlayerReact(messageID, player, game);
+            return !ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame);
         }
         if (player.isAFK()) {
             return false;
@@ -276,7 +276,7 @@ public class Helper {
         if (player.getAutoSaboPassMedian() == 0) {
             return false;
         }
-        return !ButtonListener.checkForASpecificPlayerReact(messageID, player, game);
+        return !ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame);
         // int highNum = player.getAutoSaboPassMedian()*6*3/2;
         // int result = ThreadLocalRandom.current().nextInt(1,highNum+1);
         // if(result == highNum){
@@ -286,30 +286,30 @@ public class Helper {
         // }
     }
 
-    public static void giveMeBackMyAgendaButtons(Game game) {
+    public static void giveMeBackMyAgendaButtons(Game activeGame) {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
         proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
         proceedButtons.add(Button.primary("transaction", "Transaction"));
         proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
         proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg, proceedButtons);
     }
 
-    public static List<Player> getInitativeOrder(Game game) {
+    public static List<Player> getInitativeOrder(Game activeGame) {
         HashMap<Integer, Player> order = new HashMap<>();
         int naaluSC = 0;
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
             int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
+            String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }
             order.put(sc, player);
         }
         List<Player> initiativeOrder = new ArrayList<>();
-        Integer max = Collections.max(game.getScTradeGoods().keySet());
-        if (ButtonHelper.getKyroHeroSC(game) != 1000) {
+        Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
+        if (ButtonHelper.getKyroHeroSC(activeGame) != 1000) {
             max = max + 1;
         }
         if (naaluSC != 0) {
@@ -329,10 +329,10 @@ public class Helper {
 
     }
 
-    public static List<Player> getInitativeOrderFromThisPlayer(Player p1, Game game) {
+    public static List<Player> getInitativeOrderFromThisPlayer(Player p1, Game activeGame) {
         List<Player> players = new ArrayList<>();
 
-        List<Player> initiativeOrder = getInitativeOrder(game);
+        List<Player> initiativeOrder = getInitativeOrder(activeGame);
         boolean found = false;
         for (Player p2 : initiativeOrder) {
             if (p2 == p1) {
@@ -356,100 +356,100 @@ public class Helper {
         return players;
     }
 
-    public static void resolveQueue(Game game) {
+    public static void resolveQueue(Game activeGame) {
 
-        Player imperialHolder = getPlayerWithThisSC(game, 8);
+        Player imperialHolder = getPlayerWithThisSC(activeGame, 8);
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        if (game.getStoredValue(key2).length() < 2) {
+        if (activeGame.getStoredValue(key2).length() < 2) {
             return;
         }
 
-        for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
+        for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, activeGame)) {
             String message = player.getRepresentation(true, true) + " Drew Queued Secret Objective From Imperial. ";
-            if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                game.drawSecretObjective(player.getUserID());
+            if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                activeGame.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
-                    game.drawSecretObjective(player.getUserID());
+                    activeGame.drawSecretObjective(player.getUserID());
                     message = message + ". Drew a second SO due to plausible deniability";
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player);
-                game.setStoredValue(key2,
-                    game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), message);
-                if (!game.isFoWMode()) {
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
+                SOInfo.sendSecretObjectiveInfo(activeGame, player);
+                activeGame.setStoredValue(key2,
+                    activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if (!activeGame.isFoWMode()) {
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
                 }
             }
-            if (game.getStoredValue(key3).contains(player.getFaction() + "*")
-                && game.getStoredValue(key2).length() > 2) {
-                if (!game.isFoWMode()) {
+            if (activeGame.getStoredValue(key3).contains(player.getFaction() + "*")
+                && activeGame.getStoredValue(key2).length() > 2) {
+                if (!activeGame.isFoWMode()) {
                     message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), message);
-                if (!game.isFoWMode()) {
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                if (!activeGame.isFoWMode()) {
+                    ButtonHelper.sendMessageToRightStratThread(player, activeGame, message, "imperial");
                 }
                 break;
             }
         }
     }
 
-    public static void resolvePOScoringQueue(Game game, GenericInteractionCreateEvent event) {
+    public static void resolvePOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
         String key2 = "queueToScorePOs";
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).length() < 2
-            || game.getHighestScore() + 1 > game.getVp()) {
+        if (activeGame.getStoredValue(key2).length() < 2
+            || activeGame.getHighestScore() + 1 > activeGame.getVp()) {
             return;
         }
-        for (Player player : getInitativeOrder(game)) {
-            if (game.getHighestScore() + 1 > game.getVp()) {
+        for (Player player : getInitativeOrder(activeGame)) {
+            if (activeGame.getHighestScore() + 1 > activeGame.getVp()) {
                 return;
             }
-            if (game.getStoredValue(key2).contains(player.getFaction() + "*")
-                || game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
-                if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+            if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")
+                || activeGame.getStoredValue(key2b).contains(player.getFaction() + "*")) {
+                if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     int poIndex = Integer
-                        .parseInt(game.getStoredValue(player.getFaction() + "queuedPOScore"));
-                    ScorePublic.scorePO(event, game.getMainGameChannel(), game, player, poIndex);
-                    game.setStoredValue(key2,
-                        game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                    game.setStoredValue(key3,
-                        game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                        .parseInt(activeGame.getStoredValue(player.getFaction() + "queuedPOScore"));
+                    ScorePublic.scorePO(event, activeGame.getMainGameChannel(), activeGame, player, poIndex);
+                    activeGame.setStoredValue(key2,
+                        activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                    activeGame.setStoredValue(key3,
+                        activeGame.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                 }
-                if (game.getHighestScore() + 1 > game.getVp()) {
+                if (activeGame.getHighestScore() + 1 > activeGame.getVp()) {
                     return;
                 }
-                if (game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
+                if (activeGame.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                     int soIndex = Integer
-                        .parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
-                    ScoreSO.scoreSO(event, game, player, soIndex, game.getMainGameChannel());
-                    game.setStoredValue(key2b,
-                        game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
-                    game.setStoredValue(key3b,
-                        game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                        .parseInt(activeGame.getStoredValue(player.getFaction() + "queuedSOScore"));
+                    ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
+                    activeGame.setStoredValue(key2b,
+                        activeGame.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
+                    activeGame.setStoredValue(key3b,
+                        activeGame.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
                 }
             } else {
-                if (game.getStoredValue(key3).contains(player.getFaction() + "*")
-                    && game.getStoredValue(key2).length() > 2) {
+                if (activeGame.getStoredValue(key3).contains(player.getFaction() + "*")
+                    && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
-                    if (game.isFoWMode()) {
+                    if (activeGame.isFoWMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), message);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
-                if (game.getStoredValue(key3b).contains(player.getFaction() + "*")
-                    && game.getStoredValue(key2).length() > 2) {
+                if (activeGame.getStoredValue(key3b).contains(player.getFaction() + "*")
+                    && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), message);
-                    if (game.isFoWMode()) {
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    if (activeGame.isFoWMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
                     break;
@@ -458,39 +458,39 @@ public class Helper {
         }
     }
 
-    public static void resolveSOScoringQueue(Game game, GenericInteractionCreateEvent event) {
+    public static void resolveSOScoringQueue(Game activeGame, GenericInteractionCreateEvent event) {
         String key2 = "queueToScoreSOs";
         String key3 = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).length() < 2
-            || game.getHighestScore() + 1 > game.getVp()) {
+        if (activeGame.getStoredValue(key2).length() < 2
+            || activeGame.getHighestScore() + 1 > activeGame.getVp()) {
             return;
         }
-        for (Player player : getInitativeOrder(game)) {
-            if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+        for (Player player : getInitativeOrder(activeGame)) {
+            if (activeGame.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 int soIndex = Integer
-                    .parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
-                ScoreSO.scoreSO(event, game, player, soIndex, game.getMainGameChannel());
-                game.setStoredValue(key2,
-                    game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                game.setStoredValue(key3,
-                    game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                    .parseInt(activeGame.getStoredValue(player.getFaction() + "queuedSOScore"));
+                ScoreSO.scoreSO(event, activeGame, player, soIndex, activeGame.getMainGameChannel());
+                activeGame.setStoredValue(key2,
+                    activeGame.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                activeGame.setStoredValue(key3,
+                    activeGame.getStoredValue(key3).replace(player.getFaction() + "*", ""));
             } else {
-                if (game.getStoredValue(key3).contains(player.getFaction() + "*")
-                    && game.getStoredValue(key2).length() > 2) {
+                if (activeGame.getStoredValue(key3).contains(player.getFaction() + "*")
+                    && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
-                    if (game.isFoWMode()) {
+                    if (activeGame.isFoWMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), message);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
             }
         }
     }
 
-    public static Player getPlayerWithThisSC(Game game, int sc) {
-        for (Player p2 : game.getRealPlayers()) {
+    public static Player getPlayerWithThisSC(Game activeGame, int sc) {
+        for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getSCs().contains(sc)) {
                 return p2;
             }
@@ -498,10 +498,10 @@ public class Helper {
         return null;
     }
 
-    public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game game) {
+    public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game activeGame) {
         List<Player> players = new ArrayList<>();
         boolean found = false;
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
                 found = true;
                 players.add(player);
@@ -512,7 +512,7 @@ public class Helper {
             }
         }
 
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
                 found = false;
             } else {
@@ -537,15 +537,15 @@ public class Helper {
         return true;
     }
 
-    public static void startOfTurnSaboWindowReminders(Game game, Player player) {
-        List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
+    public static void startOfTurnSaboWindowReminders(Game activeGame, Player player) {
+        List<String> messageIDs = new ArrayList<>(activeGame.getMessageIDsForSabo());
         for (String messageID : messageIDs) {
-            if (!ButtonListener.checkForASpecificPlayerReact(messageID, player, game)) {
-                game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+            if (!ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)) {
+                activeGame.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                     Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                    if (game.isFoWMode()) {
+                    if (activeGame.isFoWMode()) {
                         int index = 0;
-                        for (Player player_ : game.getPlayers().values()) {
+                        for (Player player_ : activeGame.getPlayers().values()) {
                             if (player_ == player)
                                 break;
                             index++;
@@ -557,7 +557,7 @@ public class Helper {
                     if (reaction == null) {
                         Calendar rightNow = Calendar.getInstance();
                         if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
-                            game.removeMessageIDForSabo(messageID);
+                            activeGame.removeMessageIDForSabo(messageID);
                         }
                     }
                 });
@@ -565,39 +565,39 @@ public class Helper {
         }
     }
 
-    public static void checkAllSaboWindows(Game game) {
-        List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
-        for (Player player : game.getRealPlayers()) {
+    public static void checkAllSaboWindows(Game activeGame) {
+        List<String> messageIDs = new ArrayList<>(activeGame.getMessageIDsForSabo());
+        for (Player player : activeGame.getRealPlayers()) {
             if (player.getAutoSaboPassMedian() == 0) {
                 continue;
             }
             int highNum = player.getAutoSaboPassMedian() * 6 * 3 / 2;
             int result = ThreadLocalRandom.current().nextInt(1, highNum + 1);
             boolean shouldDoIt = result == highNum;
-            if (shouldDoIt || !canPlayerConceivablySabo(player, game)) {
+            if (shouldDoIt || !canPlayerConceivablySabo(player, activeGame)) {
                 for (String messageID : messageIDs) {
-                    if (shouldPlayerLeaveAReact(player, game, messageID)) {
-                        String message = game.isFoWMode() ? "No sabotage" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
+                    if (shouldPlayerLeaveAReact(player, activeGame, messageID)) {
+                        String message = activeGame.isFoWMode() ? "No sabotage" : null;
+                        ButtonHelper.addReaction(player, false, false, message, null, messageID, activeGame);
                     }
                 }
             }
-            if ("agendawaiting".equals(game.getCurrentPhase())) {
+            if ("agendawaiting".equals(activeGame.getCurrentPhase())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
                 int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
                 boolean shouldDoIt2 = result2 == highNum2;
                 if (shouldDoIt2) {
-                    String whensID = game.getLatestWhenMsg();
+                    String whensID = activeGame.getLatestWhenMsg();
                     if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                        && !ButtonListener.checkForASpecificPlayerReact(whensID, player, game)) {
-                        String message = game.isFoWMode() ? "No whens" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, whensID, game);
+                        && !ButtonListener.checkForASpecificPlayerReact(whensID, player, activeGame)) {
+                        String message = activeGame.isFoWMode() ? "No whens" : null;
+                        ButtonHelper.addReaction(player, false, false, message, null, whensID, activeGame);
                     }
-                    String aftersID = game.getLatestAfterMsg();
+                    String aftersID = activeGame.getLatestAfterMsg();
                     if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                        && !ButtonListener.checkForASpecificPlayerReact(aftersID, player, game)) {
-                        String message = game.isFoWMode() ? "No afters" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, aftersID, game);
+                        && !ButtonListener.checkForASpecificPlayerReact(aftersID, player, activeGame)) {
+                        String message = activeGame.isFoWMode() ? "No afters" : null;
+                        ButtonHelper.addReaction(player, false, false, message, null, aftersID, activeGame);
                     }
                 }
             }
@@ -605,10 +605,10 @@ public class Helper {
         }
     }
 
-    public static Player getPlayerFromUnlockedLeader(Game game, String leader) {
+    public static Player getPlayerFromUnlockedLeader(Game activeGame, String leader) {
         Player player = null;
         if (leader != null) {
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_.isRealPlayer() && player_.hasLeaderUnlocked(leader)) {
                     player = player_;
                     break;
@@ -618,10 +618,10 @@ public class Helper {
         return player;
     }
 
-    public static Player getPlayerFromUnit(Game game, String unit) {
+    public static Player getPlayerFromUnit(Game activeGame, String unit) {
         Player player = null;
         if (unit != null) {
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_.isRealPlayer() && player_.getUnitsOwned().contains(unit)) {
                     player = player_;
                     break;
@@ -632,18 +632,18 @@ public class Helper {
     }
 
     @Nullable
-    public static String getColor(Game game, SlashCommandInteractionEvent event) {
+    public static String getColor(Game activeGame, SlashCommandInteractionEvent event) {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (factionColorOption != null) {
-            String colorFromString = getColorFromString(game, factionColorOption.getAsString());
+            String colorFromString = getColorFromString(activeGame, factionColorOption.getAsString());
             if (Mapper.isValidColor(colorFromString)) {
                 return colorFromString;
             }
         } else {
             String userID = event.getUser().getId();
-            Player foundPlayer = game.getPlayers().values().stream()
+            Player foundPlayer = activeGame.getPlayers().values().stream()
                 .filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
-            foundPlayer = getGamePlayer(game, foundPlayer, event, null);
+            foundPlayer = getGamePlayer(activeGame, foundPlayer, event, null);
             if (foundPlayer != null) {
                 return foundPlayer.getColor();
             }
@@ -651,10 +651,10 @@ public class Helper {
         return null;
     }
 
-    public static String getColorFromString(Game game, String factionColor) {
+    public static String getColorFromString(Game activeGame, String factionColor) {
         factionColor = AliasHandler.resolveColor(factionColor);
         factionColor = AliasHandler.resolveFaction(factionColor);
-        for (Player player_ : game.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             if (Objects.equals(factionColor, player_.getFaction()) ||
                 Objects.equals(factionColor, player_.getColor())) {
                 return player_.getColor();
@@ -744,10 +744,10 @@ public class Helper {
         return "[@" + roleName + "]";
     }
 
-    public static String getSCAsMention(int sc, Game game) {
-        StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
-        if (game.isHomeBrewSCMode()) {
-            return getSCName(sc, game);
+    public static String getSCAsMention(int sc, Game activeGame) {
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
+        if (activeGame.isHomeBrewSCMode()) {
+            return getSCName(sc, activeGame);
         }
         return switch (sc) {
             case 1 -> Emojis.SC1Mention;
@@ -762,15 +762,15 @@ public class Helper {
         };
     }
 
-    public static String getSCRepresentation(Game game, int sc) {
-        if (game.isHomeBrewSCMode())
-            return "SC #" + sc + " " + getSCName(sc, game);
-        return getSCAsMention(sc, game);
+    public static String getSCRepresentation(Game activeGame, int sc) {
+        if (activeGame.isHomeBrewSCMode())
+            return "SC #" + sc + " " + getSCName(sc, activeGame);
+        return getSCAsMention(sc, activeGame);
     }
 
-    public static String getSCName(int sc, Game game) {
-        if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
-            return Mapper.getStrategyCardSets().get(game.getScSetID()).getCardValues().get(sc);
+    public static String getSCName(int sc, Game activeGame) {
+        if (Optional.ofNullable(activeGame.getScSetID()).isPresent() && !"null".equals(activeGame.getScSetID())) {
+            return Mapper.getStrategyCardSets().get(activeGame.getScSetID()).getCardValues().get(sc);
         }
         return "**SC" + sc + "**";
     }
@@ -789,19 +789,19 @@ public class Helper {
         };
     }
 
-    public static File getSCImageFile(Integer sc, Game game) {
-        String scSet = game.getScSetID();
-        if (Optional.ofNullable(game.getScSetID()).isEmpty()
-            || "null".equals(game.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
+    public static File getSCImageFile(Integer sc, Game activeGame) {
+        String scSet = activeGame.getScSetID();
+        if (Optional.ofNullable(activeGame.getScSetID()).isEmpty()
+            || "null".equals(activeGame.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean gameWithGroupedSCs = "pbd100".equals(game.getName()) || "pbd500".equals(game.getName()) && !"tribunal".equals(scSet);
+        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         if (gameWithGroupedSCs) {
             char scValue = String.valueOf(sc).charAt(0);
             scSet = scSet.replace("pbd100", "pok");
             scSet = scSet.replace("pbd1000", "pok");
         }
-        StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
+        StrategyCardModel scModel = activeGame.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         String scImagePath = scModel.getImageFilePath();
         if (scImagePath == null)
             scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",
@@ -810,14 +810,14 @@ public class Helper {
         return new File(scImagePath);
     }
 
-    public static Emoji getPlayerEmoji(Game game, Player player, Message message) {
+    public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {
         Emoji emojiToUse;
         emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
         String messageId = message.getId();
 
-        if (game.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             int index = 0;
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_ == player)
                     break;
                 index++;
@@ -848,11 +848,11 @@ public class Helper {
         return name.toString();
     }
 
-    public static String getPlanetRepresentation(String planet, Game game) {
+    public static String getPlanetRepresentation(String planet, Game activeGame) {
         planet = planet.toLowerCase().replace(" ", "");
         planet = planet.replace("'", "");
         planet = planet.replace("-", "");
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = unitHolder;
         if (planet2 == null) {
             return planet + " bot error. Tell fin";
@@ -862,8 +862,8 @@ public class Helper {
             + "/" + planet2.getInfluence() + ")";
     }
 
-    public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+    public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game activeGame) {
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -874,7 +874,7 @@ public class Helper {
                 && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planetID).getTechSpecialties().get(0).toString().toLowerCase();
             } else {
-                techType = ButtonHelper.getTechSkipAttachments(game, AliasHandler.resolvePlanet(planetID));
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, AliasHandler.resolvePlanet(planetID));
             }
             if (!"".equalsIgnoreCase(techType)) {
                 switch (techType) {
@@ -889,8 +889,8 @@ public class Helper {
         }
     }
 
-    public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+    public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Game activeGame) {
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -899,8 +899,8 @@ public class Helper {
         }
     }
 
-    public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+    public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Game activeGame) {
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
@@ -911,7 +911,7 @@ public class Helper {
                 && Mapper.getPlanet(planetID).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planetID).getTechSpecialties().get(0).toString().toLowerCase();
             } else {
-                techType = ButtonHelper.getTechSkipAttachments(game, planetID);
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, planetID);
             }
             if (!"".equalsIgnoreCase(techType)) {
                 switch (techType) {
@@ -927,20 +927,20 @@ public class Helper {
     }
 
     public static List<Button> getPlanetRefreshButtons(GenericInteractionCreateEvent event, Player player,
-        Game game) {
+        Game activeGame) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Button.success("refresh_" + planet, getPlanetRepresentation(planet, game));
+            Button button = Button.success("refresh_" + planet, getPlanetRepresentation(planet, activeGame));
             planetButtons.add(button);
         }
         return planetButtons;
     }
 
-    public static String getPlayerDependingOnFog(Game game, Player player) {
+    public static String getPlayerDependingOnFog(Game activeGame, Player player) {
         String ident;
 
-        if (game.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             ident = player.getColor();
         } else {
             ident = player.getFactionEmoji();
@@ -948,19 +948,19 @@ public class Helper {
         return ident;
     }
 
-    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Game game,
+    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Game activeGame,
         Player playerPicker) {
         List<Button> scButtons = new ArrayList<>();
 
-        for (Integer sc : game.getSCList()) {
+        for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0)
                 continue; // some older games have a 0 in the list of SCs
             boolean held = false;
-            for (Player player : game.getPlayers().values()) {
+            for (Player player : activeGame.getPlayers().values()) {
                 if (player == null || player.getFaction() == null) {
                     continue;
                 }
-                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFoWMode()) {
+                if (player.getSCs() != null && player.getSCs().contains(sc) && !activeGame.isFoWMode()) {
                     held = true;
                     break;
                 }
@@ -970,14 +970,14 @@ public class Helper {
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = " ";
-            if (game.getScTradeGoods().get(sc) > 0 && !game.isFoWMode()) {
-                label = "[has " + game.getScTradeGoods().get(sc) + " tg]";
+            if (activeGame.getScTradeGoods().get(sc) > 0 && !activeGame.isFoWMode()) {
+                label = "[has " + activeGame.getScTradeGoods().get(sc) + " tg]";
             }
-            if (sc == ButtonHelper.getKyroHeroSC(game)) {
+            if (sc == ButtonHelper.getKyroHeroSC(activeGame)) {
                 label = label + " Kyro Hero Cursed";
             }
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomeBrewSCMode()) {
+                && !activeGame.isHomeBrewSCMode()) {
 
                 button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label)
                     .withEmoji(scEmoji);
@@ -989,11 +989,11 @@ public class Helper {
         return scButtons;
     }
 
-    public static List<Button> getPlanetExhaustButtons(Player player, Game game) {
-        return getPlanetExhaustButtons(player, game, "both");
+    public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame) {
+        return getPlanetExhaustButtons(player, activeGame, "both");
     }
 
-    public static List<Button> getPlanetExhaustButtons(Player player, Game game, String whatIsItFor) {
+    public static List<Button> getPlanetExhaustButtons(Player player, Game activeGame, String whatIsItFor) {
         player.resetSpentThings();
         player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
@@ -1001,7 +1001,7 @@ public class Helper {
         for (String planet : planets) {
 
             if (planet.contains("custodia") || planet.contains("ghoti")) {
-                Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, game));
+                Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
                 continue;
             }
@@ -1010,15 +1010,15 @@ public class Helper {
                 && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
             } else {
-                techType = ButtonHelper.getTechSkipAttachments(game, planet);
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, planet);
             }
             if ("none".equalsIgnoreCase(techType)) {
                 Button button = Button.danger("spend_" + planet + "_" + whatIsItFor,
-                    getPlanetRepresentation(planet, game));
+                    getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
             } else {
                 Button techB = Button.danger("spend_" + planet + "_" + whatIsItFor,
-                    getPlanetRepresentation(planet, game));
+                    getPlanetRepresentation(planet, activeGame));
                 switch (techType) {
                     case "propulsion" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
                     case "warfare" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
@@ -1032,7 +1032,7 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
+    public static List<Button> getPlanetPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
@@ -1041,14 +1041,14 @@ public class Helper {
                 continue;
             }
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
-                getPlanetRepresentation(planet, game));
+                getPlanetRepresentation(planet, activeGame));
             button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
             planetButtons.add(button);
         }
         return planetButtons;
     }
 
-    public static List<Button> getHSPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
+    public static List<Button> getHSPlanetPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
@@ -1056,76 +1056,76 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
-            if (game.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(game, player)) {
+            if (activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)) {
                 continue;
             }
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
-                getPlanetRepresentation(planet, game));
+                getPlanetRepresentation(planet, activeGame));
             button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
             planetButtons.add(button);
         }
         return planetButtons;
     }
 
-    public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Game game, String unit,
+    public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Game activeGame, String unit,
         String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeGame);
         for (Tile tile : tiles) {
             Button button = Button.danger(
                 "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                tile.getRepresentationForButtons(game, player));
+                tile.getRepresentationForButtons(activeGame, player));
             planetButtons.add(button);
         }
         return planetButtons;
     }
 
-    public static List<Button> getTileWithTrapsPlaceUnitButtons(Player player, Game game, String unit,
+    public static List<Button> getTileWithTrapsPlaceUnitButtons(Player player, Game activeGame, String unit,
         String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(game);
+        List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(activeGame);
         for (Tile tile : tiles) {
-            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)) {
                 Button button = Button.danger(
                     "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player));
+                    tile.getRepresentationForButtons(activeGame, player));
                 planetButtons.add(button);
             }
         }
         return planetButtons;
     }
 
-    public static List<Button> getTileForCheiranHeroPlaceUnitButtons(Player player, Game game, String unit,
+    public static List<Button> getTileForCheiranHeroPlaceUnitButtons(Player player, Game activeGame, String unit,
         String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, game);
+        List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, activeGame);
         for (Tile tile : tiles) {
-            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+            if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)) {
                 Button button = Button.danger(
                     "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player));
+                    tile.getRepresentationForButtons(activeGame, player));
                 planetButtons.add(button);
             }
         }
         return planetButtons;
     }
 
-    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game game, String unit,
+    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game activeGame, String unit,
         String prefix, @Nullable ButtonInteractionEvent event) {
         List<Button> planetButtons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeGame);
         for (Tile tile : tiles) {
             if (AddCC.hasCC(event, player.getColor(), tile)) {
                 Button button = Button.danger(
                     "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player));
+                    tile.getRepresentationForButtons(activeGame, player));
                 planetButtons.add(button);
             }
         }
         return planetButtons;
     }
 
-    public static String buildSpentThingsMessageForVoting(Player player, Game game, boolean justVoteTotal) {
+    public static String buildSpentThingsMessageForVoting(Player player, Game activeGame, boolean justVoteTotal) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = ButtonHelper.getIdent(player) + " used the following: \n";
         int votes = 0;
@@ -1133,13 +1133,13 @@ public class Helper {
         for (String thing : spentThings) {
             int count = 0;
             if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());
+                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + activeGame.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
             String flavor = thing.split("_")[0];
             if (flavor.contains("planet")) {
-                count = AgendaHelper.getSpecificPlanetsVoteWorth(player, game, secondHalf);
+                count = AgendaHelper.getSpecificPlanetsVoteWorth(player, activeGame, secondHalf);
             } else {
                 count = Integer.parseInt(thing.split("_")[1]);
             }
@@ -1158,7 +1158,7 @@ public class Helper {
                         + player.getSpentInfantryThisWindow() + " votes " + "\n";
                 }
                 case "planet" -> {
-                    msg = msg + getPlanetRepresentation(secondHalf, game) + " for " + count + " votes " + "\n";
+                    msg = msg + getPlanetRepresentation(secondHalf, activeGame) + " for " + count + " votes " + "\n";
                 }
                 case "absolShard" -> {
                     msg = msg + "Used Absol Shard of the Throne for " + count + " votes " + "\n";
@@ -1197,7 +1197,7 @@ public class Helper {
             }
         }
         msg = msg + "For a total of **" + votes + "** votes on the outcome "
-            + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+            + StringUtils.capitalize(activeGame.getLatestOutcomeVotedFor());
         if (justVoteTotal) {
             return "" + votes;
         }
@@ -1205,13 +1205,13 @@ public class Helper {
         return msg;
     }
 
-    public static void refreshPlanetsOnTheRevote(Player player, Game game) {
+    public static void refreshPlanetsOnTheRevote(Player player, Game activeGame) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         int tg = player.getSpentTgsThisWindow();
         player.setTg(player.getTg() + tg);
         for (String thing : spentThings) {
             if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());
+                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + activeGame.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -1233,7 +1233,7 @@ public class Helper {
         return false;
     }
 
-    public static void refreshPlanetsOnTheRespend(Player player, Game game) {
+    public static void refreshPlanetsOnTheRespend(Player player, Game activeGame) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         int tg = player.getSpentTgsThisWindow();
         player.setTg(player.getTg() + tg);
@@ -1249,7 +1249,7 @@ public class Helper {
 
     }
 
-    public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
+    public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = ButtonHelper.getIdent(player) + " exhausted the following: \n";
         int res = 0;
@@ -1268,7 +1268,7 @@ public class Helper {
                 && !thing.contains("absol_sarween")
                 && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida")
                 && !thing.contains("commander") && !thing.contains("Agent")) {
-                Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
+                Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
                     if (thing.contains("reduced comms")) {
@@ -1279,7 +1279,7 @@ public class Helper {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = unitHolder;
-                    Tile t = game.getTileFromPlanet(planet.getName());
+                    Tile t = activeGame.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem()) {
                         if (planet.getResources() > bestRes) {
                             bestRes = planet.getResources();
@@ -1287,35 +1287,35 @@ public class Helper {
                     }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) + "\n";
                             res = res + planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResources(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResources(thing, activeGame) + "\n";
                             res = res + planet.getResources();
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) + "\n";
                             inf = inf + planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusInfluence(thing, activeGame) + "\n";
                             inf = inf + planet.getInfluence();
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) + "\n";
                             res = res + planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) + "\n";
                             res = res + Math.max(planet.getInfluence(), planet.getResources());
                         }
                     } else {
                         if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) + "\n";
                             inf = inf + planet.getSumResourcesInfluence();
                             res = res + planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) + "\n";
                             inf = inf + planet.getInfluence();
                             res = res + planet.getResources();
                         }
@@ -1327,7 +1327,7 @@ public class Helper {
                     res = res + 1;
                 }
                 if (thing.contains("absol_sarween")) {
-                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 5;
+                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, activeGame, true) / 5;
                     msg = msg + "> Used Sarween Tools " + Emojis.CyberneticTech + " for " + sarweenVal + " resources\n";
                     res = res + sarweenVal;
                 }
@@ -1373,7 +1373,7 @@ public class Helper {
         res = res + tg + keleresAgent;
         inf = inf + tg + keleresAgent;
         if (tg > 0) {
-            msg = msg + "> Spent " + tg + " tgs " + Emojis.getTGorNomadCoinEmoji(game) + " ("
+            msg = msg + "> Spent " + tg + " tgs " + Emojis.getTGorNomadCoinEmoji(activeGame) + " ("
                 + (player.getTg() + tg) + "->" + player.getTg() + ") \n";
             if (player.hasTech("mc")) {
                 res = res + tg + keleresAgent;
@@ -1394,7 +1394,7 @@ public class Helper {
         return msg;
     }
 
-    public static String buildProducedUnitsMessage(Player player, Game game) {
+    public static String buildProducedUnitsMessage(Player player, Game activeGame) {
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         String msg = "";
         List<String> uniquePlaces = new ArrayList<>();
@@ -1408,12 +1408,12 @@ public class Helper {
         for (String uniquePlace : uniquePlaces) {
             String tilePos2 = uniquePlace.split("_")[0];
             String planetOrSpace2 = uniquePlace.split("_")[1];
-            Tile tile = game.getTileByPosition(tilePos2);
-            String localPlace = "__**In " + tile.getRepresentationForButtons(game, player) + " ";
+            Tile tile = activeGame.getTileByPosition(tilePos2);
+            String localPlace = "__**In " + tile.getRepresentationForButtons(activeGame, player) + " ";
             if ("space".equalsIgnoreCase(planetOrSpace2)) {
                 localPlace = localPlace + " in the space area:**__ \n";
             } else {
-                localPlace = localPlace + " on the planet " + getPlanetRepresentation(planetOrSpace2, game)
+                localPlace = localPlace + " on the planet " + getPlanetRepresentation(planetOrSpace2, activeGame)
                     + ":**__ \n";
             }
             for (String unit : producedUnits.keySet()) {
@@ -1429,15 +1429,15 @@ public class Helper {
             }
             msg = msg + localPlace;
         }
-        msg = msg + "For the total cost of: **" + calculateCostOfProducedUnits(player, game, true)
+        msg = msg + "For the total cost of: **" + calculateCostOfProducedUnits(player, activeGame, true)
             + " Resources**";
-        if (calculateCostOfProducedUnits(player, game, false) > 2) {
-            msg = msg + " (total units produced: " + calculateCostOfProducedUnits(player, game, false) + ").";
+        if (calculateCostOfProducedUnits(player, activeGame, false) > 2) {
+            msg = msg + " (total units produced: " + calculateCostOfProducedUnits(player, activeGame, false) + ").";
         }
         return msg;
     }
 
-    public static void resetProducedUnits(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static void resetProducedUnits(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
 
         for (String unit : producedUnits.keySet()) {
@@ -1448,18 +1448,18 @@ public class Helper {
             } else {
                 planetOrSpace = " " + planetOrSpace;
             }
-            Tile tile = game.getTileByPosition(tilePos);
+            Tile tile = activeGame.getTileByPosition(tilePos);
             String un = unit.split("_")[0];
             // UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un),
             // player.getColor());
             new ti4.commands.units.RemoveUnits().unitParsing(event, player.getColor(), tile,
-                producedUnits.get(unit) + " " + AliasHandler.resolveUnit(un) + planetOrSpace, game);
+                producedUnits.get(unit) + " " + AliasHandler.resolveUnit(un) + planetOrSpace, activeGame);
         }
 
         player.resetProducedUnits();
     }
 
-    public static int getProductionValueOfUnitHolder(Player player, Game game, Tile tile, UnitHolder uH) {
+    public static int getProductionValueOfUnitHolder(Player player, Game activeGame, Tile tile, UnitHolder uH) {
         int productionValueTotal = 0;
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
@@ -1489,7 +1489,7 @@ public class Helper {
                             productionValue = planet.getResources() + productionValue;
                         }
                     }
-                    if (ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
+                    if (ButtonHelper.isPlayerElected(activeGame, player, "absol_minsindus")) {
                         productionValue = productionValue + 4;
                     }
                 }
@@ -1556,12 +1556,12 @@ public class Helper {
 
     }
 
-    public static int getProductionValue(Player player, Game game, Tile tile, boolean warfare) {
+    public static int getProductionValue(Player player, Game activeGame, Tile tile, boolean warfare) {
         int productionValueTotal = 0;
         if (!warfare) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal = productionValueTotal
-                    + getProductionValueOfUnitHolder(player, game, tile, uH);
+                    + getProductionValueOfUnitHolder(player, activeGame, tile, uH);
             }
             if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 productionValueTotal = productionValueTotal + 5;
@@ -1605,9 +1605,9 @@ public class Helper {
             }
             productionValueTotal = highestProd;
         }
-        if (productionValueTotal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")) {
+        if (productionValueTotal > 0 && activeGame.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")) {
             productionValueTotal = productionValueTotal
-                + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
+                + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd");
         }
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
             productionValueTotal = productionValueTotal - 2;
@@ -1615,14 +1615,14 @@ public class Helper {
         return productionValueTotal;
     }
 
-    public static int calculateCostOfProducedUnits(Player player, Game game, boolean wantCost) {
+    public static int calculateCostOfProducedUnits(Player player, Game activeGame, boolean wantCost) {
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         int cost = 0;
         int numInf = 0;
         int numFF = 0;
         int totalUnits = 0;
-        boolean regulated = game.getLaws().containsKey("conscription")
-            || game.getLaws().containsKey("absol_conscription");
+        boolean regulated = activeGame.getLaws().containsKey("conscription")
+            || activeGame.getLaws().containsKey("absol_conscription");
         for (String unit : producedUnits.keySet()) {
             String unit2 = unit.split("_")[0];
             if (unit.contains("gf")) {
@@ -1633,7 +1633,7 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
                 if ("flagship".equalsIgnoreCase(removedUnit.getBaseType())
-                    && game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
+                    && activeGame.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
                     cost = cost; // nomad alliance
                 } else {
                     cost = cost + (int) removedUnit.getCost() * producedUnits.get(unit);
@@ -1660,14 +1660,14 @@ public class Helper {
 
     }
 
-    public static List<Button> getPlaceUnitButtonsForSaarCommander(Player player, Tile origTile, Game game,
+    public static List<Button> getPlaceUnitButtonsForSaarCommander(Player player, Tile origTile, Game activeGame,
         String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
-            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock)) {
                 if (tile.getPosition().equalsIgnoreCase(origTile.getPosition())
-                    || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                    || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, activeGame)) {
                     continue;
                 }
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
@@ -1678,7 +1678,7 @@ public class Helper {
                             String pp = planet.getName();
                             Button inf1Button = Button.success(
                                 "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
-                                "Produce 1 Infantry on " + getPlanetRepresentation(pp, game));
+                                "Produce 1 Infantry on " + getPlanetRepresentation(pp, activeGame));
                             inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
                             unitButtons.add(inf1Button);
                         } else {
@@ -1702,7 +1702,7 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game game,
+    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game activeGame,
         Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
@@ -1710,20 +1710,20 @@ public class Helper {
         String planetInteg = "";
         if (warfareNOtherstuff.contains("integrated")) {
             planetInteg = warfareNOtherstuff.replace("integrated", "");
-            UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planetInteg, game);
+            UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planetInteg, activeGame);
             if (plan != null && plan instanceof Planet planetUh) {
                 resourcelimit = planetUh.getResources();
             }
         }
-        boolean regulated = game.getLaws().containsKey("conscription")
-            || game.getLaws().containsKey("absol_conscription");
+        boolean regulated = activeGame.getLaws().containsKey("conscription")
+            || activeGame.getLaws().containsKey("absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
             if (player.hasWarsunTech() && resourcelimit > 9) {
                 Button wsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
                     "Produce Warsun");
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "warsun") > 1) {
                     wsButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
                         "Produce Warsun");
                 }
@@ -1738,7 +1738,7 @@ public class Helper {
             }
             Button fsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                 "Produce Flagship");
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "flagship") > 0) {
                 fsButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                     "Produce Flagship");
             }
@@ -1749,7 +1749,7 @@ public class Helper {
         }
         Button dnButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
             "Produce Dreadnought");
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
+        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "dreadnought") > 4) {
             dnButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
                 "Produce Dreadnought");
         }
@@ -1759,7 +1759,7 @@ public class Helper {
         }
         Button cvButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
             "Produce Carrier");
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
+        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "carrier") > 3) {
             cvButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
                 "Produce Carrier");
         }
@@ -1769,7 +1769,7 @@ public class Helper {
         }
         Button caButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
             "Produce Cruiser");
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
+        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 7) {
             caButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
                 "Produce Cruiser");
         }
@@ -1779,7 +1779,7 @@ public class Helper {
         }
         Button ddButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
             "Produce Destroyer");
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
+        if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer") > 7) {
             ddButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
                 "Produce Destroyer");
         }
@@ -1792,7 +1792,7 @@ public class Helper {
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
             && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
-            && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).size() == 0) {
+            && getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix).size() == 0) {
             Button ff2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp,
                 "Produce 2 Fighters");
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
@@ -1836,7 +1836,7 @@ public class Helper {
                         continue;
                     }
                 }
-                if ("tacticalAction".equalsIgnoreCase(warfareNOtherstuff) && getProductionValueOfUnitHolder(player, game, tile, unitHolder) == 0 && getProductionValueOfUnitHolder(player, game, tile, tile.getUnitHolders().get("space")) == 0) {
+                if ("tacticalAction".equalsIgnoreCase(warfareNOtherstuff) && getProductionValueOfUnitHolder(player, activeGame, tile, unitHolder) == 0 && getProductionValueOfUnitHolder(player, activeGame, tile, tile.getUnitHolders().get("space")) == 0) {
                     continue;
                 }
                 if (warfareNOtherstuff.contains("integrated") && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
@@ -1846,41 +1846,41 @@ public class Helper {
                 String pp = planet.getName();
                 if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button sdButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_sd_" + pp,
-                        "Place 1 Space Dock on " + getPlanetRepresentation(pp, game));
+                        "Place 1 Space Dock on " + getPlanetRepresentation(pp, activeGame));
                     sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
                     unitButtons.add(sdButton);
                     Button pdsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_pds_" + pp,
-                        "Place 1 PDS on " + getPlanetRepresentation(pp, game));
+                        "Place 1 PDS on " + getPlanetRepresentation(pp, activeGame));
                     pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
                     unitButtons.add(pdsButton);
                 }
                 Button inf1Button = Button.success(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
-                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, game));
+                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, activeGame));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
                 if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff)
                     && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                     && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4
                     && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
-                    && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).size() == 0) {
+                    && getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix).size() == 0) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp,
-                        "Produce 2 Infantry on " + getPlanetRepresentation(pp, game));
+                        "Produce 2 Infantry on " + getPlanetRepresentation(pp, activeGame));
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
                 }
                 Button mfButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
-                    "Produce Mech on " + getPlanetRepresentation(pp, game));
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                    "Produce Mech on " + getPlanetRepresentation(pp, activeGame));
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 3) {
                     mfButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
-                        "Produce Mech on " + getPlanetRepresentation(pp, game));
+                        "Produce Mech on " + getPlanetRepresentation(pp, activeGame));
                 }
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 if (resourcelimit > 1) {
                     unitButtons.add(mfButton);
                 }
 
-            } else if (ButtonHelper.canIBuildGFInSpace(game, player, tile, warfareNOtherstuff)
+            } else if (ButtonHelper.canIBuildGFInSpace(activeGame, player, tile, warfareNOtherstuff)
                 && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 Button inf1Button = Button.success(
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(),
@@ -1891,7 +1891,7 @@ public class Helper {
                     && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                     && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4
                     && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
-                    && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).size() == 0) {
+                    && getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix).size() == 0) {
                     Button inf2Button = Button.success(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(),
                         "Produce 2 Infantry in space");
@@ -1906,7 +1906,7 @@ public class Helper {
             }
         }
         if (!"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
-            unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
+            unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, activeGame, placePrefix));
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
             Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(),
@@ -1919,7 +1919,7 @@ public class Helper {
                 List<Button> unitButtons2 = new ArrayList<>();
                 unitButtons2.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     player.getRepresentation(true, true) + " you can use this to Yin Spin", unitButtons2);
             } else {
                 unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
@@ -1931,20 +1931,20 @@ public class Helper {
     }
 
     public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player,
-        Game game, boolean ac, Player mahact) {
+        Game activeGame, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         if (mahact == null) {
             for (String planet : planets) {
-                if (!getPlanetRepresentation(planet, game).toLowerCase().contains("mecatol") || ac) {
+                if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
                     Button button = Button.secondary(finsFactionCheckerPrefix + "diplo_" + planet + "_" + "diploP",
-                        getPlanetRepresentation(planet, game) + " System");
+                        getPlanetRepresentation(planet, activeGame) + " System");
                     planetButtons.add(button);
                 }
             }
         } else {
-            for (Tile tile : game.getTileMap().values()) {
+            for (Tile tile : activeGame.getTileMap().values()) {
                 if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem()) {
                     Button button = Button.secondary(finsFactionCheckerPrefix + "diplo_" + tile.getPosition() + "_"
                         + "mahact" + mahact.getColor(), tile.getRepresentation() + " System");
@@ -1957,8 +1957,8 @@ public class Helper {
         return planetButtons;
     }
 
-    public static int getPlanetResources(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+    public static int getPlanetResources(String planetID, Game activeGame) {
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
         } else {
@@ -1967,8 +1967,8 @@ public class Helper {
         }
     }
 
-    public static int getPlanetInfluence(String planetID, Game game) {
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+    public static int getPlanetInfluence(String planetID, Game activeGame) {
+        Planet unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
         } else {
@@ -2035,17 +2035,17 @@ public class Helper {
         return getLeaderRepresentation(leader, true, true, true);
     }
 
-    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
-        int ccCount = getCCCount(game, color);
-        informUserCCOverLimit(event, game, color, ccCount);
+    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game activeGame, String color) {
+        int ccCount = getCCCount(activeGame, color);
+        informUserCCOverLimit(event, activeGame, color, ccCount);
     }
 
-    public static int getCCCount(Game game, String color) {
+    public static int getCCCount(Game activeGame, String color) {
         int ccCount = 0;
         if (color == null) {
             return 0;
         }
-        Map<String, Tile> tileMap = game.getTileMap();
+        Map<String, Tile> tileMap = activeGame.getTileMap();
         for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
             Tile tile = tileEntry.getValue();
             boolean hasCC = AddCC.hasCC(null, color, tile);
@@ -2055,11 +2055,11 @@ public class Helper {
         }
         String factionColor = AliasHandler.resolveColor(color.toLowerCase());
         factionColor = AliasHandler.resolveFaction(factionColor);
-        Player player = game.getPlayerFromColorOrFaction(factionColor);
+        Player player = activeGame.getPlayerFromColorOrFaction(factionColor);
         if (player == null) {
             return 0;
         }
-        for (Player player_ : game.getRealPlayers()) {
+        for (Player player_ : activeGame.getRealPlayers()) {
             if (player == player_) {
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
@@ -2075,22 +2075,22 @@ public class Helper {
         return ccCount;
     }
 
-    private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game game, String color,
+    private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game activeGame, String color,
         int ccCount) {
         boolean ccCountIsOver = ccCount > 16;
-        if (ccCountIsOver && game.getCCNPlasticLimit()) {
+        if (ccCountIsOver && activeGame.getCCNPlasticLimit()) {
             Player player = null;
             String factionColor = AliasHandler.resolveColor(color.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor())) {
                     player = player_;
                 }
             }
 
-            String msg = game.getPing() + " ";
-            if (!game.isFoWMode()) {
+            String msg = activeGame.getPing() + " ";
+            if (!activeGame.isFoWMode()) {
                 if (player != null) {
                     msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
                     msg += player.getPing() + " ";
@@ -2098,19 +2098,19 @@ public class Helper {
             }
 
             msg += "(" + color + ") is over the CC limit of 16. CC used: " + ccCount;
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         }
     }
 
     /**
-     * @param game : ti4.map.Map object
+     * @param activeGame : ti4.map.Map object
      * @return String : TTS/TTPG Map String
      */
-    public static String getMapString(Game game) {
+    public static String getMapString(Game activeGame) {
         List<String> tilePositions = new ArrayList<>();
         tilePositions.add("000");
 
-        int ringCountMax = game.getRingCount();
+        int ringCountMax = activeGame.getRingCount();
         int ringCount = 1;
         int tileCount = 1;
         while (ringCount <= ringCountMax) {
@@ -2125,7 +2125,7 @@ public class Helper {
 
         List<String> sortedTilePositions = tilePositions.stream().sorted(Comparator.comparingInt(Integer::parseInt))
             .toList();
-        Map<String, Tile> tileMap = new HashMap<>(game.getTileMap());
+        Map<String, Tile> tileMap = new HashMap<>(activeGame.getTileMap());
         StringBuilder sb = new StringBuilder();
         for (String position : sortedTilePositions) {
             boolean missingTile = true;
@@ -2156,13 +2156,13 @@ public class Helper {
         return sb.toString().trim();
     }
 
-    public static Integer getPlayerResourcesAvailable(Player player, Game game) {
+    public static Integer getPlayerResourcesAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2177,13 +2177,13 @@ public class Helper {
         return resourcesCount;
     }
 
-    public static Integer getPlayerResourcesTotal(Player player, Game game) {
+    public static Integer getPlayerResourcesTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int resourcesCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2197,13 +2197,13 @@ public class Helper {
         return resourcesCount;
     }
 
-    public static Integer getPlayerOptimalResourcesAvailable(Player player, Game game) {
+    public static Integer getPlayerOptimalResourcesAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2213,13 +2213,13 @@ public class Helper {
             .map(planet -> planet).mapToInt(Planet::getOptimalResources).sum();
     }
 
-    public static Integer getPlayerOptimalResourcesTotal(Player player, Game game) {
+    public static Integer getPlayerOptimalResourcesTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2229,13 +2229,13 @@ public class Helper {
             .map(planet -> planet).mapToInt(Planet::getOptimalResources).sum();
     }
 
-    public static Integer getPlayerInfluenceAvailable(Player player, Game game) {
+    public static Integer getPlayerInfluenceAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2250,13 +2250,13 @@ public class Helper {
         return influenceCount;
     }
 
-    public static Integer getPlayerInfluenceTotal(Player player, Game game) {
+    public static Integer getPlayerInfluenceTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         int influenceCount = 0;
         if (player.hasLeaderUnlocked("xxchahero")) {
             int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -2271,13 +2271,13 @@ public class Helper {
         return influenceCount;
     }
 
-    public static Integer getPlayerOptimalInfluenceAvailable(Player player, Game game) {
+    public static Integer getPlayerOptimalInfluenceAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2287,13 +2287,13 @@ public class Helper {
             .map(planet -> planet).mapToInt(Planet::getOptimalInfluence).sum();
     }
 
-    public static Integer getPlayerOptimalInfluenceTotal(Player player, Game game) {
+    public static Integer getPlayerOptimalInfluenceTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2303,13 +2303,13 @@ public class Helper {
             .map(planet -> planet).mapToInt(Planet::getOptimalInfluence).sum();
     }
 
-    public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game game) {
+    public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2319,13 +2319,13 @@ public class Helper {
             .map(planet -> planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
     }
 
-    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game game) {
+    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+        Map<String, Planet> planetsInfo = activeGame.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
             return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
                 .mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -2335,16 +2335,16 @@ public class Helper {
             .map(planet -> planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
     }
 
-    public static String getPlayerResourceInfluenceRepresentation(Player player, Game game) {
+    public static String getPlayerResourceInfluenceRepresentation(Player player, Game activeGame) {
         return player.getRepresentation() + ":\n" +
-            "Resources: " + getPlayerResourcesAvailable(player, game) + "/"
-            + getPlayerResourcesTotal(player, game) + "  Optimal: "
-            + getPlayerOptimalResourcesAvailable(player, game)
-            + "/" + getPlayerOptimalResourcesTotal(player, game) + "\n" +
-            "Influence: " + getPlayerInfluenceAvailable(player, game) + "/"
-            + getPlayerInfluenceTotal(player, game) + "  Optimal: "
-            + getPlayerOptimalInfluenceAvailable(player, game)
-            + "/" + getPlayerOptimalInfluenceTotal(player, game) + "\n";
+            "Resources: " + getPlayerResourcesAvailable(player, activeGame) + "/"
+            + getPlayerResourcesTotal(player, activeGame) + "  Optimal: "
+            + getPlayerOptimalResourcesAvailable(player, activeGame)
+            + "/" + getPlayerOptimalResourcesTotal(player, activeGame) + "\n" +
+            "Influence: " + getPlayerInfluenceAvailable(player, activeGame) + "/"
+            + getPlayerInfluenceTotal(player, activeGame) + "  Optimal: "
+            + getPlayerOptimalInfluenceAvailable(player, activeGame)
+            + "/" + getPlayerOptimalInfluenceTotal(player, activeGame) + "\n";
     }
 
     public static Map<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
@@ -2419,9 +2419,9 @@ public class Helper {
         return true;
     }
 
-    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
-        if (!game.isFoWMode() && !game.isCommunityMode()) {
-            String gameName = game.getName();
+    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game activeGame) {
+        if (!activeGame.isFoWMode() && !activeGame.isCommunityMode()) {
+            String gameName = activeGame.getName();
             List<Role> roles = guild.getRolesByName(gameName, true);
             Role role = null;
             if (!roles.isEmpty()) {
@@ -2434,27 +2434,27 @@ public class Helper {
             }
 
             if (role == null) { // make sure players have access to the game channels
-                addMapPlayerPermissionsToGameChannels(guild, game);
+                addMapPlayerPermissionsToGameChannels(guild, activeGame);
             } else { // make sure players have the role
-                addGameRoleToMapPlayers(guild, game, role);
+                addGameRoleToMapPlayers(guild, activeGame, role);
             }
         }
     }
 
-    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
-        TextChannel tableTalkChannel = game.getTableTalkChannel();
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game activeGame) {
+        TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         if (tableTalkChannel != null) {
-            addPlayerPermissionsToGameChannel(guild, game, tableTalkChannel);
+            addPlayerPermissionsToGameChannel(guild, activeGame, tableTalkChannel);
         }
-        TextChannel actionsChannel = game.getMainGameChannel();
+        TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (actionsChannel != null) {
-            addPlayerPermissionsToGameChannel(guild, game, actionsChannel);
+            addPlayerPermissionsToGameChannel(guild, activeGame, actionsChannel);
         }
-        String gameName = game.getName();
+        String gameName = activeGame.getName();
         List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
             .toList();
         for (GuildChannel channel : channels) {
-            addPlayerPermissionsToGameChannel(guild, game, channel);
+            addPlayerPermissionsToGameChannel(guild, activeGame, channel);
         }
     }
 
@@ -2463,17 +2463,17 @@ public class Helper {
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            if (!game.isHasEnded()) {
-                TextChannel tableTalkChannel = game.getTableTalkChannel();
-                if (tableTalkChannel != null && game.getGuild() == guild) {
+        for (Game activeGame : mapList.values()) {
+            if (!activeGame.isHasEnded()) {
+                TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
+                if (tableTalkChannel != null && activeGame.getGuild() == guild) {
                     addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
                 }
-                TextChannel actionsChannel = game.getMainGameChannel();
-                if (actionsChannel != null && game.getGuild() == guild) {
+                TextChannel actionsChannel = activeGame.getMainGameChannel();
+                if (actionsChannel != null && activeGame.getGuild() == guild) {
                     addRolePermissionsToGameChannel(guild, actionsChannel, role);
                 }
-                String gameName = game.getName();
+                String gameName = activeGame.getName();
                 List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
                     .toList();
                 for (GuildChannel channel : channels) {
@@ -2483,11 +2483,11 @@ public class Helper {
         }
     }
 
-    private static void addPlayerPermissionsToGameChannel(Guild guild, Game game, GuildChannel channel) {
+    private static void addPlayerPermissionsToGameChannel(Guild guild, Game activeGame, GuildChannel channel) {
         TextChannel textChannel = guild.getTextChannelById(channel.getId());
         if (textChannel != null) {
             TextChannelManager textChannelManager = textChannel.getManager();
-            for (String playerID : game.getPlayerIDs()) {
+            for (String playerID : activeGame.getPlayerIDs()) {
                 Member member = guild.getMemberById(playerID);
                 if (member == null)
                     continue;
@@ -2512,9 +2512,9 @@ public class Helper {
         }
     }
 
-    private static void addGameRoleToMapPlayers(Guild guild, Game game, Role role) {
-        for (String playerID : game.getPlayerIDs()) {
-            if (game.getRound() > 1 && game.getPlayer(playerID).getFaction() == null) {
+    private static void addGameRoleToMapPlayers(Guild guild, Game activeGame, Role role) {
+        for (String playerID : activeGame.getPlayerIDs()) {
+            if (activeGame.getRound() > 1 && activeGame.getPlayer(playerID).getFaction() == null) {
                 continue;
             }
             Member member = guild.getMemberById(playerID);
@@ -2625,11 +2625,11 @@ public class Helper {
         return techButtons;
     }
 
-    public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player) {
+    public static List<TechnologyModel> getAllTechOfAType(Game activeGame, String techType, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
         Mapper.getTechs().values().stream()
-            .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
-            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
+            .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
+            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || activeGame.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
             .filter(tech -> !player.hasTech(tech.getAlias()))
             .filter(tech -> tech.getFaction().isEmpty() || "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
             .forEach(techs::add);
@@ -2707,16 +2707,16 @@ public class Helper {
         return agendaDetails.getRepresentation(uniqueID);
     }
 
-    public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Game activeGame, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
         if (playerLeader != null && playerLeader.isLocked()) {
             int scoredSOCount = player.getSecretsScored().size();
             int scoredPOCount = 0;
-            Map<String, List<String>> playerScoredPublics = game.getScoredPublicObjectives();
+            Map<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
                 if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey())
                     || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())
-                    || game.getSoToPoList().contains(scoredPublic.getKey())
+                    || activeGame.getSoToPoList().contains(scoredPublic.getKey())
                     || scoredPublic.getKey().contains("Throne of the False Emperor")) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
                         scoredPOCount++;
@@ -2726,7 +2726,7 @@ public class Helper {
             int scoredObjectiveCount = scoredPOCount + scoredSOCount;
             if (scoredObjectiveCount >= 3) {
                 // UnlockLeader ul = new UnlockLeader();
-                UnlockLeader.unlockLeader(event, "hero", game, player);
+                UnlockLeader.unlockLeader(event, "hero", activeGame, player);
             }
         }
     }
@@ -2739,20 +2739,20 @@ public class Helper {
         }
     }
 
-    public static void setOrder(Game game) {
+    public static void setOrder(Game activeGame) {
         List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
         boolean different = false;
-        for (Player player : game.getRealPlayers()) {
-            Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
+        for (Player player : activeGame.getRealPlayers()) {
+            Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
             if (tile == null) {
-                tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, game);
+                tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
             }
             boolean ghosty = player.getPlayerStatsAnchorPosition() != null
-                && game.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null
-                && "17".equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition()).getTileID());
-            if ((player.getFaction().contains("ghost") && game.getTile("17") != null) || ghosty) {
-                tile = game.getTile("17");
+                && activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null
+                && "17".equals(activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()).getTileID());
+            if ((player.getFaction().contains("ghost") && activeGame.getTile("17") != null) || ghosty) {
+                tile = activeGame.getTile("17");
             }
             hsLocations.add(Integer.parseInt(tile.getPosition()));
             unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
@@ -2769,15 +2769,15 @@ public class Helper {
             }
             lastNum = firstNum;
         }
-        String msg = game.getPing() + " set order in the following way: \n";
+        String msg = activeGame.getPing() + " set order in the following way: \n";
         if (!different) {
             List<Player> sortedPlayers = new ArrayList<>();
             for (Integer location : hsLocations) {
                 sortedPlayers.add(unsortedPlayers.get(location));
             }
             Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
-            Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
-            Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
+            Map<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+            Map<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
             try {
                 for (Player player : sortedPlayers) {
                     new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
@@ -2786,45 +2786,45 @@ public class Helper {
                 if (!players.isEmpty()) {
                     newPlayerOrder.putAll(players);
                 }
-                game.setPlayers(newPlayerOrder);
+                activeGame.setPlayers(newPlayerOrder);
             } catch (Exception e) {
-                game.setPlayers(playersBackup);
+                activeGame.setPlayers(playersBackup);
             }
             msg += "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
         } else {
             msg = "Detected an abnormal map, so did not assign speaker order automatically. Set the speaker order with /game set_order, with the speaker as the first player";
         }
-        if (!game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+        if (!activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
         }
         List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(game.getTileMap().values());
+        tiles.addAll(activeGame.getTileMap().values());
         for (Tile tile : tiles) {
             if (tile == null) {
                 continue;
             }
             if (tile.getTileID().equals("0g") || tile.getTileID().equals("-1") || tile.getTileID().equals("0gray")) {
-                game.removeTile(tile.getPosition());
+                activeGame.removeTile(tile.getPosition());
             }
         }
 
     }
 
-    public static void checkEndGame(Game game, Player player) {
-        if (player.getTotalVictoryPoints() >= game.getVp()) {
+    public static void checkEndGame(Game activeGame, Player player) {
+        if (player.getTotalVictoryPoints() >= activeGame.getVp()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.primary("rematch", "Rematch (make new game with same players/channels)"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                game.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, game)
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
+                activeGame.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, activeGame)
                     + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
         }
     }
 
-    public static boolean mechCheck(String planetName, Game game, Player player) {
-        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+    public static boolean mechCheck(String planetName, Game activeGame, Player player) {
+        Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
@@ -2841,16 +2841,16 @@ public class Helper {
         return values;
     }
 
-    public static void removePoKComponents(Game game, String codex) {
+    public static void removePoKComponents(Game activeGame, String codex) {
         boolean removeCodex = "y".equalsIgnoreCase(codex);
 
         // removing Action Cards
         Map<String, ActionCardModel> actionCards = Mapper.getActionCards();
         for (ActionCardModel ac : actionCards.values()) {
             if ("pok".equals(ac.getSource().name())) {
-                game.removeACFromGame(ac.getAlias());
+                activeGame.removeACFromGame(ac.getAlias());
             } else if ("codex1".equals(ac.getSource().name()) && removeCodex) {
-                game.removeACFromGame(ac.getAlias());
+                activeGame.removeACFromGame(ac.getAlias());
             }
         }
 
@@ -2858,7 +2858,7 @@ public class Helper {
         Map<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         for (SecretObjectiveModel so : soList.values()) {
             if ("pok".equals(so.getSource().name())) {
-                game.removeSOFromGame(so.getAlias());
+                activeGame.removeSOFromGame(so.getAlias());
             }
         }
 
@@ -2867,10 +2867,10 @@ public class Helper {
         for (PublicObjectiveModel po : poList.values()) {
             if ("pok".equals(po.getSource().name())) {
                 if (po.getPoints() == 1) {
-                    game.removePublicObjective1(po.getAlias());
+                    activeGame.removePublicObjective1(po.getAlias());
                 }
                 if (po.getPoints() == 2) {
-                    game.removePublicObjective2(po.getAlias());
+                    activeGame.removePublicObjective2(po.getAlias());
                 }
             }
         }

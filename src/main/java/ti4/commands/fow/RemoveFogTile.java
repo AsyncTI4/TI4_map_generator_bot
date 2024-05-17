@@ -19,9 +19,9 @@ public class RemoveFogTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
 
         MessageChannel channel = event.getChannel();
         if (player == null) {
@@ -43,6 +43,6 @@ public class RemoveFogTile extends FOWSubcommandData {
 
         //remove the custom tile from the player
         player.removeFogTile(position);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

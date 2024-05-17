@@ -24,14 +24,14 @@ import java.util.*;
 
 public class AddToken extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
 
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
             String tokenName = option.getAsString().toLowerCase();
             tokenName = AliasHandler.resolveAttachment(tokenName);
-            addToken(event, tile, tokenName, game);
-            game.clearPlanetsCache();
+            addToken(event, tile, tokenName, activeGame);
+            activeGame.clearPlanetsCache();
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
         }
@@ -104,7 +104,7 @@ public class AddToken extends AddRemoveToken {
                         planetUnitHolder.removeAllUnits(color);
                     }
                     Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) { 
                         UnitKey key = unitEntry.getKey();
                         if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
                             Integer count = spaceUnits.get(key);

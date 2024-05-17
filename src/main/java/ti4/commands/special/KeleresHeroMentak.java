@@ -27,10 +27,10 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -39,11 +39,11 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         //     MessageHelper.sendMessageToChannel(event.getChannel(), "Player is not playing the faction *'Council of Keleres - Mentak'*");
         //     return;
         // }
-        resolveKeleresHeroMentak(game, player, event);
+        resolveKeleresHeroMentak(activeGame, player, event);
     }
 
-    public static void resolveKeleresHeroMentak(Game game, Player player, GenericInteractionCreateEvent event) {
-        int originalACDeckCount = game.getActionCards().size();
+    public static void resolveKeleresHeroMentak(Game activeGame, Player player, GenericInteractionCreateEvent event){
+        int originalACDeckCount = activeGame.getActionCards().size();
         StringBuilder acRevealMessage = new StringBuilder("The following non-component action cards were revealed before drawing three component action cards:\n");
         StringBuilder acDrawMessage = new StringBuilder("The following component action cards were drawn into their hand:\n");
         List<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
@@ -53,7 +53,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         while (componentActionACCount < 3) {
             Integer acID = null;
             String acKey = null;
-            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(game.drawActionCard(player.getUserID())).entrySet()) {
+            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(activeGame.drawActionCard(player.getUserID())).entrySet()) {
                 acID = ac.getValue();
                 acKey = ac.getKey();
             }
@@ -65,7 +65,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
                 componentActionACCount++;
             } else {
                 acRevealMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(Emojis.ActionCard).append(" ").append(acName).append("\n");
-                game.discardActionCard(player.getUserID(), acID);
+                activeGame.discardActionCard(player.getUserID(), acID);
                 cardsToShuffleBackIntoDeck.add(acKey);
             }
             index++;
@@ -77,16 +77,16 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             }
         }
         for (String card : cardsToShuffleBackIntoDeck) {
-            Integer cardID = game.getDiscardActionCards().get(card);
-            game.shuffleActionCardBackIntoDeck(cardID);
+            Integer cardID = activeGame.getDiscardActionCards().get(card);
+            activeGame.shuffleActionCardBackIntoDeck(cardID);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.KeleresHeroHarka);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses **Keleres (Mentak) Hero** to Reveal " + Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");
-        ACInfo.sendActionCardInfo(game, player);
-        ButtonHelper.checkACLimit(game, event, player);
+        ACInfo.sendActionCardInfo(activeGame, player);
+        ButtonHelper.checkACLimit(activeGame, event, player);
         if (noMoreComponentActionCards) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }

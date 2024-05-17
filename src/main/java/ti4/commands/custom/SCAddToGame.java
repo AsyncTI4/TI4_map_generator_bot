@@ -17,7 +17,7 @@ public class SCAddToGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+		Game activeGame = getActiveGame();
 
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {
@@ -25,7 +25,7 @@ public class SCAddToGame extends CustomSubcommandData {
             return;
         }
 
-        if (game.addSC(sc)) {
+        if (activeGame.addSC(sc)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added Strategy Card: " + sc);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card already exists: " + sc);

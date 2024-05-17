@@ -15,16 +15,16 @@ public class RemoveExplore extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
             if (Mapper.getExplore(id) != null) {
-                game.purgeExplore(id);
+                activeGame.purgeExplore(id);
                 sb.append("Exploration card removed: ").append(displayExplore(id)).append(System.lineSeparator());
             } else {
-                game.purgeExplore(id);
+                activeGame.purgeExplore(id);
                 sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());
             }
         }

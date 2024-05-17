@@ -18,8 +18,8 @@ import java.util.Collection;
 
 public class RemoveAllCC implements Command {
 
-    void parsingForTile(SlashCommandInteractionEvent event, Game game) {
-        Collection<Tile> tileList = game.getTileMap().values();
+    void parsingForTile(SlashCommandInteractionEvent event, Game activeGame) {
+        Collection<Tile> tileList = activeGame.getTileMap().values();
         for (Tile tile : tileList) {
             tile.removeAllCC();
         }
@@ -36,10 +36,10 @@ public class RemoveAllCC implements Command {
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game game = gameManager.getUserActiveGame(userID);
-            parsingForTile(event, game);
-            GameSaveLoadManager.saveMap(game, event);
-            ShowGame.simpleShowGame(game, event);
+            Game activeGame = gameManager.getUserActiveGame(userID);
+            parsingForTile(event, activeGame);
+            GameSaveLoadManager.saveMap(activeGame, event);
+            ShowGame.simpleShowGame(activeGame, event);
         }
     }
 
@@ -53,8 +53,9 @@ public class RemoveAllCC implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Remove all CCs from entire map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
-                    .setRequired(true)));
+                Commands.slash(getActionID(), "Remove all CCs from entire map")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
+                                .setRequired(true))
+        );
     }
 }

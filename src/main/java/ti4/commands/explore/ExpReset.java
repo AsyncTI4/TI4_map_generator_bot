@@ -17,8 +17,8 @@ public class ExpReset extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            Game game = getActiveGame();
-            game.resetExplore();
+            Game activeGame = getActiveGame();
+            activeGame.resetExplore();
             MessageHelper.sendMessageToEventChannel(event, "Exploration decks reset.");
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Confirmation not received to reset exploration decks.");

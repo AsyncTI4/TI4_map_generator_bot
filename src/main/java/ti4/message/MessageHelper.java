@@ -93,9 +93,9 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText,
 		List<MessageEmbed> embeds, List<Button> buttons) {
-		Game game = getGameFromChannelName(channel.getName());
+		Game activeGame = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
-			&& !messageText.contains("end of turn ability") && game != null && game.getUndoButton()) {
+			&& !messageText.contains("end of turn ability") && activeGame != null && activeGame.getUndoButton()) {
 			boolean undoPresent = false;
 			for (Button button : buttons) {
 				if (button.getId().contains("ultimateUndo")) {
@@ -104,7 +104,7 @@ public class MessageHelper {
 			}
 			File mapUndoDirectory = Storage.getMapUndoDirectory();
 			if (mapUndoDirectory != null && mapUndoDirectory.exists() && !undoPresent) {
-				String mapName = game.getName();
+				String mapName = activeGame.getName();
 				String mapNameForUndoStart = mapName + "_";
 				String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
 				if (mapUndoFiles != null && mapUndoFiles.length > 0) {
@@ -130,48 +130,48 @@ public class MessageHelper {
 		sendMessageToChannelWithButtons(channel, messageText, buttons);
 	}
 
-	private static void addFactionReactToMessage(Game game, Player player, Message message) {
-		Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message);
+	private static void addFactionReactToMessage(Game activeGame, Player player, Message message) {
+		Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player, message);
 		if (reactionEmoji != null) {
 			message.addReaction(reactionEmoji).queue(null,
 				error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
 		}
 		String messageId = message.getId();
-		if (game.getStoredValue(messageId) != null
-			&& !game.getStoredValue(messageId).isEmpty()) {
-			if (!game.getStoredValue(messageId).contains(player.getFaction())) {
-				game.setStoredValue(messageId,
-					game.getStoredValue(messageId) + "_" + player.getFaction());
+		if (activeGame.getStoredValue(messageId) != null
+			&& !activeGame.getStoredValue(messageId).isEmpty()) {
+			if (!activeGame.getStoredValue(messageId).contains(player.getFaction())) {
+				activeGame.setStoredValue(messageId,
+					activeGame.getStoredValue(messageId) + "_" + player.getFaction());
 			}
 		} else {
-			game.setStoredValue(messageId, player.getFaction());
+			activeGame.setStoredValue(messageId, player.getFaction());
 		}
 	}
 
-	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game,
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game activeGame,
 		Player player, List<Button> buttons) {
-		sendMessageToChannelWithFactionReact(channel, messageText, game, player, buttons, false);
+		sendMessageToChannelWithFactionReact(channel, messageText, activeGame, player, buttons, false);
 	}
 
-	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game game,
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game activeGame,
 		Player player, List<Button> buttons, boolean saboable) {
-		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, game, player, null, buttons,
+		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, activeGame, player, null, buttons,
 			saboable);
 	}
 
 	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText,
-		Game game, Player player, List<MessageEmbed> embeds, List<Button> buttons,
+		Game activeGame, Player player, List<MessageEmbed> embeds, List<Button> buttons,
 		boolean saboable) {
 		MessageFunction addFactionReact = (msg) -> {
-			addFactionReactToMessage(game, player, msg);
+			addFactionReactToMessage(activeGame, player, msg);
 			if (saboable) {
-				game.addMessageIDForSabo(msg.getId());
-				for (Player p2 : game.getRealPlayers()) {
+				activeGame.addMessageIDForSabo(msg.getId());
+				for (Player p2 : activeGame.getRealPlayers()) {
 					if (p2 == player) {
 						continue;
 					}
 					if (p2.getAc() == 0 && !p2.hasUnit("empyrean_mech") && !p2.hasTechReady("it")) {
-						addFactionReactToMessage(game, p2, msg);
+						addFactionReactToMessage(activeGame, p2, msg);
 					}
 				}
 			}
@@ -180,31 +180,31 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText,
-		Game game, List<Button> buttons, String whenOrAfter) {
+		Game activeGame, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players;
 			if ("when".equalsIgnoreCase(whenOrAfter)) {
-				if (game.getLatestWhenMsg() != null && !"".equals(game.getLatestWhenMsg())) {
-					game.getMainGameChannel().deleteMessageById(game.getLatestWhenMsg()).queue();
+				if (activeGame.getLatestWhenMsg() != null && !"".equals(activeGame.getLatestWhenMsg())) {
+					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestWhenMsg()).queue();
 				}
-				game.setLatestWhenMsg(msg.getId());
-				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
+				activeGame.setLatestWhenMsg(msg.getId());
+				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoWhen(), "_");
 			} else if ("after".equalsIgnoreCase(whenOrAfter)) {
-				if (game.getLatestAfterMsg() != null && !"".equals(game.getLatestAfterMsg())) {
-					game.getMainGameChannel().deleteMessageById(game.getLatestAfterMsg()).queue();
+				if (activeGame.getLatestAfterMsg() != null && !"".equals(activeGame.getLatestAfterMsg())) {
+					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestAfterMsg()).queue();
 				}
-				game.setLatestAfterMsg(msg.getId());
-				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
+				activeGame.setLatestAfterMsg(msg.getId());
+				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoAfter(), "_");
 			} else {
-				if (game.getStoredValue("Pass On Shenanigans") == null) {
-					game.setStoredValue("Pass On Shenanigans", "");
+				if (activeGame.getStoredValue("Pass On Shenanigans") == null) {
+					activeGame.setStoredValue("Pass On Shenanigans", "");
 				}
-				players = new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
+				players = new StringTokenizer(activeGame.getStoredValue("Pass On Shenanigans"), "_");
 			}
 			while (players.hasMoreTokens()) {
 				String player = players.nextToken();
-				Player player_ = game.getPlayerFromColorOrFaction(player);
-				addFactionReactToMessage(game, player_, msg);
+				Player player_ = activeGame.getPlayerFromColorOrFaction(player);
+				addFactionReactToMessage(activeGame, player_, msg);
 			}
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, null, buttons);
@@ -373,16 +373,16 @@ public class MessageHelper {
 	 * Send a private message to the player.
 	 *
 	 * @param player Player to send a message to
-	 * @param game Active map
+	 * @param activeGame Active map
 	 * @param event Event that caused the message
 	 * @param messageText Message to send
 	 * @param failText Feedback if the message failed to send
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Game game,
+	public static boolean sendPrivateMessageToPlayer(Player player, Game activeGame,
 		GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
-		return sendPrivateMessageToPlayer(player, game, event.getMessageChannel(), messageText, failText, successText);
+		return sendPrivateMessageToPlayer(player, activeGame, event.getMessageChannel(), messageText, failText, successText);
 	}
 
 	/**
@@ -391,26 +391,26 @@ public class MessageHelper {
 	 * This implementation does not provide feedback
 	 *
 	 * @param player Player to send a message to
-	 * @param game Active map
+	 * @param activeGame Active map
 	 * @param messageText Message to send
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Game game, String messageText) {
-		return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
+	public static boolean sendPrivateMessageToPlayer(Player player, Game activeGame, String messageText) {
+		return sendPrivateMessageToPlayer(player, activeGame, (MessageChannel) null, messageText, null, null);
 	}
 
 	/**
 	 * Send a private message to the player.
 	 *
 	 * @param player Player to send a message to
-	 * @param game Active map
+	 * @param activeGame Active map
 	 * @param feedbackChannel Channel to send feedback to
 	 * @param messageText Message to send
 	 * @param failText Feedback if the message failed to send
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Game game, MessageChannel feedbackChannel,
+	public static boolean sendPrivateMessageToPlayer(Player player, Game activeGame, MessageChannel feedbackChannel,
 		String messageText, String failText, String successText) {
 		if (messageText == null || messageText.length() == 0)
 			return true; // blank message counts as a success
@@ -420,11 +420,11 @@ public class MessageHelper {
 			return false;
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
-			if (!game.isFoWMode()) {
+			if (!activeGame.isFoWMode()) {
 				privateChannel = player.getCardsInfoThread();
 			}
 			if (privateChannel == null) {
-				sendMessageToUser(game.getName() + " " + messageText, user);
+				sendMessageToUser(activeGame.getName() + " " + messageText, user);
 			} else {
 				sendMessageToChannel(privateChannel, messageText);
 			}
@@ -433,16 +433,16 @@ public class MessageHelper {
 		}
 	}
 
-	public static boolean privatelyPingPlayerList(List<Player> players, Game game, String message) {
-		return privatelyPingPlayerList(players, game, null, message, null, null);
+	public static boolean privatelyPingPlayerList(List<Player> players, Game activeGame, String message) {
+		return privatelyPingPlayerList(players, activeGame, null, message, null, null);
 	}
 
-	public static boolean privatelyPingPlayerList(List<Player> players, Game game, MessageChannel feedbackChannel,
+	public static boolean privatelyPingPlayerList(List<Player> players, Game activeGame, MessageChannel feedbackChannel,
 		String message, String failText, String successText) {
 		int count = 0;
 		for (Player player : players) {
 			String playerRepresentation = player.getRepresentation(true, true);
-			boolean success = sendPrivateMessageToPlayer(player, game, feedbackChannel,
+			boolean success = sendPrivateMessageToPlayer(player, activeGame, feedbackChannel,
 				playerRepresentation + message, failText, successText);
 			if (success)
 				count++;
@@ -460,10 +460,10 @@ public class MessageHelper {
 
 	/**
 	 * @param player Player to send the messageText
-	 * @param game Map/Game the player is in
+	 * @param activeGame Map/Game the player is in
 	 * @param messageText messageText - handles large text ()>1500 chars)
 	 */
-	public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Game game, String messageText) {
+	public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Game activeGame, String messageText) {
 		if (messageText == null || messageText.isEmpty()) {
 			return;
 		}
@@ -472,7 +472,7 @@ public class MessageHelper {
 		ThreadChannel threadChannel = player.getCardsInfoThread();
 		if (threadChannel == null) {
 			BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player "
-				+ player.getUserName() + " in game " + game.getName());
+				+ player.getUserName() + " in game " + activeGame.getName());
 			return;
 		}
 
@@ -672,7 +672,7 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageEmbedsToCardsInfoThread(Game game, Player player, String message, List<MessageEmbed> embeds) {
+	public static void sendMessageEmbedsToCardsInfoThread(Game activeGame, Player player, String message, List<MessageEmbed> embeds) {
 		ThreadChannel channel = player.getCardsInfoThread();
 		if (channel == null || embeds == null || embeds.isEmpty()) {
 			return;

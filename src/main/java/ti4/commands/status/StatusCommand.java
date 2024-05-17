@@ -54,11 +54,11 @@ public class StatusCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
-        MapGenerator.saveImage(game, event)
-            .thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
+        MapGenerator.saveImage(activeGame, event)
+                .thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
     }
 
     protected String getActionDescription() {

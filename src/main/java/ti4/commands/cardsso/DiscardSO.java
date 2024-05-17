@@ -28,69 +28,68 @@ public class DiscardSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "Please select what Secret Objective to discard");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame,"Please select what Secret Objective to discard");
             return;
         }
-        discardSO(event, player, option.getAsInt(), game);
+        discardSO(event, player, option.getAsInt(), activeGame);
     }
-
-    public void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game game) {
+    public void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game activeGame) {
         String soIDString = "";
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(SOID)) {
                 soIDString = so.getKey();
             }
         }
-        boolean removed = game.discardSecretObjective(player.getUserID(), SOID);
+        boolean removed = activeGame.discardSecretObjective(player.getUserID(), SOID);
         if (!removed) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame,"No such Secret Objective ID found, please retry");
             return;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "SO Discarded");
-
-        SOInfo.sendSecretObjectiveInfo(game, player);
-        if (!soIDString.isEmpty()) {
-            String msg = "You discarded the SO " + Mapper.getSecretObjective(soIDString).getName() + ". If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking back up the secret.";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame,"SO Discarded");
+        
+        SOInfo.sendSecretObjectiveInfo(activeGame, player);
+        if(!soIDString.isEmpty()){
+            String msg = "You discarded the SO "+Mapper.getSecretObjective(soIDString).getName()+". If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking back up the secret.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.secondary("drawSpecificSO_" + soIDString, "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
-            buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            buttons.add(Button.secondary("drawSpecificSO_"+soIDString, "Retrieve "+Mapper.getSecretObjective(soIDString).getName()));
+            buttons.add(Button.danger("deleteButtons","Delete These Buttons"));
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg, buttons);
         }
 
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
-        if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+        if(activeGame.getStoredValue(key2).contains(player.getFaction()+"*")){
+            activeGame.setStoredValue(key2, activeGame.getStoredValue(key2).replace(player.getFaction()+"*",""));
         }
-        if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+        if(!activeGame.getStoredValue(key).contains(player.getFaction()+"*")){
+            activeGame.setStoredValue(key, activeGame.getStoredValue(key)+player.getFaction()+"*");
         }
-        if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            Helper.resolveQueue(game);
+        if(activeGame.getStoredValue(key3).contains(player.getFaction()+"*")){
+            activeGame.setStoredValue(key3, activeGame.getStoredValue(key3).replace(player.getFaction()+"*",""));
+            Helper.resolveQueue(activeGame);
         }
-
+        
+        
     }
-
-    public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game game) {
-        String publicMsg = game.getPing() + " this is a public notice that " + ButtonHelper.getIdentOrColor(player, game) + " is picking up a secret that they accidentally discarded.";
-        Map<String, Integer> secrets = game.drawSpecificSecretObjective(soID, player.getUserID());
-        if (secrets == null) {
+    public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game activeGame){
+        String publicMsg = activeGame.getPing() + " this is a public notice that "+ButtonHelper.getIdentOrColor(player, activeGame)+" is picking up a secret that they accidentally discarded.";
+        Map<String, Integer> secrets = activeGame.drawSpecificSecretObjective(soID, player.getUserID());
+        if (secrets == null){
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "SO not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), publicMsg);
         event.getMessage().delete().queue();
-        SOInfo.sendSecretObjectiveInfo(game, player);
+        SOInfo.sendSecretObjectiveInfo(activeGame, player);
     }
 }

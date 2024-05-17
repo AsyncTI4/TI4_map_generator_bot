@@ -27,16 +27,17 @@ public class RelicSend extends GenericRelicAction {
     }
 
     public void doAction(Player player1, SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
         String targetFaction = event.getOption(Constants.FACTION_COLOR_2, null, OptionMapping::getAsString);
         String sourceFaction = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
+
 
         //resolve player1
         if (sourceFaction != null) {
             String factionColor = AliasHandler.resolveColor(sourceFaction.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player1 = player_;
                     break;
@@ -49,7 +50,7 @@ public class RelicSend extends GenericRelicAction {
         if (targetFaction != null) {
             String factionColor = AliasHandler.resolveColor(targetFaction.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player2 = player_;
                     break;
@@ -81,28 +82,28 @@ public class RelicSend extends GenericRelicAction {
         switch (relicID) {
             case "shard" -> {
                 shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get("Shard of the Throne");
+                shardPublicObjectiveID = activeGame.getRevealedPublicObjectives().get("Shard of the Throne");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
+                shardPublicObjectiveID = activeGame.getRevealedPublicObjectives().get(shardCustomPOName);
             }
         }
-        if (shardCustomPOName != null && shardPublicObjectiveID != null && game.getCustomPublicVP().containsKey(shardCustomPOName) && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
-            game.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
-            game.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+        if (shardCustomPOName != null && shardPublicObjectiveID != null && activeGame.getCustomPublicVP().containsKey(shardCustomPOName) && activeGame.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
+            activeGame.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+            activeGame.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
         }
-
+        
         if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {
             MessageHelper.sendMessageToEventChannel(event, "Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
             return;
         }
         RelicModel relicModel = Mapper.getRelic(relicID);
         String sb = player1.getRepresentation() +
-            " sent a relic to " + player2.getRepresentation() +
-            "\n" + relicModel.getSimpleRepresentation();
+        " sent a relic to " + player2.getRepresentation() +
+        "\n" + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToEventChannel(event, sb);
-        Helper.checkEndGame(game, player2);
+        Helper.checkEndGame(activeGame, player2);
     }
 }

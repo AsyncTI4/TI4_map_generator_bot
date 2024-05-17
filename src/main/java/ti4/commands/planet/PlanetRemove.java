@@ -13,9 +13,9 @@ public class PlanetRemove extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Game game) {
+    public void doAction(Player player, String planet, Game activeGame) {
         player.removePlanet(planet);
-        Planet unitHolder = game.getPlanetsInfo().get(planet);
+        Planet unitHolder = activeGame.getPlanetsInfo().get(planet);
         removePlayerControlToken(player, unitHolder);
 
         if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {

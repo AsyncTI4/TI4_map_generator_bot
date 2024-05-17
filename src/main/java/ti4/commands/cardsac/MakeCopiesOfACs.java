@@ -21,12 +21,12 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.COUNT);
         int count = 1;
         if (option != null) {
-            count = option.getAsInt();
+          count = option.getAsInt();
             if (count > 3 || count < 1) {
                 return;
             }
@@ -34,13 +34,13 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
         if (count == 2) {
             Map<String, ActionCardModel> actionCards = Mapper.getActionCards("extra1");
             List<String> ACs = new ArrayList<>(actionCards.keySet());
-            game.addActionCardDuplicates(ACs);
+            activeGame.addActionCardDuplicates(ACs);
         }
-        if (count == 3) {
-            game.triplicateRelics();
-            game.triplicateExplores();
-            game.triplicateACs();
-            game.triplicateSOs();
+        if (count ==3) {
+            activeGame.triplicateRelics();
+            activeGame.triplicateExplores();
+            activeGame.triplicateACs();
+            activeGame.triplicateSOs();
         }
     }
 }

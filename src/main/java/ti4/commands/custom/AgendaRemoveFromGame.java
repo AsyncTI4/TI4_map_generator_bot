@@ -16,14 +16,14 @@ public class AgendaRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.AGENDA_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Agenda");
             return;
         }
-        boolean removed = game.removeAgendaFromGame(soOption.getAsString());
+        boolean removed = activeGame.removeAgendaFromGame(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda removed from game deck");
         } else {

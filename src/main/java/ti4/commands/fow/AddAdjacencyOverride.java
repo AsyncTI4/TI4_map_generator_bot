@@ -19,21 +19,21 @@ public class AddAdjacencyOverride extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
-        if (primaryTileOption == null) {
+        if (primaryTileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify primary tile");
             return;
         }
 
         OptionMapping directionOption = event.getOption(Constants.PRIMARY_TILE_DIRECTION);
-        if (directionOption == null) {
+        if (directionOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify direction");
             return;
         }
 
         OptionMapping secondaryTileOption = event.getOption(Constants.SECONDARY_TILE);
-        if (secondaryTileOption == null) {
+        if (secondaryTileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify secondary tile");
             return;
         }
@@ -52,10 +52,10 @@ public class AddAdjacencyOverride extends FOWSubcommandData {
 
         String secondaryTile = secondaryTileOption.getAsString().toLowerCase();
 
-        if (primaryTile.isBlank() || secondaryTile.isBlank() || direction == -1) {
+        if (primaryTile.isBlank() || secondaryTile.isBlank() || direction == -1){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again");
             return;
         }
-        game.addAdjacentTileOverride(primaryTile, direction, secondaryTile);
+        activeGame.addAdjacentTileOverride(primaryTile, direction, secondaryTile);
     }
 }

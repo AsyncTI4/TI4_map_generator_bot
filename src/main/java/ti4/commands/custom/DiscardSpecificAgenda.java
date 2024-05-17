@@ -16,14 +16,14 @@ public class DiscardSpecificAgenda extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.AGENDA_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Agenda");
             return;
         }
-        boolean removed = game.discardSpecificAgenda(soOption.getAsString());
+        boolean removed = activeGame.discardSpecificAgenda(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda discarded from game deck");
         } else {

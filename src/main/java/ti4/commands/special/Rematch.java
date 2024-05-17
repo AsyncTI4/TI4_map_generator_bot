@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
+
 public class Rematch extends SpecialSubcommandData {
     public Rematch() {
         super(Constants.REMATCH, "New game, same players");
@@ -16,17 +17,18 @@ public class Rematch extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            ButtonHelper.rematch(game, event);
-        } else {
+            ButtonHelper.rematch(activeGame, event);
+        }else{
             MessageHelper.sendMessageToEventChannel(event, "Please type YES.");
         }
-
+        
     }
+
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-
+        
     }
 }

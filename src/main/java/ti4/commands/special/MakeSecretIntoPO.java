@@ -22,7 +22,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to make Public");
@@ -33,7 +33,8 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
         String soName = "";
         Player playerWithSO = null;
 
-        for (Map.Entry<String, Player> playerEntry : game.getPlayers().entrySet()) {
+
+        for (Map.Entry<String, Player> playerEntry : activeGame.getPlayers().entrySet()) {
             Player player_ = playerEntry.getValue();
             Map<String, Integer> secretsScored = new LinkedHashMap<>(player_.getSecretsScored());
             for (Map.Entry<String, Integer> soEntry : secretsScored.entrySet()) {
@@ -53,16 +54,16 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Can make just Scored SO to Public");
             return;
         }
-        game.addToSoToPoList(soName);
-        Integer poIndex = game.addCustomPO(soName, 1);
-        game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
+        activeGame.addToSoToPoList(soName);
+        Integer poIndex = activeGame.addCustomPO(soName, 1);
+        activeGame.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
         String sb = "**Public Objective added from Secret:**" + "\n" +
-            "(" + poIndex + ") " + "\n" +
-            Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
+                "(" + poIndex + ") " + "\n" +
+                Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        SOInfo.sendSecretObjectiveInfo(game, playerWithSO, event);
+        SOInfo.sendSecretObjectiveInfo(activeGame, playerWithSO, event);
 
     }
 }

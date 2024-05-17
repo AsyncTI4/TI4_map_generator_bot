@@ -17,13 +17,13 @@ public class ShuffleExpBackIntoDeck extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
             if (Mapper.getExplore(id) != null) {
-                game.addExplore(id);
+                activeGame.addExplore(id);
                 sb.append("Card shuffled into exploration deck: ").append(displayExplore(id)).append(System.lineSeparator());
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());

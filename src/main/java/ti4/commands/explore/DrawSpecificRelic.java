@@ -30,8 +30,8 @@ public class DrawSpecificRelic extends GenericRelicAction {
             return;
         }
         boolean forced = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
-        Game game = getActiveGame();
-        List<String> allRelics = game.getAllRelics();
+        Game activeGame = getActiveGame();
+        List<String> allRelics = activeGame.getAllRelics();
         if (!allRelics.contains(relicID) && !forced) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid relic or relic not present in deck: `" + relicID + "`");
             return;

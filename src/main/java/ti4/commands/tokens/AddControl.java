@@ -17,20 +17,20 @@ import java.util.StringTokenizer;
 
 public class AddControl extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();
             addControlToken(event, colors, tile, planetInfo);
         } else {
             Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
-            if (unitHolderIDs.size() == 2) {
+            if (unitHolderIDs.size() == 2){
                 Set<String> unitHolder = new HashSet<>(unitHolderIDs);
                 unitHolder.remove(Constants.SPACE);
                 addControlToken(event, colors, tile, unitHolder.iterator().next());
             } else {
                 String message = "Multiple planets present in system, need to specify planet.";
-                if (unitHolderIDs.size() == 1) {
+                if (unitHolderIDs.size() == 1){
                     message = "No planets present in system.";
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), message);

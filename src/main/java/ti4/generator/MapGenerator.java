@@ -3249,7 +3249,7 @@ public class MapGenerator {
         int x,
         List<String> unrevealedPublicObjectives,
         Integer objectiveWorth,
-        Game game) {
+        Game activeGame) {
 
         Integer index = 1;
 
@@ -3257,7 +3257,7 @@ public class MapGenerator {
 
             String name = Mapper.getPublicObjective(unRevealed).getName();
 
-            if (game.isRedTapeMode()) {
+            if (activeGame.isRedTapeMode()) {
                 graphics.drawString(String.format("(%d) <Unrevealed> %s - %d VP", index, name, objectiveWorth), x, y + 23);
             } else {
                 graphics.drawString(String.format("(%d) <Unrevealed> - %d VP", index, objectiveWorth), x, y + 23);
@@ -3265,14 +3265,14 @@ public class MapGenerator {
 
             graphics.drawRect(x - 4, y - 5, 785, 38);
 
-            if (game.getPublicObjectives1Peeked().containsKey(unRevealed) || game.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed) || activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
                 List<String> playerIDs;
-                if (game.getPublicObjectives1Peeked().containsKey(unRevealed)) {
-                    playerIDs = game.getPublicObjectives1Peeked().get(unRevealed);
+                if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                    playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
                 } else {
-                    playerIDs = game.getPublicObjectives2Peeked().get(unRevealed);
+                    playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
                 }
-                drawPeekedMarkers(x + 515, y, game.getPlayers(), playerIDs);
+                drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
             }
 
             y += 43;
@@ -3888,7 +3888,7 @@ public class MapGenerator {
     }
 
     private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder,
-        Function<String, Boolean> isValid, Game game) {
+        Function<String, Boolean> isValid, Game activeGame) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
@@ -3901,8 +3901,8 @@ public class MapGenerator {
             }
             return o1.compareTo(o2);
         });
-        if (game.getShowBubbles() && unitHolder instanceof Planet planetHolder
-            && shouldPlanetHaveShield(unitHolder, game)) {
+        if (activeGame.getShowBubbles() && unitHolder instanceof Planet planetHolder
+            && shouldPlanetHaveShield(unitHolder, activeGame)) {
             String tokenPath;
             switch (planetHolder.getContrastColor()) {
                 case "orange":
@@ -3966,18 +3966,18 @@ public class MapGenerator {
 
     }
 
-    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
+    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game activeGame) {
 
         Map<UnitKey, Integer> units = unitHolder.getUnits();
 
-        if (game.getLaws().containsKey("conventions")) {
+        if (activeGame.getLaws().containsKey("conventions")) {
             String planet = unitHolder.getName();
-            if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
+            if (ButtonHelper.getTypeOfPlanet(activeGame, planet).contains("cultural")) {
                 return true;
             }
         }
         Map<UnitKey, Integer> planetUnits = new HashMap<>(units);
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
             for (Map.Entry<UnitKey, Integer> unitEntry : planetUnits.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey))

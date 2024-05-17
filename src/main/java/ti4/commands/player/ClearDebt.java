@@ -25,16 +25,16 @@ public class ClearDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player clearingPlayer = game.getPlayer(getUser().getId());
-        clearingPlayer = Helper.getGamePlayer(game, clearingPlayer, event, null);
+        Game activeGame = getActiveGame();
+        Player clearingPlayer = activeGame.getPlayer(getUser().getId());
+        clearingPlayer = Helper.getGamePlayer(activeGame, clearingPlayer, event, null);
 
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     clearingPlayer = player_;
                     break;
@@ -47,7 +47,7 @@ public class ClearDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player clearedPlayer = Helper.getPlayer(game, clearingPlayer, event);
+        Player clearedPlayer = Helper.getPlayer(activeGame, clearingPlayer, event);
         if (clearedPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to have debt cleared could not be found");
             return;

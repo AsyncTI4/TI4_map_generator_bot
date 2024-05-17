@@ -22,9 +22,9 @@ public class PeakAtObjectiveDeck extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
@@ -32,7 +32,7 @@ public class PeakAtObjectiveDeck extends CustomSubcommandData {
         int count = event.getOption("count", 1, OptionMapping::getAsInt);
         int stage = event.getOption("stage", 1, OptionMapping::getAsInt);
         List<String> peakedObjectives = new ArrayList<>();
-        List<String> poDeck = stage == 1 ? game.getPublicObjectives1() : game.getPublicObjectives2();
+        List<String> poDeck = stage == 1 ? activeGame.getPublicObjectives1() : activeGame.getPublicObjectives2();
         for (int i = 0; i < count && i < poDeck.size(); i++) {
             peakedObjectives.add(poDeck.get(i));
         }

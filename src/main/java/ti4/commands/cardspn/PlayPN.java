@@ -30,9 +30,9 @@ public class PlayPN extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -83,13 +83,13 @@ public class PlayPN extends PNCardsSubcommandData {
             return;
         }
 
-        playPN(event, game, player, longPNDisplay, pnID);
+        playPN(event, activeGame, player, longPNDisplay, pnID);
     }
 
-    private void playPN(GenericInteractionCreateEvent event, Game game, Player player, boolean longPNDisplay, String pnID) {
+    private void playPN(GenericInteractionCreateEvent event, Game activeGame, Player player, boolean longPNDisplay, String pnID) {
         PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pnID);
         String pnName = pnModel.getName();
-        Player pnOwner = game.getPNOwner(pnID);
+        Player pnOwner = activeGame.getPNOwner(pnID);
         if (pnModel.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(pnID);
         } else { //return to owner
@@ -97,29 +97,29 @@ public class PlayPN extends PNCardsSubcommandData {
             if (pnOwner != null) {
                 if (pnOwner.getPromissoryNotesOwned().contains(pnID)) {
                     pnOwner.setPromissoryNote(pnID);
-                    PNInfo.sendPromissoryNoteInfo(game, pnOwner, false, event);
+                    PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false, event);
                 }
             }
         }
 
         MessageEmbed pnEmbed = pnModel.getRepresentationEmbed();
-        String emojiToUse = game.isFoWMode() || pnOwner == null ? "" : pnOwner.getFactionEmoji();
+        String emojiToUse = activeGame.isFoWMode() || pnOwner == null ? "" : pnOwner.getFactionEmoji();
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentation()).append(" played promissory note: ");
         sb.append(emojiToUse).append(Emojis.PN).append("**").append(pnName).append("**\n");
 
         if ("dspnkoll".equalsIgnoreCase(pnID)) {
-            ButtonHelperFactionSpecific.offerKolleccPNButtons(game, player);
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(activeGame, player);
         }
 
         //Fog of war ping
-        if (game.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             // Add extra message for visibility
-            FoWHelper.pingAllPlayersWithFullStats(game, event, player, sb.toString());
+            FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, sb.toString());
         }
 
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), sb.toString(), pnEmbed);
-        PNInfo.sendPromissoryNoteInfo(game, player, false);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
 
         TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
         if (posssibleCombatMod != null) {

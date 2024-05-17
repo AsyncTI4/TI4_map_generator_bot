@@ -26,20 +26,20 @@ public class SendCommodities extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(game, player, event);
+        Player player_ = Helper.getPlayer(activeGame, player, event);
         if (player_ == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to send TG/Commodities could not be found");
             return;
         }
         if (player.hasAbility("military_industrial_complex")) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)
                 + " since you cannot send players commodities due to your faction ability, sending comms here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
             return;
         }
@@ -68,23 +68,23 @@ public class SendCommodities extends PlayerSubcommandData {
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
         String message = p1 + " sent " + commString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);
-        ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, player_, sendCommodities);
-        ButtonHelperAbilities.pillageCheck(player_, game);
-        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities);
+        ButtonHelperAbilities.pillageCheck(player_, activeGame);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             ClearDebt.clearDebt(player_, player, sendCommodities);
             MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
         }
 
-        if (game.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             String fail = "Could not notify receiving player.";
             String success = "The other player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(player_, game, event.getChannel(), message, fail, success);
+            MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, event.getChannel(), message, fail, success);
 
             // Add extra message for transaction visibility
-            FoWHelper.pingPlayersTransaction(game, event, player, player_, commString, null);
+            FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, commString, null);
         }
-        ButtonHelper.checkTransactionLegality(game, player, player_);
+        ButtonHelper.checkTransactionLegality(activeGame, player, player_);
     }
 }

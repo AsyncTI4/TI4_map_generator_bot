@@ -45,19 +45,19 @@ public class ShowDistances implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game;
+        Game activeGame;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            activeGame = gameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            activeGame = gameManager.getUserActiveGame(event.getUser().getId());
         }
 
-        Player player = game.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = activeGame.getPlayer(event.getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -69,17 +69,17 @@ public class ShowDistances implements Command {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
-        game.setTileDistances(CheckDistance.getTileDistances(game, player, tile.getPosition(), maxDistance));
+        activeGame.setTileDistances(CheckDistance.getTileDistances(activeGame, player, tile.getPosition(), maxDistance));
 
-        MapGenerator.saveImage(game, DisplayType.map, event, true)
-            .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+        MapGenerator.saveImage(activeGame, DisplayType.map, event, true)
+                .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

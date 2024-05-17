@@ -65,12 +65,13 @@ public class DiscordantStarsCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
-        //  FileUpload file = new GenerateMap().saveImage(activeMap, event);
-        //  MessageHelper.replyToMessage(event, file);
+      //  FileUpload file = new GenerateMap().saveImage(activeMap, event);
+      //  MessageHelper.replyToMessage(event, file);
     }
+
 
     protected String getActionDescription() {
         return "Discordant Stars Commands";
@@ -95,7 +96,7 @@ public class DiscordantStarsCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+                Commands.slash(getActionID(), getActionDescription())
+                        .addSubcommands(getSubcommands()));
     }
 }

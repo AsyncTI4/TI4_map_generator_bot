@@ -22,18 +22,18 @@ public class PersonalCleanup extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())) {
+        if (option == null || !"YES".equals(option.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game game = getActiveGame();
-        runStatusCleanup(game);
+        Game activeGame = getActiveGame();
+        runStatusCleanup(activeGame);
     }
 
-    public void runStatusCleanup(Game game) {
+    public void runStatusCleanup(Game activeGame) {
 
-        Map<String, Tile> tileMap = game.getTileMap();
-        Player player = game.getPlayer(getUser().getId());
+        Map<String, Tile> tileMap = activeGame.getTileMap();
+        Player player = activeGame.getPlayer(getUser().getId());
         String color = player.getColor();
         String ccID = Mapper.getCCID(color);
 
@@ -47,7 +47,7 @@ public class PersonalCleanup extends StatusSubcommandData {
                 unitHolder.removeAllUnitDamage();
             }
         }
-        Map<Integer, Boolean> scPlayed = game.getScPlayed();
+        Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             if (player.getSCs().contains(sc.getKey()))
                 sc.setValue(false);
@@ -56,7 +56,7 @@ public class PersonalCleanup extends StatusSubcommandData {
         player.setPassed(false);
         Set<Integer> strategyCards = player.getSCs();
         for (int sc : strategyCards) {
-            game.setScTradeGood(sc, 0);
+            activeGame.setScTradeGood(sc, 0);
         }
         player.clearSCs();
         player.clearFollowedSCs();
@@ -64,13 +64,13 @@ public class PersonalCleanup extends StatusSubcommandData {
         player.cleanExhaustedPlanets(true);
         player.cleanExhaustedRelics();
         player.clearExhaustedAbilities();
-        List<Leader> leads = new ArrayList<>(player.getLeaders());
+      List<Leader> leads = new ArrayList<>(player.getLeaders());
         for (Leader leader : leads) {
-            if (!leader.isLocked()) {
-                if (leader.isActive()) {
+            if (!leader.isLocked()){
+                if (leader.isActive()){
                     player.removeLeader(leader.getId());
                 } else {
-                    RefreshLeader.refreshLeader(player, leader, game);
+                    RefreshLeader.refreshLeader(player, leader, activeGame);
                 }
             }
         }

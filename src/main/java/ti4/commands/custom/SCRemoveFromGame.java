@@ -17,7 +17,7 @@ public class SCRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+		Game activeGame = getActiveGame();
 
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {
@@ -25,7 +25,7 @@ public class SCRemoveFromGame extends CustomSubcommandData {
             return;
         }
 
-        if (game.removeSC(sc)) {
+        if (activeGame.removeSC(sc)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Strategy Card: " + sc);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card did not exist: " + sc);

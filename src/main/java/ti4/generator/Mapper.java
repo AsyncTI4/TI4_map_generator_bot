@@ -211,16 +211,16 @@ public class Mapper {
         }
     }
 
-    public static List<String> getColorPromissoryNoteIDs(Game game, String color) {
+    public static List<String> getColorPromissoryNoteIDs(Game activeGame, String color) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
         if (isValidColor(color)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColor().isPresent() && color.equals(pn.getColor().get())) {
-                    if ("agendas_absol".equals(game.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
+                    if ("agendas_absol".equals(activeGame.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
                         continue;
                     }
-                    if (!"agendas_absol".equals(game.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
+                    if (!"agendas_absol".equals(activeGame.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -709,13 +709,13 @@ public class Mapper {
         return agendaList;
     }
 
-    public static Map<String, String> getAgendaJustNames(Game game) {
+    public static Map<String, String> getAgendaJustNames(Game activeGame) {
         Map<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
-            if (game.isAbsolMode() && agenda.getAlias().contains("absol_")) {
+            if (activeGame.isAbsolMode() && agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
-            if (!game.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
+            if (!activeGame.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
 

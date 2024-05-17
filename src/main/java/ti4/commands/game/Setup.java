@@ -27,7 +27,7 @@ public class Setup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping playerCount = event.getOption(Constants.PLAYER_COUNT_FOR_MAP);
         if (playerCount != null) {
@@ -35,7 +35,7 @@ public class Setup extends GameSubcommandData {
             if (count < 1 || count > 30) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify between 1 or 30 players.");
             } else {
-                game.setPlayerCountForMap(count);
+                activeGame.setPlayerCountForMap(count);
             }
 
         }
@@ -48,20 +48,20 @@ public class Setup extends GameSubcommandData {
             } else if (count > 20) {
                 count = 20;
             }
-            game.setVp(count);
+            activeGame.setVp(count);
         }
 
         Integer maxSOCount = event.getOption(Constants.MAX_SO_COUNT, null, OptionMapping::getAsInt);
         if (maxSOCount != null && maxSOCount >= 0) {
-            game.setMaxSOCountPerPlayer(maxSOCount);
+            activeGame.setMaxSOCountPerPlayer(maxSOCount);
 
             String key = "factionsThatAreNotDiscardingSOs";
             String key2 = "queueToDrawSOs";
             String key3 = "potentialBlockers";
-            game.setStoredValue(key, "");
-            game.setStoredValue(key2, "");
-            game.setStoredValue(key3, "");
-            if (game.getRound() > 1) {
+            activeGame.setStoredValue(key, "");
+            activeGame.setStoredValue(key2, "");
+            activeGame.setStoredValue(key3, "");
+            if (activeGame.getRound() > 1) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
             }
 
@@ -70,10 +70,10 @@ public class Setup extends GameSubcommandData {
         Integer scCountPerPlayer = event.getOption(Constants.SC_COUNT_FOR_MAP, null, OptionMapping::getAsInt);
         if (scCountPerPlayer != null) {
             int maxSCsPerPlayer;
-            if (game.getRealPlayers().isEmpty()) {
-                maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getPlayers().size());
+            if (activeGame.getRealPlayers().isEmpty()) {
+                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getPlayers().size());
             } else {
-                maxSCsPerPlayer = game.getSCList().size() / Math.max(1, game.getRealPlayers().size());
+                maxSCsPerPlayer = activeGame.getSCList().size() / Math.max(1, activeGame.getRealPlayers().size());
             }
 
             if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
@@ -83,56 +83,56 @@ public class Setup extends GameSubcommandData {
             } else if (scCountPerPlayer > maxSCsPerPlayer) {
                 scCountPerPlayer = maxSCsPerPlayer;
             }
-            game.setStrategyCardsPerPlayer(scCountPerPlayer);
+            activeGame.setStrategyCardsPerPlayer(scCountPerPlayer);
         }
 
         Integer pingHours = event.getOption(Constants.AUTO_PING, null, OptionMapping::getAsInt);
         if (pingHours != null) {
             if (pingHours == 0) {
-                game.setAutoPing(false);
-                game.setAutoPingSpacer(pingHours);
+                activeGame.setAutoPing(false);
+                activeGame.setAutoPingSpacer(pingHours);
             } else {
-                game.setAutoPing(true);
+                activeGame.setAutoPing(true);
                 if (pingHours < 1) {
                     pingHours = 1;
                 }
-                game.setAutoPingSpacer(pingHours);
+                activeGame.setAutoPingSpacer(pingHours);
             }
         }
 
         String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
         if (customGameName != null) {
-            game.setCustomName(customGameName);
+            activeGame.setCustomName(customGameName);
         }
 
-        if (!setGameMode(event, game)) {
+        if (!setGameMode(event, activeGame)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the game modes could not be set, please see error above.");
         }
     }
 
-    public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
+    public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
         if (event.getOption(Constants.TIGL_GAME) == null && event.getOption(Constants.ABSOL_MODE) == null && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
             && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null) {
             return true; //no changes were made
         }
-        boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
-        boolean absolMode = event.getOption(Constants.ABSOL_MODE, game.isAbsolMode(), OptionMapping::getAsBoolean);
-        boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
-        boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
-        boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
-        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame);
+        boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, activeGame.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
+        boolean absolMode = event.getOption(Constants.ABSOL_MODE, activeGame.isAbsolMode(), OptionMapping::getAsBoolean);
+        boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, activeGame.isMiltyModMode(), OptionMapping::getAsBoolean);
+        boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, activeGame.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, activeGame.isBaseGameMode(), OptionMapping::getAsBoolean);
+        return setGameMode(event, activeGame, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame);
     }
 
     // TODO: find a better way to handle this - this is annoying
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
         boolean isTIGLGame) {
         if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || game.isHomeBrewSCMode() || game.isFoWMode() || game.isAllianceMode() || game.isCommunityMode())) {
+            && (baseGameMode || absolMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
-            game.setCompetitiveTIGLGame(true);
-            sendTIGLSetupText(game);
+            activeGame.setCompetitiveTIGLGame(true);
+            sendTIGLSetupText(activeGame);
             return true;
         }
 
@@ -145,131 +145,131 @@ public class Setup extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Base Game Mode is not supported with Discordant Stars or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
-            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_miltymod"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_miltymod"))) return false;
-            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_miltymod"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_miltymod"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
-            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_miltymod"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_miltymod"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_miltymod"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_miltymod"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
-            for (Player player : game.getPlayers().values()) {
+            for (Player player : activeGame.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
                 if (player.getUnitByBaseType("mech") != null) player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
             }
 
-            game.setScSetID("miltymod");
+            activeGame.setScSetID("miltymod");
 
-            game.setTechnologyDeckID("techs_miltymod");
-            game.swapInVariantTechs();
-            game.swapInVariantUnits("miltymod");
-            game.setBaseGameMode(true);
-            game.setMiltyModMode(true);
-            game.setAbsolMode(false);
-            game.setDiscordantStarsMode(false);
+            activeGame.setTechnologyDeckID("techs_miltymod");
+            activeGame.swapInVariantTechs();
+            activeGame.swapInVariantUnits("miltymod");
+            activeGame.setBaseGameMode(true);
+            activeGame.setMiltyModMode(true);
+            activeGame.setAbsolMode(false);
+            activeGame.setDiscordantStarsMode(false);
             return true;
         } else if (baseGameMode) {
-            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_base"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base"))) return false;
-            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
-            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_base"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
 
-            for (Player player : game.getPlayers().values()) {
+            for (Player player : activeGame.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
                 if (player.getUnitByBaseType("mech") != null) player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
             }
 
-            game.setScSetID("base_game");
+            activeGame.setScSetID("base_game");
 
-            game.setTechnologyDeckID("techs_base");
-            game.setBaseGameMode(true);
-            game.setAbsolMode(false);
-            game.setDiscordantStarsMode(false);
+            activeGame.setTechnologyDeckID("techs_base");
+            activeGame.setBaseGameMode(true);
+            activeGame.setAbsolMode(false);
+            activeGame.setDiscordantStarsMode(false);
             return true;
         }
-        game.setBaseGameMode(false);
-        game.setMiltyModMode(false);
+        activeGame.setBaseGameMode(false);
+        activeGame.setMiltyModMode(false);
 
         // BOTH ABSOL & DS, and/or if either was set before the other
         if (absolMode && discordantStarsMode) {
-            game.setDiscordantStarsMode(true);
-            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
-            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
-            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
-            game.setTechnologyDeckID("techs_ds_absol");
-            game.setAbsolMode(true);
+            activeGame.setDiscordantStarsMode(true);
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
+            activeGame.setTechnologyDeckID("techs_ds_absol");
+            activeGame.setAbsolMode(true);
 
-            game.setBaseGameMode(false);
-            game.swapInVariantUnits("absol");
-            game.swapInVariantTechs();
+            activeGame.setBaseGameMode(false);
+            activeGame.swapInVariantUnits("absol");
+            activeGame.swapInVariantTechs();
             return true;
         }
 
         // JUST DS
         if (discordantStarsMode) {
-            game.setDiscordantStarsMode(discordantStarsMode);
-            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
-            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
-            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
-            game.setTechnologyDeckID("techs_ds");
-            game.setAbsolMode(false);
-            game.swapOutVariantTechs();
+            activeGame.setDiscordantStarsMode(discordantStarsMode);
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
+            activeGame.setTechnologyDeckID("techs_ds");
+            activeGame.setAbsolMode(false);
+            activeGame.swapOutVariantTechs();
         }
-        game.setDiscordantStarsMode(discordantStarsMode);
+        activeGame.setDiscordantStarsMode(discordantStarsMode);
 
         // JUST ABSOL
         if (absolMode) {
-            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
-            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
-            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_absol");
-            game.setDiscordantStarsMode(false);
-            game.swapInVariantUnits("absol");
-            game.swapInVariantTechs();
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
+            activeGame.setTechnologyDeckID("techs_absol");
+            activeGame.setDiscordantStarsMode(false);
+            activeGame.swapInVariantUnits("absol");
+            activeGame.swapInVariantTechs();
         }
-        game.setAbsolMode(absolMode);
+        activeGame.setAbsolMode(absolMode);
 
         // JUST PoK
         if (!absolMode && !discordantStarsMode) {
-            if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
-            if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
-            if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
-            if (!game.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
-            if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_pok");
-            game.setBaseGameMode(false);
-            game.setAbsolMode(false);
-            game.setDiscordantStarsMode(false);
-            game.swapOutVariantTechs();
-            game.swapInVariantUnits("pok");
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
+            activeGame.setTechnologyDeckID("techs_pok");
+            activeGame.setBaseGameMode(false);
+            activeGame.setAbsolMode(false);
+            activeGame.setDiscordantStarsMode(false);
+            activeGame.swapOutVariantTechs();
+            activeGame.swapInVariantUnits("pok");
         }
 
         return true;
     }
 
-    private static void sendTIGLSetupText(Game game) {
+    private static void sendTIGLSetupText(Game activeGame) {
         String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
             "Please ensure you have all:\n" +
             "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
             "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
             "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360";
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb);
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb);
     }
 }

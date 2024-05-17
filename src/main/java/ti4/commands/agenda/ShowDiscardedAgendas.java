@@ -17,15 +17,15 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        showDiscards(game, event);
+        Game activeGame = getActiveGame();
+        showDiscards(activeGame, event);
     }
 
-    public void showDiscards(Game game, GenericInteractionCreateEvent event) {
+    public void showDiscards(Game activeGame, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
         sb.append("### __**Discarded Agendas:**__");
-        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
+        Map<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         List<MessageEmbed> agendaEmbeds = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
             agendaEmbeds.add(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());

@@ -21,14 +21,14 @@ public class UnlockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
-        unlockLeader(event, leaderID, game, player);
+    void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
+        unlockLeader(event, leaderID, activeGame, player);
     }
 
-    public static void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Game game, Player player) {
+    public static void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Game activeGame, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
-        MessageChannel channel = game.getMainGameChannel();
-        if (game.isFoWMode())
+        MessageChannel channel = activeGame.getMainGameChannel();
+        if (activeGame.isFoWMode())
             channel = player.getPrivateChannel();
 
         if (playerLeader == null) {
@@ -39,8 +39,8 @@ public class UnlockLeader extends LeaderAction {
 
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
 
-        boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
-
+        boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
+        
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " unlocked:");
             channel.sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, true, showFlavourText)).queue();
@@ -49,16 +49,17 @@ public class UnlockLeader extends LeaderAction {
             String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader);
             MessageHelper.sendMessageToChannel(channel, message);
         }
-        if (leaderID.contains("bentorcommander")) {
-            player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-            MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + "Set Commodity Total to " + player.getCommoditiesTotal());
+        if(leaderID.contains("bentorcommander")){
+            player.setCommoditiesTotal(player.getCommoditiesTotal()+1);
+            MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player)+"Set Commodity Total to "+player.getCommoditiesTotal());
         }
-        if (leaderID.contains("naalucommander")) {
-            //PNInfo.sendPromissoryNoteInfo(game, player, false);
-            CardsInfo.sendVariousAdditionalButtons(game, player);
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " you can use Naalu Commander via button in your cards info thread");
+        if(leaderID.contains("naalucommander")){
+            //PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+            CardsInfo.sendVariousAdditionalButtons(activeGame,player);
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true)+ " you can use Naalu Commander via button in your cards info thread");
 
         }
+        
 
         if (playerLeader.isExhausted()) {
             MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
