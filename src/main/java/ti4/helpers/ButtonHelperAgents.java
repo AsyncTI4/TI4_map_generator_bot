@@ -1904,7 +1904,7 @@ public class ButtonHelperAgents {
                 continue;
             }
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false, true)) {
-                if (FoWHelper.getPlayerHS(activeGame, p2).getPosition().equalsIgnoreCase(pos2)) {
+                if (p2.getHomeSystemTile().getPosition().equalsIgnoreCase(pos2)) {
                     return true;
                 }
             }

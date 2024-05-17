@@ -740,7 +740,7 @@ public class ButtonHelperModifyUnits {
         HashSet<String> adjTiles = new HashSet();
         adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos1, player, false));
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
-            Tile hs = FoWHelper.getPlayerHS(activeGame, player);
+            Tile hs = player.getHomeSystemTile();
             if (hs != null) {
                 adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, hs.getPosition(), player, false));
             }

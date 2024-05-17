@@ -152,7 +152,7 @@ public class HeroPlay extends LeaderAction {
         switch (playerLeader.getId()) {
             case "kollecchero" -> DrawRelic.drawWithAdvantage(player, event, activeGame, activeGame.getRealPlayers().size());
             case "titanshero" -> {
-                Tile t = FoWHelper.getPlayerHS(activeGame, player);
+                Tile t = player.getHomeSystemTile();
                 if (activeGame.getTileFromPlanet("elysium") != null && activeGame.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),

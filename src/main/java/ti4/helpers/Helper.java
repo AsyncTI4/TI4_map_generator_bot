@@ -1056,7 +1056,7 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
-            if (activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)) {
+            if (activeGame.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
                 continue;
             }
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,

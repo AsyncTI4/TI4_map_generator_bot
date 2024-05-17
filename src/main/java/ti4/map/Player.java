@@ -2496,8 +2496,9 @@ public class Player {
     }
 
     public String getPlayerStatsAnchorPosition() {
-        if ("null".equals(playerStatsAnchorPosition))
+        if ("null".equals(playerStatsAnchorPosition)) {
             return null;
+        }
         return playerStatsAnchorPosition;
     }
 
@@ -2842,5 +2843,27 @@ public class Player {
 
         eb.setColor(ColorModel.primaryColor(color));
         return eb.build();
+    }
+
+    public Tile getHomeSystemTile() {
+        Game game = getGame();
+        if (hasAbility("mobile_command")) {
+            if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).isEmpty()) {
+                return null;
+            }
+            return ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).get(0);
+        }
+        if (!faction.contains("franken") && game.getTile(AliasHandler.resolveTile(faction)) != null) {
+            return game.getTile(AliasHandler.resolveTile(faction));
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getPosition().equalsIgnoreCase(getPlayerStatsAnchorPosition()) && tile.isHomeSystem()) {
+                return tile;
+            }
+            if (getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null) {
+                return tile;
+            }
+        }
+        return ButtonHelper.getTileOfPlanetWithNoTrait(this, game);
     }
 }

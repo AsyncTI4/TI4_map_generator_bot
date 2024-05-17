@@ -3092,7 +3092,7 @@ public class ButtonListener extends ListenerAdapter {
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
                     }
-                    Tile tile = FoWHelper.getPlayerHS(activeGame, player);
+                    Tile tile = player.getHomeSystemTile();
                     buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "warfare", "place");
                     int val = Helper.getProductionValue(player, activeGame, tile, true);
                     String message = player.getRepresentation()
@@ -5534,7 +5534,7 @@ public class ButtonListener extends ListenerAdapter {
                 buttons.add(doneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 if (tile != null && player.hasAbility("rally_to_the_cause")
-                    && FoWHelper.getPlayerHS(activeGame, player) == tile
+                    && player.getHomeSystemTile() == tile
                     && ButtonHelperAbilities.getTilesToRallyToTheCause(activeGame, player).size() > 0) {
                     String msg = player.getRepresentation()
                         + " due to your rally to the cause ability, if you just produced a ship in your HS, you can produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units. Press button to resolve";

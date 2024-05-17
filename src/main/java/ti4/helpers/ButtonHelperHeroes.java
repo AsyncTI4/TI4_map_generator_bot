@@ -632,7 +632,7 @@ public class ButtonHelperHeroes {
         String planet = buttonID.split("_")[1];
         String attachment = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
-        Tile hs = FoWHelper.getPlayerHS(game, player);
+        Tile hs = player.getHomeSystemTile();
         for (UnitHolder uh : hs.getPlanetUnitHolders()) {
             String planet2 = uh.getName();
             buttons.add(Button.success("florzenAgentStep3_" + planet + "_" + planet2 + "_" + attachment,

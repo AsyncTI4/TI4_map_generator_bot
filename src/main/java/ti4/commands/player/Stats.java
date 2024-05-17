@@ -25,6 +25,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 
@@ -324,6 +325,11 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");
 		sb.append("> Display Name: `").append(player.getDisplayName()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
+
+		Tile homeSystemTile = player.getHomeSystemTile();
+		if (homeSystemTile != null) {
+			sb.append("> Home System:  `").append(player.getHomeSystemTile().getPosition()).append("`\n");
+		}
 
 		sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
 		sb.append("> Planets: `").append(player.getPlanets()).append("`\n");
