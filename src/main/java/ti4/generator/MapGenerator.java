@@ -742,15 +742,18 @@ public class MapGenerator {
                 }
 
                 // Unfollowed SCs
-                int xSpacer = 20;
-                graphics.setFont(Storage.getFont20());
-                graphics.drawString("Needs to Follow: ", x + 9, y + 125 + yDelta);
-                for (int sc : player.getUnfollowedSCs()) {
-                    graphics.setColor(getSCColor(sc, game, true));
-                    String drawText = String.valueOf(sc);
-                    int len = graphics.getFontMetrics().stringWidth(drawText); 
-                    graphics.drawString(drawText, x + 9 + xSpacer + 145, y + 125 + yDelta);
-                    xSpacer += len + 8;
+                if (!player.getUnfollowedSCs().isEmpty()) {
+                    int xSpacer = 20;
+                    graphics.setFont(Storage.getFont20());
+                    graphics.setColor(Color.RED);
+                    graphics.drawString("Needs to Follow: ", x + 9, y + 125 + yDelta);
+                    for (int sc : player.getUnfollowedSCs()) {
+                        graphics.setColor(getSCColor(sc, game, true));
+                        String drawText = String.valueOf(sc);
+                        int len = graphics.getFontMetrics().stringWidth(drawText);
+                        graphics.drawString(drawText, x + 9 + xSpacer + 145, y + 125 + yDelta);
+                        xSpacer += len + 8;
+                    }
                 }
 
                 // CCs
