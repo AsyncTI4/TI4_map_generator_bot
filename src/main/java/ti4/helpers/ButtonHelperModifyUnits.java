@@ -15,6 +15,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.*;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
@@ -1439,7 +1440,10 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                 event.getMessage().delete().queue();
             } else {
-                event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, activeGame)).queue();
+                event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, activeGame)).queue(
+                    null, (error) -> {
+                       BotLogger.log(MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error));
+                    });
             }
 
         }
