@@ -60,10 +60,10 @@ public class AddFrontierTokens implements Command {
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game activeGame = gameManager.getUserActiveGame(userID);
-            parsingForTile(event, activeGame);
-            GameSaveLoadManager.saveMap(activeGame, event);
-            ShowGame.simpleShowGame(activeGame, event);
+            Game game = gameManager.getUserActiveGame(userID);
+            parsingForTile(event, game);
+            GameSaveLoadManager.saveMap(game, event);
+            ShowGame.simpleShowGame(game, event);
         }
     }
 

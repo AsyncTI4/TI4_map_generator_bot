@@ -31,13 +31,13 @@ abstract public class AddRemoveToken implements Command {
         } else {
             OptionMapping option = event.getOption(Constants.FACTION_COLOR);
             List<String> colors = new ArrayList<>();
-            Game activeGame = gameManager.getUserActiveGame(userID);
+            Game game = gameManager.getUserActiveGame(userID);
             if (option != null) {
                 String colorString = option.getAsString().toLowerCase();
                 colorString = colorString.replace(" ", "");
                 StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
                 while (colorTokenizer.hasMoreTokens()) {
-                    String color = Helper.getColorFromString(activeGame, colorTokenizer.nextToken());
+                    String color = Helper.getColorFromString(game, colorTokenizer.nextToken());
                     if (!colors.contains(color)) {
                         colors.add(color);
                         if (!Mapper.isValidColor(color)) {
@@ -47,8 +47,8 @@ abstract public class AddRemoveToken implements Command {
                     }
                 }
             } else {
-                Player player = activeGame.getPlayer(userID);
-                player = Helper.getGamePlayer(activeGame, player, event, null);
+                Player player = game.getPlayer(userID);
+                player = Helper.getGamePlayer(game, player, event, null);
                 if (player == null) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
                     return;
@@ -60,29 +60,30 @@ abstract public class AddRemoveToken implements Command {
             if (tileOption != null) {
                 String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
 
-                if (activeGame.isTileDuplicated(tileID)) {
+                if (game.isTileDuplicated(tileID)) {
                     MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
                     return;
                 }
-                Tile tile = activeGame.getTile(tileID);
+                Tile tile = game.getTile(tileID);
                 if (tile == null) {
-                    tile = activeGame.getTileByPosition(tileID);
+                    tile = game.getTileByPosition(tileID);
                 }
                 if (tile == null) {
                     MessageHelper.replyToMessage(event, "Tile in map not found");
                     return;
                 }
 
-                parsingForTile(event, colors, tile, activeGame);
-                GameSaveLoadManager.saveMap(activeGame, event);
-                ShowGame.simpleShowGame(activeGame, event);
+                parsingForTile(event, colors, tile, game);
+                GameSaveLoadManager.saveMap(game, event);
+                ShowGame.simpleShowGame(game, event);
             } else {
                 MessageHelper.replyToMessage(event, "Tile needs to be specified.");
             }
         }
     }
 
-    abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game activeGame);
+    abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);
+
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());
@@ -93,15 +94,13 @@ abstract public class AddRemoveToken implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
-                                .setAutoComplete(true))
-        );
+            Commands.slash(getActionID(), getActionDescription())
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
+                    .setAutoComplete(true)));
     }
 
     abstract protected String getActionDescription();
-
 
 }

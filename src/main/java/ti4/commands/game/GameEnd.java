@@ -57,13 +57,13 @@ public class GameEnd extends GameSubcommandData {
 
   public void execute(SlashCommandInteractionEvent event) {
     GameManager gameManager = GameManager.getInstance();
-    Game activeGame = gameManager.getUserActiveGame(event.getUser().getId());
+    Game game = gameManager.getUserActiveGame(event.getUser().getId());
 
-    if (activeGame == null) {
+    if (game == null) {
       MessageHelper.replyToMessage(event, "Must set active Game");
       return;
     }
-    String gameName = activeGame.getName();
+    String gameName = game.getName();
     if (!gameName.equals(StringUtils.substringBefore(event.getChannel().getName(), "-"))) {
       MessageHelper.replyToMessage(event, "`/game end` must be executed in game channel only!");
       return;
@@ -75,12 +75,12 @@ public class GameEnd extends GameSubcommandData {
     }
     boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
     boolean archiveChannels = event.getOption(Constants.ARCHIVE_CHANNELS, true, OptionMapping::getAsBoolean);
-    secondHalfOfGameEnd(event, activeGame, publish, archiveChannels);
+    secondHalfOfGameEnd(event, game, publish, archiveChannels);
   }
 
-  public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame, boolean publish,
+  public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game game, boolean publish,
     boolean archiveChannels) {
-    String gameName = activeGame.getName();
+    String gameName = game.getName();
     List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
     boolean deleteRole = true;
     if (gameRoles.size() > 1) {
@@ -95,7 +95,7 @@ public class GameEnd extends GameSubcommandData {
     }
 
     // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
-    Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), activeGame);
+    Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
       "This game's channels' permissions have been updated.");
 
@@ -109,20 +109,20 @@ public class GameEnd extends GameSubcommandData {
 
     // POST GAME INFO
     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
-    activeGame.setHasEnded(true);
-    activeGame.setEndedDate(new Date().getTime());
-    GameSaveLoadManager.saveMap(activeGame, event);
-    String gameEndText = getGameEndText(activeGame, event);
+    game.setHasEnded(true);
+    game.setEndedDate(new Date().getTime());
+    GameSaveLoadManager.saveMap(game, event);
+    String gameEndText = getGameEndText(game, event);
     MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
-    activeGame.setAutoPing(false);
-    activeGame.setAutoPingSpacer(0);
-    ButtonHelper.offerEveryoneTitlePossibilities(activeGame);
+    game.setAutoPing(false);
+    game.setAutoPingSpacer(0);
+    ButtonHelper.offerEveryoneTitlePossibilities(game);
     // SEND THE MAP IMAGE
-    MapGenerator.saveImage(activeGame, DisplayType.all, event)
+    MapGenerator.saveImage(game, DisplayType.all, event)
       .thenAccept(fileUpload -> {
         MessageHelper.replyToMessage(event, fileUpload);
         StringBuilder message = new StringBuilder();
-        for (String playerID : activeGame.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
+        for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
           Member member = event.getGuild().getMemberById(playerID);
           if (member != null)
             message.append(member.getAsMention());
@@ -141,20 +141,20 @@ public class GameEnd extends GameSubcommandData {
             BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
             return;
           }
-          if (!activeGame.isFoWMode()) {
+          if (!game.isFoWMode()) {
             // INFORM PLAYERS
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
               m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
               m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
                 t -> {
-                  t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()));
+                  t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + game.getName() + "** in PBD Chronicles:\n> " + error.getMessage()));
                   String endOfGameSummary = "";
 
-                  for (int x = 1; x < activeGame.getRound() + 1; x++) {
+                  for (int x = 1; x < game.getRound() + 1; x++) {
                     String summary = "";
-                    for (Player player : activeGame.getRealPlayers()) {
-                      if (!activeGame.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
-                        summary = summary + player.getFactionEmoji() + ": " + activeGame.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                    for (Player player : game.getRealPlayers()) {
+                      if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
+                        summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
                       }
                     }
                     if (!summary.isEmpty()) {
@@ -173,9 +173,9 @@ public class GameEnd extends GameSubcommandData {
         }
 
         // TIGL Extras
-        if (activeGame.isCompetitiveTIGLGame() && activeGame.getWinner().isPresent()) {
+        if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
           MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            getTIGLFormattedGameEndText(activeGame, event));
+            getTIGLFormattedGameEndText(game, event));
           String blt = AsyncTI4DiscordBot.jda.getUserById("757405214398480486").getAsMention();
           MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             blt + " bot has been told to ping you when TIGL games end");
@@ -191,8 +191,8 @@ public class GameEnd extends GameSubcommandData {
 
         // MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
-        TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
-        TextChannel actionsChannel = activeGame.getMainGameChannel();
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        TextChannel actionsChannel = game.getMainGameChannel();
         if (inLimboCategory != null && archiveChannels) {
           if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
             cleanUpInLimboCategory(event.getGuild(), 3);
@@ -209,8 +209,8 @@ public class GameEnd extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
           }
         }
-        if (activeGame.isFoWMode()) {
-          Category fogCategory = event.getGuild().getCategoriesByName(activeGame.getName(), true).get(0);
+        if (game.isFoWMode()) {
+          Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).get(0);
           if (fogCategory != null) {
             List<TextChannel> channels = new ArrayList<>();
             channels.addAll(fogCategory.getTextChannels());
@@ -243,15 +243,15 @@ public class GameEnd extends GameSubcommandData {
         for (ThreadChannel threadChannel_ : threadChannels) {
           if (threadChannel_.getName().equals(threadName)) {
             MessageHelper.sendMessageToChannel(threadChannel_,
-              "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
+              "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");
           }
         }
 
         // send game json file to s3
-        File jsonGameFile = Storage.getMapsJSONStorage(activeGame.getName() + ".json");
-        boolean isWon = activeGame.getWinner().isPresent() && activeGame.isHasEnded();
+        File jsonGameFile = Storage.getMapsJSONStorage(game.getName() + ".json");
+        boolean isWon = game.getWinner().isPresent() && game.isHasEnded();
         if (isWon) {
-          WebHelper.putFile(activeGame.getName(), jsonGameFile);
+          WebHelper.putFile(game.getName(), jsonGameFile);
         }
       });
 
@@ -343,17 +343,17 @@ public class GameEnd extends GameSubcommandData {
     return numberFormat.format(d);
   }
 
-  public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
+  public static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
     StringBuilder sb = new StringBuilder();
     sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
-    sb.append("This was a TIGL game! 👑").append(activeGame.getWinner().get().getPing())
+    sb.append("This was a TIGL game! 👑").append(game.getWinner().get().getPing())
       .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-    sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentationTIGL(activeGame.getEndedDate()))
+    sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentationTIGL(game.getEndedDate()))
       .append(" (TIGL wants Game End Date for Async)\n");
     sb.append("Match Start Time: 00:00\n\n");
     sb.append("Players:").append("\n");
     int index = 1;
-    for (Player player : activeGame.getRealPlayers()) {
+    for (Player player : game.getRealPlayers()) {
       int playerVP = player.getTotalVictoryPoints();
       Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
       sb.append("  ").append(index).append(". ");
@@ -369,9 +369,9 @@ public class GameEnd extends GameSubcommandData {
 
     sb.append("\n");
     sb.append("Platform: Async\n");
-    sb.append("Additional Notes: Async Game '").append(activeGame.getName());
-    if (!StringUtils.isBlank(activeGame.getCustomName()))
-      sb.append("   ").append(activeGame.getCustomName());
+    sb.append("Additional Notes: Async Game '").append(game.getName());
+    if (!StringUtils.isBlank(game.getCustomName()))
+      sb.append("   ").append(game.getCustomName());
     sb.append("'\n```");
 
     return sb.toString();

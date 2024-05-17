@@ -49,15 +49,15 @@ public class CustomizationOptions extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping stratPings = event.getOption(Constants.STRAT_PINGS);
         if (stratPings != null) {
             String stratP = stratPings.getAsString();
             if ("YES".equalsIgnoreCase(stratP)) {
-                activeGame.setStratPings(true);
+                game.setStratPings(true);
             } else if ("FALSE".equalsIgnoreCase(stratP)) {
-                activeGame.setStratPings(false);
+                game.setStratPings(false);
             }
         }
 
@@ -65,27 +65,27 @@ public class CustomizationOptions extends CustomSubcommandData {
         if (ccNPlastic != null) {
             String ccNP = ccNPlastic.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)) {
-                activeGame.setCCNPlasticLimit(true);
+                game.setCCNPlasticLimit(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                activeGame.setCCNPlasticLimit(false);
+                game.setCCNPlasticLimit(false);
             }
         }
         OptionMapping factReacts = event.getOption(Constants.BOT_FACTION_REACTS);
         if (factReacts != null) {
             String ccNP = factReacts.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)) {
-                activeGame.setBotFactionReactions(true);
+                game.setBotFactionReactions(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                activeGame.setBotFactionReactions(false);
+                game.setBotFactionReactions(false);
             }
         }
         OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
         if (shushing != null) {
             String ccNP = shushing.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)) {
-                activeGame.setSpinMode(true);
+                game.setSpinMode(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                activeGame.setSpinMode(false);
+                game.setSpinMode(false);
             }
         }
 
@@ -96,73 +96,73 @@ public class CustomizationOptions extends CustomSubcommandData {
         Boolean showFullTextComponents = event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null,
             OptionMapping::getAsBoolean);
         if (showFullTextComponents != null)
-            activeGame.setShowFullComponentTextEmbeds(showFullTextComponents);
+            game.setShowFullComponentTextEmbeds(showFullTextComponents);
 
         Boolean showUnitTags = event.getOption(Constants.SHOW_UNIT_TAGS, null, OptionMapping::getAsBoolean);
         if (showUnitTags != null)
-            activeGame.setShowUnitTags(showUnitTags);
+            game.setShowUnitTags(showUnitTags);
 
         Boolean nomad = event.getOption(Constants.NOMAD_COIN, null, OptionMapping::getAsBoolean);
         if (nomad != null)
-            activeGame.setNomadCoin(nomad);
+            game.setNomadCoin(nomad);
 
         Boolean light = event.getOption(Constants.LIGHT_FOG_MODE, null, OptionMapping::getAsBoolean);
         if (light != null)
-            activeGame.setLightFogMode(light);
+            game.setLightFogMode(light);
         Boolean red = event.getOption(Constants.RED_TAPE_MODE, null, OptionMapping::getAsBoolean);
         if (red != null)
-            activeGame.setRedTapeMode(red);
+            game.setRedTapeMode(red);
 
         Boolean showB = event.getOption(Constants.SHOW_BUBBLES, null, OptionMapping::getAsBoolean);
         if (showB != null)
-            activeGame.setShowBubbles(showB);
+            game.setShowBubbles(showB);
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null)
-            activeGame.setShowGears(showG);
+            game.setShowGears(showG);
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null)
-            activeGame.setHomeBrew(homebrew);
+            game.setHomeBrew(homebrew);
 
         Boolean injectRules = event.getOption(Constants.INJECT_RULES_LINKS, null, OptionMapping::getAsBoolean);
         if (injectRules != null)
-            activeGame.setInjectRulesLinks(injectRules);
+            game.setInjectRulesLinks(injectRules);
 
         Boolean queueSO = event.getOption(Constants.QUEUE_SO, null, OptionMapping::getAsBoolean);
         if (queueSO != null) {
-            activeGame.setQueueSO(queueSO);
+            game.setQueueSO(queueSO);
             if (!queueSO) {
                 String key = "factionsThatAreNotDiscardingSOs";
                 String key2 = "queueToDrawSOs";
                 String key3 = "potentialBlockers";
-                activeGame.setStoredValue(key, "");
-                activeGame.setStoredValue(key2, "");
-                activeGame.setStoredValue(key3, "");
+                game.setStoredValue(key, "");
+                game.setStoredValue(key2, "");
+                game.setStoredValue(key3, "");
             }
         }
 
         Boolean undo = event.getOption(Constants.UNDO_BUTTON, null, OptionMapping::getAsBoolean);
         if (undo != null)
-            activeGame.setUndoButton(undo);
+            game.setUndoButton(undo);
 
         Integer fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsInt);
         if (fast != null) {
-            activeGame.setStoredValue("fastSCFollow", "" + fast);
+            game.setStoredValue("fastSCFollow", "" + fast);
             if (fast == 0) {
-                activeGame.setFastSCFollowMode(false);
+                game.setFastSCFollowMode(false);
             } else {
-                activeGame.setFastSCFollowMode(true);
+                game.setFastSCFollowMode(true);
             }
 
         }
 
         String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
         if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity))
-            activeGame.setOutputVerbosity(verbosity);
+            game.setOutputVerbosity(verbosity);
 
         String unitSource = event.getOption(Constants.UNIT_SOURCE, null, OptionMapping::getAsString);
         if (unitSource != null && Mapper.getUnitSources().contains(unitSource))
-            activeGame.swapInVariantUnits(unitSource);
+            game.swapInVariantUnits(unitSource);
     }
 }

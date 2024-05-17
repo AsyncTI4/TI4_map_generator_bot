@@ -16,11 +16,11 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        spinRings(activeGame);
+        Game game = getActiveGame();
+        spinRings(game);
     }
 
-    public void spinRings(Game activeGame){
+    public void spinRings(Game game) {
         List<Tile> tilesToSet = new ArrayList<>();
         //first ring
         for (int y = 1; y < 4; y++) {
@@ -30,9 +30,9 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
                 }
                 Tile tile;
                 if (x < 10) {
-                    tile = activeGame.getTileByPosition(y + "0" + x);
+                    tile = game.getTileByPosition(y + "0" + x);
                 } else {
-                    tile = activeGame.getTileByPosition(y + "" + x);
+                    tile = game.getTileByPosition(y + "" + x);
                 }
                 if (y == 2) {
                     if ((x - y) < 1) {
@@ -59,10 +59,10 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
             }
         }
         for (Tile tile : tilesToSet) {
-            activeGame.setTile(tile);
+            game.setTile(tile);
         }
-        activeGame.rebuildTilePositionAutoCompleteList();
+        game.rebuildTilePositionAutoCompleteList();
         DisplayType displayType = DisplayType.map;
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Spun the rings");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Spun the rings");
     }
 }

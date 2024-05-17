@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 
 public abstract class MapSubcommandData extends SubcommandData {
-    private Game activeGame;
+    private Game game;
     private User user;
 
     public String getActionID() {
@@ -22,7 +22,7 @@ public abstract class MapSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return activeGame;
+        return game;
     }
 
     public User getUser() {
@@ -33,9 +33,9 @@ public abstract class MapSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getInstance().getUserActiveGame(user.getId());
         if (event.getOption(Constants.GAME_NAME) != null) {
-            activeGame = GameManager.getInstance().getGame(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
+            game = GameManager.getInstance().getGame(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
         }
     }
 }

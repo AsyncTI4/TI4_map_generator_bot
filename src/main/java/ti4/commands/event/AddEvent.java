@@ -16,9 +16,9 @@ public class AddEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         Integer eventID = event.getOption(Constants.EVENT_ID, null, OptionMapping::getAsInt);
-        boolean success = activeGame.addEventInEffect(eventID);
+        boolean success = game.addEventInEffect(eventID);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event added");
         } else {

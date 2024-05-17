@@ -18,16 +18,16 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
     public AddRemoveFactionCCToFromFleet(String id, String description) {
         super(id, description);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for CC")
-                .setRequired(true).setAutoComplete(true));
+            .setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set CC's").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -40,7 +40,7 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
             colorString = colorString.replace(" ", "");
             StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
             while (colorTokenizer.hasMoreTokens()) {
-                String color = Helper.getColorFromString(activeGame, colorTokenizer.nextToken());
+                String color = Helper.getColorFromString(game, colorTokenizer.nextToken());
                 if (!colors.contains(color)) {
                     colors.add(color);
                     if (!Mapper.isValidColor(color)) {
@@ -49,11 +49,11 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
                     }
                 }
             }
-            action(event, colors, activeGame, player);
+            action(event, colors, game, player);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify CC's");
         }
     }
 
-    abstract void action(SlashCommandInteractionEvent event, List<String> color, Game activeGame, Player player);
+    abstract void action(SlashCommandInteractionEvent event, List<String> color, Game game, Player player);
 }

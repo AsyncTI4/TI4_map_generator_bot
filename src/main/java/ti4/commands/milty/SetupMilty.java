@@ -10,9 +10,9 @@ import ti4.message.MessageHelper;
 public class SetupMilty extends MiltySubcommandData {
 
     private static final String setup = "setup";
-    private static final String sliceCount= "slice_count";
-    private static final String factionCount= "faction_count";
-    private static final String playerCount= "player_count";
+    private static final String sliceCount = "slice_count";
+    private static final String factionCount = "faction_count";
+    private static final String playerCount = "player_count";
     private static final String minRes = "min_resources";
     private static final String minInf = "min_influence";
     private static final String anomTouch = "anomalies_can_touch";
@@ -29,15 +29,15 @@ public class SetupMilty extends MiltySubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
-        if (!activeGame.isTestBetaFeaturesMode()) {
+        if (!game.isTestBetaFeaturesMode()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Milty Draft settings in this bot is incomplete.\nEnable access by running `/game setup beta_test_mode: true`\nMost folks use [this website](https://milty.shenanigans.be/) to do the Milty Draft and import the TTPG string with `/map add_tile_list`");
             return;
         }
 
         OptionMapping sliceOption = event.getOption(sliceCount);
-        int sliceCount = activeGame.getPlayerCountForMap() + 2;
+        int sliceCount = game.getPlayerCountForMap() + 2;
         if (sliceOption != null) {
             sliceCount = sliceOption.getAsInt();
         }
@@ -46,7 +46,7 @@ public class SetupMilty extends MiltySubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), limit9slice);
             return;
         }
-        if (activeGame.getPlayers().values().size() > 8) {
+        if (game.getPlayers().values().size() > 8) {
             String limit8p = "Milty draft in this bot does not support more than 8 players yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), limit8p);
             return;

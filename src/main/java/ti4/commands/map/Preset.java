@@ -31,7 +31,7 @@ public class Preset extends MapSubcommandData {
         OptionMapping template = event.getOption(Constants.MAP_TEMPLATE);
         if (template == null) return;
 
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         String slice1 = event.getOption(Constants.SLICE_1, null, OptionMapping::getAsString);
         String slice2 = event.getOption(Constants.SLICE_2, null, OptionMapping::getAsString);
         String slice3 = event.getOption(Constants.SLICE_3, null, OptionMapping::getAsString);
@@ -66,7 +66,7 @@ public class Preset extends MapSubcommandData {
                     "85a3", "84a0", "85a4", "84a1", "85a5", "87a5", s1[1], s1[3], "85a1", "84a4", "85a2", "84a5", //ring 2
                     "85a3", "84a0", "84a0", "85a4", "84a1", "84a1", "85a5", "84a2", s1[2], home, s1[0], "84a3", "85a1", "84a4", "84a4", "85a2", "84a5", "84a5");//ring 3
                 String mapString = String.join(" ", tiles);
-                AddTileList.addTileListToMap(activeGame, mapString, event);
+                AddTileList.addTileListToMap(game, mapString, event);
             }
             case "TspMap (6 slices)" -> {
                 if (s1 == null || s2 == null || s3 == null || s4 == null || s5 == null || s6 == null) {
@@ -81,16 +81,16 @@ public class Preset extends MapSubcommandData {
                 // 29,27,41,62,43
                 // left, fwd, right, equi, mecatol
                 String mapString = String.join(" ", tiles);
-                AddTileList.addTileListToMap(activeGame, mapString, event);
+                AddTileList.addTileListToMap(game, mapString, event);
 
                 // finish adding hyperlanes and adjacencies
-                InitTspmap.addTspmapHyperlanes(activeGame);
-                InitTspmap.addTspmapEdgeAdjacencies(activeGame);
+                InitTspmap.addTspmapHyperlanes(game);
+                InitTspmap.addTspmapEdgeAdjacencies(game);
             }
             case "Magi's Madness (0 slices)" -> {
                 String mapString = "{85A2} 70 84A5 0g 83A2 69 0g 62 42 90B1 36 27 34 65 68 46 76 74 75 0g 88B2 26 44 37 66 25 43 48 19 18 78"
                     + " 35 61 79 49 64 45 29 80 50 67 33 0g 22 87B3 86A5 73 0g 38 77 39 40 41 59 0g 47 72 24 0g 28 91B1";
-                AddTileList.addTileListToMap(activeGame, mapString, event);
+                AddTileList.addTileListToMap(game, mapString, event);
             }
         }
     }

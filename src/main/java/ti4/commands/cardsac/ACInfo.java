@@ -31,24 +31,24 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendActionCardInfo(activeGame, player, event);
+        sendActionCardInfo(game, player, event);
         MessageHelper.sendMessageToEventChannel(event, "AC Info Sent");
     }
 
-    private static void sendTrapCardInfo(Game activeGame, Player player) {
+    private static void sendTrapCardInfo(Game game, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getTrapCardInfo(activeGame, player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(game, player));
         }
     }
 
-    private static String getTrapCardInfo(Game activeGame, Player player) {
+    private static String getTrapCardInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
         sb.append("**Trap Cards:**").append("\n");
@@ -98,24 +98,24 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+    public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendActionCardInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendActionCardInfo(game, player);
     }
 
-    public static void sendActionCardInfo(Game activeGame, Player player) {
+    public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getActionCardInfo(game, player));
         MessageHelper.sendMessageToChannelWithButtons(
             player.getCardsInfoThread(),
             "_ _\nClick a button below to play an Action Card",
-            getPlayActionCardButtons(activeGame, player));
+            getPlayActionCardButtons(game, player));
 
-        sendTrapCardInfo(activeGame, player);
+        sendTrapCardInfo(game, player);
     }
 
-    private static String getActionCardInfo(Game activeGame, Player player) {
+    private static String getActionCardInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
 
@@ -147,13 +147,13 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    private static List<Button> getPlayActionCardButtons(Game activeGame, Player player) {
+    private static List<Button> getPlayActionCardButtons(Game game, Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
 
         if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
-            && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
+            && !ButtonHelper.isPlayerElected(game, player, "censure")
+            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
@@ -166,7 +166,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         }
         acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
         if (actionCards != null && !actionCards.isEmpty()
-            && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
+            && !ButtonHelper.isPlayerElected(game, player, "censure")
             && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")
                 || actionCards.containsKey("investments") || actionCards.containsKey("summit"))) {
             acButtons.add(Button.secondary("checkForAllACAssignments", "Pre assign ACs"));
@@ -175,7 +175,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getActionPlayActionCardButtons(Game activeGame, Player player) {
+    public static List<Button> getActionPlayActionCardButtons(Game game, Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -194,7 +194,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getDiscardActionCardButtons(Game activeGame, Player player, boolean doingAction) {
+    public static List<Button> getDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         String stall = "";
@@ -215,7 +215,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getYssarilHeroActionCardButtons(Game activeGame, Player yssaril, Player notYssaril) {
+    public static List<Button> getYssarilHeroActionCardButtons(Game game, Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -233,7 +233,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getToBeStolenActionCardButtons(Game activeGame, Player player) {
+    public static List<Button> getToBeStolenActionCardButtons(Game game, Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {

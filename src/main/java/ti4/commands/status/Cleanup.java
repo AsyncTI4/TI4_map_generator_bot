@@ -29,19 +29,17 @@ public class Cleanup extends StatusSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())){
+        if (option == null || !"YES".equals(option.getAsString())) {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game activeGame = getActiveGame();
-        runStatusCleanup(activeGame);
+        Game game = getActiveGame();
+        runStatusCleanup(game);
     }
 
-    public void runStatusCleanup(Game activeGame) {
+    public void runStatusCleanup(Game game) {
 
-
-
-        Map<String, Tile> tileMap = activeGame.getTileMap();
+        Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -50,21 +48,21 @@ public class Cleanup extends StatusSubcommandData {
                 unitHolder.removeAllUnitDamage();
             }
         }
-        Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+        Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
 
-        returnEndStatusPNs(activeGame); // return any PNs with "end of status phase" return timing
+        returnEndStatusPNs(game); // return any PNs with "end of status phase" return timing
 
-        Map<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = game.getPlayers();
 
         for (Player player : players.values()) {
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {
-                activeGame.setScTradeGood(sc, 0);
-            }            
+                game.setScTradeGood(sc, 0);
+            }
             player.clearSCs();
             player.setTurnCount(0);
             player.clearFollowedSCs();
@@ -72,67 +70,66 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
-            
-            if (player.isRealPlayer() && activeGame.getStoredValue("Pre Pass " + player.getFaction()) != null
-            && activeGame.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
-                if (activeGame.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
-                    activeGame.setStoredValue("Pre Pass " + player.getFaction(), "");
+
+            if (player.isRealPlayer() && game.getStoredValue("Pre Pass " + player.getFaction()) != null
+                && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+                if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
+                    game.setStoredValue("Pre Pass " + player.getFaction(), "");
                 }
             }
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
-                if (!leader.isLocked()){
-                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")){
+                if (!leader.isLocked()) {
+                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")) {
                         player.removeLeader(leader.getId());
                     } else {
-                        RefreshLeader.refreshLeader(player, leader, activeGame);
+                        RefreshLeader.refreshLeader(player, leader, game);
                     }
                 }
             }
         }
-        activeGame.setStoredValue("absolMOW", "");
-        activeGame.setStoredValue("agendaCount", "0");
-        activeGame.setStoredValue("politicalStabilityFaction", "");
-        activeGame.setStoredValue("forcedScoringOrder", "");
-        activeGame.setStoredValue("Public Disgrace", "");
-        activeGame.setStoredValue("Public Disgrace Only", "");
-        activeGame.setStoredValue("edynAgentPreset", "");
-        activeGame.setStoredValue("Coup", "");
-        activeGame.setStoredValue("PublicExecution", "");
-        activeGame.setHasHadAStatusPhase(true);
-        if(activeGame.isSpinMode()){
-            new SpinTilesInFirstThreeRings().spinRings(activeGame);
+        game.setStoredValue("absolMOW", "");
+        game.setStoredValue("agendaCount", "0");
+        game.setStoredValue("politicalStabilityFaction", "");
+        game.setStoredValue("forcedScoringOrder", "");
+        game.setStoredValue("Public Disgrace", "");
+        game.setStoredValue("Public Disgrace Only", "");
+        game.setStoredValue("edynAgentPreset", "");
+        game.setStoredValue("Coup", "");
+        game.setStoredValue("PublicExecution", "");
+        game.setHasHadAStatusPhase(true);
+        if (game.isSpinMode()) {
+            new SpinTilesInFirstThreeRings().spinRings(game);
         }
     }
-  
 
-    public void returnEndStatusPNs(Game activeGame) {
-        Map<String, Player> players = activeGame.getPlayers();
-         for (Player player : players.values()) {
-             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
-            for(String pn: pns){
+    public void returnEndStatusPNs(Game game) {
+        Map<String, Player> players = game.getPlayers();
+        for (Player player : players.values()) {
+            List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
+            for (String pn : pns) {
                 //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
-                Player pnOwner = activeGame.getPNOwner(pn);
-                if(pnOwner == null || !pnOwner.isRealPlayer() ){
+                Player pnOwner = game.getPNOwner(pn);
+                if (pnOwner == null || !pnOwner.isRealPlayer()) {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if(pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")){
-                        player.removePromissoryNote(pn);
-                        pnOwner.setPromissoryNote(pn);  
-                        PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
-		                PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
-                    }
+                if (pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")) {
+                    player.removePromissoryNote(pn);
+                    pnOwner.setPromissoryNote(pn);
+                    PNInfo.sendPromissoryNoteInfo(game, pnOwner, false);
+                    PNInfo.sendPromissoryNoteInfo(game, player, false);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), pnModel.getName() + " was returned");
                 }
             }
-    }    
+        }
+    }
 
     @Override
 
     public void reply(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        int prevRound = activeGame.getRound() - 1;
+        Game game = getActiveGame();
+        int prevRound = game.getRound() - 1;
 
         StatusCommand.reply(event, "End of round " + prevRound + " status phase.");
     }

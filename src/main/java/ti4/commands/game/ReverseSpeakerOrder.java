@@ -18,13 +18,13 @@ public class ReverseSpeakerOrder extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if(!"YES".equals(event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString))) {
+        if (!"YES".equals(event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString))) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must confirm with YES");
             return;
         }
         User user = event.getUser();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        Game game = GameManager.getInstance().getUserActiveGame(user.getId());
 
-        activeGame.setReverseSpeakerOrder(!activeGame.isReverseSpeakerOrder());
+        game.setReverseSpeakerOrder(!game.isReverseSpeakerOrder());
     }
 }

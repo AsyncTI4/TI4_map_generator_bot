@@ -16,10 +16,10 @@ public class RemoveEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         Integer eventID = event.getOption(Constants.EVENT_ID, null, OptionMapping::getAsInt);
 
-        boolean success = activeGame.removeEventInEffect(eventID);
+        boolean success = game.removeEventInEffect(eventID);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event removed");
         } else {

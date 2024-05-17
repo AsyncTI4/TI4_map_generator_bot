@@ -20,14 +20,14 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         if (playerOption != null) {
             User user = playerOption.getAsUser();
-            Player player = activeGame.getPlayer(user.getId());
-            CardsInfo.sendCardsInfo(activeGame, player, event);
+            Player player = game.getPlayer(user.getId());
+            CardsInfo.sendCardsInfo(game, player, event);
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(game, event);
         MessageHelper.sendMessageToEventChannel(event, "Cards Info sent");
     }
 }

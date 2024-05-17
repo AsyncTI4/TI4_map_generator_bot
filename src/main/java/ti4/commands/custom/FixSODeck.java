@@ -12,8 +12,8 @@ public class FixSODeck extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        activeGame.fixScrewedSOs();
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = getActiveGame();
+        game.fixScrewedSOs();
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

@@ -19,12 +19,12 @@ import java.util.Objects;
 public class RemoveUnits extends AddRemoveUnits {
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
-        removeStuff(event, tile, count, planetName, unitID, color, true, activeGame);
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
+        removeStuff(event, tile, count, planetName, unitID, color, true, game);
     }
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
         OptionMapping option = event.getOption(Constants.PRIORITY_NO_DAMAGE);
         boolean priorityDmg = true;
         if (option != null) {
@@ -33,10 +33,10 @@ public class RemoveUnits extends AddRemoveUnits {
                 priorityDmg = false;
             }
         }
-        removeStuff(event, tile, count, planetName, unitID, color, priorityDmg, activeGame);
+        removeStuff(event, tile, count, planetName, unitID, color, priorityDmg, game);
     }
 
-    public void removeStuff(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, boolean priorityDmg, Game activeGame) {
+    public void removeStuff(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, boolean priorityDmg, Game game) {
         int countToRemove = 0;
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
 
@@ -78,12 +78,12 @@ public class RemoveUnits extends AddRemoveUnits {
             countToRemove = count;
         }
 
-        if(unitHolder != null){
+        if (unitHolder != null) {
             tile.removeUnit(unitHolder.getName(), unitID, count);
             tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
-        }else{
-            if(event instanceof ButtonInteractionEvent eventB){
-                BotLogger.log(event.getId() + " found a null unitholder with the following info: "+tile.getRepresentation() + " "+planetName);
+        } else {
+            if (event instanceof ButtonInteractionEvent eventB) {
+                BotLogger.log(event.getId() + " found a null unitholder with the following info: " + tile.getRepresentation() + " " + planetName);
             }
         }
 
@@ -103,7 +103,7 @@ public class RemoveUnits extends AddRemoveUnits {
             }
         }
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), game);
         }
     }
 
@@ -113,10 +113,10 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
-        super.actionAfterAll(event, tile, color, activeGame);
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game game) {
+        super.actionAfterAll(event, tile, color, game);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), game);
         }
     }
 

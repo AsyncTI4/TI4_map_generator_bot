@@ -14,20 +14,20 @@ public class ListTurnStats extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
         }
 
         StringBuilder message = new StringBuilder();
-        message.append("**__Average turn length in ").append(activeGame.getName());
-        if (!activeGame.getCustomName().isEmpty()) {
-            message.append(" - ").append(activeGame.getCustomName());
+        message.append("**__Average turn length in ").append(game.getName());
+        if (!game.getCustomName().isEmpty()) {
+            message.append(" - ").append(game.getCustomName());
         }
         message.append("__**");
 
-        for (Player player : activeGame.getPlayers().values()) {
+        for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) continue;
             String turnString = playerAverageTurnLength(player);
             message.append("\n").append(turnString);
@@ -46,16 +46,16 @@ public class ListTurnStats extends StatusSubcommandData {
         long total = totalMillis / numTurns;
         long millis = total % 1000;
 
-      total = total / 1000; //total seconds (truncates)
+        total = total / 1000; //total seconds (truncates)
         long seconds = total % 60;
 
         total = total / 60; //total minutes (truncates)
         long minutes = total % 60;
         long hours = total / 60; //total hours (truncates)
 
-      return "> " + player.getUserName() + ": `" +
-          String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis) +
-          "` (" + numTurns + " turns)";
+        return "> " + player.getUserName() + ": `" +
+            String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis) +
+            "` (" + numTurns + " turns)";
     }
 
     @Override

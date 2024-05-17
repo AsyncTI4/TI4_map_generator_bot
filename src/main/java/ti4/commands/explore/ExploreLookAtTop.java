@@ -21,10 +21,10 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -35,8 +35,8 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
             return;
         }
 
-        List<String> deck = activeGame.getExploreDeck(trait);
-        List<String> discardPile = activeGame.getExploreDiscard(trait);
+        List<String> deck = game.getExploreDeck(trait);
+        List<String> discardPile = game.getExploreDiscard(trait);
 
         String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
         String playerFactionNameWithEmoji = player.getFactionEmoji();
@@ -49,9 +49,9 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         String topCard = deck.get(0);
         sb.append(displayExplore(topCard));
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
-                + " Cards info thread.");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+            + " Cards info thread.");
 
     }
 }

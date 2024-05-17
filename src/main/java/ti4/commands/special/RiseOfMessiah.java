@@ -22,39 +22,39 @@ public class RiseOfMessiah extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        doRise(player, event, activeGame);
-        
+        doRise(player, event, game);
+
     }
 
-    public void doRise(Player player, GenericInteractionCreateEvent event, Game activeGame){
+    public void doRise(Player player, GenericInteractionCreateEvent event, Game game) {
         List<String> planets = player.getPlanetsAllianceMode();
-        for (Tile tile : activeGame.getTileMap().values()) {
+        for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (planets.contains(unitHolder.getName())){
+                if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;
                     for (String token : tokenList) {
-                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG)){
+                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG)) {
                             ignorePlanet = true;
                             break;
                         }
                     }
-                    if (ignorePlanet){
+                    if (ignorePlanet) {
                         continue;
                     }
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+unitHolder.getName(), activeGame);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added 1 infantry to each planet for "+ player.getColor());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added 1 infantry to each planet for " + player.getColor());
     }
 
     @Override

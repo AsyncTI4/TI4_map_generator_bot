@@ -43,11 +43,11 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "No valid leaders were provided. Please see `/help list_leaders` for available choices.");
             return;
         }
-        
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -55,9 +55,9 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
 
         doAction(player, leaderIDs);
 
-        LeaderInfo.sendLeadersInfo(activeGame, player, event);
+        LeaderInfo.sendLeadersInfo(game, player, event);
     }
 
     public abstract void doAction(Player player, List<String> leaderIDs);
-    
+
 }

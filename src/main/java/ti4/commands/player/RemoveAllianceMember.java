@@ -14,20 +14,20 @@ public class RemoveAllianceMember extends PlayerSubcommandData {
     public RemoveAllianceMember() {
         super(Constants.REMOVE_ALLIANCE_MEMBER, "Remove an alliance member");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
-                "Faction or Color with which you want to remove from your alliance").setAutoComplete(true)
+            "Faction or Color with which you want to remove from your alliance").setAutoComplete(true)
                 .setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(activeGame, player, event);
+        Player player_ = Helper.getPlayer(game, player, event);
         if (player_ == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to remove from the alliance could not be found");
             return;
@@ -44,6 +44,6 @@ public class RemoveAllianceMember extends PlayerSubcommandData {
         player_.getCardsInfoThread().removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player.getUserID())).queue();
 
         MessageHelper.sendMessageToEventChannel(event, "Removed " + player_.getFaction() + " as part of " + player.getFaction()
-                + "'s alliance. This worked both ways. You will have to /franken leader_remove to remove the commanders");
+            + "'s alliance. This worked both ways. You will have to /franken leader_remove to remove the commanders");
     }
 }

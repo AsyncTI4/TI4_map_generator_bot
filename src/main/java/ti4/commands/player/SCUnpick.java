@@ -28,20 +28,20 @@ public class SCUnpick extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
-        Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
+        Collection<Player> activePlayers = game.getPlayers().values().stream()
             .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !"null".equals(player_.getColor()))
             .collect(Collectors.toList());
-        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
+        int maxSCsPerPlayer = game.getSCList().size() / activePlayers.size();
 
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scUnpicked = option.getAsInt();
@@ -83,7 +83,7 @@ public class SCUnpick extends PlayerSubcommandData {
         if (allPicked) {
             msgExtra += "\nAll players picked SC";
 
-            Map<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+            Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
@@ -94,7 +94,7 @@ public class SCUnpick extends PlayerSubcommandData {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {
                     Integer tgCount = scTradeGoods.get(scNumber);
                     tgCount = tgCount == null ? 1 : tgCount + 1;
-                    activeGame.setScTradeGood(scNumber, tgCount);
+                    game.setScTradeGood(scNumber, tgCount);
                 }
             }
 
@@ -102,7 +102,7 @@ public class SCUnpick extends PlayerSubcommandData {
             int lowestSC = 100;
             for (Player player_ : activePlayers) {
                 int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = activeGame.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
+                String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
                     nextPlayer = player_; //no further processing, this player has the 0 token
                     break;
@@ -117,7 +117,7 @@ public class SCUnpick extends PlayerSubcommandData {
             if (nextPlayer != null) {
                 msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
                 privatePlayer = nextPlayer;
-                activeGame.updateActivePlayer(nextPlayer);
+                game.updateActivePlayer(nextPlayer);
             }
         }
 
@@ -128,10 +128,10 @@ public class SCUnpick extends PlayerSubcommandData {
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeGame, event, msgExtra, fail, success);
+            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
         } else {
             if (allPicked) {
-                ListTurnOrder.turnOrder(event, activeGame);
+                ListTurnOrder.turnOrder(event, game);
             }
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToEventChannel(event, msgExtra);

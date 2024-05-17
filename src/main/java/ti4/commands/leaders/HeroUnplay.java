@@ -13,9 +13,9 @@ public class HeroUnplay extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
+    void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
-        if (playerLeader != null){
+        if (playerLeader != null) {
             playerLeader.setActive(false);
             MessageHelper.sendMessageToEventChannel(event, "Leader deactivated/unplayed");
         } else {

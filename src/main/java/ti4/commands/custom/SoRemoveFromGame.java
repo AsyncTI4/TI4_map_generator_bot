@@ -16,14 +16,14 @@ public class SoRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.SO_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");
             return;
         }
-        boolean removed = activeGame.removeSOFromGame(soOption.getAsString());
+        boolean removed = game.removeSOFromGame(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "SO removed from game deck");
         } else {

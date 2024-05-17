@@ -22,20 +22,20 @@ public class SetFactionIcon extends FrankenSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
-        if (!activeGame.isFrankenGame()) {
+        if (!game.isFrankenGame()) {
             MessageHelper.sendMessageToEventChannel(event, "This can only be run in Franken games.");
             player.setFactionEmoji(null);
             return;
         }
-        
+
         String factionEmojiString = event.getOption(Constants.FACTION_EMOJI, null, OptionMapping::getAsString);
 
         Emoji factionEmoji = Emoji.fromFormatted(factionEmojiString);
@@ -50,7 +50,7 @@ public class SetFactionIcon extends FrankenSubcommandData {
             return;
         }
         player.setFactionEmoji(factionEmojiString);
-        
+
     }
-    
+
 }

@@ -34,7 +34,7 @@ public class CorrectFaction extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         String newFaction = AliasHandler.resolveColor(event.getOption(Constants.FACTION).getAsString().toLowerCase());
         newFaction = AliasHandler.resolveFaction(newFaction);
@@ -42,15 +42,15 @@ public class CorrectFaction extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
             return;
         }
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
-        Map<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (newFaction.equals(playerInfo.getFaction())) {
@@ -60,10 +60,10 @@ public class CorrectFaction extends PlayerSubcommandData {
             }
         }
         List<String> laws = new ArrayList<>();
-        laws.addAll(activeGame.getLawsInfo().keySet());
+        laws.addAll(game.getLawsInfo().keySet());
         for (String law : laws) {
-            if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
-                activeGame.reviseLaw(activeGame.getLaws().get(law), newFaction);
+            if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
+                game.reviseLaw(game.getLaws().get(law), newFaction);
             }
         }
         FactionModel setupInfo = player.getFactionSetupInfo();
@@ -94,9 +94,9 @@ public class CorrectFaction extends PlayerSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
-        ShowGame.simpleShowGame(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
+        ShowGame.simpleShowGame(game, event);
     }
 
     private void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
