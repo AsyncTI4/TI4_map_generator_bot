@@ -2,12 +2,6 @@ package ti4.map;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -30,10 +24,20 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -42,8 +46,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.milty.MiltyDraftManager;
@@ -1007,7 +1009,7 @@ public class Game {
             .collect(Collectors.toSet());
     }
 
-    public List<Integer> getPlayedSCsInOrder(Player player, Game activeGame) {
+    public List<Integer> getPlayedSCsInOrder(Player player) {
         Set<Integer> playedSCs = getPlayedSCs();
 
         List<Integer> orderedSCsBasic = new ArrayList<>(playedSCs);
@@ -1015,7 +1017,7 @@ public class Game {
         List<Integer> orderedSCs = new ArrayList<>();
         int playerSC = player.getLowestSC();
         String scText = playerSC + "";
-        if (!scText.equalsIgnoreCase(activeGame.getSCNumberIfNaaluInPlay(player, scText))) {
+        if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
         }
         for (int sc : orderedSCsBasic) {
@@ -1049,15 +1051,22 @@ public class Game {
     }
 
     public int getRingCount() {
-        if (getTileMap().isEmpty())
+        if (getTileMap().isEmpty()) {
             return 0;
+        }
         Map<String, Tile> tileMap = new HashMap<>(getTileMap());
-        String highestPosition = tileMap.keySet().stream().filter(Helper::isInteger)
-            .max(Comparator.comparingInt(Integer::parseInt)).get();
-        String lastTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
-        if (!Helper.isInteger(lastTwoDigits))
+        String highestPosition = tileMap.keySet().stream()
+            .filter(Helper::isInteger)
+            .max(Comparator.comparingInt(Integer::parseInt))
+            .orElse(null);
+        if (highestPosition == null) {
             return 0;
-        return Integer.parseInt(lastTwoDigits);
+        }
+        String firstTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
+        if (!Helper.isInteger(firstTwoDigits)) {
+            return 0;
+        }
+        return Integer.parseInt(firstTwoDigits);
     }
 
     public int getActivationCount() {

@@ -8,10 +8,14 @@ import ti4.map.UnitHolder;
 
 import java.util.Map;
 
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
 public class AddTile extends AddRemoveTile {
     public AddTile() {
         super(Constants.ADD_TILE, "Add tile to map");
-        //addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true).setAutoComplete(true));
     }
 
     @Override

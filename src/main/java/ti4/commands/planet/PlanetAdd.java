@@ -98,7 +98,7 @@ public class PlanetAdd extends PlanetAddRemove {
                             String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. "
                                 + player.getRepresentation()
                                 + " gained shard and a victory point.";
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 msg2);
                             player_.removeRelic(relic);
                             player.addRelic(relic);
@@ -119,7 +119,7 @@ public class PlanetAdd extends PlanetAddRemove {
                         String msg = player_.getRepresentation()
                             + " has a window to play reparations for the taking of "
                             + Mapper.getPlanet(planet).getName();
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                     if (moveTitanPN) {
                         if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)) {
@@ -137,7 +137,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 + " you may have an opportunity to use Dacxive Animators on "
                 + Helper.getPlanetRepresentation(planet, activeGame)
                 + ". Click to confirm a combat occurred and to add an infantry or delete these buttons";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg10,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getDacxiveButtons(planet));
         }
 
@@ -148,7 +148,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (event != null && buttons != null && !buttons.isEmpty()) {
                     String message = ButtonHelper.getIdent(player) + " Click button to explore "
                         + Helper.getPlanetRepresentation(planet, activeGame);
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         message, buttons);
                 }
             }
@@ -162,7 +162,7 @@ public class PlanetAdd extends PlanetAddRemove {
             && player.hasAbility("scavenge") && !doubleCheck && event != null) {
             String fac = player.getFactionEmoji();
 
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), fac
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), fac
                 + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
                 + "). Reminder that you do not legally have this tg prior to exploring, and that this was mandatory.");
             player.setTg(player.getTg() + 1);
@@ -178,7 +178,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent) to draw an AC";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
 
@@ -191,7 +191,7 @@ public class PlanetAdd extends PlanetAddRemove {
             String msg2 = player.getRepresentation(true, true)
                 + " if you have not already used Scour this tactical action, you can discard an AC to ready the planet "
                 + Helper.getPlanetRepresentation(planet, activeGame);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
         Tile tile = activeGame.getTileFromPlanet(planet);
@@ -204,7 +204,7 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
                 + " you can produce 1 ship in the system due to Free Systems Commander";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2,
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
 
@@ -214,7 +214,7 @@ public class PlanetAdd extends PlanetAddRemove {
             saarButton.add(Button.success("cymiaeCommanderRes_" + planet,
                 "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
                     + " due to Cymiae Commander, you can discard an AC here to place or move a mech on "
                     + Helper.getPlanetRepresentation(planet, activeGame)
@@ -229,7 +229,7 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Button.success("deployMykoSD_" + planet, "Deploy Dock " + planet));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd") < 3) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy a spacedock on "
                         + planet + " using the buttons.",
@@ -239,7 +239,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if (ButtonHelper.isPlayerElected(activeGame, player, "minister_exploration") && event != null) {
             String fac = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1)
                     + ").");
             player.setTg(player.getTg() + 1);
@@ -253,7 +253,7 @@ public class PlanetAdd extends PlanetAddRemove {
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "
                     + Helper.getPlanetRepresentation(planet, activeGame);
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
             }
         }
@@ -264,7 +264,7 @@ public class PlanetAdd extends PlanetAddRemove {
             saarButton.add(Button.success("saarMechRes_" + planet,
                 "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
                     + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
                 saarButton);
@@ -274,7 +274,7 @@ public class PlanetAdd extends PlanetAddRemove {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.primary("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, activeGame)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
         if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);

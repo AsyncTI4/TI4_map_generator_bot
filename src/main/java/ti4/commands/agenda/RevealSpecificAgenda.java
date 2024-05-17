@@ -168,7 +168,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         }
         for (Player player : activeGame.getRealPlayers()) {
             if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you have Florzen commander and can thus explore and ready a planet",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
             }

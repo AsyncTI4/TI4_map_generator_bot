@@ -301,7 +301,7 @@ public class MessageListener extends ListenerAdapter {
                 }
                 if (activeGame.isFastSCFollowMode()) {
                     for (Player player : activeGame.getRealPlayers()) {
-                        for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
+                        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
                             if (!player.hasFollowedSC(sc)) {
                                 int twenty4 = 24;
                                 int half = 12;

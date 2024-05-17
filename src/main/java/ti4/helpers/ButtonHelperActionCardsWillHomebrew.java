@@ -81,7 +81,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         String buttonID) {
         List<Button> buttons = getStrandedShipButtons(activeGame, player);
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot which tile you wish to place a ghost ship in",
             buttons);
     }
@@ -92,7 +92,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         tile = MoveUnits.flipMallice(event, tile, activeGame);
         new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " put a cruiser in " + tile.getRepresentation());
 
         // If Empyrean Commander is in game check if unlock condition exists
@@ -108,7 +108,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         String buttonID) {
         List<Button> buttons = getSpatialCollapseTilesStep1(activeGame, player);
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot which tile with your ships you wish to swap with an adjacent system",
             buttons);
     }

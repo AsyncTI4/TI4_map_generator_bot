@@ -557,7 +557,7 @@ public class ButtonHelper {
         if (player.getStasisInfantry() == 0) {
             return buttons;
         }
-        Tile tile = FoWHelper.getPlayerHS(game, player);
+        Tile tile = player.getHomeSystemTile();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
                 if (player.getPlanets().contains(unitHolder.getName())) {
@@ -1625,7 +1625,7 @@ public class ButtonHelper {
                         nonActivePlayer.setPromissoryNote(pn);
                         PNInfo.sendPromissoryNoteInfo(game, nonActivePlayer, false);
                         PNInfo.sendPromissoryNoteInfo(game, player, false);
-                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                        MessageHelper.sendMessageToChannel(channel, nonActivePlayer.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                         if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
                             player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                         }
@@ -2230,7 +2230,7 @@ public class ButtonHelper {
 
     public static int getNumberOfSpacedocksNotInOrAdjacentHS(Player player, Game game) {
         int count = 0;
-        Tile hs = FoWHelper.getPlayerHS(game, player);
+        Tile hs = player.getHomeSystemTile();
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
@@ -2251,7 +2251,7 @@ public class ButtonHelper {
 
     public static int getNumberOfSystemsWithShipsNotAdjacentToHS(Player player, Game game) {
         int count = 0;
-        Tile hs = FoWHelper.getPlayerHS(game, player);
+        Tile hs = player.getHomeSystemTile();
         if (hs == null) {
             BotLogger.log("not finding a HS for " + player.getFaction() + " in " + game.getName());
             return 0;
@@ -3303,7 +3303,7 @@ public class ButtonHelper {
         if (player.hasAbility("armada")) {
             armadaValue = 2;
         }
-        if (player.hasTech("dsghotg") && tile == FoWHelper.getPlayerHS(game, player)) {
+        if (player.hasTech("dsghotg") && tile == player.getHomeSystemTile()) {
             armadaValue = armadaValue + 3;
         }
         int fleetCap = (player.getFleetCC() + armadaValue + player.getMahactCC().size()) * 2;
@@ -7289,7 +7289,7 @@ public class ButtonHelper {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
                     }
-                    if (game.getTileFromPlanet(planet) == FoWHelper.getPlayerHS(game, p2)) {
+                    if (game.getTileFromPlanet(planet) == p2.getHomeSystemTile()) {
                         p2.exhaustPlanet(planet);
                     }
                 }

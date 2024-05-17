@@ -182,13 +182,13 @@ public class TurnStart extends PlayerSubcommandData {
                 ButtonHelperCommanders.olradinCommanderStep1(player, activeGame);
             }
             String text2 = player.getRepresentation() + " PASSED";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text2);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
                     + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true) + " you can use the button to get your tech",
                         List.of(Buttons.GET_A_TECH));
                 } else {
@@ -196,7 +196,7 @@ public class TurnStart extends PlayerSubcommandData {
                     String message2 = player.getRepresentation() + "! Your current CCs are "
                         + player.getCCRepresentation()
                         + ". Use buttons to gain CCs";
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         message2, buttons2);
                     activeGame.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 }
@@ -204,11 +204,11 @@ public class TurnStart extends PlayerSubcommandData {
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
                 String msg = player.getRepresentation()
                     + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain CCs";
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2, buttons2);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
             }
             TurnEnd.pingNextPlayer(event, activeGame, player, true);
         }
@@ -223,7 +223,7 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(player.getRepresentation(true, true));
         sb.append(" Please resolve these before doing anything else:\n");
         int count = 0;
-        for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
+        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
                 if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
