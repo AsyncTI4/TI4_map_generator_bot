@@ -643,7 +643,7 @@
     "name": "Renegotiation",
     "phase": "Any",
     "window": "After another player resolves an effect of 1 of your promissory notes",
-    "text": "That player must give you 1 promissory note from their hand. [Note: Players do not count as having played any promissory which forces them to place it in their play area.]",
+    "text": "That player must give you 1 promissory note from their hand.",
     "flavorText": "The Creuss merchants were overwhelmed by the wares of the bazaar: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
     "source": "action_deck_2"
   },
