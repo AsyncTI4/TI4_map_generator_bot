@@ -20,9 +20,9 @@ public class ShowACToAll extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -48,10 +48,10 @@ public class ShowACToAll extends ACCardsSubcommandData {
             return;
         }
 
-        String sb = "Game: " + game.getName() + "\n" +
-            "Player: " + player.getUserName() + "\n" +
-            "Showed Action Card:" + "\n" +
-            Mapper.getActionCard(acID).getRepresentation() + "\n";
+      String sb = "Game: " + activeGame.getName() + "\n" +
+          "Player: " + player.getUserName() + "\n" +
+          "Showed Action Card:" + "\n" +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
         if (!scored) {
             player.setActionCard(acID);
         }

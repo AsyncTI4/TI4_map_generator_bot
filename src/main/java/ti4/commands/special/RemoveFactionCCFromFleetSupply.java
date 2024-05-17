@@ -14,10 +14,10 @@ public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFlee
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, List<String> colors, Game game, Player player) {
+    void action(SlashCommandInteractionEvent event, List<String> colors, Game activeGame, Player player) {
         for (String color : colors) {
             player.removeMahactCC(color);
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

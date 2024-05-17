@@ -23,33 +23,33 @@ public class DiploSystem extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null) {
+        if (tileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
-        for (Player player_ : game.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 String color = player_.getColor();
                 if (Mapper.isValidColor(color)) {
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
+                    Helper.isCCCountCorrect(event, activeGame, color);
                 }
             }
         }

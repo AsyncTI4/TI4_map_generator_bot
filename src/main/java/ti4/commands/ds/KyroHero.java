@@ -22,19 +22,19 @@ public class KyroHero extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         int dieResult = event.getOption(Constants.SC, 1, OptionMapping::getAsInt);
-        game.setStoredValue("kyroHeroSC", dieResult + "");
-        game.setStoredValue("kyroHeroPlayer", player.getFaction());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Marked the Blex Hero Target as SC #" + dieResult + " and the faction that played the hero as " + player.getFaction());
-        ListTurnOrder.turnOrder(event, game);
+        activeGame.setStoredValue("kyroHeroSC", dieResult+"");
+        activeGame.setStoredValue("kyroHeroPlayer", player.getFaction());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Marked the Blex Hero Target as SC #"+dieResult + " and the faction that played the hero as "+player.getFaction());
+        ListTurnOrder.turnOrder(event, activeGame);
     }
-
+    
 }

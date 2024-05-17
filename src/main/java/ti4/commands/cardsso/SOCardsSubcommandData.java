@@ -12,7 +12,7 @@ import ti4.map.Player;
 
 public abstract class SOCardsSubcommandData extends SubcommandData {
 
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -24,7 +24,7 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -35,9 +35,9 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
 
-        Player player = Helper.getGamePlayer(game, null, event, user.getId());
+        Player player = Helper.getGamePlayer(activeGame, null, event, user.getId());
         if (player != null) {
             user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         }

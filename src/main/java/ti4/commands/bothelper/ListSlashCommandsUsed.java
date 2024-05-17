@@ -41,35 +41,35 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
-        for (Game game : mapList.values()) {
-            if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
+        for (Game activeGame : mapList.values()) {
+            if (useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
             }
-            if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game) {
-                largestGame = game.getName();
-                largestAmountOfButtonsIn1Game = game.getButtonPressCount();
+            if(activeGame.getButtonPressCount() > largestAmountOfButtonsIn1Game){
+                largestGame = activeGame.getName();
+                largestAmountOfButtonsIn1Game = activeGame.getButtonPressCount();
             }
-            buttonsPressed = game.getButtonPressCount() + buttonsPressed;
-            slashCommandsUsed = game.getSlashCommandsRunCount() + slashCommandsUsed;
-            for (String command : game.getAllSlashCommandsUsed().keySet()) {
-                int numUsed = game.getAllSlashCommandsUsed().get(command);
+            buttonsPressed = activeGame.getButtonPressCount() + buttonsPressed;
+            slashCommandsUsed = activeGame.getSlashCommandsRunCount() + slashCommandsUsed;
+            for (String command : activeGame.getAllSlashCommandsUsed().keySet()) {
+                int numUsed = activeGame.getAllSlashCommandsUsed().get(command);
                 int numUsed2 = 0;
                 if (slashCommands.containsKey(command)) {
                     numUsed2 = slashCommands.get(command);
                 }
                 slashCommands.put(command, numUsed + numUsed2);
             }
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) < 0) {
-                for (String acName : game.getAllActionCardsSabod().keySet()) {
-                    int numUsed = game.getAllActionCardsSabod().get(acName);
+            if(Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) < 0){
+                for (String acName : activeGame.getAllActionCardsSabod().keySet()) {
+                    int numUsed = activeGame.getAllActionCardsSabod().get(acName);
                     int numUsed2 = 0;
                     if (actionCards.containsKey(acName)) {
                         numUsed2 = actionCards.get(acName);
                     }
-                    acsSabod = acsSabod + numUsed;
+                    acsSabod = acsSabod+numUsed;
                     actionCards.put(acName, numUsed + numUsed2);
                 }
-                for (String acID : game.getDiscardActionCards().keySet()) {
+                for (String acID : activeGame.getDiscardActionCards().keySet()) {
                     ActionCardModel ac = Mapper.getActionCard(acID);
                     String acName = ac.getName();
                     int numUsed = 1;
@@ -79,7 +79,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                     }
                     actionCardsPlayed.put(acName, numUsed + numUsed2);
                 }
-                for (String acID : game.getPurgedActionCards().keySet()) {
+                for (String acID : activeGame.getPurgedActionCards().keySet()) {
                     ActionCardModel ac = Mapper.getActionCard(acID);
                     String acName = ac.getName();
                     int numUsed = 1;
@@ -100,7 +100,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         longMsg.append("\n The number of times an AC has been sabod is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
-            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of " + actionCardsPlayed.get(command) + " times played").append(" \n");
+            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of "+actionCardsPlayed.get(command)+" times played").append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }

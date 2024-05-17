@@ -20,7 +20,7 @@ public class ChangeToBaseGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping codexOption = event.getOption(Constants.REMOVE_CODEX_AC);
         String codex = "";
         if (codexOption != null) {
@@ -30,11 +30,11 @@ public class ChangeToBaseGame extends CustomSubcommandData {
             }
 
         }
-        game.setBaseGameMode(true);
-        Helper.removePoKComponents(game, codex);
-        SetDeck.setDeck(event, game, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
+        activeGame.setBaseGameMode(true);
+        Helper.removePoKComponents(activeGame, codex);
+        SetDeck.setDeck(event, activeGame, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
     }
 }

@@ -12,28 +12,29 @@ public class Add extends AddRemovePlayer {
         super(Constants.ADD, "Add player to game");
     }
 
-    protected String getResponseMessage(Game game, User user) {
-        return user.getName() + " added players to game: " + game.getName() + " - successful";
+
+    protected String getResponseMessage(Game activeGame, User user) {
+        return user.getName() + " added players to game: " + activeGame.getName() + " - successful";
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Game game, User user) {
-        addExtraUser(event, game, Constants.PLAYER1);
-        addExtraUser(event, game, Constants.PLAYER2);
-        addExtraUser(event, game, Constants.PLAYER3);
-        addExtraUser(event, game, Constants.PLAYER4);
-        addExtraUser(event, game, Constants.PLAYER5);
-        addExtraUser(event, game, Constants.PLAYER6);
-        addExtraUser(event, game, Constants.PLAYER7);
-        addExtraUser(event, game, Constants.PLAYER8);
+    protected void action(SlashCommandInteractionEvent event, Game activeGame, User user) {
+        addExtraUser(event, activeGame, Constants.PLAYER1);
+        addExtraUser(event, activeGame, Constants.PLAYER2);
+        addExtraUser(event, activeGame, Constants.PLAYER3);
+        addExtraUser(event, activeGame, Constants.PLAYER4);
+        addExtraUser(event, activeGame, Constants.PLAYER5);
+        addExtraUser(event, activeGame, Constants.PLAYER6);
+        addExtraUser(event, activeGame, Constants.PLAYER7);
+        addExtraUser(event, activeGame, Constants.PLAYER8);
     }
 
-    private void addExtraUser(SlashCommandInteractionEvent event, Game game, String playerID) {
+    private void addExtraUser(SlashCommandInteractionEvent event, Game activeGame, String playerID) {
         OptionMapping option;
         option = event.getOption(playerID);
-        if (option != null) {
+        if (option != null){
             User extraUser = option.getAsUser();
-            game.addPlayer(extraUser.getId(), extraUser.getName());
+            activeGame.addPlayer(extraUser.getId(), extraUser.getName());
         }
     }
 }

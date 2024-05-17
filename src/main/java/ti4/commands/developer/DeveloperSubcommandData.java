@@ -10,7 +10,7 @@ import ti4.map.GameManager;
 
 public abstract class DeveloperSubcommandData extends SubcommandData {
 
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public DeveloperSubcommandData(@NotNull String name, @NotNull String description) {
@@ -18,7 +18,7 @@ public abstract class DeveloperSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -29,6 +29,6 @@ public abstract class DeveloperSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 }

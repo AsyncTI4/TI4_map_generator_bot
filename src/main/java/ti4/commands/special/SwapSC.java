@@ -20,21 +20,20 @@ public class SwapSC extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
     }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         //resolve player1
         Player player1 = null; //OG player
         OptionMapping player1option = event.getOption(Constants.FACTION_COLOR_2);
         if (player1option == null) {
-            player1 = game.getPlayer(getUser().getId());
-            player1 = Helper.getGamePlayer(game, player1, event, null);
+            player1 = activeGame.getPlayer(getUser().getId());
+            player1 = Helper.getGamePlayer(activeGame, player1, event, null);
         } else {
             String factionColor = AliasHandler.resolveColor(player1option.getAsString().toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player1 = player_;
                     break;
@@ -52,7 +51,7 @@ public class SwapSC extends SpecialSubcommandData {
         if (player2option != null) {
             String factionColor = AliasHandler.resolveColor(player2option.getAsString().toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player2 = player_;
                     break;

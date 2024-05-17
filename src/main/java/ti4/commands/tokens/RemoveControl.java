@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 
 public class RemoveControl extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();

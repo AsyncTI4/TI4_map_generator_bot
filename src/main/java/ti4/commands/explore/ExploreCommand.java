@@ -42,8 +42,8 @@ public class ExploreCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 
     private Collection<ExploreSubcommandData> getSubcommands() {
@@ -79,7 +79,7 @@ public class ExploreCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+                Commands.slash(getActionID(), getActionDescription())
+                        .addSubcommands(getSubcommands()));
     }
 }

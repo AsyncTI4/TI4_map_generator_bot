@@ -27,10 +27,10 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         // List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
         OptionMapping policy1 = event.getOption(Constants.SET_PEOPLE);
         OptionMapping policy2 = event.getOption(Constants.SET_ENVIRONMENT);
@@ -49,24 +49,24 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             pol1 = policy1.getAsString().toLowerCase();
             pol1 = convertChoice(pol1);
             if (pol1 == null) {
-                MessageHelper.sendMessageToEventChannel(event,
-                    "received an incorrect input for Policy: The People, will either ignore or default to + if this is your first time setting policies");
+                MessageHelper.sendMessageToEventChannel(event, 
+                        "received an incorrect input for Policy: The People, will either ignore or default to + if this is your first time setting policies");
             }
         }
         if (policy2 != null) {
             pol2 = policy2.getAsString().toLowerCase();
             pol2 = convertChoice(pol2);
             if (pol2 == null) {
-                MessageHelper.sendMessageToEventChannel(event,
-                    "received an incorrect input for Policy: The Environment, will either ignore or default to + if this is your first time setting policies");
+                MessageHelper.sendMessageToEventChannel(event, 
+                        "received an incorrect input for Policy: The Environment, will either ignore or default to + if this is your first time setting policies");
             }
         }
         if (policy3 != null) {
             pol3 = policy3.getAsString().toLowerCase();
             pol3 = convertChoice(pol3);
             if (pol3 == null) {
-                MessageHelper.sendMessageToEventChannel(event,
-                    "received an incorrect input for Policy: The Economy, will either ignore or default to + if this is your first time setting policies");
+                MessageHelper.sendMessageToEventChannel(event, 
+                        "received an incorrect input for Policy: The Economy, will either ignore or default to + if this is your first time setting policies");
             }
         }
 
@@ -85,8 +85,8 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             }
             if (pol2 == null) {
                 pol2 = "+";
-                MessageHelper.sendMessageToEventChannel(event,
-                    "Need to initially set Environment policy. Defaulting to Policy - The Environment: Preserve (+).");
+                MessageHelper.sendMessageToEventChannel(event, 
+                        "Need to initially set Environment policy. Defaulting to Policy - The Environment: Preserve (+).");
             }
             if (pol3 == null) {
                 pol3 = "+";
@@ -179,10 +179,10 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         player.addOwnedUnitByID(unitModelID);
         UnitModel unitModel = Mapper.getUnit(unitModelID);
 
-        DiscordantStarsHelper.checkOlradinMech(game);
+        DiscordantStarsHelper.checkOlradinMech(activeGame);
 
-        AbilityInfo.sendAbilityInfo(game, player, event);
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "", List.of(unitModel.getRepresentationEmbed(false)));
+        AbilityInfo.sendAbilityInfo(activeGame, player, event);
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "", List.of(unitModel.getRepresentationEmbed(false)));
     }
 
     public static String convertChoice(String inputChoice) {
@@ -190,11 +190,11 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             return null;
         }
         if (("exploit".equals(inputChoice)) || ("plunder".equals(inputChoice)) || ("control".equals(inputChoice))
-            || ("-".equals(inputChoice))) {
+                || ("-".equals(inputChoice))) {
             return "-";
         }
         if (("empower".equals(inputChoice)) || ("preserve".equals(inputChoice)) || ("connect".equals(inputChoice))
-            || ("+".equals(inputChoice))) {
+                || ("+".equals(inputChoice))) {
             return "+";
         }
         return null;

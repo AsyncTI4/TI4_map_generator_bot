@@ -18,7 +18,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         int count = 1;
         OptionMapping countOption = event.getOption(Constants.COUNT);
@@ -27,12 +27,12 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "You are not a player in this game.");
             return;
         }
-        LookAtTopAgenda.lookAtAgendas(game, player, count, true);
+        LookAtTopAgenda.lookAtAgendas(activeGame, player, count, true);
     }
 }

@@ -21,7 +21,7 @@ public class RevealSpecificEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         String eventID = event.getOption(Constants.EVENT_ID, "", OptionMapping::getAsString);
         if (!Mapper.isValidEvent(eventID)) {
@@ -30,15 +30,15 @@ public class RevealSpecificEvent extends EventSubcommandData {
         }
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
-        if (!game.revealEvent(eventID, force)) {
+        if (!activeGame.revealEvent(eventID, force)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event not found in deck, please retry");
             return;
         }
 
-        revealEvent(event, game, event.getChannel(), eventID);
+        revealEvent(event, activeGame, event.getChannel(), eventID);
     }
 
-    public void revealEvent(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String eventID) {
+    public void revealEvent(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel != null) {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();

@@ -9,46 +9,46 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class AddAdjacencyOverrideList extends FOWSubcommandData {
-  public AddAdjacencyOverrideList() {
-    super(Constants.ADD_ADJACENCY_OVERRIDE_LIST, "Add Custom Adjacent Tiles as a List. ");
-    addOptions(new OptionData(OptionType.STRING, Constants.ADJACENCY_OVERRIDES_LIST, "Primary:Direction:Secondary 101:nw:202")
-      .setRequired(true));
-  }
-
-  @Override
-  public void execute(SlashCommandInteractionEvent event) {
-    Game game = getActiveGame();
-    OptionMapping adjacencyList = event.getOption(Constants.ADJACENCY_OVERRIDES_LIST);
-
-    String[] adjacencyListOptions = adjacencyList.getAsString().toLowerCase().split(" ");
-    for (String adjacencyOption : adjacencyListOptions) {
-      String[] adjacencyTile = adjacencyOption.split(":");
-      if (adjacencyTile.length < 3) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Adjacency Settings");
-        return;
-      }
-
-      String primaryTile = adjacencyTile[0];
-
-      int direction;
-      switch (adjacencyTile[1]) {
-        case "n" -> direction = 0;
-        case "ne" -> direction = 1;
-        case "se" -> direction = 2;
-        case "s" -> direction = 3;
-        case "sw" -> direction = 4;
-        case "nw" -> direction = 5;
-        default -> direction = -1;
-      }
-
-      String secondaryTile = adjacencyTile[2];
-
-      if (primaryTile.isBlank() || secondaryTile.isBlank() || direction == -1) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Adjacency Settings");
-        return;
-      }
-
-      game.addAdjacentTileOverride(primaryTile, direction, secondaryTile);
+    public AddAdjacencyOverrideList() {
+        super(Constants.ADD_ADJACENCY_OVERRIDE_LIST, "Add Custom Adjacent Tiles as a List. ");
+        addOptions(new OptionData(OptionType.STRING, Constants.ADJACENCY_OVERRIDES_LIST, "Primary:Direction:Secondary 101:nw:202")
+          .setRequired(true));
     }
-  }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game activeGame = getActiveGame();
+        OptionMapping adjacencyList = event.getOption(Constants.ADJACENCY_OVERRIDES_LIST);
+
+        String[] adjacencyListOptions = adjacencyList.getAsString().toLowerCase().split(" ");
+        for (String adjacencyOption : adjacencyListOptions) {
+          String[] adjacencyTile = adjacencyOption.split(":");
+          if (adjacencyTile.length < 3) {
+              MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Adjacency Settings");
+              return;
+          }
+          
+          String primaryTile = adjacencyTile[0];
+            
+          int direction;
+          switch (adjacencyTile[1]) {
+              case "n" -> direction = 0;
+              case "ne" -> direction = 1;
+              case "se" -> direction = 2;
+              case "s" -> direction = 3;
+              case "sw" -> direction = 4;
+              case "nw" -> direction = 5;
+              default -> direction = -1;
+          } 
+          
+          String secondaryTile = adjacencyTile[2];
+
+          if (primaryTile.isBlank() || secondaryTile.isBlank() || direction == -1) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Adjacency Settings");
+            return;
+          }
+
+          activeGame.addAdjacentTileOverride(primaryTile, direction, secondaryTile);
+        }
+    }
 }

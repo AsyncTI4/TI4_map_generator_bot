@@ -23,31 +23,31 @@ public class DealSOToAll extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
-        dealSOToAll(event, count, game);
+        dealSOToAll(event, count, activeGame);
     }
 
-    public void dealSOToAll(GenericInteractionCreateEvent event, int count, Game game) {
+    public void dealSOToAll(GenericInteractionCreateEvent event, int count, Game activeGame) {
         if (count > 0) {
-            for (Player player : game.getRealPlayers()) {
+            for (Player player : activeGame.getRealPlayers()) {
                 for (int i = 0; i < count; i++) {
-                    game.drawSecretObjective(player.getUserID());
+                    activeGame.drawSecretObjective(player.getUserID());
                 }
                 if (player.hasAbility("plausible_deniability")) {
-                    game.drawSecretObjective(player.getUserID());
+                    activeGame.drawSecretObjective(player.getUserID());
                 }
-                SOInfo.sendSecretObjectiveInfo(game, player, event);
+                SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
-        if (game.getRound() == 1) {
+        if (activeGame.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after everyone has discarded", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Press this button after everyone has discarded", buttons);
             Player speaker = null;
-            if (game.getPlayer(game.getSpeaker()) != null) {
-                speaker = game.getPlayers().get(game.getSpeaker());
+            if (activeGame.getPlayer(activeGame.getSpeaker()) != null) {
+                speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
             }
             if (speaker == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -56,10 +56,10 @@ public class DealSOToAll extends SOCardsSubcommandData {
             // List<Button> buttons2 = new ArrayList<>();
             // buttons2.add(Button.success("setOrder", "Set Speaker Order"));
             // buttons2.add(Button.danger("deleteButtons", "Decline"));
-            // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-            //     game.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
-            Helper.setOrder(game);
-
+            // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
+            //     activeGame.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
+            Helper.setOrder(activeGame);
+            
         }
     }
 }

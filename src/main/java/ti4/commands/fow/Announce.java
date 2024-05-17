@@ -1,5 +1,7 @@
 package ti4.commands.fow;
 
+
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,6 +16,7 @@ import ti4.message.MessageHelper;
 
 public class Announce extends FOWSubcommandData {
 
+
     public Announce() {
         super(Constants.ANNOUNCE, "Send a message to the main channel");
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
@@ -22,11 +25,11 @@ public class Announce extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player could not be found");
             return;
         }
 
@@ -39,19 +42,18 @@ public class Announce extends FOWSubcommandData {
                 String anonY = anon.getAsString();
 
                 if (anonY.compareToIgnoreCase("y") == 0) {
-                    message = "[REDACTED] announces: " + msg;
+                     message =  "[REDACTED] announces: " + msg;
                 } else {
-                    message = player.getRepresentation() + " announces: " + msg;
+                     message = player.getRepresentation() + " announces: " + msg;
                 }
             } else {
                 message = player.getRepresentation() + " announces: " + msg;
             }
 
-            MessageChannel mainGameChannel = game.getMainGameChannel() == null ? event.getChannel() : game.getMainGameChannel();
+            MessageChannel mainGameChannel = activeGame.getMainGameChannel() == null ? event.getChannel() : activeGame.getMainGameChannel();
             MessageHelper.sendMessageToChannel(mainGameChannel, message);
         }
     }
-
     @Override
     public void reply(SlashCommandInteractionEvent event) {
     }

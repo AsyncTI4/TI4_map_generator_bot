@@ -19,9 +19,9 @@ public class AddBorderAnomaly extends MapSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String tile = event.getOption(Constants.PRIMARY_TILE, null, OptionMapping::getAsString);
-        if (!game.getTileMap().containsKey(tile)) {
+        if (!activeGame.getTileMap().containsKey(tile)) {
             MessageHelper.replyToMessage(event, "Map does not contain that tile");
         }
 
@@ -46,12 +46,12 @@ public class AddBorderAnomaly extends MapSubcommandData {
             return;
         }
 
-        if (game.hasBorderAnomalyOn(tile, directionVal)) {
+        if (activeGame.hasBorderAnomalyOn(tile, directionVal)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile already has an anomaly there!");
             return;
         }
 
-        game.addBorderAnomaly(tile, directionVal, anomalyType);
-        GameSaveLoadManager.saveMap(game, event);
+        activeGame.addBorderAnomaly(tile, directionVal, anomalyType);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

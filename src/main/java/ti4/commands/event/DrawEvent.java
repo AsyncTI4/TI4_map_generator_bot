@@ -18,17 +18,18 @@ public class DrawEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
         int count = Math.max(1, event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt));
         for (int i = 0; i < count; i++) {
-            game.drawEvent(player.getUserID());
+            activeGame.drawEvent(player.getUserID());
         }
-        EventInfo.sendEventInfo(game, player, event);
+        EventInfo.sendEventInfo(activeGame, player, event);
     }
 }
+

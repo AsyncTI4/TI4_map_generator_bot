@@ -17,35 +17,35 @@ public class AddCustomPO extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping poNameOption = event.getOption(Constants.PO_NAME);
         if (poNameOption == null || poNameOption.getName().trim().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
-            return;
+             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
+             return;
         }
 
         if (poNameOption.getName().contains(",") || poNameOption.getName().contains(";")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Symbol ; or , is not allowed");
-            return;
+             MessageHelper.sendMessageToChannel(event.getChannel(), "Symbol ; or , is not allowed");
+             return;
         }
         OptionMapping vpOption = event.getOption(Constants.PO_VP_WORTH);
         if (vpOption == null || vpOption.getName().trim().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
-            return;
+             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
+             return;
 
         }
         String poName = poNameOption.getAsString();
-        if (poName.contains(",")) {
+        if (poName.contains(",")){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Objective must not contain comma ,");
             return;
         }
         int vp = vpOption.getAsInt();
 
-        Integer poIndex = game.addCustomPO(poName, vp);
-        String sb = "**Public Objective added:**" + "\n" +
-            "(" + poIndex + ") " + "\n" +
-            poName + "\n";
+        Integer poIndex = activeGame.addCustomPO(poName, vp);
+      String sb = "**Public Objective added:**" + "\n" +
+          "(" + poIndex + ") " + "\n" +
+          poName + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

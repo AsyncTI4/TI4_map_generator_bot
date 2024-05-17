@@ -42,7 +42,7 @@ public class PNCardsCommand implements Command {
                 return false;
             }
             Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (userActiveGame.isCommunityMode()) {
+            if (userActiveGame.isCommunityMode()){
                 Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
@@ -82,9 +82,9 @@ public class PNCardsCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-        // new GenerateMap().saveImage(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
+       // new GenerateMap().saveImage(activeMap, event);
     }
 
     protected String getActionDescription() {
@@ -107,7 +107,7 @@ public class PNCardsCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+                Commands.slash(getActionID(), getActionDescription())
+                        .addSubcommands(getSubcommands()));
     }
 }

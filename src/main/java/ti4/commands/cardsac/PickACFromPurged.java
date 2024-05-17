@@ -13,16 +13,16 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class PickACFromPurged extends ACCardsSubcommandData {
-    public PickACFromPurged() {
+    public PickACFromPurged () {
         super(Constants.PICK_AC_FROM_PURGED, "Pick an Action Card from the purged pile into your hand");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -35,7 +35,7 @@ public class PickACFromPurged extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (Map.Entry<String, Integer> so : game.getPurgedActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> so : activeGame.getPurgedActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -45,17 +45,17 @@ public class PickACFromPurged extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        boolean picked = game.pickActionCardFromPurged(player.getUserID(), acIndex);
+        boolean picked = activeGame.pickActionCardFromPurged(player.getUserID(), acIndex);
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        String sb = "Game: " + game.getName() + " " +
-            "Player: " + player.getUserName() + "\n" +
-            "Picked card from Purged: " +
-            Mapper.getActionCard(acID).getRepresentation() + "\n";
+      String sb = "Game: " + activeGame.getName() + " " +
+          "Player: " + player.getUserName() + "\n" +
+          "Picked card from Purged: " +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        ACInfo.sendActionCardInfo(game, player);
+        ACInfo.sendActionCardInfo(activeGame, player);
     }
 }

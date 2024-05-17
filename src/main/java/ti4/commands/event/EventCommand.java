@@ -42,9 +42,9 @@ public class EventCommand implements Command {
             }
         }
 
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        if (game != null) {
-            GameSaveLoadManager.saveMap(game, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        if (activeGame != null) {
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
         if (executedCommand != null) {
             // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());

@@ -17,9 +17,9 @@ public class RemoveBorderAnomaly extends MapSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String tile = event.getOption(Constants.PRIMARY_TILE, null, OptionMapping::getAsString);
-        if (!game.getTileMap().containsKey(tile)) {
+        if (!activeGame.getTileMap().containsKey(tile)) {
             MessageHelper.replyToMessage(event, "Map does not contain that tile");
             return;
         }
@@ -40,7 +40,7 @@ public class RemoveBorderAnomaly extends MapSubcommandData {
             return;
         }
 
-        game.removeBorderAnomaly(tile, directionVal);
-        GameSaveLoadManager.saveMap(game, event);
+        activeGame.removeBorderAnomaly(tile, directionVal);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

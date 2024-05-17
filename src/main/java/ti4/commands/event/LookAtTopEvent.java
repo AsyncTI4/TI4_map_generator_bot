@@ -21,13 +21,13 @@ public class LookAtTopEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
-        sb.append("Game: ").append(game.getName()).append("\n");
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append(event.getUser().getAsMention()).append("\n");
         sb.append("`").append(event.getCommandString()).append("`").append("\n");
         if (count > 1) {
@@ -36,7 +36,7 @@ public class LookAtTopEvent extends EventSubcommandData {
             sb.append("__**Top event:**__\n");
         }
         for (int i = 0; i < count; i++) {
-            String eventID = game.lookAtTopEvent(i);
+            String eventID = activeGame.lookAtTopEvent(i);
             sb.append(i + 1).append(": ");
             EventModel eventModel = Mapper.getEvent(eventID);
             sb.append(eventModel.getRepresentation());
@@ -44,17 +44,17 @@ public class LookAtTopEvent extends EventSubcommandData {
         }
         sb.append("-----------\n");
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        if (player == null){
             MessageHelper.sendMessageToUser(sb.toString(), event);
         } else {
             User userById = event.getJDA().getUserById(player.getUserID());
             if (userById != null) {
-                if (game.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
+                if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
                     MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
                 } else {
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
                 }
             } else {
                 MessageHelper.sendMessageToUser(sb.toString(), event);

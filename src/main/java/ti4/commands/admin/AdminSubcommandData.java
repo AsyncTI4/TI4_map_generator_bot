@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public abstract class AdminSubcommandData extends SubcommandData {
 
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public AdminSubcommandData(@NotNull String name, @NotNull String description) {
@@ -18,7 +18,7 @@ public abstract class AdminSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -29,6 +29,6 @@ public abstract class AdminSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 }

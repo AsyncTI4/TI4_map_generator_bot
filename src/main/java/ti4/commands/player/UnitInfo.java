@@ -22,36 +22,36 @@ import ti4.model.UnitModel;
 
 public class UnitInfo extends PlayerSubcommandData {
     public UnitInfo() {
-        super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel");
+		super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_ALL_UNITS, "'True' also show basic (non-faction) units (Default: False)"));
-    }
+	}
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         boolean showAllUnits = event.getOption(Constants.SHOW_ALL_UNITS, false, OptionMapping::getAsBoolean);
-        sendUnitInfo(game, player, event, showAllUnits);
+        sendUnitInfo(activeGame, player, event, showAllUnits);
     }
 
-    public static void sendUnitInfo(Game game, Player player, GenericInteractionCreateEvent event, boolean showAllUnits) {
+    public static void sendUnitInfo(Game activeGame, Player player, GenericInteractionCreateEvent event, boolean showAllUnits) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendUnitInfo(game, player, showAllUnits);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendUnitInfo(activeGame, player, showAllUnits);
     }
 
-    public static void sendUnitInfo(Game game, Player player, boolean showAllUnits) {
+    public static void sendUnitInfo(Game activeGame, Player player, boolean showAllUnits) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-            player.getCardsInfoThread(),
-            "__**Unit Info:**__",
-            getUnitMessageEmbeds(player, showAllUnits),
-            getUnitInfoButtons());
+                player.getCardsInfoThread(),
+                "__**Unit Info:**__",
+                getUnitMessageEmbeds(player, showAllUnits),
+                getUnitInfoButtons());
     }
 
     private static List<Button> getUnitInfoButtons() {

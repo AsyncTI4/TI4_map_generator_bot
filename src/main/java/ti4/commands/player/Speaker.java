@@ -19,16 +19,16 @@ public class Speaker extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        game.setSpeaker(player.getUserID());
+        activeGame.setSpeaker(player.getUserID());
         String msg = Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
         MessageHelper.sendMessageToEventChannel(event, msg);
     }

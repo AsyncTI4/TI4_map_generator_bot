@@ -93,59 +93,59 @@ public class GameSaveLoadManager {
             });
     }
 
-    public static void saveMap(Game game) {
-        saveMap(game, false, null);
+    public static void saveMap(Game activeGame) {
+        saveMap(activeGame, false, null);
     }
 
-    public static void saveMap(Game game, GenericInteractionCreateEvent event) {
-        saveMap(game, false, event);
+    public static void saveMap(Game activeGame, GenericInteractionCreateEvent event) {
+        saveMap(activeGame, false, event);
     }
 
-    public static void saveMap(Game game, boolean keepModifiedDate,
+    public static void saveMap(Game activeGame, boolean keepModifiedDate,
         @Nullable GenericInteractionCreateEvent event) {
         // ADD COMMAND/BUTTON FOR UNDO INFORMATION
         if (event != null) {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
-                game.setLatestCommand(
+                activeGame.setLatestCommand(
                     username + " used: " + ((CommandInteractionPayload) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent button) {
                 if ((event.getMessageChannel() instanceof ThreadChannel
-                    && event.getMessageChannel().getName().contains("Cards Info")) || game.isFoWMode()
+                    && event.getMessageChannel().getName().contains("Cards Info")) || activeGame.isFoWMode()
                     || button.getButton().getId().contains("anonDeclare")) {
-                    game.setLatestCommand(username + " pressed button: [CLASSIFIED]");
+                    activeGame.setLatestCommand(username + " pressed button: [CLASSIFIED]");
                 } else {
-                    game.setLatestCommand(
+                    activeGame.setLatestCommand(
                         username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- "
                             + ((ButtonInteraction) event).getButton().getLabel());
                 }
             } else {
-                game.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
+                activeGame.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
         } else {
-            if (keepModifiedDate && game.isHasEnded()
-                && "Last Command Unknown - No Event Provided".equals(game.getLatestCommand())) {
-                System.out.println("Skipped Saving Map: " + game.getName()
+            if (keepModifiedDate && activeGame.isHasEnded()
+                && "Last Command Unknown - No Event Provided".equals(activeGame.getLatestCommand())) {
+                System.out.println("Skipped Saving Map: " + activeGame.getName()
                     + " - Game has ended and has no changes since last save");
                 return;
             }
-            game.setLatestCommand("Last Command Unknown - No Event Provided");
+            activeGame.setLatestCommand("Last Command Unknown - No Event Provided");
         }
 
         try {
-            DiscordantStarsHelper.checkGardenWorlds(game);
-            DiscordantStarsHelper.checkSigil(game);
-            DiscordantStarsHelper.checkOlradinMech(game);
+            DiscordantStarsHelper.checkGardenWorlds(activeGame);
+            DiscordantStarsHelper.checkSigil(activeGame);
+            DiscordantStarsHelper.checkOlradinMech(activeGame);
         } catch (Exception e) {
             BotLogger.log("Error doing extra Discordant Stars stuff", e);
         }
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON),
-                game);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON),
+                activeGame);
         } catch (IOException e) {
-            BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something",
+            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something",
                 e);
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
@@ -154,38 +154,38 @@ public class GameSaveLoadManager {
         if (loadFromJSON)
             return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
 
-        File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
+        File mapFile = Storage.getMapImageStorage(activeGame.getName() + TXT);
         if (mapFile == null) {
             BotLogger.log("Could not save map, error creating save file");
             return;
         }
 
         try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
-            Map<String, Tile> tileMap = game.getTileMap();
-            writer.write(game.getOwnerID());
+            Map<String, Tile> tileMap = activeGame.getTileMap();
+            writer.write(activeGame.getOwnerID());
             writer.write(System.lineSeparator());
-            writer.write(game.getOwnerName());
+            writer.write(activeGame.getOwnerName());
             writer.write(System.lineSeparator());
-            writer.write(game.getName());
+            writer.write(activeGame.getName());
             writer.write(System.lineSeparator());
-            saveMapInfo(writer, game, keepModifiedDate);
+            saveMapInfo(writer, activeGame, keepModifiedDate);
 
             for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                 Tile tile = tileEntry.getValue();
                 saveTile(writer, tile);
             }
         } catch (IOException e) {
-            BotLogger.log("Could not save map: " + game.getName(), e);
+            BotLogger.log("Could not save map: " + activeGame.getName(), e);
         }
 
-        mapFile = Storage.getMapImageStorage(game.getName() + TXT);
+        mapFile = Storage.getMapImageStorage(activeGame.getName() + TXT);
         if (mapFile.exists()) {
-            saveUndo(game, mapFile);
+            saveUndo(activeGame, mapFile);
         }
     }
 
-    public static void undo(Game game, GenericInteractionCreateEvent event) {
-        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+    public static void undo(Game activeGame, GenericInteractionCreateEvent event) {
+        File originalMapFile = Storage.getMapImageStorage(activeGame.getName() + Constants.TXT);
         if (originalMapFile != null) {
             File mapUndoDirectory = Storage.getMapUndoDirectory();
             if (mapUndoDirectory == null) {
@@ -195,7 +195,7 @@ public class GameSaveLoadManager {
                 return;
             }
 
-            String mapName = game.getName();
+            String mapName = activeGame.getName();
             String mapNameForUndoStart = mapName + "_";
             String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
             if (mapUndoFiles != null && mapUndoFiles.length > 0) {
@@ -214,12 +214,12 @@ public class GameSaveLoadManager {
                     mapUndoStorage.delete();
                     Game loadedGame = loadMap(originalMapFile);
                     for (Player p1 : loadedGame.getRealPlayers()) {
-                        Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
                         if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
                             CardsInfo.sendCardsInfo(loadedGame, p1);
                         }
                     }
-                    GameManager.getInstance().deleteGame(game.getName());
+                    GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
                     StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
                         .append(maxNumber).append("` ");
@@ -229,14 +229,14 @@ public class GameSaveLoadManager {
                     } else {
                         sb.append(loadedGame.getLatestCommand());
                     }
-                    if (game.isFoWMode()) {
+                    if (activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                     } else {
-                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+                        ButtonHelper.findOrCreateThreadWithMessage(activeGame, mapName + "-undo-log", sb.toString());
                     }
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
-                            && !game.getCurrentPhase().contains("status")) {
+                            && !activeGame.getCurrentPhase().contains("status")) {
                             // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting
                             // to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
@@ -255,16 +255,16 @@ public class GameSaveLoadManager {
         }
     }
 
-    public static void reload(Game game) {
-        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+    public static void reload(Game activeGame) {
+        File originalMapFile = Storage.getMapImageStorage(activeGame.getName() + Constants.TXT);
         if (originalMapFile != null) {
             Game loadedGame = loadMap(originalMapFile);
-            GameManager.getInstance().deleteGame(game.getName());
+            GameManager.getInstance().deleteGame(activeGame.getName());
             GameManager.getInstance().addGame(loadedGame);
         }
     }
 
-    private static void saveUndo(Game game, File originalMapFile) {
+    private static void saveUndo(Game activeGame, File originalMapFile) {
         File mapUndoDirectory = Storage.getMapUndoDirectory();
         if (mapUndoDirectory == null) {
             return;
@@ -273,7 +273,7 @@ public class GameSaveLoadManager {
             mapUndoDirectory.mkdir();
         }
 
-        String mapName = game.getName();
+        String mapName = activeGame.getName();
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         if (mapUndoFiles != null) {
@@ -301,83 +301,83 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(FileWriter writer, Game game, boolean keepModifiedDate) throws IOException {
+    private static void saveMapInfo(FileWriter writer, Game activeGame, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         // game information
-        writer.write(Constants.LATEST_COMMAND + " " + game.getLatestCommand());
+        writer.write(Constants.LATEST_COMMAND + " " + activeGame.getLatestCommand());
         writer.write(System.lineSeparator());
-        writer.write(Constants.PHASE_OF_GAME + " " + game.getCurrentPhase());
+        writer.write(Constants.PHASE_OF_GAME + " " + activeGame.getCurrentPhase());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + game.getLatestOutcomeVotedFor());
+        writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + activeGame.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_AFTER_MSG + " " + game.getLatestAfterMsg());
+        writer.write(Constants.LATEST_AFTER_MSG + " " + activeGame.getLatestAfterMsg());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_WHEN_MSG + " " + game.getLatestWhenMsg());
+        writer.write(Constants.LATEST_WHEN_MSG + " " + activeGame.getLatestWhenMsg());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_TRANSACTION_MSG + " " + game.getLatestTransactionMsg());
+        writer.write(Constants.LATEST_TRANSACTION_MSG + " " + activeGame.getLatestTransactionMsg());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_UPNEXT_MSG + " " + game.getLatestUpNextMsg());
-        writer.write(System.lineSeparator());
-
-        writer.write(Constants.SO + " " + String.join(",", game.getSecretObjectives()));
+        writer.write(Constants.LATEST_UPNEXT_MSG + " " + activeGame.getLatestUpNextMsg());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.MESSAGEID_FOR_SABOS + " " + String.join(",", game.getMessageIDsForSabo()));
+        writer.write(Constants.SO + " " + String.join(",", activeGame.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AC + " " + String.join(",", game.getActionCards()));
+        writer.write(Constants.MESSAGEID_FOR_SABOS + " " + String.join(",", activeGame.getMessageIDsForSabo()));
         writer.write(System.lineSeparator());
 
-        writeCards(game.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        writeCards(game.getPurgedActionCards(), writer, Constants.AC_PURGED);
-
-        writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));
+        writer.write(Constants.AC + " " + String.join(",", activeGame.getActionCards()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RELICS + " " + String.join(",", game.getAllRelics()));
+        writeCards(activeGame.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
+        writeCards(activeGame.getPurgedActionCards(), writer, Constants.AC_PURGED);
+
+        writer.write(Constants.EXPLORE + " " + String.join(",", activeGame.getAllExplores()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", game.getAllExploreDiscard()));
+        writer.write(Constants.RELICS + " " + String.join(",", activeGame.getAllRelics()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.SPEAKER + " " + game.getSpeaker());
+        writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", activeGame.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.ACTIVE_SYSTEM + " " + game.getActiveSystem());
+        writer.write(Constants.SPEAKER + " " + activeGame.getSpeaker());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + game.getLastActivePlayerPing().getTime());
+        writer.write(Constants.ACTIVE_PLAYER + " " + activeGame.getActivePlayerID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ACTIVE_SYSTEM + " " + activeGame.getActiveSystem());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_TIME_GAMES_CHECKED + " " + game.getLastTimeGamesChecked().getTime());
+        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + activeGame.getLastActivePlayerPing().getTime());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AUTO_PING + " " + game.getAutoPingSpacer());
+        writer.write(Constants.LAST_TIME_GAMES_CHECKED + " " + activeGame.getLastTimeGamesChecked().getTime());
         writer.write(System.lineSeparator());
 
-        writer.write(
-            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + game.getPlayersWhoHitPersistentNoAfter());
+        writer.write(Constants.AUTO_PING + " " + activeGame.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 
         writer.write(
-            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + game.getPlayersWhoHitPersistentNoWhen());
+            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + activeGame.getPlayersWhoHitPersistentNoAfter());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.CURRENT_AGENDA_INFO + " " + game.getCurrentAgendaInfo());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + game.getACDrawStatusInfo());
-        writer.write(System.lineSeparator());
-
-        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + game.getLastActivePlayerChange().getTime());
+        writer.write(
+            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + activeGame.getPlayersWhoHitPersistentNoWhen());
         writer.write(System.lineSeparator());
 
-        Map<Integer, Boolean> scPlayed = game.getScPlayed();
+        writer.write(Constants.CURRENT_AGENDA_INFO + " " + activeGame.getCurrentAgendaInfo());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + activeGame.getACDrawStatusInfo());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + activeGame.getLastActivePlayerChange().getTime());
+        writer.write(System.lineSeparator());
+
+        Map<Integer, Boolean> scPlayed = activeGame.getScPlayed();
 
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
@@ -386,7 +386,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.SC_PLAYED + " " + sb);
         writer.write(System.lineSeparator());
 
-        Map<String, String> agendaVoteInfo = game.getCurrentAgendaVotes();
+        Map<String, String> agendaVoteInfo = activeGame.getCurrentAgendaVotes();
         StringBuilder sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -394,7 +394,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, String> currentCheckingForAllReacts = game.getMessagesThatICheckedForAllReacts();
+        Map<String, String> currentCheckingForAllReacts = activeGame.getMessagesThatICheckedForAllReacts();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
             sb2.append(entry.getKey()).append(",").append(entry.getValue().replace("\n", ". ")).append(":");
@@ -402,7 +402,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> displaced1System = game.getCurrentMovedUnitsFrom1System();
+        Map<String, Integer> displaced1System = activeGame.getCurrentMovedUnitsFrom1System();
         StringBuilder sb3 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : displaced1System.entrySet()) {
             sb3.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -410,7 +410,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> thalnosUnits = game.getThalnosUnits();
+        Map<String, Integer> thalnosUnits = activeGame.getThalnosUnits();
         StringBuilder sb16 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : thalnosUnits.entrySet()) {
             sb16.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -418,7 +418,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.THALNOS_UNITS + " " + sb16);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> slashCommands = game.getAllSlashCommandsUsed();
+        Map<String, Integer> slashCommands = activeGame.getAllSlashCommandsUsed();
         StringBuilder sb10 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : slashCommands.entrySet()) {
             sb10.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -426,7 +426,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.SLASH_COMMAND_STRING + " " + sb10);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> acSabod = game.getAllActionCardsSabod();
+        Map<String, Integer> acSabod = activeGame.getAllActionCardsSabod();
         StringBuilder sb11 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : acSabod.entrySet()) {
             sb11.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -434,7 +434,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.ACS_SABOD + " " + sb11);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> displacedActivation = game.getMovedUnitsFromCurrentActivation();
+        Map<String, Integer> displacedActivation = activeGame.getMovedUnitsFromCurrentActivation();
         StringBuilder sb4 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
             sb4.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -442,71 +442,71 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISPLACED_UNITS_ACTIVATION + " " + sb4);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AGENDAS + " " + String.join(",", game.getAgendas()));
+        writer.write(Constants.AGENDAS + " " + String.join(",", activeGame.getAgendas()));
         writer.write(System.lineSeparator());
 
-        writeCards(game.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
-        writeCards(game.getSentAgendas(), writer, Constants.SENT_AGENDAS);
-        writeCards(game.getLaws(), writer, Constants.LAW);
-        writeCards(game.getEventsInEffect(), writer, Constants.EVENTS_IN_EFFECT);
+        writeCards(activeGame.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
+        writeCards(activeGame.getSentAgendas(), writer, Constants.SENT_AGENDAS);
+        writeCards(activeGame.getLaws(), writer, Constants.LAW);
+        writeCards(activeGame.getEventsInEffect(), writer, Constants.EVENTS_IN_EFFECT);
 
-        writer.write(Constants.EVENTS + " " + String.join(",", game.getEvents()));
+        writer.write(Constants.EVENTS + " " + String.join(",", activeGame.getEvents()));
         writer.write(System.lineSeparator());
-        writeCards(game.getDiscardedEvents(), writer, Constants.DISCARDED_EVENTS);
+        writeCards(activeGame.getDiscardedEvents(), writer, Constants.DISCARDED_EVENTS);
 
         sb = new StringBuilder();
-        for (Map.Entry<String, String> entry : game.getLawsInfo().entrySet()) {
+        for (Map.Entry<String, String> entry : activeGame.getLawsInfo().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.LAW_INFO + " " + sb);
         writer.write(System.lineSeparator());
 
         sb = new StringBuilder();
-        for (Map.Entry<Integer, Integer> entry : game.getScTradeGoods().entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : activeGame.getScTradeGoods().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.SC_TRADE_GOODS + " " + sb);
         writer.write(System.lineSeparator());
 
-        writeCards(game.getRevealedPublicObjectives(), writer, Constants.REVEALED_PO);
-        writeCards(game.getCustomPublicVP(), writer, Constants.CUSTOM_PO_VP);
-        writer.write(Constants.PO1 + " " + String.join(",", game.getPublicObjectives1()));
+        writeCards(activeGame.getRevealedPublicObjectives(), writer, Constants.REVEALED_PO);
+        writeCards(activeGame.getCustomPublicVP(), writer, Constants.CUSTOM_PO_VP);
+        writer.write(Constants.PO1 + " " + String.join(",", activeGame.getPublicObjectives1()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO2 + " " + String.join(",", game.getPublicObjectives2()));
+        writer.write(Constants.PO2 + " " + String.join(",", activeGame.getPublicObjectives2()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.SO_TO_PO + " " + String.join(",", game.getSoToPoList()));
+        writer.write(Constants.SO_TO_PO + " " + String.join(",", activeGame.getSoToPoList()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PURGED_PN + " " + String.join(",", game.getPurgedPN()));
+        writer.write(Constants.PURGED_PN + " " + String.join(",", activeGame.getPurgedPN()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", game.getPublicObjectives1Peakable()));
+        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives1Peakable()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.SAVED_BUTTONS + " " + String.join(",", game.getSavedButtons()));
+        writer.write(Constants.SAVED_BUTTONS + " " + String.join(",", activeGame.getSavedButtons()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", game.getPublicObjectives2Peakable()));
+        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives2Peakable()));
         writer.write(System.lineSeparator());
 
-        savePeekedPublicObjectives(writer, Constants.PO1PEEKED, game.getPublicObjectives1Peeked());
-        savePeekedPublicObjectives(writer, Constants.PO2PEEKED, game.getPublicObjectives2Peeked());
+        savePeekedPublicObjectives(writer, Constants.PO1PEEKED, activeGame.getPublicObjectives1Peeked());
+        savePeekedPublicObjectives(writer, Constants.PO2PEEKED, activeGame.getPublicObjectives2Peeked());
 
-        DisplayType displayTypeForced = game.getDisplayTypeForced();
+        DisplayType displayTypeForced = activeGame.getDisplayTypeForced();
         if (displayTypeForced != null) {
             writer.write(Constants.DISPLAY_TYPE + " " + displayTypeForced.getValue());
             writer.write(System.lineSeparator());
         }
 
-        writer.write(Constants.SC_COUNT_FOR_MAP + " " + game.getStrategyCardsPerPlayer());
+        writer.write(Constants.SC_COUNT_FOR_MAP + " " + activeGame.getStrategyCardsPerPlayer());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + game.getPlayerCountForMap());
+        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeGame.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.VP_COUNT + " " + game.getVp());
+        writer.write(Constants.VP_COUNT + " " + activeGame.getVp());
         writer.write(System.lineSeparator());
-        writer.write(Constants.MAX_SO_COUNT + " " + game.getMaxSOCountPerPlayer());
+        writer.write(Constants.MAX_SO_COUNT + " " + activeGame.getMaxSOCountPerPlayer());
         writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : game.getScoredPublicObjectives().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : activeGame.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             sb1.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -514,17 +514,17 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacentTiles = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : game.getCustomAdjacentTiles().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : activeGame.getCustomAdjacentTiles().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
         }
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
-        writer.write(Constants.REVERSE_SPEAKER_ORDER + " " + game.isReverseSpeakerOrder());
+        writer.write(Constants.REVERSE_SPEAKER_ORDER + " " + activeGame.isReverseSpeakerOrder());
         writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
-        for (Map.Entry<Pair<String, Integer>, String> entry : game.getAdjacentTileOverrides().entrySet()) {
+        for (Map.Entry<Pair<String, Integer>, String> entry : activeGame.getAdjacentTileOverrides().entrySet()) {
             adjacencyOverrides.append(entry.getKey().getLeft()).append("-");
             adjacencyOverrides.append(entry.getKey().getRight()).append("-");
             adjacencyOverrides.append(entry.getValue()).append(";");
@@ -532,166 +532,166 @@ public class GameSaveLoadManager {
         writer.write(Constants.ADJACENCY_OVERRIDES + " " + adjacencyOverrides);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
+        writer.write(Constants.CREATION_DATE + " " + activeGame.getCreationDate());
         writer.write(System.lineSeparator());
-        long time = keepModifiedDate ? game.getLastModifiedDate() : new Date().getTime();
-        game.setLastModifiedDate(time);
+        long time = keepModifiedDate ? activeGame.getLastModifiedDate() : new Date().getTime();
+        activeGame.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
-        writer.write(Constants.ENDED_DATE + " " + game.getEndedDate());
+        writer.write(Constants.ENDED_DATE + " " + activeGame.getEndedDate());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ROUND + " " + game.getRound());
+        writer.write(Constants.ROUND + " " + activeGame.getRound());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BUTTON_PRESS_COUNT + " " + game.getButtonPressCount());
+        writer.write(Constants.BUTTON_PRESS_COUNT + " " + activeGame.getButtonPressCount());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SLASH_COMMAND_COUNT + " " + game.getSlashCommandsRunCount());
+        writer.write(Constants.SLASH_COMMAND_COUNT + " " + activeGame.getSlashCommandsRunCount());
         writer.write(System.lineSeparator());
-        writer.write(Constants.GAME_CUSTOM_NAME + " " + game.getCustomName());
+        writer.write(Constants.GAME_CUSTOM_NAME + " " + activeGame.getCustomName());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.TABLE_TALK_CHANNEL + " " + game.getTableTalkChannelID());
+        writer.write(Constants.TABLE_TALK_CHANNEL + " " + activeGame.getTableTalkChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.MAIN_GAME_CHANNEL + " " + game.getMainGameChannelID());
+        writer.write(Constants.MAIN_GAME_CHANNEL + " " + activeGame.getMainGameChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SAVED_CHANNEL + " " + game.getSavedChannelID());
+        writer.write(Constants.SAVED_CHANNEL + " " + activeGame.getSavedChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SAVED_MESSAGE + " " + game.getSavedMessage());
+        writer.write(Constants.SAVED_MESSAGE + " " + activeGame.getSavedMessage());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_MAP_CHANNEL + " " + game.getBotMapUpdatesThreadID());
+        writer.write(Constants.BOT_MAP_CHANNEL + " " + activeGame.getBotMapUpdatesThreadID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + game.getBagDraftStatusMessageID());
+        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + activeGame.getBagDraftStatusMessageID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.GAME_LAUNCH_THREAD_ID + " " + game.getLaunchPostThreadID());
+        writer.write(Constants.GAME_LAUNCH_THREAD_ID + " " + activeGame.getLaunchPostThreadID());
         writer.write(System.lineSeparator());
 
         // GAME MODES
-        writer.write(Constants.TIGL_GAME + " " + game.isCompetitiveTIGLGame());
+        writer.write(Constants.TIGL_GAME + " " + activeGame.isCompetitiveTIGLGame());
         writer.write(System.lineSeparator());
-        writer.write(Constants.COMMUNITY_MODE + " " + game.isCommunityMode());
+        writer.write(Constants.COMMUNITY_MODE + " " + activeGame.isCommunityMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ALLIANCE_MODE + " " + game.isAllianceMode());
+        writer.write(Constants.ALLIANCE_MODE + " " + activeGame.isAllianceMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.FOW_MODE + " " + game.isFoWMode());
+        writer.write(Constants.FOW_MODE + " " + activeGame.isFoWMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.NAALU_AGENT + " " + game.getNaaluAgent());
+        writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
-        writer.write(Constants.L1_HERO + " " + game.getL1Hero());
+        writer.write(Constants.L1_HERO + " " + activeGame.getL1Hero());
         writer.write(System.lineSeparator());
-        writer.write(Constants.NOMAD_COIN + " " + game.getNomadCoin());
+        writer.write(Constants.NOMAD_COIN + " " + activeGame.getNomadCoin());
         writer.write(System.lineSeparator());
-        writer.write(Constants.UNDO_BUTTON + " " + game.getUndoButton());
+        writer.write(Constants.UNDO_BUTTON + " " + activeGame.getUndoButton());
         writer.write(System.lineSeparator());
-        writer.write(Constants.FAST_SC_FOLLOW + " " + game.isFastSCFollowMode());
+        writer.write(Constants.FAST_SC_FOLLOW + " " + activeGame.isFastSCFollowMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.QUEUE_SO + " " + game.getQueueSO());
+        writer.write(Constants.QUEUE_SO + " " + activeGame.getQueueSO());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_BUBBLES + " " + game.getShowBubbles());
+        writer.write(Constants.SHOW_BUBBLES + " " + activeGame.getShowBubbles());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HOMEBREW_MODE + " " + game.isHomeBrew());
+        writer.write(Constants.HOMEBREW_MODE + " " + activeGame.isHomeBrew());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_GEARS + " " + game.getShowGears());
+        writer.write(Constants.SHOW_GEARS + " " + activeGame.getShowGears());
         writer.write(System.lineSeparator());
-        writer.write(Constants.PURGED_FRAGMENTS + " " + game.getNumberOfPurgedFragments());
+        writer.write(Constants.PURGED_FRAGMENTS + " " + activeGame.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
-        writer.write(Constants.TEMPORARY_PING_DISABLE + " " + game.getTemporaryPingDisable());
+        writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
         writer.write(System.lineSeparator());
-        writer.write(Constants.DOMINUS_ORB + " " + game.getDominusOrbStatus());
+        writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
         writer.write(System.lineSeparator());
-        writer.write(Constants.COMPONENT_ACTION + " " + game.getComponentAction());
+        writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
         writer.write(System.lineSeparator());
-        writer.write(Constants.JUST_PLAYED_COMPONENT_AC + " " + game.getJustPlayedComponentAC());
+        writer.write(Constants.JUST_PLAYED_COMPONENT_AC + " " + activeGame.getJustPlayedComponentAC());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ACTIVATION_COUNT + " " + game.getActivationCount());
+        writer.write(Constants.ACTIVATION_COUNT + " " + activeGame.getActivationCount());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BASE_GAME_MODE + " " + game.isBaseGameMode());
+        writer.write(Constants.BASE_GAME_MODE + " " + activeGame.isBaseGameMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LIGHT_FOG_MODE + " " + game.isLightFogMode());
+        writer.write(Constants.LIGHT_FOG_MODE + " " + activeGame.isLightFogMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.RED_TAPE_MODE + " " + game.isRedTapeMode());
+        writer.write(Constants.RED_TAPE_MODE + " " + activeGame.isRedTapeMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.STRAT_PINGS + " " + game.isStratPings());
+        writer.write(Constants.STRAT_PINGS + " " + activeGame.isStratPings());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
+        writer.write(Constants.ABSOL_MODE + " " + activeGame.isAbsolMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.MILTYMOD_MODE + " " + game.isMiltyModMode());
+        writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_MAP_SETUP + " " + game.isShowMapSetup());
+        writer.write(Constants.SHOW_MAP_SETUP + " " + activeGame.isShowMapSetup());
         writer.write(System.lineSeparator());
-        writer.write(Constants.TEXT_SIZE + " " + game.getTextSize());
+        writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
-        writer.write(Constants.DISCORDANT_STARS_MODE + " " + game.isDiscordantStarsMode());
+        writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());
+        writer.write(Constants.VERBOSITY + " " + activeGame.getOutputVerbosity());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());
+        writer.write(Constants.BETA_TEST_MODE + " " + activeGame.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
+        writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + activeGame.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HACK_ELECTION_STATUS + " " + game.getHackElectionStatus());
+        writer.write(Constants.HACK_ELECTION_STATUS + " " + activeGame.getHackElectionStatus());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + game.getCCNPlasticLimit());
+        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + activeGame.getCCNPlasticLimit());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_FACTION_REACTS + " " + game.getBotFactionReacts());
+        writer.write(Constants.BOT_FACTION_REACTS + " " + activeGame.getBotFactionReacts());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + game.getHasHadAStatusPhase());
+        writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + activeGame.getHasHadAStatusPhase());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_SHUSHING + " " + game.getBotShushing());
+        writer.write(Constants.BOT_SHUSHING + " " + activeGame.getBotShushing());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HOMEBREW_SC_MODE + " " + game.isHomeBrewSCMode());
+        writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.INJECT_RULES_LINKS + " " + game.isInjectRulesLinks());
+        writer.write(Constants.INJECT_RULES_LINKS + " " + activeGame.isInjectRulesLinks());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SPIN_MODE + " " + game.isSpinMode());
+        writer.write(Constants.SPIN_MODE + " " + activeGame.isSpinMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_UNIT_TAGS + " " + game.isShowUnitTags());
-        writer.write(System.lineSeparator());
-
-        writer.write(Constants.AC_DECK_ID + " " + game.getAcDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.SO_DECK_ID + " " + game.getSoDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + " " + game.getStage1PublicDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + game.getStage2PublicDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.MAP_TEMPLATE + " " + game.getMapTemplateID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.TECH_DECK_ID + " " + game.getTechnologyDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.RELIC_DECK_ID + " " + game.getRelicDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.AGENDA_DECK_ID + " " + game.getAgendaDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.EVENT_DECK_ID + " " + game.getEventDeckID());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.EXPLORATION_DECK_ID + " " + game.getExplorationDeckID());
+        writer.write(Constants.SHOW_UNIT_TAGS + " " + activeGame.isShowUnitTags());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.BAG_DRAFT + " " + (game.getActiveBagDraft() == null ? "" : game.getActiveBagDraft().getSaveString()));
+        writer.write(Constants.AC_DECK_ID + " " + activeGame.getAcDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SO_DECK_ID + " " + activeGame.getSoDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + " " + activeGame.getStage1PublicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + activeGame.getStage2PublicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MAP_TEMPLATE + " " + activeGame.getMapTemplateID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.TECH_DECK_ID + " " + activeGame.getTechnologyDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.RELIC_DECK_ID + " " + activeGame.getRelicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.AGENDA_DECK_ID + " " + activeGame.getAgendaDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.EVENT_DECK_ID + " " + activeGame.getEventDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.EXPLORATION_DECK_ID + " " + activeGame.getExplorationDeckID());
         writer.write(System.lineSeparator());
 
-        MiltyDraftManager manager = game.getMiltyDraftManager();
+        writer.write(Constants.BAG_DRAFT + " " + (activeGame.getActiveBagDraft() == null ? "" : activeGame.getActiveBagDraft().getSaveString()));
+        writer.write(System.lineSeparator());
+
+        MiltyDraftManager manager = activeGame.getMiltyDraftManager();
         if (manager != null) {
             writer.write(Constants.MILTY_DRAFT_MANAGER + " " + manager.superSaveMessage());
             writer.write(System.lineSeparator());
         }
 
-        writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
+        writer.write(Constants.STRATEGY_CARD_SET + " " + activeGame.getScSetID());
         writer.write(System.lineSeparator());
 
         ObjectMapper mapper = new ObjectMapper();
-        String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually
-                                                                                     // (de)serialising
+        String anomaliesJson = mapper.writeValueAsString(activeGame.getBorderAnomalies()); // much easier than manually
+                                                                                           // (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.GAME_HAS_ENDED + " " + game.isHasEnded());
+        writer.write(Constants.GAME_HAS_ENDED + " " + activeGame.isHasEnded());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.IMAGE_GEN_COUNT + " " + game.getMapImageGenerationCount());
+        writer.write(Constants.IMAGE_GEN_COUNT + " " + activeGame.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", game.getRunMigrations()));
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", activeGame.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -700,7 +700,7 @@ public class GameSaveLoadManager {
         // Player information
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
-        Map<String, Player> players = game.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
             writer.write(PLAYER);
             writer.write(System.lineSeparator());
@@ -1131,9 +1131,9 @@ public class GameSaveLoadManager {
                 for (File file : jsonfiles) {
                     if (isJSONExtention(file)) {
                         try {
-                            Game game = loadMapJSON(file);
-                            if (game != null) {
-                                mapList.put(game.getName(), game);
+                            Game activeGame = loadMapJSON(file);
+                            if (activeGame != null) {
+                                mapList.put(activeGame.getName(), activeGame);
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load JSON game:" + file, e);
@@ -1147,9 +1147,9 @@ public class GameSaveLoadManager {
                 for (File file : txtFiles) {
                     if (isTxtExtention(file)) {
                         try {
-                            Game game = loadMap(file);
-                            if (game != null && game.getName() != null) {
-                                mapList.put(game.getName(), game);
+                            Game activeGame = loadMap(file);
+                            if (activeGame != null && activeGame.getName() != null) {
+                                mapList.put(activeGame.getName(), activeGame);
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load TXT game:" + file, e);
@@ -1194,11 +1194,11 @@ public class GameSaveLoadManager {
     @Nullable
     public static Game loadMap(File mapFile) {
         if (mapFile != null) {
-            Game game = new Game();
+            Game activeGame = new Game();
             try (Scanner myReader = new Scanner(mapFile)) {
-                game.setOwnerID(myReader.nextLine());
-                game.setOwnerName(myReader.nextLine());
-                game.setName(myReader.nextLine());
+                activeGame.setOwnerID(myReader.nextLine());
+                activeGame.setOwnerName(myReader.nextLine());
+                activeGame.setName(myReader.nextLine());
                 while (myReader.hasNextLine()) {
                     String data = myReader.nextLine();
                     if (MAPINFO.equals(data)) {
@@ -1217,9 +1217,9 @@ public class GameSaveLoadManager {
                             break;
                         }
                         try {
-                            readGameInfo(game, data);
+                            readGameInfo(activeGame, data);
                         } catch (Exception e) {
-                            BotLogger.log("Data is bad: " + game.getName(), e);
+                            BotLogger.log("Data is bad: " + activeGame.getName(), e);
                         }
                     }
 
@@ -1237,13 +1237,13 @@ public class GameSaveLoadManager {
                             tmpData = null;
                             if (PLAYER.equals(data)) {
 
-                                player = game.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
+                                player = activeGame.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
                                 continue;
                             }
                             if (ENDPLAYER.equals(data)) {
                                 break;
                             }
-                            readPlayerInfo(player, data, game);
+                            readPlayerInfo(player, data, activeGame);
                         }
                     }
                 }
@@ -1264,7 +1264,7 @@ public class GameSaveLoadManager {
                         if (tile != null) {
                             tileMap.put(tile.getPosition(), tile);
                         } else {
-                            BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
+                            BotLogger.log("Error loading Map: `" + activeGame.getName() + "` -> Tile is null: `"
                                 + tileData + "` - tile will be skipped - check save file");
                         }
 
@@ -1286,7 +1286,7 @@ public class GameSaveLoadManager {
                                         if (Constants.MIRAGE.equals(spaceHolder)) {
                                             Helper.addMirageToTile(tile);
                                         } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                            BotLogger.log(game.getName() + ": Not valid space holder detected: "
+                                            BotLogger.log(activeGame.getName() + ": Not valid space holder detected: "
                                                 + spaceHolder);
                                         }
                                     }
@@ -1335,66 +1335,66 @@ public class GameSaveLoadManager {
                 } catch (Exception e) {
                     BotLogger.log("Data read error: " + mapFile.getName(), e);
                 }
-                game.setTileMap(tileMap);
+                activeGame.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
                 BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
 
-            game.endGameIfOld();
-            return game;
+            activeGame.endGameIfOld();
+            return activeGame;
         } else {
             BotLogger.log("Could not save map, error creating save file");
         }
         return null;
     }
 
-    private static void readGameInfo(Game game, String data) {
+    private static void readGameInfo(Game activeGame, String data) {
         String[] tokenizer = data.split(" ", 2);
         if (tokenizer.length == 2) {
             String identification = tokenizer[0];
             String info = tokenizer[1];
             switch (identification) {
-                case Constants.LATEST_COMMAND -> game.setLatestCommand(info);
-                case Constants.LATEST_OUTCOME_VOTED_FOR -> game.setLatestOutcomeVotedFor(info);
-                case Constants.LATEST_AFTER_MSG -> game.setLatestAfterMsg(info);
-                case Constants.LATEST_WHEN_MSG -> game.setLatestWhenMsg(info);
-                case Constants.LATEST_TRANSACTION_MSG -> game.setLatestTransactionMsg(info);
-                case Constants.PHASE_OF_GAME -> game.setCurrentPhase(info);
-                case Constants.LATEST_UPNEXT_MSG -> game.setLatestUpNextMsg(info);
-                case Constants.SO -> game.setSecretObjectives(getCardList(info));
-                case Constants.MESSAGEID_FOR_SABOS -> game.setMessageIDForSabo(getCardList(info));
-                case Constants.AC -> game.setActionCards(getCardList(info));
-                case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
-                case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));
-                case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peakable(getCardList(info));
-                case Constants.SAVED_BUTTONS -> game.setSavedButtons(getCardList(info));
-                case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peakable(getCardList(info));
-                case Constants.PO1PEEKED -> game.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
-                case Constants.PO2PEEKED -> game.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
-                case Constants.SO_TO_PO -> game.setSoToPoList(getCardList(info));
-                case Constants.PURGED_PN -> game.setPurgedPNs(getCardList(info));
-                case Constants.REVEALED_PO -> game.setRevealedPublicObjectives(getParsedCards(info));
-                case Constants.CUSTOM_PO_VP -> game.setCustomPublicVP(getParsedCards(info));
-                case Constants.SCORED_PO -> game.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
-                case Constants.AC_DECK_ID -> game.setAcDeckID(info);
-                case Constants.SO_DECK_ID -> game.setSoDeckID(info);
-                case Constants.STAGE_1_PUBLIC_DECK_ID -> game.setStage1PublicDeckID(info);
-                case Constants.STAGE_2_PUBLIC_DECK_ID -> game.setStage2PublicDeckID(info);
-                case Constants.MAP_TEMPLATE -> game.setMapTemplateID(info);
-                case Constants.TECH_DECK_ID -> game.setTechnologyDeckID(info);
-                case Constants.RELIC_DECK_ID -> game.setRelicDeckID(info);
-                case Constants.AGENDA_DECK_ID -> game.setAgendaDeckID(info);
-                case Constants.EVENT_DECK_ID -> game.setEventDeckID(info);
-                case Constants.EXPLORATION_DECK_ID -> game.setExplorationDeckID(info);
+                case Constants.LATEST_COMMAND -> activeGame.setLatestCommand(info);
+                case Constants.LATEST_OUTCOME_VOTED_FOR -> activeGame.setLatestOutcomeVotedFor(info);
+                case Constants.LATEST_AFTER_MSG -> activeGame.setLatestAfterMsg(info);
+                case Constants.LATEST_WHEN_MSG -> activeGame.setLatestWhenMsg(info);
+                case Constants.LATEST_TRANSACTION_MSG -> activeGame.setLatestTransactionMsg(info);
+                case Constants.PHASE_OF_GAME -> activeGame.setCurrentPhase(info);
+                case Constants.LATEST_UPNEXT_MSG -> activeGame.setLatestUpNextMsg(info);
+                case Constants.SO -> activeGame.setSecretObjectives(getCardList(info));
+                case Constants.MESSAGEID_FOR_SABOS -> activeGame.setMessageIDForSabo(getCardList(info));
+                case Constants.AC -> activeGame.setActionCards(getCardList(info));
+                case Constants.PO1 -> activeGame.setPublicObjectives1(getCardList(info));
+                case Constants.PO2 -> activeGame.setPublicObjectives2(getCardList(info));
+                case Constants.PO1PEAKABLE -> activeGame.setPublicObjectives1Peakable(getCardList(info));
+                case Constants.SAVED_BUTTONS -> activeGame.setSavedButtons(getCardList(info));
+                case Constants.PO2PEAKABLE -> activeGame.setPublicObjectives2Peakable(getCardList(info));
+                case Constants.PO1PEEKED -> activeGame.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
+                case Constants.PO2PEEKED -> activeGame.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
+                case Constants.SO_TO_PO -> activeGame.setSoToPoList(getCardList(info));
+                case Constants.PURGED_PN -> activeGame.setPurgedPNs(getCardList(info));
+                case Constants.REVEALED_PO -> activeGame.setRevealedPublicObjectives(getParsedCards(info));
+                case Constants.CUSTOM_PO_VP -> activeGame.setCustomPublicVP(getParsedCards(info));
+                case Constants.SCORED_PO -> activeGame.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.AC_DECK_ID -> activeGame.setAcDeckID(info);
+                case Constants.SO_DECK_ID -> activeGame.setSoDeckID(info);
+                case Constants.STAGE_1_PUBLIC_DECK_ID -> activeGame.setStage1PublicDeckID(info);
+                case Constants.STAGE_2_PUBLIC_DECK_ID -> activeGame.setStage2PublicDeckID(info);
+                case Constants.MAP_TEMPLATE -> activeGame.setMapTemplateID(info);
+                case Constants.TECH_DECK_ID -> activeGame.setTechnologyDeckID(info);
+                case Constants.RELIC_DECK_ID -> activeGame.setRelicDeckID(info);
+                case Constants.AGENDA_DECK_ID -> activeGame.setAgendaDeckID(info);
+                case Constants.EVENT_DECK_ID -> activeGame.setEventDeckID(info);
+                case Constants.EXPLORATION_DECK_ID -> activeGame.setExplorationDeckID(info);
                 case Constants.STRATEGY_CARD_SET -> {
                     String scSetID = info;
                     if (Mapper.isValidStrategyCardSet(scSetID)) {
-                        game.setScSetID(scSetID);
+                        activeGame.setScSetID(scSetID);
                     } else {
-                        // BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + game.getName() + "`");
-                        game.setScSetID("pok");
+                        // BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + activeGame.getName() + "`");
+                        activeGame.setScSetID("pok");
                     }
                 }
                 case Constants.CUSTOM_ADJACENT_TILES -> {
@@ -1406,14 +1406,14 @@ public class GameSaveLoadManager {
                         adjacentTilesMigrated.put(key, migrated);
                     }
 
-                    game.setCustomAdjacentTiles(adjacentTilesMigrated);
+                    activeGame.setCustomAdjacentTiles(adjacentTilesMigrated);
                 }
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info))
                         break;
                     ObjectMapper mapper = new ObjectMapper();
                     try {
-                        game.setBorderAnomalies(mapper.readValue(info, new TypeReference<>() {
+                        activeGame.setBorderAnomalies(mapper.readValue(info, new TypeReference<>() {
                         }));
                     } catch (Exception e) {
                         BotLogger.log("Error reading border anomalies from save file!", e);
@@ -1421,24 +1421,24 @@ public class GameSaveLoadManager {
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
-                        game.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
+                        activeGame.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                     } catch (Exception e) {
                         BotLogger.log("Failed to load adjacency overrides", e);
                     }
                 }
-                case Constants.REVERSE_SPEAKER_ORDER -> game.setReverseSpeakerOrder("true".equals(info));
-                case Constants.AGENDAS -> game.setAgendas(getCardList(info));
-                case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
-                case Constants.AC_PURGED -> game.setPurgedActionCards(getParsedCards(info));
-                case Constants.DISCARDED_AGENDAS -> game.setDiscardAgendas(getParsedCards(info));
-                case Constants.SENT_AGENDAS -> game.setSentAgendas(getParsedCards(info));
-                case Constants.LAW -> game.setLaws(getParsedCards(info));
-                case Constants.EVENTS -> game.setEvents(getCardList(info));
-                case Constants.EVENTS_IN_EFFECT -> game.setEventsInEffect(getParsedCards(info));
-                case Constants.DISCARDED_EVENTS -> game.setDiscardedEvents(getParsedCards(info));
-                case Constants.EXPLORE -> game.setExploreDeck(getCardList(info));
-                case Constants.RELICS -> game.setRelics(getCardList(info));
-                case Constants.DISCARDED_EXPLORES -> game.setExploreDiscard(getCardList(info));
+                case Constants.REVERSE_SPEAKER_ORDER -> activeGame.setReverseSpeakerOrder("true".equals(info));
+                case Constants.AGENDAS -> activeGame.setAgendas(getCardList(info));
+                case Constants.AC_DISCARDED -> activeGame.setDiscardActionCards(getParsedCards(info));
+                case Constants.AC_PURGED -> activeGame.setPurgedActionCards(getParsedCards(info));
+                case Constants.DISCARDED_AGENDAS -> activeGame.setDiscardAgendas(getParsedCards(info));
+                case Constants.SENT_AGENDAS -> activeGame.setSentAgendas(getParsedCards(info));
+                case Constants.LAW -> activeGame.setLaws(getParsedCards(info));
+                case Constants.EVENTS -> activeGame.setEvents(getCardList(info));
+                case Constants.EVENTS_IN_EFFECT -> activeGame.setEventsInEffect(getParsedCards(info));
+                case Constants.DISCARDED_EVENTS -> activeGame.setDiscardedEvents(getParsedCards(info));
+                case Constants.EXPLORE -> activeGame.setExploreDeck(getCardList(info));
+                case Constants.RELICS -> activeGame.setRelics(getCardList(info));
+                case Constants.DISCARDED_EXPLORES -> activeGame.setExploreDiscard(getCardList(info));
                 case Constants.LAW_INFO -> {
                     StringTokenizer actionCardToken = new StringTokenizer(info, ";");
                     Map<String, String> cards = new LinkedHashMap<>();
@@ -1448,7 +1448,7 @@ public class GameSaveLoadManager {
                         String value = cardInfo.nextToken();
                         cards.put(id, value);
                     }
-                    game.setLawsInfo(cards);
+                    activeGame.setLawsInfo(cards);
                 }
                 case Constants.SC_TRADE_GOODS -> {
                     StringTokenizer scTokenizer = new StringTokenizer(info, ";");
@@ -1459,16 +1459,16 @@ public class GameSaveLoadManager {
                         Integer value = Integer.parseInt(cardInfo.nextToken());
                         scTradeGoods.put(id, value);
                     }
-                    game.setScTradeGoods(scTradeGoods);
+                    activeGame.setScTradeGoods(scTradeGoods);
                 }
-                case Constants.SPEAKER -> game.setSpeaker(info);
-                case Constants.ACTIVE_PLAYER -> game.setActivePlayer(info);
-                case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
+                case Constants.SPEAKER -> activeGame.setSpeaker(info);
+                case Constants.ACTIVE_PLAYER -> activeGame.setActivePlayer(info);
+                case Constants.ACTIVE_SYSTEM -> activeGame.setActiveSystem(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
                     try {
                         long millis = Long.parseLong(info);
                         Date lastPing = new Date(millis);
-                        game.setLastActivePlayerPing(lastPing);
+                        activeGame.setLastActivePlayerPing(lastPing);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1477,7 +1477,7 @@ public class GameSaveLoadManager {
                     try {
                         long millis = Long.parseLong(info);
                         Date lastGameCheck = new Date(millis);
-                        game.setLastTimeGamesChecked(lastGameCheck);
+                        activeGame.setLastTimeGamesChecked(lastGameCheck);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1485,22 +1485,22 @@ public class GameSaveLoadManager {
                 case Constants.AUTO_PING -> {
                     try {
                         int pnghrs = Integer.parseInt(info);
-                        game.setAutoPing(pnghrs != 0);
-                        game.setAutoPingSpacer(pnghrs);
+                        activeGame.setAutoPing(pnghrs != 0);
+                        activeGame.setAutoPingSpacer(pnghrs);
                     } catch (Exception e) {
                         // do nothing
                     }
                 }
                 case Constants.CURRENT_AGENDA_INFO -> {
                     try {
-                        game.setCurrentAgendaInfo(info);
+                        activeGame.setCurrentAgendaInfo(info);
                     } catch (Exception e) {
                         // do nothing
                     }
                 }
                 case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
                     try {
-                        game.setACDrawStatusInfo(info);
+                        activeGame.setACDrawStatusInfo(info);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1510,7 +1510,7 @@ public class GameSaveLoadManager {
                     try {
                         long millis = Long.parseLong(info);
                         Date lastChange = new Date(millis);
-                        game.setLastActivePlayerChange(lastChange);
+                        activeGame.setLastActivePlayerChange(lastChange);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1519,57 +1519,57 @@ public class GameSaveLoadManager {
                     try {
                         int playerCount = Integer.parseInt(info);
                         if (playerCount >= 1 && playerCount <= 30) {
-                            game.setPlayerCountForMap(playerCount);
+                            activeGame.setPlayerCountForMap(playerCount);
                         } else {
-                            game.setPlayerCountForMap(6);
+                            activeGame.setPlayerCountForMap(6);
                         }
                     } catch (Exception e) {
-                        game.setPlayerCountForMap(6);
+                        activeGame.setPlayerCountForMap(6);
                     }
                 }
                 case Constants.SC_COUNT_FOR_MAP -> {
                     try {
                         int scCount = Integer.parseInt(info);
                         if (scCount >= 1 && scCount <= 8) {
-                            game.setStrategyCardsPerPlayer(scCount);
+                            activeGame.setStrategyCardsPerPlayer(scCount);
                         } else {
-                            game.setStrategyCardsPerPlayer(1);
+                            activeGame.setStrategyCardsPerPlayer(1);
                         }
                     } catch (Exception e) {
-                        game.setStrategyCardsPerPlayer(1);
+                        activeGame.setStrategyCardsPerPlayer(1);
                     }
                 }
                 case Constants.ACTIVATION_COUNT -> {
                     try {
                         int activationCount = Integer.parseInt(info);
-                        game.setActivationCount(activationCount);
+                        activeGame.setActivationCount(activationCount);
                     } catch (Exception e) {
-                        game.setActivationCount(0);
+                        activeGame.setActivationCount(0);
                     }
                 }
                 case Constants.VP_COUNT -> {
                     try {
                         int vpCount = Integer.parseInt(info);
-                        game.setVp(vpCount);
+                        activeGame.setVp(vpCount);
                     } catch (Exception e) {
-                        game.setVp(10);
+                        activeGame.setVp(10);
                     }
                 }
                 case Constants.MAX_SO_COUNT -> {
                     try {
                         int soCount = Integer.parseInt(info);
-                        game.setMaxSOCountPerPlayer(soCount);
+                        activeGame.setMaxSOCountPerPlayer(soCount);
                     } catch (Exception e) {
-                        game.setVp(3);
+                        activeGame.setVp(3);
                     }
                 }
                 case Constants.DISPLAY_TYPE -> {
                     if (info.equals(DisplayType.stats.getValue())) {
-                        game.setDisplayTypeForced(DisplayType.stats);
+                        activeGame.setDisplayTypeForced(DisplayType.stats);
                     } else if (info.equals(DisplayType.map.getValue())) {
-                        game.setDisplayTypeForced(DisplayType.map);
+                        activeGame.setDisplayTypeForced(DisplayType.map);
                     } else if (info.equals(DisplayType.all.getValue())) {
-                        game.setDisplayTypeForced(DisplayType.all);
+                        activeGame.setDisplayTypeForced(DisplayType.all);
                     }
                 }
                 case Constants.SC_PLAYED -> {
@@ -1578,7 +1578,7 @@ public class GameSaveLoadManager {
                         StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
                         Integer scID = Integer.parseInt(dataInfo.nextToken());
                         Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
-                        game.setSCPlayed(scID, status);
+                        activeGame.setSCPlayed(scID, status);
                     }
                 }
                 case Constants.AGENDA_VOTE_INFO -> {
@@ -1592,7 +1592,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            game.setCurrentAgendaVote(outcome, voteInfo);
+                            activeGame.setCurrentAgendaVote(outcome, voteInfo);
                         }
                     }
                 }
@@ -1607,7 +1607,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            game.setStoredValue(outcome, voteInfo);
+                            activeGame.setStoredValue(outcome, voteInfo);
                         }
                     }
                 }
@@ -1622,7 +1622,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            game.setSpecificCurrentMovedUnitsFrom1System(outcome, Integer.parseInt(voteInfo));
+                            activeGame.setSpecificCurrentMovedUnitsFrom1System(outcome, Integer.parseInt(voteInfo));
                         }
                     }
                 }
@@ -1637,7 +1637,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            game.setSpecificThalnosUnit(outcome, Integer.parseInt(voteInfo));
+                            activeGame.setSpecificThalnosUnit(outcome, Integer.parseInt(voteInfo));
                         }
                     }
                 }
@@ -1652,7 +1652,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             commandCount = dataInfo.nextToken();
-                            game.setSpecificSlashCommandCount(commandName, Integer.parseInt(commandCount));
+                            activeGame.setSpecificSlashCommandCount(commandName, Integer.parseInt(commandCount));
                         }
                     }
                 }
@@ -1667,7 +1667,7 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            game.setSpecificActionCardSaboCount(outcome, Integer.parseInt(voteInfo));
+                            activeGame.setSpecificActionCardSaboCount(outcome, Integer.parseInt(voteInfo));
                         }
                     }
                 }
@@ -1682,27 +1682,27 @@ public class GameSaveLoadManager {
                         }
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            game.setSpecificCurrentMovedUnitsFrom1TacticalAction(outcome,
+                            activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(outcome,
                                 Integer.parseInt(voteInfo));
                         }
                     }
                 }
-                case Constants.GAME_CUSTOM_NAME -> game.setCustomName(info);
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> game.setPlayersWhoHitPersistentNoAfter(info);
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> game.setPlayersWhoHitPersistentNoWhen(info);
-                case Constants.TABLE_TALK_CHANNEL -> game.setTableTalkChannelID(info);
-                case Constants.MAIN_GAME_CHANNEL -> game.setMainGameChannelID(info);
-                case Constants.SAVED_CHANNEL -> game.setSavedChannelID(info);
-                case Constants.SAVED_MESSAGE -> game.setSavedMessage(info);
-                case Constants.BOT_MAP_CHANNEL -> game.setBotMapUpdatesThreadID(info);
-                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> game.setBagDraftStatusMessageID(info);
-                case Constants.GAME_LAUNCH_THREAD_ID -> game.setLaunchPostThreadID(info);
+                case Constants.GAME_CUSTOM_NAME -> activeGame.setCustomName(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> activeGame.setPlayersWhoHitPersistentNoAfter(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> activeGame.setPlayersWhoHitPersistentNoWhen(info);
+                case Constants.TABLE_TALK_CHANNEL -> activeGame.setTableTalkChannelID(info);
+                case Constants.MAIN_GAME_CHANNEL -> activeGame.setMainGameChannelID(info);
+                case Constants.SAVED_CHANNEL -> activeGame.setSavedChannelID(info);
+                case Constants.SAVED_MESSAGE -> activeGame.setSavedMessage(info);
+                case Constants.BOT_MAP_CHANNEL -> activeGame.setBotMapUpdatesThreadID(info);
+                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> activeGame.setBagDraftStatusMessageID(info);
+                case Constants.GAME_LAUNCH_THREAD_ID -> activeGame.setLaunchPostThreadID(info);
 
                 // GAME MODES
                 case Constants.TIGL_GAME -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setCompetitiveTIGLGame(value);
+                        activeGame.setCompetitiveTIGLGame(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1710,7 +1710,7 @@ public class GameSaveLoadManager {
                 case Constants.HACK_ELECTION_STATUS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHackElectionStatus(value);
+                        activeGame.setHackElectionStatus(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1718,7 +1718,7 @@ public class GameSaveLoadManager {
                 case Constants.CC_N_PLASTIC_LIMIT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setCCNPlasticLimit(value);
+                        activeGame.setCCNPlasticLimit(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1726,7 +1726,7 @@ public class GameSaveLoadManager {
                 case Constants.BOT_FACTION_REACTS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setBotFactionReactions(value);
+                        activeGame.setBotFactionReactions(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1734,7 +1734,7 @@ public class GameSaveLoadManager {
                 case Constants.HAS_HAD_A_STATUS_PHASE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHasHadAStatusPhase(value);
+                        activeGame.setHasHadAStatusPhase(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1742,7 +1742,7 @@ public class GameSaveLoadManager {
                 case Constants.BOT_SHUSHING -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setShushing(value);
+                        activeGame.setShushing(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1750,7 +1750,7 @@ public class GameSaveLoadManager {
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setCommunityMode(value);
+                        activeGame.setCommunityMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1758,7 +1758,7 @@ public class GameSaveLoadManager {
                 case Constants.ALLIANCE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setAllianceMode(value);
+                        activeGame.setAllianceMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1766,7 +1766,7 @@ public class GameSaveLoadManager {
                 case Constants.FOW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setFoWMode(value);
+                        activeGame.setFoWMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1774,7 +1774,7 @@ public class GameSaveLoadManager {
                 case Constants.NAALU_AGENT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setNaaluAgent(value);
+                        activeGame.setNaaluAgent(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1782,7 +1782,7 @@ public class GameSaveLoadManager {
                 case Constants.L1_HERO -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setL1Hero(value);
+                        activeGame.setL1Hero(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1790,7 +1790,7 @@ public class GameSaveLoadManager {
                 case Constants.NOMAD_COIN -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setNomadCoin(value);
+                        activeGame.setNomadCoin(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1798,7 +1798,7 @@ public class GameSaveLoadManager {
                 case Constants.UNDO_BUTTON -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setUndoButton(value);
+                        activeGame.setUndoButton(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1806,7 +1806,7 @@ public class GameSaveLoadManager {
                 case Constants.FAST_SC_FOLLOW -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setFastSCFollowMode(value);
+                        activeGame.setFastSCFollowMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1814,7 +1814,7 @@ public class GameSaveLoadManager {
                 case Constants.QUEUE_SO -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setQueueSO(value);
+                        activeGame.setQueueSO(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1822,7 +1822,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_BUBBLES -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setShowBubbles(value);
+                        activeGame.setShowBubbles(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1830,7 +1830,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_GEARS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setShowGears(value);
+                        activeGame.setShowGears(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1838,7 +1838,7 @@ public class GameSaveLoadManager {
                 case Constants.HOMEBREW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHomeBrew(value);
+                        activeGame.setHomeBrew(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1846,7 +1846,7 @@ public class GameSaveLoadManager {
                 case Constants.PURGED_FRAGMENTS -> {
                     try {
                         int value = Integer.parseInt(info);
-                        game.setNumberOfPurgedFragments(value);
+                        activeGame.setNumberOfPurgedFragments(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1854,7 +1854,7 @@ public class GameSaveLoadManager {
                 case Constants.TEMPORARY_PING_DISABLE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setTemporaryPingDisable(value);
+                        activeGame.setTemporaryPingDisable(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1862,7 +1862,7 @@ public class GameSaveLoadManager {
                 case Constants.DOMINUS_ORB -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setDominusOrb(value);
+                        activeGame.setDominusOrb(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1870,7 +1870,7 @@ public class GameSaveLoadManager {
                 case Constants.COMPONENT_ACTION -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setComponentAction(value);
+                        activeGame.setComponentAction(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1878,7 +1878,7 @@ public class GameSaveLoadManager {
                 case Constants.JUST_PLAYED_COMPONENT_AC -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setJustPlayedComponentAC(value);
+                        activeGame.setJustPlayedComponentAC(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1886,7 +1886,7 @@ public class GameSaveLoadManager {
                 case Constants.BASE_GAME_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setBaseGameMode(value);
+                        activeGame.setBaseGameMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1894,7 +1894,7 @@ public class GameSaveLoadManager {
                 case Constants.LIGHT_FOG_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setLightFogMode(value);
+                        activeGame.setLightFogMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1902,7 +1902,7 @@ public class GameSaveLoadManager {
                 case Constants.RED_TAPE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setRedTapeMode(value);
+                        activeGame.setRedTapeMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1910,7 +1910,7 @@ public class GameSaveLoadManager {
                 case Constants.HOMEBREW_SC_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHomeBrewSCMode(value);
+                        activeGame.setHomeBrewSCMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1918,7 +1918,7 @@ public class GameSaveLoadManager {
                 case Constants.INJECT_RULES_LINKS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setInjectRulesLinks(value);
+                        activeGame.setInjectRulesLinks(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1926,7 +1926,7 @@ public class GameSaveLoadManager {
                 case Constants.SPIN_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setSpinMode(value);
+                        activeGame.setSpinMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1934,7 +1934,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_UNIT_TAGS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setShowUnitTags(value);
+                        activeGame.setShowUnitTags(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1942,14 +1942,14 @@ public class GameSaveLoadManager {
                 case Constants.STRAT_PINGS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setStratPings(value);
+                        activeGame.setStratPings(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
                 }
                 case Constants.TEXT_SIZE -> {
                     try {
-                        game.setTextSize(info);
+                        activeGame.setTextSize(info);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1957,7 +1957,7 @@ public class GameSaveLoadManager {
                 case Constants.ABSOL_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setAbsolMode(value);
+                        activeGame.setAbsolMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1965,7 +1965,7 @@ public class GameSaveLoadManager {
                 case Constants.MILTYMOD_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setMiltyModMode(value);
+                        activeGame.setMiltyModMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1973,7 +1973,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setMiltyModMode(value);
+                        activeGame.setMiltyModMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1981,14 +1981,14 @@ public class GameSaveLoadManager {
                 case Constants.DISCORDANT_STARS_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setDiscordantStarsMode(value);
+                        activeGame.setDiscordantStarsMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
                 }
                 case Constants.VERBOSITY -> {
                     try {
-                        game.setOutputVerbosity(info);
+                        activeGame.setOutputVerbosity(info);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1996,7 +1996,7 @@ public class GameSaveLoadManager {
                 case Constants.BETA_TEST_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setTestBetaFeaturesMode(value);
+                        activeGame.setTestBetaFeaturesMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2004,7 +2004,7 @@ public class GameSaveLoadManager {
                 case Constants.SHOW_FULL_COMPONENT_TEXT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setShowFullComponentTextEmbeds(value);
+                        activeGame.setShowFullComponentTextEmbeds(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2012,36 +2012,36 @@ public class GameSaveLoadManager {
                 case Constants.GAME_HAS_ENDED -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHasEnded(value);
+                        activeGame.setHasEnded(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
                 }
-                case Constants.CREATION_DATE -> game.setCreationDate(info);
+                case Constants.CREATION_DATE -> activeGame.setCreationDate(info);
                 case Constants.ROUND -> {
                     try {
-                        game.setRound(Integer.parseInt(info));
+                        activeGame.setRound(Integer.parseInt(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse round number", exception);
                     }
                 }
                 case Constants.BUTTON_PRESS_COUNT -> {
                     try {
-                        game.setButtonPressCount(Integer.parseInt(info));
+                        activeGame.setButtonPressCount(Integer.parseInt(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse button press count", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
                     try {
-                        game.setLastModifiedDate(Long.parseLong(info));
+                        activeGame.setLastModifiedDate(Long.parseLong(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse last modified date", exception);
                     }
                 }
                 case Constants.ENDED_DATE -> {
                     try {
-                        game.setEndedDate(Long.parseLong(info));
+                        activeGame.setEndedDate(Long.parseLong(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse ended date", exception);
                     }
@@ -2049,7 +2049,7 @@ public class GameSaveLoadManager {
                 case Constants.IMAGE_GEN_COUNT -> {
                     try {
                         int count = Integer.parseInt(info);
-                        game.setMapImageGenerationCount(count);
+                        activeGame.setMapImageGenerationCount(count);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2059,21 +2059,21 @@ public class GameSaveLoadManager {
 
                     while (migrationInfo.hasMoreTokens()) {
                         String migration = migrationInfo.nextToken();
-                        game.addMigration(migration);
+                        activeGame.addMigration(migration);
                     }
                 }
                 case Constants.BAG_DRAFT -> {
                     try {
-                        game.setBagDraft(BagDraft.GenerateDraft(info, game));
+                        activeGame.setBagDraft(BagDraft.GenerateDraft(info, activeGame));
                     } catch (Exception e) {
                         // Do nothing
                     }
                 }
                 case Constants.MILTY_DRAFT_MANAGER -> {
                     try {
-                        MiltyDraftManager manager = game.getMiltyDraftManager();
-                        manager.init(game);
-                        manager.loadSuperSaveString(game, info);
+                        MiltyDraftManager manager = activeGame.getMiltyDraftManager();
+                        manager.init(activeGame);
+                        manager.loadSuperSaveString(activeGame, info);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2137,7 +2137,7 @@ public class GameSaveLoadManager {
         return overrides;
     }
 
-    private static void readPlayerInfo(Player player, String data, Game game) {
+    private static void readPlayerInfo(Player player, String data, Game activeGame) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
             data = tokenizer.nextToken();
@@ -2234,7 +2234,7 @@ public class GameSaveLoadManager {
                         StringTokenizer pnInfo = new StringTokenizer(pnToken.nextToken(), ",");
                         String id = pnInfo.nextToken();
                         // MIGRATE ABSOL'S PS
-                        if (game.isAbsolMode() && id.endsWith("_ps") && !id.startsWith("absol_"))
+                        if (activeGame.isAbsolMode() && id.endsWith("_ps") && !id.startsWith("absol_"))
                             id = "absol_" + id;
                         // END MIGRATE
                         Integer index = Integer.parseInt(pnInfo.nextToken());

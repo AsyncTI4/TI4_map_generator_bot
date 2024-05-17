@@ -19,9 +19,9 @@ public class PNReset extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -29,13 +29,13 @@ public class PNReset extends PNCardsSubcommandData {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
         if (Mapper.isValidColor(playerColor) && Mapper.isValidFaction(playerFaction)) {
-            List<String> promissoryNotes = new ArrayList<>(Mapper.getColorPromissoryNoteIDs(game, playerColor));
+            List<String> promissoryNotes = new ArrayList<>(Mapper.getColorPromissoryNoteIDs(activeGame, playerColor));
             for (String promissoryNote : promissoryNotes) {
-                game.removePurgedPN(promissoryNote);
+                activeGame.removePurgedPN(promissoryNote);
             }
         }
-        PNInfo.checkAndAddPNs(game, player);
-        PNInfo.sendPromissoryNoteInfo(game, player, true, event);
+        PNInfo.checkAndAddPNs(activeGame, player);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
         MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }
 }

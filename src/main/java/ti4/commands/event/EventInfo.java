@@ -24,37 +24,37 @@ public class EventInfo extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendEventInfo(game, player, event);
+        sendEventInfo(activeGame, player, event);
         MessageHelper.sendMessageToEventChannel(event, "Event Info Sent");
     }
 
-    public static void sendEventInfo(Game game, Player player, SlashCommandInteractionEvent event) {
+    public static void sendEventInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
         String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendEventInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendEventInfo(activeGame, player);
     }
 
-    public static void sendEventInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+    public static void sendEventInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation(true, true) + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendEventInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendEventInfo(activeGame, player);
     }
 
-    public static void sendEventInfo(Game game, Player player, ButtonInteractionEvent event) {
+    public static void sendEventInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
         String headerText = player.getRepresentation() + " pressed button: " + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendEventInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendEventInfo(activeGame, player);
     }
 
-    public static void sendEventInfo(Game game, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Events in Hand:**__", getEventMessageEmbeds(player));
+    public static void sendEventInfo(Game activeGame, Player player) {
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Events in Hand:**__", getEventMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getEventMessageEmbeds(Player player) {

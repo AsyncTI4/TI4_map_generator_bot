@@ -16,15 +16,15 @@ public class ShuffleACDeck extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())) {
+        if (option == null || !"YES".equals(option.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
 
-        game.shuffleActionCards();
+        activeGame.shuffleActionCards();
         MessageHelper.replyToMessage(event, "Action card deck was shuffled");
     }
 }

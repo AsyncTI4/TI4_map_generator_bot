@@ -36,9 +36,10 @@ public class FrankenDraft extends BagDraft {
 
     private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane" };
 
-    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
+
+    public static List<FactionModel> getDraftableFactionsForGame(Game activeGame) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
-        if (!game.isDiscordantStarsMode()) {
+        if (!activeGame.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         return factionSet;
@@ -47,7 +48,7 @@ public class FrankenDraft extends BagDraft {
     public static List<FactionModel> getAllFrankenLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactions();
         factionSet.removeIf((FactionModel model) -> {
-            if (model.getSource().isPok() || model.getSource().isDs()) {
+            if (model.getSource().isPok() || model.getSource().isDs()){
                 for (String excludedFaction : excludedFactions) {
                     if (model.getAlias().contains(excludedFaction)) {
                         return true;
@@ -84,6 +85,7 @@ public class FrankenDraft extends BagDraft {
         MiltyDraftHelper.initDraftTiles(draftManager, game);
         allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
         allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
+
 
         List<DraftBag> bags = new ArrayList<>();
 

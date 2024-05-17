@@ -18,19 +18,19 @@ public class ListVoteCount extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        turnOrder(event, game);
+        Game activeGame = getActiveGame();
+        turnOrder(event, activeGame);
     }
 
-    public static void turnOrder(SlashCommandInteractionEvent event, Game game) {
-        turnOrder(event, game, event.getChannel());
+    public static void turnOrder(SlashCommandInteractionEvent event, Game activeGame) {
+        turnOrder(event, activeGame, event.getChannel());
     }
 
-    public static void turnOrder(GenericInteractionCreateEvent event, Game game, MessageChannel channel) {
-        List<Player> orderList = AgendaHelper.getVotingOrder(game);
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel) {
+        List<Player> orderList = AgendaHelper.getVotingOrder(activeGame);
         int votes = 0;
         for (Player player : orderList) {
-            votes = votes + AgendaHelper.getTotalVoteCount(game, player);
+            votes = votes + AgendaHelper.getTotalVoteCount(activeGame, player);
         }
         StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + votes);
         sb.append("):__**\n");
@@ -38,8 +38,8 @@ public class ListVoteCount extends AgendaSubcommandData {
         for (Player player : orderList) {
             sb.append("`").append(itemNo).append(".` ");
             sb.append(player.getRepresentation());
-            if (player.getUserID().equals(game.getSpeaker())) sb.append(Emojis.SpeakerToken);
-            sb.append(AgendaHelper.getPlayerVoteText(game, player));
+            if (player.getUserID().equals(activeGame.getSpeaker())) sb.append(Emojis.SpeakerToken);
+            sb.append(AgendaHelper.getPlayerVoteText(activeGame, player));
             sb.append("\n");
             itemNo++;
         }

@@ -20,29 +20,29 @@ public class ShowAllAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
-        Player player_ = Helper.getPlayer(game, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
 
-        showAll(player, player_, game);
+        showAll(player, player_, activeGame);
     }
 
-    public static void showAll(Player player, Player player_, Game game) {
+    public static void showAll(Player player, Player player_, Game activeGame) {
         StringBuilder sb = new StringBuilder();
         StringBuilder sa = new StringBuilder();
         sa.append("You have shown your cards to player: ").append(player_.getUserName()).append("\n");
         sa.append("Your cards were presented in the order below. You may reference the number listed when discussing the cards:\n");
-        sb.append("Game: ").append(game.getName()).append("\n");
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Action Cards, they were also presented the cards in the order you see them so you can reference the number when talking to them:").append("\n");
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
@@ -53,7 +53,7 @@ public class ShowAllAC extends ACCardsSubcommandData {
             sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sa.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sa.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb.toString());
     }
 }

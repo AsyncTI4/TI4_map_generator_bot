@@ -24,40 +24,40 @@ public class StartPhase extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         String phase = event.getOption(Constants.SPECIFIC_PHASE, null, OptionMapping::getAsString);
-        startPhase(event, game, phase);
+        startPhase(event, activeGame, phase);
     }
 
-    public static void startPhase(GenericInteractionCreateEvent event, Game game, String phase) {
+    public static void startPhase(GenericInteractionCreateEvent event, Game activeGame, String phase) {
         switch (phase) {
-            case "strategy" -> ButtonHelper.startStrategyPhase(event, game);
-            case "voting" -> AgendaHelper.startTheVoting(game);
-            case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event, "both");
-            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event, "1");
+            case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
+            case "voting" -> AgendaHelper.startTheVoting(activeGame);
+            case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
+            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(activeGame, true, event, "both");
+            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(activeGame, false, event, "1");
             // case "unleashTheNames" -> OtherStats.sendAllNames(event);
             // case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
             // case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);
             // case "unleashTheNamesEnded" -> OtherStats.showGameLengths(event, 120);
-            case "ixthian" -> AgendaHelper.rollIxthian(game, false);
-            case "gameTitles" -> ButtonHelper.offerEveryoneTitlePossibilities(game);
-            case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
+            case "ixthian" -> AgendaHelper.rollIxthian(activeGame, false);
+            case "gameTitles" -> ButtonHelper.offerEveryoneTitlePossibilities(activeGame);
+            case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(activeGame);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
-            case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
-            case "finFixSecrets" -> game.fixScrewedSOs();
+            case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
+            case "finFixSecrets" -> activeGame.fixScrewedSOs();
             case "statusScoring" -> {
-                TurnEnd.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
-                game.updateActivePlayer(null);
+                TurnEnd.showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
+                activeGame.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
                 String endOfGameSummary = "";
 
-                for (int x = 1; x < game.getRound() + 1; x++) {
+                for (int x = 1; x < activeGame.getRound() + 1; x++) {
                     String summary = "";
-                    for (Player player : game.getRealPlayers()) {
-                        if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
-                            summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                    for (Player player : activeGame.getRealPlayers()) {
+                        if (!activeGame.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
+                            summary = summary + player.getFactionEmoji() + ": " + activeGame.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
                         }
                     }
                     if (!summary.isEmpty()) {
@@ -69,10 +69,10 @@ public class StartPhase extends GameSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), endOfGameSummary);
                 }
             }
-            case "statusHomework" -> ButtonHelper.startStatusHomework(event, game);
-            case "agendaResolve" -> AgendaHelper.resolveTime(event, game, null);
-            case "action" -> ButtonHelper.startActionPhase(event, game);
-            case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
+            case "statusHomework" -> ButtonHelper.startStatusHomework(event, activeGame);
+            case "agendaResolve" -> AgendaHelper.resolveTime(event, activeGame, null);
+            case "action" -> ButtonHelper.startActionPhase(event, activeGame);
+            case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), activeGame);
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
         }
     }

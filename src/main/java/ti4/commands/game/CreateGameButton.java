@@ -153,9 +153,9 @@ public class CreateGameButton extends GameSubcommandData {
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameChannels.getNextGameName();
         String lastGame = CreateGameChannels.getLastGameName();
-        Game game = GameManager.getInstance().getGame(lastGame);
-        if (game != null) {
-            if (game.getCustomName().equalsIgnoreCase(gameSillyName)) {
+        Game activeGame = GameManager.getInstance().getGame(lastGame);
+        if (activeGame != null) {
+            if (activeGame.getCustomName().equalsIgnoreCase(gameSillyName)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "The custom name of the last game is the same as the one for this game, so the bot suspects a double press occurred and is cancelling the creation of another game. ");
                 return;

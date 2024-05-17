@@ -52,40 +52,40 @@ public class TurnEnd extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player mainPlayer = game.getPlayer(getUser().getId());
-        mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
-        mainPlayer = Helper.getPlayer(game, mainPlayer, event);
+        Game activeGame = getActiveGame();
+        Player mainPlayer = activeGame.getPlayer(getUser().getId());
+        mainPlayer = Helper.getGamePlayer(activeGame, mainPlayer, event, null);
+        mainPlayer = Helper.getPlayer(activeGame, mainPlayer, event);
 
         if (mainPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
+            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
 
-        if (game.isFoWMode() && !mainPlayer.equals(game.getActivePlayer())) {
-            OptionMapping confirm = event.getOption(Constants.CONFIRM);
-            if (confirm == null || !"YES".equals(confirm.getAsString())) {
-                MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
-                return;
-            }
+        if (activeGame.isFoWMode() && !mainPlayer.equals(activeGame.getActivePlayer())) {
+          OptionMapping confirm = event.getOption(Constants.CONFIRM);
+          if (confirm == null || !"YES".equals(confirm.getAsString())) {
+            MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
+            return;
+          }
         }
 
-        pingNextPlayer(event, game, mainPlayer);
+        pingNextPlayer(event, activeGame, mainPlayer);
         mainPlayer.resetOlradinPolicyFlags();
     }
 
-    public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
-        int startingInitiative = game.getPlayersTurnSCInitiative(currentPlayer);
+    public static Player findNextUnpassedPlayer(Game activeGame, Player currentPlayer) {
+        int startingInitiative = activeGame.getPlayersTurnSCInitiative(currentPlayer);
         //in a normal game, 8 is the maximum number, so we modulo on 9
-        List<Player> unpassedPlayers = game.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
-        int maxSC = Collections.max(game.getSCList()) + 1;
-        if (ButtonHelper.getKyroHeroSC(game) != 1000) {
+        List<Player> unpassedPlayers = activeGame.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
+        int maxSC = Collections.max(activeGame.getSCList()) + 1;
+        if (ButtonHelper.getKyroHeroSC(activeGame) != 1000) {
             maxSC = maxSC + 1;
         }
         for (int i = 1; i <= maxSC; i++) {
             int scCheck = (startingInitiative + i) % maxSC;
             for (Player p : unpassedPlayers) {
-                if (game.getPlayersTurnSCInitiative(p) == scCheck) {
+                if (activeGame.getPlayersTurnSCInitiative(p) == scCheck) {
                     return p;
                 }
             }
@@ -97,90 +97,90 @@ public class TurnEnd extends PlayerSubcommandData {
         }
     }
 
-    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer) {
-        pingNextPlayer(event, game, mainPlayer, false);
+    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
+        pingNextPlayer(event, activeGame, mainPlayer, false);
     }
 
-    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
-        game.setTemporaryPingDisable(false);
+    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer, boolean justPassed) {
+        activeGame.setTemporaryPingDisable(false);
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        for (Player player : game.getRealPlayers()) {
-            for (Player player_ : game.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
+            for (Player player_ : activeGame.getRealPlayers()) {
                 if (player_ == player) {
                     continue;
                 }
                 String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
-                if (!game.getStoredValue(key).isEmpty()) {
-                    game.setStoredValue(key, "");
+                if (!activeGame.getStoredValue(key).isEmpty()) {
+                    activeGame.setStoredValue(key, "");
                 }
             }
         }
-        game.setStoredValue("mahactHeroTarget", "");
-        game.setActiveSystem("");
-        if (game.isFoWMode()) {
+        activeGame.setStoredValue("mahactHeroTarget", "");
+        activeGame.setActiveSystem("");
+        if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
-                + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
+              + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
         }
 
-        MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
+        MessageChannel gameChannel = activeGame.getMainGameChannel() == null ? event.getMessageChannel() : activeGame.getMainGameChannel();
 
         //MAKE ALL NON-REAL PLAYERS PASSED
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : activeGame.getPlayers().values()) {
             if (!player.isRealPlayer()) {
                 player.setPassed(true);
             }
         }
 
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            showPublicObjectivesWhenAllPassed(event, game, gameChannel);
-            game.updateActivePlayer(null);
+        if (activeGame.getPlayers().values().stream().allMatch(Player::isPassed)) {
+            showPublicObjectivesWhenAllPassed(event, activeGame, gameChannel);
+            activeGame.updateActivePlayer(null);
             return;
         }
 
-        Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
-        if (!game.isFoWMode()) {
-            String lastTransaction = game.getLatestTransactionMsg();
+        Player nextPlayer = findNextUnpassedPlayer(activeGame, mainPlayer);
+        if (!activeGame.isFoWMode()) {
+            String lastTransaction = activeGame.getLatestTransactionMsg();
             try {
                 if (lastTransaction != null && !"".equals(lastTransaction)) {
-                    game.setLatestTransactionMsg("");
-                    game.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
+                    activeGame.setLatestTransactionMsg("");
+                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
                     });
                 }
             } catch (Exception e) {
                 //  Block of code to handle errors
             }
         }
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
         if (isFowPrivateGame) {
-            FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
+            FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
-        ButtonHelper.checkFleetInEveryTile(mainPlayer, game, event);
+        ButtonHelper.checkFleetInEveryTile(mainPlayer, activeGame, event);
         if (mainPlayer != nextPlayer) {
-            ButtonHelper.checkForPrePassing(game, mainPlayer);
+            ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
         }
         if (justPassed) {
-            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
-                TurnStart.turnStart(event, game, nextPlayer);
+            if (!ButtonHelperAgents.checkForEdynAgentPreset(activeGame, mainPlayer, nextPlayer, event)) {
+                TurnStart.turnStart(event, activeGame, nextPlayer);
             }
         } else {
-            if (!ButtonHelperAgents.checkForEdynAgentActive(game, event)) {
-                TurnStart.turnStart(event, game, nextPlayer);
+            if (!ButtonHelperAgents.checkForEdynAgentActive(activeGame, event)) {
+                TurnStart.turnStart(event, activeGame, nextPlayer);
             }
         }
 
     }
 
-    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game game) {
-        return getScoreObjectiveButtons(event, game, "");
+    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
+        return getScoreObjectiveButtons(event, activeGame, "");
     }
 
-    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game game, String prefix) {
-        Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
+    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame, String prefix) {
+        Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
         Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
-        Map<String, Integer> customPublicVP = game.getCustomPublicVP();
+        Map<String, Integer> customPublicVP = activeGame.getCustomPublicVP();
         List<Button> poButtons = new ArrayList<>();
         List<Button> poButtons1 = new ArrayList<>();
         List<Button> poButtons2 = new ArrayList<>();
@@ -221,8 +221,8 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtons1);
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
-        for (Player player : game.getRealPlayers()) {
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFoWMode()) {
+        for (Player player : activeGame.getRealPlayers()) {
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !activeGame.isFoWMode()) {
                 poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
                 break;
             }
@@ -231,13 +231,13 @@ public class TurnEnd extends PlayerSubcommandData {
         return poButtons;
     }
 
-    public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        String message = "All players passed. Please score objectives. " + game.getPing();
+    public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
+        String message = "All players passed. Please score objectives. " + activeGame.getPing();
 
-        game.setCurrentPhase("statusScoring");
-        game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", new Date().getTime() + "");
-        for (Player player : game.getRealPlayers()) {
-            SOInfo.sendSecretObjectiveInfo(game, player);
+        activeGame.setCurrentPhase("statusScoring");
+        activeGame.setStoredValue("startTimeOfRound" + activeGame.getRound() + "StatusScoring", new Date().getTime() + "");
+        for (Player player : activeGame.getRealPlayers()) {
+            SOInfo.sendSecretObjectiveInfo(activeGame, player);
             List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {
@@ -245,7 +245,7 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
             }
         }
-        Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
+        Player vaden = Helper.getPlayerFromAbility(activeGame, "binding_debts");
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
@@ -257,13 +257,13 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
             }
         }
-        List<Button> poButtons = getScoreObjectiveButtons(event, game);
+        List<Button> poButtons = getScoreObjectiveButtons(event, activeGame);
         Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
         Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
-        if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
-            && ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).size() > 0) {
+        if (activeGame.getActionCards().size() > 130 && activeGame.getPlayerFromColorOrFaction("hacan") != null
+            && ButtonHelper.getButtonsToSwitchWithAllianceMembers(activeGame.getPlayerFromColorOrFaction("hacan"), activeGame, false).size() > 0) {
             poButtons.add(Button.secondary("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
@@ -279,11 +279,11 @@ public class TurnEnd extends PlayerSubcommandData {
         gameChannel.sendMessage(messageObject).queue();
 
         int maxVP = 0;
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
             if (player.getTotalVictoryPoints() > maxVP) {
                 maxVP = player.getTotalVictoryPoints();
             }
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
                 int numScoredPos = player.getPublicVictoryPoints(false);
                 if (numScoredPos + player.getCommodities() > player.getCommoditiesTotal()) {
@@ -291,27 +291,27 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
                 player.setTg(player.getTg() + numScoredSOs);
                 if (numScoredSOs > 0) {
-                    ButtonHelperAbilities.pillageCheck(player, game);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, numScoredSOs);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, numScoredSOs);
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                     player.getRepresentation(true, true) + " you gained " + numScoredSOs + " tg and " + numScoredPos + " commodities due to Vaden Commander");
             }
         }
-        // if(maxVP+4 > game.getVp()){
+        // if(maxVP+4 > activeGame.getVp()){
         //     String msg = "You can use these buttons to force scoring to go in iniative order";
         //     List<Button> buttons = new ArrayList<>();
         //     buttons.add(Button.primary("forceACertainScoringOrder", "Force Scoring in Order"));
         //     buttons.add(Button.danger("deleteButtons", "Decline to force order"));
-        //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg, buttons);
+        //     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg, buttons);
         // }
         // return beginning of status phase PNs
-        Map<String, Player> players = game.getPlayers();
+        Map<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
-                Player pnOwner = game.getPNOwner(pn);
+                Player pnOwner = activeGame.getPNOwner(pn);
                 if (pnOwner == null || !pnOwner.isRealPlayer()) {
                     continue;
                 }
@@ -319,13 +319,13 @@ public class TurnEnd extends PlayerSubcommandData {
                 if (pnModel.getText().contains("eturn this card") && (pnModel.getText().contains("start of the status phase") || pnModel.getText().contains("beginning of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
-                    PNInfo.sendPromissoryNoteInfo(game, pnOwner, false);
-                    PNInfo.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), pnModel.getName() + " was returned");
+                    PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
+                    PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
@@ -342,7 +342,7 @@ public class TurnEnd extends PlayerSubcommandData {
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
                 for (String pl : player.getPlanets()) {
-                    Tile tile = game.getTile(AliasHandler.resolveTile(pl));
+                    Tile tile = activeGame.getTile(AliasHandler.resolveTile(pl));
                     if (tile == null) {
                         continue;
                     }
@@ -362,12 +362,12 @@ public class TurnEnd extends PlayerSubcommandData {
 
         }
 
-        for (Player p2 : game.getRealPlayers()) {
-            String ms2 = TurnStart.getMissedSCFollowsText(game, p2);
+        for (Player p2 : activeGame.getRealPlayers()) {
+            String ms2 = TurnStart.getMissedSCFollowsText(activeGame, p2);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), ms2);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ms2);
             }
-            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts if you'd like, and we'll share everyone's at the end of the game. You can share highlights or plots or theories/predictions or anything you want (or nothing). Simply start your message with endofround" + game.getRound()
+            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts if you'd like, and we'll share everyone's at the end of the game. You can share highlights or plots or theories/predictions or anything you want (or nothing). Simply start your message with endofround" + activeGame.getRound()
                 + " (capitalization doesnt matter) and then the rest of it will get recorded. You can do multiple messages if youd like, and theyll all get added onto eachother.";
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), endOfRoundMessage);
         }
@@ -377,43 +377,43 @@ public class TurnEnd extends PlayerSubcommandData {
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
 
-        game.setStoredValue(key2, "");
-        game.setStoredValue(key3, "");
-        game.setStoredValue(key2b, "");
-        game.setStoredValue(key3b, "");
-        if (game.getHighestScore() + 4 > game.getVp()) {
-            game.setStoredValue("forcedScoringOrder", "true");
+        activeGame.setStoredValue(key2, "");
+        activeGame.setStoredValue(key3, "");
+        activeGame.setStoredValue(key2b, "");
+        activeGame.setStoredValue(key3b, "");
+        if (activeGame.getHighestScore() + 4 > activeGame.getVp()) {
+            activeGame.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing() +
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), activeGame.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You can turn this off at any time by pressing this button", buttons);
-            for (Player player : Helper.getInitativeOrder(game)) {
-                game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
-                game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
+            for (Player player : Helper.getInitativeOrder(activeGame)) {
+                activeGame.setStoredValue(key3, activeGame.getStoredValue(key3) + player.getFaction() + "*");
+                activeGame.setStoredValue(key3b, activeGame.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
-        Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
+        Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
             String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(activeGame, arborec));
         }
-        Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
+        Player veldyr = Helper.getPlayerFromAbility(activeGame, "holding_company");
         if (veldyr != null) {
-            ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, game);
+            ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, activeGame);
         }
-        Player solPlayer = Helper.getPlayerFromUnit(game, "sol_flagship");
+        Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");
 
         if (solPlayer != null) {
             String colorID = Mapper.getColorID(solPlayer.getColor());
             UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-            for (Tile tile : game.getTileMap().values()) {
+            for (Tile tile : activeGame.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (unitHolder.getUnits() != null) {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = solPlayer.getRepresentation(true, true)
                                 + " an infantry was added to the space area of your flagship automatically.";
-                            if (game.isFoWMode()) {
+                            if (activeGame.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
                             } else {
                                 MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);

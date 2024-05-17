@@ -41,44 +41,44 @@ public class CardsInfo implements Command, InfoThreadCommand {
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
-        Game game;
+        Game activeGame;
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            game = gameManager.getUserActiveGame(userID);
-            String color = Helper.getColor(game, event);
+            activeGame = gameManager.getUserActiveGame(userID);
+            String color = Helper.getColor(activeGame, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
         }
 
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = activeGame.getPlayer(userID);
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        game.checkPromissoryNotes();
-        PNInfo.checkAndAddPNs(game, player);
-        sendCardsInfo(game, player, event);
+        activeGame.checkPromissoryNotes();
+        PNInfo.checkAndAddPNs(activeGame, player);
+        sendCardsInfo(activeGame, player, event);
     }
 
-    public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+    public static void sendCardsInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         if (player == null)
             return;
         String headerText = player.getRepresentation(true, true) + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendCardsInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendCardsInfo(activeGame, player);
     }
 
-    public static void sendCardsInfo(Game game, Player player) {
-        SOInfo.sendSecretObjectiveInfo(game, player);
-        ACInfo.sendActionCardInfo(game, player);
-        PNInfo.sendPromissoryNoteInfo(game, player, false);
-        sendVariousAdditionalButtons(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
+    public static void sendCardsInfo(Game activeGame, Player player) {
+        SOInfo.sendSecretObjectiveInfo(activeGame, player);
+        ACInfo.sendActionCardInfo(activeGame, player);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+        sendVariousAdditionalButtons(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame,
             "You can whisper to people from here by starting a message with to[color] or to[faction]." +
                 "\nYou can schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
                 +
@@ -86,13 +86,13 @@ public class CardsInfo implements Command, InfoThreadCommand {
 
     }
 
-    public static void sendVariousAdditionalButtons(Game game, Player player) {
+    public static void sendVariousAdditionalButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         Button transaction = Button.primary("transaction", "Transaction");
         buttons.add(transaction);
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.Naalu));
             buttons.add(naalu);
@@ -114,7 +114,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
                 .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
-        if (ButtonHelper.isPlayerElected(game, player, "minister_peace")) {
+        if (ButtonHelper.isPlayerElected(activeGame, player, "minister_peace")) {
             Button hacanButton = Button.secondary("ministerOfPeace", "Use Minister of Peace")
                 .withEmoji(Emoji.fromFormatted(Emojis.Agenda));
             buttons.add(hacanButton);
@@ -240,7 +240,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
-        if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
+        if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
             Button psycho = Button.success("getPsychoButtons", "Use Psychoarcheology");
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             buttons.add(psycho);
@@ -258,15 +258,15 @@ public class CardsInfo implements Command, InfoThreadCommand {
             buttons.add(nekroButton);
         }
         if (player.ownsUnit("ghost_mech")
-            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-            && !game.getLaws().containsKey("articles_war")) {
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
+            && !activeGame.getLaws().containsKey("articles_war")) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech")
                 .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
         if (player.ownsUnit("nivyn_mech2")
-            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-            && !game.getLaws().containsKey("articles_war")) {
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech", false) > 0
+            && !activeGame.getLaws().containsKey("articles_war")) {
             Button ghostButton = Button.secondary("nivynMechStep1_", "Use Nivyn Mech")
                 .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
             buttons.add(ghostButton);
@@ -283,9 +283,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
             buttons.add(Button.secondary("removeTrapStep1", "Remove a Trap"));
         }
 
-        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(game).size() > 0) {
+        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
             StringBuilder omenDice = new StringBuilder();
-            for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
+            for (int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)) {
                 omenDice.append(" ").append(omenDie);
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
@@ -300,7 +300,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
-            if (!game.getPlayedSCs().contains(SC)) {
+            if (!activeGame.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
             }
         }

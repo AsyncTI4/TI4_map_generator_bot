@@ -13,7 +13,7 @@ import ti4.map.GameSaveLoadManager;
 public abstract class FrankenSubcommandData extends SubcommandData {
 
     private SlashCommandInteractionEvent event;
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -25,7 +25,7 @@ public abstract class FrankenSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -40,13 +40,13 @@ public abstract class FrankenSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
         this.event = event;
     }
 
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

@@ -145,8 +145,8 @@ public class ConvertTTPGtoAsync {
                 BotLogger.log("TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
                 return false;
             }
-            Game game = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
-            GameSaveLoadManager.saveMap(game);
+            Game activeGame = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
+            GameSaveLoadManager.saveMap(activeGame);
             GameSaveLoadManager.loadMaps();
         } catch (Exception e) {
             BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);

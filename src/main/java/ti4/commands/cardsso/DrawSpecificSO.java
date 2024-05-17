@@ -1,5 +1,6 @@
 package ti4.commands.cardsso;
 
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -21,9 +22,10 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge SO instead of drawing it").setRequired(false));
     }
 
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);
@@ -33,28 +35,37 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         }
         User user;
         if (playerOption == null) {
-            //  MessageHelper.sendMessageToEventChannel(event, "Player option was null");
-            // return;
-            user = event.getUser();
-        } else {
-            user = playerOption.getAsUser();
+          //  MessageHelper.sendMessageToEventChannel(event, "Player option was null");
+           // return;
+           user = event.getUser();
         }
-        if (optionPurge != null && "YES".equals(optionPurge.getAsString())) {
-            if (game.purgeSpecificSecretObjective(option.getAsString())) {
+        else
+        {
+           user = playerOption.getAsUser();
+        }
+        if(optionPurge != null && "YES".equals(optionPurge.getAsString()))
+        {
+            if(activeGame.purgeSpecificSecretObjective(option.getAsString()))
+            {
                 MessageHelper.sendMessageToEventChannel(event, "Purged specified SO");
-            } else {
+            }
+            else
+            {
                 MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified SO");
             }
             return;
         }
 
-        Map<String, Integer> secrets = game.drawSpecificSecretObjective(option.getAsString(), user.getId());
-        if (secrets == null) {
+        
+        Map<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
+        if (secrets == null){
             MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
         MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
-        SOInfo.sendSecretObjectiveInfo(game, game.getPlayer(user.getId()));
+        SOInfo.sendSecretObjectiveInfo(activeGame, activeGame.getPlayer(user.getId()));
     }
 }
+    
+

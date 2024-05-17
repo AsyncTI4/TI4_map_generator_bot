@@ -24,26 +24,26 @@ public class TechInfo extends TechSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendTechInfo(game, player, event);
+        sendTechInfo(activeGame, player, event);
     }
 
-    public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+    public static void sendTechInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendTechInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendTechInfo(activeGame, player);
     }
 
-    public static void sendTechInfo(Game game, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Technologies Researched:**__", getTechMessageEmbeds(player));
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, player, "_ _\n__**Faction Technologies (Not Yet Researched)**__", getFactionTechMessageEmbeds(player));
+    public static void sendTechInfo(Game activeGame, Player player) {
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Technologies Researched:**__", getTechMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Faction Technologies (Not Yet Researched)**__", getFactionTechMessageEmbeds(player));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), null, getTechButtons(player));
     }
 

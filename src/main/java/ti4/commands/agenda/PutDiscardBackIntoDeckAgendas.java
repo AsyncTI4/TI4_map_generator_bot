@@ -18,7 +18,7 @@ public class PutDiscardBackIntoDeckAgendas extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
@@ -27,13 +27,17 @@ public class PutDiscardBackIntoDeckAgendas extends AgendaSubcommandData {
         OptionMapping option2 = event.getOption(Constants.SHUFFLE_AGENDAS);
         boolean success = false;
         if (option2 != null) {
-            if ("YES".equalsIgnoreCase(option2.getAsString())) {
-                success = game.shuffleAgendaBackIntoDeck(option.getAsInt());
-            } else {
-                success = game.putAgendaBackIntoDeckOnTop(option.getAsInt());
+            if("YES".equalsIgnoreCase(option2.getAsString()))
+            {
+                success = activeGame.shuffleAgendaBackIntoDeck(option.getAsInt());
+            }
+            else
+            {
+                success = activeGame.putAgendaBackIntoDeckOnTop(option.getAsInt());
             }
         }
 
+        
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda put back into deck");
         } else {

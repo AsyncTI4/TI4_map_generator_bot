@@ -28,14 +28,14 @@ public class SentACRandom extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(game, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
@@ -46,10 +46,10 @@ public class SentACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        sendRandomACPart2(event, game, player, player_);
+        sendRandomACPart2(event, activeGame, player, player_);
     }
 
-    public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player_) {
+    public void sendRandomACPart2(GenericInteractionCreateEvent event, Game activeGame, Player player, Player player_){
         Map<String, Integer> actionCardsMap = player.getActionCards();
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()) {
@@ -57,15 +57,15 @@ public class SentACRandom extends ACCardsSubcommandData {
         }
         Collections.shuffle(actionCards);
         String acID = actionCards.get(0);
-        // FoW specific pinging
-        if (game.isFoWMode()) {
-            FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
-        }
+		// FoW specific pinging
+		if (activeGame.isFoWMode()) {
+			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, Emojis.ActionCard + " Action Card", null);
+		}
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
-        ACInfo.sendActionCardInfo(game, player_);
-        ACInfo.sendActionCardInfo(game, player);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the AC " + Mapper.getActionCard(acID).getName());
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the AC " + Mapper.getActionCard(acID).getName());
+        ACInfo.sendActionCardInfo(activeGame, player_);
+        ACInfo.sendActionCardInfo(activeGame, player);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# "+player.getRepresentation()+" you lost the AC "+Mapper.getActionCard(acID).getName());
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# "+player_.getRepresentation()+" you gained the AC "+Mapper.getActionCard(acID).getName());
     }
 }

@@ -21,9 +21,9 @@ public class UnscoreSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
@@ -34,7 +34,7 @@ public class UnscoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        boolean scored = game.unscoreSecretObjective(getUser().getId(), option.getAsInt());
+        boolean scored = activeGame.unscoreSecretObjective(getUser().getId(), option.getAsInt());
         if (!scored) {
             List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
                 .map(e -> "> (" + e.getValue() + ") " + SOInfo.getSecretObjectiveRepresentationShort(e.getKey()))
@@ -47,6 +47,6 @@ public class UnscoreSO extends SOCardsSubcommandData {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unscored SO " + option.getAsInt());
-        SOInfo.sendSecretObjectiveInfo(game, player, event);
+        SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
     }
 }

@@ -20,52 +20,52 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
-        showUnscored(game, event);
+        showUnscored(activeGame, event);
     }
 
-    public void showUnscored(Game game, GenericInteractionCreateEvent event) {
-        if (game.isFoWMode()) {
+    public void showUnscored(Game activeGame, GenericInteractionCreateEvent event){
+        if(activeGame.isFoWMode()){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
             return;
         }
-        List<String> defaultSecrets = Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck();
+        List<String> defaultSecrets = Mapper.getDecks().get(activeGame.getSoDeckID()).getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(defaultSecrets);
-        for (Player player : game.getPlayers().values()) {
-            if (player == null) {
+        for(Player player : activeGame.getPlayers().values()){
+            if(player == null){
                 continue;
             }
-            if (player.getSecretsScored() != null) {
+           if(player.getSecretsScored() != null){
                 currentSecrets.removeAll(player.getSecretsScored().keySet());
-            }
+           }
         }
-        currentSecrets.removeAll(game.getSoToPoList());
+        currentSecrets.removeAll(activeGame.getSoToPoList());   
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Unscored Action Phase Secrets: ").append("\n");
         int x = 1;
         for (String id : currentSecrets) {
-            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
+            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Action Phase")){
                 sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                 x++;
-            }
+            }   
         }
         x = 1;
         sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
+            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")){
                 sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                 x++;
-            }
+            }   
         }
         x = 1;
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
+            if (SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")){
                 sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                 x++;
-            }
+            }   
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }

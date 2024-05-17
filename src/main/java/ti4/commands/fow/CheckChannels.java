@@ -12,12 +12,13 @@ import ti4.message.MessageHelper;
 
 public class CheckChannels extends FOWSubcommandData {
 
+
     public CheckChannels() {
         super(Constants.CHECK_CHANNELS, "Ping each channel that is set up");
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
@@ -26,7 +27,7 @@ public class CheckChannels extends FOWSubcommandData {
         StringBuilder output = new StringBuilder();
         output.append("**__Currently set channels:__**\n>>> ");
         boolean first = true;
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : activeGame.getPlayers().values()) {
             if (!first) output.append("\n");
             first = false;
 

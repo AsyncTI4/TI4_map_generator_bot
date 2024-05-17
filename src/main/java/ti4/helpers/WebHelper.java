@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Properties;
 
+
 public class WebHelper {
     private static final Properties webProperties;
 
@@ -45,20 +46,20 @@ public class WebHelper {
 
     }
 
-    public static void putData(String gameId, Game game) {
+    public static void putData(String gameId, Game activeGame) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
+            Map<String, Object> exportableFieldMap = activeGame.getExportableFieldMap();
             String json = mapper.writeValueAsString(exportableFieldMap);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameId)))
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
+                    .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s",gameId)))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
 
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
@@ -77,8 +78,8 @@ public class WebHelper {
         try {
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
-                .region(region)
-                .build();
+                    .region(region)
+                    .build();
             String mapPathFormat;
             if (frog != null && frog && player != null) {
                 mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.png";
@@ -91,10 +92,10 @@ public class WebHelper {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key(String.format(mapPathFormat, gameId, dtstamp))
-                .contentType("image/png")
-                .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(mapPathFormat, gameId, dtstamp))
+                    .contentType("image/png")
+                    .build();
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(out));
@@ -118,7 +119,6 @@ public class WebHelper {
             BotLogger.log("Could not add image for game `" + gameId + "` to web server", e);
         }
     }
-
     public static void putFile(String gameId, File file) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
@@ -126,15 +126,15 @@ public class WebHelper {
         try {
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
-                .region(region)
-                .build();
+                    .region(region)
+                    .build();
             String jsonPathFormat = "json_saves/%s/%s";
 
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key(String.format(jsonPathFormat, gameId, file.getName()))
-                .contentType("application/json")
-                .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(jsonPathFormat, gameId, file.getName()))
+                    .contentType("application/json")
+                    .build();
 
             s3.putObject(request, RequestBody.fromFile(file));
         } catch (SdkClientException e) {

@@ -16,17 +16,17 @@ import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         tile.addUnit(planetName, unitID, count);
-        actionAfterAll(event, tile, color, game);
+        actionAfterAll(event, tile, color, activeGame);
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         tile.addUnit(planetName, unitID, count);
     }
 
-    public void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game game) {
+    public void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
         OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null) {
             String value = option.getAsString().toLowerCase();
@@ -34,11 +34,11 @@ public class AddUnits extends AddRemoveUnits {
                 case "t/tactics", "t", "tactics", "tac", "tact" -> {
                     MoveUnits.removeTacticsCC(event, color, tile, GameManager.getInstance().getUserActiveGame(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
+                    Helper.isCCCountCorrect(event, activeGame, color);
                 }
                 case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
+                    Helper.isCCCountCorrect(event, activeGame, color);
                 }
             }
         }
@@ -47,9 +47,9 @@ public class AddUnits extends AddRemoveUnits {
             boolean useSlingRelay = optionSlingRelay.getAsBoolean();
             if (useSlingRelay) {
                 String userID = event.getUser().getId();
-                Player player = game.getPlayer(userID);
-                player = Helper.getGamePlayer(game, player, event, null);
-                player = Helper.getPlayer(game, player, event);
+                Player player = activeGame.getPlayer(userID);
+                player = Helper.getGamePlayer(activeGame, player, event, null);
+                player = Helper.getPlayer(activeGame, player, event);
                 if (player != null) {
                     player.exhaustTech("sr");
                 }
@@ -58,15 +58,15 @@ public class AddUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
-        tile = MoveUnits.flipMallice(event, tile, game);
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game activeGame) {
+        tile = MoveUnits.flipMallice(event, tile, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return;
         }
-        super.unitParsingForTile(event, color, tile, game);
+        super.unitParsingForTile(event, color, tile, activeGame);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), game);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
     }
 

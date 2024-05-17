@@ -12,9 +12,9 @@ public class ShowACRemainingCardCount extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
 
-        String sb = "Action cards count in deck is: " + game.getActionCards().size();
+        String sb = "Action cards count in deck is: " + activeGame.getActionCards().size();
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

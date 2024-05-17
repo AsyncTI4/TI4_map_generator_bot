@@ -30,21 +30,21 @@ public class LeaderInfo extends LeaderSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         event.deferReply();
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         User user = getUser();
-        Player player = game.getPlayer(user.getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = activeGame.getPlayer(user.getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendLeadersInfo(game, player, event);
+        sendLeadersInfo(activeGame, player, event);
     }
 
-    public static void sendLeadersInfo(Game game, Player player, GenericInteractionCreateEvent event) {
+    public static void sendLeadersInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
-        sendLeadersInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendLeadersInfo(activeGame, player);
     }
 
     private static List<Button> getLeaderButtons(Player player) {
@@ -56,12 +56,12 @@ public class LeaderInfo extends LeaderSubcommandData {
     private static List<MessageEmbed> getPlayersLeaderEmbeds(Player player) {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (Leader leader : player.getLeaders()) {
-            embeds.add(leader.getLeaderEmbed());
+            embeds.add(leader.getLeaderEmbed());            
         }
         return embeds;
     }
 
-    public static void sendLeadersInfo(Game game, Player player) {
+    public static void sendLeadersInfo(Game activeGame, Player player) {
         // LEADERS
         List<MessageEmbed> leaderEmbeds = getPlayersLeaderEmbeds(player);
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), "**Leaders Information:**", leaderEmbeds, getLeaderButtons(player));
@@ -77,7 +77,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
                     if (pnModel.getName().equals("Alliance")) {
                         String color = pnModel.getColor().orElse(null);
-                        for (Player otherPlayer : game.getPlayers().values()) {
+                        for (Player otherPlayer : activeGame.getPlayers().values()) {
                             if (otherPlayer.getColor().equalsIgnoreCase(color)) {
                                 Leader playerLeader = otherPlayer.unsafeGetLeader(Constants.COMMANDER);
                                 if (playerLeader == null) {
@@ -97,7 +97,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         //ADD YSSARIL AGENT REFERENCE
         List<MessageEmbed> yssarilEmbeds = new ArrayList<>();
         if (player.hasLeader("yssarilagent")) {
-            for (Player otherPlayer : game.getPlayers().values()) {
+            for (Player otherPlayer : activeGame.getPlayers().values()) {
                 if (otherPlayer != player) {
                     Leader otherPlayerAgent = otherPlayer.unsafeGetLeader(Constants.AGENT);
                     if (otherPlayerAgent == null) {
@@ -114,7 +114,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         //ADD MAHACT IMPERIA REFERENCE
         List<MessageEmbed> imperiaEmbeds = new ArrayList<>();
         if (player.hasAbility("imperia")) {
-            for (Player otherPlayer : game.getPlayers().values()) {
+            for (Player otherPlayer : activeGame.getPlayers().values()) {
                 if (otherPlayer != player) {
                     if (player.getMahactCC().contains(otherPlayer.getColor())) {
                         Leader leader = otherPlayer.unsafeGetLeader(Constants.COMMANDER);

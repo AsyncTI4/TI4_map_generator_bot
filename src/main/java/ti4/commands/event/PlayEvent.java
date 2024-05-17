@@ -24,9 +24,9 @@ public class PlayEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -59,19 +59,19 @@ public class PlayEvent extends EventSubcommandData {
             return;
         }
 
-        playEventFromHand(event, game, player, eventModel);
+        playEventFromHand(event, activeGame, player, eventModel);
     }
 
-    public static void playEventFromHand(GenericInteractionCreateEvent event, Game game, Player player, EventModel eventModel) {
-        game.discardEvent(eventModel.getAlias());
+    public static void playEventFromHand(GenericInteractionCreateEvent event, Game activeGame, Player player, EventModel eventModel) {
+        activeGame.discardEvent(eventModel.getAlias());
         player.removeEvent(eventModel.getAlias());
 
-        game.getActionsChannel().sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
+        activeGame.getActionsChannel().sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
 
-        Integer discardedEventNumericalID = game.getDiscardedEvents().get(eventModel.getAlias());
+        Integer discardedEventNumericalID = activeGame.getDiscardedEvents().get(eventModel.getAlias());
 
         if (eventModel.staysInPlay()) {
-            game.addEventInEffect(discardedEventNumericalID);
+            activeGame.addEventInEffect(discardedEventNumericalID);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Event `" + eventModel.getAlias() + "` is now in effect");
         }
     }

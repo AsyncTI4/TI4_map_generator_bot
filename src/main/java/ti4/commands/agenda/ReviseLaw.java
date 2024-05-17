@@ -22,32 +22,32 @@ public class ReviseLaw extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
 
         String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
         if (playerWasElected) {
             optionText = player.getFaction();
-            message = message + " with " + player.getColor() + " as the elected color";
+            message = message + " with "+player.getColor() +" as the elected color";
         } else {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
-
-        Player electedPlayer = game.getPlayerFromColorOrFaction(optionText);
+    
+        Player electedPlayer = activeGame.getPlayerFromColorOrFaction(optionText);
         if (electedPlayer != null) {
             optionText = electedPlayer.getFaction();
         }
-        boolean success = game.reviseLaw(option.getAsInt(), optionText);
+        boolean success = activeGame.reviseLaw(option.getAsInt(), optionText);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {

@@ -27,9 +27,9 @@ public class SaveMap extends AdminSubcommandData {
                 MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
                 return;
             }
-            Game game = GameManager.getInstance().getGame(mapName);
-            GameSaveLoadManager.saveMap(game, event);
-            MessageHelper.sendMessageToEventChannel(event, "Save map: " + game.getName());
+            Game activeGame = GameManager.getInstance().getGame(mapName);
+            GameSaveLoadManager.saveMap(activeGame, event);
+            MessageHelper.sendMessageToEventChannel(event, "Save map: " + activeGame.getName());
 
         } else {
             MessageHelper.sendMessageToEventChannel(event, "No Game specified.");

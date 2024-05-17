@@ -9,19 +9,19 @@ import ti4.map.GameManager;
 
 public abstract class CaptureSubcommandData extends SubcommandData {
 
-    private Game game;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
         return getName();
     }
 
-    public CaptureSubcommandData(@NotNull String name, @NotNull String description) {
+   public CaptureSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
 
     public Game getActiveGame() {
-        return game;
+        return activeGame;
     }
 
     public User getUser() {
@@ -32,10 +32,10 @@ public abstract class CaptureSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        // SCCommand.reply(event);
+       // SCCommand.reply(event);
     }
 }

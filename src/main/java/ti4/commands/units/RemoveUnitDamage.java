@@ -9,12 +9,12 @@ import ti4.map.Tile;
 
 public class RemoveUnitDamage extends AddRemoveUnits {
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         tile.removeUnitDamage(planetName, unitID, count);
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game game) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         tile.removeUnitDamage(planetName, unitID, count);
     }
 
