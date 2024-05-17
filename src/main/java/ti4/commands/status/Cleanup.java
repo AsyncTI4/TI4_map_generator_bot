@@ -101,7 +101,7 @@ public class Cleanup extends StatusSubcommandData {
         activeGame.setStoredValue("PublicExecution", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
-            new SpinTilesInRings().spinRings(activeGame);
+            SpinTilesInRings.spinRings(activeGame);
         }
     }
   

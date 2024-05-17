@@ -33,7 +33,7 @@ public class SpinTilesInRings extends CustomSubcommandData {
         }
     }
 
-    public void spinRingsCustom(Game activeGame, SlashCommandInteractionEvent event) {
+    public static void spinRingsCustom(Game activeGame, SlashCommandInteractionEvent event) {
       String[] customSpins = event.getOption(Constants.CUSTOM).getAsString().toLowerCase().split(" ");
       List<Tile> tilesToSet = new ArrayList<>();
       for (String spinString : customSpins) {
@@ -85,7 +85,7 @@ public class SpinTilesInRings extends CustomSubcommandData {
     // - ring 1 cw one step
     // - ring 2 ccw two steps
     // - ring 3 cw three steps (except 6p map HS positions)
-    public void spinRings(Game activeGame){
+    public static void spinRings(Game activeGame){
         List<Tile> tilesToSet = new ArrayList<>();
         //first ring
         for (int y = 1; y < 4; y++) {
