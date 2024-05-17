@@ -265,6 +265,14 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(activeGame, player);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 assignSpeakerMessage2, forceRefresh);
+
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                    String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
+                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
+                }
+            }
+
         }
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {

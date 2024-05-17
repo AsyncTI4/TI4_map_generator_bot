@@ -148,6 +148,7 @@ public class ButtonHelperHeroes {
             damaged = true;
             unitName = unitName.replace("damaged", "");
         }
+        destination = MoveUnits.flipMallice(event, destination, game);
         new RemoveUnits().unitParsing(event, player.getColor(), origin, unitName + " " + unitHolderName, game);
         new AddUnits().unitParsing(event, player.getColor(), destination, unitName, game);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "

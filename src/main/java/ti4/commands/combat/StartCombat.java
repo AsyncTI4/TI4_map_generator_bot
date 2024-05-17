@@ -452,8 +452,8 @@ public class StartCombat extends CombatSubcommandData {
             return buttons;
 
         // Assault Cannon
-        if ((p1.hasTech("asc") && ButtonHelper.checkNumberNonFighterShips(p1, activeGame, tile) > 2)
-            || (p2.hasTech("asc") && ButtonHelper.checkNumberNonFighterShips(p2, activeGame, tile) > 2)) {
+        if ((p1.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p1, activeGame, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p1, tile)))
+            || (p2.hasTech("asc") && (ButtonHelper.checkNumberNonFighterShips(p2, activeGame, tile) > 2 || ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", p2, tile)))) {
             buttons.add(Button.primary("assCannonNDihmohn_asc_" + tile.getPosition(), "Use Assault Cannon")
                 .withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
         }
