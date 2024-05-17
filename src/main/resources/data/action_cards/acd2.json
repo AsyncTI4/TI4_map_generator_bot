@@ -49,7 +49,7 @@
     "name": "Arms Deal",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 of your neighbors. That player places up to 1 cruiser and destroyer from their reinforcements in a system that contains their ships.",
+    "text": "Choose 1 of your neighbors. That player places up to 1 cruiser and/or destroyer from their reinforcements in a system that contains their ships.",
     "flavorText": "Ipswitch smirked when the Commander asked for the ships' documentation, \"Probably burned... with the bodies.\"",
     "source": "action_deck_2"
   },
@@ -273,7 +273,7 @@
     "alias": "energy_pulse",
     "name": "Energy Pulse",
     "phase": "Action",
-    "window": "After the \"Move Ships\" step in a system that contains your units",
+    "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
     "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
     "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
@@ -462,7 +462,7 @@
     "alias": "overtime",
     "name": "Overtime",
     "phase": "Action",
-    "window": "Action",
+    "window": "At the end of your turn",
     "text": "Spend 1 or 2 trade goods to ready an equal number of non-home planets you control.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
     "source": "action_deck_2"
@@ -633,16 +633,16 @@
     "alias": "rendezvous_point",
     "name": "Rendezvous Point",
     "phase": "Action",
-    "window": "Action",
-    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your units in adjacent systems that do not contain 1 of your command tokens into the chosen system; ground forces must be moved to planets you control. [Note: You can transport units during this movement. Ground forces may be transported to the space area.]",
-    "flavorText": "\"A logistical nightmare, aye?\" Alastair leaned back in his chair. \"I recommend you get to it then.\"",
+    "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's ships",
+    "text": "Remove your command token from that system and end your turn.",
+    "flavorText": "Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
     "source": "action_deck_2"
   },
   {
     "alias": "renegotiation_acd2",
     "name": "Renegotiation",
     "phase": "Any",
-    "window": "After a player resolves the effect of 1 of your promissory notes",
+    "window": "After another player resolves an effect of 1 of your promissory notes",
     "text": "That player must give you 1 promissory note from their hand.",
     "flavorText": "The Creuss merchants were overwhelmed by the wares of the bazaar: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
     "source": "action_deck_2"
