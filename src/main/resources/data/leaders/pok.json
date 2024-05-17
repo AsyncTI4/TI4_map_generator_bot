@@ -669,7 +669,7 @@
         "title": "Perfected Being",
         "abilityName": "Genetic Memory: Brilliance of the Hylar",
         "abilityWindow": "ACTION:",
-        "abilityText": "For each non-unit ugprade technology you own, you may replace that technology with any technology of the same color from the deck. Then, purge this card.",
+        "abilityText": "For each non-unit upgrade technology you own, you may replace that technology with any technology of the same color from the deck. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },
