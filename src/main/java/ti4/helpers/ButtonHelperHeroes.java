@@ -632,7 +632,7 @@ public class ButtonHelperHeroes {
         String planet = buttonID.split("_")[1];
         String attachment = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
-        Tile hs = FoWHelper.getPlayerHS(game, player);
+        Tile hs = player.getHomeSystemTile();
         for (UnitHolder uh : hs.getPlanetUnitHolders()) {
             String planet2 = uh.getName();
             buttons.add(Button.success("florzenAgentStep3_" + planet + "_" + planet2 + "_" + attachment,
@@ -1492,10 +1492,10 @@ public class ButtonHelperHeroes {
         for (int x = 0; x < n; x++) {
             String acID = activeGame.drawActionCardAndDiscard();
             String sb = Mapper.getActionCard(acID).getRepresentation() + "\n";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
             buttons.add(Button.success("cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " use the buttons to give out ACs to players", buttons);
         event.getMessage().delete().queue();
     }
@@ -1515,7 +1515,7 @@ public class ButtonHelperHeroes {
             }
         }
         ButtonHelper.deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot who you want to give "
                 + Mapper.getActionCard(acID).getName(),
             buttons);
@@ -1531,7 +1531,7 @@ public class ButtonHelperHeroes {
             return;
         }
         ACInfo.sendActionCardInfo(activeGame, p2, event);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " gave " + Mapper.getActionCard(acID).getName() + " to "
                 + p2.getRepresentation());
         event.getMessage().delete().queue();

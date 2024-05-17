@@ -94,7 +94,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
 
                         String sb = "__**" + "Trap: " + trapName + "**__" + " - " + trapText + "\n" +
                             "__**" + "Has been revealed on planet: " + representation + "**__";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                         if ("Minefields".equalsIgnoreCase(trapName)) {
                             for (Player p2 : activeGame.getRealPlayers()) {
                                 if (p2 == player) {
@@ -102,7 +102,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                 }
                                 new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "2 inf " + planet, activeGame);
                             }
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Destroyed up to 2 enemy infantry from " + representation);
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
                         }
                         if ("Account Siphon".equalsIgnoreCase(trapName)) {
                             for (Player p2 : activeGame.getRealPlayers()) {
@@ -113,14 +113,14 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                     List<Button> buttons = new ArrayList<>();
                                     buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2tg from " + ButtonHelper.getIdentOrColor(p2, activeGame)));
                                     buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, activeGame)));
-                                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " use buttons to resolve",
+                                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " use buttons to resolve",
                                         buttons);
                                 }
                             }
                         }
                     } else {
                         String sb = "A trap has been removed from planet: " + representation;
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                     }
 
                     return;
@@ -141,7 +141,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         String msg1 = p2.getRepresentation(true, true) + " you had " + count + " tgs stolen by a trap";
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " tgs via trap";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg1);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         event.getMessage().delete().queue();
     }
 
@@ -153,7 +153,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         String msg1 = p2.getRepresentation(true, true) + " you had " + count + " comms stolen by a trap";
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " comms via trap";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg1);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         event.getMessage().delete().queue();
     }
 }

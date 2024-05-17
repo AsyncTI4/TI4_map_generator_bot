@@ -41,8 +41,8 @@ public class DrawRelic extends GenericRelicAction {
             info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
         }
         String msg = player.getRepresentation(true, true) + " choose the relic that you want. The relic text is reproduced for your conveinenance";
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), info.toString());
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }
 
     public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game activeGame, String buttonID) {
@@ -64,11 +64,11 @@ public class DrawRelic extends GenericRelicAction {
             return;
         }
         if (player.hasAbility("a_new_edifice")) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Due to A New Edifice Ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Due to A New Edifice Ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Explore planet #1 ", buttons);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Explore planet #2 ", buttons);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + "Explore planet #3 ", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
             return;
         }
 

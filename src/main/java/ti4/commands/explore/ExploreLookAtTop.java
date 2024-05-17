@@ -50,7 +50,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         sb.append(displayExplore(topCard));
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
                 + " Cards info thread.");
 
     }

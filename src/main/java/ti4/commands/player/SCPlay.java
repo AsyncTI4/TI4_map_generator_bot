@@ -108,7 +108,7 @@ public class SCPlay extends PlayerSubcommandData {
                     String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     activeGame.setStoredValue("Coup", "");
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
                         + " you have been couped. If this is a mistake or the coup is sabod, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
                     return;
@@ -234,12 +234,12 @@ public class SCPlay extends PlayerSubcommandData {
                 + Emojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage, assignSpeakerActionRow);
         }
         if (scToPlay == ButtonHelper.getKyroHeroSC(activeGame)
             && !player.getFaction().equalsIgnoreCase(activeGame.getStoredValue("kyroHeroPlayer"))) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation()
                     + " this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
         }
@@ -251,7 +251,7 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> drawAgendaButton = new ArrayList<>();
             Button draw2Agenda = Button.success("FFCC_" + player.getFaction() + "_" + "drawAgenda_2", "Draw 2 agendas");
             drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage2, drawAgendaButton);
 
         }
@@ -263,7 +263,7 @@ public class SCPlay extends PlayerSubcommandData {
             String assignSpeakerMessage2 = player.getRepresentation()
                 + " you can force players to refresh, normally done in order to trigger a trade agreement. This is not required and not advised if you are offering them a conditional refresh.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(activeGame, player);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage2, forceRefresh);
         }
 
@@ -308,7 +308,7 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> graceButtons = new ArrayList<>();
             graceButtons.add(Button.success("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true) + " you can resolve grace with the buttons",
                 graceButtons);
         }

@@ -91,7 +91,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 String riderName = "Tarrock Ability";
                 List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, player.getFinsFactionCheckerPrefix());
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
-                MessageHelper.sendMessageToChannelWithFactionReact(ButtonHelper.getCorrectChannel(player, activeGame), "Please select your target", activeGame, player, riderButtons);
+                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), "Please select your target", activeGame, player, riderButtons);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getActionsChannel(), "Please indicate no afters again.", activeGame, afterButtons, "after");
             } else {
                 MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player) + " Chose to Exhaust Tarrock's Ability to draw 1 agenda and bottom/top it");
@@ -143,7 +143,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         String techOut = buttonID.split("@")[1];
         player.removeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " removed the tech " + techM1.getName());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdent(player) + " removed the tech " + techM1.getName());
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of pre-requisites", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
@@ -166,7 +166,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.add(button);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot who you want to force into giving you a PN or AC", buttons);
     }
 
@@ -189,7 +189,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         List<Button> buttons;
         String pnOrAC = buttonID.split("_")[2];
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " chose to send a " + pnOrAC);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdent(player) + " chose to send a " + pnOrAC);
         if ("pn".equalsIgnoreCase(pnOrAC)) {
             buttons = ButtonHelper.getForcedPNSendButtons(activeGame, p2, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " resolve", buttons);
