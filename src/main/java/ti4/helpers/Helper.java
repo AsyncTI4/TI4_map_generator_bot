@@ -5,6 +5,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -437,6 +438,9 @@ public class Helper {
                     && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
+                    if (activeGame.isFoWMode()) {
+                        message = "Waiting on someone else before proceeding with scoring";
+                    }
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
@@ -445,6 +449,9 @@ public class Helper {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+                    if (activeGame.isFoWMode()) {
+                        message = "Waiting on someone else before proceeding with scoring";
+                    }
                     break;
                 }
             }
@@ -472,6 +479,9 @@ public class Helper {
                     && activeGame.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                    if (activeGame.isFoWMode()) {
+                        message = "Waiting on someone else before proceeding with scoring";
+                    }
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                     break;
                 }
@@ -542,10 +552,13 @@ public class Helper {
                         }
                         reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageID));
                     }
+
                     MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction == null && player.getCardsInfoThreadWithoutCompletes() != null) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThreadWithoutCompletes(),
-                            "Please react to this sabo window: " + mainMessage.getJumpUrl());
+                    if (reaction == null) {
+                        Calendar rightNow = Calendar.getInstance();
+                        if (rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() > 2 || rightNow.get(Calendar.DAY_OF_YEAR) - mainMessage.getTimeCreated().getDayOfYear() < -100) {
+                            activeGame.removeMessageIDForSabo(messageID);
+                        }
                     }
                 });
             }
@@ -1035,6 +1048,25 @@ public class Helper {
         return planetButtons;
     }
 
+    public static List<Button> getHSPlanetPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
+        player.resetProducedUnits();
+        for (String planet : planets) {
+            if (planet.contains("ghoti") || planet.contains("custodia")) {
+                continue;
+            }
+            if (activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)) {
+                continue;
+            }
+            Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
+                getPlanetRepresentation(planet, activeGame));
+            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
+            planetButtons.add(button);
+        }
+        return planetButtons;
+    }
+
     public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Game activeGame, String unit,
         String prefix) {
         List<Button> planetButtons = new ArrayList<>();
@@ -1451,7 +1483,11 @@ public class Helper {
                     || player.ownsUnit("mykomentori_spacedock2")
                     || player.ownsUnit("miltymod_spacedock2"))) {
                     if (uH instanceof Planet planet) {
-                        productionValue = planet.getResources() + productionValue;
+                        if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
+                            productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
+                        } else {
+                            productionValue = planet.getResources() + productionValue;
+                        }
                     }
                     if (ButtonHelper.isPlayerElected(activeGame, player, "absol_minsindus")) {
                         productionValue = productionValue + 4;
@@ -1551,7 +1587,11 @@ public class Helper {
                             || player.ownsUnit("mykomentori_spacedock2")
                             || player.ownsUnit("miltymod_spacedock2"))) {
                             if (uH instanceof Planet planet) {
-                                productionValue = planet.getResources() + productionValue;
+                                if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
+                                    productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
+                                } else {
+                                    productionValue = planet.getResources() + productionValue;
+                                }
                             }
                         }
                         if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
@@ -1795,6 +1835,9 @@ public class Helper {
                         && !player.hasUnit("ghoti_flagship")) {
                         continue;
                     }
+                }
+                if ("tacticalAction".equalsIgnoreCase(warfareNOtherstuff) && getProductionValueOfUnitHolder(player, activeGame, tile, unitHolder) == 0 && getProductionValueOfUnitHolder(player, activeGame, tile, tile.getUnitHolders().get("space")) == 0) {
+                    continue;
                 }
                 if (warfareNOtherstuff.contains("integrated") && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
                     continue;
@@ -2515,7 +2558,7 @@ public class Helper {
                 if ("nekro".equalsIgnoreCase(jolNarHeroTech)) {
                     buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
                 } else {
-                    buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
+                    buttonID = "FFCC_" + player.getFaction() + "_swapTechs__" + jolNarHeroTech + "__" + tech.getAlias();
                 }
             } else {
                 buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
@@ -2958,11 +3001,7 @@ public class Helper {
                 count = 1;
                 alias = split[0];
             }
-
-            for (int i = 1; i <= count; i++) {
-                sb.append(
-                    Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))));
-            }
+            sb.append(StringUtils.repeat(Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))), count));
         }
         return sb.toString();
     }

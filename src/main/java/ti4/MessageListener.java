@@ -18,8 +18,10 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.forums.ForumPost;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -55,23 +57,22 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()
-            && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.")
-                .setEphemeral(true).queue();
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
+            event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
+
         long startTime = new Date().getTime();
 
         String userID = event.getUser().getId();
-
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals(Constants.HELP)
             && !event.getInteraction().getName().equals(Constants.STATISTICS)
+            && !event.getInteraction().getName().equals(Constants.USER)
+            && !event.getInteraction().getName().equals(Constants.SEARCH)
             && (event.getInteraction().getSubcommandName() == null
                 || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
-            && !event.getInteraction().getName().equals(Constants.SEARCH)
-            && event.getOption(Constants.GAME_NAME) == null) { // SKIP /help COMMANDS
+            && event.getOption(Constants.GAME_NAME) == null) {
 
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
@@ -85,7 +86,6 @@ public class MessageListener extends ListenerAdapter {
                 if (userActiveGame != null) {
                     userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
-
             }
         }
 
@@ -219,7 +219,7 @@ public class MessageListener extends ListenerAdapter {
             if (msg.getContentRaw().startsWith("[DELETE]")) {
                 msg.delete().queue();
             }
-            if (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before")) {
+            if (!msg.getAuthor().isBot() && (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before"))) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "https://discord.gg/RZ7qg9kbVZ");
             }
             //947310962485108816
@@ -230,6 +230,15 @@ public class MessageListener extends ListenerAdapter {
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary
                     .getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
+            }
+            if (event.getChannel() instanceof ThreadChannel channel) {
+                if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+                    Game mapreference = GameManager.getInstance().getGame("finreference");
+                    if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
+                        mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will create a button that you can press to launch the game after confirming the members are correct.");
+                    }
+                }
             }
 
             autoPingGames();
@@ -274,6 +283,13 @@ public class MessageListener extends ListenerAdapter {
                                                                                                                                           // minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
+            List<String> storedValues = new ArrayList<>();
+            storedValues.addAll(mapreference.getMessagesThatICheckedForAllReacts().keySet());
+            for (String value : storedValues) {
+                if (value.startsWith("gameCreator")) {
+                    mapreference.removeStoredValue(value);
+                }
+            }
             GameSaveLoadManager.saveMap(mapreference);
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
@@ -287,8 +303,14 @@ public class MessageListener extends ListenerAdapter {
                     for (Player player : activeGame.getRealPlayers()) {
                         for (int sc : activeGame.getPlayedSCsInOrder(player, activeGame)) {
                             if (!player.hasFollowedSC(sc)) {
-                                long twelveHrs = 12 * 60 * 60 * multiplier;
-                                long twentyFourhrs = 24 * 60 * 60 * multiplier;
+                                int twenty4 = 24;
+                                int half = 12;
+                                if (!activeGame.getStoredValue("fastSCFollows").isEmpty()) {
+                                    twenty4 = Integer.parseInt(activeGame.getStoredValue("fastSCFollows"));
+                                    half = twenty4 / 2;
+                                }
+                                long twelveHrs = half * 60 * 60 * multiplier;
+                                long twentyFourhrs = twenty4 * 60 * 60 * multiplier;
                                 String scTime = activeGame.getStoredValue("scPlayMsgTime" + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
@@ -303,7 +325,7 @@ public class MessageListener extends ListenerAdapter {
                                             sb.append(p2.getRepresentation(true, true));
                                             sb.append(" You are getting this ping because SC #").append(sc)
                                                 .append(
-                                                    " has been played and now it has been 12 hrs and you havent reacted. Please do so, or after another 12 hrs you will be marked as not following. \nTIP: Double check that you paid the command counter to follow\n");
+                                                    " has been played and now it has been half the alloted time and you havent reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!activeGame.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ")
                                                     .append(activeGame.getStoredValue("scPlay" + sc)
@@ -327,10 +349,9 @@ public class MessageListener extends ListenerAdapter {
                                             sb.append(p2.getRepresentation(true, true));
                                             sb.append(" SC #").append(sc)
                                                 .append(
-                                                    " has been played and now it has been 24 hrs and they havent reacted, so they have been marked as not following\n");
+                                                    " has been played and now it has been the allotted time and they havent reacted, so they have been marked as not following\n");
 
-                                            MessageHelper.sendMessageToChannel(
-                                                ButtonHelper.getCorrectChannel(p2, activeGame), sb.toString());
+                                            //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), sb.toString());
                                             ButtonHelper.sendMessageToRightStratThread(player, activeGame,
                                                 sb.toString(), ButtonHelper.getStratName(sc));
                                             player.addFollowedSC(sc);
@@ -382,6 +403,10 @@ public class MessageListener extends ListenerAdapter {
                     if (player != null && player.getPersonalPingInterval() > 0) {
                         spacer = player.getPersonalPingInterval();
                     }
+                }
+                if ("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase()) && spacer != 0) {
+                    spacer = spacer / 3;
+                    spacer = Math.max(spacer, 1);
                 }
                 if (activeGame.getAutoPingStatus() && spacer != 0 && !activeGame.getTemporaryPingDisable()) {
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
@@ -710,6 +735,7 @@ public class MessageListener extends ListenerAdapter {
         boolean messageToFutureColor = false;
         boolean messageToMyself = false;
         boolean messageToJazz = false;
+        boolean endOfRoundSummery = false;
         for (String color : colors) {
             if (messageLowerCase.startsWith("to" + color)) {
                 messageToColor = true;
@@ -722,6 +748,9 @@ public class MessageListener extends ListenerAdapter {
         }
         if (messageLowerCase.startsWith("tofutureme")) {
             messageToMyself = true;
+        }
+        if (messageLowerCase.startsWith("endofround")) {
+            endOfRoundSummery = true;
         }
         if (messageLowerCase.startsWith("tojazz") || messageLowerCase.startsWith("tofuturejazz")) {
             messageToJazz = true;
@@ -794,9 +823,9 @@ public class MessageListener extends ListenerAdapter {
 
         }
 
-        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz) {
+        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz || endOfRoundSummery) {
             String messageContent = StringUtils.substringAfter(messageText, " ");
-
+            String messageBeginning = StringUtils.substringBefore(messageText, " ");
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -852,12 +881,24 @@ public class MessageListener extends ListenerAdapter {
                     String previousThoughts = "";
                     if (!activeGame.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
                         previousThoughts = activeGame
-                            .getStoredValue("futureMessageFor" + player.getFaction()) + ". ";
+                            .getStoredValue("futureMessageFor" + player.getFaction()) + "; ";
                     }
                     activeGame.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin"));
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         ButtonHelper.getIdent(player) + " sent themselves a future message");
+                } else if (endOfRoundSummery) {
+                    String previousThoughts = "";
+                    if (!activeGame.getStoredValue(messageBeginning.toLowerCase() + player.getFaction()).isEmpty()) {
+                        previousThoughts = activeGame
+                            .getStoredValue(messageBeginning.toLowerCase() + player.getFaction()) + "; ";
+                    }
+                    activeGame.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin").replace("\n", ". "));
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                        ButtonHelper.getIdent(player) + " stored an end of round summary");
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+                        "Someone stored an end of round summary");
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);

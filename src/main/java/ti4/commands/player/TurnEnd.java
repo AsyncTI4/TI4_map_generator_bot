@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -45,6 +47,7 @@ public class TurnEnd extends PlayerSubcommandData {
     public TurnEnd() {
         super(Constants.TURN_END, "End Turn");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player").setRequired(false));
     }
 
     @Override
@@ -58,6 +61,15 @@ public class TurnEnd extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
+
+        if (activeGame.isFoWMode() && !mainPlayer.equals(activeGame.getActivePlayer())) {
+          OptionMapping confirm = event.getOption(Constants.CONFIRM);
+          if (confirm == null || !"YES".equals(confirm.getAsString())) {
+            MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
+            return;
+          }
+        }
+
         pingNextPlayer(event, activeGame, mainPlayer);
         mainPlayer.resetOlradinPolicyFlags();
     }
@@ -106,7 +118,8 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setStoredValue("mahactHeroTarget", "");
         activeGame.setActiveSystem("");
         if (activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
+            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
+              + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
         }
@@ -132,7 +145,8 @@ public class TurnEnd extends PlayerSubcommandData {
             try {
                 if (lastTransaction != null && !"".equals(lastTransaction)) {
                     activeGame.setLatestTransactionMsg("");
-                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {});
+                    activeGame.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
+                    });
                 }
             } catch (Exception e) {
                 //  Block of code to handle errors
@@ -220,7 +234,8 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + activeGame.getPing();
 
-        activeGame.setCurrentPhase("status");
+        activeGame.setCurrentPhase("statusScoring");
+        activeGame.setStoredValue("startTimeOfRound" + activeGame.getRound() + "StatusScoring", new Date().getTime() + "");
         for (Player player : activeGame.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(activeGame, player);
             List<String> relics = new ArrayList<>(player.getRelics());
@@ -306,7 +321,7 @@ public class TurnEnd extends PlayerSubcommandData {
                     pnOwner.setPromissoryNote(pn);
                     PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
                     PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
@@ -332,23 +347,15 @@ public class TurnEnd extends PlayerSubcommandData {
                         continue;
                     }
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                    if (unitHolder != null && unitHolder.getTokenList() != null
-                        && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
-
+                    if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation()
-                                    + "Reminder this is not the window to use Crown of Emphidia. You can purge crown of emphidia in the status homework phase, which is when buttons will appear");
+                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You can purge " +
+                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation()
-                                    + "Reminder this is the window to use Crown of Emphidia.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                                player.getRepresentation()
-                                    + " You can use these buttons to resolve Crown of Emphidia",
-                                ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You can use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia", ButtonHelper.getCrownButtons());
                         }
-
                     }
                 }
             }
@@ -360,6 +367,9 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ms2);
             }
+            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts if you'd like, and we'll share everyone's at the end of the game. You can share highlights or plots or theories/predictions or anything you want (or nothing). Simply start your message with endofround" + activeGame.getRound()
+                + " (capitalization doesnt matter) and then the rest of it will get recorded. You can do multiple messages if youd like, and theyll all get added onto eachother.";
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), endOfRoundMessage);
         }
 
         String key2 = "queueToScorePOs";
@@ -371,7 +381,7 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setStoredValue(key3, "");
         activeGame.setStoredValue(key2b, "");
         activeGame.setStoredValue(key3b, "");
-        if (!activeGame.isFoWMode() && activeGame.getHighestScore() + 4 > activeGame.getVp()) {
+        if (activeGame.getHighestScore() + 4 > activeGame.getVp()) {
             activeGame.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));

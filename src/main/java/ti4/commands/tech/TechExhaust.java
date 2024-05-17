@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -59,6 +60,34 @@ public class TechExhaust extends TechAddRemove {
         switch (tech) {
             case "bs" -> { // Bio-stims
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player, false);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "gls" -> { // Graviton
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted graviton. The auto assign hit buttons for PDS fire will now kill fighters last");
+                activeGame.setStoredValue(player.getFaction() + "graviton", "true");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsgledb" -> {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted lightning drives because they are applying +1 move value to ships transporting fighters or infantry");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsbenty" -> {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " exhausted merged replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsceldr" -> {
+                ButtonHelper.celdauriRedTech(player, activeGame, event);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+
+            case "dscymiy" -> {
+                List<Tile> tiles = new ArrayList<>();
+                for (Tile tile : activeGame.getTileMap().values()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem() && !tile.getTileID().equalsIgnoreCase("18")) {
+                        tiles.add(tile);
+                    }
+                }
+                ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(player, activeGame, tiles);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "absol_bs" -> { // Bio-stims

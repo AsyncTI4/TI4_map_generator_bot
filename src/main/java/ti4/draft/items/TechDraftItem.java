@@ -39,13 +39,18 @@ public class TechDraftItem extends DraftItem {
         return Emojis.getEmojiFromDiscord(model.getType().toString().toLowerCase() + "tech");
     }
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.TECH);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (var tech : faction.getFactionTech()) {
                 allItems.add(DraftItem.Generate(DraftItem.Category.TECH, tech));
             }
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.TECH);
         return allItems;
     }
 }

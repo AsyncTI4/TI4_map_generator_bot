@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -68,6 +69,9 @@ import ti4.commands.units.RemoveAllUnitDamage;
 import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands.user.UserCommand;
+import ti4.commands.user.UserSettings;
+import ti4.commands.user.UserSettingsManager;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -189,13 +193,14 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
         commandManager.addCommand(new SelectionBoxDemo());
+        commandManager.addCommand(new UserCommand());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
+        BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildPrimary.getName());
         guilds.add(guildPrimary);
 
         // Community Plays TI
@@ -205,7 +210,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildCommunityPlays.getName());
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildCommunityPlays.getName());
                 guilds.add(guildCommunityPlays);
             }
         }
@@ -217,7 +222,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildFogOfWar.getName());
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildFogOfWar.getName());
                 guilds.add(guildFogOfWar);
                 
                 // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
@@ -232,7 +237,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildSecondary.getName());
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSecondary.getName());
                 guilds.add(guildSecondary);
             }
         }
@@ -244,7 +249,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildTertiary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildTertiary.getName());
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildTertiary.getName());
                 guilds.add(guildTertiary);
             }
         }
@@ -256,7 +261,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildQuaternary.getName());
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
                 guilds.add(guildQuaternary);
             }
         }
@@ -268,14 +273,15 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildQuinary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildQuinary.getName());
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuinary.getName());
                 guilds.add(guildQuinary);
             }
         }
 
         // LOAD DATA
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
+        BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        UserSettingsManager.init();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
@@ -285,14 +291,14 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
 
         // LOAD GAMES
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES");
+        BotLogger.logWithTimestamp(" LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadMaps();
 
         // RUN DATA MIGRATIONS
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  CHECKING FOR DATA MIGRATIONS");
+        BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations();
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED CHECKING FOR DATA MIGRATIONS");
+        BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
@@ -304,14 +310,14 @@ public class AsyncTI4DiscordBot {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
+                BotLogger.logWithTimestamp("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
+                BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SAVING GAMES");
+                BotLogger.logWithTimestamp("SAVING GAMES");
                 GameSaveLoadManager.saveMaps();
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` GAMES HAVE BEEN SAVED");
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                BotLogger.logWithTimestamp("GAMES HAVE BEEN SAVED");
+                BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
                 jda.awaitShutdown();
@@ -351,7 +357,9 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
         adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
         adminRoles.add(jda.getRoleById("1215451631622164610")); // Sigma's Server
+        adminRoles.add(jda.getRoleById("1225597324206800996")); // ForlornGeas's Server
         adminRoles.add(jda.getRoleById("1226068025464197160")); // Rintsi's Server
+        adminRoles.add(jda.getRoleById("1226805374007640095")); // Solax's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -363,7 +371,9 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1209956332380229677")); // Async Quinary (Fighter Club)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
+        developerRoles.add(jda.getRoleById("1225597362186223746")); // ForlornGeas's Server
         developerRoles.add(jda.getRoleById("1226068105071956058")); // Rintsi's Server
+        developerRoles.add(jda.getRoleById("1226805601422676069")); // Solax's Server
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
@@ -375,9 +385,13 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1209956332380229675")); // Async Quinary (Fighter Club)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
+        bothelperRoles.add(jda.getRoleById("1215450829096624129")); //Sigma's Server
+        bothelperRoles.add(jda.getRoleById("1225597399385374781")); //ForlornGeas's Server
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
+        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 

@@ -110,7 +110,7 @@ public class CombatModHelper {
         }
 
         List<AgendaModel> lawAgendasTargetingPlayer = activeGame.getLawsInfo().entrySet().stream()
-            .filter(entry -> entry.getValue().equals(player.getFaction()))
+            .filter(entry -> entry.getValue().equals(player.getFaction()) || entry.getValue().equals(player.getColor()))
             .map(entry -> Mapper.getAgenda(entry.getKey()))
             .toList();
         for (AgendaModel agenda : lawAgendasTargetingPlayer) {
@@ -393,6 +393,16 @@ public class CombatModHelper {
                     scalingCount += opponentUnitsInCombat.stream()
                         .filter(unit -> !unit.getBaseType().equals("fighter"))
                         .count();
+                }
+                case "combat_round" -> {
+                    int round = 0;
+                    String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + "space";
+                    if (activeGame.getStoredValue(combatName).isEmpty()) {
+                        round = 0;
+                    } else {
+                        round = Integer.parseInt(activeGame.getStoredValue(combatName)) - 1;
+                    }
+                    scalingCount += round;
                 }
                 case "adjacent_mech" -> {
                     for (String pos : FoWHelper.getAdjacentTiles(activeGame, activeSystem.getPosition(), player, false, true)) {

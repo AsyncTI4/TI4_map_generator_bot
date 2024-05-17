@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
+import ti4.commands.uncategorized.CardsInfo;
+import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
@@ -24,8 +26,10 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
 
 public class TurnStart extends PlayerSubcommandData {
     public TurnStart() {
@@ -62,11 +66,13 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.setStoredValue(player.getFaction() + "planetsExplored", "");
         activeGame.setNaaluAgent(false);
         activeGame.setL1Hero(false);
+        activeGame.checkSOLimit(player);
         activeGame.setStoredValue("vaylerianHeroActive", "");
         activeGame.setStoredValue("tnelisCommanderTracker", "");
         activeGame.setStoredValue("planetsTakenThisRound", "");
         activeGame.setStoredValue("absolLux", "");
         activeGame.setStoredValue("mentakHero", "");
+        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
         boolean goingToPass = false;
         if (activeGame.getStoredValue("Pre Pass " + player.getFaction()) != null
             && activeGame.getStoredValue("Pre Pass " + player.getFaction())
@@ -235,6 +241,14 @@ public class TurnStart extends PlayerSubcommandData {
 
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn,
         GenericInteractionCreateEvent event) {
+
+        if (!doneActionThisTurn) {
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if (!activeGame.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
+                    activeGame.setStoredValue(p2.getFaction() + "graviton", "");
+                }
+            }
+        }
         String finChecker = player.getFinsFactionCheckerPrefix();
         activeGame.setDominusOrb(false);
 
@@ -313,14 +327,21 @@ public class TurnStart extends PlayerSubcommandData {
                     .withEmoji(Emoji.fromFormatted(Emojis.Saar));
                 startButtons.add(chaos);
             }
+            if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
+                Button chaos = Button.secondary("exhaustTech_dscymiy", "Exhaust Recursive Worm")
+                    .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                startButtons.add(chaos);
+            }
             if (player.hasUnexhaustedLeader("florzenagent")
                 && ButtonHelperAgents.getAttachments(activeGame, player).size() > 0) {
                 startButtons.add(Button
-                    .success(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent")
+                    .success(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
+                        "Use Florzen Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.florzen)));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                Button chaos = Button.secondary("exhaustAgent_vadenagent_" + player.getFaction(), "Use Vaden Agent")
+                Button chaos = Button.secondary("exhaustAgent_vadenagent_" + player.getFaction(),
+                    "Use Vaden Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.vaden));
                 startButtons.add(chaos);
             }
@@ -335,15 +356,55 @@ public class TurnStart extends PlayerSubcommandData {
                 startButtons.add(transit);
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
-                Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent")
+                Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
+                    "Use Kollecc Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
                 startButtons.add(nekroButton);
             }
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
-            Button psycho = Button.success(finChecker + "getPsychoButtons", "Use Psychoarcheology");
+            Button psycho = Button.success(finChecker + "getPsychoButtons",
+                "Use Psychoarcheology");
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             startButtons.add(psycho);
+        }
+        Player p1 = player;
+        String prefix = "componentActionRes_";
+        for (Leader leader : p1.getLeaders()) {
+            if (!leader.isExhausted() && !leader.isLocked()) {
+                String leaderID = leader.getId();
+                LeaderModel leaderModel = Mapper.getLeader(leaderID);
+                if (leaderModel == null) {
+                    continue;
+                }
+                String leaderName = leaderModel.getName();
+                String leaderAbilityWindow = leaderModel.getAbilityWindow();
+                String factionEmoji = Emojis.getFactionLeaderEmoji(leader);
+                if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
+                    if (leaderName.contains("Ssruu")) {
+                        String led = "naaluagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Button
+                                .secondary(finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Z'eu (Naalu Agent)")
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            startButtons.add(lButton);
+                        }
+                    } else {
+                        if (leaderID.equalsIgnoreCase("naaluagent")) {
+                            Button lButton = Button
+                                .secondary(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName)
+                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            startButtons.add(lButton);
+                        }
+                    }
+                } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
+                    && ButtonHelper.getTilesWithYourCC(p1, activeGame, event).size() > 0) {
+                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use " + leaderName)
+                        .withEmoji(Emoji.fromFormatted(factionEmoji));
+                    startButtons.add(lButton);
+                }
+            }
         }
 
         Button transaction = Button.primary("transaction", "Transaction");
@@ -351,7 +412,8 @@ public class TurnStart extends PlayerSubcommandData {
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent")
+            Button hacanButton = Button.secondary("exhaustAgent_hacanagent",
+                "Use Hacan Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             startButtons.add(hacanButton);
         }
@@ -359,7 +421,8 @@ public class TurnStart extends PlayerSubcommandData {
             startButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
-            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent")
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
+                "Use Nekro Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             startButtons.add(nekroButton);
         }

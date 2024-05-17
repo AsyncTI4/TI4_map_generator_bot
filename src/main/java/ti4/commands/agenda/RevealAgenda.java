@@ -79,9 +79,10 @@ public class RevealAgenda extends AgendaSubcommandData {
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
         }
-        if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().isEmpty())) {
+        if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
+            && activeGame.getLaws().size() < 1) {
             MessageHelper.sendMessageToChannel(channel,
-                activeGame.getPing() + "An \"Elect Law\" Agenda (" + agendaName
+                activeGame.getPing() + "A Law Related Agenda (" + agendaName
                     + ") was revealed when no laws in play, flipping next agenda");
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
@@ -96,8 +97,10 @@ public class RevealAgenda extends AgendaSubcommandData {
                     MessageHelper.sendMessageToChannel(channel, activeGame.getPing()
                         + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
+                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
                 if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
                     && activeGame.getLaws().size() < 1) {
+                    notEmergency = false;
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel,
                         activeGame.getPing()
@@ -109,10 +112,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 agendaType = agendaDetails2.getType();
                 agendaName = agendaModel.getName();
                 activeGame.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
-                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
-                if (agendaTarget.toLowerCase().contains("elect law") && activeGame.getLaws().size() < 1) {
-                    notEmergency = false;
-                }
+
                 if (notEmergency) {
                     cov = true;
 
@@ -213,6 +213,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (!activeGame.isFoWMode() && !action) {
             ButtonHelper.updateMap(activeGame, event,
                 "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+            activeGame.setStoredValue("startTimeOfRound" + activeGame.getRound() + "Agenda" + aCount, new Date().getTime() + "");
         }
     }
 }

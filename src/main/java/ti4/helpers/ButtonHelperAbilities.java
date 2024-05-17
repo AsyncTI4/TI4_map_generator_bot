@@ -277,8 +277,8 @@ public class ButtonHelperAbilities {
         List<Button> scButtons = new ArrayList<>();
         scButtons.add(Button.secondary("spendAStratCC", "Spend a Strategy CC"));
         if (scPlayed > 1 && (activeGame.getScPlayed().get(1) == null || !activeGame.getScPlayed().get(1))) {
-            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
-            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            // scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
         }
         if (scPlayed > 2 && (activeGame.getScPlayed().get(2) == null || !activeGame.getScPlayed().get(2))) {
             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
@@ -635,11 +635,11 @@ public class ButtonHelperAbilities {
                     .success(
                         "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_"
                             + pillaged.getFaction(),
-                        "Use Mentak Agent To Draw ACs for you and pillaged player")
+                        "Use Mentak Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                 buttons.add(winnuButton);
                 buttons.add(Button.danger("deleteButtons", "Done"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use Mentak Agent?", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
             }
             for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 != pillaged && p2 != player && p2.hasUnexhaustedLeader("yssarilagent")
@@ -649,12 +649,12 @@ public class ButtonHelperAbilities {
                         .success(
                             "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_"
                                 + pillaged.getFaction(),
-                            "Use Mentak Agent To Draw ACs for you and pillaged player")
+                            "Use Mentak Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame),
-                        p2.getRepresentation() + " Wanna use Mentak Agent?", buttons);
+                        p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
                 }
             }
         }
@@ -1086,7 +1086,7 @@ public class ButtonHelperAbilities {
                     + Helper.getPlanetRepresentation(planet, activeGame)
                     + " you can resolve the following ability: **The Environment - Plunder (-)**: Once per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
-                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition(),
+                Button remove = Button.danger("getDamageButtons_" + activeGame.getTileFromPlanet(planet).getPosition() + "_remove",
                     "Remove units in "
                         + activeGame.getTileFromPlanet(planet).getRepresentationForButtons(activeGame, player));
                 buttons.add(remove);
@@ -1235,6 +1235,17 @@ public class ButtonHelperAbilities {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
             ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
+            if (player.hasAbility("military_industrial_complex")
+                && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                    ButtonHelper.getCorrectChannel(player, activeGame),
+                    player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
+                    ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+            }
+            if (player.getLeaderIDs().contains("mykomentoricommander")
+                && !player.hasLeaderUnlocked("mykomentoricommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
+            }
         }
     }
 
@@ -1261,13 +1272,12 @@ public class ButtonHelperAbilities {
         Tile tile = activeGame.getTileByPosition(pos);
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage = "Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + "->"
-                + (player.getStrategicCC() - 1) + ")";
+            successMessage = player.getFactionEmoji() + " Spent 1 strategy token (" + (player.getStrategicCC()) + " -> "                + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, Emojis.Muaat + "Starforge");
         } else {
             player.addExhaustedRelic("emelpar");
-            successMessage = "Exhausted scepter of emelpar";
+            successMessage = "Exhausted Scepter of Emelpar";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);

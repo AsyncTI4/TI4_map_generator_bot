@@ -10,6 +10,7 @@ import ti4.commands.milty.MiltyDraftManager;
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
 import ti4.map.Game;
+import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 
 public class FrankenDraft extends BagDraft {
@@ -98,7 +99,11 @@ public class FrankenDraft extends BagDraft {
                 // ... and pull out the appropriate number of items from its collection...
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
-                    bag.Contents.add(draftableCollection.getValue().remove(0));
+                    if (!draftableCollection.getValue().isEmpty()) {
+                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                    } else {
+                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                    }
                 }
             }
 

@@ -111,7 +111,7 @@ public class ButtonHelperCommanders {
         if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             return;
         }
-        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs:\n";
+        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs (the bot did not check if you have the pre-reqs otherwise):\n";
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             for (String tech : p2.getTechs()) {
@@ -254,26 +254,21 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        resolveMuaatCommanderCheck(player, activeGame, event, "unknown trigger");
+    }
+
+    public static void resolveMuaatCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event, String reason) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, activeGame, player.getTg() + 1) || activeGame.isFoWMode()) {
-                int old = player.getTg();
-                int newTg = player.getTg() + 1;
-                player.setTg(player.getTg() + 1);
-                String mMessage = player.getRepresentation(true, true)
-                    + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
-                    + "->" + newTg + ")";
-                if (activeGame.isFoWMode()) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-                }
+                String message = player.getRepresentation(true, true) + " you gained a " + Emojis.tg + " from " + Emojis.MuaatCommander + "Muaat Commander " + player.gainTG(1) + " (" + reason + ")";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, activeGame);
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             } else {
                 String mMessage = player.getRepresentation(true, true)
-                    + " Since you have Muaat commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
+                    + " you have Muaat commander unlocked, you can gain a tg, but you are in pillage range, so this has not been done automatically";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg"));
+                buttons.add(Button.success("gain1tgFromCommander", "Gain 1 tg").withEmoji(Emoji.fromFormatted(Emojis.tg)));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
@@ -405,26 +400,7 @@ public class ButtonHelperCommanders {
             activeGame);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), message);
-        String exhaustedMessage = event.getMessage().getContentRaw();
-        if ("".equalsIgnoreCase(exhaustedMessage)) {
-            exhaustedMessage = "Updated";
-        }
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (buttonRow.size() > 0) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
-        if (actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")) {
-            event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
-        } else {
-            event.getMessage().delete().queue();
-        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getSardakkCommanderButtons(Game activeGame, Player player,

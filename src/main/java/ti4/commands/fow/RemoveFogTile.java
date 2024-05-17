@@ -13,8 +13,9 @@ import ti4.message.MessageHelper;
 
 public class RemoveFogTile extends FOWSubcommandData {
     public RemoveFogTile() {
-        super(Constants.REMOVE_FOG_TILE, "Remove a Fog of War tile from the map.");
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true));
+        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.");
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to remove from").setAutoComplete(true));
     }
 
     @Override
@@ -35,14 +36,22 @@ public class RemoveFogTile extends FOWSubcommandData {
             return;
         }
 
-        String position = positionMapping.getAsString().toLowerCase();
-        if (!PositionMapper.isTilePositionValid(position)) {
-            MessageHelper.replyToMessage(event, "Tile position is not allowed");
+        Player targetPlayer = Helper.getPlayer(activeGame, player, event);
+        if (targetPlayer == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to remove tiles from was not found.");
             return;
         }
 
-        //remove the custom tile from the player
-        player.removeFogTile(position);
+        String[] positions = positionMapping.getAsString().split(" ");
+        for (String position : positions) {
+          if (!PositionMapper.isTilePositionValid(position)) {
+              MessageHelper.replyToMessage(event, "Tile position is not allowed");
+              return;
+          }
+
+          //remove the custom tile from the player
+          targetPlayer.removeFogTile(position);
+        }
         GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

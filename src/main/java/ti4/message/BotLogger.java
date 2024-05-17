@@ -1,7 +1,11 @@
 package ti4.message;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,7 +17,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Helper;
 
@@ -23,6 +26,11 @@ public class BotLogger {
      */
     public static void log(String msg) {
         log(null, msg, null);
+    }
+
+    public static void logWithTimestamp(String msg) {
+        String timeStampedMessage = "`" + StringUtils.rightPad(new Timestamp(System.currentTimeMillis()).toString(), 23) + "`  " + msg;
+        log(null, timeStampedMessage, null);
     }
 
     /** Sends a message to the Primary Async Server's #bot-log channel, including stack trace.
@@ -63,8 +71,8 @@ public class BotLogger {
         System.out.println("[BOT-LOG] " + msg);
 
         //Adding so we don't cause an exception by attempting to log
-        if (msg.length() > 2000){
-            String ellipses = "...(log message too long)";
+        if (msg.length() > 2000) {
+            String ellipses = "...\n### Error message was too long and was truncated here\n"; //TODO: handle this better, don't truncate
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
 

@@ -768,7 +768,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.USE_MAP_TEMPLATE -> {
+            case Constants.USE_MAP_TEMPLATE, Constants.MAP_TEMPLATE -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<MapTemplateModel> templates = Mapper.getMapTemplates();
                 List<Command.Choice> options = templates.stream()
@@ -1083,6 +1083,19 @@ public class AutoCompleteProvider {
                     //         .collect(Collectors.toList());
                     //     event.replyChoices(options).queue();
                     // }
+                }
+            }
+            case Constants.REMOVE_TILE -> {
+                switch (optionName) {
+                    case Constants.POSITION -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        List<Command.Choice> options = activeGame.getTileMap().entrySet().stream()
+                            .filter(entry -> entry.getValue().search(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
                 }
             }
             case Constants.PRESET -> {

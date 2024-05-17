@@ -1,6 +1,9 @@
 package ti4.draft;
 
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -67,7 +70,8 @@ public abstract class BagDraft {
             }
         }
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
-        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), player.getRepresentation(true, true) + " you have been passed a new draft bag!",
+        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
+            player.getRepresentation(true, true) + " you have been passed a new draft bag!",
             Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
@@ -86,7 +90,8 @@ public abstract class BagDraft {
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
         if (ready && !player.isReadyToPassBag()) {
-            MessageHelper.sendMessageToChannel(owner.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
+            player.setReadyToPassBag(ready);
+            FrankenDraftHelper.updateDraftStatusMessage(owner);
         }
         player.setReadyToPassBag(ready);
     }
@@ -111,16 +116,7 @@ public abstract class BagDraft {
     public String getLongBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append("### ").append(cat.toString()).append(" (");
-            sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
-            sb.append("):\n");
-            for (DraftItem item : bag.Contents) {
-                if (item.ItemCategory != cat) {
-                    continue;
-                }
-                sb.append("- ").append(item.getShortDescription()).append("\n");
-                sb.append(" - ").append(item.getLongDescription()).append("\n");
-            }
+            sb.append(FrankenDraftHelper.getLongCategoryRepresentation(this, bag, cat));
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();
@@ -141,7 +137,13 @@ public abstract class BagDraft {
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
 
         if (existingChannel != null) {
-            existingChannel.delete().queue();
+            // Clear out all messages from the existing thread
+            existingChannel.getHistory().retrievePast(100).queue(m -> {
+                if (m.size() > 1) {
+                    existingChannel.deleteMessages(m).queue();
+                }
+            });
+            return existingChannel;
         }
 
         // CREATE NEW THREAD
@@ -161,7 +163,6 @@ public abstract class BagDraft {
     }
 
     public ThreadChannel findExistingBagChannel(Player player) {
-
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
         if (owner.isFoWMode()) {
             threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
@@ -234,5 +235,23 @@ public abstract class BagDraft {
 
     public boolean playerHasItemInQueue(Player p) {
         return !p.getDraftQueue().Contents.isEmpty();
+    }
+
+    @JsonIgnore
+    public String getDraftStatusMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("### __Draft Status__:\n");
+        for (Player player : owner.getRealPlayers()) {
+            sb.append("> ");
+            if (player.isReadyToPassBag()) {
+                sb.append("✅");
+            } else {
+                sb.append("❌");
+            }
+            sb.append(player.getRepresentationNoPing());
+            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getActiveBagDraft().getBagSize()).append(")");
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }

@@ -430,6 +430,10 @@ public class Mapper {
         return "control_" + property + ".png";
     }
 
+    public static String getPeekMarkerID(String color) {
+        return "peak_" + colors.getProperty(color) + ".png";
+    }
+
     public static String getSweepID(String color) {
         String property = colors.getProperty(color);
         return "sweep_" + property + ".png";
@@ -725,6 +729,11 @@ public class Mapper {
     }
 
     @Nullable
+    public static String getPeekMarkerPath(String markerID) {
+        return ResourceHelper.getInstance().getPeekMarkerFile(markerID);
+    }
+
+    @Nullable
     public static String getTokenPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
         if (tokenPath == null || !(new File(tokenPath).exists())) {
@@ -790,7 +799,7 @@ public class Mapper {
     public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {
         MapTemplateModel mapTemplate = null;
         List<MapTemplateModel> templates = getMapTemplatesForPlayerCount(players);
-        if (templates.size() == 0) {
+        if (templates.isEmpty()) {
             return null;
         } else if (templates.size() == 1) {
             mapTemplate = templates.get(0);
@@ -815,6 +824,10 @@ public class Mapper {
             }
         }
         return mapTemplate;
+    }
+
+    public static boolean isValidMapTemplate(String id) {
+        return mapTemplates.containsKey(id);
     }
 
     public static boolean isValidPlanet(String id) {

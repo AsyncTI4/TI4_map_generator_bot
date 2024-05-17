@@ -24,11 +24,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
-import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
@@ -39,7 +39,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.LeaderModel;
 
 public class CreateGameChannels extends BothelperSubcommandData {
     public CreateGameChannels() {
@@ -94,8 +93,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = getCategoryNameForGame(gameName);
             if (categoryChannelName == null) {
-                MessageHelper.sendMessageToEventChannel(event, 
-                    "Category could not be automatically determined. Please provide a category name for this game.");
+                MessageHelper.sendMessageToEventChannel(event, "Category could not be automatically determined. Please provide a category name for this game.");
                 return;
             }
             List<Category> categories = getAllAvailablePBDCategories();
@@ -130,8 +128,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            MessageHelper.sendMessageToEventChannel(event, 
-                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -238,7 +235,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName).complete();
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
@@ -287,6 +286,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons",
             buttons2);
 
+        List<Button> buttons3 = new ArrayList<>();
+        buttons3.add(Button.success("enableAidReacts", "Yes, have bot react"));
+        buttons3.add(Button.danger("deleteButtons", "No Aid Reacts"));
+        MessageHelper.sendMessageToChannel(actionsChannel,
+            "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember you faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under /custom customization",
+            buttons3);
+
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = role.getAsMention() + " - bot/map channel\n" +
             "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n"
@@ -317,10 +323,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
-            thread.getManager()
-                .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
-                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                .queue();
+            if (thread.getParentChannel().getName().equals("making-new-games")) {
+                newGame.setLaunchPostThreadID(thread.getId());
+                ThreadChannelManager manager = thread.getManager()
+                    .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
+                    .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR);
+                if (missingMembers.isEmpty()) {
+                    manager.setArchived(true);
+                }
+                manager.queue();
+            }
         }
     }
 

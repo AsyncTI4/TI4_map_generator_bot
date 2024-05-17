@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.GlyphVector;
@@ -43,6 +42,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -226,20 +226,18 @@ public class MapGenerator {
         return saveImage(game, null, event);
     }
 
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType,
-        @Nullable GenericInteractionCreateEvent event) {
+    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
         return AsyncTI4DiscordBot.completeAsync(() -> new MapGenerator(game, displayType).saveImage(event));
     }
 
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType,
-        @Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord) {
-        return AsyncTI4DiscordBot
-            .completeAsync(() -> new MapGenerator(game, displayType, uploadToDiscord).saveImage(event));
+    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord) {
+        return AsyncTI4DiscordBot.completeAsync(() -> new MapGenerator(game, displayType, uploadToDiscord).saveImage(event));
     }
 
     private FileUpload saveImage(@Nullable GenericInteractionCreateEvent event) {
-        if (debug)
+        if (debug) {
             debugAbsoluteStartTime = System.nanoTime();
+        }
 
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
@@ -259,48 +257,35 @@ public class MapGenerator {
             debugStartTime = System.nanoTime();
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
-        String setup = tileMap.keySet().stream()
-            .filter("0"::equals)
-            .findFirst()
-            .orElse(null);
-        if (setup != null) {
-            if ("setup".equals(tileMap.get(setup).getTileID())) {
-                int ringCount = game.getRingCount();
-                ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-                minX = 10000;
-                minY = 10000;
-                maxX = -1;
-                maxY = -1;
-                Set<String> filledPositions = new HashSet<>();
-                for (String position : PositionMapper.getTilePositions()) {
-                    String tileRing = "0";
-                    if (position.length() == 3) {
-                        tileRing = position.substring(0, 1);
-                    } else if (position.length() == 4) {
-                        tileRing = position.substring(0, 2);
-                    }
-                    int tileRingNumber = -1;
-                    try {
-                        tileRingNumber = Integer.parseInt(tileRing);
-                    } catch (Exception e) {
-                        BotLogger.log("Hitting an error");
-                    }
-
-                    if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
-                        addTile(new Tile("0gray", position), TileStep.Tile);
-                        filledPositions.add(position);
-                    }
+        if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
+            int ringCount = game.getRingCount();
+            ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+            minX = 10000;
+            minY = 10000;
+            maxX = -1;
+            maxY = -1;
+            Set<String> filledPositions = new HashSet<>();
+            for (String position : PositionMapper.getTilePositions()) {
+                String tileRing = "0";
+                if (position.length() == 3) {
+                    tileRing = position.substring(0, 1);
+                } else if (position.length() == 4) {
+                    tileRing = position.substring(0, 2);
                 }
-                for (String position : PositionMapper.getTilePositions()) {
-                    if (!tileMap.containsKey(position) || !filledPositions.contains(position)) {
-                        addTile(new Tile("0border", position), TileStep.Tile, true);
-                    }
+                int tileRingNumber = -1;
+                try {
+                    tileRingNumber = Integer.parseInt(tileRing);
+                } catch (Exception e) {
+                    BotLogger.log("Hitting an error");
                 }
 
-            } else {
-                addTile(tileMap.get(setup), TileStep.Tile);
+                if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
+                    addTile(new Tile("0gray", position), TileStep.Tile);
+                }
+                if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
+                    addTile(new Tile("0border", position), TileStep.Tile, true);
+                }
             }
-            tileMap.remove(setup);
         }
 
         tileMap.remove(null);
@@ -525,6 +510,8 @@ public class MapGenerator {
         int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
         int x = 10;
+        Coord coord = coord(x, y);
+
         int deltaX = 0;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         int yDelta = 0;
@@ -552,15 +539,35 @@ public class MapGenerator {
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(game.getCustomName(), 0, y);
+        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName());
 
         // STRATEGY CARDS
-        y = strategyCards(y);
+        coord = drawStrategyCards(coord(x, y));
+        coord = coord(coord.x + 100, coord.y);
 
+        // ROUND
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont64());
+        String roundString = "ROUND: " + game.getRound();
+        int roundLen = graphics.getFontMetrics().stringWidth(roundString);
+        if (coord.x > mapWidth - roundLen - 100 * game.getRealPlayers().size()) {
+            coord = coord(20, coord.y + 100);
+        }
+        graphics.drawString(roundString, coord.x, coord.y);
+
+        // CARD DECKS
+        drawCardDecks(Math.max(x + deltaX, coord.x), y - 75);
+
+        // TURN ORDER
+        coord = drawTurnOrderTracker(coord.x + roundLen + 100, coord.y);
+
+        y = coord.y + 30;
+        x = 10;
         int tempY = y;
-        y = objectives(y + 180);
+        y = drawObjectives(y + 180);
         y = laws(y);
         y = events(y);
-        tempY = scoreTrack(tempY + 20);
+        tempY = drawScoreTrack(tempY + 20);
         if (displayType != DisplayType.stats) {
             playerInfo(game);
         }
@@ -593,10 +600,16 @@ public class MapGenerator {
                 graphics.setColor(Color.WHITE);
 
                 StringBuilder userName = new StringBuilder();
+                String playerName = player.getUserName();
+                userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
+
+                // PAINT FACTION OR DISPLAY NAME
+                String factionText = player.getFaction();
                 if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
-                    userName.append("[").append(player.getDisplayName()).append("] ");
+                    factionText = player.getDisplayName();
                 }
-                userName.append(player.getUserName());
+                userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+
                 if (!"null".equals(player.getColor())) {
                     userName.append(" (").append(player.getColor()).append(")");
                 }
@@ -731,18 +744,23 @@ public class MapGenerator {
                 for (int sc : game.getPlayedSCsInOrder(player, game)) {
                     if (!player.hasFollowedSC(sc)) {
                         unfollowedSCs.add(sc);
+                        needToMsg = needToMsg + sc + " ";
                     }
+
                 }
                 if (unfollowedSCs.size() > 0) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.red);
                     graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
-                    int xSpacer = 20;
-                    for (int sc : unfollowedSCs) {
-                        graphics.setColor(getSCColor(sc, game));
-                        graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
-                        xSpacer = xSpacer + 20;
-                    }
+                    // int xSpacer = 20;
+                    // for (int sc : unfollowedSCs) {
+                    //     graphics.setColor(getSCColor(sc, game));
+                    //     graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
+                    //     xSpacer = xSpacer + 20;
+                    //     if (sc > 9) {
+                    //         xSpacer = xSpacer + 10;
+                    //     }
+                    // }
                 }
 
                 graphics.setFont(Storage.getFont32());
@@ -1480,7 +1498,7 @@ public class MapGenerator {
                 } else {
                     if (remainingReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
                         String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for "
-                            + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID));
+                            + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID)) + ". Use buttons to remove";
                         if (game.isFoWMode()) {
                             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage,
                                 ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game,
@@ -2181,6 +2199,10 @@ public class MapGenerator {
     private record Coord(int x, int y) {
     }
 
+    private static Coord coord(int x, int y) {
+        return new Coord(x, y);
+    }
+
     private static Coord getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {
         asyncId = AliasHandler.resolveUnit(asyncId);
         switch (asyncId) {
@@ -2254,7 +2276,7 @@ public class MapGenerator {
         for (String u : player.getUnitsOwned()) {
             UnitModel unit = Mapper.getUnit(u);
             if (unit == null) {
-                System.out.println("error:" + u);
+                System.out.println("Invalid unitID found:" + u);
             } else if (unit.getFaction().isPresent()) {
                 // ONLY PAINT FACTION IF IS FRANKEN OR IS NOT A UNIT THAT UPGRADES OR WAS
                 // UPGRADED TO (indicating faction tech)
@@ -2382,9 +2404,23 @@ public class MapGenerator {
     }
 
     private void drawPAImageScaled(int x, int y, String resourceName, int size) {
+        drawPAImageScaled(x, y, resourceName, size, size);
+    }
+
+    private void drawPAImageScaled(int x, int y, String resourceName, int width, int height) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, size, size);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
+    private void drawPAImageScaledDown(int x, int y, String resourceName, float percent) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, percent);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
             BotLogger.log("Could not display play area: " + resourceName, e);
@@ -2431,26 +2467,28 @@ public class MapGenerator {
     /**
      * 
      * @param g graphics object
-     * @param txt text to print
-     * @param x Leftmost x-position of the string. If rightAlign=true, then this is the right edge of the string
-     * @param y
+     * @param txt string to print
+     * @param x x-position of the string (Left side, unless horizontalAlignment is set)
+     * @param y y-position of the string (Bottom side, unless verticalAlignment is set)
      * @param textColor
-     * @param rightAlign
-     * @param outlineSize
+     * @param horizontalAlignment location of the provided x relative to the (default = Left)
+     * @param verticalAlignment location of the provided y relative to the text (default = Bottom)
+     * @param outlineSize use global variable "strokeX" where X = outline size e.g. stroke1 for 1px outline
      * @param outlineColor
      */
-    private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign h, VerticalAlign v, Stroke outlineSize, Color outlineColor) {
-        if (h != null) {
-            switch (h) {
-                case Center -> x -= g.getFontMetrics().stringWidth(txt) / 2.0;
-                case Right -> x -= g.getFontMetrics().stringWidth(txt);
+    private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign horizontalAlignment, VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
+        if (horizontalAlignment != null) {
+            double width = g.getFontMetrics().stringWidth(txt);
+            switch (horizontalAlignment) {
+                case Center -> x -= width / 2.0;
+                case Right -> x -= width;
                 case Left -> {
                 }
             }
         }
-        if (v != null) {
+        if (verticalAlignment != null) {
             double height = g.getFontMetrics().getStringBounds(txt, g).getHeight();
-            switch (v) {
+            switch (verticalAlignment) {
                 case Center -> y += height / 2.0;
                 case Top -> y += height;
                 case Bottom -> {
@@ -2485,68 +2523,72 @@ public class MapGenerator {
         g2.setTransform(originalTileTransform);
     }
 
-    private int scoreTrack(int y) {
+    private int drawScoreTrack(int y) {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke5);
         graphics.setFont(Storage.getFont50());
-        int height = 140;
-        int width = 150;
-        if (14 < game.getVp()) {
-            width = 120;
+        int boxHeight = 140;
+        int boxWidth = 150;
+        int boxBuffer = -1;
+        if (game.getVp() > 14) {
+            boxWidth = 120;
         }
         for (int i = 0; i <= game.getVp(); i++) {
             graphics.setColor(Color.WHITE);
-            graphics.drawString(Integer.toString(i), i * width + 55, y + (height / 2) + 25);
+            Rectangle rect = new Rectangle(i * boxWidth, y, boxWidth, boxHeight);
+            drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
             g2.setColor(Color.RED);
-            g2.drawRect(i * width, y, width, height);
+            g2.drawRect(i * boxWidth, y, boxWidth, boxHeight);
         }
 
-        List<Player> players = new ArrayList<>(game.getPlayers().values());
-        int tempCounter = 0;
-        int tempX = 0;
-        int tempWidth = 0;
-        int tempHeight;
-
+        List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (isFoWPrivate != null && isFoWPrivate) {
             Collections.shuffle(players);
         }
-        for (Player player : players) {
-            if (!player.isRealPlayer())
-                continue;
-            try {
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
-                    && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-                String controlID = convertToGeneric ? Mapper.getControlID("gray")
-                    : Mapper.getControlID(player.getColor());
 
-                float scale = 0.7f;
+        int row = 0;
+        int col = 0;
+        int tokenWidth = 0;
+        int tokenHeight = 0;
+        int playerCount = players.size();
+        int rowCount = (int) Math.max(2, Math.ceil(Math.sqrt(1.0 + playerCount) + 0.1));
+        List<List<Player>> playerChunks = ListUtils.partition(players, rowCount);
+        int colCount = (int) Math.max(2, Math.ceil(1.0 * playerCount / rowCount));
+        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerRow = (boxHeight - boxBuffer * 2) / rowCount;
+        float scale = 0.7f;
+        for (List<Player> playerChunk : playerChunks) {
+            for (Player player : playerChunk) {
+                try {
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 
-                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                tempWidth = controlTokenImage == null ? 20 : controlTokenImage.getWidth();
-                tempHeight = controlTokenImage == null ? 20 : controlTokenImage.getHeight();
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); //51
+                    tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); //33
+                    int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
+                    int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) / 2);
 
-                int vpCount = player.getTotalVictoryPoints();
-                int x = vpCount * width + 5 + tempX;
-
-                drawControlToken(graphics, controlTokenImage,
-                    getPlayerByControlMarker(game.getPlayers().values(), controlID), x,
-                    y + (tempCounter * tempHeight),
-                    convertToGeneric, scale);
-            } catch (Exception e) {
-                // nothing
-                BotLogger.log("Could not display player: " + player.getUserName(), e);
+                    int vpCount = player.getTotalVictoryPoints();
+                    int tokenX = vpCount * boxWidth + Math.min(boxBuffer + (availableSpacePerColumn * col) + centreHorizontally, boxWidth - tokenWidth - boxBuffer);
+                    int tokenY = y + boxBuffer + (availableSpacePerRow * row) + centreVertically;
+                    drawControlToken(graphics, controlTokenImage, getPlayerByControlMarker(game.getPlayers().values(), controlID), tokenX, tokenY, convertToGeneric, scale);
+                } catch (Exception e) {
+                    // nothing
+                    BotLogger.log("Could not display player: " + player.getUserName(), e);
+                }
+                row++;
             }
-            tempCounter++;
-            if (tempCounter >= 4) {
-                tempCounter = 0;
-                tempX = tempWidth;
-            }
+            row = 0;
+            col++;
         }
         y += 180;
         return y;
     }
 
-    private int strategyCards(int y) {
+    private Coord drawStrategyCards(Coord coord) {
+        int x = 20;
+        int y = coord.y;
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         int deltaY = y + 80;
         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
@@ -2556,26 +2598,27 @@ public class MapGenerator {
             scPicked.addAll(player.getSCs());
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        int x = 20;
-        int horizontalSpacingIncrement = 70;
+
         for (Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
             Integer sc = scTGs.getKey();
             if (sc == 0) {
                 continue;
             }
-            if (sc > 9)
-                horizontalSpacingIncrement = 80;
-            if (sc > 19)
-                horizontalSpacingIncrement = 100;
+            graphics.setFont(Storage.getFont64());
+            int textWidth = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
+
             if (!convertToGenericSC && !scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc, game));
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
-                    graphics.setFont(Storage.getFont26());
+                    graphics.setFont(Storage.getFont24());
                     graphics.setColor(Color.WHITE);
-                    graphics.drawString("TG:" + tg, x, deltaY + 30);
+                    String tgMsg = "TG:" + tg;
+                    int tgMsgTextWidth = graphics.getFontMetrics().stringWidth(tgMsg);
+                    graphics.drawString(tgMsg, x + textWidth / 2 - tgMsgTextWidth / 2, deltaY + 30);
+                    textWidth = Math.max(textWidth, tgMsgTextWidth);
                 }
             }
             if (convertToGenericSC && scPlayed.getOrDefault(sc, false)) {
@@ -2583,32 +2626,28 @@ public class MapGenerator {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
             }
-            x += horizontalSpacingIncrement;
+            x += textWidth + 25;
+
+            // Drop down a level if there are a lot of SC cards
+            if (x > mapWidth - 100) {
+                x = 20;
+                deltaY += 100;
+            }
         }
 
-        // NEXTLINE IF LOTS OF SC CARDS
-        if (game.getScTradeGoods().size() > 32) {
-            x = 20;
-            deltaY += 100;
-        }
+        return coord(x, deltaY);
+    }
 
-        // ROUND
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont64());
-        x += 100;
-        graphics.drawString("ROUND: " + game.getRound(), x, deltaY);
-
-        // TURN ORDER
+    private Coord drawTurnOrderTracker(int x, int y) {
+        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getCurrentPhase())) {
-            x += 450;
-
             graphics.setFont(Storage.getFont20());
             graphics.setColor(new Color(50, 230, 80));
-            graphics.drawString("ACTIVE", x + 10, deltaY + 35);
+            graphics.drawString("ACTIVE", x + 10, y + 35);
             graphics.setFont(Storage.getFont16());
             graphics.setColor(Color.LIGHT_GRAY);
-            graphics.drawString("NEXT UP", x + 112, deltaY + 34);
+            graphics.drawString("NEXT UP", x + 112, y + 34);
 
             Player activePlayer = game.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(game.getRealPlayers());
@@ -2625,13 +2664,50 @@ public class MapGenerator {
                 if (faction != null) {
                     BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
-                        graphics.drawImage(bufferedImage, x, deltaY - 70, null);
+                        graphics.drawImage(bufferedImage, x, y - 70, null);
                         x += 100;
                     }
                 }
             }
         }
-        return deltaY + 40;
+        return coord(x, y);
+    }
+
+    private int drawCardDecks(int x, int y) {
+        if (!game.isFoWMode()) {
+            int cardWidth = 60;
+            int cardHeight = 90;
+            int horSpacing = cardWidth + 15;
+            int textY = y + cardHeight - 10;
+            Stroke outline = stroke2;
+
+            graphics.setFont(Storage.getFont24());
+
+            drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+
+            drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
+        }
+        return x;
     }
 
     private void playerInfo(Game game) {
@@ -2726,6 +2802,10 @@ public class MapGenerator {
                 factionText = player.getDisplayName();
             }
             graphics.drawString(StringUtils.capitalize(factionText), point.x + deltaX, point.y + deltaY);
+
+            // PAINT COLOR
+            point = PositionMapper.getPlayerStats(Constants.STATS_COLOR);
+            graphics.drawString(player.getColor(), point.x + deltaX, point.y + deltaY);
 
             // PAIN VICTORY POINTS
             int vpCount = player.getTotalVictoryPoints();
@@ -2903,43 +2983,59 @@ public class MapGenerator {
         }
     }
 
-    private int objectives(int y) {
+    private int drawObjectives(int y) {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke3);
         Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(game.getScoredPublicObjectives());
         Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(game.getRevealedPublicObjectives());
         Map<String, Player> players = game.getPlayers();
+
+        graphics.setFont(Storage.getFont26());
+
+        int spacingBetweenObjectiveTypes = 10;
+        int maxObjWidth = (mapWidth - spacingBetweenObjectiveTypes * 4) / 3;
+        int maxYFound = 0;
+
+        int top = y;
+        int left = 5;
+        int boxWidth = 0;
+        // STAGE 1
         Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        Set<String> po1 = publicObjectivesState1.keySet();
+        graphics.setColor(new Color(230, 126, 34));
+        Coord coord = coord(left, y);
+        coord = displayObjectives(top, coord.x, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, null);
+        boxWidth = coord.x;
+        graphics.setColor(new Color(130, 70, 0));
+        int y1b = displayUnrevealedObjectives(coord.y, left, boxWidth, game.getPublicObjectives1Peakable(), 1, game);
+        maxYFound = Math.max(maxYFound, y1b);
+
+        // STAGE 2
         Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+        Set<String> po2 = publicObjectivesState2.keySet();
+        left += coord.x + spacingBetweenObjectiveTypes;
+        coord = coord(left, top);
+        graphics.setColor(new Color(93, 173, 226));
+        coord = displayObjectives(top, left, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, null);
+        boxWidth = coord.x;
+        graphics.setColor(new Color(30, 60, 128));
+        int y2b = displayUnrevealedObjectives(coord.y, left, boxWidth, game.getPublicObjectives2Peakable(), 2, game);
+        maxYFound = Math.max(maxYFound, y2b);
+
+        // CUSTOM
         Map<String, Integer> customPublicVP = game.getCustomPublicVP();
         Map<String, String> customPublics = customPublicVP.keySet().stream()
             .collect(Collectors.toMap(key -> key, name -> {
                 String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
                 return nameOfPO != null ? nameOfPO : name;
             }, (key1, key2) -> key1, LinkedHashMap::new));
-        Set<String> po1 = publicObjectivesState1.keySet();
-        Set<String> po2 = publicObjectivesState2.keySet();
         Set<String> customVP = customPublicVP.keySet();
-
-        graphics.setFont(Storage.getFont26());
-        graphics.setColor(new Color(230, 126, 34));
-        int x = 5;
-        int y1 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
-            publicObjectivesState1, po1, 1, null, false);
-        graphics.setColor(new Color(130, 70, 0));
-        int y1b = displayUnrevealedObjectives(y1, x, game.getPublicObjectives1Peakable(), 1, game);
-        x = 801;
-        graphics.setColor(new Color(93, 173, 226));
-        int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players,
-            publicObjectivesState2, po2, 2, null, false);
-        graphics.setColor(new Color(30, 60, 128));
-        int y2b = displayUnrevealedObjectives(y2, x, game.getPublicObjectives2Peakable(), 2, game);
-
-        x = 1598;
+        left += coord.x + spacingBetweenObjectiveTypes;
+        coord = coord(left, top);
         graphics.setColor(Color.WHITE);
-        int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics,
-            customVP, null, customPublicVP, false);
-        return Math.max(y3, Math.max(y1b, y2b)) + 15;
+        coord = displayObjectives(top, coord.x, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, customPublicVP);
+        maxYFound = Math.max(maxYFound, coord.y) + 15;
+        return maxYFound;
     }
 
     private int laws(int y) {
@@ -3116,36 +3212,107 @@ public class MapGenerator {
         graphics.setFont(Storage.getFont26());
         graphics.setColor(new Color(230, 126, 34));
 
-        Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+        Map<String, List<String>> scoredSecretObjectives = new LinkedHashMap<>();
         Map<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
 
         for (String id : secrets.keySet()) {
-            scoredPublicObjectives.put(id, List.of(player.getUserID()));
+            scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         if (player.isSearchWarrant()) {
             graphics.setColor(Color.LIGHT_GRAY);
             Map<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
-            y = displayObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0,
-                customPublicVP, true);
+            y = displaySecretObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, customPublicVP);
         }
         Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
             secretsScored.remove(id);
         }
-        Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(secretsScored);
+        Map<String, Integer> revealedSecretObjectives = new LinkedHashMap<>(secretsScored);
         for (String id : secretsScored.keySet()) {
-            scoredPublicObjectives.put(id, List.of(player.getUserID()));
+            scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret,
-            1, customPublicVP, true);
+        y = displaySecretObjectives(y, x, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret, 1, customPublicVP);
         if (player.isSearchWarrant()) {
             return secretsScored.keySet().size() + player.getSecrets().keySet().size();
         }
         return secretsScored.keySet().size();
     }
 
-    private int displayObjectives(
+    private Coord displayObjectives(
+        int y,
+        int x,
+        int maximumBoxWidth,
+        Map<String, List<String>> scoredObjectives,
+        Map<String, Integer> revealedObjectives,
+        Map<String, Player> players,
+        Map<String, String> publicObjectivesState,
+        Set<String> po,
+        Integer objectiveWorth,
+        Map<String, Integer> customPublicVP) {
+
+        System.out.println("x:" + x + " y:" + y);
+
+        Set<String> keysToRemove = new HashSet<>();
+        int objectiveBoxHeight = 38;
+        int spacingBetweenBoxes = 5;
+        int bufferBetweenTextAndTokens = 15;
+        int playerCount = players.size();
+        int minimumBoxWidth = 400;
+
+        int maxTextWidth = 0;
+
+        // BUILD KEY / TEXT PAIRS & CALC LONGEST STRING
+        Map<String, String> objectivesKeyDisplayName = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> revealed : revealedObjectives.entrySet()) {
+            String key = revealed.getKey();
+            if (!po.contains(key)) {
+                continue;
+            }
+            String name = publicObjectivesState.get(key);
+            Integer index = revealedObjectives.get(key);
+            if (index == null) {
+                continue;
+            }
+            keysToRemove.add(key);
+            if (customPublicVP != null) {
+                objectiveWorth = customPublicVP.get(key);
+                if (objectiveWorth == null) {
+                    objectiveWorth = 1;
+                }
+            }
+            String text = "(" + index + ") " + name + " - " + objectiveWorth + " VP";
+            int textWidth = graphics.getFontMetrics().stringWidth(text);
+            maxTextWidth = Math.max(maxTextWidth, textWidth);
+            objectivesKeyDisplayName.put(key, text);
+        }
+
+        int maxLengthOfAllTokens = maxTextWidth + bufferBetweenTextAndTokens * 2 + playerCount * scoreTokenWidth;
+        int boxWidth = Math.max(minimumBoxWidth, Math.min(maximumBoxWidth, maxLengthOfAllTokens));
+
+        // DRAW STRINGS & BOXES
+        for (Map.Entry<String, String> revealed : objectivesKeyDisplayName.entrySet()) {
+            String key = revealed.getKey();
+            String text = revealed.getValue();
+            graphics.drawString(text, x, y + 23);
+
+            List<String> scoredPlayerID = scoredObjectives.get(key);
+            boolean multiScoring = Constants.CUSTODIAN.equals(key) || (isFoWPrivate != null && isFoWPrivate);
+            if (scoredPlayerID != null) {
+                int tokenX = x + maxTextWidth + bufferBetweenTextAndTokens;
+                int tokenY = y;
+                drawScoreControlMarkers(tokenX, tokenY, players, scoredPlayerID, multiScoring);
+            }
+            graphics.drawRect(x - 4, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+
+            y += objectiveBoxHeight + spacingBetweenBoxes;
+        }
+        keysToRemove.forEach(revealedObjectives::remove);
+
+        return coord(boxWidth, y);
+    }
+
+    private int displaySecretObjectives(
         int y,
         int x,
         Map<String, List<String>> scoredPublicObjectives,
@@ -3154,13 +3321,11 @@ public class MapGenerator {
         Map<String, String> publicObjectivesState,
         Set<String> po,
         Integer objectiveWorth,
-        Map<String, Integer> customPublicVP,
-        boolean fixedColumn) {
+        Map<String, Integer> customPublicVP) {
+
         Set<String> keysToRemove = new HashSet<>();
         for (Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
-            if (fixedColumn) {
-                x = 50;
-            }
+            x = 50;
 
             String key = revealed.getKey();
             if (!po.contains(key)) {
@@ -3178,25 +3343,15 @@ public class MapGenerator {
                     objectiveWorth = 1;
                 }
             }
-            if (fixedColumn) {
-                graphics.drawString("(" + index + ") " + name, x, y + 23);
-            } else {
-                graphics.drawString("(" + index + ") " + name + " - " + objectiveWorth + " VP", x, y + 23);
-            }
+
+            graphics.drawString("(" + index + ") " + name, x, y + 23);
+
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
-            boolean multiScoring = Constants.CUSTODIAN.equals(key) || (isFoWPrivate != null && isFoWPrivate);
             if (scoredPlayerID != null) {
-                if (fixedColumn) {
-                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, true);
-                } else {
-                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring);
-                }
+                drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, true);
             }
-            if (fixedColumn) {
-                graphics.drawRect(x - 4, y - 5, 600, 38);
-            } else {
-                graphics.drawRect(x - 4, y - 5, 785, 38);
-            }
+            graphics.drawRect(x - 4, y - 5, 600, 38);
+
             y += 43;
         }
         keysToRemove.forEach(revealedPublicObjectives::remove);
@@ -3207,24 +3362,83 @@ public class MapGenerator {
     private int displayUnrevealedObjectives(
         int y,
         int x,
+        int boxWidth,
         List<String> unrevealedPublicObjectives,
         Integer objectiveWorth,
         Game activeGame) {
+
+        Integer index = 1;
+
         for (String unRevealed : unrevealedPublicObjectives) {
 
             String name = Mapper.getPublicObjective(unRevealed).getName();
 
             if (activeGame.isRedTapeMode()) {
-                graphics.drawString("(Unrevealed) " + name + " - " + objectiveWorth + " VP", x, y + 23);
+                graphics.drawString(String.format("(%d) <Unrevealed> %s - %d VP", index, name, objectiveWorth), x, y + 23);
             } else {
-                graphics.drawString("(Unrevealed) - " + objectiveWorth + " VP", x, y + 23);
+                graphics.drawString(String.format("(%d) <Unrevealed> - %d VP", index, objectiveWorth), x, y + 23);
             }
 
-            graphics.drawRect(x - 4, y - 5, 785, 38);
+            graphics.drawRect(x - 4, y - 5, boxWidth, 38);
+
+            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed) || activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+                List<String> playerIDs;
+                if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                    playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
+                } else {
+                    playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
+                }
+                drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
+            }
 
             y += 43;
+            index++;
         }
         return y;
+    }
+
+    private void drawPeekedMarkers(int x, int y, Map<String, Player> players, List<String> peekedPlayerID) {
+        try {
+            int tempX = 0;
+
+            for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
+                Player player = playerEntry.getValue();
+                String userID = player.getUserID();
+
+                if (peekedPlayerID.contains(userID)) {
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    String ccColor = convertToGeneric ? "gray" : player.getColor();
+                    String controlID = Mapper.getControlID(ccColor);
+
+                    if (controlID.contains("null")) {
+                        continue;
+                    }
+
+                    float scale = 0.55f;
+
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    if (controlTokenImage == null)
+                        return;
+
+                    String peekID = "peek" + getBlackWhiteFileSuffix(Mapper.getColorID(ccColor));
+                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(peekID), scale);
+                    if (peekMarkerImage == null)
+                        return;
+
+                    drawControlToken(graphics, controlTokenImage, player, x + tempX, y, true, scale);
+
+                    int centreCustomTokenHorizontally = controlTokenImage.getWidth() / 2 - peekMarkerImage.getWidth() / 2;
+                    int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
+
+                    graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
+                }
+
+                // This needs to be updated regardless if the player peeked or not to maintain marker alignment with PO score markers.
+                tempX += scoreTokenWidth;
+            }
+        } catch (Exception e) {
+            BotLogger.log("Could not draw peek markers", e);
+        }
     }
 
     private void drawScoreControlMarkers(
@@ -3249,11 +3463,9 @@ public class MapGenerator {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
-                    && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
                 if (scoredPlayerID.contains(userID)) {
-                    String controlID = convertToGeneric ? Mapper.getControlID("gray")
-                        : Mapper.getControlID(player.getColor());
+                    String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
                     if (controlID.contains("null")) {
                         continue;
                     }
@@ -3265,8 +3477,7 @@ public class MapGenerator {
                     if (multiScoring) {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
                         for (int i = 0; i < frequency; i++) {
-                            drawControlToken(graphics, controlTokenImage, player, x + tempX, y, convertToGeneric,
-                                scale);
+                            drawControlToken(graphics, controlTokenImage, player, x + tempX, y, convertToGeneric, scale);
                             tempX += scoreTokenWidth;
                         }
                     } else {
@@ -3278,7 +3489,7 @@ public class MapGenerator {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Could not parse custodian CV token file", e);
+            BotLogger.log("Error drawing score control token markers", e);
         }
     }
 
@@ -3762,12 +3973,25 @@ public class MapGenerator {
                     drawControlToken(tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                         new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    if (player != null && player.isRealPlayer() && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getInstance().getResourceFromFolder("command_token/", "exhaustedControl.png", "Could not find command token file"), scale);
+                        drawControlToken(tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
+                        rectangles.add(
+                            new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    }
+
                 } else {
                     int imgX = TILE_PADDING + centerPosition.x + xDelta;
                     int imgY = TILE_PADDING + centerPosition.y;
                     drawControlToken(tileGraphics, controlTokenImage, player, imgX, imgY, convertToGeneric, scale);
                     rectangles.add(
                         new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    if (player != null && player.isRealPlayer() && player.getExhaustedPlanets().contains(unitHolder.getName())) {
+                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getInstance().getResourceFromFolder("command_token/", "exhaustedControl", "Could not find command token file"), scale);
+                        drawControlToken(tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
+                        rectangles.add(
+                            new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
+                    }
                     xDelta += 10;
                 }
             }

@@ -2,12 +2,6 @@ package ti4.map;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -30,6 +24,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,8 +46,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.milty.MiltyDraftManager;
@@ -117,7 +120,7 @@ public class Game {
     @ExportableField
     private boolean allianceMode;
     @ExportableField
-    private boolean homeBrew = false;
+    private boolean homeBrew;
     @ExportableField
     private boolean fowMode;
     @ExportableField
@@ -178,6 +181,9 @@ public class Game {
     private boolean extraSecretMode;
     @Getter
     @Setter
+    private boolean showMapSetup;
+    @Getter
+    @Setter
     private String acDeckID = "action_cards_pok";
     @Getter
     @Setter
@@ -205,6 +211,9 @@ public class Game {
     private String technologyDeckID = "techs_pok";
     @Getter
     @Setter
+    private String mapTemplateID;
+    @Getter
+    @Setter
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
@@ -215,7 +224,7 @@ public class Game {
     private boolean testBetaFeaturesMode;
     @Getter
     @Setter
-    private boolean showFullComponentTextEmbeds = false;
+    private boolean showFullComponentTextEmbeds;
     private boolean hasEnded;
     private long endedDate;
     @Getter
@@ -229,6 +238,12 @@ public class Game {
     private String savedMessage;
     @Nullable
     private String botMapUpdatesThreadID;
+    @Getter
+    @Setter
+    private String bagDraftStatusMessageID;
+    @Getter
+    @Setter
+    private String launchPostThreadID;
     private Map<String, Player> players = new LinkedHashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
@@ -304,6 +319,12 @@ public class Game {
     private List<String> publicObjectives2;
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
+    @Getter
+    @Setter
+    private Map<String, List<String>> publicObjectives1Peeked = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private Map<String, List<String>> publicObjectives2Peeked = new LinkedHashMap<>();
     private List<String> savedButtons = new ArrayList<>();
     private List<String> soToPoList = new ArrayList<>();
     @JsonIgnore
@@ -660,7 +681,7 @@ public class Game {
     }
 
     public void setHomeBrew(boolean homebrew) {
-        this.homeBrew = homebrew;
+        homeBrew = homebrew;
     }
 
     public boolean isFoWMode() {
@@ -854,24 +875,39 @@ public class Game {
 
     @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
-        try {
-            return AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
-        } catch (Exception e) {
-            ThreadChannel threadChannel; // exists and is not locked
-            List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda
-                .getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
-            if (getActionsChannel() == null)
-                return null;
-            if (botChannels.size() != 1) { // can't find it, might be archived
-                for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
-                    if (threadChannel_.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
-                        threadChannel = threadChannel_;
-                        setBotMapUpdatesThreadID(threadChannel.getId());
-                        return threadChannel;
-                    }
-                }
+        if (isFoWMode()) {
+            return null;
+        }
+
+        // FIND BY ID
+        if (StringUtils.isNumeric(getBotMapUpdatesThreadID())) {
+            ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+            if (threadChannel != null) {
+                return threadChannel;
             }
         }
+
+        // FIND BY NAME
+        List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+        if (botChannels.size() == 1) {
+            return botChannels.get(0);
+        } else if (botChannels.size() > 1) {
+            BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+            return botChannels.get(0);
+        }
+
+        // CHECK IF ARCHIVED
+        if (getActionsChannel() == null) {
+            BotLogger.log(getName() + " does not have an actions channel and therefore can't find the bot-map-updates channel");
+            return null;
+        }
+        for (ThreadChannel archivedChannel : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
+            if (archivedChannel.getId().equals(getBotMapUpdatesThreadID()) || archivedChannel.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                setBotMapUpdatesThreadID(archivedChannel.getId());
+                return archivedChannel;
+            }
+        }
+        setBotMapUpdatesThreadID(null);
         return null;
     }
 
@@ -1015,15 +1051,22 @@ public class Game {
     }
 
     public int getRingCount() {
-        if (getTileMap().isEmpty())
+        if (getTileMap().isEmpty()) {
             return 0;
+        }
         Map<String, Tile> tileMap = new HashMap<>(getTileMap());
-        String highestPosition = tileMap.keySet().stream().filter(Helper::isInteger)
-            .max(Comparator.comparingInt(Integer::parseInt)).get();
-        String lastTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
-        if (!Helper.isInteger(lastTwoDigits))
+        String highestPosition = tileMap.keySet().stream()
+            .filter(Helper::isInteger)
+            .max(Comparator.comparingInt(Integer::parseInt))
+            .orElse(null);
+        if (highestPosition == null) {
             return 0;
-        return Integer.parseInt(lastTwoDigits);
+        }
+        String firstTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
+        if (!Helper.isInteger(firstTwoDigits)) {
+            return 0;
+        }
+        return Integer.parseInt(firstTwoDigits);
     }
 
     public int getActivationCount() {
@@ -1423,6 +1466,9 @@ public class Game {
             identifier++;
         }
         revealedPublicObjectives.put(id, identifier);
+
+        publicObjectives1Peeked.remove(id);
+        publicObjectives2Peeked.remove(id);
     }
 
     public Map<Integer, Integer> getScTradeGoods() {
@@ -1503,7 +1549,7 @@ public class Game {
         return publicObjectives2Peakable;
     }
 
-    public Map.Entry<String, Integer> revealState1() {
+    public Map.Entry<String, Integer> revealStage1() {
         if (publicObjectives1Peakable.isEmpty() || getCurrentPhase().contains("agenda")) {
             return revealObjective(publicObjectives1);
         } else {
@@ -1511,7 +1557,7 @@ public class Game {
         }
     }
 
-    public Map.Entry<String, Integer> revealState2() {
+    public Map.Entry<String, Integer> revealStage2() {
         if (publicObjectives2Peakable.isEmpty() || getCurrentPhase().contains("agenda")) {
             return revealObjective(publicObjectives2);
         } else {
@@ -1568,12 +1614,32 @@ public class Game {
         }
     }
 
-    public String peakAtStage1(int place) {
-        return peakAtObjective(publicObjectives1Peakable, place);
+    public String peekAtStage1(int place, Player player) {
+        String objective = peekAtObjective(publicObjectives1Peakable, place);
+
+        if (publicObjectives1Peeked.containsKey(objective) && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
+            publicObjectives1Peeked.get(objective).add(player.getUserID());
+        } else {
+            List<String> list = new ArrayList<>();
+            list.add(player.getUserID());
+            publicObjectives1Peeked.put(objective, list);
+        }
+
+        return objective;
     }
 
-    public String peakAtStage2(int place) {
-        return peakAtObjective(publicObjectives2Peakable, place);
+    public String peekAtStage2(int place, Player player) {
+        String objective = peekAtObjective(publicObjectives2Peakable, place);
+
+        if (publicObjectives2Peeked.containsKey(objective) && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
+            publicObjectives2Peeked.get(objective).add(player.getUserID());
+        } else {
+            List<String> list = new ArrayList<>();
+            list.add(player.getUserID());
+            publicObjectives2Peeked.put(objective, list);
+        }
+
+        return objective;
     }
 
     public Map.Entry<String, Integer> revealSpecificStage1(String id) {
@@ -1615,7 +1681,7 @@ public class Game {
         }
     }
 
-    public String peakAtObjective(List<String> objectiveList, int place) {
+    public String peekAtObjective(List<String> objectiveList, int place) {
         if (!objectiveList.isEmpty()) {
             place = place - 1;
             return objectiveList.get(place);
@@ -1709,9 +1775,11 @@ public class Game {
             Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
             Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
             if (po1.contains(id)) {
+                publicObjectives1Peeked.remove(id);
                 publicObjectives1.add(id);
                 Collections.shuffle(publicObjectives1);
             } else if (po2.contains(id)) {
+                publicObjectives2Peeked.remove(id);
                 publicObjectives2.add(id);
                 Collections.shuffle(publicObjectives2);
             }
@@ -1772,10 +1840,7 @@ public class Game {
 
     public boolean didPlayerScoreThisAlready(String userID, String id) {
         List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-        if (scoredPlayerList.contains(userID)) {
-            return true;
-        }
-        return false;
+        return scoredPlayerList.contains(userID);
     }
 
     public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
@@ -2519,12 +2584,14 @@ public class Game {
                 return player.getActionCards();
             }
         } else {
-            actionCards.addAll(discardActionCards.keySet());
-            discardActionCards.clear();
-            Collections.shuffle(actionCards);
-            String msg = getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
-            MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
-            return drawActionCard(userID);
+            if (!discardActionCards.keySet().isEmpty()) {
+                actionCards.addAll(discardActionCards.keySet());
+                discardActionCards.clear();
+                Collections.shuffle(actionCards);
+                String msg = "# " + getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
+                MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
+                return drawActionCard(userID);
+            }
         }
         return null;
     }
@@ -2669,10 +2736,7 @@ public class Game {
     }
 
     public String drawRelic() {
-        if (relics.isEmpty()) {
-            return "";
-        }
-        return relics.remove(0);
+        return drawRelic(0);
     }
 
     public String drawRelic(int location) {
@@ -2710,6 +2774,24 @@ public class Game {
         }
     }
 
+    public void checkSOLimit(Player player) {
+        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
+            String msg = player.getRepresentation(true, true) + " you have more SOs than the limit ("
+                + player.getMaxSOCount()
+                + ") and should discard one. If your game is playing with a higher SO limit, you can change that in /game setup.";
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+            String secretScoreMsg = "Click a button below to discard your Secret Objective";
+            List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
+            if (soButtons != null && !soButtons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
+                    soButtons);
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    "Something went wrong. Please report to Fin");
+            }
+        }
+    }
+
     public void drawSecretObjective(String userID) {
         if (!secretObjectives.isEmpty()) {
             String id = secretObjectives.get(0);
@@ -2717,21 +2799,7 @@ public class Game {
             if (player != null) {
                 secretObjectives.remove(id);
                 player.setSecret(id);
-                if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
-                    String msg = player.getRepresentation(true, true) + " you have more SOs than the limit ("
-                        + player.getMaxSOCount()
-                        + ") and should discard one. If your game is playing with a higher SO limit, you can change that in /game setup.";
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-                    String secretScoreMsg = "Click a button below to discard your Secret Objective";
-                    List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
-                    if (soButtons != null && !soButtons.isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
-                            soButtons);
-                    } else {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                            "Something went wrong. Please report to Fin");
-                    }
-                }
+                checkSOLimit(player);
             }
         }
     }
@@ -3101,9 +3169,7 @@ public class Game {
         setAcDeckID(deck.getAlias());
         newDeck.addAll(deck.getNewShuffledDeck());
         for (String ac : oldDeck) {
-            if (newDeck.contains(ac)) {
-                newDeck.remove(ac);
-            }
+            newDeck.remove(ac);
         }
         if (getDiscardActionCards().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -3491,9 +3557,15 @@ public class Game {
                 }
             }
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
+            if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
+                planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+            }
             planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
             planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
             planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
+            if ("ghoti".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
+                planets.get("ghoti").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+            }
         }
         return planets.keySet();
     }
@@ -3620,7 +3692,7 @@ public class Game {
                 if (player_.equals(player))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
-                    if (isAllianceMode() && player.getFaction().equalsIgnoreCase("mahact")) {
+                    if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
                         return leaderID.contains(player_.getFaction());
                     }
                     return true;
@@ -4169,5 +4241,12 @@ public class Game {
         setScTradeGoods(new LinkedHashMap<>());
         setScSetID(strategyCardModel.getAlias());
         strategyCardModel.getCardValues().keySet().forEach(scValue -> setScTradeGood(scValue, 0));
+    }
+
+    @JsonIgnore
+    public List<String> getUnusedColours() {
+        return Mapper.getColors().stream()
+            .filter(colour -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(colour)))
+            .toList();
     }
 }

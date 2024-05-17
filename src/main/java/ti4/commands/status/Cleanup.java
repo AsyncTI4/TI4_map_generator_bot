@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.custom.SpinTilesInFirstThreeRings;
+import ti4.commands.custom.SpinTilesInRings;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -101,7 +101,7 @@ public class Cleanup extends StatusSubcommandData {
         activeGame.setStoredValue("PublicExecution", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
-            new SpinTilesInFirstThreeRings().spinRings(activeGame);
+            SpinTilesInRings.spinRings(activeGame);
         }
     }
   
@@ -122,7 +122,7 @@ public class Cleanup extends StatusSubcommandData {
                         pnOwner.setPromissoryNote(pn);  
                         PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
 		                PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnOwner.getFactionEmoji() + " " + pnModel.getName() + " was returned");
                     }
                 }
             }

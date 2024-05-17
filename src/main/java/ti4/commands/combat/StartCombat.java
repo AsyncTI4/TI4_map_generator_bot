@@ -204,8 +204,10 @@ public class StartCombat extends CombatSubcommandData {
         activeGame.setStoredValue("letnevagent", "");
 
         // AFB
-        sendAFBButtonsToThread(event, threadChannel, activeGame,
-            ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
+        if (isSpaceCombat) {
+            sendAFBButtonsToThread(event, threadChannel, activeGame,
+                ButtonHelper.getPlayersWithUnitsInTheSystem(activeGame, tile), tile);
+        }
 
         // General Space Combat
         sendGeneralCombatButtonsToThread(threadChannel, activeGame, player1, player2, tile, spaceOrGround, event);
@@ -238,6 +240,11 @@ public class StartCombat extends CombatSubcommandData {
         pdsMessage.append("Buttons for Space Cannon Offence:");
         List<Button> spaceCannonButtons = getSpaceCannonButtons(activeGame, activePlayer, tile);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
+        for (Player player : activeGame.getRealPlayers()) {
+            if (ButtonHelper.doesPlayerHaveFSHere("argent_flagship", player, tile)) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use space cannon offense against " + ButtonHelper.getIdentOrColor(player, activeGame) + " due to their FS power");
+            }
+        }
     }
 
     private static void sendStartOfSpaceCombatButtonsToThread(ThreadChannel threadChannel, Game activeGame,
@@ -412,6 +419,12 @@ public class StartCombat extends CombatSubcommandData {
         afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb",
             "Roll " + CombatRollType.AFB.getValue()));
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
+        for (Player player : combatPlayers) {
+            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !activeGame.getLaws().containsKey("articles_war")) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + ButtonHelper.getIdentOrColor(player, activeGame) + " due to their mech power");
+            }
+        }
+
     }
 
     private static List<Button> getSpaceCannonButtons(Game activeGame, Player activePlayer, Tile tile) {
@@ -497,7 +510,7 @@ public class StartCombat extends CombatSubcommandData {
 
     /**
      * # of extra rings to show around the tile image
-     * 
+     *
      * @return 0 if no PDS2 nearby, 1 if PDS2 is nearby
      */
     private static int getTileImageContextForPDS2(Game activeGame, Player player1, Tile tile, String spaceOrGround) {
@@ -532,7 +545,7 @@ public class StartCombat extends CombatSubcommandData {
                 "Refresh Picture"));
             return buttons;
         }
-        buttons.add(Button.danger("getDamageButtons_" + pos, "Assign Hits"));
+        buttons.add(Button.danger("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
         // if (getButtonsForRepairingUnitsInASystem(p1, activeGame, tile).size() > 1 ||
         // getButtonsForRepairingUnitsInASystem(p2, activeGame, tile).size() > 1) {
         buttons.add(Button.success("getRepairButtons_" + pos, "Repair Damage"));
@@ -544,7 +557,8 @@ public class StartCombat extends CombatSubcommandData {
         Player titans = Helper.getPlayerFromUnlockedLeader(activeGame, "titansagent");
         if (!activeGame.isFoWMode() && titans != null && titans.hasUnexhaustedLeader("titansagent")) {
             String finChecker = "FFCC_" + titans.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent", "Titans Agent")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent",
+                "Use Titans Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
         if (p1.hasTechReady("sc") || (!activeGame.isFoWMode() && p2.hasTechReady("sc"))) {
@@ -558,35 +572,41 @@ public class StartCombat extends CombatSubcommandData {
         Player ghemina = Helper.getPlayerFromUnlockedLeader(activeGame, "gheminaagent");
         if (!activeGame.isFoWMode() && ghemina != null && ghemina.hasUnexhaustedLeader("gheminaagent")) {
             String finChecker = "FFCC_" + ghemina.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_gheminaagent", "Ghemina Agent")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_gheminaagent",
+                "Use Ghemina Agents")
                 .withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
 
         Player khal = Helper.getPlayerFromUnlockedLeader(activeGame, "kjalengardagent");
         if (!activeGame.isFoWMode() && khal != null && khal.hasUnexhaustedLeader("kjalengardagent")) {
             String finChecker = "FFCC_" + khal.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_kjalengardagent", "Kjalengard Agent")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_kjalengardagent",
+                "Use Kjalengard Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
         }
 
         Player sol = Helper.getPlayerFromUnlockedLeader(activeGame, "solagent");
         if (!activeGame.isFoWMode() && sol != null && sol.hasUnexhaustedLeader("solagent") && isGroundCombat) {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent", "Sol Agent")
+            buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent",
+                "Use Sol Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
         Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "kyroagent");
         if (!activeGame.isFoWMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
             String finChecker = "FFCC_" + kyro.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "getAgentSelection_kyroagent", "Kyro Agent")
+            buttons.add(Button.secondary(finChecker + "getAgentSelection_kyroagent",
+                "Use Kyro Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.blex)));
+
         }
 
         Player letnev = Helper.getPlayerFromUnlockedLeader(activeGame, "letnevagent");
         if ((!activeGame.isFoWMode() || letnev == p1) && letnev != null && letnev.hasUnexhaustedLeader("letnevagent")
             && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + letnev.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "getAgentSelection_letnevagent", "Letnev Agent")
+            buttons.add(Button.secondary(finChecker + "getAgentSelection_letnevagent",
+                "Use Letnev Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
@@ -594,14 +614,16 @@ public class StartCombat extends CombatSubcommandData {
         if ((!activeGame.isFoWMode() || nomad == p1) && nomad != null
             && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
             String finChecker = "FFCC_" + nomad.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Thundarian")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian",
+                "Use The Thundarian (Nomad Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
         }
 
         Player yin = Helper.getPlayerFromUnlockedLeader(activeGame, "yinagent");
         if ((!activeGame.isFoWMode() || yin == p1) && yin != null && yin.hasUnexhaustedLeader("yinagent")) {
             String finChecker = "FFCC_" + yin.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "yinagent_" + pos, "Yin Agent")
+            buttons.add(Button.secondary(finChecker + "yinagent_" + pos,
+                "Use Yin Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
         }
 
@@ -633,12 +655,12 @@ public class StartCombat extends CombatSubcommandData {
             && p1.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
-                "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+                "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && p2.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
-                "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+                "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
 
         // if ((p2.hasAbility("edict") || p2.hasAbility("imperia")) &&

@@ -2,7 +2,6 @@ package ti4.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +20,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String faction;
     private String color;
     private Boolean playArea;
+    private Boolean playImmediately;
     private String attachment;
     private ComponentSource source;
     private String text;
@@ -100,13 +100,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (playArea == null) {
             return false;
         }
-        List<String> pnIDsToHoldInHandBeforePlayArea = Arrays.asList(
-            "gift", "antivirus", "convoys", "dark_pact", "blood_pact",
-            "pop", "terraform", "dspnauge", "dspnaxis", "dspnbent",
-            "dspndihm", "dspnghot", "dspngled", "dspnkolu", "dspnkort",
-            "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
-
-        return playArea && !pnIDsToHoldInHandBeforePlayArea.contains(alias);
+        if (playImmediately != null) return playArea && playImmediately;
+        
+        return playArea;
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -159,6 +155,29 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
         eb.setColor(Color.blue);
         return eb.build();
+    }
+
+    public String getNameRepresentation() {
+        StringBuilder sb = new StringBuilder();
+        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        sb.append(Emojis.PN);
+        sb.append(" ").append(getName()).append("");
+        if (!StringUtils.isBlank(getColor().orElse(""))) {
+            sb.append(" (");
+            if (color.equals("<color>")) {
+                sb.append("generic");
+            } else {
+                sb.append(color);
+            }
+            sb.append(")");
+        }
+        sb.append(getSource().emoji());
+        return sb.toString();
+    }
+
+    public boolean isNotWellKnown() {
+        return getFaction().isPresent()
+            || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
     }
 
     /**

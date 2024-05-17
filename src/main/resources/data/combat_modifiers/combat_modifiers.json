@@ -814,6 +814,36 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus_x_frag_always_flagship_spacecannon",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_x_frag_always_flagship_bombardment",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
         "alias": "miltymod_cruiser2_bonus_hits_9_10",
         "type": "bonus_hits",
         "value": "+1",
@@ -839,6 +869,21 @@
             {
                 "type": "unit",
                 "alias": "winnu_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_every_round_of_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "combat_round",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "veldyr_flagship"
             }
         ],
         "forCombatAbility": "combatround"

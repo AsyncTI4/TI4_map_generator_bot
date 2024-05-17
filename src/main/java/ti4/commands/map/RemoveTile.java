@@ -3,6 +3,8 @@ package ti4.commands.map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -14,7 +16,7 @@ import ti4.message.MessageHelper;
 public class RemoveTile extends AddRemoveTile {
     public RemoveTile() {
         super(Constants.REMOVE_TILE, "Remove tile from map");
-        removeOptionByName(Constants.TILE_NAME);
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map. Accepts comma separated list", true).setAutoComplete(true));
     }
 
     @Override

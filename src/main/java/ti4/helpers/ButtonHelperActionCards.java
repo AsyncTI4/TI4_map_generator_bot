@@ -233,7 +233,7 @@ public class ButtonHelperActionCards {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), damaged, activeGame);
         String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " owned by "
-            + ButtonHelper.getIdentOrColor(p2, activeGame) + " in tile " + tile.getRepresentation()
+            + ButtonHelper.getIdentOrColor(p2, activeGame) + " in tile " + tile.getRepresentationForButtons(activeGame, player)
             + " was removed via the Lucky Shot AC";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         if (activeGame.isFoWMode()) {
@@ -410,6 +410,9 @@ public class ButtonHelperActionCards {
         player.setFleetCC(player.getFleetCC() + 2);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         event.getMessage().delete().queue();
+        if (activeGame.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
+        }
     }
 
     public static List<Button> getArcExpButtons(Game activeGame, Player player) {
@@ -534,11 +537,14 @@ public class ButtonHelperActionCards {
 
     public static void resolveReparationsStep1(Player player, Game activeGame, ButtonInteractionEvent event,
         String buttonID) {
-        List<Button> buttons;
+
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to ready";
-        buttons = Helper.getPlanetRefreshButtons(event, player, activeGame);
-        Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
-        buttons.add(DoneRefreshing);
+
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Button.secondary("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
+                Helper.getPlanetRepresentation(planet, activeGame)));
+        }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message,
             buttons);
         buttons = new ArrayList<>();
@@ -1197,7 +1203,7 @@ public class ButtonHelperActionCards {
             ButtonHelper.getIdentOrColor(player, activeGame)
                 + " successfully assassinated all the representatives of "
                 + ButtonHelper.getIdentOrColor(p2, activeGame));
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
             p2.getRepresentation(true, true) + " your representatives got sent to the headsman");
         activeGame.setStoredValue("AssassinatedReps",
             activeGame.getStoredValue("AssassinatedReps") + p2.getFaction());
@@ -1565,12 +1571,12 @@ public class ButtonHelperActionCards {
             p2.exhaustPlanet(planet);
         }
         int amountToKill = 3;
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+        if (amountToKill > 3) {
+            amountToKill = 3;
+        }
         if (p2.hasInf2Tech()) {
-            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-            amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
-            if (amountToKill > 3) {
-                amountToKill = 3;
-            }
             ButtonHelper.resolveInfantryDeath(activeGame, p2, amountToKill);
             boolean cabalMech = false;
             Tile tile = activeGame.getTileFromPlanet(planet);
@@ -1594,10 +1600,10 @@ public class ButtonHelperActionCards {
             amountToKill + " inf " + planet, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " you exhausted " + planetRep
-                + " and killed up to 3 infantry there");
+                + " and killed " + amountToKill + " infantry there");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
             p2.getRepresentation(true, true) + " your planet " + planetRep
-                + " was exhausted and up to 3 infantry were destroyed.");
+                + " was exhausted and " + amountToKill + " infantry were destroyed.");
     }
 
     public static void resolveSeizeArtifactStep3(Player player, Game activeGame, ButtonInteractionEvent event,
@@ -1694,7 +1700,7 @@ public class ButtonHelperActionCards {
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
             for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(6);
+                Die d1 = new Die(7);
                 msg.append(d1.getResult()).append(", ");
                 if (d1.isSuccess()) {
                     hits++;

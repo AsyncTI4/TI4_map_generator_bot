@@ -2,7 +2,6 @@ package ti4.commands.status;
 
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,13 +26,14 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ScorePublic extends StatusSubcommandData {
+
 	public ScorePublic() {
 		super(Constants.SCORE_OBJECTIVE, "Score Public Objective");
 		addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
-				.setRequired(true));
+			.setRequired(true));
 		addOptions(
-				new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-						.setAutoComplete(true));
+			new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+				.setAutoComplete(true));
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class ScorePublic extends StatusSubcommandData {
 	}
 
 	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game activeGame,
-			Player player, int poID) {
+		Player player, int poID) {
 		String both = getNameNEMoji(activeGame, poID);
 		String poName = both.split("_")[0];
 		String id = "";
@@ -74,25 +74,25 @@ public class ScorePublic extends StatusSubcommandData {
 			int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(id, activeGame, player);
 			if (playerProgress < threshold) {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
-								+ poName + ", The bot has you at " + playerProgress + "/" + threshold
-								+ ". If this is a mistake, please report and then you can manually score via /status po_score with the number ID of "
-								+ poID);
+					player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
+						+ poName + ", The bot has you at " + playerProgress + "/" + threshold
+						+ ". If this is a mistake, please report and then you can manually score via /status po_score with the number ID of "
+						+ poID);
 				return;
 			}
 		}
 		boolean scored = activeGame.scorePublicObjective(player.getUserID(), poID);
 		if (!scored) {
 			MessageHelper.sendMessageToChannel(channel,
-					player.getFactionEmoji() + "No such Public Objective ID found or already scored, please retry");
+				player.getFactionEmoji() + "No such Public Objective ID found or already scored, please retry");
 		} else {
 			informAboutScoring(event, channel, activeGame, player, poID);
 			for (Player p2 : player.getNeighbouringPlayers()) {
 				if (p2.hasLeaderUnlocked("syndicatecommander")) {
 					p2.setTg(p2.getTg() + 1);
 					String msg = p2.getRepresentation(true, true)
-							+ " you gained 1tg due to your neighbor scoring a PO while you have syndicate commander. Your tgs went from "
-							+ (p2.getTg() - 1) + " -> " + p2.getTg();
+						+ " you gained 1tg due to your neighbor scoring a PO while you have syndicate commander. Your tgs went from "
+						+ (p2.getTg() - 1) + " -> " + p2.getTg();
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg);
 					ButtonHelperAbilities.pillageCheck(p2, activeGame);
 					ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
@@ -128,7 +128,7 @@ public class ScorePublic extends StatusSubcommandData {
 	}
 
 	public static void informAboutScoring(GenericInteractionCreateEvent event, MessageChannel channel, Game activeGame,
-			Player player, int poID) {
+		Player player, int poID) {
 		String both = getNameNEMoji(activeGame, poID);
 		String poName = both.split("_")[0];
 		String emojiName = both.split("_")[1];
@@ -140,28 +140,28 @@ public class ScorePublic extends StatusSubcommandData {
 		}
 		Helper.checkIfHeroUnlocked(event, activeGame, player);
 		if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument")
-				|| poName.toLowerCase().contains("found a golden age")
-				|| poName.toLowerCase().contains("amass wealth")
-				|| poName.toLowerCase().contains("manipulate galactic law")
-				|| poName.toLowerCase().contains("hold vast reserves")) {
+			|| poName.toLowerCase().contains("found a golden age")
+			|| poName.toLowerCase().contains("amass wealth")
+			|| poName.toLowerCase().contains("manipulate galactic law")
+			|| poName.toLowerCase().contains("hold vast reserves")) {
 			String message2 = player.getRepresentation(true, true)
-					+ " Click the names of the planets you wish to exhaust to score the objective.";
+				+ " Click the names of the planets you wish to exhaust to score the objective.";
 			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "both");
 			Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
 			buttons.add(DoneExhausting);
 			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2,
-					buttons);
+				buttons);
 		}
 		if (poName.contains("Negotiate Trade Routes")) {
 			int oldtg = player.getTg();
 			if (oldtg > 4) {
 				player.setTg(oldtg - 5);
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						player.getRepresentation() + " Automatically deducted 5tg (" + oldtg + "->" + player.getTg()
-								+ ")");
+					player.getRepresentation() + " Automatically deducted 5tg (" + oldtg + "->" + player.getTg()
+						+ ")");
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 5tg because you didn't have that");
+					"Did not deduct 5tg because you didn't have that");
 			}
 		}
 		if (poName.contains("Centralize Galactic Trade")) {
@@ -169,11 +169,11 @@ public class ScorePublic extends StatusSubcommandData {
 			if (oldtg > 9) {
 				player.setTg(oldtg - 10);
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						player.getRepresentation() + " Automatically deducted 10tg (" + oldtg + "->" + player.getTg()
-								+ ")");
+					player.getRepresentation() + " Automatically deducted 10tg (" + oldtg + "->" + player.getTg()
+						+ ")");
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 10tg because you didn't have that");
+					"Did not deduct 10tg because you didn't have that");
 			}
 		}
 		if (poName.contains("Lead From the Front")) {
@@ -182,27 +182,23 @@ public class ScorePublic extends StatusSubcommandData {
 			if (currentStrat + currentTact > 2) {
 				if (currentStrat > 2) {
 					for (int x = 0; x < 3; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public1 + " Lead from the Front");
 					}
 					player.setStrategicCC(currentStrat - 3);
-					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 3 strategy CCs (" + currentStrat + "->"
-									+ player.getStrategicCC() + ")");
+					MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 3 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
 				} else {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 3 - currentStrat;
 					for (int x = 0; x < currentStrat; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public1 + " Lead from the Front");
 					}
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
-					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 3 strategy/tactic CCs (" + currentCC
-									+ "->" + player.getCCRepresentation() + ")");
+					MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 3 strategy/tactic CCs (" + currentCC + "->" + player.getCCRepresentation() + ")");
 				}
 			} else {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 3 CCs because you didn't have that");
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+					"Did not deduct 3 CCs because you didn't have that");
 			}
 		}
 		if (poName.contains("Galvanize the People")) {
@@ -211,30 +207,25 @@ public class ScorePublic extends StatusSubcommandData {
 			if (currentStrat + currentTact > 5) {
 				if (currentStrat > 5) {
 					for (int x = 0; x < 6; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public2 + " Galvanize the People");
 					}
 					player.setStrategicCC(currentStrat - 6);
-					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 6 strategy CCs (" + currentStrat + "->"
-									+ player.getStrategicCC() + ")");
+					MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 6 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
 				} else {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 6 - currentStrat;
 					for (int x = 0; x < currentStrat; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public2 + " Galvanize the People");
 					}
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
-					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-							player.getRepresentation() + " Automatically deducted 6 strategy/tactic CCs (" + currentCC
-									+ "->" + player.getCCRepresentation() + ")");
+					MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 6 strategy/tactic CCs (" + currentCC + "->" + player.getCCRepresentation() + ")");
 				}
 			} else {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						"Did not deduct 6 CCs because you didn't have that");
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+					"Did not deduct 6 CCs because you didn't have that");
 			}
 		}
-
 	}
 
 	@Override

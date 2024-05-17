@@ -1,14 +1,7 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.message.MessageHelper;
-
-import java.util.stream.Collectors;
 
 public interface Command {
     String getActionID();

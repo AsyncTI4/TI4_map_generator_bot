@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -140,11 +142,9 @@ public class GameSaveLoadManager {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON),
-                activeGame);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
         } catch (IOException e) {
-            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something",
-                e);
+            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }
@@ -395,7 +395,7 @@ public class GameSaveLoadManager {
         Map<String, String> currentCheckingForAllReacts = activeGame.getMessagesThatICheckedForAllReacts();
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
-            sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
+            sb2.append(entry.getKey()).append(",").append(entry.getValue().replace("\n", ". ")).append(":");
         }
         writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
@@ -483,6 +483,9 @@ public class GameSaveLoadManager {
         writer.write(Constants.PO2PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives2Peakable()));
         writer.write(System.lineSeparator());
 
+        savePeekedPublicObjectives(writer, Constants.PO1PEEKED, activeGame.getPublicObjectives1Peeked());
+        savePeekedPublicObjectives(writer, Constants.PO2PEEKED, activeGame.getPublicObjectives2Peeked());
+
         DisplayType displayTypeForced = activeGame.getDisplayTypeForced();
         if (displayTypeForced != null) {
             writer.write(Constants.DISPLAY_TYPE + " " + displayTypeForced.getValue());
@@ -554,6 +557,10 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + activeGame.getBotMapUpdatesThreadID());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BAG_DRAFT_STATUS_MESSAGE_ID + " " + activeGame.getBagDraftStatusMessageID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.GAME_LAUNCH_THREAD_ID + " " + activeGame.getLaunchPostThreadID());
+        writer.write(System.lineSeparator());
 
         // GAME MODES
         writer.write(Constants.TIGL_GAME + " " + activeGame.isCompetitiveTIGLGame());
@@ -606,6 +613,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_MAP_SETUP + " " + activeGame.isShowMapSetup());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
@@ -642,6 +651,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + " " + activeGame.getStage1PublicDeckID());
         writer.write(System.lineSeparator());
         writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + activeGame.getStage2PublicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.MAP_TEMPLATE + " " + activeGame.getMapTemplateID());
         writer.write(System.lineSeparator());
         writer.write(Constants.TECH_DECK_ID + " " + activeGame.getTechnologyDeckID());
         writer.write(System.lineSeparator());
@@ -1358,6 +1369,8 @@ public class GameSaveLoadManager {
                 case Constants.PO1PEAKABLE -> activeGame.setPublicObjectives1Peakable(getCardList(info));
                 case Constants.SAVED_BUTTONS -> activeGame.setSavedButtons(getCardList(info));
                 case Constants.PO2PEAKABLE -> activeGame.setPublicObjectives2Peakable(getCardList(info));
+                case Constants.PO1PEEKED -> activeGame.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
+                case Constants.PO2PEEKED -> activeGame.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
                 case Constants.SO_TO_PO -> activeGame.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> activeGame.setPurgedPNs(getCardList(info));
                 case Constants.REVEALED_PO -> activeGame.setRevealedPublicObjectives(getParsedCards(info));
@@ -1367,6 +1380,7 @@ public class GameSaveLoadManager {
                 case Constants.SO_DECK_ID -> activeGame.setSoDeckID(info);
                 case Constants.STAGE_1_PUBLIC_DECK_ID -> activeGame.setStage1PublicDeckID(info);
                 case Constants.STAGE_2_PUBLIC_DECK_ID -> activeGame.setStage2PublicDeckID(info);
+                case Constants.MAP_TEMPLATE -> activeGame.setMapTemplateID(info);
                 case Constants.TECH_DECK_ID -> activeGame.setTechnologyDeckID(info);
                 case Constants.RELIC_DECK_ID -> activeGame.setRelicDeckID(info);
                 case Constants.AGENDA_DECK_ID -> activeGame.setAgendaDeckID(info);
@@ -1679,6 +1693,8 @@ public class GameSaveLoadManager {
                 case Constants.SAVED_CHANNEL -> activeGame.setSavedChannelID(info);
                 case Constants.SAVED_MESSAGE -> activeGame.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> activeGame.setBotMapUpdatesThreadID(info);
+                case Constants.BAG_DRAFT_STATUS_MESSAGE_ID -> activeGame.setBagDraftStatusMessageID(info);
+                case Constants.GAME_LAUNCH_THREAD_ID -> activeGame.setLaunchPostThreadID(info);
 
                 // GAME MODES
                 case Constants.TIGL_GAME -> {
@@ -1945,6 +1961,14 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.MILTYMOD_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setMiltyModMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.SHOW_MAP_SETUP -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setMiltyModMode(value);
@@ -2410,4 +2434,42 @@ public class GameSaveLoadManager {
         // todo implement token read
     }
 
+    private static void savePeekedPublicObjectives(FileWriter writer, final String constant, Map<String, List<String>> peekedPOs) {
+        try {
+            writer.write(constant + " ");
+
+            for (String po : peekedPOs.keySet()) {
+                writer.write(po + ":");
+
+                for (String playerID : peekedPOs.get(po)) {
+                    writer.write(playerID + ",");
+                }
+
+                writer.write(";");
+            }
+
+            writer.write(System.lineSeparator());
+        } catch (Exception e) {
+            BotLogger.log("Error trying to save peeked public objective(s): " + constant, e);
+        }
+    }
+
+    private static Map<String, List<String>> loadPeekedPublicObjectives(String data) {
+        Map<String, List<String>> peekedPublicObjectives = new LinkedHashMap<>();
+
+        if (data.isEmpty()) {
+            return peekedPublicObjectives;
+        }
+
+        Pattern pattern = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
+        Matcher matcher = pattern.matcher(data);
+
+        while (matcher.find()) {
+            String po = matcher.group(1);
+            List<String> playerIDs = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
+            peekedPublicObjectives.put(po, playerIDs);
+        }
+
+        return peekedPublicObjectives;
+    }
 }

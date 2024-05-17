@@ -36,17 +36,27 @@ public class CommoditiesDraftItem extends DraftItem {
     }
 
     @JsonIgnore
+    public int getCommodities() {
+        return getFaction().getCommodities();
+    }
+
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.comm;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMODITIES);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             allItems.add(DraftItem.Generate(Category.COMMODITIES, faction.getAlias()));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMODITIES);
         return allItems;
     }
 }

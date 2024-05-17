@@ -9,6 +9,8 @@ public class Buttons {
     public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute CCs");
+    public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
+    public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
 
     // Cards Info Buttons
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
@@ -19,6 +21,7 @@ public class Buttons {
     public static final Button REFRESH_RELIC_INFO = green(Constants.REFRESH_RELIC_INFO, "Relic Info");
     public static final Button REFRESH_LEADER_INFO = green(Constants.REFRESH_LEADER_INFO, "Leader Info");
     public static final Button REFRESH_UNIT_INFO = green(Constants.REFRESH_UNIT_INFO, "Unit Info");
+    public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Tech Info");
     public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info");
 
@@ -31,7 +34,8 @@ public class Buttons {
         REFRESH_LEADER_INFO,
         REFRESH_UNIT_INFO,
         REFRESH_TECH_INFO,
-        REFRESH_PLANET_INFO
+        REFRESH_PLANET_INFO,
+        FACTION_EMBED
     );
 
 
