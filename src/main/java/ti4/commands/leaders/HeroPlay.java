@@ -98,12 +98,12 @@ public class HeroPlay extends LeaderAction {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " played:");
-            ButtonHelper.getCorrectChannel(player, activeGame)
+            player.getCorrectChannel()
                 .sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
         } else {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 Emojis.getFactionLeaderEmoji(playerLeader));
             sb.append(player.getRepresentation()).append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -116,7 +116,7 @@ public class HeroPlay extends LeaderAction {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be PURGED after status cleanup");
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
             if ("zealotshero".equals(playerLeader.getId())) {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                     player.getRepresentation() + " Use the button to get your first non-faction tech",
@@ -139,7 +139,7 @@ public class HeroPlay extends LeaderAction {
             }
 
             if (purged) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     msg);
 
             } else {
@@ -216,7 +216,7 @@ public class HeroPlay extends LeaderAction {
                     Button.success("cymiaeHeroStep1_" + (activeGame.getRealPlayers().size() + 1), "Resolve Hero"));
                 buttons.add(Button.primary("cymiaeHeroAutonetic", "Resolve Autonetic Memory first"));
 
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation() + " choose whether to resolve autonetic memory or not", buttons);
 
             }
@@ -291,7 +291,7 @@ public class HeroPlay extends LeaderAction {
             }
             case "edynhero" -> {
                 int size = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size();
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " can resolve " + size
                     + " agendas cause thats how many sigils they got. After putting the agendas on top in the order you want (dont bottom any), please press the button to reveal an agenda");
                 new DrawAgenda().drawAgenda(event, size, activeGame, player);
@@ -305,13 +305,13 @@ public class HeroPlay extends LeaderAction {
                     List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event,
                         "kjalHero_" + tile.getPosition());
                     if (buttons.size() > 0) {
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "Use buttons to remove token from "
                                 + tile.getRepresentationForButtons(activeGame, player) + " or an adjacent tile",
                             buttons);
                     }
                 }
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " can gain " + size + " CCs");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
@@ -330,11 +330,11 @@ public class HeroPlay extends LeaderAction {
                     List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event,
                         "vaylerianhero");
                     if (buttons.size() > 0) {
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "Use buttons to remove a token from the board", buttons);
                     }
                 }
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " can gain 1 CC");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
@@ -357,7 +357,7 @@ public class HeroPlay extends LeaderAction {
                         String msg = player.getRepresentation(true, true)
                             + " you can retrieve a unit upgrade tech from players with branch offices. Here is the possible techs from "
                             + ButtonHelper.getIdentOrColor(p2, activeGame);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg,
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
                             ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, activeGame));
                     }
                 }

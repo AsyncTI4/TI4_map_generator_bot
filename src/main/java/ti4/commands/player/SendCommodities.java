@@ -39,7 +39,7 @@ public class SendCommodities extends PlayerSubcommandData {
             return;
         }
         if (player.hasAbility("military_industrial_complex")) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true)
                 + " since you cannot send players commodities due to your faction ability, sending comms here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
             return;
         }

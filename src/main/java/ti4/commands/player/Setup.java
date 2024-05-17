@@ -196,7 +196,7 @@ public class Setup extends PlayerSubcommandData {
 
         if (setSpeaker) {
             activeGame.setSpeaker(player.getUserID());
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs
@@ -243,7 +243,7 @@ public class Setup extends PlayerSubcommandData {
                 Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " after every other faction gets their tech, press this button to resolve Keleres tech",
                     buttons);
@@ -252,7 +252,7 @@ public class Setup extends PlayerSubcommandData {
             } else if (player.getFaction().contains("argent")) {
                 ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
             } else {
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you can use the button to get your starting tech",
                     List.of(Buttons.GET_A_TECH));
             }
@@ -267,7 +267,7 @@ public class Setup extends PlayerSubcommandData {
 
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set up free people ability markers. " + player.getRepresentation(true, true)
                     + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
@@ -275,13 +275,13 @@ public class Setup extends PlayerSubcommandData {
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
         }
         if (player.hasAbility("teeming")) {
@@ -289,7 +289,7 @@ public class Setup extends PlayerSubcommandData {
             player.setUnitCap(unitID, 7);
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                     + " due to the teeming ability");
         }
@@ -298,7 +298,7 @@ public class Setup extends PlayerSubcommandData {
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
                     + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded");
         }

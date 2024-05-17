@@ -151,7 +151,7 @@ public class Stats extends PlayerSubcommandData {
 			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
 			if (player.hasAbility("military_industrial_complex")
 				&& ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
-				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
 					player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
 					ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
 			}

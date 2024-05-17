@@ -17,7 +17,7 @@ public class PlanetExhaust extends PlanetAddRemove {
     }
     public void doAction(Player player, String planet, Game activeGame, boolean triggerOlradin) {
         if(!player.getPlanets().contains(planet)){
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" the bot doesnt think you have planet by the name of "+planet);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()+" the bot doesnt think you have planet by the name of "+planet);
         }
         if (!player.hasPlanetReady(planet)) return;
         if(triggerOlradin){

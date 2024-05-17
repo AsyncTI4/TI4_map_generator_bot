@@ -89,7 +89,7 @@ public class ButtonHelperCommanders {
         String msg = player.getRepresentation(true, true) + " used Olradin Commander to exhaust "
             + Helper.getPlanetRepresentation(planet, activeGame) + " and gain " + count + " tgs (" + oldTg + "->"
             + player.getTg() + ")";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }
 
@@ -100,7 +100,7 @@ public class ButtonHelperCommanders {
             + Helper.getPlanetRepresentation(planet, activeGame);
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "mech " + planet,
             activeGame);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentation(true, true) + " use buttons to discard",
             ACInfo.getDiscardActionCardButtons(activeGame, player, false));
@@ -159,7 +159,7 @@ public class ButtonHelperCommanders {
         if ("space".equalsIgnoreCase(unitHName)) {
             unitHName = "";
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " removed 1 infantry from "
                 + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame) + " using Yin Commander");
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, activeGame);
@@ -222,7 +222,7 @@ public class ButtonHelperCommanders {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", activeGame);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " placed 1 fighter in " + tile.getRepresentation()
                 + " using Ghost Commander");
     }
@@ -232,7 +232,7 @@ public class ButtonHelperCommanders {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "inf", activeGame);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " placed 1 infantry in " + tile.getRepresentation()
                 + " using Khrask Commander");
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
@@ -278,7 +278,7 @@ public class ButtonHelperCommanders {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
                         uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
                     }
                 }
             }
@@ -288,7 +288,7 @@ public class ButtonHelperCommanders {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
                         uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
                     }
                 }
             }
@@ -306,7 +306,7 @@ public class ButtonHelperCommanders {
                     buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
                 }
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " You gained tech while having Nekro commander, use buttons to resolve. ",
                     buttons);
@@ -323,7 +323,7 @@ public class ButtonHelperCommanders {
 
                     }
                     if (count > 2) {
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "# " + player.getRepresentation(true, true)
                                 + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
                     }
@@ -376,7 +376,7 @@ public class ButtonHelperCommanders {
             player.setTg(oldTg - 1);
         }
         ButtonHelper.commanderUnlockCheck(player, activeGame, "keleres", event);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdentOrColor(player, activeGame) + " paid 1tg to unlock commander " + "(" + oldTg + "->"
                 + player.getTg() + ")");
         event.getMessage().delete().queue();
