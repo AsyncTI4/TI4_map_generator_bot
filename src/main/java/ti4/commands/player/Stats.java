@@ -295,29 +295,18 @@ public class Stats extends PlayerSubcommandData {
 		StringBuilder sb = new StringBuilder(player.getFactionEmoji() + " player's current stats:\n");
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints());
-		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/")
-			.append(player.getStrategicCC());
 		sb.append("      ").append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(player.getTg());
-		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/")
-			.append(player.getCommoditiesTotal());
+		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
 		sb.append("      ").append(Emojis.CFrag).append(player.getCrf());
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
 		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
 		sb.append("   ").append(Emojis.UFrag).append(player.getUrf());
-		if (!player.getSCs().isEmpty()) {
-			sb.append("      ");
-			for (int sc : player.getSCs()) {
-				if (activeGame.getScPlayed() != null && !activeGame.getScPlayed().isEmpty()
-					&& activeGame.getScPlayed().get(sc) != null) {
-					sb.append(Emojis.getSCBackEmojiFromInteger(sc));
-				} else {
-					sb.append(Emojis.getSCEmojiFromInteger(sc));
-				}
-			}
-		} else {
-			sb.append("      No SC Picked");
-		}
+		
 		sb.append("\n");
+		
+		sb.append("> CC: `").append(player.getCCRepresentation()).append("`\n");
+		sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
+		sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
 		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
 		sb.append("> Speaker: `").append(activeGame.getSpeaker().equals(player.getUserID())).append("`\n");
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
@@ -344,21 +333,17 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
 		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
 		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
-		sb.append("> Total Unit Resource Value: ").append(Emojis.resources).append("`")
-			.append(player.getTotalResourceValueOfUnits()).append("`\n");
-		sb.append("> Total Unit Hit-point Value: ").append(Emojis.PinkHeart).append("`")
-			.append(player.getTotalHPValueOfUnits()).append("`\n");
-		sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`")
-			.append(player.getTotalCombatValueOfUnits()).append("`\n");
-		sb.append("> Total Unit Ability Expected Hits: ").append(Emojis.UnitUpgradeTech).append("`")
-			.append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
+		sb.append("> Total Unit Resource Value: ").append(Emojis.resources).append("`").append(player.getTotalResourceValueOfUnits()).append("`\n");
+		sb.append("> Total Unit Hit-point Value: ").append(Emojis.PinkHeart).append("`").append(player.getTotalHPValueOfUnits()).append("`\n");
+		sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits()).append("`\n");
+		sb.append("> Total Unit Ability Expected Hits: ").append(Emojis.UnitUpgradeTech).append("`").append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
-		Guild guild = activeGame.getGuild();
-		// if (guild != null && activeGame.isFrankenGame()
-		// && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
-		// sb.append("> Bag Draft Thread: ")
-		// .append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
+
+		// Guild guild = activeGame.getGuild();
+		// if (guild != null && activeGame.isFrankenGame() && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
+		// 	sb.append("> Bag Draft Thread: ").append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
 		// }
+
 		sb.append("\n");
 
 		return sb.toString();

@@ -728,6 +728,7 @@ public class MapGenerator {
                     }
                 }
 
+                // Status
                 String activePlayerID = game.getActivePlayerID();
                 String phase = game.getCurrentPhase();
                 if (player.isPassed()) {
@@ -739,36 +740,28 @@ public class MapGenerator {
                     graphics.setColor(new Color(50, 230, 80));
                     graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
                 }
-                String needToMsg = "Needs To Follow: ";
-                List<Integer> unfollowedSCs = new ArrayList<>();
-                for (int sc : game.getPlayedSCsInOrder(player, game)) {
-                    if (!player.hasFollowedSC(sc)) {
-                        unfollowedSCs.add(sc);
-                        needToMsg = needToMsg + sc + " ";
-                    }
 
-                }
-                if (unfollowedSCs.size() > 0) {
-                    graphics.setFont(Storage.getFont20());
-                    graphics.setColor(Color.red);
-                    graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
-                    // int xSpacer = 20;
-                    // for (int sc : unfollowedSCs) {
-                    //     graphics.setColor(getSCColor(sc, game));
-                    //     graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
-                    //     xSpacer = xSpacer + 20;
-                    //     if (sc > 9) {
-                    //         xSpacer = xSpacer + 10;
-                    //     }
-                    // }
+                // Unfollowed SCs
+                int xSpacer = 20;
+                graphics.setFont(Storage.getFont20());
+                graphics.drawString("Needs to Follow: ", x + 9, y + 125 + yDelta);
+                for (int sc : player.getUnfollowedSCs()) {
+                    graphics.setColor(getSCColor(sc, game, true));
+                    String drawText = String.valueOf(sc);
+                    int len = graphics.getFontMetrics().stringWidth(drawText); 
+                    graphics.drawString(drawText, x + 9 + xSpacer + 145, y + 125 + yDelta);
+                    xSpacer += len + 8;
                 }
 
+                // CCs
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
-                String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+                String ccCount = player.getCCRepresentation();
                 x += 120;
                 graphics.drawString(ccCount, x + 40, y + deltaY + 40);
+                graphics.drawString("T/F/S", x + 40, y + deltaY);
 
+                // Additional FS
                 int additionalFleetSupply = 0;
                 if (player.hasAbility("edict")) {
                     additionalFleetSupply += player.getMahactCC().size();
@@ -779,8 +772,8 @@ public class MapGenerator {
                 if (additionalFleetSupply > 0) {
                     graphics.drawString("+" + additionalFleetSupply + " FS", x + 40, y + deltaY + 70);
                 }
-                graphics.drawString("T/F/S", x + 40, y + deltaY);
 
+                // Cards
                 String acImage = "pa_cardbacks_ac.png";
                 String soImage = "pa_cardbacks_so.png";
                 String pnImage = "pa_cardbacks_pn.png";
@@ -809,6 +802,7 @@ public class MapGenerator {
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
 
+                // Fragments
                 int urf = player.getUrf();
                 int irf = player.getIrf();
                 String urfImage = "pa_fragment_urf.png";
@@ -834,6 +828,7 @@ public class MapGenerator {
                 y += 85;
                 y += 200;
 
+                // Secret Objectives
                 int soCount = objectivesSO(yPlayArea + 165, player);
 
                 int xDeltaSecondRow = xDelta;
@@ -3509,8 +3504,12 @@ public class MapGenerator {
     }
 
     private Color getSCColor(Integer sc, Game game) {
+        return getSCColor(sc, game, false);
+    }
+
+    private Color getSCColor(Integer sc, Game game, boolean ignorePlayed) {
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        if (scPlayed.get(sc) != null && scPlayed.get(sc)) {
+        if (!ignorePlayed && scPlayed.get(sc) != null && scPlayed.get(sc)) {
             return Color.GRAY;
         }
 

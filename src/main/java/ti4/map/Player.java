@@ -2866,4 +2866,14 @@ public class Player {
         }
         return ButtonHelper.getTileOfPlanetWithNoTrait(this, game);
     }
+
+    public List<Integer> getUnfollowedSCs() {
+        List<Integer> unfollowedSCs = new ArrayList<>();
+        for (int sc : getGame().getPlayedSCsInOrder(this)) {
+            if (!hasFollowedSC(sc)) {
+                unfollowedSCs.add(sc);
+            }
+        }
+        return unfollowedSCs;
+    }
 }
