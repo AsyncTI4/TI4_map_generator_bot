@@ -62,8 +62,8 @@ public class MiltyCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     protected String getActionDescription() {

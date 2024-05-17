@@ -59,17 +59,17 @@ public class AddTileList extends MapSubcommandData {
         MapGenerator.saveImage(game, event).thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload));
     }
 
-    public static void addTileListToMap(Game activeGame, String tileList, GenericInteractionCreateEvent event) {
-        Map<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, activeGame);
+    public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {
+        Map<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, game);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
             return;
         }
 
         List<String> badTiles = new ArrayList<>();
-        activeGame.clearTileMap();
+        game.clearTileMap();
         try {
-            badTiles = addTileMapToGame(activeGame, mappedTilesToPosition);
+            badTiles = addTileMapToGame(game, mappedTilesToPosition);
         } catch (Exception e) {
             BotLogger.log(e.getMessage(), e);
             MessageHelper.replyToMessage(event, e.getMessage());
@@ -77,7 +77,7 @@ public class AddTileList extends MapSubcommandData {
 
         if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
 
-        finishSetup(activeGame, event);
+        finishSetup(game, event);
     }
 
     public static List<String> addTileMapToGame(Game game, Map<String, String> tileMap) throws Exception {

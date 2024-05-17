@@ -52,9 +52,9 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
         User extraUser = option.getAsUser();
         playerID = extraUser.getId();
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game activeGame : mapList.values()) {
-            if (!activeGame.isHasEnded()) {
-                for (Player player2 : activeGame.getRealPlayers()) {
+        for (Game game : mapList.values()) {
+            if (!game.isHasEnded()) {
+                for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(playerID)) {
                         return player2.getRepresentation(true, true) + "afk hours are: " + player2.getHoursThatPlayerIsAFK().replace(";", ", ") + "\n";
                     }

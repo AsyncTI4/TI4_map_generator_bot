@@ -20,9 +20,9 @@ public class RemoveFogTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
 
         MessageChannel channel = event.getChannel();
         if (player == null) {
@@ -36,7 +36,7 @@ public class RemoveFogTile extends FOWSubcommandData {
             return;
         }
 
-        Player targetPlayer = Helper.getPlayer(activeGame, player, event);
+        Player targetPlayer = Helper.getPlayer(game, player, event);
         if (targetPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to remove tiles from was not found.");
             return;
@@ -44,14 +44,14 @@ public class RemoveFogTile extends FOWSubcommandData {
 
         String[] positions = positionMapping.getAsString().split(" ");
         for (String position : positions) {
-          if (!PositionMapper.isTilePositionValid(position)) {
-              MessageHelper.replyToMessage(event, "Tile position is not allowed");
-              return;
-          }
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Tile position is not allowed");
+                return;
+            }
 
-          //remove the custom tile from the player
-          targetPlayer.removeFogTile(position);
+            //remove the custom tile from the player
+            targetPlayer.removeFogTile(position);
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

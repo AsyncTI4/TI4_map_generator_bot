@@ -24,7 +24,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
@@ -37,14 +37,14 @@ public class SwapTwoSystems extends SpecialSubcommandData {
             return;
         }
         String tile1ID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile1 = AddRemoveUnits.getTile(event, tile1ID, activeGame);
+        Tile tile1 = AddRemoveUnits.getTile(event, tile1ID, game);
         if (tile1 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
             return;
         }
 
         String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, activeGame);
+        Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, game);
 
         String positionFrom = tile1.getPosition();
         String positionTo = tile2ID; //need to validate position
@@ -52,18 +52,18 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         if (tile2 != null) { // tile exists, so swap
             positionTo = tile2.getPosition();
             tile2.setPosition(positionFrom);
-            activeGame.setTile(tile2);
+            game.setTile(tile2);
         } else if (!PositionMapper.isTilePositionValid(positionTo)) { // tile does not exist, so validate the TO position
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Tile To position: " + positionTo);
             return;
         } else {
-            activeGame.removeTile(positionFrom);
+            game.removeTile(positionFrom);
         }
 
         tile1.setPosition(positionTo);
-        activeGame.setTile(tile1);
+        game.setTile(tile1);
 
-        activeGame.rebuildTilePositionAutoCompleteList();
-        ShowGame.simpleShowGame(activeGame, event, DisplayType.map);
+        game.rebuildTilePositionAutoCompleteList();
+        ShowGame.simpleShowGame(game, event, DisplayType.map);
     }
 }

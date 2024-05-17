@@ -152,7 +152,7 @@ public class DataMigrationManager {
 
     /// MIGRATION: Player stats anchors implemented, but blown away all existing games.
     /// This will fix 6 player 3 ring maps anchors
-    public static Boolean migratePlayerStatsBlockPositions_300823(Game activeGame) {
+    public static Boolean migratePlayerStatsBlockPositions_300823(Game game) {
         Boolean mapNeededMigrating = false;
         List<String> setup6p = new ArrayList<>() {
             {
@@ -177,13 +177,13 @@ public class DataMigrationManager {
             }
         };
 
-        List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
-        int playerCount = activeGame.getRealPlayers().size() + activeGame.getDummies().size();
+        List<Player> players = new ArrayList<>(game.getPlayers().values());
+        int playerCount = game.getRealPlayers().size() + game.getDummies().size();
 
         List<String> setup;
-        if (playerCount == 6 && activeGame.getRingCount() == 3) {
+        if (playerCount == 6 && game.getRingCount() == 3) {
             setup = setup6p;
-        } else if (playerCount == 8 && activeGame.getRingCount() == 4) {
+        } else if (playerCount == 8 && game.getRingCount() == 4) {
             setup = setup8p;
         } else {
             return mapNeededMigrating;

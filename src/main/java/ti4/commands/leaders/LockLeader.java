@@ -13,7 +13,7 @@ public class LockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
+    void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         if (playerLeader == null) {
             MessageHelper.sendMessageToEventChannel(event, "Leader not found");

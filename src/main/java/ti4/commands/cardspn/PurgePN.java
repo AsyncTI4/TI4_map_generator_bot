@@ -19,9 +19,9 @@ public class PurgePN extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -44,9 +44,9 @@ public class PurgePN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
             return;
         }
-        activeGame.setPurgedPN(id);
+        game.setPurgedPN(id);
         player.removePromissoryNote(id);
         MessageHelper.sendMessageToEventChannel(event, "PN Purged");
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+        PNInfo.sendPromissoryNoteInfo(game, player, false);
     }
 }

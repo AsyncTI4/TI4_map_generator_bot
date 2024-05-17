@@ -430,24 +430,24 @@ public class Player {
 
     @JsonIgnore
     public ThreadChannel getCardsInfoThread() {
-        Game activeGame = getGame();
-        TextChannel actionsChannel = activeGame.getMainGameChannel();
-        if (activeGame.isFoWMode() || activeGame.isCommunityMode())
+        Game game = getGame();
+        TextChannel actionsChannel = game.getMainGameChannel();
+        if (game.isFoWMode() || game.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
-            actionsChannel = activeGame.getMainGameChannel();
+            actionsChannel = game.getMainGameChannel();
         }
         if (actionsChannel == null) {
             BotLogger.log(
                 "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                    + activeGame.getName());
+                    + game.getName());
             return null;
         }
 
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeGame.getName() + "-"
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
             + getUserName().replaceAll("/", "");
-        if (activeGame.isFoWMode()) {
-            threadName = activeGame.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+        if (game.isFoWMode()) {
+            threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
         // ATTEMPT TO FIND BY ID
@@ -520,8 +520,8 @@ public class Player {
 
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!activeGame.isFoWMode());
-        if (activeGame.getName().contains("pbd100") || activeGame.getName().contains("pbd500")) {
+        boolean isPrivateChannel = (!game.isFoWMode());
+        if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
@@ -531,30 +531,30 @@ public class Player {
         }
         ThreadChannel threadChannel = threadAction.complete();
         setCardsInfoThreadID(threadChannel.getId());
-        Helper.checkThreadLimitAndArchive(activeGame.getGuild());
+        Helper.checkThreadLimitAndArchive(game.getGuild());
         return threadChannel;
     }
 
     @JsonIgnore
     public ThreadChannel getCardsInfoThreadWithoutCompletes() {
-        Game activeGame = getGame();
-        TextChannel actionsChannel = activeGame.getMainGameChannel();
-        if (activeGame.isFoWMode() || activeGame.isCommunityMode())
+        Game game = getGame();
+        TextChannel actionsChannel = game.getMainGameChannel();
+        if (game.isFoWMode() || game.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
-            actionsChannel = activeGame.getMainGameChannel();
+            actionsChannel = game.getMainGameChannel();
         }
         if (actionsChannel == null) {
             BotLogger.log(
                 "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                    + activeGame.getName());
+                    + game.getName());
             return null;
         }
 
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeGame.getName() + "-"
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
             + getUserName().replaceAll("/", "");
-        if (activeGame.isFoWMode()) {
-            threadName = activeGame.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+        if (game.isFoWMode()) {
+            threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
         // ATTEMPT TO FIND BY ID
@@ -1301,13 +1301,13 @@ public class Player {
     }
 
     public String getRepresentation(boolean overrideFow, boolean ping) {
-        Game activeGame = getGame();
-        boolean privateGame = FoWHelper.isPrivateGame(activeGame);
+        Game game = getGame();
+        boolean privateGame = FoWHelper.isPrivateGame(game);
         if (privateGame && !overrideFow) {
             return Emojis.getColorEmojiWithName(getColor());
         }
 
-        if (activeGame != null && activeGame.isCommunityMode()) {
+        if (game != null && game.isCommunityMode()) {
             Role roleForCommunity = getRoleForCommunity();
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder(getFactionEmoji());
@@ -1714,8 +1714,8 @@ public class Player {
 
     @JsonIgnore
     public int getPublicVictoryPoints(boolean countCustoms) {
-        Game activeGame = getGame();
-        Map<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
+        Game game = getGame();
+        Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
             if (scoredPOEntry.getValue().contains(getUserID())) {
@@ -1727,12 +1727,12 @@ public class Player {
                     } else { // IS A CUSTOM PO
                         if (countCustoms) {
                             int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
-                            int poValue = activeGame.getCustomPublicVP().getOrDefault(poID, 0);
+                            int poValue = game.getCustomPublicVP().getOrDefault(poID, 0);
                             vpCount += poValue * frequency;
                         }
                     }
                 } catch (Exception e) {
-                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + activeGame.getName() + "  player="
+                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + game.getName() + "  player="
                         + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
                 }
             }
@@ -1862,10 +1862,10 @@ public class Player {
     public int getLowestSC() {
         try {
             int min = 100;
-            Game activeGame = getGame();
+            Game game = getGame();
             for (int SC : getSCs()) {
-                if (SC == ButtonHelper.getKyroHeroSC(activeGame)) {
-                    min = Math.min(activeGame.getSCList().size() + 1, min);
+                if (SC == ButtonHelper.getKyroHeroSC(game)) {
+                    min = Math.min(game.getSCList().size() + 1, min);
                 } else {
                     min = Math.min(SC, min);
                 }
@@ -2217,15 +2217,15 @@ public class Player {
         if (planets.contains(planet) && !exhaustedPlanets.contains(planet)) {
             exhaustedPlanets.add(planet);
         }
-        Game activeGame = getGame();
-        if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame) != null && activeGame.isAbsolMode()
-            && ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getTokenList()
+        Game game = getGame();
+        if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null && game.isAbsolMode()
+            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList()
                 .contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, activeGame),
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, game),
                 getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
         }
     }
@@ -2593,20 +2593,20 @@ public class Player {
 
     @JsonIgnore
     public Set<Player> getNeighbouringPlayers() {
-        Game activeGame = getGame();
+        Game game = getGame();
         Set<Player> adjacentPlayers = new HashSet<>();
         Set<Player> realPlayers = new HashSet<>(
-            activeGame.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
+            game.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
 
         Set<Tile> playersTiles = new HashSet<>();
-        for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.playerIsInSystem(activeGame, tile, this)) {
+        for (Tile tile : game.getTileMap().values()) {
+            if (FoWHelper.playerIsInSystem(game, tile, this)) {
                 playersTiles.add(tile);
             }
         }
 
         for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(activeGame, tile.getPosition(), false));
+            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(game, tile.getPosition(), false));
             if (realPlayers.size() == adjacentPlayers.size())
                 break;
         }

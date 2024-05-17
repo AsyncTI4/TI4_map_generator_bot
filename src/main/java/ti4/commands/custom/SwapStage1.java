@@ -18,11 +18,11 @@ public class SwapStage1 extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping loc1 = event.getOption(Constants.LOCATION1);
         OptionMapping loc2 = event.getOption(Constants.LOCATION2);
-        activeGame.swapStage1(loc1.getAsInt(), loc2.getAsInt());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Objectives at position "+loc1.getAsInt()+" and position "+ loc2.getAsInt() + " swapped.");
-        GameSaveLoadManager.saveMap(activeGame, event);
+        game.swapStage1(loc1.getAsInt(), loc2.getAsInt());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Objectives at position " + loc1.getAsInt() + " and position " + loc2.getAsInt() + " swapped.");
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

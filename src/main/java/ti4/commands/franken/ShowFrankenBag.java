@@ -13,8 +13,8 @@ public class ShowFrankenBag extends FrankenSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        FrankenDraftHelper.showPlayerBag(activeGame, player);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        FrankenDraftHelper.showPlayerBag(game, player);
     }
 }

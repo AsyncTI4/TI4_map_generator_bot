@@ -35,19 +35,19 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         pnIDs.removeIf(StringUtils::isEmpty);
         pnIDs.removeIf(pn -> !Mapper.getAllPromissoryNoteIDs().contains(pn));
 
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         doAction(player, pnIDs);
-        activeGame.checkPromissoryNotes();
+        game.checkPromissoryNotes();
         PNInfo.checkAndAddPNs(getActiveGame(), player);
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
+        PNInfo.sendPromissoryNoteInfo(game, player, false, event);
     }
 
     public abstract void doAction(Player player, List<String> pnIDs);

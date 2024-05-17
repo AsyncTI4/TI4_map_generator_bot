@@ -15,13 +15,13 @@ public class DiscardFromDeckExp extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
             if (Mapper.getExplore(id) != null) {
-                activeGame.discardExplore(id);
+                game.discardExplore(id);
                 sb.append("Card discarded: ").append(displayExplore(id)).append(System.lineSeparator());
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());

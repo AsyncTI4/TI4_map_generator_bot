@@ -77,36 +77,36 @@ public class ButtonHelperActionCardsWillHomebrew {
 
     }
 
-    public static void resolveStrandedShipStep1(Player player, Game activeGame, ButtonInteractionEvent event,
+    public static void resolveStrandedShipStep1(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
-        List<Button> buttons = getStrandedShipButtons(activeGame, player);
+        List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot which tile you wish to place a ghost ship in",
             buttons);
     }
 
-    public static void resolveStrandedShipStep2(Player player, Game activeGame, ButtonInteractionEvent event,
+    public static void resolveStrandedShipStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
-        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
-        tile = MoveUnits.flipMallice(event, tile, activeGame);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        tile = MoveUnits.flipMallice(event, tile, game);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " put a cruiser in " + tile.getRepresentation());
 
         // If Empyrean Commander is in game check if unlock condition exists
-        Player p2 = activeGame.getPlayerFromLeader("empyreancommander");
+        Player p2 = game.getPlayerFromLeader("empyreancommander");
         if (p2 != null) {
             if (!p2.hasLeaderUnlocked("empyreancommander")) {
-                ButtonHelper.commanderUnlockCheck(p2, activeGame, "empyrean", event);
+                ButtonHelper.commanderUnlockCheck(p2, game, "empyrean", event);
             }
         }
     }
 
-    public static void resolveSpatialCollapseStep1(Player player, Game activeGame, ButtonInteractionEvent event,
+    public static void resolveSpatialCollapseStep1(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
-        List<Button> buttons = getSpatialCollapseTilesStep1(activeGame, player);
+        List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot which tile with your ships you wish to swap with an adjacent system",
@@ -184,7 +184,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         String buttonID) {
         Player p1 = player;
         if (p1.getStrategicCC() > 0) {
-            String successMessage = p1.getFactionEmoji() + " Reduced strategy pool CCs by 1 ("                + (p1.getStrategicCC()) + " -> " + (p1.getStrategicCC() - 1) + ")";
+            String successMessage = p1.getFactionEmoji() + " Reduced strategy pool CCs by 1 (" + (p1.getStrategicCC()) + " -> " + (p1.getStrategicCC() - 1) + ")";
             p1.setStrategicCC(p1.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, Emojis.ActionCard + "Side Project");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
