@@ -2845,6 +2845,7 @@ public class Player {
         return eb.build();
     }
 
+    @JsonIgnore
     public Tile getHomeSystemTile() {
         Game game = getGame();
         if (hasAbility("mobile_command")) {
