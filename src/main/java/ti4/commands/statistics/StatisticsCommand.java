@@ -63,6 +63,7 @@ public class StatisticsCommand implements Command {
         subcommands.add(new MedianTurnTime());
         subcommands.add(new CompareAFKTimes());
         subcommands.add(new DiceLuck());
+        subcommands.add(new LifetimeRecord());
         subcommands.add(new FactionRecordOfTech());
         subcommands.add(new StellarConverter());
 

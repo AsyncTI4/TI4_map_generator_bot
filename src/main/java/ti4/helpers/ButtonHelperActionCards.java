@@ -747,10 +747,15 @@ public class ButtonHelperActionCards {
             buttons);
     }
 
-    public static void resolveEBSStep1(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveEBSStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("EBSFaction", player.getFaction());
-        ButtonHelper.resolveCombatRoll(player, game, event,
-            "combatRoll_" + game.getActiveSystem() + "_space_spacecannonoffence");
+        if (buttonID.contains("_")) {
+            ButtonHelper.resolveCombatRoll(player, game, event,
+                "combatRoll_" + buttonID.split("_")[1] + "_space_spacecannonoffence");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+        }
+
         event.getMessage().delete().queue();
     }
 

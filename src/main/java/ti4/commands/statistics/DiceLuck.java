@@ -3,6 +3,7 @@ package ti4.commands.statistics;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -38,30 +39,9 @@ public class DiceLuck extends StatisticsSubcommandData {
     }
 
     private String getDiceLuck(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
-
-        Map<String, Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
-        Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-
-        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
-
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
-                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
-                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
-
-                if (playerDiceLuck.getKey() == 0) continue;
-                Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-                playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new HashSet<>();
-                    value.add(averageDiceLuck);
-                    return value;
-                });
-            }
-        }
+        Map<String, Entry<Double, Integer>> playerDiceLucks = getAllPlayersDiceLuck(ignoreEndedGames);
 
         //  HashMap<String, Double> playerMedianDiceLucks = playerAverageDiceLucks.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
         StringBuilder sb = new StringBuilder();
@@ -90,22 +70,70 @@ public class DiceLuck extends StatisticsSubcommandData {
             .sorted(comparator)
             .limit(topLimit)
             .forEach(userTurnCountTotalTime -> {
-            User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
-            double expectedHits = userTurnCountTotalTime.getValue().getKey();
-            int actualHits = userTurnCountTotalTime.getValue().getValue();
+                User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
+                double expectedHits = userTurnCountTotalTime.getValue().getKey();
+                int actualHits = userTurnCountTotalTime.getValue().getValue();
 
-            if (user == null || expectedHits == 0 || actualHits == 0) return;
+                if (user == null || expectedHits == 0 || actualHits == 0) return;
+
+                double averageDiceLuck = actualHits / expectedHits;
+
+                sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
+                sb.append(String.format("%.2f", averageDiceLuck));
+                sb.append("` ").append(user.getEffectiveName());
+                sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
+                sb.append("\n");
+                index.getAndIncrement();
+            });
+
+        return sb.toString();
+    }
+
+    public Map<String, Entry<Double, Integer>> getAllPlayersDiceLuck(boolean ignoreEndedGames) {
+        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+
+        Map<String, Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
+        Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();
+
+        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+
+        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
+            for (Player player : game.getPlayers().values()) {
+                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
+                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
+                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+
+                if (playerDiceLuck.getKey() == 0) continue;
+                Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
+                playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+                    if (value == null) value = new HashSet<>();
+                    value.add(averageDiceLuck);
+                    return value;
+                });
+            }
+        }
+        return playerDiceLucks;
+    }
+
+    public String getSelectUsersDiceLuck(List<User> users, Map<String, Entry<Double, Integer>> playerDiceLucks) {
+        StringBuilder sb = new StringBuilder();
+        AtomicInteger index = new AtomicInteger(1);
+        sb.append("## __**Dice Luck**__\n");
+        for (User user : users) {
+            Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
+            double expectedHits = userTurnCountTotalTime.getKey();
+            int actualHits = userTurnCountTotalTime.getValue();
+
+            if (user == null || expectedHits == 0 || actualHits == 0) return "";
 
             double averageDiceLuck = actualHits / expectedHits;
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
             sb.append(String.format("%.2f", averageDiceLuck));
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
             sb.append("\n");
             index.getAndIncrement();
-        });
-
+        }
         return sb.toString();
     }
 }

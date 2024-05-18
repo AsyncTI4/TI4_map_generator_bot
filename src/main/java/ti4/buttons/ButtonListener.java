@@ -2185,6 +2185,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.returnFightersToSpace(player, game, event, buttonID);
         } else if (buttonID.startsWith("cutTape_")) {
             ButtonHelper.cutTape(game, buttonID, event);
+        } else if (buttonID.startsWith("ancientTradeRoutesStep2_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveAncientTradeRoutesStep2(player, game, event, buttonID);
+        } else if (buttonID.startsWith("armsDealStep2_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveArmsDealStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("freelancersBuild_")) {
             String planet = buttonID.replace("freelancersBuild_", "");
             List<Button> buttons;
@@ -2423,6 +2427,8 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation() + " Put 1 commodity on ATS Armaments");
             }
+        } else if (buttonID.startsWith("resolveEBSStep1_")) {
+            ButtonHelperActionCards.resolveEBSStep1(player, game, event, buttonID);
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player, buttonLabel);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
@@ -4430,7 +4436,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveAssRepsStep1" -> ButtonHelperActionCards.resolveAssRepsStep1(player, game, event, buttonID);
                 case "resolveSignalJammingStep1" -> ButtonHelperActionCards.resolveSignalJammingStep1(player, game, event, buttonID);
                 case "resolvePlagueStep1" -> ButtonHelperActionCards.resolvePlagueStep1(player, game, event, buttonID);
-                case "resolveEBSStep1" -> ButtonHelperActionCards.resolveEBSStep1(player, game, event);
+
                 case "resolveMicrometeoroidStormStep1" -> ButtonHelperActionCards.resolveMicrometeoroidStormStep1(player, game, event, buttonID);
                 case "resolveCrippleDefensesStep1" -> ButtonHelperActionCards.resolveCrippleDefensesStep1(player, game, event, buttonID);
                 case "resolveInfiltrateStep1" -> ButtonHelperActionCards.resolveInfiltrateStep1(player, game, event, buttonID);
@@ -4783,6 +4789,15 @@ public class ButtonListener extends ListenerAdapter {
                         player.getRepresentation(true, true)
                             + " All ships have been removed, continue to land troops.");
                     ButtonHelper.deleteTheOneButton(event);
+                }
+                case "resolveDataArchive" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveDataArchive(player, game, event);
+                }
+                case "resolveAncientTradeRoutes" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveAncientTradeRoutes(player, game, event);
+                }
+                case "resolveArmsDeal" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveArmsDeal(player, game, event);
                 }
                 case "purgeRohdhnaHero" -> {
                     Leader playerLeader = player.unsafeGetLeader("rohdhnahero");

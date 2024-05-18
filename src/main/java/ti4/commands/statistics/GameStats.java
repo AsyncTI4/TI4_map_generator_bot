@@ -6,12 +6,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,8 +24,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.K;
+
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -62,6 +71,7 @@ public class GameStats extends StatisticsSubcommandData {
         }
         switch (stat) {
             case UNLEASH_THE_NAMES -> sendAllNames(event);
+            case PING_LIST -> listPingCounterList(event);
             case HIGHEST_SPENDERS -> calculateSpendToWinCorrellation(event);
             case GAME_LENGTH -> showGameLengths(event, null);
             case GAME_LENGTH_4MO -> showGameLengths(event, 120);
@@ -86,8 +96,9 @@ public class GameStats extends StatisticsSubcommandData {
      */
     public enum GameStatistics {
         // Add your new statistic here
-        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour", "Show colour play count"), FACTION_WINS("Wins per Faction",
-            "Show the wins per faction"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), PING_LIST("Ping List", "List of how many times people have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
+            "Show colour play count"), FACTION_WINS("Wins per Faction",
+                "Show the wins per faction"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
         // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 pt was scored but no winner was declared"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"), SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"), GAME_COUNT("Total game count", "Shows the total game count");
 
@@ -137,6 +148,30 @@ public class GameStats extends StatisticsSubcommandData {
         public boolean search(String searchString) {
             return name.toLowerCase().contains(searchString) || description.toLowerCase().contains(searchString) || toString().contains(searchString);
         }
+    }
+
+    public static void listPingCounterList(SlashCommandInteractionEvent event) {
+        Game reference = GameManager.getInstance().getGame("finreference");
+        Map<String, Integer> pings = new HashMap<>();
+        for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
+            if (pingsFor.contains("pingsFor")) {
+                pings.put(pingsFor.replace("pingsFor", ""), Integer.parseInt(reference.getStoredValue(pingsFor)));
+            }
+        }
+        Map<String, Integer> topThousand = pings.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(1000)
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        int index = 1;
+        StringBuilder sb = new StringBuilder();
+        for (String ket : topThousand.keySet()) {
+            User user = AsyncTI4DiscordBot.jda.getUserById(ket);
+            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
+            sb.append("` ").append(user.getEffectiveName() + ": ");
+            sb.append(topThousand.get(ket) + " pings");
+            sb.append("\n");
+            index++;
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Ping Counts", sb.toString());
     }
 
     public static void sendAllNames(SlashCommandInteractionEvent event) {
