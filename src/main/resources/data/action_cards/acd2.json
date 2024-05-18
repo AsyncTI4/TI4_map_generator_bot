@@ -633,7 +633,7 @@
     "alias": "rendezvous_point",
     "name": "Rendezvous Point",
     "phase": "Action",
-    "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's ships",
+    "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
     "text": "Remove your command token from that system and end your turn.",
     "flavorText": "Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
     "source": "action_deck_2"
