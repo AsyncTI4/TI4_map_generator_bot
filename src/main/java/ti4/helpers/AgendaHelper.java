@@ -2296,6 +2296,20 @@ public class AgendaHelper {
                                 "dreadnought", "placeOneNDone_skipbuild");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
+                        if (specificVote.contains("Armament Rider")) {
+                            String message = identity
+                                + " You have a armament rider to resolve. Select the system in which you wish to produce 2 units each with cost 4 or less";
+
+                            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR, UnitType.Spacedock,
+                                UnitType.CabalSpacedock);
+                            List<Button> buttons = new ArrayList<>();
+                            for (Tile tile : tiles) {
+                                Button starTile = Button.success("umbatTile_" + tile.getPosition(),
+                                    tile.getRepresentationForButtons(game, winningR));
+                                buttons.add(starTile);
+                            }
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
 
                         if (specificVote.contains("Trade Rider")) {
                             int cTG = winningR.getTg();

@@ -1403,7 +1403,7 @@ public class Player {
             }
         }
         setAbilities(abilities);
-        if (faction.equals(Constants.LIZHO)) {
+        if (hasAbility("cunning")) {
             Map<String, String> dsHandcards = Mapper.getDSHandcards();
             for (Entry<String, String> entry : dsHandcards.entrySet()) {
                 String key = entry.getKey();

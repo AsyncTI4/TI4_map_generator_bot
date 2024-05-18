@@ -42,6 +42,90 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperActionCardsWillHomebrew {
 
+    public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #1", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #2 (different planet from #1)", buttons);
+        if (game.getCurrentPhase().toLowerCase().contains("agenda")) {
+            for (String planet : player.getPlanets()) {
+                player.exhaustPlanet(planet);
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " exhausted all planets");
+        }
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveAncientTradeRoutes(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        player.setCommodities(player.getCommodities() + 2);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained 2 commodities");
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (game.isFoWMode()) {
+                buttons.add(Button.secondary("ancientTradeRoutesStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("ancientTradeRoutesStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Dont give comms"));
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation(true, true) + " tell the bot who you want to give 2 comms to",
+            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation(true, true) + " tell the bot who else you want to give 2 comms to (different from the first time)",
+            buttons);
+    }
+
+    public static void resolveArmsDeal(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
+                continue;
+            }
+            if (game.isFoWMode()) {
+                buttons.add(Button.secondary("armsDealStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("armsDealStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation(true, true) + " tell the bot which neighbor you want to get a cruiser+destroyer",
+            buttons);
+    }
+
+    public static void resolveArmsDealStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+        buttons.add(Button.danger("deleteButtons", "Dont place"));
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
+        buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
+        buttons.add(Button.danger("deleteButtons", "Dont place"));
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveAncientTradeRoutesStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        p2.setCommodities(p2.getCommodities() + 2);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
+        event.getMessage().delete().queue();
+    }
+
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
         List<String> types = new ArrayList<String>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();

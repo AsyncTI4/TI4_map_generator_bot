@@ -3,6 +3,7 @@ package ti4.commands.statistics;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -52,7 +53,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
             for (Player player : game.getPlayers().values()) {
                 Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
                 playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
-                
+
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
                 playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
@@ -67,7 +68,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**Average Turn Time:**__\n");
-        
+
         int index = 1;
         Comparator<Entry<String, Entry<Integer, Long>>> comparator = (o1, o2) -> {
             int o1TurnCount = o1.getValue().getKey();
@@ -76,8 +77,8 @@ public class AverageTurnTime extends StatisticsSubcommandData {
             long o2total = o2.getValue().getValue();
             if (o1TurnCount == 0 || o2TurnCount == 0) return -1;
 
-            Long total1 = o1total/o1TurnCount;
-            Long total2 = o2total/o2TurnCount;
+            Long total1 = o1total / o1TurnCount;
+            Long total2 = o2total / o2TurnCount;
             return total1.compareTo(total2);
         };
 
@@ -89,7 +90,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
             long totalMillis = userTurnCountTotalTime.getValue().getValue();
 
             if (user == null || turnCount == 0 || totalMillis == 0) continue;
-            
+
             long averageTurnTime = totalMillis / turnCount;
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
@@ -98,9 +99,54 @@ public class AverageTurnTime extends StatisticsSubcommandData {
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
-            index++;     
+            index++;
         }
 
         return sb.toString();
+    }
+
+    public String getSelectUsersTurnTimes(List<User> users, Map<String, Entry<Integer, Long>> playerTurnTimes) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("## __**Average Turn Time:**__\n");
+        int index = 1;
+        for (User user : users) {
+            int turnCount = playerTurnTimes.get(user.getId()).getKey();
+            long totalMillis = playerTurnTimes.get(user.getId()).getValue();
+
+            if (user == null || turnCount == 0 || totalMillis == 0) continue;
+
+            long averageTurnTime = totalMillis / turnCount;
+
+            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
+            sb.append(Helper.getTimeRepresentationToSeconds(averageTurnTime));
+            sb.append("` ").append(user.getEffectiveName());
+            sb.append("   [").append(turnCount).append(" total turns]");
+            sb.append("\n");
+            index++;
+        }
+        return sb.toString();
+    }
+
+    public Map<String, Entry<Integer, Long>> getAllPlayersTurnTimes(boolean ignoreEndedGames) {
+        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
+        Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
+        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
+            for (Player player : game.getPlayers().values()) {
+                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
+                playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
+
+                if (playerTurnTime.getKey() == 0) continue;
+                Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
+                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+                    if (value == null) value = new HashSet<>();
+                    value.add(averageTurnTime);
+                    return value;
+                });
+            }
+        }
+        return playerTurnTimes;
     }
 }
