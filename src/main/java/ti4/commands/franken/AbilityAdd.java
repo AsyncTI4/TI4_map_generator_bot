@@ -1,6 +1,8 @@
 package ti4.commands.franken;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.generator.Mapper;
@@ -31,6 +33,15 @@ public class AbilityAdd extends AbilityAddRemove {
             }
             sb.append("\n");
             player.addAbility(abilityID);
+            if (abilityID.equalsIgnoreCase("cunning")) {
+                Map<String, String> dsHandcards = Mapper.getDSHandcards();
+                for (Entry<String, String> entry : dsHandcards.entrySet()) {
+                    String key = entry.getKey();
+                    if (key.endsWith(Constants.LIZHO)) {
+                        player.setTrapCard(key);
+                    }
+                }
+            }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

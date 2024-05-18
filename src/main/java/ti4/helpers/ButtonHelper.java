@@ -4,22 +4,27 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -28,6 +33,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
@@ -39,6 +45,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.units.qual.K;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
@@ -2953,8 +2961,15 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsToExploreAllPlanets(Player player, Game game) {
+        return getButtonsToExploreAllPlanets(player, game, false);
+    }
+
+    public static List<Button> getButtonsToExploreAllPlanets(Player player, Game game, boolean onlyReady) {
         List<Button> buttons = new ArrayList<>();
         for (String plan : player.getPlanetsAllianceMode()) {
+            if (onlyReady && player.getExhaustedPlanets().contains(plan)) {
+                continue;
+            }
             Planet planetUnit = game.getPlanetsInfo().get(plan);
             Planet planetReal = planetUnit;
             if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
@@ -6662,12 +6677,6 @@ public class ButtonHelper {
         reference.setStoredValue("pingsFor" + playerID, "" + count);
     }
 
-    public static void issueSecretCombatReminders(Game game, Tile tile, List<Player> playersInCombat) {
-        for (Player player : playersInCombat) {
-
-        }
-    }
-
     public static List<Tile> getTilesOfUnitsWithBombard(Player player, Game game) {
         return game.getTileMap().values().stream()
             .filter(tile -> tile.containsPlayersUnitsWithModelCondition(player,
@@ -7210,35 +7219,12 @@ public class ButtonHelper {
                 + "Ready For Strategy Phase means you are done playing/passing on: \n- Political Stability \n- Summit \n- Manipulate Investments ";
         }
         List<Button> buttons = new ArrayList<>();
-        if (game.isFoWMode()) {
-            buttons.add(draw1AC);
-            buttons.add(getCCs);
-            message2 = "Please resolve status homework";
-            for (Player p1 : game.getPlayers().values()) {
-                if (p1 == null || p1.isDummy() || p1.getFaction() == null || p1.getPrivateChannel() == null) {
-                } else {
-                    MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), message2, buttons);
-
-                }
-            }
-            buttons = new ArrayList<>();
-            buttons.add(passOnAbilities);
-        } else {
-
-            buttons.add(draw1AC);
-            buttons.add(getCCs);
-            buttons.add(passOnAbilities);
-            if (yssarilPolicy != null) {
-                buttons.add(yssarilPolicy);
-            }
+        buttons.add(draw1AC);
+        buttons.add(getCCs);
+        buttons.add(passOnAbilities);
+        if (yssarilPolicy != null) {
+            buttons.add(yssarilPolicy);
         }
-        // if (game.getActionCards().size() > 130 &&
-        // game.getPlayerFromColorOrFaction("hacan") != null
-        // &&
-        // getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"),
-        // game, false).size() > 0) {
-        // buttons.add(Button.secondary("getSwapButtons_", "Swap"));
-        // }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
     }
 
