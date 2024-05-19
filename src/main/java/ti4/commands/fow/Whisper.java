@@ -86,6 +86,9 @@ public class Whisper extends FOWSubcommandData {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
+            if (!player.getNeighbouringPlayers().contains(player_)) {
+              MessageHelper.sendMessageToChannel(feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
+            }
         } else {
             String fail = "Could not notify receiving player.";
             String success;
