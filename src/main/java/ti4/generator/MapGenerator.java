@@ -731,6 +731,7 @@ public class MapGenerator {
                     }
                 }
 
+                // Status
                 String activePlayerID = game.getActivePlayerID();
                 String phase = game.getCurrentPhase();
                 if (player.isPassed()) {
@@ -742,36 +743,31 @@ public class MapGenerator {
                     graphics.setColor(new Color(50, 230, 80));
                     graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
                 }
-                String needToMsg = "Needs To Follow: ";
-                List<Integer> unfollowedSCs = new ArrayList<>();
-                for (int sc : game.getPlayedSCsInOrder(player, game)) {
-                    if (!player.hasFollowedSC(sc)) {
-                        unfollowedSCs.add(sc);
-                        needToMsg = needToMsg + sc + " ";
-                    }
 
-                }
-                if (unfollowedSCs.size() > 0) {
+                // Unfollowed SCs
+                if (!player.getUnfollowedSCs().isEmpty()) {
+                    int xSpacer = 20;
                     graphics.setFont(Storage.getFont20());
-                    graphics.setColor(Color.red);
-                    graphics.drawString(needToMsg, x + 9, y + 125 + yDelta);
-                    // int xSpacer = 20;
-                    // for (int sc : unfollowedSCs) {
-                    //     graphics.setColor(getSCColor(sc, game));
-                    //     graphics.drawString("" + sc + " ", x + 9 + xSpacer + 145, y + 125 + yDelta);
-                    //     xSpacer = xSpacer + 20;
-                    //     if (sc > 9) {
-                    //         xSpacer = xSpacer + 10;
-                    //     }
-                    // }
+                    graphics.setColor(Color.RED);
+                    graphics.drawString("Needs to Follow: ", x + 9, y + 125 + yDelta);
+                    for (int sc : player.getUnfollowedSCs()) {
+                        graphics.setColor(getSCColor(sc, game, true));
+                        String drawText = String.valueOf(sc);
+                        int len = graphics.getFontMetrics().stringWidth(drawText);
+                        graphics.drawString(drawText, x + 9 + xSpacer + 145, y + 125 + yDelta);
+                        xSpacer += len + 8;
+                    }
                 }
 
+                // CCs
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
-                String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+                String ccCount = player.getCCRepresentation();
                 x += 120;
                 graphics.drawString(ccCount, x + 40, y + deltaY + 40);
+                graphics.drawString("T/F/S", x + 40, y + deltaY);
 
+                // Additional FS
                 int additionalFleetSupply = 0;
                 if (player.hasAbility("edict")) {
                     additionalFleetSupply += player.getMahactCC().size();
@@ -782,8 +778,8 @@ public class MapGenerator {
                 if (additionalFleetSupply > 0) {
                     graphics.drawString("+" + additionalFleetSupply + " FS", x + 40, y + deltaY + 70);
                 }
-                graphics.drawString("T/F/S", x + 40, y + deltaY);
 
+                // Cards
                 String acImage = "pa_cardbacks_ac.png";
                 String soImage = "pa_cardbacks_so.png";
                 String pnImage = "pa_cardbacks_pn.png";
@@ -812,6 +808,7 @@ public class MapGenerator {
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
 
+                // Fragments
                 int urf = player.getUrf();
                 int irf = player.getIrf();
                 String urfImage = "pa_fragment_urf.png";
@@ -837,6 +834,7 @@ public class MapGenerator {
                 y += 85;
                 y += 200;
 
+                // Secret Objectives
                 int soCount = objectivesSO(yPlayArea + 165, player);
 
                 int xDeltaSecondRow = xDelta;
@@ -2738,16 +2736,12 @@ public class MapGenerator {
 
             String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
             if (playerStatsAnchor != null) {
-                String anchorProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount,
-                    playerStatsAnchor);
-                Point anchorProjectedPoint = PositionMapper.getTilePosition(anchorProjectedOnOutsideRing);
+                // String anchorProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
+                Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
                 if (anchorProjectedPoint != null) {
-                    Point playerStatsAnchorPoint = getTilePosition(anchorProjectedOnOutsideRing, anchorProjectedPoint.x,
-                        anchorProjectedPoint.y);
-                    int anchorLocationIndex = PositionMapper
-                        .getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
-                    boolean isCorner = anchorProjectedOnOutsideRing
-                        .equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
+                    Point playerStatsAnchorPoint = getTilePosition(playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y);
+                    int anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
+                    boolean isCorner = playerStatsAnchor.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
                     if (anchorLocationIndex == 0 && isCorner) { // North Corner
                         deltaX = playerStatsAnchorPoint.x + EXTRA_X + 80;
                         deltaY = playerStatsAnchorPoint.y - 80;
@@ -3260,8 +3254,6 @@ public class MapGenerator {
         Integer objectiveWorth,
         Map<String, Integer> customPublicVP) {
 
-        System.out.println("x:" + x + " y:" + y);
-
         Set<String> keysToRemove = new HashSet<>();
         int objectiveBoxHeight = 38;
         int spacingBetweenBoxes = 5;
@@ -3374,7 +3366,7 @@ public class MapGenerator {
         int boxWidth,
         List<String> unrevealedPublicObjectives,
         Integer objectiveWorth,
-        Game activeGame) {
+        Game game) {
 
         Integer index = 1;
 
@@ -3382,7 +3374,7 @@ public class MapGenerator {
 
             String name = Mapper.getPublicObjective(unRevealed).getName();
 
-            if (activeGame.isRedTapeMode()) {
+            if (game.isRedTapeMode()) {
                 graphics.drawString(String.format("(%d) <Unrevealed> %s - %d VP", index, name, objectiveWorth), x, y + 23);
             } else {
                 graphics.drawString(String.format("(%d) <Unrevealed> - %d VP", index, objectiveWorth), x, y + 23);
@@ -3390,14 +3382,14 @@ public class MapGenerator {
 
             graphics.drawRect(x - 4, y - 5, boxWidth, 38);
 
-            if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed) || activeGame.getPublicObjectives2Peeked().containsKey(unRevealed)) {
+            if (game.getPublicObjectives1Peeked().containsKey(unRevealed) || game.getPublicObjectives2Peeked().containsKey(unRevealed)) {
                 List<String> playerIDs;
-                if (activeGame.getPublicObjectives1Peeked().containsKey(unRevealed)) {
-                    playerIDs = activeGame.getPublicObjectives1Peeked().get(unRevealed);
+                if (game.getPublicObjectives1Peeked().containsKey(unRevealed)) {
+                    playerIDs = game.getPublicObjectives1Peeked().get(unRevealed);
                 } else {
-                    playerIDs = activeGame.getPublicObjectives2Peeked().get(unRevealed);
+                    playerIDs = game.getPublicObjectives2Peeked().get(unRevealed);
                 }
-                drawPeekedMarkers(x + 515, y, activeGame.getPlayers(), playerIDs);
+                drawPeekedMarkers(x + 515, y, game.getPlayers(), playerIDs);
             }
 
             y += 43;
@@ -3520,8 +3512,12 @@ public class MapGenerator {
     }
 
     private Color getSCColor(Integer sc, Game game) {
+        return getSCColor(sc, game, false);
+    }
+
+    private Color getSCColor(Integer sc, Game game, boolean ignorePlayed) {
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
-        if (scPlayed.get(sc) != null && scPlayed.get(sc)) {
+        if (!ignorePlayed && scPlayed.get(sc) != null && scPlayed.get(sc)) {
             return Color.GRAY;
         }
 
@@ -4010,7 +4006,7 @@ public class MapGenerator {
     }
 
     private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder,
-        Function<String, Boolean> isValid, Game activeGame) {
+        Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
@@ -4023,8 +4019,8 @@ public class MapGenerator {
             }
             return o1.compareTo(o2);
         });
-        if (activeGame.getShowBubbles() && unitHolder instanceof Planet planetHolder
-            && shouldPlanetHaveShield(unitHolder, activeGame)) {
+        if (game.getShowBubbles() && unitHolder instanceof Planet planetHolder
+            && shouldPlanetHaveShield(unitHolder, game)) {
             String tokenPath;
             switch (planetHolder.getContrastColor()) {
                 case "orange":
@@ -4088,18 +4084,18 @@ public class MapGenerator {
 
     }
 
-    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game activeGame) {
+    private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
 
         Map<UnitKey, Integer> units = unitHolder.getUnits();
 
-        if (activeGame.getLaws().containsKey("conventions")) {
+        if (game.getLaws().containsKey("conventions")) {
             String planet = unitHolder.getName();
-            if (ButtonHelper.getTypeOfPlanet(activeGame, planet).contains("cultural")) {
+            if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                 return true;
             }
         }
         Map<UnitKey, Integer> planetUnits = new HashMap<>(units);
-        for (Player player : activeGame.getRealPlayers()) {
+        for (Player player : game.getRealPlayers()) {
             for (Map.Entry<UnitKey, Integer> unitEntry : planetUnits.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey))

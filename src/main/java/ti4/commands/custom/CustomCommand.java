@@ -37,7 +37,7 @@ public class CustomCommand implements Command {
             Game userActiveGame = gameManager.getUserActiveGame(userID);
             if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
                 MessageHelper.replyToMessage(event,
-                        "You're not a player of the game, please call function /join gameName");
+                    "You're not a player of the game, please call function /join gameName");
                 return false;
             }
             return true;
@@ -66,8 +66,8 @@ public class CustomCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     protected String getActionDescription() {
@@ -95,7 +95,7 @@ public class CustomCommand implements Command {
         subcommands.add(new SwapStage2());
         subcommands.add(new RevealSpecificStage1());
         subcommands.add(new RevealSpecificStage2());
-        subcommands.add(new SpinTilesInFirstThreeRings());
+        subcommands.add(new SpinTilesInRings());
         subcommands.add(new OfferAutoPassOptions());
         subcommands.add(new OfferAFKTimeOptions());
         subcommands.add(new ChangeToBaseGame());
@@ -106,7 +106,7 @@ public class CustomCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

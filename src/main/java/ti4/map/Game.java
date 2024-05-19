@@ -1019,7 +1019,7 @@ public class Game {
             .collect(Collectors.toSet());
     }
 
-    public List<Integer> getPlayedSCsInOrder(Player player, Game activeGame) {
+    public List<Integer> getPlayedSCsInOrder(Player player) {
         Set<Integer> playedSCs = getPlayedSCs();
 
         List<Integer> orderedSCsBasic = new ArrayList<>(playedSCs);
@@ -1027,7 +1027,7 @@ public class Game {
         List<Integer> orderedSCs = new ArrayList<>();
         int playerSC = player.getLowestSC();
         String scText = playerSC + "";
-        if (!scText.equalsIgnoreCase(activeGame.getSCNumberIfNaaluInPlay(player, scText))) {
+        if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
         }
         for (int sc : orderedSCsBasic) {

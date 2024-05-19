@@ -38,31 +38,31 @@ public class ScorePublic extends StatusSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveGame();
+		Game game = getActiveGame();
 		OptionMapping option = event.getOption(Constants.PO_ID);
 		if (option == null) {
 			MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to score");
 			return;
 		}
 
-		Player player = activeGame.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeGame, player, event, null);
-		player = Helper.getPlayer(activeGame, player, event);
+		Player player = game.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(game, player, event, null);
+		player = Helper.getPlayer(game, player, event);
 		if (player == null) {
 			MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
 			return;
 		}
 
 		int poID = option.getAsInt();
-		scorePO(event, event.getChannel(), activeGame, player, poID);
+		scorePO(event, event.getChannel(), game, player, poID);
 	}
 
-	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game activeGame,
+	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game game,
 		Player player, int poID) {
-		String both = getNameNEMoji(activeGame, poID);
+		String both = getNameNEMoji(game, poID);
 		String poName = both.split("_")[0];
 		String id = "";
-		Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
+		Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
 		for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
 			if (po.getValue().equals(poID)) {
 				id = po.getKey();
@@ -71,9 +71,9 @@ public class ScorePublic extends StatusSubcommandData {
 		}
 		if (Mapper.getPublicObjective(id) != null && event instanceof ButtonInteractionEvent) {
 			int threshold = ListPlayerInfoButton.getObjectiveThreshold(id);
-			int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(id, activeGame, player);
+			int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player);
 			if (playerProgress < threshold) {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
 						+ poName + ", The bot has you at " + playerProgress + "/" + threshold
 						+ ". If this is a mistake, please report and then you can manually score via /status po_score with the number ID of "
@@ -81,30 +81,30 @@ public class ScorePublic extends StatusSubcommandData {
 				return;
 			}
 		}
-		boolean scored = activeGame.scorePublicObjective(player.getUserID(), poID);
+		boolean scored = game.scorePublicObjective(player.getUserID(), poID);
 		if (!scored) {
 			MessageHelper.sendMessageToChannel(channel,
 				player.getFactionEmoji() + "No such Public Objective ID found or already scored, please retry");
 		} else {
-			informAboutScoring(event, channel, activeGame, player, poID);
+			informAboutScoring(event, channel, game, player, poID);
 			for (Player p2 : player.getNeighbouringPlayers()) {
 				if (p2.hasLeaderUnlocked("syndicatecommander")) {
 					p2.setTg(p2.getTg() + 1);
 					String msg = p2.getRepresentation(true, true)
 						+ " you gained 1tg due to your neighbor scoring a PO while you have syndicate commander. Your tgs went from "
 						+ (p2.getTg() - 1) + " -> " + p2.getTg();
-					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg);
-					ButtonHelperAbilities.pillageCheck(p2, activeGame);
-					ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg);
+					ButtonHelperAbilities.pillageCheck(p2, game);
+					ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
 				}
 			}
 		}
-		Helper.checkEndGame(activeGame, player);
+		Helper.checkEndGame(game, player);
 	}
 
-	public static String getNameNEMoji(Game activeGame, int poID) {
+	public static String getNameNEMoji(Game game, int poID) {
 		String id = "";
-		Map<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
+		Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
 		for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
 			if (po.getValue().equals(poID)) {
 				id = po.getKey();
@@ -127,18 +127,18 @@ public class ScorePublic extends StatusSubcommandData {
 		return poName + "_" + emojiName;
 	}
 
-	public static void informAboutScoring(GenericInteractionCreateEvent event, MessageChannel channel, Game activeGame,
+	public static void informAboutScoring(GenericInteractionCreateEvent event, MessageChannel channel, Game game,
 		Player player, int poID) {
-		String both = getNameNEMoji(activeGame, poID);
+		String both = getNameNEMoji(game, poID);
 		String poName = both.split("_")[0];
 		String emojiName = both.split("_")[1];
 
 		String message = player.getRepresentation() + " scored " + emojiName + " __**" + poName + "**__";
 		MessageHelper.sendMessageToChannel(channel, message);
-		if (activeGame.isFoWMode()) {
-			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message);
+		if (game.isFoWMode()) {
+			FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 		}
-		Helper.checkIfHeroUnlocked(event, activeGame, player);
+		Helper.checkIfHeroUnlocked(event, game, player);
 		if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument")
 			|| poName.toLowerCase().contains("found a golden age")
 			|| poName.toLowerCase().contains("amass wealth")
@@ -146,21 +146,21 @@ public class ScorePublic extends StatusSubcommandData {
 			|| poName.toLowerCase().contains("hold vast reserves")) {
 			String message2 = player.getRepresentation(true, true)
 				+ " Click the names of the planets you wish to exhaust to score the objective.";
-			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, "both");
+			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
 			Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
 			buttons.add(DoneExhausting);
-			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message2,
+			MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2,
 				buttons);
 		}
 		if (poName.contains("Negotiate Trade Routes")) {
 			int oldtg = player.getTg();
 			if (oldtg > 4) {
 				player.setTg(oldtg - 5);
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					player.getRepresentation() + " Automatically deducted 5tg (" + oldtg + "->" + player.getTg()
 						+ ")");
 			} else {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					"Did not deduct 5tg because you didn't have that");
 			}
 		}
@@ -168,11 +168,11 @@ public class ScorePublic extends StatusSubcommandData {
 			int oldtg = player.getTg();
 			if (oldtg > 9) {
 				player.setTg(oldtg - 10);
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					player.getRepresentation() + " Automatically deducted 10tg (" + oldtg + "->" + player.getTg()
 						+ ")");
 			} else {
-				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 					"Did not deduct 10tg because you didn't have that");
 			}
 		}
@@ -182,7 +182,7 @@ public class ScorePublic extends StatusSubcommandData {
 			if (currentStrat + currentTact > 2) {
 				if (currentStrat > 2) {
 					for (int x = 0; x < 3; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public1 + " Lead from the Front");
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public1 + " Lead from the Front");
 					}
 					player.setStrategicCC(currentStrat - 3);
 					MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 3 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
@@ -190,7 +190,7 @@ public class ScorePublic extends StatusSubcommandData {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 3 - currentStrat;
 					for (int x = 0; x < currentStrat; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public1 + " Lead from the Front");
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public1 + " Lead from the Front");
 					}
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
@@ -207,7 +207,7 @@ public class ScorePublic extends StatusSubcommandData {
 			if (currentStrat + currentTact > 5) {
 				if (currentStrat > 5) {
 					for (int x = 0; x < 6; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public2 + " Galvanize the People");
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public2 + " Galvanize the People");
 					}
 					player.setStrategicCC(currentStrat - 6);
 					MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Automatically deducted 6 strategy CCs (" + currentStrat + "->" + player.getStrategicCC() + ")");
@@ -215,7 +215,7 @@ public class ScorePublic extends StatusSubcommandData {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 6 - currentStrat;
 					for (int x = 0; x < currentStrat; x++) {
-						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event, "Scored " + Emojis.Public2 + " Galvanize the People");
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + Emojis.Public2 + " Galvanize the People");
 					}
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
@@ -231,7 +231,7 @@ public class ScorePublic extends StatusSubcommandData {
 	@Override
 	public void reply(SlashCommandInteractionEvent event) {
 		String userID = event.getUser().getId();
-		Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-		GameSaveLoadManager.saveMap(activeGame, event);
+		Game game = GameManager.getInstance().getUserActiveGame(userID);
+		GameSaveLoadManager.saveMap(game, event);
 	}
 }

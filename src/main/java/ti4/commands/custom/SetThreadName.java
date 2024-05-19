@@ -18,7 +18,7 @@ public class SetThreadName extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping soOption = event.getOption(Constants.THREAD_NAME);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Thread Name");
@@ -27,12 +27,12 @@ public class SetThreadName extends CustomSubcommandData {
         String name = soOption.getAsString();
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
-            if(activeGame != null){
-                manager.setName(activeGame.getName()+"-"+name).queue();
-            }else{
+            if (game != null) {
+                manager.setName(game.getName() + "-" + name).queue();
+            } else {
                 manager.setName(name).queue();
             }
-        }else{
+        } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Run this command in the thread you are changing");
         }
 

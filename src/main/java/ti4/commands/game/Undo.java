@@ -33,12 +33,12 @@ public class Undo extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         GameManager gameManager = GameManager.getInstance();
-        Game activeGame = gameManager.getUserActiveGame(event.getUser().getId());
-        if (activeGame == null) {
+        Game game = gameManager.getUserActiveGame(event.getUser().getId());
+        if (game == null) {
             MessageHelper.replyToMessage(event, "Must set active Game");
             return;
         }
-        if (!event.getChannel().getName().startsWith(activeGame.getName() + "-")) {
+        if (!event.getChannel().getName().startsWith(game.getName() + "-")) {
             MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
             return;
         }
@@ -56,23 +56,23 @@ public class Undo extends GameSubcommandData {
         }
         if (gameToUndoBackTo.toLowerCase().contains("fog of war")) {
             MessageHelper.replyToMessage(event, "Game is Fog of War - limited to a single undo at a time.");
-            GameSaveLoadManager.undo(activeGame, event);
+            GameSaveLoadManager.undo(game, event);
             return;
         }
-        if (!gameToUndoBackTo.contains(activeGame.getName())) {
+        if (!gameToUndoBackTo.contains(game.getName())) {
             MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
             return;
         }
-        String intToUndoBackTo = gameToUndoBackTo.replace(activeGame.getName() + "_", "").replace(".txt", "");
+        String intToUndoBackTo = gameToUndoBackTo.replace(game.getName() + "_", "").replace(".txt", "");
 
         Integer gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo)
             + 1;
 
-        Map<String, Game> undoFiles = getAllUndoSavedGames(activeGame);
-        Integer maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(activeGame.getName() + "_", "").replace(".txt", ""))
+        Map<String, Game> undoFiles = getAllUndoSavedGames(game);
+        Integer maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(game.getName() + "_", "").replace(".txt", ""))
             .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
 
-        String undoFileToRestorePath = activeGame.getName() + "_" + gameToUndoBackToNumber + ".txt";
+        String undoFileToRestorePath = game.getName() + "_" + gameToUndoBackToNumber + ".txt";
         File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
         if (!undoFileToRestore.exists()) {
             MessageHelper.replyToMessage(event,
@@ -89,7 +89,7 @@ public class Undo extends GameSubcommandData {
         StringBuilder sb = new StringBuilder(
             "Undoing Save #" + maxSaveNumber + " back to Save #" + gameToUndoBackToNumber + ":\n");
         for (int i = maxSaveNumber; i >= gameToUndoBackToNumber; i--) {
-            String undoFile = activeGame.getName() + "_" + i + ".txt";
+            String undoFile = game.getName() + "_" + i + ".txt";
             File undoFileToBeDeleted = new File(Storage.getMapUndoDirectory(), undoFile);
             if (undoFileToBeDeleted.exists()) {
                 sb.append("> `").append(i).append("` ")
@@ -97,21 +97,21 @@ public class Undo extends GameSubcommandData {
                 undoFileToBeDeleted.delete();
             }
         }
-        if (activeGame.isFoWMode()) {
+        if (game.isFoWMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         } else {
-            ButtonHelper.findOrCreateThreadWithMessage(activeGame, activeGame.getName() + "-undo-log", sb.toString());
+            ButtonHelper.findOrCreateThreadWithMessage(game, game.getName() + "-undo-log", sb.toString());
         }
         // MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
-        GameManager.getInstance().deleteGame(activeGame.getName());
+        GameManager.getInstance().deleteGame(game.getName());
         GameManager.getInstance().addGame(gameToRestore);
         GameSaveLoadManager.undo(gameToRestore, event);
     }
 
-    public static Map<String, Game> getAllUndoSavedGames(Game activeGame) {
+    public static Map<String, Game> getAllUndoSavedGames(Game game) {
         File mapUndoDirectory = Storage.getMapUndoDirectory();
-        String mapName = activeGame.getName();
+        String mapName = game.getName();
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getMapUndoStorage)

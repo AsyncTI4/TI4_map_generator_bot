@@ -41,7 +41,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
     }
 
     public static void offerInfoButtons(ButtonInteractionEvent event) {
@@ -65,7 +65,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         // event.getMessage().delete().queue();
     }
 
-    public static void resolveOfferInfoButtonStep2(ButtonInteractionEvent event, String buttonID, Game activeGame) {
+    public static void resolveOfferInfoButtonStep2(ButtonInteractionEvent event, String buttonID, Game game) {
         String category = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         String msg = "";
@@ -74,7 +74,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             buttons.add(Button.primary("showObjInfo_1", "All Stage 1s Possible"));
             buttons.add(Button.primary("showObjInfo_2", "All Stage 2s Possible"));
         } else {
-            for (Player p2 : activeGame.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayers()) {
                 Button button = Button.secondary("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
@@ -87,17 +87,17 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         // event.getMessage().delete().queue();
     }
 
-    public static void resolveOfferInfoButtonStep3(ButtonInteractionEvent event, String buttonID, Game activeGame,
+    public static void resolveOfferInfoButtonStep3(ButtonInteractionEvent event, String buttonID, Game game,
         Player player) {
         String category = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         if (faction.equalsIgnoreCase("all")) {
-            for (Player p2 : activeGame.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayers()) {
                 switch (category) {
                     case "allFaction" -> {
-                        sb.append(new Stats().getPlayersCurrentStatsText(p2, activeGame));
+                        sb.append(new Stats().getPlayersCurrentStatsText(p2, game));
                         for (String ability : p2.getAbilities()) {
                             messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                         }
@@ -116,7 +116,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                             messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
                         }
                         for (String planet : p2.getPlanets()) {
-                            sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, activeGame)
+                            sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
                                 + "\n");
                         }
                         for (String tech : p2.getTechs()) {
@@ -134,7 +134,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         }
                     }
                     case "stats" -> {
-                        sb.append(new Stats().getPlayersCurrentStatsText(p2, activeGame));
+                        sb.append(new Stats().getPlayersCurrentStatsText(p2, game));
                     }
                     case "relic" -> {
                         for (String relic : p2.getRelics()) {
@@ -153,7 +153,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     }
                     case "planet" -> {
                         for (String planet : p2.getPlanets()) {
-                            sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, activeGame)
+                            sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
                                 + "\n");
                         }
                     }
@@ -181,10 +181,10 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
             }
         } else {
-            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
             switch (category) {
                 case "allFaction" -> {
-                    sb.append(new Stats().getPlayersCurrentStatsText(p2, activeGame));
+                    sb.append(new Stats().getPlayersCurrentStatsText(p2, game));
                     for (String ability : p2.getAbilities()) {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
@@ -203,7 +203,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
                     }
                     for (String planet : p2.getPlanets()) {
-                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, activeGame)
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
                             + "\n");
                     }
                     for (String tech : p2.getTechs()) {
@@ -221,7 +221,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     }
                 }
                 case "stats" -> {
-                    sb.append(new Stats().getPlayersCurrentStatsText(p2, activeGame));
+                    sb.append(new Stats().getPlayersCurrentStatsText(p2, game));
                 }
                 case "relic" -> {
                     for (String relic : p2.getRelics()) {
@@ -240,7 +240,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
                 case "planet" -> {
                     for (String planet : p2.getPlanets()) {
-                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, activeGame)
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
                             + "\n");
                     }
                 }
@@ -272,13 +272,13 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         event.getMessage().delete().queue();
     }
 
-    public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game activeGame) {
+    public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game game) {
 
         String extent = buttonID.split("_")[1];
         if (extent.equalsIgnoreCase("both")) {
-            ListPlayerInfoButton.displayerScoringProgression(activeGame, true, event, "both");
+            ListPlayerInfoButton.displayerScoringProgression(game, true, event, "both");
         } else {
-            ListPlayerInfoButton.displayerScoringProgression(activeGame, false, event, extent);
+            ListPlayerInfoButton.displayerScoringProgression(game, false, event, extent);
             event.getMessage().delete().queue();
         }
     }
@@ -410,14 +410,14 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         return 0;
     }
 
-    public static void displayerScoringProgression(Game activeGame, boolean onlyThisGameObj,
+    public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,
         GenericInteractionCreateEvent event, String stage1sOrTwos) {
         String msg = "";
         int x = 1;
         if (onlyThisGameObj) {
-            for (String id : activeGame.getRevealedPublicObjectives().keySet()) {
+            for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
-                    msg = msg + representScoring(activeGame, id, x) + "\n";
+                    msg = msg + representScoring(game, id, x) + "\n";
                     x++;
                 }
             }
@@ -427,7 +427,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     || Mapper.getPublicObjective(id).getSource() == ComponentSource.base) {
                     if (stage1sOrTwos.equalsIgnoreCase("" + Mapper.getPublicObjective(id).getPoints())
                         || stage1sOrTwos.equalsIgnoreCase("both")) {
-                        msg = msg + representScoring(activeGame, id, x) + "\n";
+                        msg = msg + representScoring(game, id, x) + "\n";
                         x++;
                     }
 
@@ -437,7 +437,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
-    public static String representScoring(Game activeGame, String objID, int x) {
+    public static String representScoring(Game game, String objID, int x) {
         String representation = "";
         PublicObjectiveModel model = Mapper.getPublicObjective(objID);
         if (x > 0) {
@@ -445,14 +445,14 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         } else {
             representation = model.getRepresentation() + "\n> ";
         }
-        if (!activeGame.isFoWMode()) {
-            for (Player player : activeGame.getRealPlayers()) {
+        if (!game.isFoWMode()) {
+            for (Player player : game.getRealPlayers()) {
                 representation = representation + player.getFactionEmoji() + ": ";
-                if (activeGame.getRevealedPublicObjectives().containsKey(objID)
-                    && activeGame.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                if (game.getRevealedPublicObjectives().containsKey(objID)
+                    && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
                     representation = representation + "✅  ";
                 } else {
-                    representation = representation + getPlayerProgressOnObjective(objID, activeGame, player) + "/"
+                    representation = representation + getPlayerProgressOnObjective(objID, game, player) + "/"
                         + getObjectiveThreshold(objID) + "  ";
                 }
             }
@@ -460,7 +460,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         return representation;
     }
 
-    public static int getPlayerProgressOnObjective(String objID, Game activeGame, Player player) {
+    public static int getPlayerProgressOnObjective(String objID, Game game, Player player) {
         int comms = 0;
         if (player.hasUnexhaustedLeader("keleresagent")) {
             comms = player.getCommodities();
@@ -477,9 +477,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "outer_rim", "control_borderlands" -> {
                 int edge = 0;
-                for (Tile tile : activeGame.getTileMap().values()) {
-                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(activeGame)
-                        && tile != FoWHelper.getPlayerHS(activeGame, player)) {
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(game)
+                        && tile != player.getHomeSystemTile()) {
                         edge++;
                     }
                 }
@@ -487,9 +487,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "make_history", "become_legend" -> {
                 int counter = 0;
-                for (Tile tile : activeGame.getTileMap().values()) {
+                for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && (tile.getTileID().equalsIgnoreCase("18")
-                        || tile.isAnomaly(activeGame) || ButtonHelper.isTileLegendary(tile, activeGame))) {
+                        || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile, game))) {
                         counter++;
                     }
                 }
@@ -498,22 +498,22 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
                 for (String planet : player.getPlanets()) {
-                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-                    if (uH != null && activeGame.getTileFromPlanet(planet) != FoWHelper.getPlayerHS(activeGame, player)
+                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
                         && (uH.getUnitCount(UnitType.Spacedock, player) > 0
                             || uH.getUnitCount(UnitType.Pds, player) > 0)) {
                         counter++;
                     }
                 }
                 if (player.hasAbility("privileged_citizenry")) {
-                    counter = counter + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "pds", false);
+                    counter = counter + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
                 return counter;
             }
             case "corner", "unify_colonies" -> {
-                int max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, activeGame, "industrial"),
-                    ButtonHelper.getNumberOfXTypePlanets(player, activeGame, "cultural"));
-                max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, activeGame, "hazardous"), max);
+                int max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial"),
+                    ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural"));
+                max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous"), max);
                 return max;
             }
             case "develop", "revolutionize" -> {
@@ -536,7 +536,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return numAbove1;
             }
             case "monument", "golden_age" -> {
-                int x = Helper.getPlayerResourcesAvailable(player, activeGame) + player.getTg() + comms;
+                int x = Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
                     x = x + player.getTg() + comms;
                 }
@@ -545,7 +545,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "expand_borders", "subdue" -> {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
-                    Tile tile = activeGame.getTileFromPlanet(planet);
+                    Tile tile = game.getTileFromPlanet(planet);
                     if (tile != null && (!tile.isHomeSystem() || tile.getTileID().equalsIgnoreCase("17"))) {
                         count++;
                     }
@@ -555,7 +555,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "research_outposts", "brain_trust" -> {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
-                    if (ButtonHelper.checkForTechSkips(activeGame, planet)) {
+                    if (ButtonHelper.checkForTechSkips(game, planet)) {
                         count++;
                     }
                 }
@@ -563,13 +563,13 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "intimidate" -> {
                 int count = 0;
-                Tile tile = activeGame.getTileFromPlanet("mr");
+                Tile tile = game.getTileFromPlanet("mr");
                 if (tile == null) {
                     return 2;
                 }
-                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player,
+                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player,
                     false)) {
-                    Tile tile2 = activeGame.getTileByPosition(pos);
+                    Tile tile2 = game.getTileByPosition(pos);
                     if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
                         count++;
                     }
@@ -585,21 +585,21 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "amass_wealth" -> {
                 int forTG = Math.min(3, player.getTg() + comms);
                 int leftOverTg = player.getTg() + comms - forTG;
-                int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, activeGame));
-                int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, activeGame));
+                int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, game));
+                int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, game));
                 if (player.hasTech("mc")) {
                     leftOverTg = leftOverTg * 2;
                 }
                 return forTG + leftOverTg + forInfluence + forResources;
             }
             case "build_defenses", "massive_cities" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "pds", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd", false);
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments" -> {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
-                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && uH instanceof Planet plan) {
                         if (plan.hasAttachment()) {
                             count++;
@@ -609,24 +609,24 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return count;
             }
             case "engineer_marvel" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "fs", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "lady", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "warsun", false);
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fs", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
             }
             case "deep_space", "vast_territories" -> {
-                return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(activeGame, player);
+                return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player);
             }
             case "raise_fleet", "command_armada" -> {
                 int x = 0;
-                for (Tile tile : activeGame.getTileMap().values()) {
+                for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                        x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, activeGame, tile));
+                        x = Math.max(x, ButtonHelper.checkNumberNonFighterShips(player, game, tile));
                     }
                 }
                 return x;
             }
             case "sway_council", "manipulate_law" -> {
-                int x = Helper.getPlayerInfluenceAvailable(player, activeGame) + player.getTg() + comms;
+                int x = Helper.getPlayerInfluenceAvailable(player, game) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
                     x = x + player.getTg() + comms;
                 }
@@ -635,8 +635,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "conquer" -> {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
-                    Tile tile = activeGame.getTileFromPlanet(planet);
-                    if (tile != null && tile.isHomeSystem() && tile != FoWHelper.getPlayerHS(activeGame, player)) {
+                    Tile tile = game.getTileFromPlanet(planet);
+                    if (tile != null && tile.isHomeSystem() && tile != player.getHomeSystemTile()) {
                         count++;
                     }
                 }
@@ -644,9 +644,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "supremacy" -> {
                 int count = 0;
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship,
+                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship,
                     UnitType.Warsun, UnitType.Lady)) {
-                    if ((tile.isHomeSystem() && tile != FoWHelper.getPlayerHS(activeGame, player))
+                    if ((tile.isHomeSystem() && tile != player.getHomeSystemTile())
                         || tile.getTileID().equalsIgnoreCase("18")) {
                         count++;
                     }
@@ -656,8 +656,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "vast_reserves" -> {
                 int forTG = Math.min(6, player.getTg() + comms);
                 int leftOverTg = player.getTg() + comms - forTG;
-                int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, activeGame));
-                int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, activeGame));
+                int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, game));
+                int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, game));
                 if (player.hasTech("mc")) {
                     leftOverTg = leftOverTg * 2;
                 }
@@ -665,17 +665,17 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "distant_lands" -> {
                 int count = 0;
-                for (Player p2 : activeGame.getRealPlayers()) {
+                for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
                     }
-                    Tile tile = FoWHelper.getPlayerHS(activeGame, p2);
+                    Tile tile = p2.getHomeSystemTile();
                     if (tile == null) {
                         continue;
                     }
-                    for (String pos : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player,
+                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
                         false)) {
-                        Tile tile2 = activeGame.getTileByPosition(pos);
+                        Tile tile2 = game.getTileByPosition(pos);
                         if (FoWHelper.playerHasPlanetsInSystem(player, tile2)) {
                             count++;
                             break;

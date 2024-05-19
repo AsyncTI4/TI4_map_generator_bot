@@ -20,7 +20,6 @@ public class GameManager {
         return gameManager;
     }
 
-
     public Map<String, Game> getGameNameToGame() {
         return gameNameToGame;
     }
@@ -29,8 +28,8 @@ public class GameManager {
         this.gameNameToGame = gameNameToGame;
     }
 
-    public void addGame(Game activeGame) {
-        gameNameToGame.put(activeGame.getName(), activeGame);
+    public void addGame(Game game) {
+        gameNameToGame.put(game.getName(), game);
     }
 
     public Game getGame(String gameName) {

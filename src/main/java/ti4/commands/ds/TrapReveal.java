@@ -32,10 +32,10 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -45,7 +45,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
             return;
         }
         String planetName = planetOption.getAsString();
-        if (!activeGame.getPlanets().contains(planetName)) {
+        if (!game.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
@@ -67,16 +67,16 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                 stringTrapID = trapIDS;
             }
         }
-        revealTrapForPlanet(event, activeGame, planetName, stringTrapID, player, true);
+        revealTrapForPlanet(event, game, planetName, stringTrapID, player, true);
     }
 
-    public void revealTrapForPlanet(GenericInteractionCreateEvent event, Game activeGame, String planetName, String trap, Player player, boolean reveal) {
+    public void revealTrapForPlanet(GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player, boolean reveal) {
         if (player.getTrapCardsPlanets().containsValue(planetName) || planetName == null) {
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
                 String planet = entry.getValue();
                 if (planetName.equals(planet) || planet == null) {
-                    ButtonHelperAbilities.removeATrapToken(activeGame, planetName);
+                    ButtonHelperAbilities.removeATrapToken(game, planetName);
                     player.removeTrapCardPlanet(trap);
                     player.setTrapCard(trap);
                     Map<String, String> dsHandcards = Mapper.getDSHandcards();
@@ -94,33 +94,33 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
 
                         String sb = "__**" + "Trap: " + trapName + "**__" + " - " + trapText + "\n" +
                             "__**" + "Has been revealed on planet: " + representation + "**__";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                         if ("Minefields".equalsIgnoreCase(trapName)) {
-                            for (Player p2 : activeGame.getRealPlayers()) {
+                            for (Player p2 : game.getRealPlayers()) {
                                 if (p2 == player) {
                                     continue;
                                 }
-                                new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "2 inf " + planet, activeGame);
+                                new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "2 inf " + planet, game);
                             }
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Destroyed up to 2 enemy infantry from " + representation);
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
                         }
                         if ("Account Siphon".equalsIgnoreCase(trapName)) {
-                            for (Player p2 : activeGame.getRealPlayers()) {
+                            for (Player p2 : game.getRealPlayers()) {
                                 if (p2 == player) {
                                     continue;
                                 }
                                 if (p2.getPlanets().contains(planet)) {
                                     List<Button> buttons = new ArrayList<>();
-                                    buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2tg from " + ButtonHelper.getIdentOrColor(p2, activeGame)));
-                                    buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, activeGame)));
-                                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " use buttons to resolve",
+                                    buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2tg from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " use buttons to resolve",
                                         buttons);
                                 }
                             }
                         }
                     } else {
                         String sb = "A trap has been removed from planet: " + representation;
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                     }
 
                     return;
@@ -128,32 +128,32 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
             }
         } else {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " could not find a trap for the planet " + Helper.getPlanetRepresentation(planetName, activeGame));
+                player.getRepresentation(true, true) + " could not find a trap for the planet " + Helper.getPlanetRepresentation(planetName, game));
 
         }
     }
 
-    public void steal2Tg(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
-        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+    public void steal2Tg(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg() - count);
         player.setTg(player.getTg() + count);
         String msg1 = p2.getRepresentation(true, true) + " you had " + count + " tgs stolen by a trap";
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " tgs via trap";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg1);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg1);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         event.getMessage().delete().queue();
     }
 
-    public void steal3Comm(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
-        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+    public void steal3Comm(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int count = Math.min(p2.getCommodities(), 3);
         p2.setCommodities(p2.getCommodities() - count);
         player.setTg(player.getTg() + count);
         String msg1 = p2.getRepresentation(true, true) + " you had " + count + " comms stolen by a trap";
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " comms via trap";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg1);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg1);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         event.getMessage().delete().queue();
     }
 }

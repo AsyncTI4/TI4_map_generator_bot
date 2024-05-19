@@ -42,9 +42,9 @@ public class PlayAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -56,7 +56,7 @@ public class PlayAC extends ACCardsSubcommandData {
             return;
         }
 
-        String reply = playAC(event, activeGame, player, option.getAsString().toLowerCase(), event.getChannel(),
+        String reply = playAC(event, game, player, option.getAsString().toLowerCase(), event.getChannel(),
             event.getGuild());
         if (reply != null) {
             MessageHelper.sendMessageToEventChannel(event, reply);
@@ -366,7 +366,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Experimental Battlestation";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveEBSStep1",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(),
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
@@ -456,6 +456,24 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Unexpected Action";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveUnexpected",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Data Archive";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveDataArchive",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Ancient Trade Routes";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveAncientTradeRoutes",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Arms Deal";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveArmsDeal",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }

@@ -28,10 +28,10 @@ public class ReloadMap extends AdminSubcommandData {
 
                 return;
             }
-            Game activeGame = GameManager.getInstance().getGame(mapName);
-            GameSaveLoadManager.reload(activeGame);
-            activeGame = GameManager.getInstance().getGame(mapName);
-            ShowGame.simpleShowGame(activeGame, event);
+            Game game = GameManager.getInstance().getGame(mapName);
+            GameSaveLoadManager.reload(game);
+            game = GameManager.getInstance().getGame(mapName);
+            ShowGame.simpleShowGame(game, event);
 
         } else {
             MessageHelper.sendMessageToEventChannel(event, "No Game specified.");

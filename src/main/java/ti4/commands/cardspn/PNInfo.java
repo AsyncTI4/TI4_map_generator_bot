@@ -31,45 +31,45 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendPromissoryNoteInfo(activeGame, player, true, event);
+        sendPromissoryNoteInfo(game, player, true, event);
         MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }
 
-    public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
-        checkAndAddPNs(activeGame, player);
-        activeGame.checkPromissoryNotes();
+    public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
+        checkAndAddPNs(game, player);
+        game.checkPromissoryNotes();
         String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendPromissoryNoteInfo(activeGame, player, longFormat);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendPromissoryNoteInfo(game, player, longFormat);
     }
 
-    public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat) {
+    public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat) {
         MessageHelper.sendMessageToChannelWithButtons(
             player.getCardsInfoThread(),
-            getPromissoryNoteCardInfo(activeGame, player, longFormat, false),
-            getPNButtons(activeGame, player));
+            getPromissoryNoteCardInfo(game, player, longFormat, false),
+            getPNButtons(game, player));
     }
 
-    private static List<Button> getPNButtons(Game activeGame, Player player) {
+    private static List<Button> getPNButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
             if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
-            Player owner = activeGame.getPNOwner(pnShortHand);
+            Player owner = game.getPNOwner(pnShortHand);
             if (owner == player || pnShortHand.endsWith("_ta"))
                 continue;
 
             Button transact;
-            if (activeGame.isFoWMode()) {
+            if (game.isFoWMode()) {
                 transact = Button.success("resolvePNPlay_" + pnShortHand,
                     "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
@@ -81,7 +81,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         return buttons;
     }
 
-    public static String getPromissoryNoteCardInfo(Game activeGame, Player player, boolean longFormat, boolean excludePlayArea) {
+    public static String getPromissoryNoteCardInfo(Game game, Player player, boolean longFormat, boolean excludePlayArea) {
         StringBuilder sb = new StringBuilder();
 
         //PROMISSORY NOTES
@@ -96,7 +96,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
                 for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                     if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                         sb.append("> `").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                        sb.append(getPromissoryNoteRepresentation(activeGame, pn.getKey(), longFormat));
+                        sb.append(getPromissoryNoteRepresentation(game, pn.getKey(), longFormat));
                         index++;
                     }
                 }
@@ -111,7 +111,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
                             if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                                 sb.append("`").append(index).append(".");
                                 sb.append("(").append(pn.getValue()).append(")`");
-                                sb.append(getPromissoryNoteRepresentation(activeGame, pn.getKey(), longFormat));
+                                sb.append(getPromissoryNoteRepresentation(game, pn.getKey(), longFormat));
                                 index++;
                             }
                         }
@@ -122,15 +122,15 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    public static String getPromissoryNoteRepresentation(Game activeGame, String pnID) {
-        return getPromissoryNoteRepresentation(activeGame, pnID, null, true);
+    public static String getPromissoryNoteRepresentation(Game game, String pnID) {
+        return getPromissoryNoteRepresentation(game, pnID, null, true);
     }
 
-    public static String getPromissoryNoteRepresentation(Game activeGame, String pnID, boolean longFormat) {
-        return getPromissoryNoteRepresentation(activeGame, pnID, null, longFormat);
+    public static String getPromissoryNoteRepresentation(Game game, String pnID, boolean longFormat) {
+        return getPromissoryNoteRepresentation(game, pnID, null, longFormat);
     }
 
-    private static String getPromissoryNoteRepresentation(Game activeGame, String pnID, Integer pnUniqueID, boolean longFormat) {
+    private static String getPromissoryNoteRepresentation(Game game, String pnID, Integer pnUniqueID, boolean longFormat) {
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
         if (pnModel == null) {
             String error = "Could not find representation for PN ID: " + pnID;
@@ -147,9 +147,9 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         sb.append("   ");
 
         String pnText = pnModel.getText();
-        Player pnOwner = activeGame.getPNOwner(pnID);
+        Player pnOwner = game.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
-            if (!activeGame.isFoWMode()) sb.append(pnOwner.getFactionEmoji());
+            if (!game.isFoWMode()) sb.append(pnOwner.getFactionEmoji());
             sb.append(Emojis.getColorEmojiWithName(pnOwner.getColor()));
             pnText = pnText.replaceAll(pnOwner.getColor(), Emojis.getColorEmojiWithName(pnOwner.getColor()));
         }
@@ -163,7 +163,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    public static void checkAndAddPNs(Game activeGame, Player player) {
+    public static void checkAndAddPNs(Game game, Player player) {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
         if (!Mapper.isValidColor(playerColor) || !Mapper.isValidFaction(playerFaction)) {
@@ -174,13 +174,13 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotesOwned());
 
         // Remove PNs in other players' hands and player areas and purged PNs
-        for (Player player_ : activeGame.getPlayers().values()) {
+        for (Player player_ : game.getPlayers().values()) {
             promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
             promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
         }
         promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
         promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
-        promissoryNotes.removeAll(activeGame.getPurgedPN());
+        promissoryNotes.removeAll(game.getPurgedPN());
 
         // Any remaining PNs are missing from the game and can be re-added to the player's hand
         if (!promissoryNotes.isEmpty()) {

@@ -9,7 +9,7 @@ import ti4.map.GameManager;
 
 public abstract class BothelperSubcommandData extends SubcommandData {
 
-    private Game activeGame;
+    private Game game;
     private User user;
 
     public BothelperSubcommandData(@NotNull String name, @NotNull String description) {
@@ -21,13 +21,13 @@ public abstract class BothelperSubcommandData extends SubcommandData {
     }
 
     public Game getActiveGame() {
-        return activeGame;
+        return game;
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 }
