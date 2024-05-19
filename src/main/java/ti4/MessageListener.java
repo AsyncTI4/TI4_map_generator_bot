@@ -863,6 +863,7 @@ public class MessageListener extends ListenerAdapter {
                 if (messageToColor) {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(2);
                     factionColor = AliasHandler.resolveFaction(factionColor);
+                    player_ = null;
                     for (Player player3 : game.getRealPlayers()) {
                         if (Objects.equals(factionColor, player3.getFaction()) ||
                             Objects.equals(factionColor, player3.getColor())) {
@@ -875,6 +876,10 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
 
+                    if (player_ == null) {
+                      MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
+                      return;
+                    }
                     Whisper.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(),
                         event.getGuild());
                 } else if (messageToMyself) {
