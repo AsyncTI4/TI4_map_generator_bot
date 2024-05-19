@@ -1775,7 +1775,7 @@ public class GameSaveLoadManager {
                 case Constants.FOW_OPTION_HIDE_NAMES -> {
                   try {
                       boolean value = Boolean.parseBoolean(info);
-                      activeGame.setFowOptionHideNames(value);
+                      game.setFowOptionHideNames(value);
                   } catch (Exception e) {
                       // Do nothing
                   }
