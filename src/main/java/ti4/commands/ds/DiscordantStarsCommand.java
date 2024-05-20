@@ -85,6 +85,7 @@ public class DiscordantStarsCommand implements Command {
         subcommands.add(new FlipGrace());
         subcommands.add(new SetPolicy());
         subcommands.add(new DrawBlueBackTile());
+        subcommands.add(new DrawRedBackTile());
         subcommands.add(new AddOmenDie());
         subcommands.add(new KyroHero());
         subcommands.add(new ATS());

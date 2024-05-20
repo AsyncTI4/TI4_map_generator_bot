@@ -224,6 +224,7 @@ public class Game {
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
+    private boolean ageOfExplorationMode;
     @Getter
     @Setter
     private boolean showFullComponentTextEmbeds;
@@ -764,8 +765,16 @@ public class Game {
         return testBetaFeaturesMode;
     }
 
+    public boolean isAgeOfExplorationMode() {
+        return ageOfExplorationMode;
+    }
+
     public void setTestBetaFeaturesMode(boolean testBetaFeaturesMode) {
         this.testBetaFeaturesMode = testBetaFeaturesMode;
+    }
+
+    public void setAgeOfExplorationMode(boolean ageOfExplorationMode) {
+        this.ageOfExplorationMode = ageOfExplorationMode;
     }
 
     @JsonIgnore
