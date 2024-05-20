@@ -143,7 +143,7 @@ public class FrankenDraftHelper {
 
         int draftQueueCount = player.getDraftQueue().Contents.size();
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
-        boolean isQueueFull = draftQueueCount >= 2 && !isFirstDraft || draftQueueCount >= 3;
+        boolean isQueueFull = draftQueueCount >= draft.getPicksFromNextBags() && !isFirstDraft || draftQueueCount >= draft.getPicksFromFirstBag();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentation(true, true) + " you cannot legally draft anything from this bag right now.");
         } else if (!isQueueFull) {
@@ -262,7 +262,8 @@ public class FrankenDraftHelper {
     }
 
     public static void startDraft(Game game) {
-        List<DraftBag> bags = game.getActiveBagDraft().generateBags(game);
+        BagDraft draft = game.getActiveBagDraft();
+        List<DraftBag> bags = draft.generateBags(game);
         Collections.shuffle(bags);
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
@@ -274,10 +275,12 @@ public class FrankenDraftHelper {
         }
         game.setBagDraftStatusMessageID(null); // Clear the status message so it will be regenerated
 
+        int first = draft.getPicksFromFirstBag();
+        int next = draft.getPicksFromNextBags();
         String message = "# " + game.getPing() + " Franken Draft has started!\n" +
-            "> As a reminder, for the first bag you pick 3 items, and for all the bags after that you pick 2 items.\n" +
+            "> As a reminder, for the first bag you pick " + first + " item(s), and for all the bags after that you pick " + next + " item(s).\n" +
             "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n" +
-            "> Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready.";
+            "> Once you have made your " + next + " pick(s) (" + first + " in the first bag), the bags will automatically be passed once everyone is ready.";
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
         GameSaveLoadManager.saveMap(game);

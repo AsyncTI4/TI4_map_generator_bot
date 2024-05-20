@@ -876,6 +876,7 @@ public class Constants {
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String POWERED = "powered";
+    public static final String ONEPICK = "onepick";
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String HAS_HAD_A_STATUS_PHASE = "has_had_a_status_phase";
     public static final String BOT_SHUSHING = "bot_shushing";
