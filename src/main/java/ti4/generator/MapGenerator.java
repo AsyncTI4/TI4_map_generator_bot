@@ -609,7 +609,7 @@ public class MapGenerator {
                 if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
                     factionText = player.getDisplayName();
                 }
-                if (factionText != null) {
+                if (factionText != null && !"null".equals(factionText)) {
                   userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
                 }
 
