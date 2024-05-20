@@ -24,6 +24,8 @@ public abstract class BagDraft {
             return new FrankenDraft(game);
         } else if ("powered_franken".equals(draftType)) {
             return new PoweredFrankenDraft(game);
+        } else if ("onepick_franken".equals(draftType)) {
+            return new OnePickFrankenDraft(game);
         }
 
         return null;
@@ -40,6 +42,14 @@ public abstract class BagDraft {
     public abstract List<DraftBag> generateBags(Game game);
 
     public abstract int getBagSize();
+
+    public int getPicksFromFirstBag() {
+      return 3;
+    }
+
+    public int getPicksFromNextBags() {
+      return 2;
+    }
 
     public boolean isDraftStageComplete() {
         List<Player> players = owner.getRealPlayers();
