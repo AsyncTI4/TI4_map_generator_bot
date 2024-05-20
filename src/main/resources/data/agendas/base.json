@@ -235,8 +235,8 @@
         "alias": "miscount",
         "name": "Miscount Disclosed",
         "type": "Directive",
-        "target": "Elect Law (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
-        "text1": "Vote on the elected law as if it were just revealed from the top of the deck.",
+        "target": "Elect Law",
+        "text1": "(When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.) Vote on the elected law as if it were just revealed from the top of the deck.",
         "text2": "",
         "source": "base"
     },

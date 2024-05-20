@@ -2234,6 +2234,9 @@ public class AgendaHelper {
 
                                 if (scheming) {
                                     game.drawActionCard(winningR.getUserID());
+                                    MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
+                                        winningR.getRepresentation(true, true) + " use buttons to discard",
+                                        ACInfo.getDiscardActionCardButtons(game, winningR, false));
                                 }
                                 ButtonHelper.checkACLimit(game, event, winningR);
                                 ACInfo.sendActionCardInfo(game, winningR, event);
@@ -2243,7 +2246,7 @@ public class AgendaHelper {
                             sb.append("due to having a winning **Keleres Rider**, you have been given");
                             if (scheming) {
                                 sb.append(" two ").append(Emojis.ActionCard).append(Emojis.ActionCard)
-                                    .append(" Action Cards (Due to your **Scheming** ability)");
+                                    .append(" Action Cards (Due to your **Scheming** ability, discard buttons sent to thread)");
                             } else {
                                 sb.append(" an ").append(Emojis.ActionCard).append(" Action Card");
                             }

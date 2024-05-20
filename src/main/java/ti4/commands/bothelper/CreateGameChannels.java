@@ -287,10 +287,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
             buttons2);
 
         List<Button> buttons3 = new ArrayList<>();
-        buttons3.add(Button.success("enableAidReacts", "Yes, have bot react"));
+        buttons3.add(Button.success("enableAidReacts", "Yes, Enable Aid Reacts"));
         buttons3.add(Button.danger("deleteButtons", "No Aid Reacts"));
         MessageHelper.sendMessageToChannel(actionsChannel,
-            "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember you faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under /custom customization",
+            "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember your faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under /custom customization",
             buttons3);
 
         // INTRODUCTION TO BOT-MAP THREAD

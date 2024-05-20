@@ -156,15 +156,17 @@ public class GameStats extends StatisticsSubcommandData {
         for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
             if (pingsFor.contains("pingsFor")) {
                 pings.put(pingsFor.replace("pingsFor", ""), Integer.parseInt(reference.getStoredValue(pingsFor)));
+                System.out.println(reference.getStoredValue(pingsFor));
             }
         }
+
         Map<String, Integer> topThousand = pings.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(1000)
             .collect(Collectors.toMap(
                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         int index = 1;
         StringBuilder sb = new StringBuilder();
         for (String ket : topThousand.keySet()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(ket);
+            User user = AsyncTI4DiscordBot.jda.getUserById(Long.parseLong(ket));
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append("` ").append(user.getEffectiveName() + ": ");
             sb.append(topThousand.get(ket) + " pings");
