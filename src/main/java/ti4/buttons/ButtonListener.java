@@ -842,6 +842,9 @@ public class ButtonListener extends ListenerAdapter {
             }
             if (setStatus) {
                 player.addFollowedSC(scNum);
+                if (scNum == 7) {
+                    ButtonHelper.postTechSummary(game);
+                }
             }
             ButtonHelper.addReaction(event, false, false, "Not Following", "");
             Set<Player> players = playerUsedSC.get(messageID);
@@ -2476,6 +2479,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.starChartStep2(game, player, buttonID, event);
         } else if (buttonID.startsWith("starChartsStep3_")) {
             ButtonHelper.starChartStep3(game, player, buttonID, event);
+        } else if (buttonID.startsWith("detTileAdditionStep2_")) {
+            ButtonHelper.detTileAdditionStep2(game, player, buttonID, event);
+        } else if (buttonID.startsWith("detTileAdditionStep3_")) {
+            ButtonHelper.detTileAdditionStep3(game, player, buttonID, event);
+        } else if (buttonID.startsWith("detTileAdditionStep4_")) {
+            ButtonHelper.detTileAdditionStep4(game, player, buttonID, event);
         } else if (buttonID.startsWith("naaluHeroSend")) {
             ButtonHelperHeroes.resolveNaaluHeroSend(player, game, buttonID, event);
         } else if (buttonID.startsWith("landUnits_")) {
@@ -3398,7 +3407,7 @@ public class ButtonListener extends ListenerAdapter {
                     String msg = "Use buttons to do an end of turn ability";
                     List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-                    ButtonHelper.deleteTheOneButton(event);
+                    //ButtonHelper.deleteTheOneButton(event);
                 }
                 case "redistributeCCButtons" -> { // Buttons.REDISTRIBUTE_CCs
                     String message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()

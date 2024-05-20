@@ -11,7 +11,7 @@ public class DiceHelper {
         private final int threshold;
         private final int result;
 
-        Die(int threshold) {
+        public Die(int threshold) {
             this.threshold = threshold;
             result = ThreadLocalRandom.current().nextInt(1, 11);
         }
