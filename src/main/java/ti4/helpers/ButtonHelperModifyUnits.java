@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.combat.CombatRoll;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
@@ -122,6 +123,28 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    public static void autoMateGroundCombat(Player p1, Player p2, String planet, Game game, ButtonInteractionEvent event) {
+        boolean haveGroundForces = true;
+        Tile tile = game.getTileFromPlanet(planet);
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        int count = 0;
+        while (haveGroundForces) {
+            int hitP1 = new CombatRoll().secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP2 = new CombatRoll().secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
+
+            ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
+            ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+
+            if (!doesPlayerHaveGfOnPlanet(unitHolder, p2) || !doesPlayerHaveGfOnPlanet(unitHolder, p1)) {
+                haveGroundForces = false;
+            }
+            count++;
+            if (count > 100) {
+                haveGroundForces = false;
+            }
+        }
+    }
+
     public static void autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
         ButtonInteractionEvent event) {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -154,6 +177,9 @@ public class ButtonHelperModifyUnits {
                     duraniumMsg = duraniumMsg + unitName;
                 }
             }
+        }
+        if (hits < 1 && (usedDuraniumAlready || (unitHolder.getUnitDamageCount(UnitType.Mech, player.getColor()) < 1 && unitHolder.getUnitDamageCount(UnitType.Pds, player.getColor()) < 1))) {
+            return;
         }
         if (numSustains > 0) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -341,12 +367,8 @@ public class ButtonHelperModifyUnits {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        if ((unitHolder.getUnitCount(UnitType.Pds, player.getColor()) < 1
-            || (!player.hasUnit("titans_pds") && !player.hasUnit("titans_pds2")))
-            && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) < 1
-            && unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1
-            && (unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0
-                || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+        if (!doesPlayerHaveGfOnPlanet(unitHolder, player) && (unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0
+            || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
             String msg2 = player.getRepresentation()
                 + " you may want to remove structures if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
             List<Button> buttons = new ArrayList<>();
@@ -357,6 +379,10 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
         }
         event.getMessage().delete().queue();
+    }
+
+    public static boolean doesPlayerHaveGfOnPlanet(UnitHolder unitHolder, Player player) {
+        return !((unitHolder.getUnitCount(UnitType.Pds, player.getColor()) < 1 || (!player.hasUnit("titans_pds") && !player.hasUnit("titans_pds2"))) && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1);
     }
 
     public static String autoAssignSpaceCombatHits(Player player, Game game, Tile tile, int hits,

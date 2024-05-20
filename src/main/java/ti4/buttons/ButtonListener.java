@@ -225,11 +225,16 @@ public class ButtonListener extends ListenerAdapter {
             String declaration = buttonID.split("_")[1];
             String old = game.getStoredValue(player.getUserID() + "anonDeclare");
             if (old.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Someone has expressed their preference for a \"" + declaration + "\" environment.");
+                if (declaration.toLowerCase().contains("strong")) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                        "Someone has said that they have \"" + declaration + "\"");
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                        "Someone has said that they prefer a \"" + declaration + "\" environment.");
+                }
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Someone has changed their preference from a \""
-                    + old + "\" environment to a \"" + declaration + "\" environment.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Someone has changed their preference from \""
+                    + old + "\" to  \"" + declaration + "\" ");
             }
             game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
             GameSaveLoadManager.saveMap(game, event);
@@ -1555,6 +1560,31 @@ public class ButtonListener extends ListenerAdapter {
             if (buttonID.contains("bombard")) {
                 ButtonHelper.deleteTheOneButton(event);
             }
+        } else if (buttonID.startsWith("automateGroundCombat_")) {
+            String faction1 = buttonID.split("_")[1];
+            String faction2 = buttonID.split("_")[2];
+            Player p1 = game.getPlayerFromColorOrFaction(faction1);
+            Player p2 = game.getPlayerFromColorOrFaction(faction2);
+            Player opponent = null;
+            String planet = buttonID.split("_")[3];
+            String confirmed = buttonID.split("_")[4];
+            if (player != p1 && player != p2) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "This button is only for combat participants");
+                return;
+            }
+            if (player == p2) {
+                opponent = p1;
+            } else {
+                opponent = p2;
+            }
+            event.getMessage().delete().queue();
+            if (opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
+                ButtonHelperModifyUnits.autoMateGroundCombat(p1, p2, planet, game, event);
+            } else {
+                Button automate = Button.success(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_" + p1.getFaction() + "_" + p2.getFaction() + "_" + planet + "_confirmed", "Automate Combat");
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm confirm", automate);
+            }
+
         } else if (buttonID.startsWith("transitDiodes_")) {
             ButtonHelper.resolveTransitDiodesStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("novaSeed_")) {
@@ -2189,6 +2219,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCardsWillHomebrew.resolveAncientTradeRoutesStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("armsDealStep2_")) {
             ButtonHelperActionCardsWillHomebrew.resolveArmsDealStep2(player, game, event, buttonID);
+
+        } else if (buttonID.startsWith("defenseInstallationStep2_")) {
+            ButtonHelperActionCardsWillHomebrew.resolveDefenseInstallationStep2(player, game, event, buttonID);
+
         } else if (buttonID.startsWith("freelancersBuild_")) {
             String planet = buttonID.replace("freelancersBuild_", "");
             List<Button> buttons;
@@ -2435,6 +2469,13 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveNaaluHeroInitiation(player, game, event);
         } else if (buttonID.startsWith("kyroHeroInitiation")) {
             ButtonHelperHeroes.resolveKyroHeroInitiation(player, game, event);
+        } else if (buttonID.startsWith("starChartsStep1_")) {
+            event.getMessage().delete().queue();
+            ButtonHelper.starChartStep1(game, player, buttonID.split("_")[1]);
+        } else if (buttonID.startsWith("starChartsStep2_")) {
+            ButtonHelper.starChartStep2(game, player, buttonID, event);
+        } else if (buttonID.startsWith("starChartsStep3_")) {
+            ButtonHelper.starChartStep3(game, player, buttonID, event);
         } else if (buttonID.startsWith("naaluHeroSend")) {
             ButtonHelperHeroes.resolveNaaluHeroSend(player, game, buttonID, event);
         } else if (buttonID.startsWith("landUnits_")) {
@@ -4792,6 +4833,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveDataArchive" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveDataArchive(player, game, event);
+                }
+                case "resolveDefenseInstallation" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveDefenseInstallation(player, game, event);
                 }
                 case "resolveAncientTradeRoutes" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveAncientTradeRoutes(player, game, event);

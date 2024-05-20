@@ -78,7 +78,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         }
 
         //ELECT LAW BUT NO LAWS IN PLAY
-        if (agendaTarget.contains("Law") && (game.getLaws().isEmpty() || game.getLaws().isEmpty())) {
+        if (agendaTarget.toLowerCase().contains("elect law") && game.getLaws().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel,
                 game.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
             agendaID = game.revealAgenda(false);
@@ -91,6 +91,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         } else {
             boolean notEmergency = false;
             while (!notEmergency) {
+
                 if ("Emergency Session".equalsIgnoreCase(agendaName)) {
                     game.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(channel, game.getPing() + " Emergency Session revealed underneath Covert Legislation, discarding it.");

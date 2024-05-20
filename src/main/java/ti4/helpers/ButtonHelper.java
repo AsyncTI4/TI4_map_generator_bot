@@ -89,6 +89,7 @@ import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -256,10 +257,10 @@ public class ButtonHelper {
         }
     }
 
-    public static List<Button> getDacxiveButtons(String planet) {
+    public static List<Button> getDacxiveButtons(String planet, Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("dacxive_" + planet, "Resolve Dacxive"));
-        buttons.add(Button.danger("deleteButtons", "No Dacxive"));
+        buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "dacxive_" + planet, "Resolve Dacxive"));
+        buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "No Dacxive"));
         return buttons;
     }
 
@@ -1095,6 +1096,9 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), msg);
         MessageHelper.sendMessageToChannel(getCorrectChannel(p2, game), msg2);
         deleteTheOneButton(event);
+        if (!p2.getFollowedSCs().contains(5)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(p2, 5, game, event);
+        }
         p2.addFollowedSC(5);
         p2.setCommodities(p2.getCommoditiesTotal());
         if (p2.getLeaderIDs().contains("mykomentoricommander") && !p2.hasLeaderUnlocked("mykomentoricommander")) {
@@ -3753,6 +3757,64 @@ public class ButtonHelper {
             }
         }
         return shipOrders;
+    }
+
+    public static void starChartStep0(Game game, Player player, List<String> newTileIDs) {
+        List<Button> buttons = new ArrayList<>();
+        for (String newTileID : newTileIDs) {
+            TileModel tile = TileHelper.getTile(newTileID);
+            buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "starChartsStep1_" + newTileID, tile.getName()));
+
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the tile you want to add to the board", buttons);
+    }
+
+    public static void starChartStep1(Game game, Player player, String newTileID) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2) {
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "starChartsStep2_" + newTileID + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose an edge tile that the new tile will be adjacent too", buttons);
+    }
+
+    public static void starChartStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        event.getMessage().delete().queue();
+        String newTileID = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        for (String pos2 : directlyAdjacentTiles) {
+            Tile tile = game.getTileByPosition(pos2);
+            if (tile != null && tile.isEdgeOfBoard(game)) {
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_" + tile.getPosition() + "_" + pos, tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose another tile that the new tile will be adjacent too", buttons);
+    }
+
+    public static void starChartStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        String newTileID = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        String pos2 = buttonID.split("_")[3];
+        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
+        String inBoth = "";
+        for (String pos3 : directlyAdjacentTiles) {
+            if (directlyAdjacentTiles2.contains(pos3) && game.getTileByPosition(pos3) == null) {
+                inBoth = pos3;
+            }
+        }
+        if (inBoth.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " could not find the correct location, sorry.");
+        } else {
+            Tile tile = new Tile(newTileID, inBoth);
+            game.setTile(tile);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " added the tile " + tile.getRepresentationForButtons(game, player));
+        }
+
     }
 
     public static void checkForPrePassing(Game game, Player player) {
@@ -8931,7 +8993,7 @@ public class ButtonHelper {
             }
             case "doStarCharts" -> {
                 purge2StarCharters(p1);
-                new DrawBlueBackTile().drawBlueBackTiles(event, game, p1, 1, false);
+                DrawBlueBackTile.drawBlueBackTiles(event, game, p1, 1, false);
             }
         }
 
