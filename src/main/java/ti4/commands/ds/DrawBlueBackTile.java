@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.TileHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -110,15 +111,21 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         }
 
         List<MessageEmbed> tileEmbeds = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             String tileID = tilesToPullFrom.get(i);
+            ids.add(tileID);
             TileModel tile = TileHelper.getTile(tileID);
             tileEmbeds.add(tile.getHelpMessageEmbed(false));
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use /map add_tile to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        if (ids.size() == 1) {
+            ButtonHelper.starChartStep1(game, player, ids.get(0));
+        } else {
+            ButtonHelper.starChartStep0(game, player, ids);
+        }
     }
 
 }
