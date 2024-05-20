@@ -135,7 +135,7 @@ public class StartCombat extends CombatSubcommandData {
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
-                initializeCombatThread(threadChannel_, game, player1, player2, tile, event, spaceOrGround, null);
+                initializeCombatThread(threadChannel_, game, player1, player2, tile, event, spaceOrGround, null, unitHolderName);
                 return;
             }
         }
@@ -162,12 +162,12 @@ public class StartCombat extends CombatSubcommandData {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
             }
             threadChannel.queue(tc -> initializeCombatThread(tc, game, player1, player2, tile, event,
-                spaceOrGround, systemWithContext));
+                spaceOrGround, systemWithContext, unitHolderName));
         });
     }
 
     private static void initializeCombatThread(ThreadChannel threadChannel, Game game, Player player1,
-        Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file) {
+        Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file, String unitHolderName) {
         StringBuilder message = new StringBuilder();
         message.append(player1.getRepresentation(true, true));
         if (!game.isFoWMode())
@@ -212,6 +212,10 @@ public class StartCombat extends CombatSubcommandData {
         // General Space Combat
         sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
 
+        if (isGroundCombat && !game.isFoWMode()) {
+            Button automate = Button.success("automateGroundCombat_" + player1.getFaction() + "_" + player2.getFaction() + "_" + unitHolderName + "_unconfirmed", "Automate Combat");
+            MessageHelper.sendMessageToChannelWithButton(threadChannel, "You can automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm", automate);
+        }
         // DS Lanefir ATS Armaments
         if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0)
             || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {

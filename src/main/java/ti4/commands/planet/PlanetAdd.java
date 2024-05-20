@@ -138,7 +138,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 + Helper.getPlanetRepresentation(planet, game)
                 + ". Click to confirm a combat occurred and to add an infantry or delete these buttons";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
-                ButtonHelper.getDacxiveButtons(planet));
+                ButtonHelper.getDacxiveButtons(planet, player));
         }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {

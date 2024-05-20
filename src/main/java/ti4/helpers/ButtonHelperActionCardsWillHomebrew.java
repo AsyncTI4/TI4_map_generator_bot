@@ -55,6 +55,26 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getReadiedPlanets()) {
+            buttons.add(Button.success("defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation(true, true) + " select the planet you wish to exhaust and put a pds on",
+            buttons);
+    }
+
+    public static void resolveDefenseInstallationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        player.exhaustPlanet(planet);
+        new AddUnits().unitParsing(event, buttonID, game.getTileFromPlanet(planet), "pds " + planet, game);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put a pds on it");
+    }
+
     public static void resolveAncientTradeRoutes(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         player.setCommodities(player.getCommodities() + 2);
