@@ -102,6 +102,9 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
 
         // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
         tilesToPullFrom.removeAll(game.getTileMap().values().stream().map(Tile::getTileID).toList());
+        if (!game.isDiscordantStarsMode()) {
+            tilesToPullFrom.removeAll(tilesToPullFrom.stream().filter(tileID -> tileID.contains("d")).toList());
+        }
         List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
         Collections.shuffle(tilesToPullFrom);
 
@@ -122,7 +125,11 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
         if (ids.size() == 1) {
-            ButtonHelper.starChartStep1(game, player, ids.get(0));
+            if (game.isDiscordantStarsMode()) {
+                ButtonHelper.starChartStep1(game, player, ids.get(0));
+            } else {
+                ButtonHelper.detTileAdditionStep1(game, player, ids.get(0));
+            }
         } else {
             ButtonHelper.starChartStep0(game, player, ids);
         }
