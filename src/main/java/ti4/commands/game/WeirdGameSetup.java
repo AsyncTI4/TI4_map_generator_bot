@@ -22,6 +22,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with Base Game Mode)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
@@ -36,20 +37,6 @@ public class WeirdGameSetup extends GameSubcommandData {
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
         if (fowMode != null) game.setFoWMode(fowMode);
 
-        Integer pingHours = event.getOption(Constants.AUTO_PING, null, OptionMapping::getAsInt);
-        if (pingHours != null) {
-            if (pingHours == 0) {
-                game.setAutoPing(false);
-                game.setAutoPingSpacer(pingHours);
-            } else {
-                game.setAutoPing(true);
-                if (pingHours < 1) {
-                    pingHours = 1;
-                }
-                game.setAutoPingSpacer(pingHours);
-            }
-        }
-
         String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
         if (customGameName != null) {
             game.setCustomName(customGameName);
@@ -61,6 +48,9 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
+
+        Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
+        if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);

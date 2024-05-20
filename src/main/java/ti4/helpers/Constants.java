@@ -910,6 +910,7 @@ public class Constants {
         VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
     }
     public static final String BETA_TEST_MODE = "beta_test_mode";
+    public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
     public static final String AUTO_ARCHIVE_DURATION = "auto_archive_duration";
@@ -1019,6 +1020,7 @@ public class Constants {
     public static final Object TECHNOLOGY = "technology";
     public static final String TECH_DECK_ID = "tech_deck_id";
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
+    public static final String DRAW_RED_BACK_TILE = "draw_red_back_tile";
     public static final String ADD_OMEN_DIE = "add_omen_die";
     public static final String KYRO_HERO = "kyro_hero";
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";

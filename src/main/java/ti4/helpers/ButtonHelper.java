@@ -984,6 +984,13 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message.toString());
         } else {
             sendMessageToRightStratThread(player, game, message.toString(), "technology");
+            String key = "TechForRound" + game.getRound() + player.getFaction();
+            if (game.getStoredValue(key).isEmpty()) {
+                game.setStoredValue(key, techID);
+            } else {
+                game.setStoredValue(key, game.getStoredValue(key) + "." + techID);
+            }
+            postTechSummary(game);
         }
         if (paymentRequired) {
             payForTech(game, player, event, techID);
@@ -1010,6 +1017,35 @@ public class ButtonHelper {
         }
 
         event.getMessage().delete().queue();
+    }
+
+    public static void postTechSummary(Game game) {
+        if (game.isFoWMode() || game.getTableTalkChannel() == null || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty() || game.isHomeBrewSCMode()) {
+            return;
+        }
+        String msg = "**__Tech Summary For Round " + game.getRound() + "__**\n";
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasFollowedSC(7)) {
+                return;
+            }
+            String key = "TechForRound" + game.getRound() + player.getFaction();
+            if (!game.getStoredValue(key).isEmpty()) {
+                msg = msg + player.getFactionEmoji() + ":";
+                if (game.getStoredValue(key).contains(".")) {
+                    String tech1 = StringUtils.substringBefore(game.getStoredValue(key), ".");
+                    String tech2 = StringUtils.substringAfter(game.getStoredValue(key), ".");
+                    msg = msg + " " + Mapper.getTech(tech1).getNameRepresentation() + "and " + Mapper.getTech(tech2).getNameRepresentation();
+
+                } else {
+                    msg = msg + " " + Mapper.getTech(game.getStoredValue(key)).getNameRepresentation();
+                }
+                msg = msg + "\n";
+            } else {
+                msg = msg + player.getFactionEmoji() + ": Did not follow\n";
+            }
+        }
+        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg);
+        game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
     }
 
     public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech) {
@@ -1517,7 +1553,7 @@ public class ButtonHelper {
                     ident + " use buttons to resolve potential wound ", buttons);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander")
-                && nonActivePlayer.hasProductionUnitInSystem(activeSystem)) {
+                && Helper.getProductionValue(nonActivePlayer, game, activeSystem, false) > 0) {
                 if (justChecking) {
                     if (!game.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger the arborec commander");
@@ -3769,6 +3805,58 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the tile you want to add to the board", buttons);
     }
 
+    public static void detTileAdditionStep1(Game game, Player player, String newTileID) {
+        List<Button> buttons = new ArrayList<>();
+        TileModel tile = TileHelper.getTile(newTileID);
+        buttons.add(Button.success("detTileAdditionStep2_" + newTileID, "Next to only 1 tile"));
+        buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "starChartsStep1_" + newTileID, "Next to 2 tiles"));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you are placing " + tile.getName() + ". Will this tile be adjacent to 1 other tile or 2?", buttons);
+    }
+
+    public static void detTileAdditionStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        event.getMessage().delete().queue();
+        String newTileID = buttonID.split("_")[1];
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2) {
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "detTileAdditionStep3_" + newTileID + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose an edge tile that the new tile will be adjacent too", buttons);
+    }
+
+    public static void detTileAdditionStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        String newTileID = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+        String pos = buttonID.split("_")[2];
+        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> adjacentToSomethingElse = new ArrayList<>();
+        for (String pos3 : directlyAdjacentTiles) {
+            if (game.getTileByPosition(pos3) != null) {
+                adjacentToSomethingElse.addAll(PositionMapper.getAdjacentTilePositions(pos3));
+            }
+        }
+        for (String pos3 : directlyAdjacentTiles) {
+            if (game.getTileByPosition(pos3) == null && !adjacentToSomethingElse.contains(pos3)) {
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "detTileAdditionStep4_" + newTileID + "_" + pos3, pos3));
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " select the tile position where the tile should go", buttons);
+    }
+
+    public static void detTileAdditionStep4(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        String newTileID = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        Tile tile = new Tile(newTileID, pos);
+        game.setTile(tile);
+        if (tile.getPlanetUnitHolders().isEmpty()) {
+            AddToken.addToken(event, tile, Constants.FRONTIER, game);
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " added the tile " + tile.getRepresentationForButtons(game, player));
+    }
+
     public static void starChartStep1(Game game, Player player, String newTileID) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -3814,7 +3902,6 @@ public class ButtonHelper {
             game.setTile(tile);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " added the tile " + tile.getRepresentationForButtons(game, player));
         }
-
     }
 
     public static void checkForPrePassing(Game game, Player player) {
@@ -8104,7 +8191,7 @@ public class ButtonHelper {
             String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
             String techText = techRep.getText();
 
-            if (techText.contains("ACTION")) {
+            if (techText.contains("ACTION") || (tech.equalsIgnoreCase("det") && game.isAgeOfExplorationMode())) {
                 if ("lgf".equals(tech) && !p1.getPlanets().contains("mr")) {
                     continue;
                 }
@@ -8920,6 +9007,9 @@ public class ButtonHelper {
                 String message = "Click the fragments you'd like to purge. ";
                 List<Button> purgeFragButtons = new ArrayList<>();
                 int numToBeat = 2 - p1.getUrf();
+                if (game.isAgeOfExplorationMode()) {
+                    numToBeat = numToBeat - 1;
+                }
                 if ((p1.hasAbility("fabrication") || p1.getPromissoryNotes().containsKey("bmf"))) {
                     numToBeat = numToBeat - 1;
                     if (p1.getPromissoryNotes().containsKey("bmf") && game.getPNOwner("bmf") != p1) {

@@ -274,7 +274,7 @@
         "type": "Law",
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card may resolve the secondary ability of the Imperial strategy card without spending a command token.\nWhen the owner of this card resolves the primary ability of the Imperial strategy card, they may draw a relic instead of scoring a public objective.",
-        "mapText": "Follow Imperial without spending a command token. When resolve Primary of Imperial, may draw a relic instead of secret objective.",
+        "mapText": "Follow Imperial without spending a command token. When resolve Primary of Imperial, may draw a relic instead of scoring a public objective.",
         "source": "absol"
     },
     {

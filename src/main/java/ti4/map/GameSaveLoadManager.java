@@ -625,6 +625,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.AGE_OF_EXPLORATION_MODE + " " + game.isAgeOfExplorationMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
         writer.write(Constants.HACK_ELECTION_STATUS + " " + game.getHackElectionStatus());
@@ -2006,6 +2008,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setTestBetaFeaturesMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.AGE_OF_EXPLORATION_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setAgeOfExplorationMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

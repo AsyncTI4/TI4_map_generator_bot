@@ -1126,6 +1126,9 @@ public class Player {
         if (hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf")) {
             targetToHit = targetToHit - 1;
         }
+        if (getGame().isAgeOfExplorationMode()) {
+            targetToHit = targetToHit - 1;
+        }
         if (haz >= targetToHit || cult >= targetToHit || ind >= targetToHit) {
             enough = true;
         }
@@ -2560,32 +2563,6 @@ public class Player {
                 continue;
             if (unitHolder.getUnitCount(UnitType.Mech, colorID) > 0) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasProductionUnitInSystem(Tile tile) {
-        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(getColor());
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty())
-                continue;
-            if (unitHolder.getUnitCount(UnitType.Spacedock, colorID) > 0) {
-                return true;
-            }
-            if (unitHolder.getUnitCount(UnitType.CabalSpacedock, colorID) > 0) {
-                return true;
-            }
-            if (hasUnit("arborec_mech")) {
-                if (unitHolder.getUnitCount(UnitType.Mech, colorID) > 0) {
-                    return true;
-                }
-            }
-            if (hasUnit("arborec_infantry") || hasTech("lw2")) {
-                if (unitHolder.getUnitCount(UnitType.Infantry, colorID) > 0) {
-                    return true;
-                }
             }
         }
         return false;
