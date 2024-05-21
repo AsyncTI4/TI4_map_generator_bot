@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
+import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
 import ti4.commands.player.ChangeUnitDecal;
@@ -778,6 +779,17 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.DRAFT_MODE -> {
+              String enteredValue = event.getFocusedOption().getValue();
+              List<FrankenDraftMode> stats = Arrays.asList(FrankenDraftMode.values());
+              List<Command.Choice> options = stats.stream()
+                  .filter(stat -> stat.search(enteredValue))
+                  .limit(25)
+                  .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
+                  .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
+                  .collect(Collectors.toList());
+              event.replyChoices(options).queue();
+          }
         }
     }
 
