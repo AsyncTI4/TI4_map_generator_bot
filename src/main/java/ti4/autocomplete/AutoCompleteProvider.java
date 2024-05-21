@@ -781,12 +781,12 @@ public class AutoCompleteProvider {
             }
             case Constants.DRAFT_MODE -> {
               String enteredValue = event.getFocusedOption().getValue();
-              List<FrankenDraftMode> stats = Arrays.asList(FrankenDraftMode.values());
-              List<Command.Choice> options = stats.stream()
-                  .filter(stat -> stat.search(enteredValue))
+              List<FrankenDraftMode> modes = Arrays.asList(FrankenDraftMode.values());
+              List<Command.Choice> options = modes.stream()
+                  .filter(mode -> mode.search(enteredValue))
                   .limit(25)
                   .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
-                  .map(stat -> new Command.Choice(stat.getAutoCompleteName(), stat.toString()))
+                  .map(mode -> new Command.Choice(mode.getAutoCompleteName(), mode.toString()))
                   .collect(Collectors.toList());
               event.replyChoices(options).queue();
           }
