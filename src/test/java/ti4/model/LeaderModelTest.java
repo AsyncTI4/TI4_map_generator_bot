@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
-import ti4.message.BotLogger;
 import ti4.testUtils.BaseTi4Test;
 
 public class LeaderModelTest extends BaseTi4Test {
@@ -21,11 +20,9 @@ public class LeaderModelTest extends BaseTi4Test {
     private boolean validateFaction(LeaderModel model) {
         if (model.getFaction().isEmpty())
             return true;
-        if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction())
-                || "fogalliance".equals(model.getFaction()))
+        if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction()) || "fogalliance".equals(model.getFaction()) || "generic".equals(model.getFaction()))
             return true;
-        System.out.println("Tech **" + model.getAlias() + "** failed validation due to invalid FactionID: `"
-                + model.getFaction() + "`");
+        System.out.println("Tech **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
         return false;
     }
 
@@ -35,8 +32,7 @@ public class LeaderModelTest extends BaseTi4Test {
         if (Mapper.isValidLeader(techModel.getHomebrewReplacesID().get()))
             return true;
         System.out.println(
-                "Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `"
-                        + techModel.getHomebrewReplacesID().get() + "`");
+            "Tech **" + techModel.getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `" + techModel.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }
