@@ -24,8 +24,8 @@ public class SetUnitCap extends GameSubcommandData {
         Game game = getActiveGame();
         String unit = event.getOption(Constants.UNIT_NAME).getAsString();
         int unitCap = event.getOption(Constants.UNIT_CAP).getAsInt();
-        if (unitCap > 14) {
-            unitCap = 14;
+        if (unitCap > 99) {
+            unitCap = 99;
         }
         Player player = Helper.getPlayer(game, null, event);
         String unitID = AliasHandler.resolveUnit(unit);
