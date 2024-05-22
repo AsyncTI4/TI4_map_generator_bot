@@ -2781,7 +2781,11 @@ public class Helper {
             try {
                 for (Player player : sortedPlayers) {
                     new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
-                    msg = msg + player.getRepresentation(true, true) + " \n";
+                    if (player.isSpeaker()) {
+                        msg = msg + player.getRepresentation(true, true) + " " + Emojis.SpeakerToken + " \n";
+                    } else {
+                        msg = msg + player.getRepresentation(true, true) + " \n";
+                    }
                 }
                 if (!players.isEmpty()) {
                     newPlayerOrder.putAll(players);
@@ -2790,7 +2794,6 @@ public class Helper {
             } catch (Exception e) {
                 game.setPlayers(playersBackup);
             }
-            msg += "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
         } else {
             msg = "Detected an abnormal map, so did not assign speaker order automatically. Set the speaker order with /game set_order, with the speaker as the first player";
         }
