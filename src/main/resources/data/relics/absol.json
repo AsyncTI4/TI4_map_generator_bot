@@ -135,7 +135,7 @@
     {
         "alias": "absol_tyrantslament",
         "name": "Tyrant's Lament",
-        "text": "TYRANT'S LAMENT (Note: not a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
+        "text": "TYRANT'S LAMENT (Note: not a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or your technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
         "source": "absol",
         "flavourText": "*Instrument of Judgement\nThe Tyrant's Lament has never responded to a hail, and fights under no banner.  Wherever it appears, death rains.  And then it is gone.*"
     }
