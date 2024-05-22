@@ -57,6 +57,8 @@ public class DrawRedBackTile extends DiscordantStarsSubcommandData {
             "47",
             "48",
             "49",
+            "67",
+            "68",
             "77",
             "78",
             "79",
