@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,7 +18,7 @@ import ti4.model.Source.ComponentSource;
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
-    private TechnologyType type;
+    private List<TechnologyType> types;
     private String requirements;
     private String faction;
     private String baseUpgrade;
@@ -35,12 +38,47 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return alias != null
             && name != null
-            && type != null
+            && types != null
+            && !types.isEmpty()
             // && getRequirements() != null
             // && getFaction() != null
             // && getBaseUpgrade() != null
             && source != null
             && text != null;
+    }
+
+    /**
+     * @return the first techType in the list of techTypes
+     * @deprecated Added to handle the switch from [TechnologyType type] -> [List(TechnologyType)] types. Use helpers isPropulsionTech, isCyberneticTech, isBioticTech, isWarfareTech, and isUnitUpgrade instead
+     */
+    @Deprecated
+    @JsonIgnore
+    public TechnologyType getType() {
+        return types.get(0);
+    }
+
+    public boolean isPropulsionTech() {
+        return types.contains(TechnologyType.PROPULSION);
+    }
+
+    public boolean isCyberneticTech() {
+        return types.contains(TechnologyType.CYBERNETIC);
+    }
+
+    public boolean isBioticTech() {
+        return types.contains(TechnologyType.BIOTIC);
+    }
+
+    public boolean isWarfareTech() {
+        return types.contains(TechnologyType.WARFARE);
+    }
+
+    public boolean isUnitUpgrade() {
+        return types.contains(TechnologyType.UNITUPGRADE);
+    }
+
+    public boolean hasMoreThanOneType() {
+        return types.size() > 1;
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = TechnologyModel::sortTechsByRequirements;
@@ -158,7 +196,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString)
+        return getAlias().toLowerCase().contains(searchString)
+            || getName().toLowerCase().contains(searchString)
+            || getFaction().orElse("").contains(searchString)
             || getSearchTags().contains(searchString);
     }
 

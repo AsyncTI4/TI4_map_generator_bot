@@ -2,7 +2,7 @@
     {
         "alias": "specialclearances",
         "name": "Special Clearances",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YYY",
         "faction": "keleresplus",
         "source": "keleresplus",
@@ -11,7 +11,7 @@
     {
         "alias": "guildfund",
         "name": "Guild Fund",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "faction": "drahn",
         "source": "keleresplus",
@@ -20,7 +20,7 @@
     {
         "alias": "specialforces",
         "name": "Special Forces",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "drahn",
         "source": "keleresplus",
