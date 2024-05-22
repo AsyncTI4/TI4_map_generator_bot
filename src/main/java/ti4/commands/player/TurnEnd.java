@@ -23,6 +23,7 @@ import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -359,6 +360,24 @@ public class TurnEnd extends PlayerSubcommandData {
                     }
                 }
             }
+
+            String message2a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following public objectives: ";
+            String message2b = "none";
+            for (String obbie : game.getRevealedPublicObjectives().keySet()) {
+                List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
+                if (!scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
+                    int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie);
+                    int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
+                    if (playerProgress >= threshold) {
+                        if (message2b.equalsIgnoreCase("none")) {
+                            message2b = Mapper.getPublicObjective(obbie).getName();
+                        } else {
+                            message2b = message2b + ", " + Mapper.getPublicObjective(obbie).getName();
+                        }
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
 
         }
 
