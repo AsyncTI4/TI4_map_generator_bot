@@ -596,8 +596,8 @@ public class MapGenerator {
                 StringBuilder userName = new StringBuilder();
                 String playerName = player.getUserName();
                 if (!game.isFowOptionHideNames()) {
-                  graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
-                  userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
+                    graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
+                    userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
                 }
                 y += 34;
                 graphics.setFont(Storage.getFont32());
@@ -610,7 +610,7 @@ public class MapGenerator {
                     factionText = player.getDisplayName();
                 }
                 if (factionText != null && !"null".equals(factionText)) {
-                  userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+                    userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
                 }
 
                 if (!"null".equals(player.getColor())) {
@@ -2000,7 +2000,8 @@ public class MapGenerator {
         Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
-            String techType = Mapper.getTechType(tech).toString().toLowerCase();
+            TechnologyModel techModel = Mapper.getTech(tech);
+            String techType = techModel.getType().toString();
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techType = game.getStoredValue("colorChange" + tech);
             }
@@ -2119,8 +2120,9 @@ public class MapGenerator {
             graphics.setColor(Color.DARK_GRAY);
 
             TechnologyModel techInformation = techInfo.get(tech);
-            if (techInformation.getType() == TechnologyType.UNITUPGRADE)
+            if (techInformation.isUnitUpgrade()) {
                 continue;
+            }
 
             String techIcon;
             switch (techInformation.getType()) {
@@ -2140,8 +2142,7 @@ public class MapGenerator {
             }
 
             if (techInformation.getFaction().isPresent()) {
-                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42,
-                    42, 0.5f);
+                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
@@ -2151,8 +2152,7 @@ public class MapGenerator {
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } else {
                 TechnologyModel techModel = Mapper.getTech(tech);
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148,
-                    Storage.getFont16(), 16);
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
             }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
@@ -2794,8 +2794,8 @@ public class MapGenerator {
             // PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
             if (!game.isFowOptionHideNames()) {
-              graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
-                  point.y + deltaY);
+                graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
+                    point.y + deltaY);
             }
 
             // PAINT FACTION

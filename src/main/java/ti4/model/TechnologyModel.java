@@ -48,7 +48,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     /**
-     * @return the first techType in the list of techTypes
+     * @return the first techType in the list of techTypes - this will be broken for techs with multiple types
      * @deprecated Added to handle the switch from [TechnologyType type] -> [List(TechnologyType)] types. Use helpers isPropulsionTech, isCyberneticTech, isBioticTech, isWarfareTech, and isUnitUpgrade instead
      */
     @Deprecated
@@ -188,12 +188,12 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getRequirementsEmoji() {
         if (getRequirements().isPresent()) {
-            String requirements = getRequirements().get();
-            requirements = requirements.replace("B", Emojis.PropulsionTech);
-            requirements = requirements.replace("Y", Emojis.CyberneticTech);
-            requirements = requirements.replace("G", Emojis.BioticTech);
-            requirements = requirements.replace("R", Emojis.WarfareTech);
-            return requirements;
+            String reqs = getRequirements().get();
+            reqs = reqs.replace("B", Emojis.PropulsionTech);
+            reqs = reqs.replace("Y", Emojis.CyberneticTech);
+            reqs = reqs.replace("G", Emojis.BioticTech);
+            reqs = reqs.replace("R", Emojis.WarfareTech);
+            return reqs;
         }
         return "None";
     }

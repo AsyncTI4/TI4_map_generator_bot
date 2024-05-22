@@ -132,7 +132,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString()) && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
+            if (!techM.isUnitUpgrade() && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
                 buttons.add(Button.secondary(finChecker + "newPrism@" + tech, techM.getName()));
             }
         }
