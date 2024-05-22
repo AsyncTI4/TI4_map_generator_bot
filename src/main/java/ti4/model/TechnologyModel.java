@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -28,7 +29,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
-        UNITUPGRADE, PROPULSION, BIOTIC, CYBERNETIC, WARFARE, NONE;
+        PROPULSION, CYBERNETIC, WARFARE, BIOTIC, UNITUPGRADE, NONE;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -77,8 +78,51 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return types.contains(TechnologyType.UNITUPGRADE);
     }
 
+    public boolean isDualPropulsionCybernetic() {
+        return isPropulsionTech() && isCyberneticTech();
+    }
+
+    public boolean isDualPropulsionBiotic() {
+        return isPropulsionTech() && isBioticTech();
+    }
+
+    public boolean isDualPropulsionWarfare() {
+        return isPropulsionTech() && isWarfareTech();
+    }
+
+    public boolean isDualCyberneticBiotic() {
+        return isCyberneticTech() && isBioticTech();
+    }
+
+    public boolean isDualCyberneticWarfare() {
+        return isCyberneticTech() && isWarfareTech();
+    }
+
+    public boolean isDualWarfareBiotic() {
+        return isWarfareTech() && isBioticTech();
+    }
+
     public boolean hasMoreThanOneType() {
         return types.size() > 1;
+    }
+
+    public String getImageFileModifier() {
+        if (types.size() == 2) {
+            if (isDualPropulsionBiotic()) {
+                return "propulsionbiotic";
+            } else if (isDualPropulsionCybernetic()) {
+                return "propulsioncybernetic";
+            } else if (isDualPropulsionWarfare()) {
+                return "propulsionwarfare";
+            } else if (isDualCyberneticBiotic()) {
+                return "cyberneticbiotic";
+            } else if (isDualCyberneticWarfare()) {
+                return "cyberneticwarfare";
+            } else if (isDualWarfareBiotic()) {
+                return "warfarebiotic";
+            }
+        }
+        return getType().toString();
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = TechnologyModel::sortTechsByRequirements;
@@ -101,6 +145,12 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public static int sortFactionTechsLast(TechnologyModel t1, TechnologyModel t2) {
         return sortFactionTechsFirst(t1, t2) * -1;
+    }
+
+    public static final Comparator<TechnologyModel> sortByType = TechnologyModel::sortByType;
+
+    public static int sortByType(TechnologyModel t1, TechnologyModel t2) {
+        return t1.getType().compareTo(t2.getType());
     }
 
     public Optional<String> getBaseUpgrade() {
