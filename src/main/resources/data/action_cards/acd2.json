@@ -40,7 +40,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "End that player's turn. Then, they may discard 1 random action card from their hand to return their command token in that system to their tactic pool.",
+    "text": "End that player's turn. Then, that player may discard 1 random action card from their hand to return their command token in that system to their tactic pool.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
     "source": "action_deck_2"
   },
@@ -76,7 +76,7 @@
     "name": "Betrayal",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose another player. That player gives you 1 random action card from their hand. During this turn, they cannot play promissory notes or action cards.",
+    "text": "Choose another player. That player gives you 1 random action card from their hand and cannot play action cards or promissory notes during this turn.",
     "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
     "source": "action_deck_2"
   },
@@ -589,7 +589,7 @@
     "name": "Public Outcry",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Players must vote on this agenda, if able. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome discards 2 random action cards from their hand.",
+    "text": "During this agenda, players must vote, if able. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome discards 2 random action cards from their hand.",
     "flavorText": "A crowd formed outside the Senate Possessional. As they hurled objects towards those accessing the building, Ciel smiled, \"Nice dodge, Junn, quite agile for your age.\"",
     "source": "action_deck_2"
   },
