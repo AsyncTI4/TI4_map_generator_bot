@@ -124,6 +124,8 @@ public class Game {
     @ExportableField
     private boolean fowMode;
     @ExportableField
+    private boolean fowOptionHideNames;
+    @ExportableField
     private boolean naaluAgent;
     @ExportableField
     private boolean l1Hero;
@@ -691,6 +693,14 @@ public class Game {
 
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+
+    public boolean isFowOptionHideNames() {
+      return fowOptionHideNames;
+    }
+
+    public void setFowOptionHideNames(boolean fowOptionHideNames) {
+      this.fowOptionHideNames = fowOptionHideNames;
     }
 
     public boolean isLightFogMode() {

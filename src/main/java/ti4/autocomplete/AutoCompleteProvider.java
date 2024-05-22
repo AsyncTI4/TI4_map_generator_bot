@@ -12,15 +12,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
+import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
 import ti4.commands.player.ChangeUnitDecal;
@@ -42,6 +44,7 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
@@ -778,6 +781,17 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.DRAFT_MODE -> {
+              String enteredValue = event.getFocusedOption().getValue();
+              List<FrankenDraftMode> modes = Arrays.asList(FrankenDraftMode.values());
+              List<Command.Choice> options = modes.stream()
+                  .filter(mode -> mode.search(enteredValue))
+                  .limit(25)
+                  .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
+                  .map(mode -> new Command.Choice(mode.getAutoCompleteName(), mode.toString()))
+                  .collect(Collectors.toList());
+              event.replyChoices(options).queue();
+          }
         }
     }
 
@@ -1047,6 +1061,20 @@ public class AutoCompleteProvider {
                         Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
                         List<Command.Choice> options = techs.entrySet().stream()
                             .filter(entry -> entry.getValue().getFaction().isPresent())
+                            .filter(entry -> entry.getValue().search(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+            case Constants.LEADER_ADD, Constants.LEADER_REMOVE -> {
+                switch (optionName) {
+                    case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, LeaderModel> techs = new HashMap<>(Mapper.getLeaders());
+                        List<Command.Choice> options = techs.entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))

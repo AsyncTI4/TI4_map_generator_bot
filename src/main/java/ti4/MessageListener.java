@@ -875,6 +875,11 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
 
+                    //if no target player was found
+                    if (Objects.equals(player, player_)) {
+                      MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
+                      return;
+                    }
                     Whisper.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(),
                         event.getGuild());
                 } else if (messageToMyself) {

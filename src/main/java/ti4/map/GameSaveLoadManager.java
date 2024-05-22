@@ -571,6 +571,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + game.isFoWMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.FOW_OPTION_HIDE_NAMES + " " + game.isFowOptionHideNames());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + game.getNaaluAgent());
         writer.write(System.lineSeparator());
         writer.write(Constants.L1_HERO + " " + game.getL1Hero());
@@ -715,7 +717,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmojiRaw());
             writer.write(System.lineSeparator());
-            writer.write(Constants.FACTION_DISPLAY_NAME + " " + player.getDisplayName());
+            String displayName = player.getDisplayName() != null ? player.getDisplayName().replace(" ", "_") : "null";
+            writer.write(Constants.FACTION_DISPLAY_NAME + " " + displayName);
             writer.write(System.lineSeparator());
             // TODO Remove when no longer relevant
             String playerColor = player.getColor();
@@ -1771,6 +1774,14 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.FOW_OPTION_HIDE_NAMES -> {
+                  try {
+                      boolean value = Boolean.parseBoolean(info);
+                      game.setFowOptionHideNames(value);
+                  } catch (Exception e) {
+                      // Do nothing
+                  }
+                }
                 case Constants.NAALU_AGENT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -2152,7 +2163,7 @@ public class GameSaveLoadManager {
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.FACTION_EMOJI -> player.setFactionEmoji(tokenizer.nextToken());
-                case Constants.FACTION_DISPLAY_NAME -> player.setDisplayName(tokenizer.nextToken());
+                case Constants.FACTION_DISPLAY_NAME -> player.setDisplayName(tokenizer.nextToken().replace("_", " "));
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
