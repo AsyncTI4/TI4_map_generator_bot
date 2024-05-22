@@ -3818,7 +3818,7 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
         String newTileID = buttonID.split("_")[1];
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2) {
+            if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2 && FoWHelper.playerHasShipsInSystem(player, tile)) {
                 buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "detTileAdditionStep3_" + newTileID + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
@@ -3860,7 +3860,7 @@ public class ButtonHelper {
     public static void starChartStep1(Game game, Player player, String newTileID) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2) {
+            if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2 && (game.isDiscordantStarsMode() || FoWHelper.playerHasShipsInSystem(player, tile))) {
                 buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "starChartsStep2_" + newTileID + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
@@ -3901,7 +3901,11 @@ public class ButtonHelper {
             Tile tile = new Tile(newTileID, inBoth);
             game.setTile(tile);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " added the tile " + tile.getRepresentationForButtons(game, player));
+            if (tile.getPlanetUnitHolders().isEmpty()) {
+                AddToken.addToken(event, tile, Constants.FRONTIER, game);
+            }
         }
+
     }
 
     public static void checkForPrePassing(Game game, Player player) {
