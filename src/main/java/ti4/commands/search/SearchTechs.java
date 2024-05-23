@@ -28,6 +28,7 @@ public class SearchTechs extends SearchComponentModel {
 
         List<MessageEmbed> messageEmbeds = Mapper.getTechs().values().stream()
             .sorted(TechnologyModel.sortByTechRequirements)
+            .sorted(TechnologyModel.sortByType)
             .filter(model -> model.search(searchString, source))
             .map(model -> model.getRepresentationEmbed(true, true))
             .toList();

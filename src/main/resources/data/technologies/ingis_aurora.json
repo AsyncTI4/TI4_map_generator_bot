@@ -2,7 +2,7 @@
     {
         "alias": "ciqineqreceptors",
         "name": "Ciqineq Receptors",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "qulane",
         "source": "ignis_aurora",
@@ -11,7 +11,7 @@
     {
         "alias": "gjenspecterii",
         "name": "Gjen Specter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "G",
         "faction": "qulane",
         "baseUpgrade": "inf2",
@@ -21,7 +21,7 @@
     {
         "alias": "stellarcorridors",
         "name": "Stellar Corridors",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "source": "ignis_aurora",
         "text": "At the start of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
@@ -29,7 +29,7 @@
     {
         "alias": "fabrilerealignment",
         "name": "Fibrile Realignment",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "source": "ignis_aurora",
         "text": "ACTION: Exhaust this card to discard either one secret objective or one action card. Then, draw a new card of the same type."
@@ -37,7 +37,7 @@
     {
         "alias": "precisiontargeting",
         "name": "Precision Targeting",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "source": "ignis_aurora",
         "text": "At the start of a round of combat you may exhaust this card to cause your opponents' units participating in that combat that have Sustain Damage to become damaged."
@@ -45,7 +45,7 @@
     {
         "alias": "syntheticreclamation",
         "name": "Synthetic Reclamation",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "arborec",
         "source": "ignis_aurora",
@@ -54,7 +54,7 @@
     {
         "alias": "leviathaneruptor",
         "name": "Leviathan Eruptor",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "cabal",
         "source": "ignis_aurora",
@@ -63,14 +63,14 @@
     {
         "alias": "baldrick_amd",
         "name": "Antimass Deflectors",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "source": "ignis_aurora",
         "text": "Your ships can move into and through asteroid fields. When other players' units use SPACE CANNON against your units, apply -2 to the result of each die roll."
     },
     {
         "alias": "baldrick_gd",
         "name": "Gravity Drive",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "source": "ignis_aurora",
         "text": "After you activate a system, you may exhaust this card to apply +1 to the move value of your ships during this tactical action."
@@ -78,7 +78,7 @@
     {
         "alias": "baldrick_fl",
         "name": "Fleet Logistics",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "source": "ignis_aurora",
         "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1."
@@ -86,7 +86,7 @@
     {
         "alias": "baldrick_lwd",
         "name": "Light/Wave Deflector",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BBB",
         "source": "ignis_aurora",
         "text": "After you activate a system, you may exhaust this card to allow your ships to move through systems that contain other players' ship during this tactical action."
@@ -94,14 +94,14 @@
     {
         "alias": "baldrick_nm",
         "name": "Neural Motivator",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "source": "ignis_aurora",
         "text": "ACTION: Exhaust this card to draw one action card."
     },
     {
         "alias": "baldrick_dxa",
         "name": "Dacxive Animators",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "source": "ignis_aurora",
         "text": "At the start of a round of ground combat, you may exhaust this card. If you do, for each infantry destroyed in that combat round place an infantry token on this card. At the end of the combat round, place 1 infantry from your reinforcements on the planet for each token on this card."
@@ -109,7 +109,7 @@
     {
         "alias": "baldrick_hm",
         "name": "Hyper Metabolism",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "source": "ignis_aurora",
         "text": "You may exhaust this card at the end of your turn to gain one command token."
@@ -117,7 +117,7 @@
     {
         "alias": "baldrick_x89",
         "name": "X-89 Bacterial Weapon",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "source": "ignis_aurora",
         "text": "After the space cannon defense step of a planetary invasion, you may exhaust this card to destroy all of your opponent's infantry on that planet. Then, roll 1 die for each of your infantry on that planet. For each result of 6 or greater, destroy 1 of those units."
@@ -125,21 +125,21 @@
     {
         "alias": "baldrick_bs",
         "name": "Bio-Stims",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "source": "ignis_aurora",
         "text": "You may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty or 1 of your other technologies."
     },
     {
         "alias": "baldrick_ps",
         "name": "Plasma Scoring",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "source": "ignis_aurora",
         "text": "When 1 or more of your units use Bombardment, Anti-Fighter Barrage, or Space Cannon, 1 of those units may roll 1 additional die."
     },
     {
         "alias": "baldrick_td",
         "name": "Transit Diodes",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "source": "ignis_aurora",
         "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control."
@@ -147,7 +147,7 @@
     {
         "alias": "baldrick_pi",
         "name": "Predictive Intelligence",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "source": "ignis_aurora",
         "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\nWhen you cast votes during the agenda phase, you may cast 3 additional votes."
@@ -155,7 +155,7 @@
     {
         "alias": "baldrick_ws",
         "name": "War Sun",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RRRY",
         "source": "ignis_aurora",
         "text": "Cost 10, Combat 3(x3), Move 2, Capacity 8, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
@@ -163,7 +163,7 @@
     {
         "alias": "baldrick_sd2",
         "name": "Space Dock II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "source": "ignis_aurora",
         "text": "This unit's PRODUCTION value is equal to 5 more than the resource or influence value of this planet. Up to 6 fighters in this system do not count against your ships' capacity. PRODUCTION X"
@@ -171,7 +171,7 @@
     {
         "alias": "baldrick_l4",
         "name": "L4 Disruptors",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "letnev",
         "source": "ignis_aurora",
@@ -180,7 +180,7 @@
     {
         "alias": "baldrick_pws2",
         "name": "Prototype War Sun II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RRRY",
         "faction": "muaat",
         "baseUpgrade": "ws",
@@ -190,7 +190,7 @@
     {
         "alias": "baldrick_ac2",
         "name": "Advanced Carrier II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "faction": "sol",
         "baseUpgrade": "cv2",
@@ -200,7 +200,7 @@
     {
         "alias": "baldrick_sdn2",
         "name": "Super Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "faction": "l1z1x",
         "baseUpgrade": "dn2",
@@ -210,7 +210,7 @@
     {
         "alias": "baldrick_cl2",
         "name": "Crimson Legionnaire II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "G",
         "faction": "mahact",
         "baseUpgrade": "inf2",
@@ -220,7 +220,7 @@
     {
         "alias": "baldrick_hcf2",
         "name": "Hybrid Crystal Fighter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BY",
         "faction": "naalu",
         "baseUpgrade": "ff2",
@@ -230,7 +230,7 @@
     {
         "alias": "baldrick_exo2",
         "name": "Exotrireme II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "faction": "sardakk",
         "baseUpgrade": "dn2",
@@ -240,7 +240,7 @@
     {
         "alias": "baldrick_scc",
         "name": "Spatial Conduit Cylinders",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "faction": "jolnar",
         "source": "ignis_aurora",
@@ -249,7 +249,7 @@
     {
         "alias": "baldrick_lgf",
         "name": "Lazax Gate Folding",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "winnu",
         "source": "ignis_aurora",
@@ -258,7 +258,7 @@
     {
         "alias": "baldrick_bio",
         "name": "Bioplasmosis",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "arborec",
         "source": "ignis_aurora",
@@ -267,7 +267,7 @@
     {
         "alias": "baldrick_so2",
         "name": "Spec Ops II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "G",
         "faction": "sol",
         "baseUpgrade": "inf2",
@@ -277,7 +277,7 @@
     {
         "alias": "baldrick_is",
         "name": "Inheritance Systems",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "l1z1x",
         "source": "ignis_aurora",
@@ -286,7 +286,7 @@
     {
         "alias": "baldrick_ht2",
         "name": "Hel-Titan II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YR",
         "faction": "titans",
         "baseUpgrade": "pds2",
@@ -296,7 +296,7 @@
     {
         "alias": "baldrick_ers",
         "name": "E-Res Siphons",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "jolnar",
         "source": "ignis_aurora",
@@ -305,7 +305,7 @@
     {
         "alias": "baldrick_dn2",
         "name": "Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "source": "ignis_aurora",
         "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 5."
@@ -313,7 +313,7 @@
     {
         "alias": "baldrick_pds2",
         "name": "PDS II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RY",
         "source": "ignis_aurora",
         "text": "PLANETARY SHIELD, DEEP SPACE CANNON 6 You may use this unit's Space Cannon against ships that are adjacent to this unit's system.\nWhen your units use Space Cannon, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able."
@@ -321,7 +321,7 @@
     {
         "alias": "baldrick_cv2",
         "name": "Carrier II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "source": "ignis_aurora",
         "text": "Cost 3, Combat 9, Move 2, Capacity 6"
@@ -329,7 +329,7 @@
     {
         "alias": "baldrick_ff2",
         "name": "Fighter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BY",
         "source": "ignis_aurora",
         "text": "Cost 1(x2), Combat 8, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
@@ -337,7 +337,7 @@
     {
         "alias": "baldrick_inf2",
         "name": "Infantry II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "G",
         "source": "ignis_aurora",
         "text": "Cost 1(x2), Combat 7. You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
@@ -345,7 +345,7 @@
     {
         "alias": "baldrick_htp",
         "name": "Hegemonic Trade Policy",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "winnu",
         "source": "ignis_aurora",
@@ -354,7 +354,7 @@
     {
         "alias": "baldrick_ic",
         "name": "Impulse Core",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "yin",
         "source": "ignis_aurora",

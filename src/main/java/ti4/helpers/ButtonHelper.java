@@ -881,7 +881,7 @@ public class ButtonHelper {
             }
         }
         player.addTech(techID);
-        if (techM.getType() == TechnologyType.UNITUPGRADE) {
+        if (techM.isUnitUpgrade()) {
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
                 Button hacanButton = Button
@@ -1054,11 +1054,11 @@ public class ButtonHelper {
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
         List<Button> buttons = getExhaustButtonsWithTG(game, player, "res" + "tech");
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
-        if ("unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasTechReady("aida")) {
+        if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
             buttons.add(aiDEVButton);
         }
-        if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasAbility("iconoclasm")) {
+        if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
                 Button transact = Button.primary("purge_Frags_CRF_" + x,
@@ -4075,7 +4075,7 @@ public class ButtonHelper {
         List<String> types = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if ("unitupgrade".equalsIgnoreCase(techM.getType().toString())) {
+            if (techM.isUnitUpgrade()) {
                 if (!types.contains(techM.getBaseUpgrade().orElse("bleh"))) {
                     count++;
                     types.add(tech);
@@ -4086,11 +4086,11 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int getNumberOfCertainTypeOfTech(Player player, String type) {
+    public static int getNumberOfCertainTypeOfTech(Player player, TechnologyType type) {
         int count = 0;
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (type.equalsIgnoreCase(techM.getType().toString())) {
+            if (techM.getTypes().contains(type)) {
                 count++;
             }
         }

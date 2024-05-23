@@ -2638,11 +2638,11 @@ public class Helper {
         List<TechnologyModel> techs2 = new ArrayList<>();
         for (TechnologyModel tech : techs) {
             boolean addTech = true;
-            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString())) {
+            if (tech.isUnitUpgrade()) {
                 for (String factionTech : player.getNotResearchedFactionTechs()) {
                     TechnologyModel fTech = Mapper.getTech(factionTech);
                     if (fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias())
-                        && "unitupgrade".equalsIgnoreCase(fTech.getType().toString())
+                        && fTech.isUnitUpgrade()
                         && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(tech.getAlias())) {
                         addTech = false;
                     }
@@ -2668,8 +2668,7 @@ public class Helper {
     public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game) {
         List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
-            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString()) && tech.getFaction().isEmpty()
-                && game.getTechnologyDeck().contains(tech.getAlias())) {
+            if (tech.isUnitUpgrade() && tech.getFaction().isEmpty() && game.getTechnologyDeck().contains(tech.getAlias())) {
                 techs.add(tech);
             }
         }
