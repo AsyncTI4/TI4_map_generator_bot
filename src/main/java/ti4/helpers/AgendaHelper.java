@@ -124,7 +124,7 @@ public class AgendaHelper {
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "# Added Law with " + winner + " as the elected!");
-                if ("censure".equalsIgnoreCase(agID) || "absool_censure".equalsIgnoreCase(agID)) {
+                if ("censure".equalsIgnoreCase(agID) || "absol_censure".equalsIgnoreCase(agID)) {
                     StringBuilder message = new StringBuilder();
                     Integer poIndex = game.addCustomPO("Political Censure", 1);
                     message.append("Custom PO 'Political Censure' has been added.\n");
