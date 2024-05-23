@@ -2314,33 +2314,33 @@ public class ButtonListener extends ListenerAdapter {
                         String msg = player.getRepresentation(true, true) +
                             "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-                        if (tgCount != null && tgCount != 0) {
-                            int tg = player.getTg();
-                            tg += tgCount;
-                            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                                player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
-                            if (game.isFoWMode()) {
-                                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                                    + " tgs from picking SC #" + scNumber;
-                                FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
-                            }
-                            player.setTg(tg);
-                            if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
-                                ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
-                            }
-                            ButtonHelperAbilities.pillageCheck(player, game);
-                            if (scNumber == 2 && game.isRedTapeMode()) {
-                                for (int x = 0; x < tgCount; x++) {
-                                    ButtonHelper.offerRedTapButtons(game, player);
-                                }
-                            }
-                            game.setScTradeGood(scNumber, 0);
-                        }
+                        // if (tgCount != null && tgCount != 0) {
+                        //     int tg = player.getTg();
+                        //     tg += tgCount;
+                        //     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+                        //         player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
+                        //     if (game.isFoWMode()) {
+                        //         String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
+                        //             + " tgs from picking SC #" + scNumber;
+                        //         FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
+                        //     }
+                        //     player.setTg(tg);
+                        //     if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
+                        //         ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
+                        //     }
+                        //     ButtonHelperAbilities.pillageCheck(player, game);
+                        //     if (scNumber == 2 && game.isRedTapeMode()) {
+                        //         for (int x = 0; x < tgCount; x++) {
+                        //             ButtonHelper.offerRedTapButtons(game, player);
+                        //         }
+                        //     }
+                        //     game.setScTradeGood(scNumber, 0);
+                        // }
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             player.getRepresentation()
                                 + " you have been public disgraced because someone preset it to occur when the number "
                                 + scpick
-                                + " was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC. (note, you keep any of the tgs that were on the card either way)");
+                                + " was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
                         return;
                     }
                 }
@@ -3733,6 +3733,9 @@ public class ButtonListener extends ListenerAdapter {
                     new RevealAgenda().revealAgenda(event, false, game, event.getChannel());
                     event.getMessage().delete().queue();
 
+                }
+                case "refreshAgenda" -> {
+                    AgendaHelper.refreshAgenda(game, event);
                 }
                 case "resolveVeto" -> {
                     String agendaCount = game.getStoredValue("agendaCount");
