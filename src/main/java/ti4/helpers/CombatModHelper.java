@@ -384,7 +384,7 @@ public class CombatModHelper {
                 }
                 case Constants.UNIT_TECH -> scalingCount = player.getTechs().stream()
                     .map(Mapper::getTech)
-                    .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
+                    .filter(TechnologyModel::isUnitUpgrade)
                     .count();
                 case Constants.MOD_DESTROYERS -> {
                     scalingCount = (long) ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
@@ -426,7 +426,7 @@ public class CombatModHelper {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
                             .map(Mapper::getTech)
-                            .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
+                            .filter(TechnologyModel::isUnitUpgrade)
                             .count();
                     }
                 }

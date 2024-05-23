@@ -2,7 +2,7 @@
     {
         "alias": "cop",
         "name": "Coproduction",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "syndicate",
         "source": "pbd2000",
@@ -11,7 +11,7 @@
     {
         "alias": "tac",
         "name": "Tactical Retreat",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "syndicate",
         "source": "pbd2000",
@@ -20,7 +20,7 @@
     {
         "alias": "negr",
         "name": "Nexus Grid",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "faction": "raven",
         "source": "pbd2000",
@@ -29,7 +29,7 @@
     {
         "alias": "stco",
         "name": "Stellar Corridors",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "faction": "raven",
         "source": "pbd2000",
@@ -38,7 +38,7 @@
     {
         "alias": "clmu",
         "name": "Cluster Munitions",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RRR",
         "faction": "terminator",
         "source": "pbd2000",
@@ -47,7 +47,7 @@
     {
         "alias": "aug",
         "name": "Augmentation",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "terminator",
         "source": "pbd2000",
@@ -56,7 +56,7 @@
     {
         "alias": "doba",
         "name": "Double Barrels",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "enclave",
         "source": "pbd2000",
@@ -65,7 +65,7 @@
     {
         "alias": "sap",
         "name": "Sappers",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YYY",
         "faction": "enclave",
         "source": "pbd2000",

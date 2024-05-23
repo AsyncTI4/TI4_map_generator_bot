@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,7 +18,8 @@ import ti4.model.Source.ComponentSource;
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
-    private TechnologyType type;
+    private String shortName;
+    private List<TechnologyType> types;
     private String requirements;
     private String faction;
     private String baseUpgrade;
@@ -25,7 +29,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
-        UNITUPGRADE, PROPULSION, BIOTIC, CYBERNETIC, WARFARE, NONE;
+        PROPULSION, CYBERNETIC, WARFARE, BIOTIC, UNITUPGRADE, NONE;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -35,12 +39,90 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return alias != null
             && name != null
-            && type != null
+            && types != null
+            && !types.isEmpty()
             // && getRequirements() != null
             // && getFaction() != null
             // && getBaseUpgrade() != null
             && source != null
             && text != null;
+    }
+
+    /**
+     * @return the first techType in the list of techTypes - this will be broken for techs with multiple types
+     * @deprecated Added to handle the switch from [TechnologyType type] -> [List(TechnologyType)] types. Use helpers isPropulsionTech, isCyberneticTech, isBioticTech, isWarfareTech, and isUnitUpgrade instead
+     */
+    @Deprecated
+    @JsonIgnore
+    public TechnologyType getType() {
+        return types.get(0);
+    }
+
+    public boolean isPropulsionTech() {
+        return types.contains(TechnologyType.PROPULSION);
+    }
+
+    public boolean isCyberneticTech() {
+        return types.contains(TechnologyType.CYBERNETIC);
+    }
+
+    public boolean isBioticTech() {
+        return types.contains(TechnologyType.BIOTIC);
+    }
+
+    public boolean isWarfareTech() {
+        return types.contains(TechnologyType.WARFARE);
+    }
+
+    public boolean isUnitUpgrade() {
+        return types.contains(TechnologyType.UNITUPGRADE);
+    }
+
+    public boolean isDualPropulsionCybernetic() {
+        return isPropulsionTech() && isCyberneticTech();
+    }
+
+    public boolean isDualPropulsionBiotic() {
+        return isPropulsionTech() && isBioticTech();
+    }
+
+    public boolean isDualPropulsionWarfare() {
+        return isPropulsionTech() && isWarfareTech();
+    }
+
+    public boolean isDualCyberneticBiotic() {
+        return isCyberneticTech() && isBioticTech();
+    }
+
+    public boolean isDualCyberneticWarfare() {
+        return isCyberneticTech() && isWarfareTech();
+    }
+
+    public boolean isDualWarfareBiotic() {
+        return isWarfareTech() && isBioticTech();
+    }
+
+    public boolean hasMoreThanOneType() {
+        return types.size() > 1;
+    }
+
+    public String getImageFileModifier() {
+        if (types.size() == 2) {
+            if (isDualPropulsionBiotic()) {
+                return "propulsionbiotic";
+            } else if (isDualPropulsionCybernetic()) {
+                return "propulsioncybernetic";
+            } else if (isDualPropulsionWarfare()) {
+                return "propulsionwarfare";
+            } else if (isDualCyberneticBiotic()) {
+                return "cyberneticbiotic";
+            } else if (isDualCyberneticWarfare()) {
+                return "cyberneticwarfare";
+            } else if (isDualWarfareBiotic()) {
+                return "warfarebiotic";
+            }
+        }
+        return getType().toString();
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = TechnologyModel::sortTechsByRequirements;
@@ -65,6 +147,12 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return sortFactionTechsFirst(t1, t2) * -1;
     }
 
+    public static final Comparator<TechnologyModel> sortByType = TechnologyModel::sortByType;
+
+    public static int sortByType(TechnologyModel t1, TechnologyModel t2) {
+        return t1.getType().compareTo(t2.getType());
+    }
+
     public Optional<String> getBaseUpgrade() {
         return Optional.ofNullable(baseUpgrade);
     }
@@ -79,6 +167,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getHomebrewReplacesID() {
         return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getName());
     }
 
     public String getRepresentation(boolean includeCardText) {
@@ -103,11 +195,14 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String factionEmoji = "";
-        String techFaction = getFaction().orElse("");
-        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
-        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSource().emoji());
+        StringBuilder title = new StringBuilder();
+        for (TechnologyType techType : types) {
+            title.append(Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech"));
+        }
+        title.append("**__").append(getName()).append("__**");
+        if (getFaction().isPresent()) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        title.append(getSource().emoji());
+        eb.setTitle(title.toString());
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
@@ -147,18 +242,20 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getRequirementsEmoji() {
         if (getRequirements().isPresent()) {
-            String requirements = getRequirements().get();
-            requirements = requirements.replace("B", Emojis.PropulsionTech);
-            requirements = requirements.replace("Y", Emojis.CyberneticTech);
-            requirements = requirements.replace("G", Emojis.BioticTech);
-            requirements = requirements.replace("R", Emojis.WarfareTech);
-            return requirements;
+            String reqs = getRequirements().get();
+            reqs = reqs.replace("B", Emojis.PropulsionTech);
+            reqs = reqs.replace("Y", Emojis.CyberneticTech);
+            reqs = reqs.replace("G", Emojis.BioticTech);
+            reqs = reqs.replace("R", Emojis.WarfareTech);
+            return reqs;
         }
         return "None";
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString)
+        return getAlias().toLowerCase().contains(searchString)
+            || getName().toLowerCase().contains(searchString)
+            || getFaction().orElse("").contains(searchString)
             || getSearchTags().contains(searchString);
     }
 

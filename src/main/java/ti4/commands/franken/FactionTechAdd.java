@@ -8,7 +8,6 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 
 public class FactionTechAdd extends FactionTechAddRemove {
@@ -35,7 +34,7 @@ public class FactionTechAdd extends FactionTechAddRemove {
             // ADD BASE UNIT IF ADDING UNIT UPGRADE TECH
             TechnologyModel techModel = Mapper.getTech(techID);
             if (techModel == null) continue;
-            if (techModel.getType() == TechnologyType.UNITUPGRADE) {
+            if (techModel.isUnitUpgrade()) {
                 UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
                 unitModel.getUpgradesFromUnitId().ifPresent(upgradesFromUnitId -> {
                     player.removeOwnedUnitByID(unitModel.getBaseType());

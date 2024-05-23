@@ -859,13 +859,13 @@ public class ButtonHelperHeroes {
         List<String> techs = new ArrayList<>();
         for (String tech : victim.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if ("unitupgrade".equalsIgnoreCase(techM.getType().toString())) {
+            if (techM.isUnitUpgrade()) {
                 if (techM.getFaction().orElse("").length() > 0) {
                     techM = Mapper.getTech(techM.getBaseUpgrade().orElse(tech));
                 }
                 for (String fTech : veldyr.getFactionTechs()) {
                     TechnologyModel techF = Mapper.getTech(fTech);
-                    if ("unitupgrade".equalsIgnoreCase(techF.getType().toString())) {
+                    if (techF.isUnitUpgrade()) {
                         if (techF.getBaseUpgrade().orElse("").equalsIgnoreCase(techM.getAlias())) {
                             techM = techF;
                         }
@@ -1687,7 +1687,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString())) {
+            if (!techM.isUnitUpgrade()) {
                 buttons.add(Button.secondary(finChecker + "jnHeroSwapOut_" + tech, techM.getName()));
             }
         }
