@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
@@ -19,6 +18,7 @@ import ti4.model.Source.ComponentSource;
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
+    private String shortName;
     private List<TechnologyType> types;
     private String requirements;
     private String faction;
@@ -167,6 +167,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getHomebrewReplacesID() {
         return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getName());
     }
 
     public String getRepresentation(boolean includeCardText) {

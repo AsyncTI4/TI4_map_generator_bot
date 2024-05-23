@@ -1124,7 +1124,8 @@ public class MapGenerator {
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
-                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                    g2.setFont(Storage.getFont20());
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, 130);
                 } else {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
@@ -1160,7 +1161,8 @@ public class MapGenerator {
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
-                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                    g2.setFont(Storage.getFont20());
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, 130);
                 } else {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
@@ -1247,8 +1249,8 @@ public class MapGenerator {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
                     LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148,
-                        Storage.getFont16(), 16);
+                    g2.setFont(Storage.getFont16());
+                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148, 130);
                 } else {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
@@ -1399,8 +1401,8 @@ public class MapGenerator {
             } else if (game.isFrankenGame()) {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
-                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144,
-                    Storage.getFont16(), 20);
+                g2.setFont(Storage.getFont16());
+                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
                 graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             }
 
@@ -2020,10 +2022,10 @@ public class MapGenerator {
             List<String> list = entry.getValue();
             list.sort(techComparator);
         }
-        
+
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        
+
         int deltaX = 0;
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, deltaX, player);
@@ -2060,7 +2062,7 @@ public class MapGenerator {
                 techStatus = "_exh.png";
             } else {
                 graphics.setColor(Color.WHITE);
-                techStatus = "_rdy.png";    
+                techStatus = "_rdy.png";
             }
 
             TechnologyModel techModel = Mapper.getTech(tech);
@@ -2093,7 +2095,8 @@ public class MapGenerator {
                     drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
                 }
             } else { //no special image, so draw the text
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 20, y + 148, Storage.getFont16(), 16);
+                graphics.setFont(Storage.getFont20());
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
             }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
@@ -2143,7 +2146,8 @@ public class MapGenerator {
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } else {
                 TechnologyModel techModel = Mapper.getTech(tech);
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+                graphics.setFont(Storage.getFont20());
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 130, 110);
             }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
@@ -4587,27 +4591,40 @@ public class MapGenerator {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 graphics2D.drawString(text,
-                    (y + j) * -1, // See
-                    // https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                    (y + j) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
                     x + graphics2D.getFontMetrics().getHeight() / 2 + i);
             }
         }
         graphics2D.setColor(originalColor);
 
         graphics2D.drawString(text,
-            (y) * -1, // See
-            // https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+            (y) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
             x + graphics2D.getFontMetrics().getHeight() / 2);
         graphics2D.setTransform(originalTransform);
     }
 
-    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, Font font, int offset) {
-        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 12).toUpperCase();
-        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 12).toUpperCase();
-        drawTextVertically(graphics, firstRow, x, y, font);
+    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+        String firstRow = StringUtils.substringBefore(text, "\n");
+        firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
+        String secondRow = text.replace(firstRow, "").replace("\n", "");
+        secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
+        drawTextVertically(graphics, firstRow, x, y, graphics.getFont());
         if (StringUtils.isNotBlank(secondRow)) {
-            drawTextVertically(graphics, secondRow, x + offset, y, font);
+            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont());
         }
+    }
+
+    private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
+        int currentPixels = 0;
+        for (int i = 0; i < text.length(); i++) {
+            currentPixels += graphics.getFontMetrics().charWidth(text.charAt(i));
+            if (currentPixels > pixelLength) {
+                return text.substring(0, i);
+            }
+        }
+        return text;
     }
 
 }
