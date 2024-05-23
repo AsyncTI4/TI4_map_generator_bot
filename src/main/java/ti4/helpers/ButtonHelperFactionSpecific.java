@@ -2037,6 +2037,10 @@ public class ButtonHelperFactionSpecific {
             msg = sb.toString();
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+        for (Player p2 : game.getRealPlayers()) {
+            ButtonHelper.fullCommanderUnlockCheck(p2, game, "ghost", event);
+        }
         event.getMessage().delete().queue();
     }
 
