@@ -365,7 +365,7 @@ public class TurnEnd extends PlayerSubcommandData {
             String message2b = "none";
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
-                if (!scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
+                if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie);
                     int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
@@ -386,8 +386,8 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), ms2);
             }
-            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts if you'd like, and we'll share everyone's at the end of the game. You can share highlights or plots or theories/predictions or anything you want (or nothing). Simply start your message with endofround" + game.getRound()
-                + " (capitalization doesnt matter) and then the rest of it will get recorded. You can do multiple messages if youd like, and theyll all get added onto eachother.";
+            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts, to be shared at the end of the game. Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing). Simply start your message with endofround" + game.getRound()
+                + " (capitalization doesnt matter) and the rest of the message will get recorded. You can do multiple messages, and they'll all get added onto eachother.";
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), endOfRoundMessage);
         }
 

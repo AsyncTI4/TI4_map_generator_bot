@@ -1266,7 +1266,7 @@ public class Helper {
         for (String thing : spentThings) {
             if (!thing.contains("tg_") && !thing.contains("boon") && !thing.contains("sarween")
                 && !thing.contains("absol_sarween")
-                && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida")
+                && !thing.contains("ghoti") && !thing.contains("aida")
                 && !thing.contains("commander") && !thing.contains("Agent")) {
                 Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
@@ -1360,7 +1360,8 @@ public class Helper {
                 } else if (thing.contains("Agent")) {
                     msg = msg + "> " + thing + "\n";
                 } else if (thing.contains("custodia")) {
-                    msg = msg + "> " + "Custiodia Vigilia (2/3)" + "\n";
+                    //game.getPlanetsInfo().get("custodiavigilia")
+                    msg = msg + "> " + "Custodia Vigilia (2/3)" + "\n";
                     res = res + 2;
                     inf = inf + 3;
                 } else if (thing.contains("ghoti")) {
