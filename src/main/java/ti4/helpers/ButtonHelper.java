@@ -1044,6 +1044,7 @@ public class ButtonHelper {
                 msg = msg + player.getFactionEmoji() + ": Did not follow\n";
             }
         }
+        //game.getTableTalkChannel().sendMessage(msg).queueAfter(20,TimeUnit.MINUTES);
         MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg);
         game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
     }
@@ -2836,9 +2837,11 @@ public class ButtonHelper {
             AddCC.addCC(event, target.getColor(), tile);
 
         }
+
         MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, game),
             mahact.getRepresentation(true, true) + " the " + target.getColor()
                 + " CC has been removed from your fleet pool");
+        ButtonHelper.checkFleetInEveryTile(mahact, game, event);
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Button.danger(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
@@ -5700,6 +5703,7 @@ public class ButtonHelper {
                         || ("mech".equalsIgnoreCase(unitName)
                             && doesPlayerHaveFSHere("nekro_flagship", player, tile))
                         || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2"))
+                        || ("mech".equalsIgnoreCase(unitName) && ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile))
                         || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
                         Button validTile2 = Button
                             .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName,
@@ -9520,6 +9524,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(true, true) + " acquired Warsun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
+            ButtonHelper.checkFleetInEveryTile(owner, game, event);
             String reducedMsg = owner.getRepresentation(true, true)
                 + " reduced your fleet CC by 1 due to fires being played";
             if (game.isFoWMode()) {

@@ -390,9 +390,7 @@ public class CombatModHelper {
                     scalingCount = (long) ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
-                    scalingCount += opponentUnitsInCombat.stream()
-                        .filter(unit -> !unit.getBaseType().equals("fighter"))
-                        .count();
+                    scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, game, activeSystem);
                 }
                 case "combat_round" -> {
                     int round = 0;

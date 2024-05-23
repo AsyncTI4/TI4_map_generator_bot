@@ -220,6 +220,17 @@ public class SCPlay extends PlayerSubcommandData {
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
                                 "These buttons will work inside the thread", scButtons);
+                            if (scToPlay == 5) {
+                                String neighborsMsg = "As a reminder, the following factions are not neighbors with the trade holder:";
+                                for (Player p2 : game.getRealPlayers()) {
+                                    if (!player.getNeighbouringPlayers().contains(p2)) {
+                                        neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
+                                    }
+                                }
+                                if (!player.getPromissoryNotes().containsKey("convoys") && !player.hasAbility("guild_ships")) {
+                                    MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
+                                }
+                            }
                         }
                     }
                 });

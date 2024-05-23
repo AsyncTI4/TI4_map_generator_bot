@@ -270,7 +270,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {
-            String message = ButtonHelper.getIdent(player) + " Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getRepresentation() + " Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, game);
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.primary("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
