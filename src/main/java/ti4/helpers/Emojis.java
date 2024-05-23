@@ -749,6 +749,37 @@ public class Emojis {
     public static final String Franken15 = "<:Franken15:1222165995733385287>";
     public static final String Franken16 = "<:Franken16:1222165988238430238>";
 
+    // EMOJI FARM 18 - MISC FACTION EMBLEMS
+    public static final String franken_aurilian_vanguard = "<:franken_aurilian_vanguard:1243245354439282761>";
+    public static final String franken_aelorian_clans = "<:franken_aelorian_clans:1243245353411809341>";
+    public static final String franken_dakari_hegemony = "<:franken_dakari_hegemony:1243245355395715202>";
+    public static final String franken_durethian_shard = "<:franken_durethian_shard:1243245356364468304>";
+    public static final String franken_elyndor_consortium = "<:franken_elyndor_consortium:1243245357480284190>";
+    public static final String franken_fal_kesh_covenant = "<:franken_fal_kesh_covenant:1243245358600028210>";
+    public static final String franken_ghaldir_union = "<:franken_ghaldir_union:1243245359812182126>";
+    public static final String franken_helian_imperium = "<:franken_helian_imperium:1243245360835727461>";
+    public static final String franken_jhoran_brotherhood = "<:franken_jhoran_brotherhood:1243245493736308958>";
+    public static final String franken_kyrenic_republic = "<:franken_kyrenic_republic:1243245364228788244>";
+    public static final String franken_lysarian_order = "<:franken_lysarian_order:1243245527261253634>";
+    public static final String franken_mydran_assembly = "<:franken_mydran_assembly:1243245368099995840>";
+    public static final String franken_nyridian_coalition = "<:franken_nyridian_coalition:1243245546454646974>";
+    public static final String franken_olthax_collective = "<:franken_olthax_collective:1243245371405111378>";
+    public static final String franken_qalorian_federation = "<:franken_qalorian_federation:1243245374815076372>";
+    public static final String franken_prayers_of_trudval = "<:franken_prayers_of_trudval:1243245571741843598>";
+    public static final String franken_rak_thul_tribes = "<:franken_rak_thul_tribes:1243245697613037588>";
+    public static final String franken_sol_tari_dynasty = "<:franken_sol_tari_dynasty:1243245378451668992>";
+    public static final String franken_syrketh_conclave = "<:franken_syrketh_conclave:1243245384781004961>";
+    public static final String franken_thalassian_guild = "<:franken_thalassian_guild:1243245385934307409>";
+    public static final String franken_thraxian_imperium = "<:franken_thraxian_imperium:1243245718936883230>";
+    public static final String franken_thymarian_league = "<:franken_thymarian_league:1243245388648157204>";
+    public static final String franken_valxian_pact = "<:franken_valxian_pact:1243245733142859816>";
+    public static final String franken_var_sul_syndicate = "<:franken_var_sul_syndicate:1243245392158527528>";
+    public static final String franken_veridian_empire = "<:franken_veridian_empire:1243245757285269514>";
+    public static final String franken_zel_tharr_dominion = "<:franken_zel_tharr_dominion:1243245395685933197>";
+    public static final String franken_zircon_ascendancy = "<:franken_zircon_ascendancy:1243245769826500628>";
+    public static final String franken_zor_thul_matriarchate = "<:franken_zor_thul_matriarchate:1243245399129722940>";
+
+
     // PBD2000 FACTIONS
     public static final String echoes = "<:echoes:1189668215413026968>";
     public static final String enclave = "<:enclave:1189668216478367744>";
