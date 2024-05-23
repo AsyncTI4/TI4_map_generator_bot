@@ -16,6 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
@@ -156,8 +158,17 @@ public class AgendaHelper {
                         for (Player playerB : game.getRealPlayers()) {
                             if (playerB.getFleetCC() > 4) {
                                 playerB.setFleetCC(4);
+                                ButtonHelper.checkFleetInEveryTile(playerB, game, event);
+                            }
+                            if (playerB.hasAbility("imperia")) {
+                                if (playerB.getFleetCC() + playerB.getMahactCC().size() > 4) {
+                                    int min = Math.max(0, 4 - playerB.getMahactCC().size());
+                                    playerB.setFleetCC(min);
+                                    ButtonHelper.checkFleetInEveryTile(playerB, game, event);
+                                }
                             }
                         }
+
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                             game.getPing() + " Reduced people's fleets to 4 if they had more than that");
                     } else {
@@ -386,6 +397,7 @@ public class AgendaHelper {
                     player2.setFleetCC(3);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Set " + ButtonHelper.getIdentOrColor(player2, game) + " CCs to 3/3/2");
+                    ButtonHelper.checkFleetInEveryTile(player2, game, event);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
                     DrawRelic.drawRelicAndNotify(player2, event, game);
@@ -2917,6 +2929,36 @@ public class AgendaHelper {
         planetButtons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "proceedToFinalizingVote",
             "Done exhausting planets."));
         return planetButtons;
+    }
+
+    public static void refreshAgenda(Game game, ButtonInteractionEvent event) {
+        String agendaDetails = game.getCurrentAgendaInfo();
+        String agendaID = "CL";
+        if (StringUtils.countMatches(agendaDetails, "_") > 2) {
+            if (StringUtils.countMatches(agendaDetails, "_") > 3) {
+                agendaID = StringUtils.substringAfter(agendaDetails, agendaDetails.split("_")[2] + "_");
+            } else {
+                agendaID = agendaDetails.split("_")[3];
+            }
+        }
+        AgendaModel agendaModel = Mapper.getAgenda(agendaID);
+        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
+
+        String revealMessage = "Refreshed Agenda";
+        MessageHelper.sendMessageToChannelWithEmbed(game.getMainGameChannel(), revealMessage, agendaEmbed);
+        List<Button> proceedButtons = new ArrayList<>();
+        String msg = "Buttons for various things";
+
+        ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+
+        proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
+        proceedButtons.add(Button.primary("transaction", "Transaction"));
+        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
+        proceedButtons.add(Button.secondary("refreshAgenda", "Refresh Agenda"));
+
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
     }
 
     public static void proceedToFinalizingVote(Game game, Player player, ButtonInteractionEvent event) {
