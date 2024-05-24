@@ -305,8 +305,8 @@ public class MessageListener extends ListenerAdapter {
                             if (!player.hasFollowedSC(sc)) {
                                 int twenty4 = 24;
                                 int half = 12;
-                                if (!game.getStoredValue("fastSCFollows").isEmpty()) {
-                                    twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollows"));
+                                if (!game.getStoredValue("fastSCFollow").isEmpty()) {
+                                    twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
                                     half = twenty4 / 2;
                                 }
                                 long twelveHrs = half * 60 * 60 * multiplier;

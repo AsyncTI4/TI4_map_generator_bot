@@ -1298,7 +1298,7 @@ public class ButtonHelperAbilities {
             successMessage = "Produced 2 " + Emojis.fighter + " in tile "
                 + tile.getRepresentationForButtons(game, player) + ".";
         }
-        if (!game.getLaws().containsKey("articles_war")) {
+        if (!ButtonHelper.isLawInPlay(game, "articles_war")) {
             successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, game, player, event);
         }
 

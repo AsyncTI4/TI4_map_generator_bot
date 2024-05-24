@@ -1580,7 +1580,7 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 opponent = p2;
             }
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteTheOneButton(event);
             if (opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
                 ButtonHelperModifyUnits.autoMateGroundCombat(p1, p2, planet, game, event);
             } else {
@@ -2210,7 +2210,7 @@ public class ButtonListener extends ListenerAdapter {
             if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
                 ButtonHelper.commanderUnlockCheck(player, game, "mahact", event);
             }
-            if (game.getLaws().containsKey("regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
+            if (ButtonHelper.isLawInPlay(game, "regulations") && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
             }
             ButtonHelper.deleteTheOneButton(event);
@@ -3009,12 +3009,23 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveRelicSwapStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("relicSwapStep1")) {
             ButtonHelperHeroes.resolveRelicSwapStep1(player, game, event, buttonID);
+        } else if (buttonID.startsWith("retrieveAgenda_")) {
+            String agendaID = buttonID.substring(buttonID.indexOf("_") + 1);
+            DrawAgenda.drawSpecificAgenda(agendaID, game, player);
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("topAgenda_")) {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);
+            String key = "round" + game.getRound() + "AgendaPlacement";
+            if (game.getStoredValue(key).isEmpty()) {
+                game.setStoredValue(key, "top");
+            } else {
+                game.setStoredValue(key, game.getStoredValue(key) + "_top");
+            }
             AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Put " + agenda.getName() + " on the top of the agenda deck.");
+            Button reassign = Button.secondary("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
+            MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
+                "Put " + agenda.getName() + " on the top of the agenda deck. You can use this button to undo that and reassign it", reassign);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveCounterStroke_")) {
             ButtonHelperActionCards.resolveCounterStroke(game, player, event, buttonID);
@@ -3051,8 +3062,15 @@ public class ButtonListener extends ListenerAdapter {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
             AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Put " + agenda.getName() + " on the bottom of the agenda deck.");
+            Button reassign = Button.secondary("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
+            MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
+                "Put " + agenda.getName() + " on the bottom of the agenda deck. You can use this button to undo that and reassign it", reassign);
+            String key = "round" + game.getRound() + "AgendaPlacement";
+            if (game.getStoredValue(key).isEmpty()) {
+                game.setStoredValue(key, "bottom");
+            } else {
+                game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
+            }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("discardAgenda_")) {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
@@ -4343,7 +4361,7 @@ public class ButtonListener extends ListenerAdapter {
                     String editedMessage = player.getRepresentation() + " CCs have gone from " + originalCCs + " -> "
                         + player.getCCRepresentation() + ". Net gain of: " + netGain;
                     event.getMessage().editMessage(editedMessage).queue();
-                    if (game.getLaws().containsKey("regulations") && player.getFleetCC() > 4) {
+                    if (ButtonHelper.isLawInPlay(game, "regulations") && player.getFleetCC() > 4) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is fleet regulations in place, which is limiting fleet cap to 4");
                     }
                 }
@@ -4995,6 +5013,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "Click the names of the planets you wish to exhaust to pay the 1 influence", buttons);
                     ButtonHelper.deleteTheOneButton(event);
+                    game.setStoredValue("lawsDisabled", "yes");
                 }
                 case "orbitolDropFollowUp" -> ButtonHelperAbilities.oribtalDropFollowUp(buttonID, event, game, player, ident);
                 case "dropAMechToo" -> {

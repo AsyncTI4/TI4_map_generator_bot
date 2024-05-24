@@ -1034,9 +1034,9 @@ public class ButtonHelper {
             if (!game.getStoredValue(key2).isEmpty()) {
                 msg = msg + "(From RA: ";
                 if (game.getStoredValue(key2).contains(".")) {
-                    String tech1 = StringUtils.substringBefore(game.getStoredValue(key2), ".");
-                    String tech2 = StringUtils.substringAfter(game.getStoredValue(key2), ".");
-                    msg = msg + " " + Mapper.getTech(tech1).getNameRepresentation() + "and " + Mapper.getTech(tech2).getNameRepresentation();
+                    for (String tech : game.getStoredValue(key2).split("\\.")) {
+                        msg = msg + " " + Mapper.getTech(tech).getNameRepresentation();
+                    }
 
                 } else {
                     msg = msg + " " + Mapper.getTech(game.getStoredValue(key2)).getNameRepresentation();
@@ -1054,7 +1054,7 @@ public class ButtonHelper {
                 }
                 msg = msg + "\n";
             } else {
-                msg = msg + " Did not follow\n";
+                msg = msg + " Did not follow for tech\n";
             }
         }
         String key2 = "TechForRound" + game.getRound() + "Counter";
@@ -1137,7 +1137,7 @@ public class ButtonHelper {
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
-        if (game.getLaws().containsKey("revolution")) {
+        if (ButtonHelper.isLawInPlay(game, "revolution")) {
             MessageHelper.sendMessageToChannelWithButton(getCorrectChannel(player, game),
                 player.getRepresentation()
                     + " Due to the anti-intellectual revolution law, you now have to kill a non-fighter ship if you researched the tech you just acquired",
@@ -1279,7 +1279,17 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    public static boolean isLawInPlay(Game game, String lawID) {
+        if (game.getStoredValue("lawsDisabled").equalsIgnoreCase("yes")) {
+            return false;
+        }
+        return game.getLaws().containsKey(lawID);
+    }
+
     public static boolean isPlayerElected(Game game, Player player, String lawID) {
+        if (game.getStoredValue("lawsDisabled").equalsIgnoreCase("yes")) {
+            return false;
+        }
         for (String law : game.getLaws().keySet()) {
             if (lawID.equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
@@ -1420,11 +1430,11 @@ public class ButtonHelper {
         Player ghostPlayer = Helper.getPlayerFromUnit(game, "ghost_mech");
         if (!game.isFoWMode() && ghostPlayer != null && ghostPlayer != player
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
-            && !game.getLaws().containsKey("articles_war")) {
+            && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
         }
-        if (!game.isFoWMode() && game.getLaws().containsKey("minister_peace")) {
+        if (!game.isFoWMode() && ButtonHelper.isLawInPlay(game, "minister_peace")) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, activeSystem, game)) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (isPlayerElected(game, p2, "minister_peace")) {
@@ -1610,7 +1620,7 @@ public class ButtonHelper {
             }
             if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem)
                 && nonActivePlayer.getMahactCC().contains(player.getColor())
-                && !game.getLaws().containsKey("articles_war")) {
+                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 if (justChecking) {
                     if (!game.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel,
@@ -1868,10 +1878,10 @@ public class ButtonHelper {
             return 999;
         }
         int limit = 7;
-        if (game.getLaws().containsKey("sanctions") && !game.isAbsolMode()) {
+        if (ButtonHelper.isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
             limit = 3;
         }
-        if (game.getLaws().containsKey("absol_sanctions")) {
+        if (ButtonHelper.isLawInPlay(game, "absol_sanctions")) {
             limit = 3;
             if (game.getLawsInfo().get("absol_sanctions") != null && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
                 limit = 5;
@@ -4607,7 +4617,7 @@ public class ButtonHelper {
         }
         new CombatRoll().secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos),
             unitHolderName, rollType);
-        if (buttonID.contains("bombardment") && game.getLaws().containsKey("conventions")) {
+        if (buttonID.contains("bombardment") && ButtonHelper.isLawInPlay(game, "conventions")) {
             boolean relevant = false;
             for (UnitHolder unitHolder : game.getTileByPosition(pos).getPlanetUnitHolders()) {
                 String planet = unitHolder.getName();
@@ -5706,7 +5716,7 @@ public class ButtonHelper {
                         || (player != game.getActivePlayer() && !"fighter".equalsIgnoreCase(unitName)
                             && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
                             && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander"))
-                        || ("warsun".equalsIgnoreCase(unitName) && !game.getLaws().containsKey("schematics"))
+                        || ("warsun".equalsIgnoreCase(unitName) && !ButtonHelper.isLawInPlay(game, "schematics"))
                         || "lady".equalsIgnoreCase(unitName) || "cavalry".equalsIgnoreCase(unitName)
                         || "flagship".equalsIgnoreCase(unitName)
                         || ("mech".equalsIgnoreCase(unitName)
@@ -6964,7 +6974,7 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model == null || (model.getId().equalsIgnoreCase("xxcha_mech") && game.getLaws().containsKey("articles_war"))) {
+                    if (model == null || (model.getId().equalsIgnoreCase("xxcha_mech") && ButtonHelper.isLawInPlay(game, "articles_war"))) {
                         continue;
                     }
                     if (model != null && model.getSpaceCannonDieCount() > 0
@@ -9211,7 +9221,11 @@ public class ButtonHelper {
                 return;
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, buttons);
+        if (player != null) {
+            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
+        }
     }
 
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {

@@ -87,7 +87,9 @@ public class PlanetAdd extends PlanetAddRemove {
                     if (player_.getExhaustedPlanetsAbilities().contains(planet)) {
                         player.exhaustPlanetAbility(planet);
                     }
-                    alreadyOwned = true;
+                    if (player_.isRealPlayer()) {
+                        alreadyOwned = true;
+                    }
                     player_.removePlanet(planet);
                     List<String> relics = new ArrayList<>();
                     relics.addAll(player_.getRelics());

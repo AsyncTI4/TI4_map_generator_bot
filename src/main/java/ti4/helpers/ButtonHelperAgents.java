@@ -1984,7 +1984,7 @@ public class ButtonHelperAgents {
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
             buttons.add(Button
                 .success("exhaustAgent_sardakkagent_" + game.getActiveSystem() + "_" + planetId,
-                    "Use Sardakk Agent Agent on " + planetRepresentation)
+                    "Use Sardakk Agent on " + planetRepresentation)
                 .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
             //}
         }
