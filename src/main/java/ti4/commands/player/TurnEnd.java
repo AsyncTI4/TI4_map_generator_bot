@@ -104,6 +104,7 @@ public class TurnEnd extends PlayerSubcommandData {
 
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         game.setTemporaryPingDisable(false);
+        game.setStoredValue("lawsDisabled", "no");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -137,6 +138,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
             showPublicObjectivesWhenAllPassed(event, game, gameChannel);
             game.updateActivePlayer(null);
+            ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event);
             return;
         }
 

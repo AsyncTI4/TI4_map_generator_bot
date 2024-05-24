@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -201,6 +202,16 @@ public class RevealAgenda extends AgendaSubcommandData {
             "The game believes this is agenda #" + aCount + " of this agenda phase");
         if (!action && aCount == 1) {
             AgendaHelper.pingAboutDebt(game);
+            String key = "round" + game.getRound() + "AgendaPlacement";
+            if (!game.getStoredValue(key).isEmpty() && !game.isFoWMode()) {
+                String message = "Politics holder did the following with the agendas in terms of topping or bottoming them:";
+                for (String actionA : game.getStoredValue(key).split("_")) {
+                    message = message + " " + StringUtils.capitalize(actionA);
+                }
+                MessageHelper.sendMessageToChannel(channel,
+                    message);
+
+            }
         }
         for (Player player : game.getRealPlayers()) {
             if (!action && game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")

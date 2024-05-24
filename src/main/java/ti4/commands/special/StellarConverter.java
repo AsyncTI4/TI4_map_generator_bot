@@ -81,7 +81,7 @@ public class StellarConverter extends SpecialSubcommandData {
                     if (unitHolder.getUnitCount(UnitType.Mech,
                         p2.getColor()) > 0
                         && p2.hasUnit("cabal_mech")
-                        && !game.getLaws().containsKey("articles_war")) {
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                         cabalMech = true;
                     }
                     if (p2.hasAbility("amalgamation")

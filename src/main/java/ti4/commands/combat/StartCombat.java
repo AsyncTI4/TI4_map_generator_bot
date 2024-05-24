@@ -24,6 +24,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CombatHelper;
 import ti4.helpers.CombatRollType;
 import ti4.helpers.Constants;
@@ -213,8 +214,22 @@ public class StartCombat extends CombatSubcommandData {
         sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
 
         if (isGroundCombat && !game.isFoWMode()) {
-            Button automate = Button.success("automateGroundCombat_" + player1.getFaction() + "_" + player2.getFaction() + "_" + unitHolderName + "_unconfirmed", "Automate Combat");
-            MessageHelper.sendMessageToChannelWithButton(threadChannel, "You can automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm", automate);
+            List<Button> autoButtons = new ArrayList<>();
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                List<Player> playersWithGF = new ArrayList<>();
+                for (Player player : game.getRealPlayersNDummies()) {
+                    if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(uH, player)) {
+                        playersWithGF.add(player);
+                    }
+                }
+                if (playersWithGF.size() > 1) {
+                    Button automate = Button.success("automateGroundCombat_" + playersWithGF.get(0).getFaction() + "_" + playersWithGF.get(1).getFaction() + "_" + unitHolderName + "_unconfirmed", "Automate Combat For " + Helper.getPlanetRepresentation(unitHolderName, game));
+                    autoButtons.add(automate);
+                }
+            }
+            if (autoButtons.size() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You can automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm", autoButtons);
+            }
         }
         // DS Lanefir ATS Armaments
         if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0)
@@ -424,7 +439,7 @@ public class StartCombat extends CombatSubcommandData {
             "Roll " + CombatRollType.AFB.getValue()));
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
         for (Player player : combatPlayers) {
-            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !game.getLaws().containsKey("articles_war")) {
+            if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + ButtonHelper.getIdentOrColor(player, game) + " due to their mech power");
             }
         }

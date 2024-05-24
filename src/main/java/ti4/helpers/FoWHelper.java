@@ -471,8 +471,8 @@ public class FoWHelper {
 			}
 		}
 
-		boolean wh_recon = game.getLaws().containsKey("wormhole_recon");
-		boolean absol_recon = game.getLaws().containsKey("absol_recon");
+		boolean wh_recon = ButtonHelper.isLawInPlay(game, "wormhole_recon");
+		boolean absol_recon = ButtonHelper.isLawInPlay(game, "absol_recon");
 		if (tile == null || tile.getTileID() == null) {
 			return adjacentPositions;
 		}

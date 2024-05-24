@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CombatHelper;
 import ti4.helpers.CombatMessageHelper;
@@ -142,7 +143,7 @@ public class CombatRoll extends CombatSubcommandData {
 
         Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
             rollType, game);
-        if (game.getLaws().containsKey("articles_war")) {
+        if (ButtonHelper.isLawInPlay(game, "articles_war")) {
             if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
                     .filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
