@@ -2,7 +2,7 @@
     {
         "alias": "pi_td",
         "name": "Tranist Diodes",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "source": "project_pi",
         "homebrewReplacesID": "td",
@@ -11,7 +11,7 @@
     {
         "alias": "pi_nm",
         "name": "Neural Motivator",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "source": "project_pi",
         "homebrewReplacesID": "nm",
         "text": "At the end of your turn, you may exhaust this card to draw 1 action card."
@@ -19,7 +19,7 @@
     {
         "alias": "pi_da",
         "name": "Dacxive Animators",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "source": "project_pi",
         "homebrewReplacesID": "da",
@@ -28,7 +28,7 @@
     {
         "alias": "pi_hm",
         "name": "Hyper Motabolism",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "source": "project_pi",
         "homebrewReplacesID": "hm",
@@ -37,7 +37,7 @@
     {
         "alias": "pi_psy",
         "name": "Psychoarchaeology",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "source": "project_pi",
         "homebrewReplacesID": "pa",
         "text": "You may exhaust this card to use thechnology specialties on planets you control without exhausting them, even if those planets are exhausted. You may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty."
@@ -45,7 +45,7 @@
     {
         "alias": "pi_x89",
         "name": "X-89 Bacterial Weapon",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "source": "project_pi",
         "homebrewReplacesID": "x89",
@@ -54,7 +54,7 @@
     {
         "alias": "pi_bs",
         "name": "Bio-Stems",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "source": "project_pi",
         "homebrewReplacesID": "bs",
@@ -63,7 +63,7 @@
     {
         "alias": "pi_ps",
         "name": "Plasma Scoring",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "source": "project_pi",
         "homebrewReplacesID": "ps",
         "text": "When 1 or more of your units make a roll for a unit ability, you may choose 1 of those units to roll 1 additional die."
@@ -71,7 +71,7 @@
     {
         "alias": "pi_mdg",
         "name": "Magen Defence Grid",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "source": "project_pi",
         "homebrewReplacesID": "md",
@@ -80,7 +80,7 @@
     {
         "alias": "pi_dur",
         "name": "Duranium Armor",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "source": "project_pi",
         "homebrewReplacesID": "da",
@@ -89,7 +89,7 @@
     {
         "alias": "pi_gls",
         "name": "Graviton Laser Systems",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "source": "project_pi",
         "homebrewReplacesID": "gls",
@@ -98,7 +98,7 @@
     {
         "alias": "pi_sar",
         "name": "Self Assembly Routines",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "source": "project_pi",
         "homebrewReplacesID": "sar",
@@ -107,7 +107,7 @@
     {
         "alias": "pi_fl",
         "name": "Fleet Logistics",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "source": "project_pi",
         "homebrewReplacesID": "fl",
@@ -116,7 +116,7 @@
     {
         "alias": "pi_st",
         "name": "Sarween Tools",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "source": "project_pi",
         "homebrewReplacesID": "st",
         "text": "When you produce 1 or more units, reduce the combined cost of the produced units by 1."
@@ -124,7 +124,7 @@
     {
         "alias": "pi_ie",
         "name": "Integrated Economy",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YYY",
         "source": "project_pi",
         "homebrewReplacesID": "ie",
@@ -133,7 +133,7 @@
     {
         "alias": "pi_pi",
         "name": "Predictive Intelligence",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "source": "project_pi",
         "homebrewReplacesID": "pi",
@@ -142,7 +142,7 @@
     {
         "alias": "pi_l4",
         "name": "L4 Disruptors",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "faction": "letnev",
         "source": "project_pi",
         "homebrewReplacesID": "l4",
@@ -151,7 +151,7 @@
     {
         "alias": "pi_vpw",
         "name": "Valkyrie Particle Weave",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "faction": "sardakk",
         "source": "project_pi",
@@ -161,7 +161,7 @@
     {
         "alias": "pi_exo2",
         "name": "Exotrieme II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "baseUpgrade": "dn2",
         "faction": "sardakk",
@@ -172,7 +172,7 @@
     {
         "alias": "pi_ac2",
         "name": "Advacned Carrier II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "baseUpgrade": "cv2",
         "faction": "sol",
@@ -183,7 +183,7 @@
     {
         "alias": "pi_so2",
         "name": "Spec Ops II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "baseUpgrade": "inf2",
         "faction": "sol",
@@ -194,7 +194,7 @@
     {
         "alias": "pi_it",
         "name": "Instinct Training",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "xxcha",
         "source": "project_pi",
@@ -204,7 +204,7 @@
     {
         "alias": "pi_nf",
         "name": "Nullification Field",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "xxcha",
         "source": "project_pi",
@@ -214,7 +214,7 @@
     {
         "alias": "pi_ers",
         "name": "E-Res Siphons",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "jolnar",
         "source": "project_pi",
@@ -224,7 +224,7 @@
     {
         "alias": "pi_pb",
         "name": "Production Biomes",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "hacan",
         "source": "project_pi",
@@ -234,7 +234,7 @@
     {
         "alias": "pi_tp",
         "name": "Transparasteel Plating",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "yssaril",
         "source": "project_pi",
@@ -244,7 +244,7 @@
     {
         "alias": "pi_hcf2",
         "name": "Hybrid Crystal Fighter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YB",
         "baseUpgrade": "ff2",
         "faction": "naalu",
@@ -255,7 +255,7 @@
     {
         "alias": "pi_sdn2",
         "name": "Super Dreadnaught II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "baseUpgrade": "dn2",
         "faction": "l1z1x",
@@ -266,7 +266,7 @@
     {
         "alias": "pi_is",
         "name": "Inheritance Sysytems",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "l1z1x",
         "source": "project_pi",
@@ -276,7 +276,7 @@
     {
         "alias": "pi_lgf",
         "name": "Lazax Gate Folding",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "winnu",
         "source": "project_pi",
@@ -286,7 +286,7 @@
     {
         "alias": "pi_htp",
         "name": "Hegemonic Trade Policy",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "winnu",
         "source": "project_pi",
@@ -296,7 +296,7 @@
     {
         "alias": "pi_cm",
         "name": "Chaos Mapping",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "BB",
         "faction": "saar",
         "source": "project_pi",
@@ -306,7 +306,7 @@
     {
         "alias": "pi_ffac2",
         "name": "Floating Factory II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "faction": "saar",
         "baseUpgrade": "sd2",
@@ -317,7 +317,7 @@
     {
         "alias": "pi_pws2",
         "name": "Protoype War Sun II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RRRY",
         "faction": "muaat",
         "baseUpgrade": "ws",
@@ -328,7 +328,7 @@
     {
         "alias": "pi_ic",
         "name": "Impluse Core",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "yin",
         "source": "project_pi",
@@ -338,7 +338,7 @@
     {
         "alias": "pi_bp",
         "name": "Bioplasmosis",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "arborec",
         "source": "project_pi",
@@ -348,7 +348,7 @@
     {
         "alias": "pi_lw2",
         "name": "Letani Warrior II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "baseUpgrade": "inf2",
         "faction": "arborec",
@@ -359,7 +359,7 @@
     {
         "alias": "pi_wg",
         "name": "Wormhole Generator",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "G",
         "faction": "ghost",
         "source": "project_pi",
@@ -369,7 +369,7 @@
     {
         "alias": "pi_se2",
         "name": "Saturn Engine II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GYB",
         "baseUpgrade": "cr2",
         "faction": "titans",
@@ -380,7 +380,7 @@
     {
         "alias": "pi_gr",
         "name": "Genetic Recombination",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "mahact",
         "source": "project_pi",
@@ -390,7 +390,7 @@
     {
         "alias": "pi_cl2",
         "name": "Crimson Legionnaire II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "baseUpgrade": "inf2",
         "faction": "mahact",
@@ -401,7 +401,7 @@
     {
         "alias": "pi_m2",
         "name": "Memoria II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RGB",
         "faction": "nomad",
         "source": "project_pi",
@@ -411,7 +411,7 @@
     {
         "alias": "pi_ws",
         "name": "War Sun",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YRRR",
         "source": "project_pi",
         "homebrewReplacesID": "ws",
@@ -420,7 +420,7 @@
     {
         "alias": "pi_cr2",
         "name": "Cruiser 2",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GYB",
         "source": "project_pi",
         "homebrewReplacesID": "cr2",
@@ -429,7 +429,7 @@
     {
         "alias": "pi_dn2",
         "name": "Dreadnaught II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "source": "project_pi",
         "homebrewReplacesID": "dn2",
@@ -438,7 +438,7 @@
     {
         "alias": "pi_cv2",
         "name": "Carrier II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "source": "project_pi",
         "homebrewReplacesID": "cv2",
@@ -447,7 +447,7 @@
     {
         "alias": "pi_ff2",
         "name": "Fighter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BY",
         "source": "project_pi",
         "homebrewReplacesID": "ff2",
@@ -456,7 +456,7 @@
     {
         "alias": "pi_inf2",
         "name": "Infantry II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "source": "project_pi",
         "homebrewReplacesID": "inf2",
@@ -465,7 +465,7 @@
     {
         "alias": "pi_sd2",
         "name": "Space Dock II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "source": "project_pi",
         "homebrewReplacesID": "sd2",

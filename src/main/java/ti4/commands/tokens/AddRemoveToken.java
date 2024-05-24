@@ -56,24 +56,32 @@ abstract public class AddRemoveToken implements Command {
                 colors.add(player.getColor());
 
             }
-            OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-            if (tileOption != null) {
-                String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
+            String tileOptions = event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString);
+            if (tileOptions != null) {
+                List<Tile> tiles = new ArrayList<>();
+                String tileString = tileOptions.toLowerCase().replace(" ", "");
+                StringTokenizer tileTokenizer = new StringTokenizer(tileString, ",");
+                while (tileTokenizer.hasMoreTokens()) {
+                    String tileID = AliasHandler.resolveTile(tileTokenizer.nextToken());
 
-                if (game.isTileDuplicated(tileID)) {
-                    MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
-                    return;
-                }
-                Tile tile = game.getTile(tileID);
-                if (tile == null) {
-                    tile = game.getTileByPosition(tileID);
-                }
-                if (tile == null) {
-                    MessageHelper.replyToMessage(event, "Tile in map not found");
-                    return;
+                    if (game.isTileDuplicated(tileID)) {
+                        MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+                        return;
+                    }
+                    Tile tile = game.getTile(tileID);
+                    if (tile == null) {
+                        tile = game.getTileByPosition(tileID);
+                    }
+                    if (tile == null) {
+                        MessageHelper.replyToMessage(event, "Tile in map not found");
+                        return;
+                    }
+                    tiles.add(tile);
                 }
 
-                parsingForTile(event, colors, tile, game);
+                for (Tile tile : tiles) {
+                  parsingForTile(event, colors, tile, game);
+                }
                 GameSaveLoadManager.saveMap(game, event);
                 ShowGame.simpleShowGame(game, event);
             } else {

@@ -2,7 +2,7 @@
     {
         "alias": "miltymod_fl",
         "name": "Fleet Logistics",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "source": "miltymod",
         "text": "During each of your turns of the action phase, after you perform an action, you may perform an additional tactical action.",
@@ -11,7 +11,7 @@
     {
         "alias": "miltymod_nm",
         "name": "Neural Motivator",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "source": "miltymod",
         "text": "At the end of your turn, you may exhaust this card to draw 1 action card.",
         "homebrewReplacesID": "nm"
@@ -19,7 +19,7 @@
     {
         "alias": "miltymod_dxa",
         "name": "Dacxive Animators",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "source": "miltymod",
         "text": "After 1 of your ground forces is destroyed during ground combat, you may place that unit on this card.\n \n At the end of your turn, you may exhaust this card to place any number of units from it onto a planet you control.",
@@ -28,7 +28,7 @@
     {
         "alias": "miltymod_hm",
         "name": "Hyper Metabolism",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "source": "miltymod",
         "text": "At the end of your turn, you may exhaust this card to gain 1 command token.",
@@ -37,7 +37,7 @@
     {
         "alias": "miltymod_x89",
         "name": "X-89 Bacterial Weapon",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "source": "miltymod",
         "text": "After 1 or more of your units use BOMBARDMENT against a planet, if at least 1 hit was produced, you may exhaust this card; if you do, destroy all other player's ground forces on that planet.",
@@ -46,7 +46,7 @@
     {
         "alias": "miltymod_st",
         "name": "Sarween Tools",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "source": "miltymod",
         "text": "When you produce 1 or more units, reduce the combined cost of the produced units by 1.",
         "homebrewReplacesID": "st"
@@ -54,7 +54,7 @@
     {
         "alias": "miltymod_gls",
         "name": "Graviton Laser System",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "source": "miltymod",
         "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.\n \n You may exhaust this card at the start of a space combat round; hits produced by your units this round must be assigned to non-fighter ships if able.",
@@ -63,7 +63,7 @@
     {
         "alias": "miltymod_ie",
         "name": "Integrated Economy",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YYY",
         "source": "miltymod",
         "text": "After you gain control of a planet, you may produce any number of units on that planet that have a combined cost equal or less than the sum of that planet's resource and influence values.",
@@ -72,7 +72,7 @@
     {
         "alias": "miltymod_ps",
         "name": "Plasma Scoring",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "source": "miltymod",
         "text": "When 1 or more of your units make a roll for a unit ability, you may choose 1 of those units to roll 1 additional die.",
         "homebrewReplacesID": "ps"
@@ -80,7 +80,7 @@
     {
         "alias": "miltymod_md",
         "name": "Magen Defense Grid",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "source": "miltymod",
         "text": "You may exhaust this card at the start of a round of ground combat on a planet you control; your opponent cannot make combat rolls during this combat round.",
@@ -89,7 +89,7 @@
     {
         "alias": "miltymod_da",
         "name": "Duranium Armor",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "source": "miltymod",
         "text": "During each combat round, after you assign hits to your units, repair 1 of your participating damaged units that did not use SUSTAIN DAMAGE during this combat round.",
@@ -98,7 +98,7 @@
     {
         "alias": "miltymod_sd2",
         "name": "Space Dock II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "source": "miltymod",
         "text": "This unit's Production value is equal to 5 more than the resource value of this planet.\n \n Up to 5 fighters in this system do not count against your ships' capacity.\n \nWhen you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.\n \n PRODUCTION X",
@@ -107,7 +107,7 @@
     {
         "alias": "miltymod_inf2",
         "name": "Infantry II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "source": "miltymod",
         "text": "COST: 1(x2); COMBAT 7\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
@@ -116,7 +116,7 @@
     {
         "alias": "miltymod_ff2",
         "name": "Fighter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BY",
         "source": "miltymod",
         "text": "COST: 1(x2); COMBAT 8; MOVE 2\n \n This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
@@ -125,7 +125,7 @@
     {
         "alias": "miltymod_cr2",
         "name": "Cruiser II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GYR",
         "source": "miltymod",
         "text": "COST 2; COMBAT 6; MOVE 3; CAPACITY 1\n \n When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.",
@@ -134,7 +134,7 @@
     {
         "alias": "miltymod_cv2",
         "name": "Carrier II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "source": "miltymod",
         "text": "COST 3; COMBAT 9; MOVE 2; CAPACITY 6",
@@ -143,7 +143,7 @@
     {
         "alias": "miltymod_dn2",
         "name": "Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "source": "miltymod",
         "text": "COST 4; COMBAT 4; MOVE 2; CAPACITY 1\n \n SUSTAIN DAMAGE, BOMBARDMENT 4",
@@ -152,7 +152,7 @@
     {
         "alias": "miltymod_ws",
         "name": "War Sun",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GYRR",
         "source": "miltymod",
         "text": "COST 12; COMBAT 3(x3); MOVE 2; CAPACITY 6\n \n Other player's units in this system lose PLANETARY SHIELD.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x3)",
@@ -161,7 +161,7 @@
     {
         "alias": "miltymod_pm",
         "name": "Production Biomes",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "hacan",
         "source": "miltymod",
@@ -171,7 +171,7 @@
     {
         "alias": "miltymod_ac2",
         "name": "Advanced Carrier II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GB",
         "faction": "sol",
         "baseUpgrade": "miltymod_cv2",
@@ -182,7 +182,7 @@
     {
         "alias": "miltymod_so2",
         "name": "Spec Ops II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "faction": "sol",
         "baseUpgrade": "miltymod_inf2",
@@ -193,7 +193,7 @@
     {
         "alias": "miltymod_l4",
         "name": "L4 Disruptors",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "",
         "faction": "letnev",
         "source": "miltymod",
@@ -203,7 +203,7 @@
     {
         "alias": "miltymod_it",
         "name": "Instinct Training",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "xxcha",
         "source": "miltymod",
@@ -213,7 +213,7 @@
     {
         "alias": "miltymod_ers",
         "name": "E-Res Siphons",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "jolnar",
         "source": "miltymod",
@@ -223,7 +223,7 @@
     {
         "alias": "miltymod_vpw",
         "name": "Valkyrie Particle Weave",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "faction": "sardakk",
         "source": "miltymod",
@@ -233,7 +233,7 @@
     {
         "alias": "miltymod_exo2",
         "name": "Exotrireme II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "faction": "sardakk",
         "baseUpgrade": "miltymod_dn2",
@@ -244,7 +244,7 @@
     {
         "alias": "miltymod_is",
         "name": "Inheritance Systems",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "l1z1x",
         "source": "miltymod",
@@ -254,7 +254,7 @@
     {
         "alias": "miltymod_sdn2",
         "name": "Super-Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RBY",
         "faction": "l1z1x",
         "baseUpgrade": "miltymod_dn2",
@@ -265,7 +265,7 @@
     {
         "alias": "miltymod_hcf2",
         "name": "Hybrid Crystal Fighter II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BY",
         "faction": "naalu",
         "baseUpgrade": "miltymod_ff2",
@@ -276,7 +276,7 @@
     {
         "alias": "miltymod_lgf",
         "name": "Lazax Gate Folding",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "winnu",
         "source": "miltymod",
@@ -286,7 +286,7 @@
     {
         "alias": "miltymod_htp",
         "name": "Hegemonic Trade Policy",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "winnu",
         "source": "miltymod",
@@ -296,7 +296,7 @@
     {
         "alias": "miltymod_mr",
         "name": "Magmus Reactor",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "muaat",
         "source": "miltymod",
@@ -306,7 +306,7 @@
     {
         "alias": "miltymod_pws2",
         "name": "Prototype Warsun II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GYRR",
         "faction": "muaat",
         "source": "miltymod",
@@ -316,7 +316,7 @@
     {
         "alias": "miltymod_yso",
         "name": "Yin Spinner",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "yin",
         "source": "miltymod",
@@ -326,7 +326,7 @@
     {
         "alias": "miltymod_ic",
         "name": "Impulse Core",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "yin",
         "source": "miltymod",
@@ -336,7 +336,7 @@
     {
         "alias": "miltymod_cm",
         "name": "Chaos Mapping",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BBB",
         "faction": "saar",
         "source": "miltymod",
@@ -346,7 +346,7 @@
     {
         "alias": "miltymod_ffac2",
         "name": "Floating Factory II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "faction": "saar",
         "baseUpgrade": "miltymod_sd2",
@@ -357,7 +357,7 @@
     {
         "alias": "miltymod_wg",
         "name": "Wormhole Generator",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "ghost",
         "source": "miltymod",
@@ -367,7 +367,7 @@
     {
         "alias": "miltymod_bio",
         "name": "Bioplasmosis",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "arborec",
         "source": "miltymod",
@@ -377,7 +377,7 @@
     {
         "alias": "miltymod_lw2",
         "name": "Letani Warrior II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "faction": "arborec",
         "baseUpgrade": "miltymod_inf2",

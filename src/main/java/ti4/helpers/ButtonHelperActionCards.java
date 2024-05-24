@@ -468,8 +468,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString())
-                && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
+            if (!techM.isUnitUpgrade() && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
                 buttons.add(Button.secondary(finChecker + "divertFunding@" + tech, techM.getName()));
             }
         }
@@ -1818,12 +1817,12 @@ public class ButtonHelperActionCards {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                if ("unitupgrade".equalsIgnoreCase(Mapper.getTech(tech).getType().toString())) {
+                if (Mapper.getTech(tech).isUnitUpgrade()) {
                     boolean hasSpecialUpgrade = false;
                     for (String factionTech : player.getNotResearchedFactionTechs()) {
                         TechnologyModel fTech = Mapper.getTech(factionTech);
                         if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
-                            && "unitupgrade".equalsIgnoreCase(fTech.getType().toString())
+                            && fTech.isUnitUpgrade()
                             && fTech.getBaseUpgrade().orElse("bleh")
                                 .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
                             hasSpecialUpgrade = true;

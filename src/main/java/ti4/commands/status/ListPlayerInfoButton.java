@@ -33,6 +33,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TechnologyModel.TechnologyType;
 
 public class ListPlayerInfoButton extends StatusSubcommandData {
     public ListPlayerInfoButton() {
@@ -521,16 +522,16 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "diversify", "master_science" -> {
                 int numAbove1 = 0;
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, "warfare") > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.WARFARE) > 1) {
                     numAbove1++;
                 }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, "propulsion") > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.PROPULSION) > 1) {
                     numAbove1++;
                 }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, "biotic") > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.BIOTIC) > 1) {
                     numAbove1++;
                 }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, "cybernetic") > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.CYBERNETIC) > 1) {
                     numAbove1++;
                 }
                 return numAbove1;
