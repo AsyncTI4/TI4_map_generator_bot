@@ -696,11 +696,11 @@ public class Game {
     }
 
     public boolean isFowOptionHideNames() {
-      return fowOptionHideNames;
+        return fowOptionHideNames;
     }
 
     public void setFowOptionHideNames(boolean fowOptionHideNames) {
-      this.fowOptionHideNames = fowOptionHideNames;
+        this.fowOptionHideNames = fowOptionHideNames;
     }
 
     public boolean isLightFogMode() {
@@ -3985,8 +3985,8 @@ public class Game {
     }
 
     public Optional<Player> getPlayerByColorID(String color) {
-        return getRealPlayers().stream()
-            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
+        return getPlayers().values().stream()
+            .filter(otherPlayer -> otherPlayer.getColor() != null && Mapper.getColorID(otherPlayer.getColor()).equals(color))
             .findFirst();
     }
 

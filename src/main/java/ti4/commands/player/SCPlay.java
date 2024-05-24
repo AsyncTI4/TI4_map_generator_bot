@@ -223,7 +223,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (scToPlay == 5) {
                                 String neighborsMsg = "As a reminder, the following factions are not neighbors with the trade holder:";
                                 for (Player p2 : game.getRealPlayers()) {
-                                    if (!player.getNeighbouringPlayers().contains(p2)) {
+                                    if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
                                         neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
                                     }
                                 }
