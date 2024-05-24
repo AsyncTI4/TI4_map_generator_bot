@@ -66,6 +66,7 @@ public class TurnStart extends PlayerSubcommandData {
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setNaaluAgent(false);
         game.setL1Hero(false);
+        game.setStoredValue("lawsDisabled", "no");
         game.checkSOLimit(player);
         game.setStoredValue("vaylerianHeroActive", "");
         game.setStoredValue("tnelisCommanderTracker", "");
@@ -400,7 +401,7 @@ public class TurnStart extends PlayerSubcommandData {
                     }
                 } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
                     && ButtonHelper.getTilesWithYourCC(p1, game, event).size() > 0) {
-                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use " + leaderName)
+                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use Mahact Commander")
                         .withEmoji(Emoji.fromFormatted(factionEmoji));
                     startButtons.add(lButton);
                 }

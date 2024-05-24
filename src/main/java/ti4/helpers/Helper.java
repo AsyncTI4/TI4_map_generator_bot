@@ -1622,8 +1622,8 @@ public class Helper {
         int numInf = 0;
         int numFF = 0;
         int totalUnits = 0;
-        boolean regulated = game.getLaws().containsKey("conscription")
-            || game.getLaws().containsKey("absol_conscription");
+        boolean regulated = ButtonHelper.isLawInPlay(game, "conscription")
+            || ButtonHelper.isLawInPlay(game, "absol_conscription");
         for (String unit : producedUnits.keySet()) {
             String unit2 = unit.split("_")[0];
             if (unit.contains("gf")) {
@@ -1716,8 +1716,8 @@ public class Helper {
                 resourcelimit = planetUh.getResources();
             }
         }
-        boolean regulated = game.getLaws().containsKey("conscription")
-            || game.getLaws().containsKey("absol_conscription");
+        boolean regulated = ButtonHelper.isLawInPlay(game, "conscription")
+            || ButtonHelper.isLawInPlay(game, "absol_conscription");
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {

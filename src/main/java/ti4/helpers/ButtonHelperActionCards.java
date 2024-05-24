@@ -1588,7 +1588,7 @@ public class ButtonHelperActionCards {
                 && game.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech,
                     p2.getColor()) > 0
                 && p2.hasUnit("cabal_mech")
-                && !game.getLaws().containsKey("articles_war")) {
+                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation")
@@ -1676,7 +1676,7 @@ public class ButtonHelperActionCards {
                 && game.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech,
                     p2.getColor()) > 0
                 && p2.hasUnit("cabal_mech")
-                && !game.getLaws().containsKey("articles_war")) {
+                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation")

@@ -259,7 +259,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         }
         if (player.ownsUnit("ghost_mech")
             && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
-            && !game.getLaws().containsKey("articles_war")) {
+            && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech")
                 .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);

@@ -628,10 +628,12 @@ public class ButtonHelperTacticalAction {
         if (!game.isFoWMode() && playersWithPds2.size() > 0 && !game.getL1Hero()) {
             StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true)
                 + " the selected system is in range of space cannon units owned by");
-            for (Player playerWithPds : playersWithPds2) {
-                pdsMessage.append(" ").append(playerWithPds.getRepresentation());
+            if (playersWithPds2.size() != 1 || playersWithPds2.get(0) != player) {
+                for (Player playerWithPds : playersWithPds2) {
+                    pdsMessage.append(" ").append(playerWithPds.getRepresentation());
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
         }
 
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);

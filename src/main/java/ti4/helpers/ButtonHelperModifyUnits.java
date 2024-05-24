@@ -6,12 +6,14 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -143,6 +145,13 @@ public class ButtonHelperModifyUnits {
                 haveGroundForces = false;
             }
         }
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## End of Ground Combat");
+        String pos = tile.getPosition();
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, pos, event);
+        MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
+        List<Button> buttons = StartCombat.getGeneralCombatButtons(game, pos, p1, p2, "ground", event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
     public static void autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
@@ -154,7 +163,7 @@ public class ButtonHelperModifyUnits {
         Player cabalMechOwner = Helper.getPlayerFromUnit(game, "cabal_mech");
         boolean cabalMech = cabalMechOwner != null
             && unitHolder.getUnitCount(UnitType.Mech, cabalMechOwner.getColor()) > 0
-            && !game.getLaws().containsKey("articles_war");
+            && !ButtonHelper.isLawInPlay(game, "articles_war");
         Tile tile = game.getTileFromPlanet(planet);
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
         boolean usedDuraniumAlready = true;
@@ -400,7 +409,7 @@ public class ButtonHelperModifyUnits {
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
-        boolean noMechPowers = game.getLaws().containsKey("articles_war");
+        boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
 
         Player mentakHero = game
@@ -2044,7 +2053,7 @@ public class ButtonHelperModifyUnits {
                             boolean cabalMech = cabalMechOwner != null
                                 && unitHolder.getUnitCount(UnitType.Mech, cabalMechOwner.getColor()) > 0
                                 && unitName.toLowerCase().contains("infantry")
-                                && !game.getLaws().containsKey("articles_war");
+                                && !ButtonHelper.isLawInPlay(game, "articles_war");
 
                             new RemoveUnits().removeStuff(event, game.getTileByPosition(pos),
                                 unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false,
@@ -2171,7 +2180,7 @@ public class ButtonHelperModifyUnits {
                 && game.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech,
                     cabal.getColor()) > 0
                 && cabal.hasUnit("cabal_mech")
-                && unitName.toLowerCase().contains("infantry") && !game.getLaws().containsKey("articles_war");
+                && unitName.toLowerCase().contains("infantry") && !ButtonHelper.isLawInPlay(game, "articles_war");
             if (cabal != null
                 && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())
                     || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech)
