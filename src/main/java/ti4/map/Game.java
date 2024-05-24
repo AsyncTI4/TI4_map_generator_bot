@@ -3985,8 +3985,8 @@ public class Game {
     }
 
     public Optional<Player> getPlayerByColorID(String color) {
-        return getPlayers().values().stream()
-            .filter(otherPlayer -> otherPlayer.getColor() != null && Mapper.getColorID(otherPlayer.getColor()).equals(color))
+        return getRealPlayersNDummies().stream()
+            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
             .findFirst();
     }
 
