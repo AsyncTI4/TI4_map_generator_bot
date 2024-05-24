@@ -173,7 +173,7 @@ public class GameStats extends StatisticsSubcommandData {
         StringBuilder sb = new StringBuilder("List of times the player has hit the autoping threshold(aka the bots most wanted list)\n");
         for (String ket : topThousand.keySet()) {
             User user = AsyncTI4DiscordBot.jda.getUserById(Long.parseLong(ket));
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
+            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(user.getEffectiveName() + ": ");
             sb.append(topThousand.get(ket) + " pings");
             sb.append("\n");
