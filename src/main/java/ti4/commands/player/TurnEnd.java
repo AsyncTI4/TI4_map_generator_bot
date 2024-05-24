@@ -377,7 +377,9 @@ public class TurnEnd extends PlayerSubcommandData {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
+            if (player.isRealPlayer()) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
+            }
 
         }
 

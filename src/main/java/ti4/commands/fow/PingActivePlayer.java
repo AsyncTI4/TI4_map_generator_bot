@@ -3,10 +3,11 @@ package ti4.commands.fow;
 import java.util.Date;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.map.GameSaveLoadManager;
@@ -50,6 +51,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             game.setLastActivePlayerPing(new Date());
             GameSaveLoadManager.saveMap(game);
         }
+        ButtonHelper.increasePingCounter(GameManager.getInstance().getGame("finreference"), player.getUserID());
     }
 
     @Override

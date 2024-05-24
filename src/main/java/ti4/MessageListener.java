@@ -279,8 +279,8 @@ public class MessageListener extends ListenerAdapter {
         Game mapreference = GameManager.getInstance().getGame("finreference");
         int multiplier = 1000; // should be 1000
         if (mapreference != null
-            && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10 * 60 * multiplier) // 10
-                                                                                                                                          // minutes
+            && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10 * 1 * multiplier) // 10
+                                                                                                                                         // minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
             List<String> storedValues = new ArrayList<>();
@@ -407,6 +407,13 @@ public class MessageListener extends ListenerAdapter {
                 if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase()) && spacer != 0) {
                     spacer = spacer / 3;
                     spacer = Math.max(spacer, 1);
+                }
+                String key2 = "TechForRound" + game.getRound() + "Counter";
+                if (!game.getStoredValue(key2).isEmpty() && !game.getStoredValue(key2).equalsIgnoreCase("0")) {
+                    game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
+                    if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
+                        ButtonHelper.postTechSummary(game);
+                    }
                 }
                 if (game.getAutoPingStatus() && spacer != 0 && !game.getTemporaryPingDisable()) {
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
@@ -877,8 +884,8 @@ public class MessageListener extends ListenerAdapter {
 
                     //if no target player was found
                     if (Objects.equals(player, player_)) {
-                      MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
-                      return;
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
+                        return;
                     }
                     Whisper.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(),
                         event.getGuild());
