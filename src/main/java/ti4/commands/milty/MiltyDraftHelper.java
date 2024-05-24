@@ -234,10 +234,13 @@ public class MiltyDraftHelper {
             MapGenerator.superDrawString(graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
             if (pd.getFaction() != null) {
                 FactionModel factionModel = Mapper.getFaction(faction);
+                String factionName = factionModel.getFactionName();
+                if (factionModel.getAlias().startsWith("keleres"))
+                    factionName = "The Council Keleres";
                 graphics.setFont(Storage.getFont35());
-                MapGenerator.superDrawString(graphics, factionModel.getFactionName(), hs.x + 172, hs.y + 270, Color.orange, hCenter, null, outlineStroke, Color.black);
+                MapGenerator.superDrawString(graphics, factionName, hs.x + 172, hs.y + 270, Color.orange, hCenter, null, outlineStroke, Color.black);
                 img = getEmojiImage(factionModel.getFactionEmoji());
-                int offset = graphics.getFontMetrics().stringWidth(factionModel.getFactionName()) / 2 + 10;
+                int offset = graphics.getFontMetrics().stringWidth(factionName) / 2 + 10;
                 graphics.drawImage(img, hs.x + 172 - offset - 40, hs.y + 240, null);
                 graphics.drawImage(img, hs.x + 172 + offset, hs.y + 240, null);
             }
@@ -287,13 +290,13 @@ public class MiltyDraftHelper {
 
             boolean sourceAllowed = false;
             if (sources.contains(tileModel.getSource())) sourceAllowed = true;
-            
+
             // leaving these as a stop-gap for now until I can verify all sources are setup
             if (tileID.length() <= 2) sourceAllowed = true;
             if (tileID.matches("d\\d{1,3}") && sources.contains(ComponentSource.ds)) sourceAllowed = true;
-            
+
             if (!sourceAllowed) continue;
-            
+
             Tile tile = new Tile(tileID, "none");
             if (tile.isHomeSystem() || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres")) {
                 continue;
