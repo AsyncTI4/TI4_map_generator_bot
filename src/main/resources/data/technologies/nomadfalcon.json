@@ -1,0 +1,108 @@
+[
+    {
+        "alias": "nf_al",
+        "name": "Assault Laser",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRY",
+        "source": "nomadfalcon",
+        "text": "At the start of a combat you are participating in you may exhaust this card to produce 2 hits against your opponent.\nAfter 1 or more of your non-fighter non-infantry unit is destroyed roll 1 die for 1 of the destroyed unit on a result of 6 or higher produce 1 hit against your opponent."
+    },
+    {
+        "alias": "nf_bws",
+        "name": "Bacterial Weapons Systems",
+        "types": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "requirements": "BR",
+        "source": "nomadfalcon",
+        "text": "After 1 of your opponents ships are destroyed you may exhyast this card to destroy 2 infantry in the space area of the active system.\nThis card counts as either a red or green prerequiste."
+    },
+    {
+        "alias": "nf_hg",
+        "name": "Hypernet Gates",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBY",
+        "source": "nomadfalcon",
+        "text": "After you activate a system that conatins 1 or more of your structures you may exhaust this card to treat all systems with your structures as adjacent till the end of your turn."
+    },
+    {
+        "alias": "nf_prs",
+        "name": "Plasma Radial Shielding",
+        "types": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "requirements": "RG",
+        "source": "nomadfalcon",
+        "text": "If you win a combat in a system with 3 or more non-fighter ships you may move 1 ship with a cost of 4 or fewer out of the active system into an adjacent system with any of your ships.\nThis card counts as either a red or green prerequiste."
+    },
+    {
+        "alias": "nf_pdn",
+        "name": "Planetary Defense Network",
+        "types": [
+            "PROPULSION",
+            "WARFARE "
+        ],
+        "requirements": "BR",
+        "source": "nomadfalcon",
+        "text": "At the start of the status phase you may remove 1 PDS from 1 planet you control and place it on another planet you control in or adjacent to that system.\nThis card counts as either a red or blue prerequisite."
+    },
+    {
+        "alias": "nf_brs",
+        "name": "Bio-Redesign Systems",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGR",
+        "source": "nomadfalcon",
+        "text": "After the move ships step of the tactical action if you have ships in the active system you may exhaust this card to remove 1 of your opponents ships in the active system and place a matching unit from your reinforcements in the active system."
+    },
+    {
+        "alias": "nf_gdn",
+        "name": "Gene Data Network",
+        "types": [
+            "BIOTIC",
+            "PROPULSION"
+        ],
+        "requirements": "GB",
+        "source": "nomadfalcon",
+        "text": "At the start of the status phase you may place 1 infantry on each planet with 1 or more structures.\nThis card counts as either a green or blue prerequiste."
+    },
+    {
+        "alias": "nf_ni",
+        "name": "Neural Implants",
+        "types": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "requirements": "YB",
+        "source": "nomadfalcon",
+        "text": "At the start of your turn you may remove 1 of your infantry from the game board to gain 1 trade good.\nThis card counts as either a green or yellow prerequsite."
+    },
+    {
+        "alias": "nf_clp",
+        "name": "Carrier Life Pods",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYG",
+        "source": "nomadfalcon",
+        "text": "Each of your non-fighter ships without the capacity stat gain the capacity stat.\nApply +1 to the capacity value to each of your units with capacity."
+    },
+    {
+        "alias": "nf_tfp",
+        "name": "Transit Fighter Pods",
+        "types": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "requirements": "BY",
+        "source": "nomadfalcon",
+        "text": "At the start of your turn during the action phase you may exhaust this card to remove up to 4 of your fighters from the game board and place them in up to 4 systems with any of your ships."
+    }
+]

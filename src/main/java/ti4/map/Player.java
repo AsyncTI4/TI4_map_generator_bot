@@ -2126,7 +2126,7 @@ public class Player {
         if (techID == null)
             return;
 
-        if (techModel.getType() == TechnologyType.UNITUPGRADE) {
+        if (techModel.isUnitUpgrade()) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
             if (unitModel != null) {
                 // Remove all non-faction-upgrade matching units
@@ -2142,8 +2142,7 @@ public class Player {
         }
     }
 
-    // Provided because people make mistakes, also nekro exists, also weird homebrew
-    // exists
+    // Provided because people make mistakes, also nekro exists, also weird homebrew exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
@@ -2162,7 +2161,7 @@ public class Player {
         if (techID == null)
             return;
 
-        if (techModel.getType() == TechnologyType.UNITUPGRADE) {
+        if (techModel.isUnitUpgrade()) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
             List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech)
                 .filter(tech -> tech.getBaseUpgrade().orElse("").equals(unitModel.getBaseType())).toList();

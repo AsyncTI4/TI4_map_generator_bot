@@ -2,7 +2,7 @@
     {
         "alias": "adminsy",
         "name": "Molecular Transference",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "admins",
         "source": "admins",
@@ -11,7 +11,7 @@
     {
         "alias": "adminssd",
         "name": "Tunnel Network II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "faction": "admins",
         "baseUpgrade": "sd2",

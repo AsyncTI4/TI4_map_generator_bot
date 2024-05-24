@@ -596,8 +596,8 @@ public class MapGenerator {
                 StringBuilder userName = new StringBuilder();
                 String playerName = player.getUserName();
                 if (!game.isFowOptionHideNames()) {
-                  graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
-                  userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
+                    graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
+                    userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
                 }
                 y += 34;
                 graphics.setFont(Storage.getFont32());
@@ -610,7 +610,7 @@ public class MapGenerator {
                     factionText = player.getDisplayName();
                 }
                 if (factionText != null && !"null".equals(factionText)) {
-                  userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
+                    userName.append(" [").append(StringUtils.capitalize(factionText)).append("]");
                 }
 
                 if (!"null".equals(player.getColor())) {
@@ -1124,7 +1124,8 @@ public class MapGenerator {
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
-                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                    g2.setFont(Storage.getFont20());
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, 130);
                 } else {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
@@ -1160,7 +1161,8 @@ public class MapGenerator {
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
-                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, Storage.getFont20(), 20);
+                    g2.setFont(Storage.getFont20());
+                    drawTwoLinesOfTextVertically(g2, relicModel.getShortName(), x + deltaX + 5, y + 140, 130);
                 } else {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
@@ -1247,8 +1249,8 @@ public class MapGenerator {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
                     LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148,
-                        Storage.getFont16(), 16);
+                    g2.setFont(Storage.getFont16());
+                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148, 130);
                 } else {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
@@ -1399,8 +1401,8 @@ public class MapGenerator {
             } else if (game.isFrankenGame()) {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
-                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144,
-                    Storage.getFont16(), 20);
+                g2.setFont(Storage.getFont16());
+                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
                 graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             }
 
@@ -1997,10 +1999,10 @@ public class MapGenerator {
         // return y;
         // }
 
-        Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
-            String techType = Mapper.getTechType(tech).toString().toLowerCase();
+            TechnologyModel techModel = Mapper.getTech(tech);
+            String techType = techModel.getType().toString();
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techType = game.getStoredValue("colorChange" + tech);
             }
@@ -2011,25 +2013,26 @@ public class MapGenerator {
             techList.add(tech);
             techsFiltered.put(techType, techList);
         }
+        Comparator<String> techComparator = (tech1, tech2) -> {
+            TechnologyModel tech1Info = Mapper.getTech(tech1);
+            TechnologyModel tech2Info = Mapper.getTech(tech2);
+            return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
+        };
         for (Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
             List<String> list = entry.getValue();
-            list.sort((tech1, tech2) -> {
-                TechnologyModel tech1Info = techInfo.get(tech1);
-                TechnologyModel tech2Info = techInfo.get(tech2);
-                return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
-            });
+            list.sort(techComparator);
         }
-        int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
-        deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, techInfo, deltaX, player);
-        deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, techInfo, deltaX, player);
-        deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX, player);
-        deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, techInfo, deltaX, player);
-        deltaX = techStasisCapsule(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE), techInfo);
-        deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), techInfo, deltaX, player, game);
+        int deltaX = 0;
+        deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, deltaX, player);
+        deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, deltaX, player);
+        deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, deltaX, player);
+        deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
+        deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
+        deltaX = techStasisCapsule(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
         return x + deltaX + 20;
     }
 
@@ -2047,8 +2050,7 @@ public class MapGenerator {
         return x + deltaX + 20;
     }
 
-    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs,
-        Map<String, TechnologyModel> techInfo, int deltaX, Player player) {
+    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, int deltaX, Player player) {
         if (techs == null) {
             return deltaX;
         }
@@ -2063,43 +2065,38 @@ public class MapGenerator {
                 techStatus = "_rdy.png";
             }
 
-            TechnologyModel techInformation = techInfo.get(tech);
+            TechnologyModel techModel = Mapper.getTech(tech);
 
-            String techIcon;
-            switch (techInformation.getType()) {
-                case WARFARE -> techIcon = Constants.WARFARE;
-                case PROPULSION -> techIcon = Constants.PROPULSION;
-                case CYBERNETIC -> techIcon = Constants.CYBERNETIC;
-                case BIOTIC -> techIcon = Constants.BIOTIC;
-                case UNITUPGRADE -> techIcon = Constants.UNIT_UPGRADE;
-                default -> techIcon = "";
-            }
+            String techIcon = techModel.getImageFileModifier();
+
+            // Handle Homebrew techs with modded colours
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techIcon = game.getStoredValue("colorChange" + tech);
             }
 
+            // Draw Background Colour
             if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (techInformation.getFaction().isPresent()) {
-                drawFactionIconImage(graphics, techInformation.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+            // Draw Faction Tech Icon
+            if (techModel.getFaction().isPresent()) {
+                drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
 
+            // Draw Tech Name
             String techName = "pa_tech_techname_" + tech + techStatus;
             String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 if ("dslaner".equalsIgnoreCase(tech)) {
-                    drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140,
-                        Storage.getFont16());
+                    drawTextVertically(graphics, "" + player.getAtsCount(), x + deltaX + 15, y + 140, Storage.getFont16());
                 }
-            } else {
-                TechnologyModel techModel = Mapper.getTech(tech);
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 20, y + 148,
-                    Storage.getFont16(), 16);
+            } else { //no special image, so draw the text
+                graphics.setFont(Storage.getFont20());
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
             }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
@@ -2109,8 +2106,6 @@ public class MapGenerator {
     }
 
     private int factionTechField(int x, int y, List<String> techs, int deltaX) {
-        Map<String, TechnologyModel> techInfo = Mapper.getTechs();
-
         if (techs == null) {
             return deltaX;
         }
@@ -2118,9 +2113,10 @@ public class MapGenerator {
         for (String tech : techs) {
             graphics.setColor(Color.DARK_GRAY);
 
-            TechnologyModel techInformation = techInfo.get(tech);
-            if (techInformation.getType() == TechnologyType.UNITUPGRADE)
+            TechnologyModel techInformation = Mapper.getTech(tech);
+            if (techInformation.isUnitUpgrade()) {
                 continue;
+            }
 
             String techIcon;
             switch (techInformation.getType()) {
@@ -2140,8 +2136,7 @@ public class MapGenerator {
             }
 
             if (techInformation.getFaction().isPresent()) {
-                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42,
-                    42, 0.5f);
+                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
@@ -2151,8 +2146,8 @@ public class MapGenerator {
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } else {
                 TechnologyModel techModel = Mapper.getTech(tech);
-                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148,
-                    Storage.getFont16(), 16);
+                graphics.setFont(Storage.getFont20());
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 130, 110);
             }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
@@ -2161,10 +2156,9 @@ public class MapGenerator {
         return deltaX;
     }
 
-    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs,
-        Map<String, TechnologyModel> techInfo) {
+    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs) {
         int stasisInfantry = player.getStasisInfantry();
-        if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs, techInfo) && stasisInfantry == 0) {
+        if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs) && stasisInfantry == 0) {
             return deltaX;
         }
         String techSpec = "pa_tech_techname_stasiscapsule.png";
@@ -2184,12 +2178,12 @@ public class MapGenerator {
         return deltaX;
     }
 
-    private boolean hasInfantryII(List<String> techs, Map<String, TechnologyModel> techInfo) {
+    private boolean hasInfantryII(List<String> techs) {
         if (techs == null) {
             return false;
         }
         for (String tech : techs) {
-            TechnologyModel techInformation = techInfo.get(tech);
+            TechnologyModel techInformation = Mapper.getTech(tech);
             if ("inf2".equals(techInformation.getBaseUpgrade().orElse("")) || "inf2".equals(tech)) {
                 return true;
             }
@@ -2268,11 +2262,9 @@ public class MapGenerator {
         }
     }
 
-    private int techFieldUnit(int x, int y, List<String> techs, Map<String, TechnologyModel> techInfo, int deltaX,
-        Player player, Game game) {
-        String outline = "pa_tech_unitupgrade_outlines.png";
+    private int techFieldUnit(int x, int y, List<String> techs, int deltaX, Player player, Game game) {
+        drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
 
-        drawPAImage(x + deltaX, y, outline);
         // Add faction icons for base units
         for (String u : player.getUnitsOwned()) {
             UnitModel unit = Mapper.getUnit(u);
@@ -2286,23 +2278,21 @@ public class MapGenerator {
                         || (unit.getUpgradesToUnitId().isPresent()
                             && unit.getUpgradesToUnitId().isPresent()))) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(),
-                        deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+                    drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
         }
         if (techs != null) {
             for (String tech : techs) {
-                TechnologyModel techInformation = techInfo.get(tech);
-                if (techInformation.getType() != TechnologyModel.TechnologyType.UNITUPGRADE) {
+                TechnologyModel techInformation = Mapper.getTech(tech);
+                if (!techInformation.isUnitUpgrade()) {
                     continue;
                 }
 
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
 
                 if (unit == null) {
-                    BotLogger.log(game.getName() + " " + player.getUserName()
-                        + " Could not load unit associated with tech: " + techInformation.getAlias());
+                    BotLogger.log(game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: " + techInformation.getAlias());
                     continue;
                 }
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
@@ -2311,14 +2301,13 @@ public class MapGenerator {
 
                 if (techInformation.getFaction().isPresent()) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, techInformation.getFaction().get(), deltaX + x + unitFactionOffset.x,
-                        y + unitFactionOffset.y, 30, 30);
+                    drawFactionIconImage(graphics, techInformation.getFaction().get(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
                 }
             }
         }
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 252, 152);
-        deltaX += 228;
+        deltaX += 270;
         return deltaX;
     }
 
@@ -2794,8 +2783,8 @@ public class MapGenerator {
             // PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
             if (!game.isFowOptionHideNames()) {
-              graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
-                  point.y + deltaY);
+                graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
+                    point.y + deltaY);
             }
 
             // PAINT FACTION
@@ -4602,28 +4591,40 @@ public class MapGenerator {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 graphics2D.drawString(text,
-                    (y + j) * -1, // See
-                    // https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                    (y + j) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
                     x + graphics2D.getFontMetrics().getHeight() / 2 + i);
             }
         }
         graphics2D.setColor(originalColor);
 
         graphics2D.drawString(text,
-            (y) * -1, // See
-            // https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+            (y) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
             x + graphics2D.getFontMetrics().getHeight() / 2);
         graphics2D.setTransform(originalTransform);
     }
 
-    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, Font font,
-        int offset) {
-        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 12).toUpperCase();
-        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 12).toUpperCase();
-        drawTextVertically(graphics, firstRow, x, y, font);
+    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+        String firstRow = StringUtils.substringBefore(text, "\n");
+        firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
+        String secondRow = text.replace(firstRow, "").replace("\n", "");
+        secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
+        drawTextVertically(graphics, firstRow, x, y, graphics.getFont());
         if (StringUtils.isNotBlank(secondRow)) {
-            drawTextVertically(graphics, secondRow, x + offset, y, font);
+            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont());
         }
+    }
+
+    private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
+        int currentPixels = 0;
+        for (int i = 0; i < text.length(); i++) {
+            currentPixels += graphics.getFontMetrics().charWidth(text.charAt(i));
+            if (currentPixels > pixelLength) {
+                return text.substring(0, i);
+            }
+        }
+        return text;
     }
 
 }
