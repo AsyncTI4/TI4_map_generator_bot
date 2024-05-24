@@ -31,13 +31,13 @@ public class MapTemplateHelper {
         List<PlayerDraft> speakerOrdered = manager.getDraft().values().stream()
             .sorted(Comparator.comparing(PlayerDraft::getPosition))
             .toList();
-        
+
         Map<String, String> positionMap = new HashMap<>();
         for (MapTemplateTile templateTile : template.getTemplateTiles()) {
             Entry<String, String> tileEntry = inferTileFromTemplateAndDraft(templateTile, speakerOrdered);
             positionMap.put(tileEntry.getKey(), tileEntry.getValue());
         }
-        
+
         List<String> badTiles = AddTileList.addTileMapToGame(game, positionMap);
         if (!badTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
@@ -63,6 +63,7 @@ public class MapTemplateHelper {
                 tileId = player.getSlice().getTiles().get(index).getTile().getTileID();
             } else if (templateTile.getHome() != null && templateTile.getHome()) {
                 FactionModel faction = Mapper.getFaction(player.getFaction());
+                if (faction.getAlias().startsWith("keleres")) return null; // don't fill in keleres tile
                 tileId = faction.getHomeSystem();
             }
         }
@@ -85,14 +86,15 @@ public class MapTemplateHelper {
         }
         return null;
     }
-    
+
     public static void buildPartialMapFromMiltyData(Game game, GenericInteractionCreateEvent event, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         List<Player> players = manager.getPlayers().stream().map(p -> game.getPlayer(p)).toList();
-        List<String> backupColors = Arrays.asList("black","bloodred","blue","brown","chocolate","chrome","emerald",
-            "ethereal","forest","gold","green","grey","lavender","lightbrown","lightgrey","navy","orange","petrol",
-            "pink","purple","rainbow","red","rose","spring","sunset","tan","teal","turquoise","white","yellow");
+
+        List<String> backupColors = Arrays.asList("red", "blue", "yellow", "emerald", "lavender", "petrol", "chocolate",
+            "ethereal", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
+            "turquoise", "lightbrown", "orange", "pink", "sunset", "bloodred", "brown", "chrome", "purple", "rose", "white", "tan");
         boolean somethingHappened = false;
         // fill in draft tiles for all players
         for (Player p : players) {
@@ -105,7 +107,6 @@ public class MapTemplateHelper {
                 if (tile.getPos() != null && tile.getPlayerNumber() != null && tile.getPlayerNumber() == playerNum) {
                     if (gameTile != null && !TileHelper.isDraftTile(gameTile.getTileModel())) continue; //already set
 
-                    
                     if (slice != null && tile.getMiltyTileIndex() != null) {
                         String tileID = slice.getTiles().get(tile.getMiltyTileIndex()).getTile().getTileID();
                         tileID = AliasHandler.resolveTile(tileID);
@@ -113,22 +114,23 @@ public class MapTemplateHelper {
                         Tile toAdd = new Tile(tileID, tile.getPos());
                         game.setTile(toAdd);
                         somethingHappened = true;
-                    } else if (faction != null && tile.getHome() != null && tile.getHome()) {
+                    } else if (faction != null && !faction.startsWith("keleres") && tile.getHome() != null && tile.getHome()) {
                         String tileID = Mapper.getFaction(faction).getHomeSystem();
                         tileID = AliasHandler.resolveTile(tileID);
-                        
+
                         Tile toAdd = new Tile(tileID, tile.getPos());
                         game.setTile(toAdd);
                         somethingHappened = true;
                     }
                 } else if (tile.getPos() != null && gameTile == null) {
                     String tileID = null;
-                    if (tile.getStaticTileId() != null) tileID = tile.getStaticTileId();
+                    if (tile.getStaticTileId() != null)
+                        tileID = tile.getStaticTileId();
                     else if (tile.getPlayerNumber() != null) {
                         if (tile.getPlayerNumber() != null) {
                             String color = backupColors.get(tile.getPlayerNumber());
                             if (tile.getMiltyTileIndex() != null) {
-                                tileID = color + (tile.getMiltyTileIndex()+1);
+                                tileID = color + (tile.getMiltyTileIndex() + 1);
                             } else if (tile.getHome() != null) {
                                 tileID = color + "blank";
                             }
@@ -153,5 +155,4 @@ public class MapTemplateHelper {
             ButtonHelper.updateMap(game, event);
         }
     }
-
 }
