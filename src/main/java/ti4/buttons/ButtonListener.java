@@ -2950,6 +2950,12 @@ public class ButtonListener extends ListenerAdapter {
                 String message = ident + " Acquired The Tech " + techModel.getRepresentation(false)
                     + " via Research Agreement";
                 player.addTech(tech);
+                String key = "RAForRound" + game.getRound() + player.getFaction();
+                if (game.getStoredValue(key).isEmpty()) {
+                    game.setStoredValue(key, tech);
+                } else {
+                    game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
+                }
                 ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
                     ButtonHelper.commanderUnlockCheck(player, game, "jolnar", event);

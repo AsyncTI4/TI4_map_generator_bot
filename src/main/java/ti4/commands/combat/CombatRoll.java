@@ -216,6 +216,24 @@ public class CombatRoll extends CombatSubcommandData {
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
+        int round = 0;
+        String combatName = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
+        if (game.getStoredValue(combatName).isEmpty()) {
+            round = 0;
+        } else {
+            round = Integer.parseInt(game.getStoredValue(combatName));
+        }
+        int round2 = 0;
+        String combatName2 = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
+        if (game.getStoredValue(combatName2).isEmpty()) {
+            round2 = 1;
+        } else {
+            round2 = Integer.parseInt(game.getStoredValue(combatName2));
+        }
+
+        if (round2 > round) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## Start of Combat Round #" + round2);
+        }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
@@ -224,21 +242,6 @@ public class CombatRoll extends CombatSubcommandData {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,", Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         }
         if (!game.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
-
-            int round = 0;
-            String combatName = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
-            if (game.getStoredValue(combatName).isEmpty()) {
-                round = 0;
-            } else {
-                round = Integer.parseInt(game.getStoredValue(combatName));
-            }
-            int round2 = 0;
-            String combatName2 = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
-            if (game.getStoredValue(combatName2).isEmpty()) {
-                round2 = 1;
-            } else {
-                round2 = Integer.parseInt(game.getStoredValue(combatName2));
-            }
             String msg2 = "\n" + opponent.getRepresentation(true, true) + " your opponent rolled ground combat for round #" + round2 + " and got " + h + " hit(s)";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (!automated) {
@@ -267,20 +270,6 @@ public class CombatRoll extends CombatSubcommandData {
             if (!game.isFoWMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player) {
 
                 List<Button> buttons = new ArrayList<>();
-                int round = 0;
-                String combatName = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
-                if (game.getStoredValue(combatName).isEmpty()) {
-                    round = 0;
-                } else {
-                    round = Integer.parseInt(game.getStoredValue(combatName));
-                }
-                int round2 = 0;
-                String combatName2 = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
-                if (game.getStoredValue(combatName2).isEmpty()) {
-                    round2 = 1;
-                } else {
-                    round2 = Integer.parseInt(game.getStoredValue(combatName2));
-                }
                 if (round2 > round) {
                     buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + (round + 1)));
                 }

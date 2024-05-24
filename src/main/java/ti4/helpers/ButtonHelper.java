@@ -1029,8 +1029,21 @@ public class ButtonHelper {
                 return;
             }
             String key = "TechForRound" + game.getRound() + player.getFaction();
+            msg = msg + player.getFactionEmoji() + ":";
+            String key2 = "RAForRound" + game.getRound() + player.getFaction();
+            if (!game.getStoredValue(key2).isEmpty()) {
+                msg = msg + "(From RA: ";
+                if (game.getStoredValue(key2).contains(".")) {
+                    String tech1 = StringUtils.substringBefore(game.getStoredValue(key2), ".");
+                    String tech2 = StringUtils.substringAfter(game.getStoredValue(key2), ".");
+                    msg = msg + " " + Mapper.getTech(tech1).getNameRepresentation() + "and " + Mapper.getTech(tech2).getNameRepresentation();
+
+                } else {
+                    msg = msg + " " + Mapper.getTech(game.getStoredValue(key2)).getNameRepresentation();
+                }
+                msg = msg + ")";
+            }
             if (!game.getStoredValue(key).isEmpty()) {
-                msg = msg + player.getFactionEmoji() + ":";
                 if (game.getStoredValue(key).contains(".")) {
                     String tech1 = StringUtils.substringBefore(game.getStoredValue(key), ".");
                     String tech2 = StringUtils.substringAfter(game.getStoredValue(key), ".");
@@ -1041,12 +1054,18 @@ public class ButtonHelper {
                 }
                 msg = msg + "\n";
             } else {
-                msg = msg + player.getFactionEmoji() + ": Did not follow\n";
+                msg = msg + " Did not follow\n";
             }
         }
-        //game.getTableTalkChannel().sendMessage(msg).queueAfter(20,TimeUnit.MINUTES);
-        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg);
-        game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
+        String key2 = "TechForRound" + game.getRound() + "Counter";
+        if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg);
+            game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
+        } else {
+            if (game.getStoredValue(key2).isEmpty()) {
+                game.setStoredValue(key2, "6");
+            }
+        }
     }
 
     public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech) {
@@ -1840,6 +1859,14 @@ public class ButtonHelper {
         if (player.hasAbility("crafty")) {
             return false;
         }
+        int limit = getACLimit(game, player);
+        return player.getAc() > limit;
+    }
+
+    public static int getACLimit(Game game, Player player) {
+        if (player.hasAbility("crafty")) {
+            return 999;
+        }
         int limit = 7;
         if (game.getLaws().containsKey("sanctions") && !game.isAbsolMode()) {
             limit = 3;
@@ -1859,29 +1886,11 @@ public class ButtonHelper {
         if (player.getRelics().contains("e6-g0_network")) {
             limit = limit + 2;
         }
-        return player.getAc() > limit;
+        return limit;
     }
 
     public static void checkACLimit(Game game, GenericInteractionCreateEvent event, Player player) {
-        int limit = 7;
-        if (game.getLaws().containsKey("sanctions") && !game.isAbsolMode()) {
-            limit = 3;
-        }
-        if (game.getLaws().containsKey("absol_sanctions")) {
-            limit = 3;
-            if (game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
-                limit = 5;
-            }
-        }
-        if (player.getRelics().contains("absol_codex")) {
-            limit = limit + 5;
-        }
-        if (player.getTechs().contains("absol_nm")) {
-            limit = limit + 3;
-        }
-        if (player.getRelics().contains("e6-g0_network")) {
-            limit = limit + 2;
-        }
+        int limit = getACLimit(game, player);
         if (isPlayerOverLimit(game, player)) {
             MessageChannel channel = game.getMainGameChannel();
             if (game.isFoWMode()) {
