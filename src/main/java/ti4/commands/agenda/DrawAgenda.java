@@ -64,6 +64,25 @@ public class DrawAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
     }
 
+    public static void drawSpecificAgenda(String agendaID, Game game, @NotNull Player player) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getRepresentation(true, true)).append(" here are the agenda(s) you have drawn:");
+        Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
+        if (realPlayer == null || game == null) return;
+
+        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb.toString());
+
+        Map.Entry<String, Integer> entry = game.drawSpecificAgenda(agendaID);
+        if (entry != null) {
+            AgendaModel agenda = Mapper.getAgenda(entry.getKey());
+            List<MessageEmbed> agendaEmbed = Collections.singletonList(agenda.getRepresentationEmbed());
+
+            List<Button> buttons = agendaButtons(agenda, entry.getValue(), false);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(realPlayer.getCardsInfoThread(), null, agendaEmbed, buttons);
+        }
+
+    }
+
     private static List<Button> agendaButtons(AgendaModel agenda, Integer id, boolean discard) {
         List<Button> buttons = new ArrayList<>();
         Button topButton = Button.success("topAgenda_" + id, "Put " + agenda.getName() + " on the top of the agenda deck.").withEmoji(Emoji.fromUnicode("🔼"));

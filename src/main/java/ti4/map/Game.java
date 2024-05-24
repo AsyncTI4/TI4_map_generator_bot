@@ -2504,6 +2504,23 @@ public class Game {
     }
 
     @Nullable
+    public Map.Entry<String, Integer> drawSpecificAgenda(String agendaID) {
+        if (!agendas.isEmpty()) {
+            for (String id : agendas) {
+                if (agendaID.equalsIgnoreCase(id)) {
+                    setSentAgenda(id);
+                    for (Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+                        if (entry.getKey().equals(id)) {
+                            return entry;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     public Map.Entry<String, Integer> drawBottomAgenda() {
         if (!agendas.isEmpty()) {
             for (int i = agendas.size() - 1; i >= 0; i--) {
@@ -3409,7 +3426,7 @@ public class Game {
 
     @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
-        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isDummy()))
+        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || (player != null && player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))))
             .collect(Collectors.toList());
     }
 

@@ -191,7 +191,7 @@ public class MapGenerator {
             heightForGameInfo = 40;
             height = heightStats;
         } else if (displayType == DisplayType.map) {
-            heightForGameInfo = mapHeight - 400;
+            heightForGameInfo = mapHeight;
             height = mapHeight + 600;
         } else {
             heightForGameInfo = mapHeight;
@@ -4077,7 +4077,7 @@ public class MapGenerator {
 
         Map<UnitKey, Integer> units = unitHolder.getUnits();
 
-        if (game.getLaws().containsKey("conventions")) {
+        if (ButtonHelper.isLawInPlay(game, "conventions")) {
             String planet = unitHolder.getName();
             if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                 return true;
