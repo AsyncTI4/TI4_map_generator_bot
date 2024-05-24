@@ -1478,7 +1478,7 @@ public class MapGenerator {
                             String unitPath = ResourceHelper.getInstance().getUnitFile(unitColorID);
                             image = ImageHelper.read(unitPath);
                         } catch (Exception e) {
-                            BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
+                            BotLogger.log("Could not parse unit file for reinforcements: " + unitID + " in game " + game.getName(), e);
                         }
                         BufferedImage decal = null;
                         try {
@@ -1673,7 +1673,7 @@ public class MapGenerator {
                     }
                     image = ImageHelper.read(unitPath);
                 } catch (Exception e) {
-                    BotLogger.log("Could not parse unit file for: " + unitKey, e);
+                    BotLogger.log("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
                 }
                 if (bulkUnitCount != null && bulkUnitCount > 0) {
                     unitCount = 1;
@@ -4362,7 +4362,7 @@ public class MapGenerator {
 
                 unitImage = ImageHelper.read(unitPath);
             } catch (Exception e) {
-                BotLogger.log("Could not parse unit file for: " + unitKey, e);
+                BotLogger.log("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
                 continue;
             }
             if (unitImage == null)
