@@ -30,7 +30,7 @@ public class RemoveFogTile extends FOWSubcommandData {
             return;
         }
 
-        OptionMapping positionMapping = event.getOption(Constants.POSITION);
+        String positionMapping = event.getOption(Constants.POSITION, null, OptionMapping::getAsString);
         if (positionMapping == null) {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
@@ -42,7 +42,7 @@ public class RemoveFogTile extends FOWSubcommandData {
             return;
         }
 
-        String[] positions = positionMapping.getAsString().split(" ");
+        String[] positions = positionMapping.replace(" ", "").split(",");
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position is not allowed");
