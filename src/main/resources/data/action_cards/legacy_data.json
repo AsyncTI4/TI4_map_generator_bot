@@ -709,5 +709,14 @@
     "text": "Choose up to 3 of your opponent's ground forces. Roll 1 die for each of those units; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2_old"
+  },
+  {
+    "alias": "crisis_management",
+    "name": "Crisis Management",
+    "phase": "Action",
+    "window": "After you pass",
+    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
+    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+    "source": "action_deck_2_old"
   }
 ]
