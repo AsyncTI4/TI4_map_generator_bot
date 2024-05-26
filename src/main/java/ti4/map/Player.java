@@ -91,6 +91,8 @@ public class Player {
 
     @Setter
     private String playerStatsAnchorPosition;
+    @Setter
+    private String homeSystemPosition;
     private String allianceMembers = "";
     private String hoursThatPlayerIsAFK = "";
     private String color;
@@ -2504,6 +2506,13 @@ public class Player {
         return playerStatsAnchorPosition;
     }
 
+    public String getHomeSystemPosition() {
+        if ("null".equals(homeSystemPosition)) {
+          return null;
+        }
+        return homeSystemPosition;
+    }
+
     public boolean hasOlradinPolicies() {
         return (hasAbility("policies"))
             || (hasAbility("policy_the_people_connect"))
@@ -2824,6 +2833,13 @@ public class Player {
     @JsonIgnore
     public Tile getHomeSystemTile() {
         Game game = getGame();
+        if (getHomeSystemPosition() != null) {
+            Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
+            if (frankenHs != null) {
+                return frankenHs;
+            }
+        }
+
         if (hasAbility("mobile_command")) {
             if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).isEmpty()) {
                 return null;

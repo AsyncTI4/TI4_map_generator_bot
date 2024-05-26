@@ -734,6 +734,9 @@ public class GameSaveLoadManager {
             writer.write(Constants.STATS_ANCHOR_LOCATION + " " + player.getPlayerStatsAnchorPosition());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.HS_TILE_POSITION + " " + player.getHomeSystemPosition());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
             writer.write(System.lineSeparator());
 
@@ -2167,6 +2170,7 @@ public class GameSaveLoadManager {
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
+                case Constants.HS_TILE_POSITION -> player.setHomeSystemPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
