@@ -1,11 +1,11 @@
 package ti4.commands.special;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -37,13 +37,22 @@ public class DiploSystem extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
-        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return;
-        }
 
+        diploSystem(event, game, player, tileOption.getAsString().toLowerCase());
+    }
+
+    public static boolean diploSystem(GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
+        String tileID = AliasHandler.resolveTile(tileToResolve);
+        
+        Tile tile = game.getTile(tileID);
+        if (tile == null) {
+            tile = game.getTileByPosition(tileID);
+        }
+        if (tile == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            return false;
+        }
+        
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player && player_.isRealPlayer()) {
                 String color = player_.getColor();
@@ -53,5 +62,7 @@ public class DiploSystem extends SpecialSubcommandData {
                 }
             }
         }
+      
+        return true;
     }
 }

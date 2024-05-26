@@ -77,6 +77,7 @@ import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
+import ti4.commands.special.DiploSystem;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
@@ -8791,27 +8792,10 @@ public class ButtonHelper {
             String message = getIdent(player) + " chose to use the mahact PN in the tile " + tile.getRepresentation();
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message);
         } else {
-            String tileID = AliasHandler.resolveTile(planet.toLowerCase());
-            Tile tile = game.getTile(tileID);
-            if (tile == null) {
-                tile = game.getTileByPosition(tileID);
-            }
-            if (tile == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            if (!DiploSystem.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_ != player && player_.isRealPlayer()) {
-                    String color = player_.getColor();
-                    if (Mapper.isValidColor(color)) {
-                        AddCC.addCC(event, color, tile);
-                        Helper.isCCCountCorrect(event, game, color);
-                    }
-                }
-            }
-            String message = getIdent(player) + " chose to diplo the system containing "
-                + Helper.getPlanetRepresentation(planet, game);
+            String message = getIdent(player) + " chose to diplo the system containing " + Helper.getPlanetRepresentation(planet, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
         event.getMessage().delete().queue();
