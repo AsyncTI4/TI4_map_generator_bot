@@ -8802,7 +8802,7 @@ public class ButtonHelper {
                 return;
             }
             for (Player player_ : game.getPlayers().values()) {
-                if (player_ != player) {
+                if (player_ != player && player_.isRealPlayer()) {
                     String color = player_.getColor();
                     if (Mapper.isValidColor(color)) {
                         AddCC.addCC(event, color, tile);
