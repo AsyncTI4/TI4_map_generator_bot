@@ -396,11 +396,11 @@ public class Stats extends PlayerSubcommandData {
 		Integer tgCount = scTradeGoods.get(scNumber);
 		String msg = player.getRepresentation(true, true) +
 			"\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
-		MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+		MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
+			MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 				player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
 			if (game.isFoWMode()) {
 				String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
