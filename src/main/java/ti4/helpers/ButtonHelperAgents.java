@@ -965,7 +965,7 @@ public class ButtonHelperAgents {
             resolveVadenAgentStep2(player, game, event, rest);
         }
         if ("celdauriagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "George Nobin (Muaat Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "George Nobin (Celdauri Agent)";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveCeldauriAgentStep2(player, game, event, rest);
         }
