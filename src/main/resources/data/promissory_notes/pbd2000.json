@@ -24,7 +24,7 @@
         "playArea": false,
         "attachment": "",
         "source": "pbd2000",
-        "text": "At the start of your turn, you may spend 2 resources to place 1 destroyer or 2 fighters in a system that does not contain another player's ships. Then, return this card to the Raven player."
+        "text": "At the start of your turn, you may spend 1 resource to place 1 destroyer or 2 fighters in a system that does not contain another player's ships. Then, return this card to the Raven player."
     },
     {
         "alias": "deathstrike",
