@@ -82,7 +82,6 @@
         "name": "Mentak Cruiser II",
         "faction": "Mentak",
         "upgradesFromUnitId": "pbd2000_mentak_cruiser2",
-        "requiredTechId": "cr2",
         "source": "pbd2000",
         "moveValue": 3,
         "capacityValue": 2,
