@@ -6,25 +6,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.forums.ForumPost;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -125,7 +122,7 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                 }
-            });
+            }, BotLogger::catchRestError);
         }
 
         CommandManager commandManager = CommandManager.getInstance();
@@ -352,8 +349,7 @@ public class MessageListener extends ListenerAdapter {
                                                     " has been played and now it has been the allotted time and they havent reacted, so they have been marked as not following\n");
 
                                             //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), sb.toString());
-                                            ButtonHelper.sendMessageToRightStratThread(player, game,
-                                                sb.toString(), ButtonHelper.getStratName(sc));
+                                            ButtonHelper.sendMessageToRightStratThread(player, game, sb.toString(), ButtonHelper.getStratName(sc));
                                             player.addFollowedSC(sc);
                                             game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
                                                 "2");
@@ -897,8 +893,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                     game.setStoredValue("futureMessageFor" + player.getFaction(),
                         previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        ButtonHelper.getIdent(player) + " sent themselves a future message");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummery) {
                     String previousThoughts = "";
                     if (!game.getStoredValue(messageBeginning.toLowerCase() + player.getFaction()).isEmpty()) {
@@ -908,7 +903,7 @@ public class MessageListener extends ListenerAdapter {
                     game.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
                         previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin").replace("\n", ". "));
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        ButtonHelper.getIdent(player) + " stored an end of round summary");
+                        player.getFactionEmoji() + " stored an end of round summary");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Someone stored an end of round summary");
                 } else {
@@ -929,8 +924,7 @@ public class MessageListener extends ListenerAdapter {
                         game.getStoredValue(
                             "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " "
                             + messageContent.replace(":", "666fin"));
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        ButtonHelper.getIdent(player) + " sent someone else a future message");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent someone else a future message");
                 }
                 msg.delete().queue();
             }

@@ -178,8 +178,8 @@ public class SCPick extends PlayerSubcommandData {
         Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
 
         Stats.secondHalfOfPickSC(event, game, p2, scpick);
-        
-        String recipientMessage = p2.getRepresentation(true, true) + " was given SC #" + scpick 
+
+        String recipientMessage = p2.getRepresentation(true, true) + " was given SC #" + scpick
             + (!game.isFoWMode() ? " by " + player.getFactionEmoji() : "");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
@@ -229,7 +229,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             game.setCurrentPhase("strategy");
             game.updateActivePlayer(privatePlayer);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, game),
+            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                 privatePlayer.getRepresentation(true, true) + "Use Buttons to Pick Which SC you want to give someone", Helper.getRemainingSCButtons(event, game, privatePlayer));
         }
     }
@@ -360,12 +360,12 @@ public class SCPick extends PlayerSubcommandData {
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getStasisInfantry() > 0) {
                     if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, game),
+                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                             "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                             ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, game), privatePlayer.getRepresentation()
+                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
                             + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
                     }
@@ -389,12 +389,12 @@ public class SCPick extends PlayerSubcommandData {
                         TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
                     if (privatePlayer.getStasisInfantry() > 0) {
                         if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, game),
+                            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                                 "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                                 ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                         } else {
                             privatePlayer.setStasisInfantry(0);
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, game), privatePlayer.getRepresentation()
+                            MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
                                 + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
                         }
@@ -409,13 +409,13 @@ public class SCPick extends PlayerSubcommandData {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     buttons.add(Button.success("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), p2.getRepresentation(true, true) + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use QDN", buttons);
                 }
                 buttons = new ArrayList<>();
                 if (game.getLaws().containsKey("arbiter") && game.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
                     buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game),
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
                         p2.getRepresentation(true, true) + " you have the opportunity to use Imperial Arbiter", buttons);
                 }
             }

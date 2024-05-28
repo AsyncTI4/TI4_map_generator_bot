@@ -848,6 +848,7 @@ public class Constants {
     //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
+    public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
 
     public static final String ABILITY = "ability";
     public static final String ABILITY_1 = "ability_1";

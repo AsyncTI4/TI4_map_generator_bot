@@ -14,13 +14,11 @@ import ti4.commands.ds.DrawRedBackTile;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
-import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -258,8 +256,7 @@ public class TechExhaust extends TechAddRemove {
             case "lgf" -> { // Lazax Gate Folding
                 if (player.getPlanets().contains("mr")) {
                     deleteIfButtonEvent(event);
-                    new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet("mr"), "inf mr",
-                        game);
+                    new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet("mr"), "inf mr", game);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, game, player);
@@ -277,14 +274,13 @@ public class TechExhaust extends TechAddRemove {
                 if (d1.getResult() > 4) {
                     message = message + "blue backed tile";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DrawBlueBackTile.drawBlueBackTiles(event, game, player, 1, false);
+                    DrawBlueBackTile.drawBlueBackTiles(event, game, player, 1);
                 } else {
                     message = message + "red backed tile";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     DrawRedBackTile.drawRedBackTiles(event, game, player, 1);
                 }
                 sendNextActionButtonsIfButtonEvent(event, game, player);
-
             }
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);

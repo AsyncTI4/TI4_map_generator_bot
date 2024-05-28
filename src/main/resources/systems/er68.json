@@ -33,5 +33,7 @@
         null
     ],
     "planets": [],
-    "isSupernova": true
+    "isSupernova": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

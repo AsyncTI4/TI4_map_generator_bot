@@ -156,7 +156,7 @@ public class ButtonHelperAgents {
             return;
         }
         Integer commodities = p2.getCommodities();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentation(true, true) + " a " + unit
                 + " of yours has been captured by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "The Stillness of Stars (Vuil'Raith Agent). "
                 + "Rejoice, for your " + commodities.toString() + " commodities been washed.");

@@ -1,12 +1,14 @@
 package ti4.selections;
 
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import ti4.message.BotLogger;
+import ti4.selections.SelectionMenuListener.SelectionMenuContext;
 
 public class SelectionMenuProvider {
-    public static void resolveSelectionMenu(StringSelectInteractionEvent event) {
-        event.reply(getSelectionMenuDebugText(event)).setEphemeral(true).queue();
 
+    public static void resolveSelectionMenu(StringSelectInteractionEvent event, SelectionMenuContext context) {
         SelectionManager selectionManager = SelectionManager.getInstance();
         for (Selection selection : selectionManager.getSelectionMenuList()) {
             if (selection.accept(event)) {
@@ -20,13 +22,25 @@ public class SelectionMenuProvider {
                 return;
             }
         }
-        event.getHook().deleteOriginal().queue();
+
+        resolveOtherSelectionMenu(event, context);
     }
 
-    private static String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
-      return "You selected:\n```\n" +
-          "MenuID: " + event.getComponentId() + "\n" +
-          "Values: " + event.getValues() + "\n" +
-          "\n```";
+    public static void resolveOtherSelectionMenu(StringSelectInteractionEvent event, SelectionMenuContext context) {
+        if (context.menuID.startsWith("jmfN_") || context.menuID.startsWith("jmfA_")) {
+            context.game.initializeMiltySettings().parseSelectionInput(event);
+            deleteMsg(event);
+        }
+    }
+
+    private static void deleteMsg(StringSelectInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
+        return "You selected:\n```\n" +
+            "MenuID: " + event.getComponentId() + "\n" +
+            "Values: " + event.getValues() + "\n" +
+            "\n```";
     }
 }

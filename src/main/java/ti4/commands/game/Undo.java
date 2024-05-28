@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,10 +22,8 @@ import ti4.message.MessageHelper;
 public class Undo extends GameSubcommandData {
     public Undo() {
         super(Constants.UNDO, "Undo the last action");
-        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to")
-            .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
-            .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
     @Override
@@ -65,8 +61,7 @@ public class Undo extends GameSubcommandData {
         }
         String intToUndoBackTo = gameToUndoBackTo.replace(game.getName() + "_", "").replace(".txt", "");
 
-        Integer gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo)
-            + 1;
+        Integer gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo);
 
         Map<String, Game> undoFiles = getAllUndoSavedGames(game);
         Integer maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(game.getName() + "_", "").replace(".txt", ""))
@@ -75,8 +70,7 @@ public class Undo extends GameSubcommandData {
         String undoFileToRestorePath = game.getName() + "_" + gameToUndoBackToNumber + ".txt";
         File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
         if (!undoFileToRestore.exists()) {
-            MessageHelper.replyToMessage(event,
-                "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
+            MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
             return;
         }
         Game gameToRestore = GameSaveLoadManager.loadMap(undoFileToRestore);

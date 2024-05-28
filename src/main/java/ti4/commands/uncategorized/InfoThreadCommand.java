@@ -52,6 +52,4 @@ public interface InfoThreadCommand {
         }
         return false;
     }
-
-
 }

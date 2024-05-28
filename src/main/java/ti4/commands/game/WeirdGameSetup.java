@@ -210,7 +210,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         return true;
     }
 
-    private static void sendTIGLSetupText(Game game) {
+    public static void sendTIGLSetupText(Game game) {
         String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
             "Please ensure you have all:\n" +
             "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
