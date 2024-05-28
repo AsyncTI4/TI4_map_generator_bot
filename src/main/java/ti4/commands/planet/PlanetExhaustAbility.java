@@ -43,10 +43,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     public static void resolveAbility(Player player, String planet, Game game) {
         planet = AliasHandler.resolvePlanet(planet);
         PlanetModel model = Mapper.getPlanet(planet);
-        MessageChannel channel = game.getMainGameChannel();
-        if (game.isFoWMode()) {
-            channel = player.getPrivateChannel();
-        }
+        MessageChannel channel = player.getCorrectChannel();
+
         String exhaustMsg = player.getFactionEmoji() + " used the " + model.getName() + " ability:";
         MessageHelper.sendMessageToChannelWithEmbed(channel, exhaustMsg, model.getLegendaryEmbed());
 

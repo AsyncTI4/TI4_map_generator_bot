@@ -473,8 +473,7 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getId().equals(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -505,8 +504,7 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -1262,7 +1260,7 @@ public class Player {
     }
 
     @JsonIgnore
-    public User getUser() {
+    public User getUser() { //TODO: Jazz
         return AsyncTI4DiscordBot.jda.getUserById(userID);
     }
 
