@@ -4,19 +4,22 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,8 +27,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -33,7 +34,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
@@ -42,10 +42,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.units.qual.K;
 
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
@@ -3136,8 +3132,11 @@ public class ButtonHelper {
         String msg = "New Thread for " + threadName;
 
         channel.sendMessage(msg).queue(m -> {
+            ThreadChannel.AutoArchiveDuration duration = ThreadChannel.AutoArchiveDuration.TIME_3_DAYS;
+            if (finalThreadName.contains("undo-log")) duration = ThreadChannel.AutoArchiveDuration.TIME_1_HOUR;
+
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            threadChannel = threadChannel.setAutoArchiveDuration(duration);
             threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message + game.getPing()));
         });
     }
@@ -4537,36 +4536,26 @@ public class ButtonHelper {
         return getTilesWithShipsForAction(player, game, "domnaStepOne", false);
     }
 
-    public static List<Button> getTilesWithUnitsForAction(Player player, Game game, String action,
-        boolean includeDelete) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-        List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-            if (FoWHelper.playerIsInSystem(game, tileEntry.getValue(), player)) {
-                Tile tile = tileEntry.getValue();
-                String buttonID = finChecker + action + "_" + tileEntry.getKey();
-                Button validTile = Button.success(buttonID, tile.getRepresentationForButtons(game, player));
-                buttons.add(validTile);
-            }
-        }
-        if (includeDelete) {
-            Button deleteButtons = Button.danger(finChecker + "deleteButtons", "Delete these buttons");
-            buttons.add(deleteButtons);
-        }
-        return buttons;
+    public static List<Button> getTilesWithUnitsForAction(Player player, Game game, String action, boolean includeDelete) {
+        Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
+        return getTilesWithPredicateForAction(player, game, action, hasPlayerUnits, includeDelete);
     }
 
-    public static List<Button> getTilesWithShipsForAction(Player player, Game game, String action,
-        boolean includeDelete) {
+    public static List<Button> getTilesWithShipsForAction(Player player, Game game, String action, boolean includeDelete) {
+        Predicate<Tile> hasPlayerShips = tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
+        return getTilesWithPredicateForAction(player, game, action, hasPlayerShips, includeDelete);
+    }
+
+    public static List<Button> getTilesWithPredicateForAction(Player player, Game game, String action, Predicate<Tile> predicate, boolean includeDelete) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
-                Tile tile = tileEntry.getValue();
-                String buttonID = finChecker + action + "_" + tileEntry.getKey();
-                Button validTile = Button.success(buttonID, tile.getRepresentationForButtons(game, player));
-                buttons.add(validTile);
-            }
+            Tile tile = tileEntry.getValue();
+            if (predicate.negate().test(tile)) continue;
+
+            String buttonID = finChecker + action + "_" + tileEntry.getKey();
+            Button validTile = Button.success(buttonID, tile.getRepresentationForButtons(game, player));
+            buttons.add(validTile);
         }
         if (includeDelete) {
             Button deleteButtons = Button.danger(finChecker + "deleteButtons", "Delete these buttons");
@@ -7419,12 +7408,12 @@ public class ButtonHelper {
             if (game.getStoredValue("Summit") != null
                 && game.getStoredValue("Summit").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("summit")) {
-                PlayAC.playAC(event, game, p2, "summit", game.getMainGameChannel(), event.getGuild());
+                PlayAC.playAC(event, game, p2, "summit", game.getMainGameChannel());
             }
             if (game.getStoredValue("Investments") != null
                 && game.getStoredValue("Investments").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("investments")) {
-                PlayAC.playAC(event, game, p2, "investments", game.getMainGameChannel(), event.getGuild());
+                PlayAC.playAC(event, game, p2, "investments", game.getMainGameChannel());
             }
             if (p2.hasLeader("zealotshero") && p2.getLeader("zealotshero").get().isActive()) {
                 if (!game.getStoredValue("zealotsHeroTechs").isEmpty()) {
@@ -8380,7 +8369,7 @@ public class ButtonHelper {
                 && !prom.getOwner().equalsIgnoreCase(p1.getColor())
                 && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
-                if (pnText.contains("Action:") && !"bmf".equalsIgnoreCase(pn)) {
+                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Button.danger(finChecker + prefix + "pn_" + pn, "Use " + pnName);
@@ -8589,7 +8578,7 @@ public class ButtonHelper {
                 game.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
 
-            event.getChannel().addReactionById(messageId, emojiToUse).queue();
+            event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
             if (game.getStoredValue(messageId) != null) {
                 if (!game.getStoredValue(messageId).contains(player.getFaction())) {
                     game.setStoredValue(messageId,
@@ -8680,8 +8669,8 @@ public class ButtonHelper {
                 if (game.isFoWMode() && !sendPublic) {
                     MessageHelper.sendPrivateMessageToPlayer(player, game, text);
                 }
-            });
-        } catch (Error e) {
+            }, BotLogger::catchRestError);
+        } catch (Throwable e) {
             game.removeMessageIDForSabo(messageID);
         }
     }
@@ -9110,7 +9099,7 @@ public class ButtonHelper {
             }
             case "doStarCharts" -> {
                 purge2StarCharters(p1);
-                DrawBlueBackTile.drawBlueBackTiles(event, game, p1, 1, false);
+                DrawBlueBackTile.drawBlueBackTiles(event, game, p1, 1);
             }
         }
 
@@ -9157,7 +9146,7 @@ public class ButtonHelper {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
             case "codex", "absol_codex" -> offerCodexButtons(player, game, event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> offerNanoforgeButtons(player, game, event);
-            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3, false);
+            case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("drawRelic", "Draw a relic"));
@@ -9754,5 +9743,4 @@ public class ButtonHelper {
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message, systemButtons);
     }
-
 }

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.function.Consumers;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -28,6 +29,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 
@@ -113,12 +115,12 @@ public class TurnStart extends PlayerSubcommandData {
             Player privatePlayer = player;
             if (privatePlayer.getStasisInfantry() > 0) {
                 if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, game),
+                    MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                         "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, game), privatePlayer.getRepresentation()
+                    MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
                         + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
                 }
@@ -142,12 +144,12 @@ public class TurnStart extends PlayerSubcommandData {
             Player privatePlayer = player;
             if (privatePlayer.getStasisInfantry() > 0) {
                 if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, game),
+                    MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                         "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(privatePlayer, game), privatePlayer.getRepresentation()
+                    MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
                         + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
                 }
@@ -430,8 +432,8 @@ public class TurnStart extends PlayerSubcommandData {
 
         if (game.getLatestTransactionMsg() != null
             && !"".equalsIgnoreCase(game.getLatestTransactionMsg())) {
-            game.getMainGameChannel().deleteMessageById(game.getLatestTransactionMsg()).queueAfter(1,
-                TimeUnit.SECONDS);
+            game.getMainGameChannel().deleteMessageById(game.getLatestTransactionMsg())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
             game.setLatestTransactionMsg("");
         }
         // if (game.getActionCards().size() > 130 &&

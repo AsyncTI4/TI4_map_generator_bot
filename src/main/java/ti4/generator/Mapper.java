@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -30,33 +31,10 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-import ti4.model.AbilityModel;
-import ti4.model.ActionCardModel;
-import ti4.model.AgendaModel;
-import ti4.model.AttachmentModel;
-import ti4.model.ColorableModelInterface;
-import ti4.model.CombatModifierModel;
-import ti4.model.DeckModel;
-import ti4.model.DraftErrataModel;
-import ti4.model.EventModel;
-import ti4.model.ExploreModel;
-import ti4.model.FactionModel;
-import ti4.model.LeaderModel;
-import ti4.model.MapTemplateModel;
-import ti4.model.ModelInterface;
-import ti4.model.PlanetModel;
-import ti4.model.PromissoryNoteModel;
-import ti4.model.PublicObjectiveModel;
-import ti4.model.RelicModel;
-import ti4.model.SecretObjectiveModel;
-import ti4.model.StrategyCardModel;
+import ti4.model.*;
 import ti4.model.Source.ComponentSource;
-import ti4.model.StrategyCardSetModel;
-import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
-import ti4.model.TileModel;
-import ti4.model.UnitModel;
-import ti4.model.WormholeModel;
+import ti4.model.GenericCardModel.CardType;
 
 public class Mapper {
     private static final Properties colors = new Properties();
@@ -65,7 +43,6 @@ public class Mapper {
     private static final Properties special_case = new Properties();
     private static final Properties general = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
-    private static final Properties ds_handcards = new Properties();
 
     //TODO: Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
@@ -88,6 +65,7 @@ public class Mapper {
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
+    private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
 
     public static void init() {
         try {
@@ -105,7 +83,6 @@ public class Mapper {
         readData("special_case.properties", special_case);
         readData("general.properties", general);
         readData("hyperlanes.properties", hyperlaneAdjacencies);
-        readData("DS_handcards.properties", ds_handcards);
         importJsonObjectsFromFolder("explores", explore, ExploreModel.class);
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class);
         importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class);
@@ -125,6 +102,7 @@ public class Mapper {
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
+        importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
 
         duplicateObjectsForAllColors(promissoryNotes);
     }
@@ -272,6 +250,10 @@ public class Mapper {
         return factions.containsKey(faction);
     }
 
+    public static String getTheFrickinColorID(String color) {
+        return colors.getProperty(color, color);
+    }
+
     public static String getColorID(String color) {
         return color != null ? colors.getProperty(color) : null;
     }
@@ -373,12 +355,19 @@ public class Mapper {
         return unitMap;
     }
 
-    public static Map<String, String> getDSHandcards() {
-        Map<String, String> cards = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : ds_handcards.entrySet()) {
-            cards.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return cards;
+    public static Map<String, GenericCardModel> getGenericCards() {
+        return new HashMap<>(genericCards);
+    }
+
+    public static Map<String, GenericCardModel> getTraps() {
+        Map<String, GenericCardModel> plots = getGenericCards().entrySet().stream()
+            .filter(card -> card.getValue().getCardType() == CardType.trap)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        return new HashMap<>(plots);
+    }
+
+    public static GenericCardModel getTrap(String plotID) {
+        return getTraps().get(plotID);
     }
 
     // public static String getUnitID(String unitID, String color) {

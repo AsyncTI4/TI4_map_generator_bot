@@ -35,9 +35,7 @@ public class Buttons {
         REFRESH_UNIT_INFO,
         REFRESH_TECH_INFO,
         REFRESH_PLANET_INFO,
-        FACTION_EMBED
-    );
-
+        FACTION_EMBED);
 
     public static Button blue(String buttonID, String buttonLabel) {
         return Button.primary(buttonID, buttonLabel);

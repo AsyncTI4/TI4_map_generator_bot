@@ -30,5 +30,7 @@
     ],
     "planets": [
         "brilenci"
-    ]
+    ],
+    "tileBack": "blue",
+    "source": "eronous"
 }

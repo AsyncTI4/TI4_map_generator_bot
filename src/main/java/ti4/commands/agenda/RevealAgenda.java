@@ -41,12 +41,9 @@ public class RevealAgenda extends AgendaSubcommandData {
         revealAgenda(event, revealFromBottom, game, event.getChannel());
     }
 
-    public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game game,
-        MessageChannel channel) {
+    public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game game, MessageChannel channel) {
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
-            && ((new Date().getTime())
-                - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60
-                    * 10) {
+            && ((new Date().getTime()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake");
             return;

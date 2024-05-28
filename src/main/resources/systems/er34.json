@@ -31,5 +31,7 @@
     "wormholes": [
         "ETA"
     ],
-    "planets": []
+    "planets": [],
+    "tileBack": "blue",
+    "source": "eronous"
 }

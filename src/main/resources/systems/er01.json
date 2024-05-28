@@ -7,11 +7,12 @@
     ],
     "imagePath": "er01_rialarchon.png",
     "shipPositionsType": null,
-    "spaceTokenLocations": null,
     "wormholes": [
         null
     ],
     "planets": [
         "rialarchon"
-    ]
+    ],
+    "tileBack": "blue",
+    "source": "eronous"
 }
