@@ -87,7 +87,6 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 
 public class MapGenerator {
@@ -3956,7 +3955,6 @@ public class MapGenerator {
                 }
 
                 float scale = 1.0f;
-
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
                 if (controlTokenImage == null)
                     continue;

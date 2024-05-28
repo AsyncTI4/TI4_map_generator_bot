@@ -125,7 +125,9 @@ public class Emojis {
     public static final String FrontierCard = "<:FrontierCard:1147194828417929397>";
     public static final String EventCard = "";
 
-    // OBJECTIVES
+    // OBJECTIVES 
+    public static final String Custodians = "<:Custodians:1244158363449692231>";
+    public static final String CustodiansVP = "<:CustodiansVP:1244158364381085697>";
     public static final String SecretObjective = "<:Secretobjective:1159118787572940891>";
     public static final String Public1 = "<:Public1:1159118826026303528>";
     public static final String Public2 = "<:Public2:1159118827544662106>";

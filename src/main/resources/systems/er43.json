@@ -31,5 +31,7 @@
     "wormholes": [
         "KAPPA"
     ],
-    "planets": []
+    "planets": [],
+    "tileBack": "blue",
+    "source": "eronous"
 }

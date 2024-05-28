@@ -514,6 +514,7 @@ public class MiltyDraftManager {
         Player p = game.getPlayer(getCurrentDraftPlayer());
         String ping = p.getPing() + " is up to draft!";
         List<Button> showAgain = Arrays.asList(Button.secondary("showMiltyDraft", "Show draft again"));
+        showAgain = MessageHelper.addUndoButtonToList(showAgain, game);
         MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), showAgain, m -> prevPingMessage = m.getId());
     }
 
@@ -577,13 +578,8 @@ public class MiltyDraftManager {
         }
 
         // Slices
-        int sliceIndex = 1;
         String slices = bigTokenizer.nextToken();
-        StringTokenizer sliceTokenizer = new StringTokenizer(slices, ";");
-        while (sliceTokenizer.hasMoreTokens()) {
-            loadSliceFromString(sliceTokenizer.nextToken(), sliceIndex);
-            sliceIndex++;
-        }
+        loadSlicesFromString(slices);
 
         // Factions
         String factionStr = bigTokenizer.nextToken();
@@ -645,17 +641,21 @@ public class MiltyDraftManager {
         setMapTemplate(savedTemplate);
     }
 
+    public void loadSlicesFromString(String str) throws Exception {
+        int sliceIndex = 1;
+        StringTokenizer sliceTokenizer = new StringTokenizer(str, ";");
+        while (sliceTokenizer.hasMoreTokens()) {
+            loadSliceFromString(sliceTokenizer.nextToken(), sliceIndex);
+            sliceIndex++;
+        }
+    }
+
     private void loadSliceFromString(String str, int index) throws Exception {
         List<String> tiles = Arrays.asList(str.split(","));
         if (tiles.size() != 5) throw new Exception("Slice does not have the right number of tiles.");
         List<MiltyDraftTile> draftTiles = tiles.stream().map(t -> findTile(t)).toList();
         MiltyDraftSlice slice = new MiltyDraftSlice();
-        slice.setLeft(draftTiles.get(0));
-        slice.setFront(draftTiles.get(1));
-        slice.setRight(draftTiles.get(2));
-        slice.setEquidistant(draftTiles.get(3));
-        slice.setFarFront(draftTiles.get(4));
-
+        slice.setTiles(draftTiles);
         slice.setName(Character.toString(index - 1 + 'A'));
         slices.add(slice);
     }

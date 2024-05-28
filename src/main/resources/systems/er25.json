@@ -31,5 +31,7 @@
     "wormholes": [
         "EPSILON"
     ],
-    "planets": []
+    "planets": [],
+    "tileBack": "blue",
+    "source": "eronous"
 }

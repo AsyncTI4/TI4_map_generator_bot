@@ -1,8 +1,6 @@
 package ti4.commands.milty;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
@@ -15,7 +13,6 @@ import ti4.message.MessageHelper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MiltyCommand implements Command {
 
@@ -72,6 +69,8 @@ public class MiltyCommand implements Command {
 
     private Collection<MiltySubcommandData> getSubcommands() {
         Collection<MiltySubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new DebugMilty());
+        subcommands.add(new SetupMilty());
         subcommands.add(new StartMilty());
         subcommands.add(new ShowMilty());
 

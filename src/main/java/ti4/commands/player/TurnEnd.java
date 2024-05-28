@@ -388,7 +388,7 @@ public class TurnEnd extends PlayerSubcommandData {
         for (Player p2 : game.getRealPlayers()) {
             String ms2 = TurnStart.getMissedSCFollowsText(game, p2);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), ms2);
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
             }
             String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts, to be shared at the end of the game. Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing). Simply start your message with endofround" + game.getRound()
                 + " (capitalization doesnt matter) and the rest of the message will get recorded. You can do multiple messages, and they'll all get added onto eachother.";

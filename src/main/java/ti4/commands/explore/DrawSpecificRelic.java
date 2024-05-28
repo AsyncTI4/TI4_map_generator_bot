@@ -44,5 +44,6 @@ public class DrawSpecificRelic extends GenericRelicAction {
             message += " (FORCE DRAW: This relic was not in the deck but was forcefully drawn from the ether)";
         }
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        DrawRelic.resolveRelicEffects(event, game, player, relicID);
     }
 }

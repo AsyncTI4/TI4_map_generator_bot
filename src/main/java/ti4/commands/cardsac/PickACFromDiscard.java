@@ -1,6 +1,8 @@
 package ti4.commands.cardsac;
 
 import java.util.Map;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -34,27 +36,31 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         }
 
         int acIndex = option.getAsInt();
-        String acID = null;
-        for (Map.Entry<String, Integer> so : game.getDiscardActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+        getActionCardFromDiscard(event, game, player, acIndex);
+    }
+
+    public static void getActionCardFromDiscard(GenericInteractionCreateEvent event, Game game, Player player, int acIndex) {
+        String acId = null;
+        for (Map.Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
+            if (ac.getValue().equals(acIndex)) {
+                acId = ac.getKey();
             }
         }
 
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+        if (acId == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
             return;
         }
         boolean picked = game.pickActionCard(player.getUserID(), acIndex);
         if (!picked) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
             return;
         }
         String sb = "Game: " + game.getName() + " " +
             "Player: " + player.getUserName() + "\n" +
             "Picked card from Discards: " +
-            Mapper.getActionCard(acID).getRepresentation() + "\n";
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
+            Mapper.getActionCard(acId).getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
         ACInfo.sendActionCardInfo(game, player);
     }

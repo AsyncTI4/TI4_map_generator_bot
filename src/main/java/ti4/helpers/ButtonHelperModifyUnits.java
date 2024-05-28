@@ -1934,8 +1934,7 @@ public class ButtonHelperModifyUnits {
                     "Move " + unit + " to " + tile2.getRepresentationForButtons(game, player)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select tile you want to move to",
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select tile you want to move to", buttons);
         event.getMessage().delete().queue();
     }
 

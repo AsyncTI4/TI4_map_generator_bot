@@ -25,12 +25,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
 
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        List<String> allRelics = new ArrayList<>(getActiveGame().getAllRelics());
         Game game = getActiveGame();
-        int deckCount = allRelics.size();
-        Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
-        NumberFormat formatPercent = NumberFormat.getPercentInstance();
-        formatPercent.setMaximumFractionDigits(1);
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
         boolean over = false;
         if (override != null) {

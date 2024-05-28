@@ -584,7 +584,7 @@ public class ButtonHelperAbilities {
             msg.append(d1.getResult()).append(" ");
             addOmenDie(game, d1.getResult());
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, game), msg.toString());
+        MessageHelper.sendMessageToChannel(myko.getCorrectChannel(), msg.toString());
     }
 
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game game, Player player,
@@ -610,7 +610,7 @@ public class ButtonHelperAbilities {
             buttons.add(Button.success(finsFactionCheckerPrefix + "deleteButtons", "Delete these buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
-            MessageChannel channel1 = ButtonHelper.getCorrectChannel(pillaged, game);
+            MessageChannel channel1 = pillaged.getCorrectChannel();
             MessageChannel channel2 = player.getCorrectChannel();
             String pillagerMessage = player.getRepresentation(true, true) + " you pillaged, your tgs have gone from "
                 + player.getTg() + " to "
@@ -653,7 +653,7 @@ public class ButtonHelperAbilities {
                         .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game),
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
                         p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
                 }
             }
@@ -881,7 +881,7 @@ public class ButtonHelperAbilities {
                 List<Button> buttons2 = new ArrayList<>();
                 buttons2.add(Buttons.GET_A_TECH);
                 buttons2.add(Button.danger("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), p2
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2
                     .getRepresentation(true, true)
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName()
                     + ") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r",
@@ -1426,9 +1426,7 @@ public class ButtonHelperAbilities {
         TextChannel mainGameChannel = game.getMainGameChannel();
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
 
-        new AddUnits().unitParsing(event, player.getColor(),
-            game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet,
-            game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " used contagion ability to land " + amount
                 + " infantry on " + Helper.getPlanetRepresentation(planet, game));

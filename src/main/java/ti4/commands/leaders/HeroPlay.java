@@ -20,8 +20,6 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
-import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -92,8 +90,7 @@ public class HeroPlay extends LeaderAction {
         playHero(event, game, player, playerLeader);
     }
 
-    public static void playHero(GenericInteractionCreateEvent event, Game game, Player player,
-        Leader playerLeader) {
+    public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();

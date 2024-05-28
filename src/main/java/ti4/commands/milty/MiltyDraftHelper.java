@@ -137,7 +137,7 @@ public class MiltyDraftHelper {
         tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
         List<Point> tilePositions = Arrays.asList(left, front, right, equidistant, farFront, hs);
 
-        String fow = slice.getFront().getTile().getFowTilePath(null);
+        String fow = slice.getTiles().get(0).getTile().getFowTilePath(null);
         BufferedImage fogFilter = ImageHelper.read(fow);
 
         BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
@@ -367,5 +367,18 @@ public class MiltyDraftHelper {
         }
 
         MapTemplateHelper.buildMapFromMiltyData(game, mapTemplate);
+    }
+
+    // TODO: add map template
+    public static List<MiltyDraftSlice> parseSlicesFromString(String sliceString, List<ComponentSource> allowedSources) {
+        try {
+            MiltyDraftManager manager = new MiltyDraftManager();
+            manager.init(allowedSources);
+            manager.loadSlicesFromString(sliceString);
+            return manager.getSlices();
+        } catch (Exception e) {
+            BotLogger.log("invalid slice string", e);
+            return null;
+        }
     }
 }

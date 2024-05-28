@@ -32,5 +32,7 @@
         "KAPPA"
     ],
     "planets": [],
-    "isNebula": true
+    "isNebula": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

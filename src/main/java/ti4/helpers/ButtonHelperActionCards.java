@@ -237,7 +237,7 @@ public class ButtonHelperActionCards {
             + " was removed via the Lucky Shot AC";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg);
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
         }
         event.getMessage().delete().queue();
     }
@@ -485,8 +485,7 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveForwardSupplyBaseStep2(Player hacan, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveForwardSupplyBaseStep2(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, game),
@@ -1080,7 +1079,7 @@ public class ButtonHelperActionCards {
         player.setTg(player.getTg() + comm);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " stole the commodities (there were " + comm
-                + " comms to steal )of " + ButtonHelper.getIdentOrColor(player, game));
+                + " comms to steal) of " + ButtonHelper.getIdentOrColor(player, game));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
             p2.getRepresentation(true, true) + " your commodities were stolen due to salvage.");
         event.getMessage().delete().queue();

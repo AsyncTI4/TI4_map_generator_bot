@@ -232,11 +232,9 @@ public class StartCombat extends CombatSubcommandData {
             }
         }
         // DS Lanefir ATS Armaments
-        if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0)
-            || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {
+        if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0) || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
-            MessageHelper.sendMessageToChannelWithButtons(threadChannel,
-                "Buttons to remove commodities from ATS Armaments:", lanefirATSButtons);
+            MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from ATS Armaments:", lanefirATSButtons);
         }
     }
 
@@ -424,8 +422,7 @@ public class StartCombat extends CombatSubcommandData {
 
     }
 
-    private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel,
-        Game game, List<Player> combatPlayers, Tile tile) {
+    private static void sendAFBButtonsToThread(GenericInteractionCreateEvent event, ThreadChannel threadChannel, Game game, List<Player> combatPlayers, Tile tile) {
         boolean thereAreAFBUnits = false;
         for (Player player : combatPlayers) {
             if (!CombatHelper.GetUnitsInAFB(tile, player, event).isEmpty())
@@ -435,8 +432,7 @@ public class StartCombat extends CombatSubcommandData {
             return;
 
         List<Button> afbButtons = new ArrayList<>();
-        afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb",
-            "Roll " + CombatRollType.AFB.getValue()));
+        afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
         for (Player player : combatPlayers) {
             if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
@@ -630,11 +626,9 @@ public class StartCombat extends CombatSubcommandData {
         }
 
         Player nomad = Helper.getPlayerFromUnlockedLeader(game, "nomadagentthundarian");
-        if ((!game.isFoWMode() || nomad == p1) && nomad != null
-            && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
+        if ((!game.isFoWMode() || nomad == p1) && nomad != null && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
             String finChecker = "FFCC_" + nomad.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian",
-                "Use The Thundarian (Nomad Agent)")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use The Thundarian (Nomad Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
         }
 
@@ -792,16 +786,13 @@ public class StartCombat extends CombatSubcommandData {
                 .withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
-        if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile)
-            && !game.isFoWMode()) {
+        if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !game.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship")
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+            buttons.add(Button.secondary(finChecker + "gain_1_comms", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship")
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+            buttons.add(Button.secondary(finChecker + "gain_1_comms", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
         if (isSpaceCombat) {

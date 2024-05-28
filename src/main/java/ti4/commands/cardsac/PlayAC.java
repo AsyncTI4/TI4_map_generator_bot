@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -56,17 +55,13 @@ public class PlayAC extends ACCardsSubcommandData {
             return;
         }
 
-        String reply = playAC(event, game, player, option.getAsString().toLowerCase(), event.getChannel(),
-            event.getGuild());
+        String reply = playAC(event, game, player, option.getAsString().toLowerCase(), event.getChannel());
         if (reply != null) {
             MessageHelper.sendMessageToEventChannel(event, reply);
         }
     }
 
-    public static String playAC(GenericInteractionCreateEvent event, Game game, Player player, String value,
-        MessageChannel channel, Guild guild) {
-        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
-
+    public static String playAC(GenericInteractionCreateEvent event, Game game, Player player, String value, MessageChannel channel) {
         String acID = null;
         int acIndex = -1;
         try {
@@ -99,6 +94,11 @@ public class PlayAC extends ACCardsSubcommandData {
             // MessageHelper.sendMessageToEventChannel(event, );
             return "No such Action Card ID found, please retry";
         }
+        return resolveActionCard(event, game, player, acID, acIndex, channel);
+    }
+
+    public static String resolveActionCard(GenericInteractionCreateEvent event, Game game, Player player, String acID, int acIndex, MessageChannel channel) {
+        MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
@@ -188,7 +188,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     + "**Watcher** may still be viable, who knows.";
                 MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage);
             }
-            MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, game);
+            MessageChannel channel2 = player.getCorrectChannel();
             if (actionCardTitle.contains("Manipulate Investments")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc = 1; sc < 9; sc++) {
@@ -219,7 +219,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
                 String msg = player.getRepresentation()
                     + " After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg, acbuttons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
             }
 
             String codedName = "Plagiarize";
@@ -765,7 +765,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 "Use Cymiae Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw an AC",
                 buttons2);
         }

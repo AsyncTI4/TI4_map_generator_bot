@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -1164,39 +1165,30 @@ public class ButtonHelperFactionSpecific {
 
     public static void offerMahactInfButtons(Player player, Game game) {
         String message = player.getRepresentation(true, true) + " Resolve Mahact infantry loss using the buttons";
-        Button convert2CommButton = Button.success("convert_1_comms", "Convert 1 Commodity Into TG")
-            .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity")
-            .withEmoji(Emoji.fromFormatted(Emojis.comm));
-        List<Button> buttons = List.of(convert2CommButton, get2CommButton,
-            Button.danger("deleteButtons", "Done resolving"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+        List<Button> buttons = gainOrConvertCommButtons(player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void offerHoldingCompanyButtons(Player player, Game game) {
-        String message = player.getRepresentation(true, true)
-            + " Resolve Holding Company comm gain using the buttons. Remember you get 1 comm per attachment you've given out. ";
-        Button convert2CommButton = Button.success("convert_1_comms", "Convert 1 Commodity Into TG")
-            .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity")
-            .withEmoji(Emoji.fromFormatted(Emojis.comm));
-        List<Button> buttons = List.of(convert2CommButton, get2CommButton,
-            Button.danger("deleteButtons", "Done resolving"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+        String message = player.getRepresentation(true, true) + " Resolve Holding Company comm gain using the buttons. Remember you get 1 comm per attachment you've given out. ";
+        List<Button> buttons = gainOrConvertCommButtons(player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void offerNekrophageButtons(Player player, ButtonInteractionEvent event) {
         String message = player.getRepresentation(true, true) + " Resolve Necrophage ability using buttons. ";
-        Button convert2CommButton = Button.success("convert_1_comms", "Convert 1 Commodity Into TG")
-            .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity")
-            .withEmoji(Emoji.fromFormatted(Emojis.comm));
-        List<Button> buttons = List.of(convert2CommButton, get2CommButton,
-            Button.danger("deleteButtons", "Done resolving"));
+        List<Button> buttons = gainOrConvertCommButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static List<Button> gainOrConvertCommButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String ffcc = player.getFinsFactionCheckerPrefix();
+        buttons.add(Button.of(ButtonStyle.SUCCESS, ffcc + "convert_1_comms", "Convert 1 comm to TG", Emoji.fromFormatted(Emojis.Wash)));
+        buttons.add(Button.of(ButtonStyle.PRIMARY, ffcc + "gain_1_comms", "Gain 1 comm", Emoji.fromFormatted(Emojis.comm)));
+        buttons.add(Button.danger("deleteButtons", "Done resolving"));
+        return buttons;
     }
 
     public static void KeleresIIHQCCGainCheck(Player player, Game game) {
