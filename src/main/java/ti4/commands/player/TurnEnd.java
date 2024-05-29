@@ -368,7 +368,7 @@ public class TurnEnd extends PlayerSubcommandData {
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
-                    int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie);
+                    int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
                         if (message2b.equalsIgnoreCase("none")) {

@@ -233,7 +233,7 @@ public class CombatRoll extends CombatSubcommandData {
         }
 
         if (round2 > round) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## Start of Combat Round #" + round2);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## __Start of Combat Round #" + round2 + "__");
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
@@ -243,7 +243,7 @@ public class CombatRoll extends CombatSubcommandData {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,", Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         }
         if (!game.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true) + " your opponent rolled ground combat for round #" + round2 + " and got " + h + " hit(s)";
+            String msg2 = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h + " hit(s) in round #" + round2;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (!automated) {
                 if (h > 0) {
@@ -274,7 +274,7 @@ public class CombatRoll extends CombatSubcommandData {
                 if (round2 > round) {
                     buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + (round + 1)));
                 }
-                String msg = "\n" + opponent.getRepresentation(true, true) + " your opponent rolled space combat for round #" + round2 + " and got " + h + " hit(s)";
+                String msg = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h + " hit(s) in round #" + round2;
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 if (h > 0) {
 
@@ -297,7 +297,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
         }
         if (!game.isFoWMode() && rollType == CombatRollType.AFB && opponent != null && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true) + " your opponent rolled AFB and got " + h + " hit(s)";
+            String msg2 = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit(s) from AFB";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
                 String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit(s)";
@@ -310,7 +310,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
         }
         if (!game.isFoWMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != null && opponent != player) {
-            String msg = "\n" + opponent.getRepresentation(true, true) + " your opponent rolled space cannon offense and got " + h + " hit(s)";
+            String msg = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit(s) from space cannon offense";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> buttons = new ArrayList<>();
             if (h > 0) {
