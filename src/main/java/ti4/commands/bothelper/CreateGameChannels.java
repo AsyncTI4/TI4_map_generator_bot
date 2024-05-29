@@ -326,7 +326,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             if (thread.getParentChannel().getName().equals("making-new-games")) {
                 newGame.setLaunchPostThreadID(thread.getId());
                 ThreadChannelManager manager = thread.getManager()
-                    .setName(StringUtils.left(newGame.getName() + "-launched - " + thread.getName(), 100))
+                    .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR);
                 if (missingMembers.isEmpty()) {
                     manager.setArchived(true);
