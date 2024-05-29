@@ -5032,8 +5032,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static String putInfWithMechsForStarforge(String pos, String successMessage, Game game, Player player,
-        ButtonInteractionEvent event) {
+    public static String putInfWithMechsForStarforge(String pos, String successMessage, Game game, Player player, ButtonInteractionEvent event) {
         Set<String> tiles = FoWHelper.getAdjacentTiles(game, pos, player, true);
         tiles.add(pos);
         StringBuilder successMessageBuilder = new StringBuilder(successMessage);
@@ -6653,12 +6652,13 @@ public class ButtonHelper {
         if (game.getPlayer(game.getSpeaker()) != null) {
             speaker = game.getPlayers().get(game.getSpeaker());
         }
+        if (game.getPlayerFromColorOrFaction(color) != null)
+            color = player.getNextAvailableColour();
         if (buttonID.split("_").length == 6 || speaker != null) {
             if (speaker != null) {
-                new Setup().secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
+                Setup.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, false);
             } else {
-                new Setup().secondHalfOfPlayerSetup(player, game, color, factionId, pos, event,
-                    "yes".equalsIgnoreCase(buttonID.split("_")[5]));
+                Setup.secondHalfOfPlayerSetup(player, game, color, factionId, pos, event, "yes".equalsIgnoreCase(buttonID.split("_")[5]));
             }
         } else {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -9000,7 +9000,7 @@ public class ButtonHelper {
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);
                     // MessageHelper.sendMessageToChannel(event.getChannel(),
-                    // ButtonHelper.getIdent(p1)+" Chose to use the mantle cracking ability");
+                    // p1.getFactionEmoji()+" Chose to use the mantle cracking ability");
                     String message = "Select the planet you would like to mantle crack";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {

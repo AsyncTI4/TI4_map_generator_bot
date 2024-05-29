@@ -942,7 +942,7 @@ public class ButtonHelperHeroes {
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " removed all opposing infantry and fighters in "
+            player.getFactionEmoji() + " removed all opposing infantry and fighters in "
                 + tile.getRepresentationForButtons(game, player) + " using Saar hero");
         event.getMessage().delete().queue();
     }
@@ -1088,7 +1088,7 @@ public class ButtonHelperHeroes {
         int count = planetHolder.getResources() + planetHolder.getInfluence();
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
+            player.getFactionEmoji() + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         game.setComponentAction(true);
@@ -1720,7 +1720,7 @@ public class ButtonHelperHeroes {
         player.addTech(techIn);
         player.removeTech(techOut);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " swapped the tech '" + techM1.getName() + "' for the tech '"
+            player.getFactionEmoji() + " swapped the tech '" + techM1.getName() + "' for the tech '"
                 + techM2.getName() + "'");
         event.getMessage().delete().queue();
     }

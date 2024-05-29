@@ -282,7 +282,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int count = hasSchemingAbility ? 3 : 2;
                 if (player.hasAbility("autonetic_memory")) {
                     ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
                 } else {
                     for (int i = 0; i < count; i++) {
                         game.drawActionCard(player.getUserID());
@@ -622,7 +622,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
             gainComm.add(Button.danger("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
-            sb.append(ButtonHelper.getIdent(player)).append(" can use their **Fortune Seekers** ability\n");
+            sb.append(player.getFactionEmoji()).append(" can use their **Fortune Seekers** ability\n");
             sb.append(player.getRepresentation(true, true)).append(
                 " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);

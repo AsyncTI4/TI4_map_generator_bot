@@ -61,7 +61,7 @@ public class ButtonHelperModifyUnits {
         ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(pos);
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
-        String msg = ButtonHelper.getIdent(player) + " assigned hits in the following way:\n";
+        String msg = player.getFactionEmoji() + " assigned hits in the following way:\n";
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
@@ -157,7 +157,7 @@ public class ButtonHelperModifyUnits {
     public static void autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
         ButtonInteractionEvent event) {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        String msg = ButtonHelper.getIdent(player) + " assigned hits in the following way:\n";
+        String msg = player.getFactionEmoji() + " assigned hits in the following way:\n";
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
         Player cabalMechOwner = Helper.getPlayerFromUnit(game, "cabal_mech");
@@ -403,9 +403,9 @@ public class ButtonHelperModifyUnits {
     public static String autoAssignSpaceCombatHits(Player player, Game game, Tile tile, int hits,
         GenericInteractionCreateEvent event, boolean justSummarizing, boolean spaceCannonOffence) {
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
-        String msg = ButtonHelper.getIdent(player) + " assigned hits in the following way:\n";
+        String msg = player.getFactionEmoji() + " assigned hits in the following way:\n";
         if (justSummarizing) {
-            msg = ButtonHelper.getIdent(player) + " would assign hits in the following way:\n";
+            msg = player.getFactionEmoji() + " would assign hits in the following way:\n";
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
@@ -1169,7 +1169,7 @@ public class ButtonHelperModifyUnits {
         tile2 = MoveUnits.flipMallice(event, tile2, game);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander") && !buttonID.contains("skilled")
             && !AddCC.hasCC(event, player.getColor(), tile1)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
                 + " did not place a CC in the retreat system due to kollecc commander");
         } else {
             AddCC.addCC(event, player.getColor(), tile2, true);
@@ -1948,7 +1948,7 @@ public class ButtonHelperModifyUnits {
         new AddUnits().unitParsing(event, player.getColor(), tile2, unit, game);
         new RemoveUnits().unitParsing(event, player.getColor(), tile1, unit, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " moved 1 " + unit + " from "
+            player.getFactionEmoji() + " moved 1 " + unit + " from "
                 + tile1.getRepresentationForButtons(game, player) + " to "
                 + tile2.getRepresentationForButtons(game, player) + "an ability.");
         event.getMessage().delete().queue();

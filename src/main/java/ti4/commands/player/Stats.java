@@ -246,8 +246,8 @@ public class Stats extends PlayerSubcommandData {
 			StringBuilder message = new StringBuilder();
 			int sc = optionSCPlayed.getAsInt();
 			if (sc > 0) {
-				boolean scIsPlayed = game.getScPlayed().get(sc);
-				if (!scIsPlayed) {
+				Boolean scIsPlayed = game.getScPlayed().get(sc);
+				if (scIsPlayed == null || !scIsPlayed) {
 					game.setSCPlayed(sc, true);
 					message.append("> flipped ").append(Emojis.getSCEmojiFromInteger(sc)).append(" to ")
 						.append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");

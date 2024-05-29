@@ -32,11 +32,11 @@ public class PurgePN extends PNCardsSubcommandData {
             return;
         }
 
-        int acIndex = option.getAsInt();
+        int pnIndex = option.getAsInt();
         String id = null;
-        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                id = so.getKey();
+        for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+            if (pn.getValue().equals(pnIndex)) {
+                id = pn.getKey();
             }
         }
 

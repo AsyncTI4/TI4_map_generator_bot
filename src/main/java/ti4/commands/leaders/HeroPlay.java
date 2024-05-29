@@ -369,12 +369,12 @@ public class HeroPlay extends LeaderAction {
             case "bentorhero" -> {
                 ButtonHelperHeroes.resolveBentorHero(game, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    ButtonHelper.getIdent(player) + " offered buttons to explore all planets");
+                    player.getFactionEmoji() + " offered buttons to explore all planets");
             }
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    ButtonHelper.getIdent(player) + " sustained all units except their mechs");
+                    player.getFactionEmoji() + " sustained all units except their mechs");
             }
             case "jolnarhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(player);
