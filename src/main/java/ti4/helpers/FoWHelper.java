@@ -449,6 +449,55 @@ public class FoWHelper {
 		return (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA));
 	}
 
+	public static boolean doesTileHaveBeta(Game game, String position) {
+		Tile tile = game.getTileByPosition(position);
+
+		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+			Set<String> tokenList = unitHolder.getTokenList();
+			for (String token : tokenList) {
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
+				if (!tokenName.contains("champion")) {
+					tokenName = tokenName.replace("ion", "");
+				}
+				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
+					if (tokenName.contains(wh.getWhString())) {
+						wormholeIDs.add(wh.getWhString());
+						if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
+							wormholeIDs.add(wh.toString());
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		return wormholeIDs.contains(Constants.BETA);
+	}
+
+	public static boolean doesTileHaveAlpha(Game game, String position) {
+		Tile tile = game.getTileByPosition(position);
+
+		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+			Set<String> tokenList = unitHolder.getTokenList();
+			for (String token : tokenList) {
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
+				if (!tokenName.contains("champion")) {
+					tokenName = tokenName.replace("ion", "");
+				}
+				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
+					if (tokenName.contains(wh.getWhString())) {
+						wormholeIDs.add(wh.getWhString());
+						break;
+					}
+				}
+			}
+		}
+
+		return (wormholeIDs.contains(Constants.ALPHA));
+	}
+
 	/**
 	 * Check the map for other tiles that have wormholes connecting to the source
 	 * system.

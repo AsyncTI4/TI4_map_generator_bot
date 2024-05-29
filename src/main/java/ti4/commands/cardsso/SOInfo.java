@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -91,16 +92,24 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     }
 
     public static String getSecretObjectiveRepresentation(String soID) {
-        return getSecretObjectiveRepresentation(soID, null);
+        return getSecretObjectiveRepresentation(soID, null, true);
     }
 
-    private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID) {
+    public static String getSecretObjectiveRepresentationNoNewLine(String soID) {
+        return getSecretObjectiveRepresentation(soID, null, false);
+    }
+
+    private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();
-        sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+        if (newLine) {
+            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+        } else {
+            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription);
+        }
         return sb.toString();
     }
 
@@ -114,7 +123,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         int index = 1;
 
         //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives:**").append("\n");
+        sb.append("**Scored Secret Objectives (" + player.getSoScored() + "/" + player.getMaxSOCount() + "):**").append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -135,7 +144,13 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                     Integer idValue = so.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
-                    sb.append(getSecretObjectiveRepresentation(so.getKey()));
+
+                    if (ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) > 0) {
+                        sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
+                        sb.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) + ")\n");
+                    } else {
+                        sb.append(getSecretObjectiveRepresentation(so.getKey()));
+                    }
                     index++;
                 }
             }
