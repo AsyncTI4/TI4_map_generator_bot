@@ -11,7 +11,6 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -81,6 +80,18 @@ public class DrawRelic extends GenericRelicAction {
         relicID = relicID.replace("extra2", "");
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
+
+        String message = player.getRepresentation() + " drew a Relic:";
+        if (game.isFoWMode()) {
+            FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        }
+        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        resolveRelicEffects(event, game, player, relicID);
+
+        if (checked) game.shuffleRelics();
+    }
+
+    public static void resolveRelicEffects(GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
         StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
@@ -117,15 +128,7 @@ public class DrawRelic extends GenericRelicAction {
             }
         }
 
-        String message = player.getRepresentation() + " drew a Relic:";
-        if (game.isFoWMode()) {
-            FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
-        }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
-        if (checked) {
-            game.shuffleRelics();
-        }
         Helper.checkEndGame(game, player);
     }
 }

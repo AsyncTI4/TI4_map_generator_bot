@@ -6,6 +6,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -65,7 +68,6 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
-
         EmbedBuilder eb = new EmbedBuilder();
 
         StringBuilder sb = new StringBuilder();
@@ -94,6 +96,28 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         eb.setFooter(sb.toString());
 
         if (getEmojiURL() != null) eb.setThumbnail(getEmojiURL());
+
+        return eb.build();
+    }
+
+    @JsonIgnore
+    public MessageEmbed getLegendaryEmbed() {
+        if (StringUtils.isBlank(getLegendaryAbilityName())) return null; //no ability name, no embed
+        if (StringUtils.isBlank(getLegendaryAbilityText())) return null; //no ability text, no embed
+
+        EmbedBuilder eb = new EmbedBuilder();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Emojis.LegendaryPlanet).append("__").append(getLegendaryAbilityName()).append("__");
+        eb.setTitle(sb.toString());
+        eb.setColor(Color.black);
+
+        eb.setDescription(getLegendaryAbilityText());
+        if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
+        if (getEmojiURL() != null) eb.setThumbnail(getEmojiURL());
+
+        // footer can have some of the planet info
+        eb.setFooter(getName());
 
         return eb.build();
     }
@@ -158,6 +182,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getEmojiURL() {
         Emoji emoji = Emoji.fromFormatted(getEmoji());
+        if (getEmoji().equals(Emojis.SemLore) && !getId().equals("semlore")) {
+            return null;
+        }
         if (emoji instanceof CustomEmoji customEmoji) {
             return customEmoji.getImageUrl();
         }

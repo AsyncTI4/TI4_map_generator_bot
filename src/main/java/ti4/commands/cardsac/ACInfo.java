@@ -11,7 +11,6 @@ import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -19,6 +18,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.GenericCardModel;
 
 public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public ACInfo() {
@@ -72,27 +72,17 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
-        Map<String, String> dsHandcards = Mapper.getDSHandcards();
-        String info = dsHandcards.get(trapID);
-        if (info == null) {
-            return "";
-        }
-        String[] split = info.split(";");
-        // String trapType = split[0];
-        String trapName = split[1];
-        String trapText = split[2];
+        GenericCardModel trap = Mapper.getTrap(trapID);
         String planet = trapCardsPlanets.get(trapID);
-        sb.append("__**").append(trapName).append("**__").append(" - ").append(trapText);
+
+        sb.append(trap.getRepresentation());
         if (planet != null) {
             Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             String representation = planetRepresentations.get(planet);
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("__**");
-            sb.append(" Planet: ");
-            sb.append(representation);
-            sb.append("**__");
+            sb.append(" **__Planet: ").append(representation).append("**__");
         }
         sb.append("\n");
         return sb.toString();
@@ -107,10 +97,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getActionCardInfo(game, player));
-        MessageHelper.sendMessageToChannelWithButtons(
-            player.getCardsInfoThread(),
-            "_ _\nClick a button below to play an Action Card",
-            getPlayActionCardButtons(game, player));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an Action Card", getPlayActionCardButtons(game, player));
 
         sendTrapCardInfo(game, player);
     }

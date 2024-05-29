@@ -32,5 +32,7 @@
         "EPSILON"
     ],
     "planets": [],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
@@ -102,7 +101,7 @@ public class SCPlay extends PlayerSubcommandData {
                     if (p2 == player) {
                         continue;
                     }
-                    PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel(), event.getGuild());
+                    PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
                     String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";

@@ -13,7 +13,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -71,7 +70,7 @@ public class StellarConverter extends SpecialSubcommandData {
 
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                     p2.getRepresentation(true, true) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been stellar converted");
                 int amountToKill = 0;
                 amountToKill = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());

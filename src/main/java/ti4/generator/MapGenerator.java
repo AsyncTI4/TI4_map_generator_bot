@@ -87,7 +87,6 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 
 public class MapGenerator {
@@ -283,7 +282,7 @@ public class MapGenerator {
                     addTile(new Tile("0gray", position), TileStep.Tile);
                 }
                 if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
-                    addTile(new Tile("0border", position), TileStep.Tile, true);
+                    addTile(new Tile("0border", position), TileStep.Tile);
                 }
             }
         }
@@ -3956,7 +3955,6 @@ public class MapGenerator {
                 }
 
                 float scale = 1.0f;
-
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
                 if (controlTokenImage == null)
                     continue;

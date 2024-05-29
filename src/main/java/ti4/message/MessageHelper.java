@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -86,44 +87,46 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, embeds, null);
 	}
 
-	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText,
-		List<Button> buttons) {
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		sendMessageToChannelWithEmbedsAndButtons(channel, messageText, null, buttons);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText,
-		List<MessageEmbed> embeds, List<Button> buttons) {
+	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
 		Game game = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
 			&& !messageText.contains("end of turn ability") && game != null && game.getUndoButton()) {
-			boolean undoPresent = false;
-			for (Button button : buttons) {
-				if (button.getId().contains("ultimateUndo")) {
-					undoPresent = true;
-				}
+			buttons = addUndoButtonToList(buttons, game);
+		}
+		splitAndSent(messageText, channel, embeds, buttons);
+	}
+
+	public static List<Button> addUndoButtonToList(List<Button> buttons, Game game) {
+		boolean undoPresent = false;
+		List<Button> newButtons = new ArrayList<>(buttons);
+		for (Button button : buttons) {
+			if (button.getId().contains("ultimateUndo")) {
+				undoPresent = true;
 			}
-			File mapUndoDirectory = Storage.getMapUndoDirectory();
-			if (mapUndoDirectory != null && mapUndoDirectory.exists() && !undoPresent) {
-				String mapName = game.getName();
-				String mapNameForUndoStart = mapName + "_";
-				String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-				if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-					try {
-						List<Integer> numbers = Arrays.stream(mapUndoFiles)
-							.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-							.map(fileName -> fileName.replace(Constants.TXT, ""))
-							.map(Integer::parseInt).toList();
-						int maxNumber = numbers.isEmpty() ? 0
-							: numbers.stream().mapToInt(value -> value)
-								.max().orElseThrow(NoSuchElementException::new);
-						buttons.add(Button.secondary("ultimateUndo_" + maxNumber, "UNDO"));
-					} catch (Exception e) {
-						BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
-					}
+		}
+		File mapUndoDirectory = Storage.getMapUndoDirectory();
+		if (mapUndoDirectory != null && mapUndoDirectory.exists() && !undoPresent) {
+			String mapName = game.getName();
+			String mapNameForUndoStart = mapName + "_";
+			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+			if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+				try {
+					List<Integer> numbers = Arrays.stream(mapUndoFiles)
+						.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+						.map(fileName -> fileName.replace(Constants.TXT, ""))
+						.map(Integer::parseInt).toList();
+					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+					newButtons.add(Button.secondary("ultimateUndo_" + maxNumber, "UNDO"));
+				} catch (Exception e) {
+					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
 				}
 			}
 		}
-		splitAndSent(messageText, channel, embeds, buttons);
+		return newButtons;
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
@@ -191,7 +194,7 @@ public class MessageHelper {
 				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
 			} else if ("after".equalsIgnoreCase(whenOrAfter)) {
 				if (game.getLatestAfterMsg() != null && !"".equals(game.getLatestAfterMsg())) {
-					game.getMainGameChannel().deleteMessageById(game.getLatestAfterMsg()).queue();
+					game.getMainGameChannel().deleteMessageById(game.getLatestAfterMsg()).queue(Consumers.nop(), BotLogger::catchRestError);
 				}
 				game.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
@@ -526,8 +529,7 @@ public class MessageHelper {
 	 * }
 	* </pre>
 	 */
-	public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<MessageEmbed> embeds,
-		List<Button> buttons) {
+	public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<MessageEmbed> embeds, List<Button> buttons) {
 		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
 		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
@@ -608,7 +610,7 @@ public class MessageHelper {
 		return getMessageCreateDataObjects(message, null, buttons);
 	}
 
-	private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+	public static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
 		List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
 		try {
 			buttons.removeIf(Objects::isNull);

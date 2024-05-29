@@ -31,6 +31,6 @@ public class SendJsonToS3 extends BothelperSubcommandData {
             } catch (Exception e) {
                 BotLogger.log("Error sending json file to s3: " + game.getName(), e);
             }
-        };
+        }
     }
 }

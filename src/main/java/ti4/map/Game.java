@@ -61,6 +61,10 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.settingsFramework.menus.DeckSettings;
+import ti4.helpers.settingsFramework.menus.GameSettings;
+import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -346,12 +350,21 @@ public class Game {
     @Getter
     @Setter
     private int numberOfPurgedFragments;
+    @Getter
+    @Setter
+    private MiltySettings miltySettings = null;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
 
         miltyDraftManager = new MiltyDraftManager();
+    }
+
+    public void finishImport() {
+        if (miltySettings != null) {
+            miltySettings.finishInitialization(this, null);
+        }
     }
 
     public void newGameSetup() {
@@ -516,6 +529,14 @@ public class Game {
         return miltyDraftManager;
     }
 
+    public MiltySettings initializeMiltySettings() {
+        if (miltySettings == null) {
+            miltySettings = new MiltySettings();
+            miltySettings.finishInitialization(this, null);
+        }
+        return miltySettings;
+    }
+
     public void setPurgedPN(String purgedPN) {
         this.purgedPN.add(purgedPN);
     }
@@ -660,6 +681,8 @@ public class Game {
     }
 
     public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
+        if (absolMode || miltyModMode || discordantStarsMode || homebrewSCMode || fowMode || allianceMode || communityMode)
+            competitiveTIGLGame = false;
         this.competitiveTIGLGame = competitiveTIGLGame;
     }
 
@@ -2054,6 +2077,7 @@ public class Game {
         adjacencyOverrides.put(secondary, primaryTile);
     }
 
+    @JsonIgnore
     public void setAdjacentTileOverride(Map<Pair<String, Integer>, String> overrides) {
         adjacencyOverrides = new LinkedHashMap<>(overrides);
     }
@@ -3173,6 +3197,50 @@ public class Game {
         this.actionCards = actionCards;
     }
 
+    public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
+        SourceSettings sources = miltySettings.getSourceSettings();
+        if (sources.getAbsol().val) setAbsolMode(true);
+
+        GameSettings settings = miltySettings.getGameSettings();
+        setVp(settings.getPointTotal().val);
+        setMaxSOCountPerPlayer(settings.getSecrets().val);
+        setUpPeakableObjectives(settings.getStage1s().val, 1);
+        setUpPeakableObjectives(settings.getStage2s().val, 2);
+        setCompetitiveTIGLGame(settings.getTigl().val);
+        setAllianceMode(settings.getAlliance().val);
+        return validateAndSetAllDecks(event, miltySettings);
+    }
+
+    public boolean validateAndSetAllDecks(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
+        DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
+
+        boolean success = true;
+        // &= is the "and operator". It will assign true to success iff success is true and the result is true. Otherwise it will propagate a false value to the end
+        success &= validateAndSetPublicObjectivesStage1Deck(event, deckSettings.getStage1().getValue());
+        success &= validateAndSetPublicObjectivesStage2Deck(event, deckSettings.getStage2().getValue());
+        success &= validateAndSetSecretObjectiveDeck(event, deckSettings.getSecrets().getValue());
+        success &= validateAndSetActionCardDeck(event, deckSettings.getActionCards().getValue());
+        success &= validateAndSetExploreDeck(event, deckSettings.getExplores().getValue());
+        success &= validateAndSetTechnologyDeck(event, deckSettings.getTechs().getValue());
+        //success &= validateAndSetEventDeck(event, deckSettings.getEvents().getValue());
+        setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
+
+        if (absolMode && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the agenda deck you chose will be overridden.");
+            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
+        } else {
+            success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
+        }
+        if (absolMode && !deckSettings.getRelics().getChosenKey().contains("absol")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
+            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("relics_absol"));
+        } else {
+            success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
+        }
+
+        return success;
+    }
+
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
@@ -3281,6 +3349,13 @@ public class Game {
         return true;
     }
 
+    public boolean validateAndSetTechnologyDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        swapOutVariantTechs();
+        setTechnologyDeckID(deck.getAlias());
+        swapInVariantTechs();
+        return true;
+    }
+
     public boolean validateAndSetEventDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardedEvents().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change event deck to **"
@@ -3314,6 +3389,7 @@ public class Game {
         this.discardActionCards = discardActionCards;
     }
 
+    @JsonIgnore
     public void setPurgedActionCards(List<String> purgedActionCardList) {
         Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
         for (String card : purgedActionCardList) {

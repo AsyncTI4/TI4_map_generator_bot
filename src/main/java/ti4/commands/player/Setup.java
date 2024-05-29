@@ -340,7 +340,6 @@ public class Setup extends PlayerSubcommandData {
             p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
             p2.removePromissoryNote(p2.getColor() + "_sftt");
         }
-
     }
 
     private static void addUnits(FactionModel setupInfo, Tile tile, String color, GenericInteractionCreateEvent event) {

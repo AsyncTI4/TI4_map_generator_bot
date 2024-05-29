@@ -78,8 +78,7 @@ public class GameEnd extends GameSubcommandData {
     secondHalfOfGameEnd(event, game, publish, archiveChannels);
   }
 
-  public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game game, boolean publish,
-    boolean archiveChannels) {
+  public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game game, boolean publish, boolean archiveChannels) {
     String gameName = game.getName();
     List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
     boolean deleteRole = true;
@@ -176,17 +175,8 @@ public class GameEnd extends GameSubcommandData {
         if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
           MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             getTIGLFormattedGameEndText(game, event));
-          String blt = AsyncTI4DiscordBot.jda.getUserById("757405214398480486").getAsMention();
-          MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            blt + " bot has been told to ping you when TIGL games end");
-        }
-
-        // GET BOTHELPER LOUNGE
-        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-          .getTextChannelsByName("staff-lounge", true).get(0);
-        if (bothelperLoungeChannel == null) {
-          BotLogger.log(event, "`#staff-lounge` channel not found - `/game end` cannot continue");
-          return;
+          String blt = Constants.bltPing();
+          MessageHelper.sendMessageToChannel(event.getMessageChannel(), blt + " bot has been told to ping you when TIGL games end");
         }
 
         // MOVE CHANNELS TO IN-LIMBO
@@ -237,13 +227,18 @@ public class GameEnd extends GameSubcommandData {
           }
         }
 
-        // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
-        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        String threadName = "game-starts-and-ends";
-        for (ThreadChannel threadChannel_ : threadChannels) {
-          if (threadChannel_.getName().equals(threadName)) {
-            MessageHelper.sendMessageToChannel(threadChannel_,
-              "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");
+        // GET BOTHELPER LOUNGE
+        List<TextChannel> bothelperLoungeChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);
+        TextChannel bothelperLoungeChannel = bothelperLoungeChannels.size() > 0 ? bothelperLoungeChannels.get(0) : null;
+        if (bothelperLoungeChannel != null) {
+          // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
+          List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+          String threadName = "game-starts-and-ends";
+          for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+              MessageHelper.sendMessageToChannel(threadChannel_,
+                "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");
+            }
           }
         }
 

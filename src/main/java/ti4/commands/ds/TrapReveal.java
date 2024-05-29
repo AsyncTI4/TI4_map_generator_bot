@@ -20,6 +20,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.GenericCardModel;
 
 public class TrapReveal extends DiscordantStarsSubcommandData {
 
@@ -79,12 +80,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                     ButtonHelperAbilities.removeATrapToken(game, planetName);
                     player.removeTrapCardPlanet(trap);
                     player.setTrapCard(trap);
-                    Map<String, String> dsHandcards = Mapper.getDSHandcards();
-                    String info = dsHandcards.get(trap);
-                    String[] split = info.split(";");
-                    String trapType = split[0];
-                    String trapName = split[1];
-                    String trapText = split[2];
+                    GenericCardModel trapCard = Mapper.getTrap(trap);
                     Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
                     String representation = planetRepresentations.get(planet);
                     if (representation == null) {
@@ -92,10 +88,10 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                     }
                     if (reveal && planet != null) {
 
-                        String sb = "__**" + "Trap: " + trapName + "**__" + " - " + trapText + "\n" +
+                        String sb = trapCard.getRepresentation() + "\n" +
                             "__**" + "Has been revealed on planet: " + representation + "**__";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
-                        if ("Minefields".equalsIgnoreCase(trapName)) {
+                        if ("Minefields".equalsIgnoreCase(trapCard.getName())) {
                             for (Player p2 : game.getRealPlayers()) {
                                 if (p2 == player) {
                                     continue;
@@ -104,7 +100,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                             }
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
                         }
-                        if ("Account Siphon".equalsIgnoreCase(trapName)) {
+                        if ("Account Siphon".equalsIgnoreCase(trapCard.getName())) {
                             for (Player p2 : game.getRealPlayers()) {
                                 if (p2 == player) {
                                     continue;
@@ -140,7 +136,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         player.setTg(player.getTg() + count);
         String msg1 = p2.getRepresentation(true, true) + " you had " + count + " tgs stolen by a trap";
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " tgs via trap";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg1);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         event.getMessage().delete().queue();
     }
@@ -152,7 +148,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         player.setTg(player.getTg() + count);
         String msg1 = p2.getRepresentation(true, true) + " you had " + count + " comms stolen by a trap";
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " comms via trap";
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg1);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         event.getMessage().delete().queue();
     }

@@ -32,5 +32,7 @@
         "ZETA"
     ],
     "planets": [],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

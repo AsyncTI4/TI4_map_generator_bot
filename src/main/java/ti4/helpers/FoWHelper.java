@@ -233,8 +233,7 @@ public class FoWHelper {
 
 	}
 
-	public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow,
-		boolean includeTile) {
+	public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow, boolean includeTile) {
 		Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
 
 		List<String> adjacentCustomTiles = game.getCustomAdjacentTiles().get(position);
@@ -284,8 +283,7 @@ public class FoWHelper {
 		return adjacentPositions;
 	}
 
-	public static Set<String> getAdjacentTilesAndNotThisTile(Game game, String position, Player player,
-		boolean toShow) {
+	public static Set<String> getAdjacentTilesAndNotThisTile(Game game, String position, Player player, boolean toShow) {
 
 		return getAdjacentTiles(game, position, player, toShow, false);
 	}
@@ -306,8 +304,7 @@ public class FoWHelper {
 	 * <p>
 	 * Does not traverse wormholes
 	 */
-	private static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position,
-		Integer sourceDirection, Set<String> exploredSet, String prevTile) {
+	private static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position, Integer sourceDirection, Set<String> exploredSet, String prevTile) {
 		Set<String> tiles = new HashSet<>();
 		if (exploredSet.contains(position + sourceDirection)) {
 			// We already explored this tile from this direction!

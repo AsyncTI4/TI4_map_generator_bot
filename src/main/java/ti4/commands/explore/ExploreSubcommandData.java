@@ -282,7 +282,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int count = hasSchemingAbility ? 3 : 2;
                 if (player.hasAbility("autonetic_memory")) {
                     ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
                 } else {
                     for (int i = 0; i < count; i++) {
                         game.drawActionCard(player.getUserID());
@@ -487,12 +487,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
-                Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On " + planetID)
-                    .withEmoji(Emoji.fromFormatted(Emojis.mech)); // TODO: Button resolves using planet ID at end of
-                                                                                                                                                                     // label - add planetID to buttonId and use that
-                                                                                                                                                                     // instead
-                Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity")
-                    .withEmoji(Emoji.fromFormatted(Emojis.comm));
+                // TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
+                Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On " + planetID).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
@@ -625,7 +622,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
             gainComm.add(Button.danger("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
-            sb.append(ButtonHelper.getIdent(player)).append(" can use their **Fortune Seekers** ability\n");
+            sb.append(player.getFactionEmoji()).append(" can use their **Fortune Seekers** ability\n");
             sb.append(player.getRepresentation(true, true)).append(
                 " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);

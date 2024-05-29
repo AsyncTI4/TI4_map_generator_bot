@@ -34,7 +34,7 @@ public class Pass extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "You have not played your strategy cards, you cannot pass.");
             return;
         }
-        
+
         passPlayerForRound(event, game, player);
     }
 
@@ -48,10 +48,10 @@ public class Pass extends PlayerSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                    ButtonHelper.getCorrectChannel(player, game),
+                    player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you can use the button to get your tech",
                     Collections.singletonList(Buttons.GET_A_TECH));
             } else {
@@ -63,10 +63,10 @@ public class Pass extends PlayerSubcommandData {
         }
         if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
             String msg = player.getRepresentation() + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (player.hasTech("dskolug")) {
             int oldComm = player.getCommodities();
@@ -81,7 +81,7 @@ public class Pass extends PlayerSubcommandData {
             }
             if (player.getCommodities() > oldComm) {
                 String msg = player.getRepresentation() + " since you have Applied Biothermics, you gained 1 comm for each passed player (Comms went from " + oldComm + " -> " + player.getCommodities() + ")";
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
         TurnEnd.pingNextPlayer(event, game, player, true);

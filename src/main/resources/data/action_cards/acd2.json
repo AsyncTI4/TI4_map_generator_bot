@@ -72,6 +72,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "averted_crisis",
+    "name": "Averted Crisis",
+    "phase": "Action",
+    "window": "After you pass",
+    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
+    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "betrayal",
     "name": "Betrayal",
     "phase": "Action",
@@ -150,15 +159,6 @@
     "window": "After an agenda is revealed",
     "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
     "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "crisis_management",
-    "name": "Crisis Management",
-    "phase": "Action",
-    "window": "After you pass",
-    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
-    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
   {
@@ -382,7 +382,7 @@
     "name": "Intrigue",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order. Then, draw 1 action card.",
+    "text": "Look at the top 2 and bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order.",
     "flavorText": "After years of honing the stillness of his mind, Ronald's schemes were finally paying off. Jord had paid him well to infiltrate M'aban's inner circle, but they would only ever receive a pittance of the benefits. No, only the Cabal could provide him with the power he truly desired.",
     "source": "action_deck_2"
   },

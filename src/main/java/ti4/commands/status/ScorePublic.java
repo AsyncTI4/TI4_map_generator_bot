@@ -93,7 +93,7 @@ public class ScorePublic extends StatusSubcommandData {
 					String msg = p2.getRepresentation(true, true)
 						+ " you gained 1tg due to your neighbor scoring a PO while you have syndicate commander. Your tgs went from "
 						+ (p2.getTg() - 1) + " -> " + p2.getTg();
-					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg);
+					MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
 					ButtonHelperAbilities.pillageCheck(p2, game);
 					ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
 				}
