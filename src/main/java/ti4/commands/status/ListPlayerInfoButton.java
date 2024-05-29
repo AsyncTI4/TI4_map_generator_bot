@@ -277,7 +277,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         }
     }
 
-    public static int getObjectiveThreshold(String objID) {
+    public static int getObjectiveThreshold(String objID, Game game) {
         return switch (objID) {
             // stage 1's
             case "push_boundaries" -> 2;
@@ -321,6 +321,36 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "protect_border" -> 5;
             case "ancient_monuments" -> 3;
             case "distant_lands" -> 2;
+
+            //status phase secrets
+            case "pem" -> 8; // 8 production
+            case "sai" -> 1; //legendary
+            case "syc" -> 1; // control a planet in same system someone else does
+            case "sb" -> 1; // have a PN in your play area
+            case "otf" -> 9; // 9 gf on a planet without a dock
+            case "mtm" -> 4; // 4 mechs on 4 planets
+            case "hrm" -> 12; // 12 resources
+            case "eh" -> 12; // 12 influence
+            case "dp" -> 3; // 3 laws in play
+            case "dhw" -> 2; // 2 frags
+            case "dfat" -> 1; //nexus
+            case "te" -> 1; // be next to HS
+            case "ose" -> 3; // control rex and have 3 ships
+            case "mrm" -> 4; //4 hazardous
+            case "mlp" -> 4; //4 techs of a color
+            case "mp" -> 4; // 4 industrial
+            case "lsc" -> 3; // 3 anomalies
+            case "fwm" -> 3; // 3 SD
+            case "fsn" -> 5; // 5 AC
+            case "gamf" -> 5; // 5 dreads
+            case "ans" -> 2; // 2 faction tech
+            case "btgk" -> 2; // in systems with alphas and betas
+            case "ctr" -> 6; // ships in 6 systems
+            case "csl" -> 1; // blockade space dock
+            case "eap" -> 4; // 4 PDS
+            case "faa" -> 4; // 4 cultural
+            case "fc" -> (game.getRealPlayers().size() - 1); // neighbors
+
             default -> 0;
         };
     }
@@ -368,7 +398,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     representation = representation + "✅  ";
                 } else {
                     representation = representation + getPlayerProgressOnObjective(objID, game, player) + "/"
-                        + getObjectiveThreshold(objID) + "  ";
+                        + getObjectiveThreshold(objID, game) + "  ";
                 }
             }
         }
@@ -598,6 +628,223 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     }
                 }
                 return count;
+            }
+            //status phase secrets
+            case "pem" -> {
+                return ButtonHelper.checkHighestProductionSystem(player, game); // 8 production
+            }
+            case "sai" -> {
+                int count = 0;
+                for (String planet : player.getPlanets()) {
+                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    if (uH != null && uH instanceof Planet planetP) {
+                        if (planetP.isLegendary()) {
+                            count++;
+                        }
+                    } else {
+                        if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isLegendary()) {
+                            count++;
+                        }
+                    }
+                }
+                return count;
+            }
+            case "syc" -> {
+                int count = 0;
+                for (String planet : player.getPlanets()) {
+                    Tile tile = game.getTileFromPlanet(planet);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if (tile != null && FoWHelper.playerHasPlanetsInSystem(p2, tile)) {
+                            count++;
+                            break;
+                        }
+                    }
+                }
+                return count;
+            }
+            case "sb" -> {
+                return player.getPromissoryNotesInPlayArea().size();
+            }
+            case "otf" -> {
+                int count = 0;
+                for (String planet : player.getPlanets()) {
+                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    if (uH != null && uH.getUnitCount(UnitType.Spacedock, player) < 1) {
+                        count = Math.max(count, ButtonHelper.getNumberOfGroundForces(player, uH));
+                    }
+                }
+                return count;
+            }
+            case "mtm" -> {
+                int count = 0;
+                for (String planet : player.getPlanets()) {
+                    UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            case "hrm" -> { // 12 resources
+                int resources = 0;
+                for (String planet : player.getPlanets()) {
+                    resources = resources + Helper.getPlanetResources(planet, game);
+                }
+                return resources;
+            }
+            case "eh" -> { // 12 influence
+                int resources = 0;
+                for (String planet : player.getPlanets()) {
+                    resources = resources + Helper.getPlanetInfluence(planet, game);
+                }
+                return resources;
+            }
+            case "dp" -> {
+                return game.getLaws().size(); // 3 laws in play
+            }
+            case "dhw" -> {
+                return player.getFragments().size(); // 2 frags
+            }
+            case "dfat" -> {
+                Tile tile = game.getTileFromPlanet("mallice");
+                if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+            case "te" -> {
+                int count = 0;
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    Tile tile = p2.getHomeSystemTile();
+                    if (tile == null) {
+                        continue;
+                    }
+                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
+                        false, false)) {
+                        Tile tile2 = game.getTileByPosition(pos);
+                        if (ButtonHelper.checkNumberShips(player, game, tile2) > 0) {
+                            count++;
+                        }
+                    }
+                }
+                return count;
+            }
+            case "ose" -> {
+                Tile tile = game.getTileFromPlanet("mr");
+                if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile) || !player.getPlanets().contains("mr")) {
+                    return 0;
+                } else {
+                    return ButtonHelper.checkNumberShips(player, game, tile);
+                }
+            }
+            case "mrm" -> {
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous"); //4 hazardous
+            }
+            case "mlp" -> {//4 techs of a color
+                int maxNum = 0;
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.WARFARE));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.PROPULSION));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.CYBERNETIC));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.BIOTIC));
+                return maxNum;
+            }
+            case "mp" -> {
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial"); // 4 industrial
+            }
+            case "lsc" -> {
+                int count = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
+                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
+                            false, false)) {
+                            Tile tile2 = game.getTileByPosition(pos);
+                            if (tile2.isAnomaly(game)) {
+                                count++;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return count;
+            }
+            case "fwm" -> {
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock"); // 3 SD
+            }
+            case "fsn" -> {
+                return player.getAc(); // 5 AC
+            }
+            case "gamf" -> {
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought"); // 5 dreads
+            }
+            case "ans" -> {
+                int count = 0;
+                for (String nekroTech : player.getTechs()) {
+                    if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
+                        continue;
+                    }
+                    if (!"".equals(Mapper.getTech(nekroTech).getFaction().orElse(""))) {
+                        count = count + 1;
+                    }
+
+                }
+                return count;
+            }
+            case "btgk" -> {
+                int alpha = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition())) {
+                        alpha = 1;
+                        break;
+                    }
+                }
+
+                int beta = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.doesTileHaveBeta(game, tile.getPosition())) {
+                        beta = 1;
+                        break;
+                    }
+                }
+                return alpha + beta;
+            }
+            case "ctr" -> {
+                int count = 0;
+                for (Tile tile : game.getTileMap().values()) {
+                    if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            case "csl" -> {
+                int count = 0;
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)) {
+                        if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
+                            count++;
+                        }
+                    }
+                }
+                return count;
+            }
+            case "eap" -> {
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds"); // 4 PDS
+            }
+            case "faa" -> { // 4 cultural
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural");
+            }
+            case "fc" -> {
+                return player.getNeighbourCount(); // neighbors
             }
 
         }

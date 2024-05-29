@@ -142,13 +142,15 @@ public class CombatMessageHelper {
         Planet holderPlanet = null;
         if (combatOnHolder instanceof Planet) {
             holderPlanet = (Planet) combatOnHolder;
+        } else {
+            holderName = tile.getRepresentation();
         }
         if (holderPlanet != null) {
             PlanetModel planetModel = Mapper.getPlanet(holderPlanet.getName());
             holderName = planetModel.getName();
         }
 
-        String combatTypeName = StringUtils.capitalize(holderName) + " combat";
+        String combatTypeName = StringUtils.capitalize(holderName) + " Combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
             if (holderPlanet != null) {
@@ -169,9 +171,9 @@ public class CombatMessageHelper {
             }
             game.setStoredValue(combatName, "" + round);
             if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                combatTypeName = combatTypeName + " (Thalnos Reroll for Combat Round #" + round + ")";
+                combatTypeName = combatTypeName + " (Thalnos Reroll for Round #" + round + ")";
             } else {
-                combatTypeName = combatTypeName + " (Combat Round #" + round + ")";
+                combatTypeName = combatTypeName + " (Round #" + round + ")";
                 if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
                     game.setStoredValue("solagent", "");
                 }
@@ -180,8 +182,7 @@ public class CombatMessageHelper {
                 }
             }
         }
-        return String.format("**%s** rolls for %s on %s %s:  \n",
-            combatTypeName, player.getFactionEmoji(),
-            tile.getPosition(), Emojis.RollDice);
+        return String.format("%s rolls for %s %s :  \n",
+            player.getFactionEmoji(), combatTypeName, Emojis.RollDice);
     }
 }

@@ -70,7 +70,7 @@ public class ScorePublic extends StatusSubcommandData {
 			}
 		}
 		if (Mapper.getPublicObjective(id) != null && event instanceof ButtonInteractionEvent) {
-			int threshold = ListPlayerInfoButton.getObjectiveThreshold(id);
+			int threshold = ListPlayerInfoButton.getObjectiveThreshold(id, game);
 			int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player);
 			if (playerProgress < threshold) {
 				MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
