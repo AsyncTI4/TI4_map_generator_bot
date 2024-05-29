@@ -1577,6 +1577,7 @@ public class ButtonHelperAgents {
             }
         }
         int tgGain = count + player.getCommodities() - player.getCommoditiesTotal();
+        int tgGain = Math.max(tgGain, 0);
         int commGain = count - tgGain;
         player.setCommodities(player.getCommodities() + commGain);
         String msg = ButtonHelper.getIdentOrColor(player, game) + " max influence planet had " + count
