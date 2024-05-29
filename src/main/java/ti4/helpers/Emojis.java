@@ -125,7 +125,9 @@ public class Emojis {
     public static final String FrontierCard = "<:FrontierCard:1147194828417929397>";
     public static final String EventCard = "";
 
-    // OBJECTIVES
+    // OBJECTIVES 
+    public static final String Custodians = "<:Custodians:1244158363449692231>";
+    public static final String CustodiansVP = "<:CustodiansVP:1244158364381085697>";
     public static final String SecretObjective = "<:Secretobjective:1159118787572940891>";
     public static final String Public1 = "<:Public1:1159118826026303528>";
     public static final String Public2 = "<:Public2:1159118827544662106>";
@@ -297,27 +299,27 @@ public class Emojis {
     // RESOURCE AND INFLUENCE SYMBOLS
     public static final String influence = "<:influence:959575421337358336>";
     public static final String resources = "<:resources:959575421274451998>";
-    public static final String ResInf = "<:ResInf:1104118692897374379>";
-    public static final String Resources_0 = "<:R0:864278976553156640>";
-    public static final String Resources_1 = "<:R1:864278976524189727>";
-    public static final String Resources_2 = "<:R2:864278977133019157>";
-    public static final String Resources_3 = "<:R3:864278977321631754>";
-    public static final String Resources_4 = "<:R4:864278977355186176>";
-    public static final String Resources_5 = "<:R5:864278977468170290>";
-    public static final String Resources_6 = "<:R6:864278977459126278>";
-    public static final String Resources_7 = "<:R7:864278977468432395>";
-    public static final String Resources_8 = "<:R8:864278977530691604>";
-    public static final String Resources_9 = "<:R9:864278977463451699>";
-    public static final String Influence_0 = "<:I0:864278934032351282>";
-    public static final String Influence_1 = "<:I1:864278934195798046>";
-    public static final String Influence_2 = "<:I2:864278934249406474>";
-    public static final String Influence_3 = "<:I3:864278934786932746>";
-    public static final String Influence_4 = "<:I4:864278934501195836>";
-    public static final String Influence_5 = "<:I5:864278934506176552>";
-    public static final String Influence_6 = "<:I6:864278934504996866>";
-    public static final String Influence_7 = "<:I7:864278934602776576>";
-    public static final String Influence_8 = "<:I8:864278934173253653>";
-    public static final String Influence_9 = "<:I9:864278934509322300>";
+    public static final String ResInf = "<:resinf:1236835261833543762>";
+    public static final String Resources_0 = "<:R0:1244032628462457023>";
+    public static final String Resources_1 = "<:R1:1244032629548781568>";
+    public static final String Resources_2 = "<:R2:1244032630513729587>";
+    public static final String Resources_3 = "<:R3:1244032631646191681>";
+    public static final String Resources_4 = "<:R4:1244032689338716230>";
+    public static final String Resources_5 = "<:R5:1244032690580099134>";
+    public static final String Resources_6 = "<:R6:1244032691565756527>";
+    public static final String Resources_7 = "<:R7:1244032692626915389>";
+    public static final String Resources_8 = "<:R8:1244032693688336435>";
+    public static final String Resources_9 = "<:R9:1244032695080714360>";
+    public static final String Influence_0 = "<:I0:1244032564620951592>";
+    public static final String Influence_1 = "<:I1:1244032565304885259>";
+    public static final String Influence_2 = "<:I2:1244032566919692359>";
+    public static final String Influence_3 = "<:I3:1244032567972200570>";
+    public static final String Influence_4 = "<:I4:1244032569482416189>";
+    public static final String Influence_5 = "<:I5:1244032571055018025>";
+    public static final String Influence_6 = "<:I6:1244032572108050554>";
+    public static final String Influence_7 = "<:I7:1244032572900769833>";
+    public static final String Influence_8 = "<:I8:1244032625946001498>";
+    public static final String Influence_9 = "<:I9:1244032627225268254>";
 
     // PLANETS
     public static final String SemLor = "<:SemLor:1072075882618961930>";
@@ -778,7 +780,6 @@ public class Emojis {
     public static final String franken_zel_tharr_dominion = "<:franken_zel_tharr_dominion:1243245395685933197>";
     public static final String franken_zircon_ascendancy = "<:franken_zircon_ascendancy:1243245769826500628>";
     public static final String franken_zor_thul_matriarchate = "<:franken_zor_thul_matriarchate:1243245399129722940>";
-
 
     // PBD2000 FACTIONS
     public static final String echoes = "<:echoes:1189668215413026968>";

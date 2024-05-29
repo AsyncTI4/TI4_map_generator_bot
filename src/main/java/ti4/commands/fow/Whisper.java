@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.utils.StringUtils;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -72,7 +71,7 @@ public class Whisper extends FOWSubcommandData {
         }
 
         if (anonY.compareToIgnoreCase("y") == 0) {
-            message = "[REDACTED] says: " + msg;
+            message = "Attention " + realIdentity + "! [REDACTED] says: " + msg;
         } else {
             message = "Attention " + realIdentity + "! " + player1 + " says: " + msg;
         }
@@ -80,20 +79,20 @@ public class Whisper extends FOWSubcommandData {
             String fail = "Could not notify receiving player.";
             String success;
             String player2 = Emojis.getColorEmojiWithName(player_.getColor());
-            if (message.startsWith("[REDACTED]")) {
+            if (message.contains("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
             if (!player.getNeighbouringPlayers().contains(player_)) {
-              MessageHelper.sendMessageToChannel(feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
+                MessageHelper.sendMessageToChannel(feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
             }
         } else {
             String fail = "Could not notify receiving player.";
             String success;
             String player2 = Emojis.getColorEmojiWithName(player_.getColor());
-            if (message.startsWith("[REDACTED]")) {
+            if (message.contains("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
@@ -101,14 +100,14 @@ public class Whisper extends FOWSubcommandData {
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
             String whisperHistory = game.getStoredValue(key);
             if (whisperHistory.isEmpty()) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdent(player) + " is whispering for the first time this turn to " + ButtonHelper.getIdent(player_));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is whispering for the first time this turn to " + player_.getFactionEmoji());
                 game.setStoredValue(key, "1");
             } else {
                 int num = Integer.parseInt(whisperHistory);
                 num = num + 1;
                 game.setStoredValue(key, "" + num);
                 if (num == 5 || num == 10) {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdent(player) + " is sending whisper #" + num + " of this turn to " + ButtonHelper.getIdent(player_));
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());
                 }
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);

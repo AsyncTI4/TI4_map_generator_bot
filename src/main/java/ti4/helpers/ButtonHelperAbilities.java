@@ -232,7 +232,7 @@ public class ButtonHelperAbilities {
             + "to get 2 debt tokens cleared via the binding debts ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, game), msg);
+            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
         }
     }
 
@@ -257,11 +257,11 @@ public class ButtonHelperAbilities {
     }
 
     public static void resolveGrace(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String msg = ButtonHelper.getIdent(player) + " is resolving the grace ability";
+        String msg = player.getFactionEmoji() + " is resolving the grace ability";
         int scPlayed = Integer.parseInt(buttonID.split("_")[1]);
         if (!player.hasAbility("grace")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "To " + ButtonHelper.getIdent(player) + ": This button aint for you ");
+                "To " + player.getFactionEmoji() + ": This button aint for you ");
             return;
         }
         player.addExhaustedAbility("grace");
@@ -496,7 +496,7 @@ public class ButtonHelperAbilities {
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count - 1);
         ACInfo.sendActionCardInfo(game, player, event);
-        String msg2 = ButtonHelper.getIdent(player) + " is choosing to resolve their Autonetic Memory ability";
+        String msg2 = player.getFactionEmoji() + " is choosing to resolve their Autonetic Memory ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("autoneticMemoryStep3a", "Pick A Card From the Discard"));
@@ -584,7 +584,7 @@ public class ButtonHelperAbilities {
             msg.append(d1.getResult()).append(" ");
             addOmenDie(game, d1.getResult());
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, game), msg.toString());
+        MessageHelper.sendMessageToChannel(myko.getCorrectChannel(), msg.toString());
     }
 
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game game, Player player,
@@ -610,7 +610,7 @@ public class ButtonHelperAbilities {
             buttons.add(Button.success(finsFactionCheckerPrefix + "deleteButtons", "Delete these buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
-            MessageChannel channel1 = ButtonHelper.getCorrectChannel(pillaged, game);
+            MessageChannel channel1 = pillaged.getCorrectChannel();
             MessageChannel channel2 = player.getCorrectChannel();
             String pillagerMessage = player.getRepresentation(true, true) + " you pillaged, your tgs have gone from "
                 + player.getTg() + " to "
@@ -653,7 +653,7 @@ public class ButtonHelperAbilities {
                         .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game),
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
                         p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
                 }
             }
@@ -715,7 +715,7 @@ public class ButtonHelperAbilities {
     public static void resolveDiplomatExhaust(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String planet = buttonID.split("_")[1];
-        String message = ButtonHelper.getIdent(player) + " exhausted the unowned planet "
+        String message = player.getFactionEmoji() + " exhausted the unowned planet "
             + Helper.getPlanetRepresentation(planet, game) + " using the diplomats ability";
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         unitHolder.removeToken("token_freepeople.png");
@@ -844,7 +844,7 @@ public class ButtonHelperAbilities {
         String buttonID) {
         String order = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " Chose to Use " + Mapper.getRelic(order).getName());
+            player.getFactionEmoji() + " Chose to Use " + Mapper.getRelic(order).getName());
         List<Button> buttons = new ArrayList<>();
         String message = "";
         String techName = "";
@@ -881,7 +881,7 @@ public class ButtonHelperAbilities {
                 List<Button> buttons2 = new ArrayList<>();
                 buttons2.add(Buttons.GET_A_TECH);
                 buttons2.add(Button.danger("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), p2
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2
                     .getRepresentation(true, true)
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName()
                     + ") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r",
@@ -1298,7 +1298,7 @@ public class ButtonHelperAbilities {
             successMessage = "Produced 2 " + Emojis.fighter + " in tile "
                 + tile.getRepresentationForButtons(game, player) + ".";
         }
-        if (!ButtonHelper.isLawInPlay(game, "articles_war")) {
+        if (player.ownsUnit("muaat_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, game, player, event);
         }
 
@@ -1426,9 +1426,7 @@ public class ButtonHelperAbilities {
         TextChannel mainGameChannel = game.getMainGameChannel();
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
 
-        new AddUnits().unitParsing(event, player.getColor(),
-            game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet,
-            game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " used contagion ability to land " + amount
                 + " infantry on " + Helper.getPlanetRepresentation(planet, game));
@@ -1531,7 +1529,7 @@ public class ButtonHelperAbilities {
             ButtonHelper.commanderUnlockCheck(player, game, "yin", event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
+            player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using indoctrination");
         options.add(Button.danger("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),

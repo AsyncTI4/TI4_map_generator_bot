@@ -31,5 +31,7 @@
     "planets": [
         "fyrain",
         "leonelli"
-    ]
+    ],
+    "tileBack": "blue",
+    "source": "eronous"
 }

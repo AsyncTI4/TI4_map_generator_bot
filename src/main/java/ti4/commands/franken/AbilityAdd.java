@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.model.GenericCardModel;
 
 public class AbilityAdd extends AbilityAddRemove {
     public AbilityAdd() {
@@ -34,8 +35,8 @@ public class AbilityAdd extends AbilityAddRemove {
             sb.append("\n");
             player.addAbility(abilityID);
             if (abilityID.equalsIgnoreCase("cunning")) {
-                Map<String, String> dsHandcards = Mapper.getDSHandcards();
-                for (Entry<String, String> entry : dsHandcards.entrySet()) {
+                Map<String, GenericCardModel> traps = Mapper.getTraps();
+                for (Entry<String, GenericCardModel> entry : traps.entrySet()) {
                     String key = entry.getKey();
                     if (key.endsWith(Constants.LIZHO)) {
                         player.setTrapCard(key);

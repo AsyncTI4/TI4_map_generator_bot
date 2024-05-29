@@ -1,14 +1,9 @@
 package ti4.commands.status;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,10 +14,8 @@ import ti4.commands.player.Stats;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -42,7 +35,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        //Game game = getActiveGame();
     }
 
     public static void offerInfoButtons(ButtonInteractionEvent event) {
@@ -285,130 +278,51 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static int getObjectiveThreshold(String objID) {
-        switch (objID) {
-            case "push_boundaries" -> {
-                return 2;
-            }
-            case "outer_rim" -> {
-                return 3;
-            }
-            case "make_history" -> {
-                return 2;
-            }
-            case "infrastructure" -> {
-                return 3;
-            }
-            case "corner" -> {
-                return 4;
-            }
-            case "develop" -> {
-                return 2;
-            }
-            case "diversify" -> {
-                return 2;
-            }
-            case "monument" -> {
-                return 8;
-            }
-            case "expand_borders" -> {
-                return 6;
-            }
-            case "research_outposts" -> {
-                return 3;
-            }
-            case "intimidate" -> {
-                return 2;
-            }
-            case "lead" -> {
-                return 3;
-            }
-            case "trade_routes" -> {
-                return 5;
-            }
-            case "amass_wealth" -> {
-                return 9;
-            }
-            case "build_defenses" -> {
-                return 4;
-            }
-            case "lost_outposts" -> {
-                return 2;
-            }
-            case "engineer_marvel" -> {
-                return 1;
-            }
-            case "deep_space" -> {
-                return 3;
-            }
-            case "raise_fleet" -> {
-                return 5;
-            }
-            case "sway_council" -> {
-                return 8;
-            }
-            case "centralize_trade" -> {
-                return 10;
-            }
-            case "conquer" -> {
-                return 1;
-            }
-            case "brain_trust" -> {
-                return 5;
-            }
-            case "golden_age" -> {
-                return 16;
-            }
-            case "galvanize" -> {
-                return 6;
-            }
-            case "manipulate_law" -> {
-                return 16;
-            }
-            case "master_science" -> {
-                return 4;
-            }
-            case "revolutionize" -> {
-                return 3;
-            }
-            case "subdue" -> {
-                return 11;
-            }
-            case "unify_colonies" -> {
-                return 6;
-            }
-            case "supremacy" -> {
-                return 1;
-            }
-            case "become_legend" -> {
-                return 4;
-            }
-            case "command_armada" -> {
-                return 8;
-            }
-            case "massive_cities" -> {
-                return 7;
-            }
-            case "control_borderlands" -> {
-                return 5;
-            }
-            case "vast_reserves" -> {
-                return 18;
-            }
-            case "vast_territories" -> {
-                return 5;
-            }
-            case "protect_border" -> {
-                return 5;
-            }
-            case "ancient_monuments" -> {
-                return 3;
-            }
-            case "distant_lands" -> {
-                return 2;
-            }
-
-        }
-        return 0;
+        return switch (objID) {
+            // stage 1's
+            case "push_boundaries" -> 2;
+            case "outer_rim" -> 3;
+            case "make_history" -> 2;
+            case "infrastructure" -> 3;
+            case "corner" -> 4;
+            case "develop" -> 2;
+            case "diversify" -> 2;
+            case "monument" -> 8;
+            case "expand_borders" -> 6;
+            case "research_outposts" -> 3;
+            case "intimidate" -> 2;
+            case "lead" -> 3;
+            case "trade_routes" -> 5;
+            case "amass_wealth" -> 9;
+            case "build_defenses" -> 4;
+            case "lost_outposts" -> 2;
+            case "engineer_marvel" -> 1;
+            case "deep_space" -> 3;
+            case "raise_fleet" -> 5;
+            case "sway_council" -> 8;
+            // stage 2's
+            case "centralize_trade" -> 10;
+            case "conquer" -> 1;
+            case "brain_trust" -> 5;
+            case "golden_age" -> 16;
+            case "galvanize" -> 6;
+            case "manipulate_law" -> 16;
+            case "master_science" -> 4;
+            case "revolutionize" -> 3;
+            case "subdue" -> 11;
+            case "unify_colonies" -> 6;
+            case "supremacy" -> 1;
+            case "become_legend" -> 4;
+            case "command_armada" -> 8;
+            case "massive_cities" -> 7;
+            case "control_borderlands" -> 5;
+            case "vast_reserves" -> 18;
+            case "vast_territories" -> 5;
+            case "protect_border" -> 5;
+            case "ancient_monuments" -> 3;
+            case "distant_lands" -> 2;
+            default -> 0;
+        };
     }
 
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,

@@ -69,7 +69,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (pingPeople || game.isFoWMode()) {
                 text += player.getRepresentation();
             } else {
-                text += ButtonHelper.getIdent(player) + " " + player.getUserName();
+                text += player.getFactionEmoji() + " " + player.getUserName();
             }
 
             if (passed) {

@@ -297,6 +297,7 @@ public class MiltyDraftManager {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
+            boolean keleresExists = false;
             for (String playerId : players) {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = getPlayerDraft(playerId);
@@ -305,12 +306,37 @@ public class MiltyDraftManager {
                     color = "lightgray";
                 }
                 String faction = picks.getFaction();
-
                 String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, mapTemplate);
+                boolean speaker = picks.getPosition() == 1;
 
-                Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, picks.getPosition() == 1);
+                if (faction.startsWith("keleres")) {
+                    keleresExists = true;
+                    Set<String> allowed = new HashSet<>();
+                    allowed.addAll(Set.of("mentak", "xxcha", "argent"));
+                    for (PlayerDraft pd : getDraft().values()) {
+                        if (allowed.contains(pd.faction)) {
+                            allowed.remove(pd.faction);
+                        }
+                    }
+                    List<Button> buttons = new ArrayList<>();
+                    String message = player.getPing() + " choose a flavor of keleres:";
+                    for (String flavor : allowed) {
+                        String emoji = Mapper.getFaction(flavor).getFactionEmoji();
+                        String keleres = "keleres" + flavor.charAt(0);
+                        String id = String.format("setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
+                        String msg = "Keleres (" + flavor + ")";
+                        Button butt = Button.success(id, msg).withEmoji(Emoji.fromFormatted(emoji));
+                        buttons.add(butt);
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                } else {
+                    Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
+                }
             }
             AddTileList.finishSetup(game, event);
+            if (keleresExists) {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
+            }
         } catch (Exception e) {
             String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
             List<PlayerDraft> speakerOrdered = getDraft().values().stream()
@@ -423,7 +449,10 @@ public class MiltyDraftManager {
             if (model == null || isFactionTaken(faction)) continue;
 
             Emoji emoji = Emoji.fromFormatted(model.getFactionEmoji());
-            Button button = Button.secondary("milty_faction_" + faction, model.getFactionName()).withEmoji(emoji);
+            String name = model.getFactionName();
+            if (faction.startsWith("keleres"))
+                name = "The Council Keleres";
+            Button button = Button.secondary("milty_faction_" + faction, name).withEmoji(emoji);
             factionButtons.add(button);
         }
         return factionButtons;
@@ -485,6 +514,7 @@ public class MiltyDraftManager {
         Player p = game.getPlayer(getCurrentDraftPlayer());
         String ping = p.getPing() + " is up to draft!";
         List<Button> showAgain = Arrays.asList(Button.secondary("showMiltyDraft", "Show draft again"));
+        showAgain = MessageHelper.addUndoButtonToList(showAgain, game);
         MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), showAgain, m -> prevPingMessage = m.getId());
     }
 
@@ -548,13 +578,8 @@ public class MiltyDraftManager {
         }
 
         // Slices
-        int sliceIndex = 1;
         String slices = bigTokenizer.nextToken();
-        StringTokenizer sliceTokenizer = new StringTokenizer(slices, ";");
-        while (sliceTokenizer.hasMoreTokens()) {
-            loadSliceFromString(sliceTokenizer.nextToken(), sliceIndex);
-            sliceIndex++;
-        }
+        loadSlicesFromString(slices);
 
         // Factions
         String factionStr = bigTokenizer.nextToken();
@@ -616,17 +641,21 @@ public class MiltyDraftManager {
         setMapTemplate(savedTemplate);
     }
 
+    public void loadSlicesFromString(String str) throws Exception {
+        int sliceIndex = 1;
+        StringTokenizer sliceTokenizer = new StringTokenizer(str, ";");
+        while (sliceTokenizer.hasMoreTokens()) {
+            loadSliceFromString(sliceTokenizer.nextToken(), sliceIndex);
+            sliceIndex++;
+        }
+    }
+
     private void loadSliceFromString(String str, int index) throws Exception {
         List<String> tiles = Arrays.asList(str.split(","));
         if (tiles.size() != 5) throw new Exception("Slice does not have the right number of tiles.");
         List<MiltyDraftTile> draftTiles = tiles.stream().map(t -> findTile(t)).toList();
         MiltyDraftSlice slice = new MiltyDraftSlice();
-        slice.setLeft(draftTiles.get(0));
-        slice.setFront(draftTiles.get(1));
-        slice.setRight(draftTiles.get(2));
-        slice.setEquidistant(draftTiles.get(3));
-        slice.setFarFront(draftTiles.get(4));
-
+        slice.setTiles(draftTiles);
         slice.setName(Character.toString(index - 1 + 'A'));
         slices.add(slice);
     }
