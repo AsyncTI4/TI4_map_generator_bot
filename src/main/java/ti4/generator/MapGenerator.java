@@ -282,7 +282,7 @@ public class MapGenerator {
                     addTile(new Tile("0gray", position), TileStep.Tile);
                 }
                 if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
-                    addTile(new Tile("0border", position), TileStep.Tile, true);
+                    addTile(new Tile("0border", position), TileStep.Tile);
                 }
             }
         }

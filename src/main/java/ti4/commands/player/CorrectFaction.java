@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -50,6 +51,10 @@ public class CorrectFaction extends PlayerSubcommandData {
             return;
         }
 
+        changeFactionSheetAndComponents(event, game, player, newFaction);
+    }
+
+    public void changeFactionSheetAndComponents(GenericInteractionCreateEvent event, Game game, Player player, String newFaction) {
         Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
@@ -59,6 +64,7 @@ public class CorrectFaction extends PlayerSubcommandData {
                 }
             }
         }
+
         List<String> laws = new ArrayList<>();
         laws.addAll(game.getLawsInfo().keySet());
         for (String law : laws) {
@@ -66,6 +72,7 @@ public class CorrectFaction extends PlayerSubcommandData {
                 game.reviseLaw(game.getLaws().get(law), newFaction);
             }
         }
+
         FactionModel setupInfo = player.getFactionSetupInfo();
         player.setFaction(newFaction);
         player.getFactionTechs().clear();

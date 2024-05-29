@@ -348,7 +348,7 @@ public class MessageListener extends ListenerAdapter {
                                                 .append(
                                                     " has been played and now it has been the allotted time and they havent reacted, so they have been marked as not following\n");
 
-                                            //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), sb.toString());
+                                            //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
                                             ButtonHelper.sendMessageToRightStratThread(player, game, sb.toString(), ButtonHelper.getStratName(sc));
                                             player.addFollowedSC(sc);
                                             game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),

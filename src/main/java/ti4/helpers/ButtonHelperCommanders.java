@@ -96,7 +96,7 @@ public class ButtonHelperCommanders {
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = ButtonHelper.getIdent(player) + " will discard 1 AC to move or place a mech on "
+        String msg = player.getFactionEmoji() + " will discard 1 AC to move or place a mech on "
             + Helper.getPlanetRepresentation(planet, game);
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
             game);
@@ -160,14 +160,14 @@ public class ButtonHelperCommanders {
             unitHName = "";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " removed 1 infantry from "
+            player.getFactionEmoji() + " removed 1 infantry from "
                 + ButtonHelper.getUnitHolderRep(unitHolder, tile, game) + " using Yin Commander");
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, game);
         event.getMessage().delete().queue();
     }
 
     public static void mykoCommanderUsage(Player player, Game game, ButtonInteractionEvent event) {
-        String msg = ButtonHelper.getIdent(player) + " spent 1 ";
+        String msg = player.getFactionEmoji() + " spent 1 ";
         if (player.getCommodities() > 0) {
             msg = msg + "commoditity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
             player.setCommodities(player.getCommodities() - 1);
@@ -223,7 +223,7 @@ public class ButtonHelperCommanders {
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " placed 1 fighter in " + tile.getRepresentation()
+            player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation()
                 + " using Ghost Commander");
     }
 
@@ -233,7 +233,7 @@ public class ButtonHelperCommanders {
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "inf", game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " placed 1 infantry in " + tile.getRepresentation()
+            player.getFactionEmoji() + " placed 1 infantry in " + tile.getRepresentation()
                 + " using Khrask Commander");
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
@@ -338,7 +338,7 @@ public class ButtonHelperCommanders {
         Tile tile = game.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " placed 1 infantry on "
+            player.getFactionEmoji() + " placed 1 infantry on "
                 + Helper.getPlanetRepresentation(planet, game) + " using Sol Commander");
     }
 
@@ -399,7 +399,7 @@ public class ButtonHelperCommanders {
             game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1,
             game);
 
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, game), message);
+        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message);
         ButtonHelper.deleteTheOneButton(event);
     }
 

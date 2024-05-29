@@ -518,7 +518,7 @@ public class ButtonHelperTacticalAction {
 
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
         if (player.getTacticalCC() < 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " does not have any tactical CC.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " does not have any tactical CC.");
             return;
         }
         game.setNaaluAgent(false);
@@ -666,8 +666,11 @@ public class ButtonHelperTacticalAction {
             }
 
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to select the first system you want to move from", systemButtons);
+
+        // Send buttons to move
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you want to move from", systemButtons);
+
+        // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(game, player);
             if (!buttons.isEmpty()) {
@@ -694,7 +697,7 @@ public class ButtonHelperTacticalAction {
             // List<Button> buttons = new ArrayList<>();
             // buttons.add(Button.success("doActivation_" + pos, "Confirm"));
             // buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
-            // String msg = "# " + ButtonHelper.getIdent(player) + " You are about to
+            // String msg = "# " + player.getFactionEmoji() + " You are about to
             // automatically trigger some abilities by activating this system. Please hit
             // confirm before continuing";
             // MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg,

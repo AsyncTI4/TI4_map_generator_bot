@@ -12,12 +12,16 @@ public class Constants {
     public static final String chassitId = "183213554445320192";
     public static final String tspId = "150809002974904321";
     public static final String jazzId = "228999251328368640";
+    public static final String bltId = "757405214398480486";
+    public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     public static String jazzPing() {
         return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
     }
 
-    public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+    public static String bltPing() {
+        return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
+    }
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";

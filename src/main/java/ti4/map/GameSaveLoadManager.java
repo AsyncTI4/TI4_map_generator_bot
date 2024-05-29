@@ -1162,7 +1162,6 @@ public class GameSaveLoadManager {
                         try {
                             Game game = loadMap(file);
                             if (game != null && game.getName() != null) {
-                                game.finishImport();
                                 mapList.put(game.getName(), game);
                             }
                         } catch (Exception e) {
@@ -1357,6 +1356,7 @@ public class GameSaveLoadManager {
             }
 
             game.endGameIfOld();
+            game.finishImport();
             return game;
         } else {
             BotLogger.log("Could not save map, error creating save file");

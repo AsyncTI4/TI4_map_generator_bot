@@ -246,7 +246,7 @@ public class ButtonHelperActionCards {
         String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " tgs increased by " + tgAlready + " (" + player.getTg() + "->"
+            player.getFactionEmoji() + " tgs increased by " + tgAlready + " (" + player.getTg() + "->"
                 + (player.getTg() + tgAlready) + ")");
         player.setTg(player.getTg() + tgAlready);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -292,14 +292,14 @@ public class ButtonHelperActionCards {
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, game);
         String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile "
             + tile.getRepresentation() + " was removed via the Scuttle AC by "
-            + ButtonHelper.getIdent(player);
+            + player.getFactionEmoji();
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
         if (tgAlready > 0) {
             tgAlready = tgAlready + (int) removedUnit.getCost();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                ButtonHelper.getIdent(player) + " tgs increased by " + tgAlready + " (" + player.getTg() + "->"
+                player.getFactionEmoji() + " tgs increased by " + tgAlready + " (" + player.getTg() + "->"
                     + (player.getTg() + tgAlready) + ")");
             player.setTg(player.getTg() + tgAlready);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -325,7 +325,7 @@ public class ButtonHelperActionCards {
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
         RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()),
             game);
-        String message = ButtonHelper.getIdent(player) + " removed their CC from tile " + game.getActiveSystem()
+        String message = player.getFactionEmoji() + " removed their CC from tile " + game.getActiveSystem()
             + " using counterstroke and gained it to their tactics";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -336,7 +336,7 @@ public class ButtonHelperActionCards {
         String buttonID) {
         RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]),
             game);
-        String message = ButtonHelper.getIdent(player) + " removed their CC from tile " + buttonID.split("_")[1]
+        String message = player.getFactionEmoji() + " removed their CC from tile " + buttonID.split("_")[1]
             + " using counterstroke and gained it to their tactics";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -384,7 +384,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveHarnessEnergy(Game game, Player player, ButtonInteractionEvent event) {
-        String message = ButtonHelper.getIdent(player) + " Replenished Commodities (" + player.getCommodities() + "->"
+        String message = player.getFactionEmoji() + " Replenished Commodities (" + player.getCommodities() + "->"
             + player.getCommoditiesTotal()
             + ").";
         player.setCommodities(player.getCommoditiesTotal());
@@ -405,7 +405,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveRally(Game game, Player player, ButtonInteractionEvent event) {
-        String message = ButtonHelper.getIdent(player) + " gained 2 fleet CC (" + player.getFleetCC() + "->"
+        String message = player.getFactionEmoji() + " gained 2 fleet CC (" + player.getFleetCC() + "->"
             + (player.getFleetCC() + 2) + ") using rally";
         player.setFleetCC(player.getFleetCC() + 2);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -480,7 +480,7 @@ public class ButtonHelperActionCards {
         player.removeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " removed the tech " + techM1.getName());
+            player.getFactionEmoji() + " removed the tech " + techM1.getName());
         resolveFocusedResearch(game, player, buttonID, event);
         event.getMessage().delete().queue();
     }
@@ -488,8 +488,7 @@ public class ButtonHelperActionCards {
     public static void resolveForwardSupplyBaseStep2(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, game),
-                "Could not resolve target player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
         int oldTg = player.getTg();
@@ -498,8 +497,7 @@ public class ButtonHelperActionCards {
             ButtonHelper.getIdentOrColor(player, game) + " gained 1tg due to forward supply base (" + oldTg
                 + "->" + player.getTg() + ")");
         if (game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, game),
-                ButtonHelper.getIdentOrColor(player, game) + " gained 1tg due to forward supply base");
+            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained 1tg due to forward supply base");
         }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -511,7 +509,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + 3);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " gained 3tg (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained 3tg (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
         List<Button> buttons = new ArrayList<>();
@@ -803,7 +801,7 @@ public class ButtonHelperActionCards {
         new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " put a destroyer in " + tile.getRepresentation());
+            player.getFactionEmoji() + " put a destroyer in " + tile.getRepresentation());
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
@@ -820,7 +818,7 @@ public class ButtonHelperActionCards {
         new ExpFrontier().expFront(event, tile, game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " explored the DET in " + tile.getRepresentation());
+            player.getFactionEmoji() + " explored the DET in " + tile.getRepresentation());
     }
 
     public static void resolveCrippleDefensesStep1(Player player, Game game, ButtonInteractionEvent event,
@@ -916,7 +914,7 @@ public class ButtonHelperActionCards {
     public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        String message = ButtonHelper.getIdent(player) + " Drew Secret Objective";
+        String message = player.getFactionEmoji() + " Drew Secret Objective";
         game.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
@@ -1391,7 +1389,7 @@ public class ButtonHelperActionCards {
         new AddUnits().unitParsing(event, player.getColor(), tile, "dread", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " replaced a cruiser with a dread in " + tile.getRepresentation());
+            player.getFactionEmoji() + " replaced a cruiser with a dread in " + tile.getRepresentation());
     }
 
     public static void checkForAssigningCoup(Game game, Player player) {
@@ -1514,7 +1512,7 @@ public class ButtonHelperActionCards {
         tile.removeAllUnitDamage(player.getColor());
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " repaired all damaged units in " + tile.getRepresentation());
+            player.getFactionEmoji() + " repaired all damaged units in " + tile.getRepresentation());
     }
 
     public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event,
@@ -1546,7 +1544,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " exhausted all enemy planets in " + tile.getRepresentation());
+            player.getFactionEmoji() + " exhausted all enemy planets in " + tile.getRepresentation());
     }
 
     public static void resolveUnstableStep2(Player player, Game game, ButtonInteractionEvent event,
@@ -1633,7 +1631,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + resValue);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " gained " + resValue + " tgs (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + resValue + " tgs (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, resValue);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1798,7 +1796,7 @@ public class ButtonHelperActionCards {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " repealed " + Mapper.getAgendaTitle(name));
+            player.getFactionEmoji() + " repealed " + Mapper.getAgendaTitle(name));
         if (game.isFoWMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 Mapper.getAgendaTitle(name) + " was repealed");
@@ -1927,7 +1925,7 @@ public class ButtonHelperActionCards {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " readied each cultural planet");
+            player.getFactionEmoji() + " readied each cultural planet");
         event.getMessage().delete().queue();
     }
 
@@ -1936,7 +1934,7 @@ public class ButtonHelperActionCards {
         int count = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial");
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " gained " + count + " tgs(" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + count + " tgs(" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         event.getMessage().delete().queue();
@@ -1952,7 +1950,7 @@ public class ButtonHelperActionCards {
             }
         }
         player.setTg(oldTg + count);
-        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " gained " + count
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " gained " + count
             + " tgs (" + oldTg + "->" + player.getTg() + ") from their highest resource planet");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);

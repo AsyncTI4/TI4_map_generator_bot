@@ -825,7 +825,7 @@ public class AgendaHelper {
                         String message;
                         if (playerWL.hasAbility("autonetic_memory")) {
                             ButtonHelperAbilities.autoneticMemoryStep1(game, playerWL, 2);
-                            message = ButtonHelper.getIdent(playerWL) + " Triggered Autonetic Memory Option";
+                            message = playerWL.getFactionEmoji() + " Triggered Autonetic Memory Option";
                         } else {
                             game.drawActionCard(playerWL.getUserID());
                             game.drawActionCard(playerWL.getUserID());
@@ -916,7 +916,7 @@ public class AgendaHelper {
         List<Player> voters = getWinningVoters(winner, game);
         for (Player voter : voters) {
             if (voter.hasTech("dskyrog")) {
-                MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), ButtonHelper.getIdent(voter) + " gets to drop 2 infantry on a planet due to Kyro green tech");
+                MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to Kyro green tech");
                 List<Button> buttons = new ArrayList<>();
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
                 MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet", buttons);
@@ -1003,7 +1003,7 @@ public class AgendaHelper {
 
     private static void sleep() {
         try {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(2);
         } catch (Exception ignored) {
         }
     }
@@ -1076,7 +1076,7 @@ public class AgendaHelper {
             if (voteInfo[0] < 1) {
                 continue;
             }
-            String msg = ButtonHelper.getIdent(player)
+            String msg = player.getFactionEmoji()
                 + " if you intend to abstain from voting on this agenda, you have the option to preset an abstain here. Feel free not to pre-abstain, this is simply an optional way to resolve agendas faster";
             List<Button> buttons = new ArrayList<>();
             if (player.hasAbility("future_sight")) {
@@ -1091,51 +1091,32 @@ public class AgendaHelper {
 
     public static void rollIxthian(Game game, boolean publish) {
         String activeGamePing = game.getPing();
-        if (publish) {
-            TextChannel watchParty = watchPartyChannel(game);
-            String watchPartyPing = watchPartyPing(game);
-            Message watchPartyMsg = watchParty == null ? null
-                : watchParty.sendMessage(drumroll(watchPartyPing, 0)).complete();
-            MessageHelper.MessageFunction resolveIxthian = (msg) -> {
-                int rand = 10 + ThreadLocalRandom.current().nextInt(5);
-                if (ThreadLocalRandom.current().nextInt(10) == 0) {
-                    // random chance for a super long wait
-                    rand += ThreadLocalRandom.current().nextInt(45);
-                }
-                sleep();
-                for (int i = 1; i <= rand; i++) {
-                    msg.editMessage(drumroll(activeGamePing, i)).queue();
-                    if (watchPartyMsg != null) {
-                        watchPartyMsg.editMessage(drumroll(watchPartyPing, i)).queue();
-                    }
-                    sleep();
-                }
-                msg.delete().queue();
-                if (watchPartyMsg != null) {
-                    watchPartyMsg.delete().queue();
-                }
-                resolveIxthianRoll(game, true);
-            };
-            MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), game.getMainGameChannel(),
-                resolveIxthian);
-        } else {
-            MessageHelper.MessageFunction resolveIxthian = (msg) -> {
-                int rand = 10 + ThreadLocalRandom.current().nextInt(5);
-                if (ThreadLocalRandom.current().nextInt(10) == 0) {
-                    // random chance for a super long wait
-                    rand += ThreadLocalRandom.current().nextInt(45);
-                }
-                sleep();
-                for (int i = 1; i <= rand; i++) {
-                    msg.editMessage(drumroll(activeGamePing, i)).queue();
-                    sleep();
-                }
-                msg.delete().queue();
-                resolveIxthianRoll(game, false);
-            };
-            MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), game.getMainGameChannel(), resolveIxthian);
-        }
+        TextChannel watchParty = watchPartyChannel(game);
+        String watchPartyPing = watchPartyPing(game);
+        Message watchPartyMsg = publish && watchParty != null ? watchParty.sendMessage(drumroll(watchPartyPing, 0)).complete() : null;
 
+        MessageHelper.MessageFunction resolveIxthian = (msg) -> {
+            int rand = 4 + ThreadLocalRandom.current().nextInt(4);
+            if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
+                rand += 8 + ThreadLocalRandom.current().nextInt(14);
+            }
+
+            // Sleep will sleep for 2 seconds now, many quick edits is bad for rate limit
+            sleep();
+            for (int i = 1; i <= rand; i++) {
+                msg.editMessage(drumroll(activeGamePing, i)).queue(Consumers.nop(), BotLogger::catchRestError);
+                if (publish && watchPartyMsg != null) {
+                    watchPartyMsg.editMessage(drumroll(watchPartyPing, i)).queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                sleep();
+            }
+            msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            if (publish && watchPartyMsg != null) {
+                watchPartyMsg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            resolveIxthianRoll(game, publish);
+        };
+        MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), game.getMainGameChannel(), resolveIxthian);
     }
 
     private static void resolveIxthianRoll(Game game, boolean publish) {
@@ -1261,7 +1242,7 @@ public class AgendaHelper {
     public static void exhaustPlanetsForVoting(String buttonID, ButtonInteractionEvent event, Game game,
         Player player, String ident, String buttonLabel, String finsFactionCheckerPrefix) {
         String votes = buttonID.substring(buttonID.indexOf("_") + 1);
-        String voteMessage = ButtonHelper.getIdent(player) + " Chose to vote " + votes + " votes for "
+        String voteMessage = player.getFactionEmoji() + " Chose to vote " + votes + " votes for "
             + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
         List<Button> voteActionRow = getPlanetButtons(event, player, game);
         int allVotes = getVoteTotal(player, game)[0];
@@ -1449,7 +1430,7 @@ public class AgendaHelper {
                     existingData = existingData + ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(outcome, existingData);
-                String msg = ButtonHelper.getIdent(player) + " Voted " + votes + " votes for "
+                String msg = player.getFactionEmoji() + " Voted " + votes + " votes for "
                     + StringUtils.capitalize(outcome) + "!";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     Helper.buildSpentThingsMessageForVoting(player, game, false));
@@ -1673,7 +1654,7 @@ public class AgendaHelper {
                         totalBuilder.append(";").append(onePiece);
                     } else {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            ButtonHelper.getIdent(player) + " erased " + onePiece.split("_")[1]);
+                            player.getFactionEmoji() + " erased " + onePiece.split("_")[1]);
                     }
                 }
                 String total = totalBuilder.toString();

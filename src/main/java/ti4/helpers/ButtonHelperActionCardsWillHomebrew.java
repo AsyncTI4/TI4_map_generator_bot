@@ -176,7 +176,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " readied every tech skip planet");
+            player.getFactionEmoji() + " readied every tech skip planet");
         event.getMessage().delete().queue();
 
     }
@@ -197,7 +197,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " put a cruiser in " + tile.getRepresentation());
+            player.getFactionEmoji() + " put a cruiser in " + tile.getRepresentation());
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
