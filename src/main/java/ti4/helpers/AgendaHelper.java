@@ -2250,10 +2250,7 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Politics Rider")) {
                             int amount = 3;
-                            if (winningR.hasAbility("scheming")) {
-                                amount = 4;
-                                game.drawActionCard(winningR.getUserID());
-                            }
+
                             if (winningR.hasAbility("autonetic_memory")) {
                                 ButtonHelperAbilities.autoneticMemoryStep1(game, winningR, 3);
                             } else {
@@ -2262,6 +2259,13 @@ public class AgendaHelper {
                                 game.drawActionCard(winningR.getUserID());
                                 ButtonHelper.checkACLimit(game, event, winningR);
                                 ACInfo.sendActionCardInfo(game, winningR, event);
+                            }
+                            if (winningR.hasAbility("scheming")) {
+                                amount = 4;
+                                game.drawActionCard(winningR.getUserID());
+                                MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
+                                    winningR.getRepresentation(true, true) + " use buttons to discard",
+                                    ACInfo.getDiscardActionCardButtons(game, winningR, false));
                             }
 
                             game.setSpeaker(winningR.getUserID());

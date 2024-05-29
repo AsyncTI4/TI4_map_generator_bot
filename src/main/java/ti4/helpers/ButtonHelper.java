@@ -1985,6 +1985,14 @@ public class ButtonHelper {
         return count;
     }
 
+    public static int getNumberOfGroundForces(Player player, UnitHolder uH) {
+        int count = uH.getUnitCount(UnitType.Mech, player) + uH.getUnitCount(UnitType.Infantry, player);
+        if (player.hasUnit("titans_pds") || player.hasUnit("titans_pds2")) {
+            count = count + uH.getUnitCount(UnitType.Pds, player);
+        }
+        return count;
+    }
+
     public static int getNumberOfTilesPlayerIsInWithNoPlanets(Game game, Player player) {
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -2095,6 +2103,21 @@ public class ButtonHelper {
             }
             UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                count = count + space.getUnits().get(unit);
+            }
+        }
+        return count;
+    }
+
+    public static int checkNumberShips(Player player, Game game, Tile tile) {
+        int count = 0;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        for (UnitKey unit : space.getUnits().keySet()) {
+            if (!unit.getColor().equals(player.getColor())) {
+                continue;
+            }
+            UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
+            if (removedUnit.getIsShip()) {
                 count = count + space.getUnits().get(unit);
             }
         }
@@ -5886,7 +5909,7 @@ public class ButtonHelper {
         } else {
             if (!game.isFoWMode() && rollType == CombatRollType.combatround && opponent != null
                 && opponent != player) {
-                String msg = "\n" + opponent.getRepresentation(true, true) + " your opponent rolled and got " + h
+                String msg = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h
                     + " hit(s)";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
@@ -7651,7 +7674,7 @@ public class ButtonHelper {
             stuffToTransButtons.add(transact);
         }
 
-        if ((p1.getCommodities() > 0 || p2.getCommodities() > 0) && !p1.hasAbility("military_industrial_complex")
+        if (!game.isFoWMode() && (p1.getCommodities() > 0 || p2.getCommodities() > 0) && !p1.hasAbility("military_industrial_complex")
             && !p1.getAllianceMembers().contains(p2.getFaction())) {
             Button transact = Button.secondary(finChecker + "send_WashComms_" + p2.getFaction() + "_0",
                 "Wash Both Players Comms");
