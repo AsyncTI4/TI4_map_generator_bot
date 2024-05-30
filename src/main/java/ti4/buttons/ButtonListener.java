@@ -3779,7 +3779,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "proceed_to_strategy" -> {
                     Map<String, Player> players = game.getPlayers();
-                    if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+                    if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
                         for (Player player_ : players.values()) {
                             player_.cleanExhaustedPlanets(false);
                         }
