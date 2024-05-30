@@ -444,8 +444,10 @@ public class ButtonHelperTacticalAction {
                     } else {
                         StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
                             threadName, tile, event, "space", "space");
-                        StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                            threadName, tile, event, "space", "space");
+                        if (player2.isRealPlayer()) {
+                            StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
+                                threadName, tile, event, "space", "space");
+                        }
                         for (Player player3 : game.getRealPlayers()) {
                             if (player3 == player2 || player3 == player) {
                                 continue;
