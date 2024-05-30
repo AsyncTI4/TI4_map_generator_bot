@@ -113,11 +113,11 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         eb.setColor(Color.black);
 
         eb.setDescription(getLegendaryAbilityText());
-        if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
+        //if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getEmojiURL() != null) eb.setThumbnail(getEmojiURL());
 
         // footer can have some of the planet info
-        eb.setFooter(getName());
+        //eb.setFooter(getName());
 
         return eb.build();
     }
