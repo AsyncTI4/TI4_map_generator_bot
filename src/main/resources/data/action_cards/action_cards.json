@@ -1597,7 +1597,7 @@
     "name": "Meditative Firing Cycles",
     "phase": "Any",
     "window": "At any time:",
-    "text": "You may use the SPACE CANNON ability of each of up to 3 of your units in any system against another player's ship in or adjacent to that system.",
+    "text": "You may use the SPACE CANNON ability of each of up to 3 of your units in any system against another player's ships in or adjacent to that system.",
     "flavorText": "",
     "source": "ds"
   },

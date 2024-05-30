@@ -769,12 +769,15 @@ public class FoWHelper {
 		List<Player> players = getAdjacentPlayers(game, position, true);
 		int successfulCount = 0;
 		for (Player player_ : players) {
-			String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> "
-				+ message;
-			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
-			MessageChannel channel = player_.getPrivateChannel();
-			MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-				StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+      boolean success = true;
+      if (player_.isRealPlayer()) {
+        String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> "
+          + message;
+        success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
+        MessageChannel channel = player_.getPrivateChannel();
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
+          StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+      }
 			successfulCount += success ? 1 : 0;
 		}
 		feedbackMessage(event, successfulCount, players.size());
