@@ -7486,6 +7486,30 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "# Exhausted all tech skip planets due to that one agenda");
         }
+        if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+            game.setStoredValue("agendaChecksNBalancesAgainst", "");
+            for (Player p2 : game.getRealPlayers()) {
+                String message = p2.getRepresentation() + " Click the names of up to 3 planets you wish to ready after checks and balances resolved against";
+
+                List<Button> buttons = Helper.getPlanetRefreshButtons(event, p2, game);
+                buttons.add(Button.danger("deleteButtons_spitItOut", "Done Readying Planets")); //spitItOut
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message, buttons);
+            }
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                "# Sent buttons to refresh 3 planets due to checks and balances");
+        }
+        if (!game.getStoredValue("agendaRevolution").isEmpty()) {
+            game.setStoredValue("agendaRevolution", "");
+            for (Player p2 : game.getRealPlayers()) {
+                String message = p2.getRepresentation() + " Exhaust 1 planet for each tech you own (" + p2.getTechs().size() + ")";
+
+                List<Button> buttons = Helper.getPlanetExhaustButtons(p2, game);
+                buttons.add(Button.danger("deleteButtons_spitItOut", "Done Exhausting")); //spitItOut
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message, buttons);
+            }
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                "# Sent buttons to exhaust 1 planet for each tech due to anti-intellectual revolution resolving against");
+        }
         if (!game.getStoredValue("agendaRepGov").isEmpty()) {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("agendaRepGov").contains(p2.getFaction())) {
@@ -9286,7 +9310,7 @@ public class ButtonHelper {
     public static void resolveSARMechStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String warfareOrNot = buttonID.split("_")[2];
-        String msg1 = getIdent(player) + " exhausted Self-Assembley Routines to place a mech on "
+        String msg1 = getIdent(player) + " exhausted Self-Assembly Routines to place a mech on "
             + Helper.getPlanetRepresentation(planet, game);
         player.exhaustTech("sar");
         Tile tile = game.getTileFromPlanet(planet);

@@ -908,8 +908,10 @@ public class ButtonHelperModifyUnits {
                 } else {
                     StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
                         threadName, tile, event, "ground", unitHolder.getName());
-                    StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                        threadName, tile, event, "ground", unitHolder.getName());
+                    if (player2.isRealPlayer()) {
+                        StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
+                            threadName, tile, event, "ground", unitHolder.getName());
+                    }
                     for (Player player3 : game.getRealPlayers()) {
                         if (player3 == player2 || player3 == player) {
                             continue;

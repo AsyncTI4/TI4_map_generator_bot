@@ -132,6 +132,11 @@ public class StartCombat extends CombatSubcommandData {
         }
 
         StartCombat.sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
+        String combatName2 = "combatRoundTracker" + player1.getFaction() + tile.getPosition() + unitHolderName;
+        game.setStoredValue(combatName2, "");
+        combatName2 = "combatRoundTracker" + player2.getFaction() + tile.getPosition() + unitHolderName;
+        game.setStoredValue(combatName2, "");
+
         TextChannel textChannel = (TextChannel) channel;
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
@@ -155,6 +160,7 @@ public class StartCombat extends CombatSubcommandData {
 
         // Create the thread
         final String finalThreadName = threadName;
+
         channel.sendMessage("Resolve Combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
             if (game.isFoWMode()) {
