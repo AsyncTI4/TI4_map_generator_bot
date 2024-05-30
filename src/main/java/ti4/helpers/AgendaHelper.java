@@ -153,7 +153,15 @@ public class AgendaHelper {
                 if ("for".equalsIgnoreCase(winner)) {
                     game.addLaw(aID, null);
                     MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing() + " Added law to map!");
+                } else {
+                    if ("checks".equalsIgnoreCase(agID)) {
+                        game.setStoredValue("agendaChecksNBalancesAgainst", "true");
+                    }
+                    if ("revolution".equalsIgnoreCase(agID)) {
+                        game.setStoredValue("agendaRevolution", "true");
+                    }
                 }
+
                 if ("regulations".equalsIgnoreCase(agID)) {
                     if ("for".equalsIgnoreCase(winner)) {
                         for (Player playerB : game.getRealPlayers()) {

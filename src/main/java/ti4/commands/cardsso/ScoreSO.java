@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -61,7 +62,13 @@ public class ScoreSO extends SOCardsSubcommandData {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
+            if (ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) > 0) {
+                message.append(SOInfo.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
+                message.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(entry.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) + ")\n");
+            } else {
+                message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey()));
+            }
+            //message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;

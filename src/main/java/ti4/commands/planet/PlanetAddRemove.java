@@ -103,7 +103,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s):").toString();
             case Constants.PLANET_EXHAUST -> message.append(" exhausted planet(s):").toString();
             case Constants.PLANET_REFRESH -> message.append(" readied planet(s):").toString();
-            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability:").toString();
+            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability").toString();
             case Constants.PLANET_REFRESH_ABILITY -> message.append(" readied the legendary ability:").toString();
             default -> "";
         };
