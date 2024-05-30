@@ -3248,6 +3248,9 @@ public class MapGenerator {
         int bufferBetweenTextAndTokens = 15;
         int playerCount = players.size();
         int minimumBoxWidth = 400;
+        if (game.isRedTapeMode()) { //TODO move and handle method displayUnrevealedObjectives into this method and calc boxWidth properly
+            minimumBoxWidth += 400;
+        }
 
         int maxTextWidth = 0;
 
