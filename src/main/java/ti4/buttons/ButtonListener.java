@@ -3357,7 +3357,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = trueIdentity + " Click the names of the planets you wish to ready";
 
                     List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
-                    Button doneRefreshing = Button.danger("deleteButtons_diplomacy", "Done Readying Planets");
+                    Button doneRefreshing = Button.danger("deleteButtons_diplomacy", "Done Readying Planets"); //spitItOut
                     buttons.add(doneRefreshing);
                     if (!game.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(
@@ -3779,10 +3779,14 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "proceed_to_strategy" -> {
                     Map<String, Player> players = game.getPlayers();
-                    for (Player player_ : players.values()) {
-                        player_.cleanExhaustedPlanets(false);
+                    if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
+                        for (Player player_ : players.values()) {
+                            player_.cleanExhaustedPlanets(false);
+                        }
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Refreshed all planets at the end of the agenda phase");
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Did not refresh planets due to the checks and balances resolving against. Players have been sent buttons to refresh up to 3 planets");
                     }
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda cleanup run!");
                     ButtonHelper.startStrategyPhase(event, game);
                     event.getMessage().delete().queue();
 
