@@ -49,6 +49,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
@@ -678,6 +679,12 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
+        MiltySettings miltySettings = game.getMiltySettings();
+        if (miltySettings != null) {
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
+            writer.write(System.lineSeparator());
+        }
+
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
         writer.write(System.lineSeparator());
 
@@ -732,6 +739,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.STATS_ANCHOR_LOCATION + " " + player.getPlayerStatsAnchorPosition());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.HS_TILE_POSITION + " " + player.getHomeSystemPosition());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
@@ -1346,6 +1356,7 @@ public class GameSaveLoadManager {
             }
 
             game.endGameIfOld();
+            game.finishImport();
             return game;
         } else {
             BotLogger.log("Could not save map, error creating save file");
@@ -1775,12 +1786,12 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.FOW_OPTION_HIDE_NAMES -> {
-                  try {
-                      boolean value = Boolean.parseBoolean(info);
-                      game.setFowOptionHideNames(value);
-                  } catch (Exception e) {
-                      // Do nothing
-                  }
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setFowOptionHideNames(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
                 }
                 case Constants.NAALU_AGENT -> {
                     try {
@@ -2097,6 +2108,14 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.MILTY_DRAFT_SETTINGS -> {
+                    try {
+                        MiltySettings settings = MiltySettings.readJson(info, MiltySettings.class);
+                        game.setMiltySettings(settings);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
             }
         }
     }
@@ -2167,6 +2186,7 @@ public class GameSaveLoadManager {
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
+                case Constants.HS_TILE_POSITION -> player.setHomeSystemPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
@@ -2207,7 +2227,8 @@ public class GameSaveLoadManager {
                         String id = unitInfo.nextToken();
                         UnitKey unitKey = Units.parseID(id);
                         Integer number = Integer.parseInt(unitInfo.nextToken());
-                        unitHolder.addUnit(unitKey, number);
+                        if (unitKey != null)
+                            unitHolder.addUnit(unitKey, number);
                     }
                 }
                 case Constants.AC -> {

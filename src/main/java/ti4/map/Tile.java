@@ -563,4 +563,11 @@ public class Tile {
         return isHome;
     }
 
+    public static Predicate<Tile> tileHasPlayerShips(Player player) {
+        return tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
+    }
+
+    public static Predicate<Tile> tileHasPlayerUnits(Player player) {
+        return tile -> tile.containsPlayersUnits(player);
+    }
 }

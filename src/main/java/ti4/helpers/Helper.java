@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,7 +53,6 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
-import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.status.ScorePublic;
@@ -80,13 +78,11 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.model.Source.ComponentSource;
 
 public class Helper {
 
     @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, GenericInteractionCreateEvent event,
-        String userID) {
+    public static Player getGamePlayer(Game game, Player initialPlayer, GenericInteractionCreateEvent event, String userID) {
         return getGamePlayer(game, initialPlayer, event.getMember(), userID);
     }
 
@@ -207,35 +203,42 @@ public class Helper {
         return player;
     }
 
-    // TODO: Jazz: This method only includes base game + pok tiles. It will include DS tiles if DS mode is set
+    // TODO: Jazz: This method *should* include base game + pok tiles (+ DS tiles IFF DS mode is set)
     //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
     //     - from every source available to the active game
-    public static void getRandomBlueTile(Game game, GenericInteractionCreateEvent event) {
+    public static List<MiltyDraftTile> getUnusedTiles(Game game) {
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
-        MiltyDraftHelper.initDraftTiles(draftManager, game);
+        draftManager.init(game);
 
-        List<MiltyDraftTile> allTiles;
-        allTiles = draftManager.getBlue();
-        boolean inMap = true;
-        int counter = 1;
-        while (inMap && counter < 1000) {
-            int result = ThreadLocalRandom.current().nextInt(1, allTiles.size());
+        List<MiltyDraftTile> allTiles = new ArrayList<>(draftManager.getAll()).stream()
+            .filter(tile -> game.getTile(tile.getTile().getTileID()) == null)
+            .toList();
+        return new ArrayList<>(allTiles);
+    }
 
-            MiltyDraftTile tile = allTiles.get(result);
-            tile.getTile().getTileID();
-            boolean foundInMap = false;
-            for (Tile mapTile : game.getTileMap().values()) {
-                if (mapTile.getTileID().equalsIgnoreCase(tile.getTile().getTileID())) {
-                    foundInMap = true;
-                    break;
-                }
-            }
-            if (!foundInMap) {
-                inMap = false;
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "You randomly drew the tile: " + tile.getTile().getRepresentation());
-            }
-            counter++;
+    public static void getRandomBlueTile(Game game, GenericInteractionCreateEvent event) {
+        List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(getUnusedTiles(game).stream()
+            .filter(tile -> tile.getTierList().isBlue())
+            .toList());
+        if (unusedBlueTiles.size() == 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no blue tiles available to draw.");
+        } else {
+            Collections.shuffle(unusedBlueTiles);
+            Tile tile = unusedBlueTiles.get(0).getTile();
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getRepresentation());
+        }
+    }
+
+    public static void getRandomRedTile(Game game, GenericInteractionCreateEvent event) {
+        List<MiltyDraftTile> unusedRedTiles = new ArrayList<>(getUnusedTiles(game).stream()
+            .filter(tile -> !tile.getTierList().isBlue())
+            .toList());
+        if (unusedRedTiles.size() == 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no red tiles available to draw.");
+        } else {
+            Collections.shuffle(unusedRedTiles);
+            Tile tile = unusedRedTiles.get(0).getTile();
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getRepresentation());
         }
     }
 
@@ -359,7 +362,7 @@ public class Helper {
     public static void resolveQueue(Game game) {
 
         Player imperialHolder = getPlayerWithThisSC(game, 8);
-        String key = "factionsThatAreNotDiscardingSOs";
+        //String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         if (game.getStoredValue(key2).length() < 2) {
@@ -745,7 +748,7 @@ public class Helper {
     }
 
     public static String getSCAsMention(int sc, Game game) {
-        StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
+        //StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         if (game.isHomeBrewSCMode()) {
             return getSCName(sc, game);
         }
@@ -797,7 +800,7 @@ public class Helper {
         }
         boolean gameWithGroupedSCs = "pbd100".equals(game.getName()) || "pbd500".equals(game.getName()) && !"tribunal".equals(scSet);
         if (gameWithGroupedSCs) {
-            char scValue = String.valueOf(sc).charAt(0);
+            //char scValue = String.valueOf(sc).charAt(0);
             scSet = scSet.replace("pbd100", "pok");
             scSet = scSet.replace("pbd1000", "pok");
         }
@@ -1127,7 +1130,7 @@ public class Helper {
 
     public static String buildSpentThingsMessageForVoting(Player player, Game game, boolean justVoteTotal) {
         List<String> spentThings = player.getSpentThingsThisWindow();
-        String msg = ButtonHelper.getIdent(player) + " used the following: \n";
+        String msg = player.getFactionEmoji() + " used the following: \n";
         int votes = 0;
         int tg = player.getSpentTgsThisWindow();
         for (String thing : spentThings) {
@@ -1251,13 +1254,13 @@ public class Helper {
 
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
         List<String> spentThings = player.getSpentThingsThisWindow();
-        String msg = ButtonHelper.getIdent(player) + " exhausted the following: \n";
+        String msg = player.getFactionEmoji() + " exhausted the following: \n";
         int res = 0;
         int inf = 0;
-        boolean tech = false;
+        //boolean tech = false;
         if (resOrInfOrBoth.contains("tech")) {
             resOrInfOrBoth = resOrInfOrBoth.replace("tech", "");
-            tech = true;
+            //tech = true;
         }
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
@@ -1424,7 +1427,7 @@ public class Helper {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
                 if (uniquePlace.equalsIgnoreCase(tilePos + "_" + planetOrSpace)) {
-                    localPlace = localPlace + ButtonHelper.getIdent(player) + " produced " + producedUnits.get(unit)
+                    localPlace = localPlace + player.getFactionEmoji() + " produced " + producedUnits.get(unit)
                         + " " + removedUnit.getUnitEmoji() + "\n";
                 }
             }
@@ -1635,7 +1638,7 @@ public class Helper {
                 UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
                 if ("flagship".equalsIgnoreCase(removedUnit.getBaseType())
                     && game.playerHasLeaderUnlockedOrAlliance(player, "nomadcommander")) {
-                    cost = cost; // nomad alliance
+                    //cost = cost; // nomad alliance
                 } else {
                     cost = cost + (int) removedUnit.getCost() * producedUnits.get(unit);
                 }

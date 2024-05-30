@@ -165,7 +165,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             }
         }
         ButtonHelper.fullCommanderUnlockCheck(player, game, "kollecc", event);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), sb.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         event.getMessage().delete().queue();
     }
 
@@ -176,7 +176,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdent(player) + " readied every tech skip planet");
+            player.getFactionEmoji() + " readied every tech skip planet");
         event.getMessage().delete().queue();
 
     }
@@ -197,7 +197,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " put a cruiser in " + tile.getRepresentation());
+            player.getFactionEmoji() + " put a cruiser in " + tile.getRepresentation());
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
@@ -247,7 +247,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 tile.getRepresentationForButtons(game, player)));
 
         }
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " Chose the tile you want to swap places with "
                 + tile1.getRepresentationForButtons(game, player),
             buttons);
@@ -265,7 +265,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         game.setTile(tile);
         game.setTile(tile2);
         game.rebuildTilePositionAutoCompleteList();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " Chose to swap "
                 + tile2.getRepresentationForButtons(game, player) + " with "
                 + tile.getRepresentationForButtons(game, player));
@@ -309,7 +309,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons.add(Button.success("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation() + " choose the target of brutal occupation");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation");
     }
 
     public static void resolveBrutalOccupationStep2(Player player, Game game, ButtonInteractionEvent event,
@@ -320,11 +320,11 @@ public class ButtonHelperActionCardsWillHomebrew {
         if (!buttons.isEmpty()) {
             String message = player.getFactionEmoji() + " Click button to explore "
                 + Helper.getPlanetRepresentation(planet, game);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 message, buttons);
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentation(planet, game));
     }
 
 }

@@ -775,6 +775,9 @@ public class ButtonHelperAgents {
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+                    player.getRepresentation(true, true) + " use buttons to discard",
+                    ACInfo.getDiscardActionCardButtons(game, player, false));
             }
             if (p2.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
@@ -807,10 +810,16 @@ public class ButtonHelperAgents {
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 successMessage += " Drew another AC for scheming. Please discard 1";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                    player.getRepresentation(true, true) + " use buttons to discard",
+                    ACInfo.getDiscardActionCardButtons(game, player, false));
             }
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+                    player.getRepresentation(true, true) + " use buttons to discard",
+                    ACInfo.getDiscardActionCardButtons(game, player, false));
             }
             if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
@@ -1577,6 +1586,7 @@ public class ButtonHelperAgents {
             }
         }
         int tgGain = count + player.getCommodities() - player.getCommoditiesTotal();
+        tgGain = Math.max(tgGain, 0);
         int commGain = count - tgGain;
         player.setCommodities(player.getCommodities() + commGain);
         String msg = ButtonHelper.getIdentOrColor(player, game) + " max influence planet had " + count

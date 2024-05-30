@@ -33,5 +33,7 @@
         "meranna",
         "hurigati",
         "ferrust"
-    ]
+    ],
+    "tileBack": "blue",
+    "source": "eronous"
 }

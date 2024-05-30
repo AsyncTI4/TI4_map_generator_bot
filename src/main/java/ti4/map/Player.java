@@ -56,13 +56,13 @@ import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
+import ti4.model.GenericCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 
@@ -91,6 +91,8 @@ public class Player {
 
     @Setter
     private String playerStatsAnchorPosition;
+    @Setter
+    private String homeSystemPosition;
     private String allianceMembers = "";
     private String hoursThatPlayerIsAFK = "";
     private String color;
@@ -471,8 +473,7 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getId().equals(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -503,8 +504,7 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -736,6 +736,7 @@ public class Player {
         return promissoryNotesOwned;
     }
 
+    @JsonIgnore
     public Set<String> getSpecialPromissoryNotesOwned() {
         return promissoryNotesOwned.stream()
             .filter(pn -> Mapper.getPromissoryNotes().get(pn).isNotWellKnown())
@@ -1194,7 +1195,7 @@ public class Player {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
                             String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
                 }
@@ -1206,7 +1207,7 @@ public class Player {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
                             String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
                 }
@@ -1218,7 +1219,7 @@ public class Player {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
                             String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, getGame()), message, buttons);
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
                 }
@@ -1259,7 +1260,7 @@ public class Player {
     }
 
     @JsonIgnore
-    public User getUser() {
+    public User getUser() { //TODO: Jazz
         return AsyncTI4DiscordBot.jda.getUserById(userID);
     }
 
@@ -1268,7 +1269,7 @@ public class Player {
     }
 
     public String getUserName() {
-        User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+        User userById = getUser();
         if (userById != null) {
             userName = userById.getName();
             Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(userID);
@@ -1353,7 +1354,7 @@ public class Player {
 
     @JsonIgnore
     public String getPing() {
-        User userById = AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        User userById = getUser();
         if (userById == null)
             return "";
 
@@ -1407,8 +1408,8 @@ public class Player {
         }
         setAbilities(abilities);
         if (hasAbility("cunning")) {
-            Map<String, String> dsHandcards = Mapper.getDSHandcards();
-            for (Entry<String, String> entry : dsHandcards.entrySet()) {
+            Map<String, GenericCardModel> traps = Mapper.getTraps();
+            for (Entry<String, GenericCardModel> entry : traps.entrySet()) {
                 String key = entry.getKey();
                 if (key.endsWith(Constants.LIZHO)) {
                     setTrapCard(key);
@@ -1949,6 +1950,7 @@ public class Player {
         return allianceMembers.contains(player2.getFaction());
     }
 
+    @JsonIgnore
     public List<String> getPlanetsAllianceMode() {
         List<String> newPlanets = new ArrayList<>(planets);
         if (!"".equalsIgnoreCase(allianceMembers)) {
@@ -2227,7 +2229,7 @@ public class Player {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(this, game),
+            MessageHelper.sendMessageToChannel(this.getCorrectChannel(),
                 getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
         }
     }
@@ -2502,6 +2504,13 @@ public class Player {
             return null;
         }
         return playerStatsAnchorPosition;
+    }
+
+    public String getHomeSystemPosition() {
+        if ("null".equals(homeSystemPosition)) {
+            return null;
+        }
+        return homeSystemPosition;
     }
 
     public boolean hasOlradinPolicies() {
@@ -2824,6 +2833,13 @@ public class Player {
     @JsonIgnore
     public Tile getHomeSystemTile() {
         Game game = getGame();
+        if (getHomeSystemPosition() != null) {
+            Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
+            if (frankenHs != null) {
+                return frankenHs;
+            }
+        }
+
         if (hasAbility("mobile_command")) {
             if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).isEmpty()) {
                 return null;

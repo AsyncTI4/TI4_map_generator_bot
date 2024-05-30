@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
@@ -102,7 +101,7 @@ public class SCPlay extends PlayerSubcommandData {
                     if (p2 == player) {
                         continue;
                     }
-                    PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel(), event.getGuild());
+                    PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
                     String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";
@@ -110,7 +109,7 @@ public class SCPlay extends PlayerSubcommandData {
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + " you have been couped. If this is a mistake or the coup is sabod, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
+                        + " you have been couped due to attempting to play SC #" + scToPlay + ". If this is a mistake or the coup is sabod, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
                     return;
                 }
             }

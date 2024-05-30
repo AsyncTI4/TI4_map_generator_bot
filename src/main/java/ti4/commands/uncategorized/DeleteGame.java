@@ -18,7 +18,6 @@ import ti4.message.MessageHelper;
 
 public class DeleteGame implements Command {
 
-
     @Override
     public String getActionID() {
         return Constants.DELETE_GAME;
@@ -35,7 +34,7 @@ public class DeleteGame implements Command {
             return false;
         }
         String confirm = event.getOptions().get(1).getAsString();
-        if (!"YES".equals(confirm)){
+        if (!"YES".equals(confirm)) {
             MessageHelper.replyToMessage(event, "Need to confirm map deletion");
         }
         return true;
@@ -66,7 +65,7 @@ public class DeleteGame implements Command {
                 }
             }
         }
-        if (!gameToDelete.getOwnerID().equals(member.getId()) && !isAdmin){
+        if (!gameToDelete.getOwnerID().equals(member.getId()) && !isAdmin) {
             MessageHelper.replyToMessage(event, "Map: " + mapName + " can be deleted by it's creator or admin.");
             return;
         }
@@ -84,9 +83,8 @@ public class DeleteGame implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Delete selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type in YES").setRequired(true))
-        );
+            Commands.slash(getActionID(), "Delete selected map")
+                .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type in YES").setRequired(true)));
     }
 }

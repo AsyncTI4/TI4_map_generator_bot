@@ -31,5 +31,7 @@
     "wormholes": [
         "THETA"
     ],
-    "planets": []
+    "planets": [],
+    "tileBack": "blue",
+    "source": "eronous"
 }

@@ -24,6 +24,6 @@ public class OfferAFKTimeOptions extends CustomSubcommandData {
             return;
         }
         ButtonHelper.offerAFKTimeOptions(game, mainPlayer);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to " + ButtonHelper.getIdent(mainPlayer));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to " + mainPlayer.getFactionEmoji());
     }
 }

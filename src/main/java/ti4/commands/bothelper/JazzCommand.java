@@ -1,18 +1,25 @@
 package ti4.commands.bothelper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.milty.MiltyDraftManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class JazzCommand extends BothelperSubcommandData {
+
+    ObjectMapper mapper = ObjectMapperFactory.build();
+
     public JazzCommand() {
         super("jazz_command", "jazzxhands");
     }
@@ -23,26 +30,32 @@ public class JazzCommand extends BothelperSubcommandData {
         //sendJazzButton(event);
 
         Game game = getActiveGame();
-        MiltyDraftManager man = game.getMiltyDraftManager();
-        String s = man.superSaveMessage();
-        MessageHelper.sendMessageToEventChannel(event, s);
-
+        MiltySettings menu = game.initializeMiltySettings();
+        String json = json(menu);
+        String json2 = "error :(";
         try {
-            MiltyDraftManager man2 = new MiltyDraftManager();
-            man2.init(game);
-            man2.loadSuperSaveString(game, s);
-            String s2 = man2.superSaveMessage();
-            MessageHelper.sendMessageToEventChannel(event, s2);
+            MiltySettings newMenu = mapper.readValue(json, MiltySettings.class);
+            json2 = json(newMenu);
         } catch (Exception e) {
-            MessageHelper.sendMessageToEventChannel(event, "Unable to load data. Check log.");
-            BotLogger.log("Unable to load data", e);
+            BotLogger.log(event, e);
+        }
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), json);
+        if (json.equals(json2)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "# SUCCESS!!!");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), json2);
         }
     }
 
-    private static void sendJazzButton(GenericInteractionCreateEvent event) {
+    public static void sendJazzButton(GenericInteractionCreateEvent event) {
         Emoji spinner = Emoji.fromFormatted(Emojis.scoutSpinner);
         Button jazz = Button.success("jazzButton", spinner);
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), Constants.jazzPing() + " button", jazz);
+    }
+
+    public static void handleJazzButton(ButtonInteractionEvent event, Player p, Game game) {
+
     }
 
     public static boolean jazzCheck(GenericInteractionCreateEvent event) {
@@ -53,5 +66,16 @@ public class JazzCommand extends BothelperSubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + Constants.jazzPing());
         return false;
+    }
+
+    public String json(MiltySettings object) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String val = mapper.writeValueAsString(object);
+            return val;
+        } catch (Exception e) {
+            BotLogger.log("Error mapping to json: ", e);
+        }
+        return null;
     }
 }

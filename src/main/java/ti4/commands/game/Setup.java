@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -265,11 +264,6 @@ public class Setup extends GameSubcommandData {
     }
 
     private static void sendTIGLSetupText(Game game) {
-        String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
-            "Please ensure you have all:\n" +
-            "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
-            "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
-            "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360";
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb);
+        WeirdGameSetup.sendTIGLSetupText(game);
     }
 }

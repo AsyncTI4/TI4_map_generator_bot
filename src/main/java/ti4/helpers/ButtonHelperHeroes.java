@@ -647,7 +647,7 @@ public class ButtonHelperHeroes {
 
     public static void resolveTnelisHeroAttach(Player tnelis, Game game, String soID,
         ButtonInteractionEvent event) {
-        Map<String, Integer> customPOs = new HashMap<>(game.getCustomPublicVP());
+        Map<String, Integer> customPOs = new HashMap<>(game.getRevealedPublicObjectives());
         for (String customPO : customPOs.keySet()) {
             if (customPO.contains("Tnelis Hero")) {
                 game.removeCustomPO(customPOs.get(customPO));
@@ -1814,8 +1814,10 @@ public class ButtonHelperHeroes {
             } else {
                 StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
                     threadName, tile2, event, "space", "space");
-                StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                    threadName, tile2, event, "space", "space");
+                if (player2.isRealPlayer()) {
+                    StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
+                        threadName, tile2, event, "space", "space");
+                }
                 for (Player player3 : game.getRealPlayers()) {
                     if (player3 == player2 || player3 == player) {
                         continue;

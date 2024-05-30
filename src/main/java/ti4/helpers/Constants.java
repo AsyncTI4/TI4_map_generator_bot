@@ -12,12 +12,16 @@ public class Constants {
     public static final String chassitId = "183213554445320192";
     public static final String tspId = "150809002974904321";
     public static final String jazzId = "228999251328368640";
+    public static final String bltId = "757405214398480486";
+    public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     public static String jazzPing() {
         return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
     }
 
-    public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
+    public static String bltPing() {
+        return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
+    }
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
@@ -848,6 +852,7 @@ public class Constants {
     //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
+    public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
 
     public static final String ABILITY = "ability";
     public static final String ABILITY_1 = "ability_1";
@@ -1030,6 +1035,7 @@ public class Constants {
     public static final String FACTION_IMAGE_URL = "faction_image_url";
     public static final String SET_FACTION_ICON = "set_faction_icon";
     public static final String SET_FACTION_DISPLAY_NAME = "set_faction_display_name";
+    public static final String SET_HOMESYSTEM_POS = "set_hs_position";
     public static final String FRANKEN_FACTION_NAME = "franken_faction_suffix";
     public static final String FORCE = "force";
     public static final String REVEAL_SPECIFIC = "reveal_specific";
