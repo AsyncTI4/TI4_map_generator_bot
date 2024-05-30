@@ -658,6 +658,9 @@ public class ButtonListener extends ListenerAdapter {
                         String message = Emojis.SpeakerToken + " Speaker assigned to: "
                             + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                        if (game.isFoWMode() && player != player_) {
+                          MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
+                        }
                         if (!game.isFoWMode()) {
                             ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
                         }
