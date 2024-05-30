@@ -42,10 +42,13 @@ public class StartFrankenDraft extends FrankenSubcommandData {
         FrankenDraftHelper.setUpFrankenFactions(game, event, force);
         FrankenDraftHelper.clearPlayerHands(game);
 
-        switch (draftMode) {
-          case POWERED -> game.setBagDraft(new PoweredFrankenDraft(game));
-          case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
-          default -> game.setBagDraft(new FrankenDraft(game));
+        if (draftMode == null) {
+            game.setBagDraft(new FrankenDraft(game));
+        } else {
+            switch (draftMode) {
+                case POWERED -> game.setBagDraft(new PoweredFrankenDraft(game));
+                case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
+            }
         }
 
         FrankenDraftHelper.startDraft(game);
