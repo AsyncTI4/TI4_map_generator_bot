@@ -381,6 +381,21 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus1_roll_cheiran_fs_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "next_to_structure",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "cheiran_flagship"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
         "alias": "plus1_roll_argent_commander_bombard",
         "type": "extrarolls",
         "value": "+1",
@@ -633,6 +648,21 @@
             {
                 "type": "unit",
                 "alias": "mahact_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_roll_cheiran_fs_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "next_to_structure",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "cheiran_flagship"
             }
         ],
         "forCombatAbility": "combatround"
