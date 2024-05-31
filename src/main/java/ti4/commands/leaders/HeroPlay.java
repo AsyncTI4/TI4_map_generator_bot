@@ -349,15 +349,13 @@ public class HeroPlay extends LeaderAction {
             case "veldyrhero" -> {
                 game.setComponentAction(true);
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
-                    for (int x = 0; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
-                        if (ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
-                            .size() > 0) {
-                            String msg = player.getRepresentation(true, true)
-                                + " you can retrieve a unit upgrade tech from players with branch offices, one for each branch office. Here is the possible techs from "
-                                + ButtonHelper.getIdentOrColor(p2, game);
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
-                                ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
-                        }
+                    if (ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
+                        .size() > 0) {
+                        String msg = player.getRepresentation(true, true)
+                            + " you can retrieve a unit upgrade tech from players with branch offices. Here is the possible techs from "
+                            + ButtonHelper.getIdentOrColor(p2, game);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
+                            ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                     }
                 }
             }
