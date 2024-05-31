@@ -628,6 +628,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_EXPLORATION_MODE + " " + game.isAgeOfExplorationMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MINOR_FACTIONS_MODE + " " + game.isMinorFactionsMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
         writer.write(Constants.HACK_ELECTION_STATUS + " " + game.getHackElectionStatus());
@@ -2027,6 +2029,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setAgeOfExplorationMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.MINOR_FACTIONS_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setMinorFactionsMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

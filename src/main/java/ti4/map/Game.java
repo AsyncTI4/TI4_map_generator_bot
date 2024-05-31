@@ -229,6 +229,7 @@ public class Game {
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
     private boolean ageOfExplorationMode;
+    private boolean minorFactionsMode;
     @Getter
     @Setter
     private boolean showFullComponentTextEmbeds;
@@ -792,12 +793,20 @@ public class Game {
         return ageOfExplorationMode;
     }
 
+    public boolean isMinorFactionsMode() {
+        return minorFactionsMode;
+    }
+
     public void setTestBetaFeaturesMode(boolean testBetaFeaturesMode) {
         this.testBetaFeaturesMode = testBetaFeaturesMode;
     }
 
     public void setAgeOfExplorationMode(boolean ageOfExplorationMode) {
         this.ageOfExplorationMode = ageOfExplorationMode;
+    }
+
+    public void setMinorFactionsMode(boolean minorMode) {
+        this.minorFactionsMode = minorMode;
     }
 
     @JsonIgnore
@@ -3788,6 +3797,11 @@ public class Game {
 
         // check if player has any allainces with players that have the commander
         // unlocked
+
+        if (isMinorFactionsMode() && getStoredValue("minorFactionCommanders").contains(leaderID)) {
+            return false;
+        }
+
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
