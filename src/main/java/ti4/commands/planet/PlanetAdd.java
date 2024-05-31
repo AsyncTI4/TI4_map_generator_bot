@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+
+import ti4.commands.leaders.UnlockLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -19,6 +21,7 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
@@ -89,6 +92,13 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
+                        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
+                            PlanetModel p = Mapper.getPlanet(unitHolder.getName());
+                            if (p != null && p.getFactionHomeworld() != null && player_.hasLeader(p.getFactionHomeworld() + "commander")) {
+                                String leaderID = p.getFactionHomeworld() + "commander";
+                                player_.removeLeader(leaderID);
+                            }
+                        }
                     }
                     player_.removePlanet(planet);
                     List<String> relics = new ArrayList<>();
@@ -141,6 +151,30 @@ public class PlanetAdd extends PlanetAddRemove {
                 + ". Click to confirm a combat occurred and to add an infantry or delete these buttons";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getDacxiveButtons(planet, player));
+        }
+        if (!alreadyOwned && game.isMinorFactionsMode() && (unitHolder.getOriginalPlanetType().equalsIgnoreCase("FACTION"))) {
+            unitHolder.addToken("attachment_threetraits.png");
+        }
+
+        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
+            Tile tile = game.getTileFromPlanet(unitHolder.getName());
+            boolean ownsThemAll = true;
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (!player.getPlanets().contains(uH.getName())) {
+                    ownsThemAll = false;
+                }
+            }
+            if (ownsThemAll) {
+                PlanetModel p = Mapper.getPlanet(unitHolder.getName());
+                if (p != null && p.getFactionHomeworld() != null && !player.hasLeader(p.getFactionHomeworld() + "commander")) {
+                    String leaderID = p.getFactionHomeworld() + "commander";
+                    player.addLeader(leaderID);
+                    if (!game.getStoredValue("minorFactionCommanders").contains(leaderID)) {
+                        game.setStoredValue("minorFactionCommanders", game.getStoredValue("minorFactionCommanders") + leaderID);
+                    }
+                    UnlockLeader.unlockLeader(event, leaderID, game, player);
+                }
+            }
         }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
