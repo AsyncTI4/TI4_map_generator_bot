@@ -2187,18 +2187,6 @@ public class AgendaHelper {
                             ButtonHelper.checkFleetInEveryTile(p2, game, event);
                         }
                     }
-                    if (winningR != null && specificVote.contains("Corporate Lobbying")) {
-                        List<Player> loseFleetPlayers = getWinningVoters(winner, game);
-                        for (Player p2 : loseFleetPlayers) {
-                            p2.setTg(p2.getTg() + 2);
-                            ButtonHelperAgents.resolveArtunoCheck(p2, game, 2);
-                            ButtonHelperAbilities.pillageCheck(p2, game);
-                            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                                p2.getRepresentation()
-                                    + " you gained 2tg due to voting the same way as corporate lobbying");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
-                        }
-                    }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
                         || specificVote.contains("Radiance") || specificVote.contains("Tarrock Ability"))) {
 
@@ -2220,12 +2208,6 @@ public class AgendaHelper {
 
                             MessageHelper.sendMessageToChannelWithButtons(channel,
                                 identity + " resolve Technology Rider by using the button to get a tech",
-                                List.of(Buttons.GET_A_TECH));
-                        }
-                        if (specificVote.contains("Schematics Rider")) {
-
-                            MessageHelper.sendMessageToChannelWithButtons(channel,
-                                identity + " resolve Schematics Rider by using the button to get the pre-selected tech",
                                 List.of(Buttons.GET_A_TECH));
                         }
                         if (specificVote.contains("Leadership Rider")

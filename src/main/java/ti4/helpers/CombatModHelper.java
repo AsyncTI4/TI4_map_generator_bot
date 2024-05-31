@@ -255,7 +255,6 @@ public class CombatModHelper {
             }
             case Constants.MOD_HAS_FRAGILE -> meetsCondition = player.getAbilities().contains("fragile");
             case Constants.MOD_OPPONENT_NO_CC_FLEET -> meetsCondition = !player.getMahactCC().contains(opponent.getColor());
-            case "next_to_structure" -> meetsCondition = (ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile).size() > 0 || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.entrySet().size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
