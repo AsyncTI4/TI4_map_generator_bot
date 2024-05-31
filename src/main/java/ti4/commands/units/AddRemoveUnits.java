@@ -109,35 +109,35 @@ abstract public class AddRemoveUnits implements Command {
 
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
-
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
-            game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
-            Player neutral = game.getPlayer("572698679618568193");
-            neutral.setColor(color);
-            neutral.setFaction("neutral");
-            neutral.setDummy(true);
-            FactionModel setupInfo = neutral.getFactionSetupInfo();
-            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-            neutral.setUnitsOwned(playerOwnedUnits);
+        if (game.isMinorFactionsMode()) {
+            if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+                game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
+                Player neutral = game.getPlayer("572698679618568193");
+                neutral.setColor(color);
+                neutral.setFaction("neutral");
+                neutral.setDummy(true);
+                FactionModel setupInfo = neutral.getFactionSetupInfo();
+                Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+                neutral.setUnitsOwned(playerOwnedUnits);
+            }
         }
-
         unitParsing(event, color, tile, unitList, game);
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList,
         Game game) {
-
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
-            game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
-            Player neutral = game.getPlayer("572698679618568193");
-            neutral.setColor(color);
-            neutral.setFaction("neutral");
-            neutral.setDummy(true);
-            FactionModel setupInfo = neutral.getFactionSetupInfo();
-            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-            neutral.setUnitsOwned(playerOwnedUnits);
+        if (game.isMinorFactionsMode()) {
+            if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+                game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
+                Player neutral = game.getPlayer("572698679618568193");
+                neutral.setColor(color);
+                neutral.setFaction("neutral");
+                neutral.setDummy(true);
+                FactionModel setupInfo = neutral.getFactionSetupInfo();
+                Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+                neutral.setUnitsOwned(playerOwnedUnits);
+            }
         }
-
         commonUnitParsing(event, color, tile, unitList, game);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, game);
     }
@@ -145,18 +145,18 @@ abstract public class AddRemoveUnits implements Command {
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList,
         Game game) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
-
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
-            game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
-            Player neutral = game.getPlayer("572698679618568193");
-            neutral.setColor(color);
-            neutral.setFaction("neutral");
-            neutral.setDummy(true);
-            FactionModel setupInfo = neutral.getFactionSetupInfo();
-            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-            neutral.setUnitsOwned(playerOwnedUnits);
+        if (game.isMinorFactionsMode()) {
+            if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+                game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
+                Player neutral = game.getPlayer("572698679618568193");
+                neutral.setColor(color);
+                neutral.setFaction("neutral");
+                neutral.setDummy(true);
+                FactionModel setupInfo = neutral.getFactionSetupInfo();
+                Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+                neutral.setUnitsOwned(playerOwnedUnits);
+            }
         }
-
         commonUnitParsing(event, color, tile, unitList, game);
         actionAfterAll(event, tile, color, game);
     }
