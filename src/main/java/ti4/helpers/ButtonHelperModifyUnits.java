@@ -134,8 +134,20 @@ public class ButtonHelperModifyUnits {
             int hitP1 = new CombatRoll().secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
             int hitP2 = new CombatRoll().secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
 
-            ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
-            ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+            if (p1.hasTech("vpw") && hitP2 > 0) {
+                hitP1++;
+            }
+            if (p2.hasTech("vpw") && hitP1 > 0) {
+                hitP1++;
+            }
+
+            if (p1.getPlanets().contains(planet)) {
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP2, event);
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP1, event);
+            } else {
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+            }
 
             if (!doesPlayerHaveGfOnPlanet(unitHolder, p2) || !doesPlayerHaveGfOnPlanet(unitHolder, p1)) {
                 haveGroundForces = false;

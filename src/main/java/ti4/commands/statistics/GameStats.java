@@ -255,7 +255,7 @@ public class GameStats extends StatisticsSubcommandData {
             sb.append("\n");
             index++;
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Public Objectives Revealed", sb.toString());
 
         topThousand = relics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
             .collect(Collectors.toMap(
