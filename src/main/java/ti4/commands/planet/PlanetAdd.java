@@ -92,13 +92,13 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
-                        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
-                            PlanetModel p = Mapper.getPlanet(unitHolder.getName());
-                            if (p != null && p.getFactionHomeworld() != null && player_.hasLeader(p.getFactionHomeworld() + "commander")) {
-                                String leaderID = p.getFactionHomeworld() + "commander";
-                                player_.removeLeader(leaderID);
-                            }
-                        }
+                        // if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
+                        //     PlanetModel p = Mapper.getPlanet(unitHolder.getName());
+                        //     if (p != null && p.getFactionHomeworld() != null && player_.hasLeader(p.getFactionHomeworld() + "commander")) {
+                        //         String leaderID = p.getFactionHomeworld() + "commander";
+                        //         player_.removeLeader(leaderID);
+                        //     }
+                        // }
                     }
                     player_.removePlanet(planet);
                     List<String> relics = new ArrayList<>();
@@ -173,7 +173,16 @@ public class PlanetAdd extends PlanetAddRemove {
                         game.setStoredValue("minorFactionCommanders", game.getStoredValue("minorFactionCommanders") + leaderID);
                     }
                     UnlockLeader.unlockLeader(event, leaderID, game, player);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if (p2.hasLeader(leaderID)) {
+                            p2.removeLeader(leaderID);
+                        }
+                    }
                 }
+
             }
         }
 
