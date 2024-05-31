@@ -142,8 +142,8 @@ public class ButtonHelperModifyUnits {
             }
 
             if (p1.getPlanets().contains(planet)) {
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP2, event);
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP1, event);
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
             } else {
                 ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
                 ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
