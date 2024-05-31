@@ -860,7 +860,11 @@ public class Helper {
         if (planet2 == null) {
             return planet + " bot error. Tell fin";
         }
-
+        boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+        if (unitHolder != null && containsDMZ) {
+            return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" + planet2.getResources()
+                + "/" + planet2.getInfluence() + ") [DMZ]";
+        }
         return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" + planet2.getResources()
             + "/" + planet2.getInfluence() + ")";
     }

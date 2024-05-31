@@ -590,7 +590,7 @@ public class MapGenerator {
                 if (convertToGeneric) {
                     continue;
                 }
-                if (game.isMinorFactionsMode() && player.isDummy()) {
+                if ((game.isMinorFactionsMode() || player.getFaction().equalsIgnoreCase("neutral")) && player.isDummy()) {
                     continue;
                 }
 

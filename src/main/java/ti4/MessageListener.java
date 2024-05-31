@@ -800,7 +800,8 @@ public class MessageListener extends ListenerAdapter {
                         String newMessage = player.getRepresentation(true, true) + " Someone said: " + messageText;
                         if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
                             String hits = StringUtils.substringAfter(messageText, "Total hits ");
-                            String location = StringUtils.substringBefore(messageText, "rolls for");
+                            String location = StringUtils.substringAfter(messageText, "rolls for");
+                            location = StringUtils.substringBefore(messageText, "Combat");
                             newMessage = player.getRepresentation(true, true) + " Someone rolled dice for " + location
                                 + " and got a total of **" + hits + " hits";
                         }
