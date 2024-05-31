@@ -2,6 +2,7 @@ package ti4.commands.statistics;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -78,6 +79,7 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
+            case SOS_SCORED -> listScoredSOsPulledRelicsRevealedPOs(event);
             //case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
@@ -98,7 +100,7 @@ public class GameStats extends StatisticsSubcommandData {
         // Add your new statistic here
         UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), PING_LIST("Ping List", "List of how many times people have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
             "Show colour play count"), FACTION_WINS("Wins per Faction",
-                "Show the wins per faction"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+                "Show the wins per faction"), SOS_SCORED("Times an SO has been scored", "Show the amount of times each SO has been scored"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
         // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 pt was scored but no winner was declared"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"), SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"), GAME_COUNT("Total game count", "Shows the total game count");
 
@@ -180,6 +182,95 @@ public class GameStats extends StatisticsSubcommandData {
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), "Ping Counts", sb.toString());
+    }
+
+    public static void listScoredSOsPulledRelicsRevealedPOs(SlashCommandInteractionEvent event) {
+        Map<String, Integer> sos = new HashMap<>();
+        Map<String, Integer> publics = new HashMap<>();
+        Map<String, Integer> relics = new HashMap<>();
+
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+        for (Game game : filteredGames) {
+            for (Player player : game.getRealPlayers()) {
+                for (String so : player.getSecretsScored().keySet()) {
+                    if (Mapper.getSecretObjective(so) != null) {
+                        String secret = Mapper.getSecretObjective(so).getName();
+                        if (sos.containsKey(secret)) {
+                            sos.put(secret, sos.get(secret) + 1);
+                        } else {
+                            sos.put(secret, 1);
+                        }
+                    }
+                }
+            }
+            for (String po : game.getRevealedPublicObjectives().keySet()) {
+                if (Mapper.getPublicObjective(po) != null) {
+                    String publicO = Mapper.getPublicObjective(po).getName();
+                    if (publics.containsKey(publicO)) {
+                        publics.put(publicO, publics.get(publicO) + 1);
+                    } else {
+                        publics.put(publicO, 1);
+                    }
+                }
+            }
+
+            List<String> relicsNames = Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
+            for (String relic : relicsNames) {
+                if (!game.getAllRelics().contains(relic)) {
+                    String relicName = Mapper.getRelic(relic).getName();
+                    if (relics.containsKey(relicName)) {
+                        relics.put(relicName, relics.get(relicName) + 1);
+                    } else {
+                        relics.put(relicName, 1);
+                    }
+                }
+            }
+        }
+
+        Map<String, Integer> topThousand = sos.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        int index = 1;
+        StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
+        for (String ket : topThousand.keySet()) {
+
+            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append("` ").append(ket + ": ");
+            sb.append(topThousand.get(ket));
+            sb.append("\n");
+            index++;
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Score Counts", sb.toString());
+
+        topThousand = publics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        index = 1;
+        sb = new StringBuilder("List of times a particular public has been revealed \n");
+        for (String ket : topThousand.keySet()) {
+
+            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append("` ").append(ket + ": ");
+            sb.append(topThousand.get(ket));
+            sb.append("\n");
+            index++;
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());
+
+        topThousand = relics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        index = 1;
+        sb = new StringBuilder("List of times a particular relic has been drawn \n");
+        for (String ket : topThousand.keySet()) {
+
+            sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
+            sb.append("` ").append(ket + ": ");
+            sb.append(topThousand.get(ket));
+            sb.append("\n");
+            index++;
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Relics Drawn Count", sb.toString());
     }
 
     public static void sendAllNames(SlashCommandInteractionEvent event) {
