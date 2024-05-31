@@ -39,6 +39,7 @@ public class Emojis {
     public static final String Xxcha = "<:Xxcha:1156670723541180547>";
     public static final String Yin = "<:Yin:1156670724438769754>";
     public static final String Lazax = "<:Lazax:946891797639073884>";
+    public static final String Neutral = "<:neutral:1245950121485664276>";
     public static final String Keleres = "<:Keleres:1156670565793398875>";
 
     // FACTIONS - DISCORDANT STARS
@@ -965,6 +966,7 @@ public class Emojis {
             case "yin" -> Yin;
 
             case "lazax" -> Lazax;
+            case "neutral" -> Neutral;
 
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
 

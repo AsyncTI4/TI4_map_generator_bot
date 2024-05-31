@@ -590,6 +590,9 @@ public class MapGenerator {
                 if (convertToGeneric) {
                     continue;
                 }
+                if (game.isMinorFactionsMode() && player.isDummy()) {
+                    continue;
+                }
 
                 // PAINT AVATAR AND USERNAME
                 StringBuilder userName = new StringBuilder();
@@ -1263,6 +1266,9 @@ public class MapGenerator {
             deltaX += 5;
             List<String> mahactCCs = player.getMahactCC();
             Collection<Player> players = game.getRealPlayersNDummies();
+            if (game.isMinorFactionsMode()) {
+                players = game.getRealPlayers();
+            }
             for (Player player_ : players) {
                 if (player_ != player) {
                     String playerColor = player_.getColor();
@@ -1888,7 +1894,7 @@ public class MapGenerator {
 
                 graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
-                if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
+                if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG) || unitHolder.getTokenList().contains("attachment_threetraits.png")) {
                     String planetTypeName = "pc_attribute_titanspn.png";
                     drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
                 } else {

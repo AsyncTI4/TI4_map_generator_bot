@@ -13,7 +13,7 @@ public class Source {
         ds, absol, franken,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi,
+        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral,
 
         // async homebrew
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
@@ -69,6 +69,7 @@ public class Source {
                 case project_pi -> Emojis.ProjectPi;
                 case miltymod -> Emojis.MiltyMod;
                 case lazax -> Emojis.Lazax;
+                case neutral -> Emojis.Neutral;
                 case salliance -> Emojis.StrategicAlliance;
                 default -> "";
             };

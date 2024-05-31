@@ -8329,6 +8329,7 @@ public class ButtonHelper {
                                 .withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
+
                         led = "axisagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
