@@ -580,7 +580,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to force to give you a PN",
+            player.getRepresentation(true, true) + " tell the bot who you want to diplo pressure",
             buttons);
     }
 
@@ -1045,7 +1045,7 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message = p2.getRepresentation(true, true)
-            + " You have been forced to give a PN. Please select the PN you would like to send";
+            + " You have been diplo pressured. Please select the PN you would like to send";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " sent buttons to resolve diplo pressure to "

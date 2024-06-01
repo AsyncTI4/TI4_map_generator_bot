@@ -1310,26 +1310,13 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
     }
 
-    public static List<Tile> getAdjacentTilesWithStructuresInThemAndNoCC(Player player, Game game, Tile origTile) {
-        List<Tile> tiles = new ArrayList<>();
-        List<String> adjTiles = new ArrayList<>();
-        adjTiles.addAll(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
-        for (String posTile : adjTiles) {
-            Tile adjTile = game.getTileByPosition(posTile);
-            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, adjTile)) {
-                tiles.add(adjTile);
-            }
-        }
-        return tiles;
-    }
-
     public static List<Tile> getAdjacentTilesWithStructuresInThem(Player player, Game game, Tile origTile) {
         List<Tile> tiles = new ArrayList<>();
         List<String> adjTiles = new ArrayList<>();
         adjTiles.addAll(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
         for (String posTile : adjTiles) {
             Tile adjTile = game.getTileByPosition(posTile);
-            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile)) {
+            if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, adjTile)) {
                 tiles.add(adjTile);
             }
         }
@@ -1522,10 +1509,10 @@ public class ButtonHelperAgents {
             ButtonHelper.getIdent(player) + " removed a cc from "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)");
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : getAdjacentTilesWithStructuresInThemAndNoCC(player, game, origTile)) {
+        for (Tile tile : getAdjacentTilesWithStructuresInThem(player, game, origTile)) {
             buttons.add(Button.success("cheiranAgentStep3_" + tile.getPosition(),
                 tile.getRepresentationForButtons(game, player)));
-            if (getAdjacentTilesWithStructuresInThemAndNoCC(player, game, origTile).size() == 1) {
+            if (getAdjacentTilesWithStructuresInThem(player, game, origTile).size() == 1) {
                 resolveCheiranAgentStep3(player, game, event, "cheiranAgentStep3_" + tile.getPosition());
                 return;
             }
@@ -1550,7 +1537,7 @@ public class ButtonHelperAgents {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (AddCC.hasCC(player, tile)) {
-                if (getAdjacentTilesWithStructuresInThemAndNoCC(player, game, tile).size() > 0) {
+                if (getAdjacentTilesWithStructuresInThem(player, game, tile).size() > 0) {
                     tiles.add(tile);
                 }
             }
