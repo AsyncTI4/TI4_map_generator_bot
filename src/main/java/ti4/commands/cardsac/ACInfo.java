@@ -151,7 +151,11 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 }
             }
         }
-        acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+        if (ButtonHelper.isPlayerElected(game, player, "censure") || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
+            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC (You are politically censured)"));
+        } else {
+            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+        }
         if (actionCards != null && !actionCards.isEmpty()
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")

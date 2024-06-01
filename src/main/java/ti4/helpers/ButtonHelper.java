@@ -1044,7 +1044,10 @@ public class ButtonHelper {
                 if (game.getStoredValue(key).contains(".")) {
                     String tech1 = StringUtils.substringBefore(game.getStoredValue(key), ".");
                     String tech2 = StringUtils.substringAfter(game.getStoredValue(key), ".");
-                    msg = msg + " " + Mapper.getTech(tech1).getNameRepresentation() + "and " + Mapper.getTech(tech2).getNameRepresentation();
+                    msg = msg + " " + Mapper.getTech(tech1).getNameRepresentation();
+                    for (String tech2Plus : tech2.split("\\.")) {
+                        msg = msg + "and " + Mapper.getTech(tech2Plus).getNameRepresentation();
+                    }
 
                 } else {
                     msg = msg + " " + Mapper.getTech(game.getStoredValue(key)).getNameRepresentation();
@@ -2749,7 +2752,7 @@ public class ButtonHelper {
 
     public static List<Player> getOtherPlayersWithShipsInTheSystem(Player player, Game game, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNDummies()) {
             if (p2 == player)
                 continue;
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
