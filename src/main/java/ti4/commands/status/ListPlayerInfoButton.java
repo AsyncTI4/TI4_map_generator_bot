@@ -799,7 +799,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "btgk" -> {
                 int alpha = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition())) {
+                    if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         alpha = 1;
                         break;
                     }
@@ -807,7 +807,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
                 int beta = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.doesTileHaveBeta(game, tile.getPosition())) {
+                    if (FoWHelper.doesTileHaveBeta(game, tile.getPosition()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         beta = 1;
                         break;
                     }
