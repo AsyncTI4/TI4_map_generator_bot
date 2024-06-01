@@ -192,7 +192,6 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
         }
-        player.getFinsFactionCheckerPrefix();
         if (game != null && game.getMainGameChannel() != null) {
             mainGameChannel = game.getMainGameChannel();
         }
