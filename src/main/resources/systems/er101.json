@@ -1,0 +1,39 @@
+{
+    "id": "er101",
+    "name": "Ryl Fang",
+    "aliases": [
+        "er101",
+        "rylfang",
+        "syvian"
+    ],
+    "imagePath": "er_101_async.png",
+    "planets": [
+        "rylfang",
+        "syvian"
+    ],
+    "shipPositionsType": "TYPE05",
+    "spaceTokenLocations": [
+        {
+            "x": 180.0,
+            "y": 0.0
+        },
+        {
+            "x": 220.0,
+            "y": 60.0
+        },
+        {
+            "x": 45.0,
+            "y": 120.0
+        },
+        {
+            "x": 95.0,
+            "y": 170.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}

@@ -1,0 +1,41 @@
+{
+    "id": "er100",
+    "name": "Nix",
+    "aliases": [
+        "er100",
+        "nix",
+        "nokturn",
+        "viliguard"
+    ],
+    "imagePath": "er_100_async.png",
+    "planets": [
+        "nix",
+        "nokturn",
+        "viliguard"
+    ],
+    "shipPositionsType": "TYPE06",
+    "spaceTokenLocations": [
+        {
+            "x": 250.0,
+            "y": 90.0
+        },
+        {
+            "x": 80.0,
+            "y": 10.0
+        },
+        {
+            "x": 135.0,
+            "y": 105.0
+        },
+        {
+            "x": 80.0,
+            "y": 185.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}
