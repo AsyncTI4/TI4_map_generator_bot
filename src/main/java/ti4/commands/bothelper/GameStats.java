@@ -38,7 +38,9 @@ public class GameStats extends BothelperSubcommandData {
             int channelCount = guild.getChannels().size(); //500
             guildRoomForGames = Math.min(guildRoomForGames, (500 - channelCount)/2);
             long gameCount = GameManager.getInstance().getGameNameToGame().values().stream()
-                    .filter(g -> g.getGuild() != null && g.getGuild().getId().equals(guild.getId())).count();
+                    .filter(g -> g.getGuild() != null && g.getGuild().getId().equals(guild.getId()))
+                    .filter(g -> g.getMainGameChannel() != null && g.getMainGameChannel().getParentCategory() != null && !g.getMainGameChannel().getParentCategory().getName().equals("The in-limbo PBD Archive"))
+                    .count();
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
             hostedGames += gameCount;

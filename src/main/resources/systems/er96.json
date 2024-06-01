@@ -1,0 +1,37 @@
+{
+    "id": "er96",
+    "name": "Mecantor",
+    "aliases": [
+        "er96",
+        "mecantor"
+    ],
+    "imagePath": "er_96_async.png",
+    "planets": [
+        "mecantor"
+    ],
+    "shipPositionsType": "TYPE10",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": true,
+    "source": "eronous"
+}

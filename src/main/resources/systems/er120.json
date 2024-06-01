@@ -1,0 +1,39 @@
+{
+    "id": "er120",
+    "name": "Sentuim",
+    "aliases": [
+        "er120",
+        "sentuim",
+        "volgan"
+    ],
+    "imagePath": "er_120_async.png",
+    "planets": [
+        "sentuim",
+        "volgan"
+    ],
+    "shipPositionsType": "TYPE05",
+    "spaceTokenLocations": [
+        {
+            "x": 180.0,
+            "y": 0.0
+        },
+        {
+            "x": 220.0,
+            "y": 60.0
+        },
+        {
+            "x": 45.0,
+            "y": 120.0
+        },
+        {
+            "x": 95.0,
+            "y": 170.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}
