@@ -1828,6 +1828,17 @@ public class ButtonHelperFactionSpecific {
         return players;
     }
 
+    public static int getNumberOfBranchOffices(Game game, Player player) {
+        int count = 0;
+        for (String pn : player.getPromissoryNotes().keySet()) {
+            if (pn.contains("dspnveld")) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     public static List<Button> getCreussIFFTypeOptions() {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("creussIFFStart_beta", "Beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
