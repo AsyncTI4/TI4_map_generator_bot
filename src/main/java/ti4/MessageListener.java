@@ -208,8 +208,9 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (!isAsyncServer(event.getGuild().getId()))
+        if (!isAsyncServer(event.getGuild().getId())) {
             return;
+        }
         long timeNow = new Date().getTime();
         try {
             Message msg = event.getMessage();
@@ -217,15 +218,13 @@ public class MessageListener extends ListenerAdapter {
                 msg.delete().queue();
             }
             if (!msg.getAuthor().isBot() && (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before"))) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "https://discord.gg/RZ7qg9kbVZ");
+                msg.reply("to explore strange new maps; to seek out new tiles and new factions || https://discord.gg/RZ7qg9kbVZ ||").queue();
             }
             //947310962485108816
             Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
             if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
-                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (its old if it has -launched in its title) "
-                    + msg.getJumpUrl();
-                TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary
-                    .getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
+                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (its old if it has -launched [FULL] in its title) " + msg.getJumpUrl();
+                TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
             }
             if (event.getChannel() instanceof ThreadChannel channel) {
@@ -243,12 +242,10 @@ public class MessageListener extends ListenerAdapter {
             mapLog(event, msg);
             saveJSONInTTPGExportsChannel(event);
         } catch (Exception e) {
-            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> "
-                + event.getMessage().getJumpUrl(), e);
+            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
         if (new Date().getTime() - timeNow > 1500) {
-            BotLogger.log(event.getMessage().getChannel().getName()
-                + " A message in this channel took longer than 1500 ms (" + (new Date().getTime() - timeNow) + ")");
+            BotLogger.log(event.getMessage().getChannel().getName() + " A message in this channel took longer than 1500 ms (" + (new Date().getTime() - timeNow) + ")");
         }
     }
 
