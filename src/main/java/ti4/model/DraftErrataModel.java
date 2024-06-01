@@ -1,8 +1,10 @@
 package ti4.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -51,6 +53,8 @@ public class DraftErrataModel implements ModelInterface {
         Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
+        Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
+        items = new ArrayList<>(itemsSet);
         Collections.shuffle(items);
     }
 
