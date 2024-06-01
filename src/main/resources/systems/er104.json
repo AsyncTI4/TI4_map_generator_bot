@@ -1,0 +1,37 @@
+{
+    "id": "er104",
+    "name": "Thenphase",
+    "aliases": [
+        "er104",
+        "thenphase"
+    ],
+    "imagePath": "er_104_async.png",
+    "planets": [
+        "thenphase"
+    ],
+    "shipPositionsType": "TYPE04",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}

@@ -1,0 +1,42 @@
+{
+    "id": "er54",
+    "name": "Tethn'Sekun",
+    "aliases": [
+        "er54",
+        "tethn",
+        "sekus",
+        "tirs",
+        "tethnsekus",
+        "tethntirs"
+    ],
+    "imagePath": "er_54_async.png",
+    "planets": [
+        "tethnsekus",
+        "tethntirs"
+    ],
+    "shipPositionsType": "TYPE05",
+    "spaceTokenLocations": [
+        {
+            "x": 180.0,
+            "y": 0.0
+        },
+        {
+            "x": 220.0,
+            "y": 60.0
+        },
+        {
+            "x": 45.0,
+            "y": 120.0
+        },
+        {
+            "x": 95.0,
+            "y": 170.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}

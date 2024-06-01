@@ -1,0 +1,37 @@
+{
+    "id": "er111",
+    "name": "Stygain",
+    "aliases": [
+        "er111",
+        "stygain"
+    ],
+    "imagePath": "er_111_async.png",
+    "planets": [
+        "stygain"
+    ],
+    "shipPositionsType": "TYPE01",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}
