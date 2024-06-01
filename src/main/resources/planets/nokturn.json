@@ -1,0 +1,116 @@
+{
+    "id": "nokturn",
+    "tileId": "er100",
+    "name": "Nokturn",
+    "shortName": null,
+    "aliases": [
+        "nok",
+        "nokturn"
+    ],
+    "positionInTile": {
+        "x": 210.0,
+        "y": 85.0
+    },
+    "resources": 0,
+    "influence": 2,
+    "factionHomeworld": null,
+    "planetType": "HAZARDOUS",
+    "cardImagePath": null,
+    "techSpecialties": [
+        "WARFARE"
+    ],
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "legendaryAbilityFlavourText": null,
+    "flavourText": "Just as barren and hellish as the other planets in the Vili system. The only location of note are the Nokturn facilities located near the southern hemisphere.",
+    "unitPositions": {
+        "unitHolderName": "nokturn",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 171.0,
+                    "y": 70.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 140.0,
+                    "y": 105.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 177.0,
+                    "y": 97.0
+                },
+                {
+                    "x": 192.0,
+                    "y": 97.0
+                },
+                {
+                    "x": 210.0,
+                    "y": 97.0
+                },
+                {
+                    "x": 188.0,
+                    "y": 110.0
+                },
+                {
+                    "x": 205.0,
+                    "y": 110.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 178.0,
+                    "y": 27.0
+                },
+                {
+                    "x": 196.0,
+                    "y": 27.0
+                },
+                {
+                    "x": 173.0,
+                    "y": 40.0
+                },
+                {
+                    "x": 190.0,
+                    "y": 40.0
+                },
+                {
+                    "x": 210.0,
+                    "y": 40.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 191.0,
+                    "y": 68.0
+                },
+                {
+                    "x": 160.0,
+                    "y": 68.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 111.0,
+                    "y": 74.0
+                },
+                {
+                    "x": 233.0,
+                    "y": 30.0
+                },
+                {
+                    "x": 240.0,
+                    "y": 60.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "spaceCannonDieCount": 0,
+    "spaceCannonHitsOn": 0,
+    "searchTags": [],
+    "source": "eronous"
+}
