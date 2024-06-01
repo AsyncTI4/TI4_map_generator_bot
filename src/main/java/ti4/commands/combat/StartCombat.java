@@ -995,6 +995,12 @@ public class StartCombat extends CombatSubcommandData {
             }
             if ("space".equalsIgnoreCase(nameOfHolder) && isSpaceCombat) {
                 buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
+                if (p1.isDummy()) {
+                    buttons.add(Button.secondary(p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat For Dummy").withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
+                }
+                if (p2.isDummy()) {
+                    buttons.add(Button.secondary(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat For Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+                }
             } else {
                 if (!isSpaceCombat && !"space".equalsIgnoreCase(nameOfHolder)) {
                     buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(),
@@ -1002,6 +1008,12 @@ public class StartCombat extends CombatSubcommandData {
                     Player nonActive = p1;
                     if (p1 == game.getActivePlayer()) {
                         nonActive = p2;
+                    }
+                    if (p1.isDummy()) {
+                        buttons.add(Button.secondary(p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
+                    }
+                    if (p2.isDummy()) {
+                        buttons.add(Button.secondary(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
                     if (new CombatRoll().checkIfUnitsOfType(nonActive, game, event, tile, unitH.getName(),
                         CombatRollType.SpaceCannonDefence)) {
