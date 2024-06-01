@@ -384,6 +384,10 @@ public class Player {
         return "FFCC_" + getFaction() + "_";
     }
 
+    public String dummyPlayerSpoof() {
+        return "dummyPlayerSpoof" + getFaction() + "_";
+    }
+
     @JsonIgnore
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2") || getTechs().contains("pds2") || getTechs().contains("dsgledpds")

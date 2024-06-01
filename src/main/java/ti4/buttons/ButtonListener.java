@@ -192,9 +192,14 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
         }
-
+        player.getFinsFactionCheckerPrefix();
         if (game != null && game.getMainGameChannel() != null) {
             mainGameChannel = game.getMainGameChannel();
+        }
+        if (buttonID.contains("dummyPlayerSpoof")) {
+            String identity = StringUtils.substringBefore(buttonID, "_").replace("dummyPlayerSpoof", "");
+            player = game.getPlayerFromColorOrFaction(identity);
+            buttonID = buttonID.replace("dummyPlayerSpoof" + identity + "_", "");
         }
 
         if (buttonID.startsWith("FFCC_")) {
@@ -659,7 +664,7 @@ public class ButtonListener extends ListenerAdapter {
                             + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                         if (game.isFoWMode() && player != player_) {
-                          MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
+                            MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
                         }
                         if (!game.isFoWMode()) {
                             ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
@@ -4852,6 +4857,18 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveAncientTradeRoutes" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveAncientTradeRoutes(player, game, event);
+                }
+                case "resolveSisterShip" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveSisterShip(player, game, event);
+                }
+                case "resolveRendezvousPoint" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveRendezvousPoint(player, game, event);
+                }
+                case "resolveFlawlessStrategy" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveFlawlessStrategy(player, game, event);
+                }
+                case "resolveChainReaction" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveChainReaction(player, game, event);
                 }
                 case "resolveArmsDeal" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveArmsDeal(player, game, event);
