@@ -138,15 +138,22 @@ public class ButtonHelperModifyUnits {
                 hitP1++;
             }
             if (p2.hasTech("vpw") && hitP1 > 0) {
-                hitP1++;
+                hitP2++;
             }
-
+            int p1SardakkMechHits = 0;
+            int p2SardakkMechHits = 0;
             if (p1.getPlanets().contains(planet)) {
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
+                p2SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+                p1SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
             } else {
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
-                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+                p1SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);
+                p2SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
+            }
+            if (p2SardakkMechHits > 0) {
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, p2SardakkMechHits, event);
+            }
+            if (p1SardakkMechHits > 0) {
+                ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, p1SardakkMechHits, event);
             }
 
             if (!doesPlayerHaveGfOnPlanet(unitHolder, p2) || !doesPlayerHaveGfOnPlanet(unitHolder, p1)) {
@@ -166,8 +173,9 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
-    public static void autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
+    public static int autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
         ButtonInteractionEvent event) {
+        int sardakkMechHits = 0;
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         String msg = player.getFactionEmoji() + " assigned hits in the following way:\n";
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -200,7 +208,7 @@ public class ButtonHelperModifyUnits {
             }
         }
         if (hits < 1 && (usedDuraniumAlready || (unitHolder.getUnitDamageCount(UnitType.Mech, player.getColor()) < 1 && unitHolder.getUnitDamageCount(UnitType.Pds, player.getColor()) < 1))) {
-            return;
+            return 0;
         }
         if (numSustains > 0) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -228,6 +236,10 @@ public class ButtonHelperModifyUnits {
                     tile.addUnitDamage(planet, unitKey, min);
                     for (int x = 0; x < min; x++) {
                         ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
+                    }
+                    if (player.hasUnit("sardakk_mech")) {
+                        msg = msg + "> Sardakk mech generated " + min + " hits \n";
+                        sardakkMechHits = min;
                     }
                 }
             }
@@ -399,7 +411,10 @@ public class ButtonHelperModifyUnits {
             buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
         }
-        event.getMessage().delete().queue();
+        if (event.getMessage() != null) {
+            event.getMessage().delete().queue();
+        }
+        return sardakkMechHits;
     }
 
     public static boolean doesPlayerHaveGfOnPlanet(UnitHolder unitHolder, Player player) {
