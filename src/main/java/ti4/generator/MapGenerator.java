@@ -598,7 +598,7 @@ public class MapGenerator {
                 // PAINT AVATAR AND USERNAME
                 StringBuilder userName = new StringBuilder();
                 String playerName = player.getUserName();
-                Boolean fowHidePlayerNames = Boolean.valueOf(game.getFowOption(FOWOptions.HIDE_NAMES));
+                boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES));
                 if (!fowHidePlayerNames) {
                     graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
                     userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
@@ -2789,7 +2789,7 @@ public class MapGenerator {
 
             // PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
-            if (!Boolean.valueOf(game.getFowOption(FOWOptions.HIDE_NAMES))) {
+            if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
                 graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
                     point.y + deltaY);
             }
