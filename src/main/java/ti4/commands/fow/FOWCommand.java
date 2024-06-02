@@ -94,6 +94,7 @@ public class FOWCommand implements Command {
         subcommands.add(new SetFogFilter());
         subcommands.add(new Whisper());
         subcommands.add(new Announce());
+        subcommands.add(new FOWOptions());
         return subcommands;
     }
 
