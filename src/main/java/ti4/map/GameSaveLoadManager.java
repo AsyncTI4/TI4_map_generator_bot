@@ -1800,7 +1800,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case "fow_hide_names" -> { //REMOVE THIS AFTER ONE SAVE/LOAD GAMES
+                case "fow_hide_names" -> { //TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         if (value)
