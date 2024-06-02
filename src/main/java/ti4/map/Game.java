@@ -127,8 +127,7 @@ public class Game {
     private boolean homeBrew;
     @ExportableField
     private boolean fowMode;
-    @ExportableField
-    private boolean fowOptionHideNames;
+    private final Map<String, String> fowOptions = new HashMap<>();
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
@@ -719,12 +718,16 @@ public class Game {
         this.fowMode = fowMode;
     }
 
-    public boolean isFowOptionHideNames() {
-        return fowOptionHideNames;
+    public Map<String, String> getFowOptions() {
+        return fowOptions;
     }
 
-    public void setFowOptionHideNames(boolean fowOptionHideNames) {
-        this.fowOptionHideNames = fowOptionHideNames;
+    public String getFowOption(String optionName) {
+        return fowOptions.get(optionName);
+    }
+
+    public void setFowOption(String optionName, String value) {
+        fowOptions.put(optionName, value);
     }
 
     public boolean isLightFogMode() {

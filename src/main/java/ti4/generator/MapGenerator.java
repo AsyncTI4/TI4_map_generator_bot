@@ -56,6 +56,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
+import ti4.commands.fow.FOWOptions;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -597,7 +598,8 @@ public class MapGenerator {
                 // PAINT AVATAR AND USERNAME
                 StringBuilder userName = new StringBuilder();
                 String playerName = player.getUserName();
-                if (!game.isFowOptionHideNames()) {
+                boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES));
+                if (!fowHidePlayerNames) {
                     graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
                     userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
                 }
@@ -622,7 +624,7 @@ public class MapGenerator {
                     userName.append(" -- AFK");
                 }
 
-                graphics.drawString(userName.toString(), !game.isFowOptionHideNames() ? x + 34 : x, y);
+                graphics.drawString(userName.toString(), !fowHidePlayerNames ? x + 34 : x, y);
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
@@ -2787,7 +2789,7 @@ public class MapGenerator {
 
             // PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
-            if (!game.isFowOptionHideNames()) {
+            if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
                 graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
                     point.y + deltaY);
             }
