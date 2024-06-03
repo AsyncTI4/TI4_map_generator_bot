@@ -302,6 +302,8 @@ public class ButtonListener extends ListenerAdapter {
                 game.getTileByPosition(buttonID.split("_")[1]), event);
         } else if (buttonID.startsWith("raghsCallStepOne_")) {
             ButtonHelperFactionSpecific.resolveRaghsCallStepOne(player, game, event, buttonID);
+        } else if (buttonID.startsWith("tnelisDeploy_")) {
+            ButtonHelperFactionSpecific.tnelisDeploy(player, game, event, buttonID);
         } else if (buttonID.startsWith("gheminaMechStart_")) {
             ButtonHelperFactionSpecific.gheminaMechStart(player, game, buttonID, event);
         } else if (buttonID.startsWith("collateralizedLoans_")) {
@@ -1699,6 +1701,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.resolveInitialIndoctrinationQuestion(player, game, buttonID, event);
         } else if (buttonID.startsWith("utilizeSolCommander_")) {
             ButtonHelperCommanders.resolveSolCommander(player, game, buttonID, event);
+        } else if (buttonID.startsWith("resolveVadenMech_")) {
+            ButtonHelperFactionSpecific.resolveVadenMech(player, game, buttonID, event);
         } else if (buttonID.startsWith("mercerMove_")) {
             ButtonHelperAgents.resolveMercerMove(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("tiedPlanets_")) {
@@ -2459,6 +2463,10 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("resolveEBSStep1_")) {
             ButtonHelperActionCards.resolveEBSStep1(player, game, event, buttonID);
+        } else if (buttonID.startsWith("resolveBlitz_")) {//resolveShrapnelTurrents_
+            ButtonHelperActionCards.resolveBlitz(player, game, event, buttonID);
+        } else if (buttonID.startsWith("resolveShrapnelTurrents_")) {//resolveShrapnelTurrents_
+            ButtonHelperActionCardsWillHomebrew.resolveShrapnelTurrents(player, game, event, buttonID);
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player, buttonLabel);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
@@ -4859,6 +4867,12 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveSisterShip" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveSisterShip(player, game, event);
+                }
+                case "resolveBoardingTorpedoes" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveBoardingTorpedoes(player, game, event);
+                }
+                case "resolveMercenaryContract" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveMercenaryContract(player, game, event);
                 }
                 case "resolveRendezvousPoint" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveRendezvousPoint(player, game, event);

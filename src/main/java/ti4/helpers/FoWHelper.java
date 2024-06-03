@@ -675,7 +675,7 @@ public class FoWHelper {
 	}
 
 	public static boolean otherPlayersHaveShipsInSystem(Player player, Tile tile, Game game) {
-		for (Player p2 : game.getRealPlayers()) {
+		for (Player p2 : game.getRealPlayersNDummies()) {
 			if (p2 == player) {
 				continue;
 			}
@@ -687,7 +687,7 @@ public class FoWHelper {
 	}
 
 	public static boolean otherPlayersHaveUnitsInSystem(Player player, Tile tile, Game game) {
-		for (Player p2 : game.getRealPlayers()) {
+		for (Player p2 : game.getRealPlayersNDummies()) {
 			if (p2 == player) {
 				continue;
 			}
@@ -769,15 +769,15 @@ public class FoWHelper {
 		List<Player> players = getAdjacentPlayers(game, position, true);
 		int successfulCount = 0;
 		for (Player player_ : players) {
-      boolean success = true;
-      if (player_.isRealPlayer()) {
-        String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> "
-          + message;
-        success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
-        MessageChannel channel = player_.getPrivateChannel();
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
-          StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
-      }
+			boolean success = true;
+			if (player_.isRealPlayer()) {
+				String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> "
+					+ message;
+				success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
+				MessageChannel channel = player_.getPrivateChannel();
+				MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
+					StartCombat.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+			}
 			successfulCount += success ? 1 : 0;
 		}
 		feedbackMessage(event, successfulCount, players.size());

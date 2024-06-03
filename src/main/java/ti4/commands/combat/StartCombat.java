@@ -104,7 +104,7 @@ public class StartCombat extends CombatSubcommandData {
     public static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile) {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
-            .append(tile.getPosition()).append("-");
+            .append(tile.getPosition()).append("-turn-").append(player1.getTurnCount()).append("-");
         if (game.isFoWMode()) {
             sb.append(player1.getColor());
             if (player2 != null)
@@ -120,6 +120,97 @@ public class StartCombat extends CombatSubcommandData {
     public static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2,
         Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, String unitHolderName) {
         findOrCreateCombatThread(game, channel, player1, player2, null, tile, event, spaceOrGround, unitHolderName);
+    }
+
+    public static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event) {
+        startSpaceCombat(game, player, player2, tile, event, null);
+    }
+
+    private static String combatThreadName(Game game, Player player1, @Nullable Player player2, Tile tile, String specialCombatTitle) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(game.getName()).append("-round-").append(game.getRound()).append("-system-")
+            .append(tile.getPosition()).append("-turn-").append(player1.getTurnCount()).append("-");
+        if (game.isFoWMode()) {
+            sb.append(player1.getColor());
+            if (player2 != null) {
+                sb.append("-vs-").append(player2.getColor());
+            }
+            sb.append(specialCombatTitle != null ? specialCombatTitle : "");
+            sb.append("-private");
+        } else {
+            sb.append(player1.getFaction());
+            if (player2 != null) {
+                sb.append("-vs-").append(player2.getFaction());
+            }
+            sb.append(specialCombatTitle != null ? specialCombatTitle : "");
+        }
+        return sb.toString();
+    }
+
+    public static void startSpaceCombat(Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event,
+        String specialCombatTitle) {
+        String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
+        if (!game.isFoWMode()) {
+            findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
+                threadName, tile, event, "space", "space");
+        } else {
+            findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
+                threadName, tile, event, "space", "space");
+            if (player2.getPrivateChannel() != null) {
+                findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
+                    threadName, tile, event, "space", "space");
+            }
+            for (Player player3 : game.getRealPlayers()) {
+                if (player3 == player2 || player3 == player) {
+                    continue;
+                }
+                if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
+                    continue;
+                }
+                findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
+                    threadName, tile, event, "space", "space");
+            }
+        }
+    }
+
+    public static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
+        String threadName = StartCombat.combatThreadName(game, player, player2, tile);
+        if (!game.isFoWMode()) {
+            StartCombat.findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
+                threadName, tile, event, "ground", unitHolder.getName());
+            if ((unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) < 1
+                || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
+                && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) < 1
+                && unitHolder.getUnitCount(UnitType.Infantry, player2.getColor()) < 1
+                && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
+                    || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
+                String msg2 = player2.getRepresentation()
+                    + " you may want to remove structures on " + unitHolder.getName() + " if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(
+                    Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
+                        "Remove Structures"));
+                buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+            }
+        } else {
+            StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
+                threadName, tile, event, "ground", unitHolder.getName());
+            if (player2.isRealPlayer()) {
+                StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
+                    threadName, tile, event, "ground", unitHolder.getName());
+            }
+            for (Player player3 : game.getRealPlayers()) {
+                if (player3 == player2 || player3 == player) {
+                    continue;
+                }
+                if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
+                    continue;
+                }
+                StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
+                    threadName, tile, event, "ground", unitHolder.getName());
+            }
+        }
     }
 
     public static void findOrCreateCombatThread(Game game, MessageChannel channel, Player player1, Player player2,
@@ -929,6 +1020,22 @@ public class StartCombat extends CombatSubcommandData {
                         .secondary(finChecker + "utilizeSolCommander_" + unitH.getName(),
                             "Sol Commander on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
+                }
+                if (p1.hasUnit("vaden_mech")
+                    && unitH.getUnitCount(UnitType.Mech, p1) > 0 && isGroundCombat && p1.getDebtTokenCount(p2.getColor()) > 0) {
+                    String finChecker = "FFCC_" + p1.getFaction() + "_";
+                    buttons.add(Button
+                        .secondary(finChecker + "resolveVadenMech_" + unitH.getName() + "_" + p2.getColor(),
+                            "Vaden Mech Ability on " + nameOfHolder)
+                        .withEmoji(Emoji.fromFormatted(Emojis.vaden)));
+                }
+                if (p2.hasUnit("vaden_mech")
+                    && unitH.getUnitCount(UnitType.Mech, p2) > 0 && isGroundCombat && p2.getDebtTokenCount(p1.getColor()) > 0) {
+                    String finChecker = "FFCC_" + p1.getFaction() + "_";
+                    buttons.add(Button
+                        .secondary(finChecker + "resolveVadenMech_" + unitH.getName() + "_" + p1.getColor(),
+                            "Vaden Mech Ability on " + nameOfHolder)
+                        .withEmoji(Emoji.fromFormatted(Emojis.vaden)));
                 }
                 if (p2 != game.getActivePlayer()
                     && game.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !game.isFoWMode()

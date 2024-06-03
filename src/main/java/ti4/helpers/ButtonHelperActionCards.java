@@ -751,7 +751,20 @@ public class ButtonHelperActionCards {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
         }
+        game.setStoredValue("EBSFaction", "");
 
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveBlitz(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue("BlitzFaction", player.getFaction());
+        if (buttonID.contains("_")) {
+            ButtonHelper.resolveCombatRoll(player, game, event,
+                "combatRoll_" + buttonID.split("_")[1] + "_space_bombardment");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+        }
+        game.setStoredValue("BlitzFaction", "");
         event.getMessage().delete().queue();
     }
 

@@ -420,13 +420,9 @@ public class ButtonHelperTacticalAction {
             }
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
             ButtonHelperFactionSpecific.checkForStymie(game, player, tile);
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (!"space".equalsIgnoreCase(unitHolder.getName())) {
-                    continue;
-                }
-                if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                    break;
-                }
+
+            if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+
                 List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
                 Player player2 = player;
                 for (Player p2 : players) {
@@ -437,33 +433,13 @@ public class ButtonHelperTacticalAction {
                 }
                 if (player != player2) {
 
-                    String threadName = StartCombat.combatThreadName(game, player, player2, tile);
-                    if (!game.isFoWMode()) {
-                        StartCombat.findOrCreateCombatThread(game, game.getActionsChannel(), player,
-                            player2, threadName, tile, event, "space", "space");
-                    } else {
-                        StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
-                            threadName, tile, event, "space", "space");
-                        if (player2.isRealPlayer()) {
-                            StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                                threadName, tile, event, "space", "space");
-                        }
-                        for (Player player3 : game.getRealPlayers()) {
-                            if (player3 == player2 || player3 == player) {
-                                continue;
-                            }
-                            if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
-                                continue;
-                            }
-                            StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3,
-                                player3, threadName, tile, event, "space", "space");
-                        }
-                    }
+                    StartCombat.startSpaceCombat(game, player, player2, tile, event);
                 } else {
                     needPDSCheck = true;
                 }
             }
         }
+
         if (systemButtons.size() == 2 || game.getL1Hero()) {
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         }
@@ -589,6 +565,7 @@ public class ButtonHelperTacticalAction {
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
         game.setActiveSystem(pos);
+        game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true) + " activated "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player));

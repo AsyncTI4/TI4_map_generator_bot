@@ -7,6 +7,8 @@ import java.util.Objects;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.CombatRollType;
+import ti4.map.Game;
+import ti4.map.Player;
 
 @Data
 public class CombatModifierModel implements ModelInterface {
@@ -27,9 +29,9 @@ public class CombatModifierModel implements ModelInterface {
 
     public boolean isValid() {
         return type != null
-                && value != null
-                && persistenceType != null
-                && related != null;
+            && value != null
+            && persistenceType != null
+            && related != null;
     }
 
     public boolean isRelevantTo(String relatedType, String relatedAlias) {
@@ -37,7 +39,7 @@ public class CombatModifierModel implements ModelInterface {
             && related.getType().equals(relatedType));
     }
 
-    public Boolean isInScopeForUnit(UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType) {
+    public Boolean isInScopeForUnit(UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType, Game game, Player player) {
         boolean isInScope = false;
         if (scopeExcept != null) {
             if (!scopeExcept.equals(unit.getAsyncId())) {
@@ -45,14 +47,14 @@ public class CombatModifierModel implements ModelInterface {
             }
         } else {
             if (StringUtils.isBlank(scope)
-                    || "all".equals(scope)
-                    || scope.equals(unit.getAsyncId())) {
+                || "all".equals(scope)
+                || scope.equals(unit.getAsyncId())) {
                 isInScope = true;
             }
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
                 sortedAllUnits.sort(
-                    Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType)));
+                    Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
                 isInScope = Objects.equals(sortedAllUnits.get(0).getAsyncId(), unit.getAsyncId());
             }
             if ("_ship_".equals(scope)) {

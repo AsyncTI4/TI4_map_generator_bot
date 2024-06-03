@@ -438,6 +438,10 @@ public class CombatHelper {
                 numOfUnit = 1;
                 game.setStoredValue("EBSFaction", "");
             }
+            if (rollType == CombatRollType.bombardment && numRollsPerUnit > 1 && unit.getBaseType().equalsIgnoreCase("destroyer")) {
+                numOfUnit = 1;
+                game.setStoredValue("TnelisAgentFaction", "");
+            }
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
@@ -447,6 +451,18 @@ public class CombatHelper {
                 for (Die die : resultRolls) {
                     if (die.getResult() > 8) {
                         hitRolls = hitRolls + 2;
+                    }
+                }
+            }
+            if (unit.getId().equalsIgnoreCase("vaden_flagship") && CombatRollType.bombardment == rollType) {
+                for (Die die : resultRolls) {
+                    if (die.getResult() > 4) {
+                        player.setTg(player.getTg() + 1);
+                        ButtonHelperAbilities.pillageCheck(player, game);
+                        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1tg due to hitting on a bombardment roll with their flagship");
+                        break;
+
                     }
                 }
             }
