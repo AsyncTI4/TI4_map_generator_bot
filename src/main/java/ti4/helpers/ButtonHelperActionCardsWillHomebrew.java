@@ -75,6 +75,27 @@ public class ButtonHelperActionCardsWillHomebrew {
             player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put a pds on it");
     }
 
+    public static void resolveBoardingTorpedoes(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        String type = "sling";
+        String pos = game.getActiveSystem();
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), type,
+            "placeOneNDone_skipbuild");
+        String message = player.getRepresentation() + " Use the buttons to place the 1 ship you killed under 5 cost. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+    }
+
+    public static void resolveMercenaryContract(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        String type = "sling";
+        String pos = game.getActiveSystem();
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), type,
+            "placeOneNDone_dontskip");
+        String message = player.getRepresentation() + " Use the buttons to place the 1 ship, you may spend influences as resources";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+    }
+
     public static void resolveSisterShip(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
@@ -394,6 +415,18 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation");
+    }
+
+    public static void resolveShrapnelTurrents(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue("ShrapnelTurrentsFaction", player.getFaction());
+        if (buttonID.contains("_")) {
+            ButtonHelper.resolveCombatRoll(player, game, event,
+                "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+        }
+        game.setStoredValue("ShrapnelTurrentsFaction", "");
+        event.getMessage().delete().queue();
     }
 
     public static void resolveBrutalOccupationStep2(Player player, Game game, ButtonInteractionEvent event,

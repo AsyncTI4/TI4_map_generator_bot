@@ -144,7 +144,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return switch (rollType) {
             case combatround -> getCombatDieCount();
             case AFB -> getAfbDieCount(player, game);
-            case bombardment -> getBombardDieCount();
+            case bombardment -> getBombardDieCount(player, game);
             case SpaceCannonOffence -> getSpaceCannonDieCount(player, game);
             case SpaceCannonDefence -> getSpaceCannonDieCount();
         };
@@ -152,6 +152,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getAfbDieCount(Player player, Game game) {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
+                return 2;
+            }
             return getAfbDieCount();
         } else {
             if (getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
@@ -176,6 +179,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getAfbHitsOn(Player player, Game game) {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
+                return 9;
+            }
             return getAfbHitsOn();
         } else {
             if (getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
@@ -198,6 +204,37 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
     }
 
+    public int getBombardDieCount(Player player, Game game) {
+        if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
+
+            if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
+                return getAfbDieCount();
+            }
+            return getBombardDieCount();
+        } else {
+            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+                return 1;
+            } else {
+                return getBombardDieCount();
+            }
+        }
+    }
+
+    public int getBombardHitsOn(Player player, Game game) {
+        if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
+            if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
+                return getAfbHitsOn();
+            }
+            return getBombardHitsOn();
+        } else {
+            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+                return 6;
+            } else {
+                return getBombardHitsOn();
+            }
+        }
+    }
+
     public int getCombatDieHitsOnForAbility(CombatRollType rollType) {
         return switch (rollType) {
             case combatround -> getCombatHitsOn();
@@ -211,7 +248,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return switch (rollType) {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player, game);
-            case bombardment -> getBombardHitsOn();
+            case bombardment -> getBombardHitsOn(player, game);
             case SpaceCannonOffence -> getSpaceCannonHitsOn(player, game);
             case SpaceCannonDefence -> getSpaceCannonHitsOn();
         };

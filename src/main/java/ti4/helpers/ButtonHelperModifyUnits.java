@@ -913,43 +913,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player != player2 && players.contains(player)) {
-                String threadName = StartCombat.combatThreadName(game, player, player2, tile);
-                if (!game.isFoWMode()) {
-                    StartCombat.findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
-                        threadName, tile, event, "ground", unitHolder.getName());
-                    if ((unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) < 1
-                        || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
-                        && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) < 1
-                        && unitHolder.getUnitCount(UnitType.Infantry, player2.getColor()) < 1
-                        && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
-                            || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
-                        String msg2 = player2.getRepresentation()
-                            + " you may want to remove structures on " + unitHolder.getName() + " if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
-                        List<Button> buttons = new ArrayList<>();
-                        buttons.add(
-                            Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
-                                "Remove Structures"));
-                        buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
-                    }
-                } else {
-                    StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
-                        threadName, tile, event, "ground", unitHolder.getName());
-                    if (player2.isRealPlayer()) {
-                        StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                            threadName, tile, event, "ground", unitHolder.getName());
-                    }
-                    for (Player player3 : game.getRealPlayers()) {
-                        if (player3 == player2 || player3 == player) {
-                            continue;
-                        }
-                        if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
-                            continue;
-                        }
-                        StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
-                            threadName, tile, event, "ground", unitHolder.getName());
-                    }
-                }
+                StartCombat.startGroundCombat(player, player2, game, event, unitHolder, tile);
                 if (player2.ownsUnit("keleres_mech")
                     && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) > 0) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");

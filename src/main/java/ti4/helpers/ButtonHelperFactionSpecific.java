@@ -19,12 +19,14 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.TurnStart;
+import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -43,6 +45,53 @@ import ti4.model.ExploreModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
+
+    public static void resolveVadenTgForSpeed(Player player, Game game, GenericInteractionCreateEvent event) {
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation() + " is paying tgs to boost their non-fighter ships.");
+        List<Button> buttons = new ArrayList<>();
+        String whatIsItFor = "both";
+        if (player.getTg() > 0) {
+            Button lost1TG = Button.danger("reduceTG_1_" + whatIsItFor, "Spend 1 TG");
+            buttons.add(lost1TG);
+        }
+        if (player.getTg() > 1) {
+            Button lost2TG = Button.danger("reduceTG_2_" + whatIsItFor, "Spend 2 TGs");
+            buttons.add(lost2TG);
+        }
+        if (player.getTg() > 2) {
+            Button lost3TG = Button.danger("reduceTG_3_" + whatIsItFor, "Spend 3 TGs");
+            buttons.add(lost3TG);
+        }
+        if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
+            Button lost1C = Button.danger("reduceComm_1_" + whatIsItFor, "Spend 1 comm");
+            buttons.add(lost1C);
+        }
+
+        if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
+            Button lost2C = Button.danger("reduceComm_2_" + whatIsItFor, "Spend 2 comms");
+            buttons.add(lost2C);
+        }
+
+        buttons.add(Button.secondary("resetSpend_" + whatIsItFor, "Reset Spent Planets and Tgs"));
+        Button doneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(doneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            "Click how many tg you want to spend", buttons);
+        TechExhaust.deleteTheOneButtonIfButtonEvent(event);
+    }
+
+    public static void resolveVadenMech(Player player, Game game, String buttonID,
+        ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        String opposingFaction = buttonID.split("_")[2];
+        Tile tile = game.getTileFromPlanet(planet);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, game);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " placed 1 infantry at the end of a round of ground combat on "
+                + Helper.getPlanetRepresentation(planet, game) + " using Vaden Mech ability. This consumed 1 debt counter of the opposing factions color");
+        player.removeDebtTokens(game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1);
+    }
 
     public static void collateralizedLoans(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
@@ -613,6 +662,21 @@ public class ButtonHelperFactionSpecific {
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
+        }
+    }
+
+    public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event,
+        String buttonID) {
+        ButtonHelper.deleteTheOneButton(event);
+        String planet = buttonID.split("_")[1];
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
+            "1 mech " + planet, game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            ButtonHelper.getIdent(player) + " landed a mech on "
+                + Helper.getPlanetRepresentation(planet, game) + " using Tnelis mech deploy ability");
+        List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, game.getTileFromPlanet(planet), planet);
+        if (players.size() > 1) {
+            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, ButtonHelper.getUnitHolderFromPlanetName(planet, game), game.getTileFromPlanet(planet));
         }
     }
 

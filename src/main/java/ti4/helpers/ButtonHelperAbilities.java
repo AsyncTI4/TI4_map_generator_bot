@@ -1423,7 +1423,6 @@ public class ButtonHelperAbilities {
         Player player) {
         String planet = buttonID.split("_")[1];
         String amount = "1";
-        TextChannel mainGameChannel = game.getMainGameChannel();
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
 
         new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
@@ -1431,54 +1430,9 @@ public class ButtonHelperAbilities {
             player.getRepresentation() + " used contagion ability to land " + amount
                 + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
-        for (Player player2 : game.getRealPlayers()) {
-            if (player2 == player) {
-                continue;
-            }
-            String colorID = Mapper.getColorID(player2.getColor());
-            int numMechs = 0;
-            int numInf = 0;
-            if (unitHolder.getUnits() != null) {
-                numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-                numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
-            }
-
-            if (numInf > 0 || numMechs > 0) {
-                String messageCombat = "Resolve ground combat.";
-                if (!game.isFoWMode()) {
-                    MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
-                    String threadName = game.getName() + "-contagion-" + game.getRound() + "-planet-"
-                        + planet
-                        + "-" + player.getFaction() + "-vs-" + player2.getFaction();
-                    mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-                        ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName,
-                            message_.getId());
-                        threadChannel = threadChannel
-                            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-                        threadChannel.queue(m5 -> {
-                            List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-                            for (ThreadChannel threadChannel_ : threadChannels) {
-                                if (threadChannel_.getName().equals(threadName)) {
-                                    MessageHelper.sendMessageToChannel(threadChannel_,
-                                        player.getRepresentation(true, true)
-                                            + player2.getRepresentation(true, true)
-                                            + " Please resolve the interaction here.");
-                                    int context = 0;
-                                    FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game,
-                                        context, tile.getPosition(), event);
-                                    MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext,
-                                        "Picture of system", false);
-                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(game,
-                                        tile.getPosition(), player, player2, "ground", event);
-                                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
-                                }
-                            }
-                        });
-                    });
-                }
-                break;
-            }
-
+        List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
+        if (players.size() > 1) {
+            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
         event.getMessage().delete().queue();

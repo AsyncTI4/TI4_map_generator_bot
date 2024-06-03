@@ -381,6 +381,22 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "minus1_roll_tnelis_flagship",
+        "type": "extrarolls",
+        "value": "-1",
+        "scope": "_best_",
+        "persistenceType": "CONDITIONAL",
+        "condition": "tnelisopponentfs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Tnelis Flagship causes -1 to best ships rolls"
+            }
+        ]
+    },
+    {
         "alias": "plus1_roll_cheiran_fs_afb",
         "type": "extrarolls",
         "value": "+1",

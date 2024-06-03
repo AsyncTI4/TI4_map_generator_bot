@@ -1297,6 +1297,9 @@ public class Game {
     }
 
     public String getActiveSystem() {
+        if (activeSystem == null || activeSystem.isEmpty()) {
+            return getStoredValue("lastActiveSystem");
+        }
         return activeSystem;
     }
 
