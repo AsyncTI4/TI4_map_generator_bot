@@ -27,9 +27,9 @@ import ti4.model.UnitModel;
 public class CombatModHelper {
 
     public static Boolean IsModInScopeForUnits(List<UnitModel> units, CombatModifierModel modifier,
-        CombatRollType rollType) {
+        CombatRollType rollType, Game game, Player player) {
         for (UnitModel unit : units) {
-            if (modifier.isInScopeForUnit(unit, units, rollType)) {
+            if (modifier.isInScopeForUnit(unit, units, rollType, game, player)) {
                 return true;
             }
         }
@@ -49,7 +49,7 @@ public class CombatModHelper {
             .filter(entry -> entry.getValue().getType().equals(modifierType))
             .filter(entry -> !entry.getValue().getApplyToOpponent())
             .filter(entry -> IsModInScopeForUnits(new ArrayList<>(unitsByQuantity.keySet()), entry.getValue(),
-                rollType))
+                rollType, game, player))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (String ability : player.getAbilities()) {
@@ -179,7 +179,7 @@ public class CombatModHelper {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
-            if (modifier.isInScopeForUnit(unit, playerUnits, rollType)) {
+            if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
                 Integer modValue = GetVariableModValue(modifier, player, opponent, game, opponentUnits, unit, tile);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
@@ -273,6 +273,11 @@ public class CombatModHelper {
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
                     && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
+                    meetsCondition = true;
+                }
+            }
+            case "tnelisopponentfs" -> {
+                if (ButtonHelper.doesPlayerHaveFSHere("tnelis_flagship", opponent, tile) && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && FoWHelper.playerHasShipsInSystem(player, tile)) {
                     meetsCondition = true;
                 }
             }

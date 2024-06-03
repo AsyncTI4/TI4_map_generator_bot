@@ -15,6 +15,7 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
@@ -180,6 +181,9 @@ public class TechExhaust extends TechAddRemove {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
             }
+            case "dsvadeb" -> {
+                ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, game, event);
+            }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
                 //List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "getACFrom", null); old way
@@ -340,7 +344,7 @@ public class TechExhaust extends TechAddRemove {
         }
     }
 
-    private static void deleteTheOneButtonIfButtonEvent(GenericInteractionCreateEvent event) {
+    public static void deleteTheOneButtonIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
             ButtonHelper.deleteTheOneButton((ButtonInteractionEvent) event);
         }

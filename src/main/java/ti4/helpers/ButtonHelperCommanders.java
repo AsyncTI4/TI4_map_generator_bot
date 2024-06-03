@@ -335,6 +335,7 @@ public class ButtonHelperCommanders {
     public static void resolveSolCommander(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
+        ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),

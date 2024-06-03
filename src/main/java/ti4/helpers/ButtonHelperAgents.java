@@ -968,6 +968,14 @@ public class ButtonHelperAgents {
                 ButtonHelper.getIdent(player) + " landed an extra infantry on "
                     + Helper.getPlanetRepresentation(planet, game) + " using " + ssruu + "Jgin Faru (Dih-Mohn Agent) [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent]");
         }
+        if ("tnelisagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + " Tnelis Agent";
+            MessageHelper.sendMessageToChannel(channel2, exhaustText);
+            game.setStoredValue("tnelisAgentFaction", player.getFaction());
+            ButtonHelper.resolveCombatRoll(player, game, event,
+                "combatRoll_" + game.getActiveSystem() + "_space_bombardment");
+            game.setStoredValue("tnelisAgentFaction", "");
+        }
         if ("vadenagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Yudri Sukhov (Vaden Agent)";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);

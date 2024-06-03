@@ -4703,6 +4703,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("dsgledb") && !player.getExhaustedTechs().contains("dsgledb")) {
             buttons.add(Button.success(finChecker + "exhaustTech_dsgledb", "Exhaust Lightning Drives").withEmoji(Emoji.fromFormatted(Emojis.gledge)));
         }
+        if (player.getTechs().contains("dsvadeb") && !player.getExhaustedTechs().contains("dsvadeb")) {
+            buttons.add(Button.success(finChecker + "exhaustTech_dsvadeb", "Exhaust Midas Turbine").withEmoji(Emoji.fromFormatted(Emojis.vaden)));
+        }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "vayleriancommander")) {
             Button ghostButton = Button.secondary("declareUse_Vaylerian Commander", "Use Vaylerian Commander")
@@ -4827,7 +4830,7 @@ public class ButtonHelper {
                         buttons.add(validTile2);
                     }
                 }
-                if (planet.getUnitCount(inf, colorID) > 0 || planet.getUnitCount(mech, colorID) > 0) {
+                if (planet.getUnitCount(inf, player) > 0 || planet.getUnitCount(mech, player) > 0) {
                     if (player.hasUnexhaustedLeader("dihmohnagent")) {
                         Button dihmohn = Button
                             .success("exhaustAgent_dihmohnagent_" + unitHolder.getName(),
@@ -4836,6 +4839,14 @@ public class ButtonHelper {
                             .withEmoji(Emoji.fromFormatted(Emojis.dihmohn));
                         buttons.add(dihmohn);
                     }
+                }
+                if (player.hasUnit("tnelis_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4 && tile.getUnitHolders().get("space").getUnitCount(UnitType.Destroyer, player) > 0) {
+                    Button tnelis = Button
+                        .success("tnelisDeploy_" + unitHolder.getName(),
+                            "Deploy Mech On "
+                                + Helper.getPlanetRepresentation(unitHolder.getName(), game))
+                        .withEmoji(Emoji.fromFormatted(Emojis.tnelis));
+                    buttons.add(tnelis);
                 }
                 if (planet.getUnitCount(inf, colorID) > 0) {
                     limit = planet.getUnitCount(inf, colorID);
@@ -9537,6 +9548,13 @@ public class ButtonHelper {
         }
         if ("cavalry".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveCavStep1(game, player);
+        }
+        if ("dspntnel".equalsIgnoreCase(id)) {
+            game.drawSecretObjective(player.getUserID());
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), player.getRepresentation() + " drew an extra SO due to Tnelis PN. Please discard an extra SO");
+        }
+        if ("dspnvade".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, game, event);
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(
