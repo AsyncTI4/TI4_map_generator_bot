@@ -232,7 +232,7 @@ public class CombatRoll extends CombatSubcommandData {
             round2 = Integer.parseInt(game.getStoredValue(combatName2));
         }
 
-        if (round2 > round) {
+        if (round2 > round && rollType == CombatRollType.combatround) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## __Start of Combat Round #" + round2 + "__");
         }
 

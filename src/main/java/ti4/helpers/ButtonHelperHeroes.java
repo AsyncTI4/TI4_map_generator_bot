@@ -1551,7 +1551,6 @@ public class ButtonHelperHeroes {
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
-        TextChannel mainGameChannel = game.getMainGameChannel();
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
 
         new AddUnits().unitParsing(event, player.getColor(),
@@ -1560,54 +1559,11 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " Chose to land " + amount
             + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
-        for (Player player2 : game.getRealPlayers()) {
-            if (player2 == player) {
-                continue;
-            }
-            String colorID = Mapper.getColorID(player2.getColor());
-            int numMechs = 0;
-            int numInf = 0;
-            if (unitHolder.getUnits() != null) {
-                numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-                numInf = unitHolder.getUnitCount(UnitType.Infantry, colorID);
-            }
-
-            if (numInf > 0 || numMechs > 0) {
-                String messageCombat = "Resolve ground combat.";
-
-                if (!game.isFoWMode()) {
-                    MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
-                    String threadName = game.getName() + "-yinHero-" + game.getRound() + "-planet-" + planet
-                        + "-" + player.getFaction() + "-vs-" + player2.getFaction();
-                    mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-                        ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName,
-                            message_.getId());
-                        threadChannel = threadChannel
-                            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-                        threadChannel.queue(m5 -> {
-                            List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-                            for (ThreadChannel threadChannel_ : threadChannels) {
-                                if (threadChannel_.getName().equals(threadName)) {
-                                    MessageHelper.sendMessageToChannel(threadChannel_,
-                                        player.getRepresentation(true, true)
-                                            + player2.getRepresentation(true, true)
-                                            + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
-                                    int context = 0;
-                                    FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game,
-                                        context, tile.getPosition(), event);
-                                    MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext,
-                                        "Picture of system", false);
-                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(game,
-                                        tile.getPosition(), player, player2, "ground", event);
-                                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
-                                }
-                            }
-                        });
-                    });
-                }
-                break;
-            }
-
+        List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
+        if (players.size() > 1) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                + " Reminder that Yin Hero skips pds fire.");
+            StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
         event.getMessage().delete().queue();
@@ -1802,33 +1758,7 @@ public class ButtonHelperHeroes {
         }
         if (player != player2) {
 
-            String threadName = StartCombat.combatThreadName(game, player, player2, tile2);
-            if (threadName.contains("private")) {
-                threadName = threadName.replace("private", "benediction-private");
-            } else {
-                threadName = threadName + "-benediction";
-            }
-            if (!game.isFoWMode()) {
-                StartCombat.findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
-                    threadName, tile2, event, "space", "space");
-            } else {
-                StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
-                    threadName, tile2, event, "space", "space");
-                if (player2.isRealPlayer()) {
-                    StartCombat.findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
-                        threadName, tile2, event, "space", "space");
-                }
-                for (Player player3 : game.getRealPlayers()) {
-                    if (player3 == player2 || player3 == player) {
-                        continue;
-                    }
-                    if (!tile2.getRepresentationForButtons(game, player3).contains("(")) {
-                        continue;
-                    }
-                    StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
-                        threadName, tile2, event, "space", "space");
-                }
-            }
+            StartCombat.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
         }
 
     }

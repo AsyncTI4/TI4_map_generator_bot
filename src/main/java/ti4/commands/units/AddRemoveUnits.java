@@ -281,21 +281,24 @@ abstract public class AddRemoveUnits implements Command {
                     }
                 }
                 if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox")) {
-                    StartCombat.findOrCreateCombatThread(game, event.getMessageChannel(), player1, player2, tile,
-                        event, combatType, planetName);
+                    if ("ground".equals(combatType)) {
+                        StartCombat.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
+                    } else {
+                        StartCombat.startSpaceCombat(game, player1, player2, tile, event);
+                    }
                 }
             }
         }
 
         if (game.isFoWMode()) {
             boolean pingedAlready = false;
-            int count = 0;
+            int countF = 0;
             String[] tileList = game.getListOfTilesPinged();
-            while (count < 10 && !pingedAlready) {
-                String tilePingedAlready = tileList[count];
+            while (countF < 10 && !pingedAlready) {
+                String tilePingedAlready = tileList[countF];
                 if (tilePingedAlready != null) {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
-                    count++;
+                    countF++;
                 } else {
                     break;
                 }
@@ -308,9 +311,9 @@ abstract public class AddRemoveUnits implements Command {
                 }
                 message = message + "Refresh map to see what changed ";
                 FoWHelper.pingSystem(game, event, tile.getPosition(), message);
-                if (count < 10) {
-                    game.setPingSystemCounter(count);
-                    game.setTileAsPinged(count, tile.getPosition());
+                if (countF < 10) {
+                    game.setPingSystemCounter(countF);
+                    game.setTileAsPinged(countF, tile.getPosition());
                 }
             }
         }
