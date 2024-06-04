@@ -572,7 +572,11 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + game.isFoWMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.FOW_OPTION_HIDE_NAMES + " " + game.isFowOptionHideNames());
+        StringBuilder fowOptions = new StringBuilder();
+        for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
+            fowOptions.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(Constants.FOW_OPTIONS + " " + fowOptions);
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + game.getNaaluAgent());
         writer.write(System.lineSeparator());
@@ -1703,6 +1707,15 @@ public class GameSaveLoadManager {
                         }
                     }
                 }
+                case Constants.FOW_OPTIONS -> {
+                  StringTokenizer fowOptions = new StringTokenizer(info, ";");
+                  while (fowOptions.hasMoreTokens()) {
+                      StringTokenizer dataInfo = new StringTokenizer(fowOptions.nextToken(), ",");
+                      String optionName = dataInfo.nextToken();
+                      String optionValue = dataInfo.nextToken();
+                      game.setFowOption(optionName, optionValue);
+                  }
+                }
                 case Constants.GAME_CUSTOM_NAME -> game.setCustomName(info);
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> game.setPlayersWhoHitPersistentNoAfter(info);
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> game.setPlayersWhoHitPersistentNoWhen(info);
@@ -1787,10 +1800,11 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case Constants.FOW_OPTION_HIDE_NAMES -> {
+                case "fow_hide_names" -> { //TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setFowOptionHideNames(value);
+                        if (value)
+                          game.setFowOption("hide_player_names", info);
                     } catch (Exception e) {
                         // Do nothing
                     }

@@ -1,0 +1,39 @@
+{
+    "id": "er51",
+    "name": "Grywon",
+    "aliases": [
+        "er51",
+        "grywon"
+    ],
+    "imagePath": "er_51_async.png",
+    "planets": [
+        "grywon"
+    ],
+    "shipPositionsType": "TYPE05",
+    "spaceTokenLocations": [
+        {
+            "x": 180.0,
+            "y": 0.0
+        },
+        {
+            "x": 220.0,
+            "y": 60.0
+        },
+        {
+            "x": 45.0,
+            "y": 120.0
+        },
+        {
+            "x": 95.0,
+            "y": 170.0
+        }
+    ],
+    "wormholes": [
+        "THETA"
+    ],
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
+}
