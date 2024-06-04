@@ -9178,6 +9178,9 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg, buttons3);
                 }
             }
+        } else { // PURGE THE RELIC
+            player.removeRelic(relicID);
+            player.removeExhaustedRelic(relicID);
         }
 
         RelicModel relicModel = Mapper.getRelic(relicID);
@@ -9223,11 +9226,6 @@ public class ButtonHelper {
                 //handled above
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "This Relic is not tied to any automation. Please resolve manually.");
-        }
-
-        if ("Purged".equals(purgeOrExhaust)) {
-            player.removeRelic(relicID);
-            player.removeExhaustedRelic(relicID);
         }
     }
 
