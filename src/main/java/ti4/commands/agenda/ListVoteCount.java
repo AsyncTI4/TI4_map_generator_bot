@@ -4,6 +4,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.fow.FOWOptions;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -32,7 +33,8 @@ public class ListVoteCount extends AgendaSubcommandData {
         for (Player player : orderList) {
             votes = votes + AgendaHelper.getTotalVoteCount(game, player);
         }
-        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + votes);
+        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " 
+          + (Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_TOTAL_VOTES)) ? "???" : votes));
         sb.append("):__**\n");
         int itemNo = 1;
         for (Player player : orderList) {
