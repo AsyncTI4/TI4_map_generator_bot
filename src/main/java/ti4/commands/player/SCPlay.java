@@ -179,6 +179,9 @@ public class SCPlay extends PlayerSubcommandData {
         }
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+            if (scModel.usesAutomationForSCID("pok5trade")) {
+                ButtonHelper.tradePrimary(game, event, player, message_.getId());
+            }
             Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
@@ -466,7 +469,7 @@ public class SCPlay extends PlayerSubcommandData {
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         Button refreshAndWash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
         Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-        return List.of(tradePrimary, followButton, noFollowButton, refresh, refreshAndWash);
+        return List.of(followButton, noFollowButton, refresh, refreshAndWash);
     }
 
     private static List<Button> getWarfareButtons(int sc) {

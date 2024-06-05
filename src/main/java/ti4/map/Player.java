@@ -1183,10 +1183,10 @@ public class Player {
                     crf++;
                     if (!hasFoundCulFrag) {
                         hasFoundCulFrag = true;
-                        if (hasUnit("bentor_mech")) {
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
                             MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
@@ -1195,10 +1195,10 @@ public class Player {
                     irf++;
                     if (!hasFoundIndFrag) {
                         hasFoundIndFrag = true;
-                        if (hasUnit("bentor_mech")) {
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
                             MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
@@ -1207,10 +1207,10 @@ public class Player {
                     hrf++;
                     if (!hasFoundHazFrag) {
                         hasFoundHazFrag = true;
-                        if (hasUnit("bentor_mech")) {
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
                             MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }
@@ -1219,10 +1219,10 @@ public class Player {
                     vrf++;
                     if (!hasFoundUnkFrag) {
                         hasFoundUnkFrag = true;
-                        if (hasUnit("bentor_mech")) {
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
                             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
                                 "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due tp your mech deploy ability, you can now place a mech on a planet you control";
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
                             MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
                         }
                     }

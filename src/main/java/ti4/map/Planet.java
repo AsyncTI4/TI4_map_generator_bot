@@ -81,7 +81,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(
-            token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
+            token -> !token.contains("sleeper") && !token.contains("dmz_large") && !token.contains("threetraits") && !Helper.isFakeAttachment(token));
     }
 
     @JsonIgnore

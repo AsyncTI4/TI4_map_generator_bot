@@ -2311,28 +2311,7 @@ public class ButtonListener extends ListenerAdapter {
                         String msg = player.getRepresentation(true, true) +
                             "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-                        // if (tgCount != null && tgCount != 0) {
-                        //     int tg = player.getTg();
-                        //     tg += tgCount;
-                        //     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                        //         player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
-                        //     if (game.isFoWMode()) {
-                        //         String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                        //             + " tgs from picking SC #" + scNumber;
-                        //         FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
-                        //     }
-                        //     player.setTg(tg);
-                        //     if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
-                        //         ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
-                        //     }
-                        //     ButtonHelperAbilities.pillageCheck(player, game);
-                        //     if (scNumber == 2 && game.isRedTapeMode()) {
-                        //         for (int x = 0; x < tgCount; x++) {
-                        //             ButtonHelper.offerRedTapButtons(game, player);
-                        //         }
-                        //     }
-                        //     game.setScTradeGood(scNumber, 0);
-                        // }
+
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             player.getRepresentation()
                                 + " you have been public disgraced because someone preset it to occur when the number "
@@ -3926,40 +3905,7 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 case "trade_primary" -> {
-                    if (!player.getSCs().contains(5)) {
-                        break;
-                    }
-                    boolean used = addUsedSCPlayer(messageID, game, player, event, "Trade Primary");
-                    if (used) {
-                        break;
-                    }
-                    int tg = player.getTg();
-                    player.setTg(tg + 3);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-                    if (player.getLeaderIDs().contains("hacancommander")
-                        && !player.hasLeaderUnlocked("hacancommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
-                    }
-
-                    ButtonHelperAbilities.pillageCheck(player, game);
-                    player.setCommodities(player.getCommoditiesTotal());
-                    ButtonHelper.addReaction(event, false, false,
-                        " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " and replenished commodities ("
-                            + player.getCommodities() + Emojis.comm + ")",
-                        "");
-                    ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
-                    ButtonHelperAgents.cabalAgentInitiation(game, player);
-                    if (player.hasAbility("military_industrial_complex")
-                        && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                            ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-                    }
-                    if (player.getLeaderIDs().contains("mykomentoricommander")
-                        && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-                    }
+                    ButtonHelper.tradePrimary(game, event, player, messageID);
                 }
                 case "score_imperial" -> {
                     if (player == null || game == null) {
@@ -4420,10 +4366,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setTg(player.getTg() + 2);
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
-                    if (player.getLeaderIDs().contains("hacancommander")
-                        && !player.hasLeaderUnlocked("hacancommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
-                    }
+                    ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
                     if (!game.isFoWMode() && event.getMessageChannel() != game.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                     }
@@ -4804,7 +4747,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
                         return;
                     }
-
+                    ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
                     TurnEnd.pingNextPlayer(event, game, player);
                     event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
