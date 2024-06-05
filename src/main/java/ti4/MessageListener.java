@@ -305,7 +305,7 @@ public class MessageListener extends ListenerAdapter {
                                 }
                                 long twelveHrs = half * 60 * 60 * multiplier;
                                 long twentyFourhrs = twenty4 * 60 * 60 * multiplier;
-                                String scTime = game.getStoredValue("scPlayMsgTime" + sc);
+                                String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
                                     long timeDifference = (new Date().getTime()) - scPlayTime;

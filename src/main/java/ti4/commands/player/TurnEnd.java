@@ -382,6 +382,17 @@ public class TurnEnd extends PlayerSubcommandData {
             if (player.isRealPlayer()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
             }
+            int count = 0;
+            String message3a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:";
+            for (String soID : player.getSecretsUnscored().keySet()) {
+                if (ListPlayerInfoButton.getObjectiveThreshold(soID, game) > 0 && ListPlayerInfoButton.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoButton.getObjectiveThreshold(soID, game) - 1) && !soID.equalsIgnoreCase("dp")) {
+                    message3a = message3a + " " + Mapper.getSecretObjective(soID).getName();
+                    count++;
+                }
+            }
+            if (count > 0 && player.isRealPlayer()) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
+            }
 
         }
 

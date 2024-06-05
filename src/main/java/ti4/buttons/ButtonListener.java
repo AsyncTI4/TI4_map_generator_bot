@@ -4119,6 +4119,33 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                     }
                 }
+                case "gain_1_comms_stay" -> {
+                    String message;
+                    if (player.getCommodities() + 1 > player.getCommoditiesTotal()) {
+                        player.setCommodities(player.getCommoditiesTotal());
+                        message = "Gained No Commodities (at max already)";
+                    } else {
+                        player.setCommodities(player.getCommodities() + 1);
+                        message = " Gained 1 Commodity (" + (player.getCommodities() - 1) + "->"
+                            + player.getCommodities() + ")";
+                    }
+                    ButtonHelper.addReaction(event, false, false, message, "");
+                    if (player.hasAbility("military_industrial_complex")
+                        && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
+                        MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
+                            ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+                    }
+                    if (player.getLeaderIDs().contains("mykomentoricommander")
+                        && !player.hasLeaderUnlocked("mykomentoricommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
+                    }
+                    if (!game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+                        String pF = player.getFactionEmoji();
+                        MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
+                    }
+                }
                 case "startPlayerSetup" -> ButtonHelper.resolveSetupStep0(player, game, event);
                 case "comm_for_AC" -> {
                     boolean hasSchemingAbility = player.hasAbility("scheming");
@@ -5355,7 +5382,29 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             channel = actionsChannel;
         }
-
+        if (acID.contains("sabo")) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                fowIdentity + " please play sabo by clicking the sabo button on the AC you wish to sabo");
+            return;
+        }
+        if (acID.contains("reverse_")) {
+            String actionCardTitle = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            List<Button> scButtons = new ArrayList<>();
+            scButtons.add(Button.success("resolveReverse_" + actionCardTitle,
+                "Pick up " + actionCardTitle + " from the discard"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                fowIdentity + " After checking for sabos, use buttons to resolve reverse engineer.", scButtons);
+        }
+        if (acID.contains("counterstroke_")) {
+            String tilePos = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            List<Button> scButtons = new ArrayList<>();
+            scButtons.add(Button.success("resolveCounterStroke_" + tilePos,
+                "Counterstroke in " + tilePos));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                fowIdentity + " After checking for sabos, use buttons to resolve counterstroke.", scButtons);
+        }
         if (channel != null) {
             try {
                 String error = PlayAC.playAC(event, game, player, acID, channel);
