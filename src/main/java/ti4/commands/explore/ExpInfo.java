@@ -54,11 +54,11 @@ public class ExpInfo extends ExploreSubcommandData {
         secondHalfOfExpInfo(types, event, player, game, over);
     }
 
-    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {
+    public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {
         secondHalfOfExpInfo(types, event, player, game, overRide, false);
     }
 
-    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide, boolean fullText) {
+    public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide, boolean fullText) {
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
@@ -92,7 +92,7 @@ public class ExpInfo extends ExploreSubcommandData {
         }
     }
 
-    private String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
+    private static String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
         int deckCount = deck.size();
         double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
