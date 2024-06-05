@@ -477,6 +477,42 @@ public class ButtonHelperModifyUnits {
                 if (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)) {
                     continue;
                 }
+                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                }
+                int totalUnits = unitEntry.getValue() - damagedUnits;
+                int min = Math.min(totalUnits, hits);
+                if (player.hasTech("nes")) {
+                    min = Math.min(totalUnits, (hits + 1) / 2);
+                }
+                if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) {
+                    hits = hits - min;
+                    if (player.hasTech("nes")) {
+                        hits = hits - min;
+                    }
+                    if (!justSummarizing) {
+                        msg = msg + "> Sustained " + min + " " + unitModel.getUnitEmoji() + "\n";
+                        tile.addUnitDamage("space", unitKey, min);
+                        for (int x = 0; x < min; x++) {
+                            ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
+                        }
+                    } else {
+                        msg = msg + "> Would sustain " + min + " " + unitModel.getUnitEmoji() + "\n";
+                    }
+                }
+            }
+            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey()))
+                    continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null)
+                    continue;
+                UnitKey unitKey = unitEntry.getKey();
+                if (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)) {
+                    continue;
+                }
 
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
@@ -492,11 +528,10 @@ public class ButtonHelperModifyUnits {
                     .getStoredValue("stuffNotToSustainFor" + player.getFaction());
 
                 if (stuffNotToSustain.isEmpty()) {
-                    game.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsun");
-                    stuffNotToSustain = "warsun";
+                    game.setStoredValue("stuffNotToSustainFor" + player.getFaction(), "warsunflagship");
+                    stuffNotToSustain = "warsunflagship";
                 }
-                if (unitModel.getSustainDamage() && min > 0 && (!stuffNotToSustain.contains(unitName.toLowerCase())
-                    || (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")))) {
+                if (unitModel.getSustainDamage() && min > 0 && (!stuffNotToSustain.contains(unitName.toLowerCase()))) {
                     hits = hits - min;
                     if (player.hasTech("nes")) {
                         hits = hits - min;
@@ -651,7 +686,7 @@ public class ButtonHelperModifyUnits {
         }
 
         // kill any floating infantry and mechs if everything else is dead
-        if (hits > 0) {
+        if (hits > 0 || !FoWHelper.playerHasActualShipsInSystem(player, tile)) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                     continue;
@@ -678,6 +713,7 @@ public class ButtonHelperModifyUnits {
         }
 
         if (!usedDuraniumAlready) {
+            units = new HashMap<>(unitHolder.getUnits());
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                     continue;
@@ -2025,6 +2061,13 @@ public class ButtonHelperModifyUnits {
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
         Player mentakHero = game
             .getPlayerFromColorOrFaction(game.getStoredValue("mentakHero"));
+        String assignType = "combat";
+        if (!game.getStoredValue(player.getFaction() + "latestAssignHits").isEmpty()) {
+            assignType = game.getStoredValue(player.getFaction() + "latestAssignHits");
+        }
+        if (!assignType.toLowerCase().contains("combat")) {
+            cabal = null;
+        }
         if (rest.contains("All")) {
             String cID = Mapper.getColorID(player.getColor());
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -2086,7 +2129,7 @@ public class ButtonHelperModifyUnits {
                                     ButtonHelper.rollMykoMechRevival(game, player);
                                 }
                             }
-                            if (player.hasUnit("cheiran_mech")) {
+                            if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("cheiran_mech")) {
                                 new AddUnits().unitParsing(event, player.getColor(), tile, amount + " infantry " + unitHolder.getName(), game);
                                 String msg = "> Added " + amount + " infantry to the planet due to Cheiran mech trigger";
                                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -2121,7 +2164,7 @@ public class ButtonHelperModifyUnits {
                 message2 = ident + " Removed all units in space area";
             }
             String message = event.getMessage().getContentRaw();
-            String assignType = "combat";
+            assignType = "combat";
             if (!game.getStoredValue(player.getFaction() + "latestAssignHits").isEmpty()) {
                 assignType = game.getStoredValue(player.getFaction() + "latestAssignHits");
             }
@@ -2195,7 +2238,7 @@ public class ButtonHelperModifyUnits {
                     ButtonHelper.rollMykoMechRevival(game, player);
                 }
             }
-            if (player.hasUnit("cheiran_mech") && !planetName.equalsIgnoreCase("space")) {
+            if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("cheiran_mech") && !planetName.equalsIgnoreCase("space")) {
                 new AddUnits().unitParsing(event, player.getColor(), tile, amount + " infantry " + planetName, game);
                 String msg = "> Added " + amount + " infantry to the planet due to Cheiran mech trigger";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -2212,7 +2255,7 @@ public class ButtonHelperModifyUnits {
         String message = event.getMessage().getContentRaw();
         String message2 = ident + " Removed " + amount + " " + unitName + " from " + planetName + " in tile "
             + tile.getRepresentationForButtons(game, player);
-        String assignType = "combat";
+        assignType = "combat";
         if (!game.getStoredValue(player.getFaction() + "latestAssignHits").isEmpty()) {
             assignType = game.getStoredValue(player.getFaction() + "latestAssignHits");
         }

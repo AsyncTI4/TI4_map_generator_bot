@@ -235,10 +235,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-            .complete();
-        newGame.setBotMapUpdatesThreadID(botThread.getId());
+        ThreadChannel botThread = null;
+        try {
+            botThread = actionsChannel.createThreadChannel(newBotThreadName)
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+                .complete();
+            newGame.setBotMapUpdatesThreadID(botThread.getId());
+        } catch (Exception e) {
+            MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you dont know how");
+        }
 
         // INTRODUCTION TO TABLETALK CHANNEL
         String tabletalkGetStartedMessage = role.getAsMention() + " - table talk channel\n" +
@@ -305,14 +310,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "\n" +
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
-        MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
-        MessageHelper.sendMessageToChannelAndPin(botThread,
-            "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+        if (botThread != null) {
+            MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
+            MessageHelper.sendMessageToChannelAndPin(botThread,
+                "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+        }
 
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
             "> " + chatChannel.getAsMention() + "\n" +
-            "> " + actionsChannel.getAsMention() + "\n" +
-            "> " + botThread.getAsMention() + "\n";
+            "> " + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         newGame.setUpPeakableObjectives(5, 1);

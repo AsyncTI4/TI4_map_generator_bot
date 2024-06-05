@@ -92,13 +92,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
-                        // if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
-                        //     PlanetModel p = Mapper.getPlanet(unitHolder.getName());
-                        //     if (p != null && p.getFactionHomeworld() != null && player_.hasLeader(p.getFactionHomeworld() + "commander")) {
-                        //         String leaderID = p.getFactionHomeworld() + "commander";
-                        //         player_.removeLeader(leaderID);
-                        //     }
-                        // }
+
                     }
                     player_.removePlanet(planet);
                     List<String> relics = new ArrayList<>();
@@ -153,7 +147,10 @@ public class PlanetAdd extends PlanetAddRemove {
                 ButtonHelper.getDacxiveButtons(planet, player));
         }
         if (!alreadyOwned && game.isMinorFactionsMode() && (unitHolder.getOriginalPlanetType().equalsIgnoreCase("FACTION"))) {
-            unitHolder.addToken("attachment_threetraits.png");
+            PlanetModel p = Mapper.getPlanet(unitHolder.getName());
+            if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
+                unitHolder.addToken("attachment_threetraits.png");
+            }
         }
 
         if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
@@ -290,6 +287,7 @@ public class PlanetAdd extends PlanetAddRemove {
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+
         }
 
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
