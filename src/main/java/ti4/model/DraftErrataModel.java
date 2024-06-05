@@ -54,7 +54,8 @@ public class DraftErrataModel implements ModelInterface {
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
         Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
-        items = new ArrayList<>(itemsSet);
+        items.clear();
+        items.addAll(itemsSet);
         Collections.shuffle(items);
     }
 
