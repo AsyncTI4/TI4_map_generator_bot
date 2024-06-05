@@ -21,7 +21,7 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
         showDiscard(game, event);
     }
 
-    public void showDiscard(Game game, GenericInteractionCreateEvent event) {
+    public static void showDiscard(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("Action card discard list: ").append("\n");
         int index = 1;

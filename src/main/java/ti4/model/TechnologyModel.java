@@ -106,6 +106,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return types.size() > 1;
     }
 
+    public boolean isFactionTech() {
+        return getFaction().isPresent();
+    }
+
     public String getImageFileModifier() {
         if (types.size() == 2) {
             if (isDualPropulsionBiotic()) {
