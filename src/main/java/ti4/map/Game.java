@@ -2717,6 +2717,7 @@ public class Game {
         return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
     }
 
+    @JsonIgnore
     public List<TechnologyModel> getPropulsionTechDeck() {
         return getTechnologyDeck().stream()
             .map(Mapper::getTech)
@@ -2725,6 +2726,7 @@ public class Game {
             .toList();
     }
 
+    @JsonIgnore
     public List<TechnologyModel> getWarfareTechDeck() {
         return getTechnologyDeck().stream()
             .map(Mapper::getTech)
@@ -2733,6 +2735,7 @@ public class Game {
             .toList();
     }
 
+    @JsonIgnore
     public List<TechnologyModel> getCyberneticTechDeck() {
         return getTechnologyDeck().stream()
             .map(Mapper::getTech)
@@ -2741,6 +2744,7 @@ public class Game {
             .toList();
     }
 
+    @JsonIgnore
     public List<TechnologyModel> getBioticTechDeck() {
         return getTechnologyDeck().stream()
             .map(Mapper::getTech)
