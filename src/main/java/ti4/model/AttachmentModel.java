@@ -8,13 +8,14 @@ import lombok.Data;
 @Data
 public class AttachmentModel implements ModelInterface {
     private String id;
+    private String imagePath;
     private List<String> techSpeciality = new ArrayList<>();
     private List<String> planetTypes = new ArrayList<>();
     private int resourcesModifier;
     private int influenceModifier;
+    private String abilityText;
     private String token;
     private Boolean isLegendary;
-    private String imagePath;
     private Boolean isFakeAttachment; // is an attachment on backend, but should not be displayed as one
 
     private int spaceCannonHitsOn;
