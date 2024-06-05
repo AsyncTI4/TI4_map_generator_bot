@@ -81,6 +81,7 @@ public class FrankenDraft extends BagDraft {
         allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        draftManager.clear();
         MiltyDraftHelper.initDraftTiles(draftManager, game);
         allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
         allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
