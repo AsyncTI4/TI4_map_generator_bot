@@ -549,6 +549,10 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         if (plan.hasAttachment()) {
                             count++;
                         }
+                    } else {
+                        if (planet.contains("custodia") && game.getStoredValue("terraformedPlanet").equalsIgnoreCase(planet)) {
+                            count++;
+                        }
                     }
                 }
                 return count;

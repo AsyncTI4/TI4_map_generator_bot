@@ -1250,7 +1250,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         String ffcc = player.getFinsFactionCheckerPrefix();
         buttons.add(Button.of(ButtonStyle.SUCCESS, ffcc + "convert_1_comms", "Convert 1 comm to TG", Emoji.fromFormatted(Emojis.Wash)));
-        buttons.add(Button.of(ButtonStyle.PRIMARY, ffcc + "gain_1_comms", "Gain 1 comm", Emoji.fromFormatted(Emojis.comm)));
+        buttons.add(Button.of(ButtonStyle.PRIMARY, ffcc + "gain_1_comms_stay", "Gain 1 comm", Emoji.fromFormatted(Emojis.comm)));
         buttons.add(Button.danger("deleteButtons", "Done resolving"));
         return buttons;
     }
