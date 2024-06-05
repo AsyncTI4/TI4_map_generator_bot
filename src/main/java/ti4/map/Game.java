@@ -2717,6 +2717,38 @@ public class Game {
         return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
     }
 
+    public List<TechnologyModel> getPropulsionTechDeck() {
+        return getTechnologyDeck().stream()
+            .map(Mapper::getTech)
+            .filter(TechnologyModel::isPropulsionTech)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList();
+    }
+
+    public List<TechnologyModel> getWarfareTechDeck() {
+        return getTechnologyDeck().stream()
+            .map(Mapper::getTech)
+            .filter(TechnologyModel::isWarfareTech)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList();
+    }
+
+    public List<TechnologyModel> getCyberneticTechDeck() {
+        return getTechnologyDeck().stream()
+            .map(Mapper::getTech)
+            .filter(TechnologyModel::isCyberneticTech)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList();
+    }
+
+    public List<TechnologyModel> getBioticTechDeck() {
+        return getTechnologyDeck().stream()
+            .map(Mapper::getTech)
+            .filter(TechnologyModel::isBioticTech)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList();
+    }
+
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         String result = null;

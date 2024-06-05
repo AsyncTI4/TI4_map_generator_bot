@@ -25,6 +25,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -42,7 +43,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
@@ -1207,63 +1207,72 @@ public class ButtonHelper {
 
     public static void offerDeckButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.secondary("showDeck_frontier", "Frontier")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("frontier"))));
-        buttons.add(Button.primary("showDeck_cultural", "Cultural")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("cultural"))));
-        buttons.add(Button.danger("showDeck_hazardous", "Hazardous")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("hazardous"))));
-        buttons.add(Button.success("showDeck_industrial", "Industrial")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("industrial"))));
-        buttons.add(Button.secondary("showDeck_all", "All Explores"));
-        buttons.add(Button.secondary("showDeck_ac", "AC Discards")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
-        buttons.add(Button.secondary("showDeck_unplayedAC", "Unplayed ACs")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
-        buttons.add(Button.secondary("showDeck_agenda", "Agenda Discards")
-            .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("agenda"))));
-        buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
-        buttons.add(Button.secondary("showDeck_unscoredSO", "Unscored SOs")
-            .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
-        buttons.add(Button.secondary("showObjInfo_both", "All Revealed Objectives in Game")
-            .withEmoji(Emoji.fromFormatted(Emojis.Public1)));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
+        buttons.add(Buttons.gray("showDeck_frontier", "Frontier").withEmoji(Emoji.fromFormatted(Emojis.Frontier)));
+        buttons.add(Buttons.blue("showDeck_cultural", "Cultural").withEmoji(Emoji.fromFormatted(Emojis.Cultural)));
+        buttons.add(Buttons.red("showDeck_hazardous", "Hazardous").withEmoji(Emoji.fromFormatted(Emojis.Hazardous)));
+        buttons.add(Buttons.green("showDeck_industrial", "Industrial").withEmoji(Emoji.fromFormatted(Emojis.Industrial)));
+        buttons.add(Buttons.gray("showDeck_all", "All Explores"));
+        buttons.add(Buttons.blue("showDeck_propulsion", "Propulsion Techs").withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech)));
+        buttons.add(Buttons.red("showDeck_warfare", "Warfare Techs").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
+        buttons.add(Buttons.gray("showDeck_cybernetic", "Cybernetic Techs").withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech)));
+        buttons.add(Buttons.green("showDeck_biotic", "Biotic Techs").withEmoji(Emoji.fromFormatted(Emojis.BioticTech)));
+        buttons.add(Buttons.gray("showDeck_ac", "AC Discards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+        buttons.add(Buttons.gray("showDeck_unplayedAC", "Unplayed ACs").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+        buttons.add(Buttons.gray("showDeck_agenda", "Agenda Discards").withEmoji(Emoji.fromFormatted(Emojis.Agenda)));
+        buttons.add(Buttons.gray("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+        buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored SOs").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+        buttons.add(Buttons.gray("showObjInfo_both", "All Revealed Objectives in Game").withEmoji(Emoji.fromFormatted(Emojis.Public1)));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
-        String type = buttonID.split("_")[1];
-        List<String> types = new ArrayList<>();
-        String msg = "You can click this button to get the full text";
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("showTextOfDeck_" + type, "Show full text"));
-        buttons.add(Button.danger("deleteButtons", "No Thanks"));
-        if ("ac".equalsIgnoreCase(type)) {
-            new ShowDiscardActionCards().showDiscard(game, event);
-        } else if ("all".equalsIgnoreCase(type)) {
-            types.add(Constants.CULTURAL);
-            types.add(Constants.INDUSTRIAL);
-            types.add(Constants.HAZARDOUS);
-            types.add(Constants.FRONTIER);
-            new ExpInfo().secondHalfOfExpInfo(types, event, player, game, false);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-        } else if ("agenda".equalsIgnoreCase(type)) {
-            new ShowDiscardedAgendas().showDiscards(game, event);
-        } else if ("relic".equalsIgnoreCase(type)) {
-            new ShowRemainingRelics().showRemaining(event, false, game, player);
-        } else if ("unscoredSO".equalsIgnoreCase(type)) {
-            new ShowUnScoredSOs().showUnscored(game, event);
-        } else if ("unplayedAC".equalsIgnoreCase(type)) {
-            showUnplayedACs(game, event);
-        } else {
-            types.add(type);
-            new ExpInfo().secondHalfOfExpInfo(types, event, player, game, false);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        String deck = buttonID.replace("showDeck_", "");
+        switch (deck) {
+            case "ac" -> ShowDiscardActionCards.showDiscard(game, event);
+            case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
+            case "relic" -> ShowRemainingRelics.showRemaining(event, false, game, player);
+            case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
+            case "unplayedAC" -> showUnplayedACs(game, event);
+            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC -> displayTechDeck(game, event, deck);
+            case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
+                List<String> types = new ArrayList<>();
+                String msg = "You can click this button to get the full text";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("showTextOfDeck_" + deck, "Show full text"));
+                buttons.add(Button.danger("deleteButtons", "No Thanks"));
+                if ("all".equalsIgnoreCase(deck)) { // Show all explores
+                    types.add(Constants.CULTURAL);
+                    types.add(Constants.INDUSTRIAL);
+                    types.add(Constants.HAZARDOUS);
+                    types.add(Constants.FRONTIER);
+                } else {
+                    types.add(deck);
+                }
+                ExpInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            }
+            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
         }
         event.getMessage().delete().queue();
     }
 
-    public static void resolveShowFullTextDeckChoice(Game game, ButtonInteractionEvent event, String buttonID,
-        Player player) {
+    private static void displayTechDeck(Game game, ButtonInteractionEvent event, String deck) {
+        List<TechnologyModel> techs = switch (deck) {
+            case Constants.PROPULSION -> game.getPropulsionTechDeck();
+            case Constants.WARFARE -> game.getWarfareTechDeck();
+            case Constants.CYBERNETIC -> game.getCyberneticTechDeck();
+            case Constants.BIOTIC -> game.getBioticTechDeck();
+            default -> new ArrayList<>();
+        };
+        List<MessageEmbed> embeds = techs.stream()
+            .filter(t -> !t.isFactionTech())
+            .map(t -> t.getRepresentationEmbed(false, true))
+            .toList();
+        String message = StringUtils.capitalize(deck) + " Tech Deck:";
+        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), message, embeds);
+    }
+
+    public static void resolveShowFullTextDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String type = buttonID.split("_")[1];
         List<String> types = new ArrayList<>();
         if ("all".equalsIgnoreCase(type)) {
@@ -1271,10 +1280,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            new ExpInfo().secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExpInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
         } else {
             types.add(type);
-            new ExpInfo().secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExpInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
         }
         event.getMessage().delete().queue();
     }
