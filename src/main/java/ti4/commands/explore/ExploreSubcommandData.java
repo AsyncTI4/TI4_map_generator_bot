@@ -518,9 +518,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
-                if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
-                }
+                ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
                 message += "\n" + trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
@@ -615,7 +614,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
+
         }
+        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();

@@ -818,8 +818,8 @@ public class ButtonHelperAgents {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-                    player.getRepresentation(true, true) + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(game, player, false));
+                    p2.getRepresentation(true, true) + " use buttons to discard",
+                    ACInfo.getDiscardActionCardButtons(game, p2, false));
             }
             if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);

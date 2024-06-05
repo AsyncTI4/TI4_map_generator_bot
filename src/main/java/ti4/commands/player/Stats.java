@@ -408,9 +408,7 @@ public class Stats extends PlayerSubcommandData {
 				FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
 			}
 			player.setTg(tg);
-			if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
-				ButtonHelper.commanderUnlockCheck(player, game, "hacan", event);
-			}
+			ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
 			ButtonHelperAbilities.pillageCheck(player, game);
 			if (scNumber == 2 && game.isRedTapeMode()) {
 				for (int x = 0; x < tgCount; x++) {
