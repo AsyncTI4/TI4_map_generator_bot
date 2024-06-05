@@ -77,6 +77,7 @@ import ti4.commands.special.DiploSystem;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
+import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
@@ -1233,7 +1234,7 @@ public class ButtonHelper {
             case "relic" -> ShowRemainingRelics.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
             case "unplayedAC" -> showUnplayedACs(game, event);
-            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC -> displayTechDeck(game, event, deck);
+            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC -> TechShowDeck.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
                 List<String> types = new ArrayList<>();
                 String msg = "You can click this button to get the full text";
@@ -1254,22 +1255,6 @@ public class ButtonHelper {
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
         }
         event.getMessage().delete().queue();
-    }
-
-    private static void displayTechDeck(Game game, ButtonInteractionEvent event, String deck) {
-        List<TechnologyModel> techs = switch (deck) {
-            case Constants.PROPULSION -> game.getPropulsionTechDeck();
-            case Constants.WARFARE -> game.getWarfareTechDeck();
-            case Constants.CYBERNETIC -> game.getCyberneticTechDeck();
-            case Constants.BIOTIC -> game.getBioticTechDeck();
-            default -> new ArrayList<>();
-        };
-        List<MessageEmbed> embeds = techs.stream()
-            .filter(t -> !t.isFactionTech())
-            .map(t -> t.getRepresentationEmbed(false, true))
-            .toList();
-        String message = StringUtils.capitalize(deck) + " Tech Deck:";
-        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), message, embeds);
     }
 
     public static void resolveShowFullTextDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
