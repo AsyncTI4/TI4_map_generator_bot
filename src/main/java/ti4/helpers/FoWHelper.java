@@ -674,6 +674,22 @@ public class FoWHelper {
 		return false;
 	}
 
+	public static boolean playerHasActualShipsInSystem(Player player, Tile tile) {
+		String colorID = Mapper.getColorID(player.getColor());
+		if (colorID == null)
+			return false; // player doesn't have a color
+
+		UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+
+		for (UnitKey unitKey : units.keySet()) {
+			if (unitKey != null && unitKey.getColorID().equals(colorID) && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static boolean otherPlayersHaveShipsInSystem(Player player, Tile tile, Game game) {
 		for (Player p2 : game.getRealPlayersNDummies()) {
 			if (p2 == player) {

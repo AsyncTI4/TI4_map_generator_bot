@@ -1919,6 +1919,38 @@ public class ButtonHelper {
         updateMap(game, event, "");
     }
 
+    public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player, String messageID) {
+        if (!player.getSCs().contains(5) || player.getFollowedSCs().contains(5)) {
+            return;
+        }
+        int tg = player.getTg();
+        player.setTg(tg + 3);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
+        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+
+        ButtonHelperAbilities.pillageCheck(player, game);
+        player.setCommodities(player.getCommoditiesTotal());
+        if (event instanceof ButtonInteractionEvent e) {
+            ButtonHelper.addReaction(e, false, false,
+                " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " and replenished commodities ("
+                    + player.getCommodities() + Emojis.comm + ")",
+                "");
+        }
+        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
+        ButtonHelperAgents.cabalAgentInitiation(game, player);
+        if (player.hasAbility("military_industrial_complex")
+            && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
+                ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+        }
+        if (player.getLeaderIDs().contains("mykomentoricommander")
+            && !player.hasLeaderUnlocked("mykomentoricommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
+        }
+    }
+
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
@@ -7979,9 +8011,7 @@ public class ButtonHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                if (p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")) {
-                    commanderUnlockCheck(p2, game, "hacan", event);
-                }
+                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -8005,9 +8035,7 @@ public class ButtonHelper {
                     p2.setCommodities(targetTG);
                 }
 
-                if (p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")) {
-                    commanderUnlockCheck(p2, game, "hacan", event);
-                }
+                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
@@ -8040,9 +8068,8 @@ public class ButtonHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                if (p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")) {
-                    commanderUnlockCheck(p2, game, "hacan", event);
-                }
+                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                ButtonHelper.fullCommanderUnlockCheck(p1, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 // ButtonHelperAbilities.pillageCheck(p1, game);
