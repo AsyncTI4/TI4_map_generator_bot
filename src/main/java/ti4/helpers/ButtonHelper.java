@@ -6304,7 +6304,8 @@ public class ButtonHelper {
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
             .complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
-
+        newGame.setUpPeakableObjectives(5, 1);
+        newGame.setUpPeakableObjectives(5, 2);
         // INTRODUCTION TO TABLETALK CHANNEL
         String tabletalkGetStartedMessage = gameRole.getAsMention() + " - table talk channel\n" +
             "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"

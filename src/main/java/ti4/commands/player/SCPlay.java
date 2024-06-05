@@ -189,7 +189,7 @@ public class SCPlay extends PlayerSubcommandData {
             }
             game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
             game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
-            game.setStoredValue("scPlayMsgTime" + scToPlay, new Date().getTime() + "");
+            game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction())
                     .isEmpty()) {
@@ -283,6 +283,15 @@ public class SCPlay extends PlayerSubcommandData {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
+                    for (Player p3 : game.getRealPlayers()) {
+                        if (p2 == p3) {
+                            continue;
+                        }
+                        if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                            String message3 = p3.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they can force the player to replenish and then you will be prompted to play the TA. ";
+                            MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
+                        }
+                    }
                 }
             }
 

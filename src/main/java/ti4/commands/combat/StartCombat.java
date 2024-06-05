@@ -885,11 +885,11 @@ public class StartCombat extends CombatSubcommandData {
 
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !game.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "gain_1_comms", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+            buttons.add(Button.secondary(finChecker + "gain_1_comms_stay", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
         if (isSpaceCombat && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "gain_1_comms", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+            buttons.add(Button.secondary(finChecker + "gain_1_comms_stay", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
         if (isSpaceCombat) {
