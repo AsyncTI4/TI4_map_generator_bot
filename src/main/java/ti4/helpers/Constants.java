@@ -977,6 +977,8 @@ public class Constants {
     public static final String CLEAR_DEBT = "clear_debt";
 
     public static final String OBSERVER = "observer";
+    public static final String REMOVE_TITLE = "remove_title";
+    public static final String TITLE = "title";
     public static final String ADD_REMOVE = "add_remove";
 
     public static final String COMBAT = "combat";
