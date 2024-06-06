@@ -1119,7 +1119,7 @@ public class MapGenerator {
 
             // ABSOL QUANTUMCORE
             if (relicID.contains("quantumcore")) {
-                drawPAImage(x + deltaX, y, "pa_tech_techicons_multicolorry" + relicStatus + ".png");
+                drawPAImage(x + deltaX, y, "pa_tech_techicons_cyberneticwarfare" + relicStatus + ".png");
             }
 
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
