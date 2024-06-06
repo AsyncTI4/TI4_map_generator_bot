@@ -73,6 +73,7 @@ import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
+import ti4.commands.special.CheckDistance;
 import ti4.commands.special.DiploSystem;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.status.Cleanup;
@@ -5294,7 +5295,7 @@ public class ButtonHelper {
     }
 
     public static String buildMessageFromDisplacedUnits(Game game, boolean landing, Player player,
-        String moveOrRemove) {
+        String moveOrRemove, Tile tile) {
         String message;
         Map<String, Integer> displacedUnits = game.getCurrentMovedUnitsFrom1System();
         String prefix = " > " + player.getFactionEmoji();
@@ -5325,6 +5326,33 @@ public class ButtonHelper {
                 messageBuilder.append(prefix).append(" ").append(moveOrRemove).append("d ").append(amount).append(" ")
                     .append(damagedMsg).append(Emojis.getEmojiFromDiscord(unit.toLowerCase()));
                 if (planet == null) {
+                    Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+                    UnitModel uni = player.getUnitByBaseType(unit);
+                    if (activeSystem != null && uni != null && uni.getIsShip() && !uni.getBaseType().equalsIgnoreCase("fighter")) {
+                        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(), game.getActiveSystem());
+                        int moveValue = uni.getMoveValue();
+                        if (tile.isNebula() && !player.hasAbility("voidborn")) {
+                            moveValue = 1;
+                        }
+                        if (player.hasTech("as")
+                            && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
+                            moveValue++;
+                        }
+                        if (player.hasAbility("slipstream") && (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition()) || tile == player.getHomeSystemTile())) {
+                            moveValue++;
+                        }
+                        if (tile.isGravityRift(game)) {
+                            moveValue++;
+                        }
+
+                        if (distance > moveValue && distance < 90) {
+                            if (player.hasTech("gd")) {
+                                messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue + "), maybe used gravity drive)");
+                            } else {
+                                messageBuilder.append(" ((Distance exceeds move value (" + distance + " > " + moveValue + "), did not have gravity drive)");
+                            }
+                        }
+                    }
                     messageBuilder.append("\n");
                 } else {
                     messageBuilder.append(" from the planet ")

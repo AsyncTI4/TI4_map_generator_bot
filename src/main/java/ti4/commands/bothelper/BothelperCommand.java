@@ -80,6 +80,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new ListSlashCommandsUsed());
         subcommands.add(new SendJsonToS3());
         subcommands.add(new GameStats());
+        subcommands.add(new RemoveTitle());
         return subcommands;
     }
 
