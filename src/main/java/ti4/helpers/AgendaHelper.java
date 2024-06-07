@@ -2463,7 +2463,7 @@ public class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
-                    if (loser != null && !specificVote.contains("Rider") && !specificVote.contains("Sanction")) {
+                    if (loser != null && !specificVote.contains("Rider") && !specificVote.contains("Sanction") && !specificVote.contains("Ability")) {
                         if (!losers.contains(loser)) {
                             losers.add(loser);
                         }
@@ -2489,7 +2489,7 @@ public class AgendaHelper {
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser) && !specificVote.contains("Rider")
-                            && !specificVote.contains("Sanction")) {
+                            && !specificVote.contains("Sanction") && !specificVote.contains("Ability")) {
                             losers.add(loser);
                         }
 
