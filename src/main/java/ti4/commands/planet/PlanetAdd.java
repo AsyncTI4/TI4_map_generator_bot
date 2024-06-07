@@ -146,14 +146,14 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getDacxiveButtons(planet, player));
         }
-        if (!alreadyOwned && game.isMinorFactionsMode() && (unitHolder.getOriginalPlanetType().equalsIgnoreCase("FACTION"))) {
+        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer() && (unitHolder.getOriginalPlanetType().equalsIgnoreCase("FACTION"))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");
             }
         }
 
-        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")) {
+        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png") && player.isRealPlayer()) {
             Tile tile = game.getTileFromPlanet(unitHolder.getName());
             boolean ownsThemAll = true;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
