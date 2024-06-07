@@ -683,6 +683,8 @@ public class ButtonHelperTacticalAction {
             // buttons);
             // }
         }
+        game.setStoredValue("crucibleBoost", "");
+        game.setStoredValue("flankspeedBoost", "");
 
         event.getMessage().delete().queue();
 

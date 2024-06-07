@@ -5344,12 +5344,18 @@ public class ButtonHelper {
                         if (tile.isGravityRift(game)) {
                             moveValue++;
                         }
+                        if (!game.getStoredValue("crucibleBoost").isEmpty()) {
+                            moveValue = moveValue + 2;
+                        }
+                        if (!game.getStoredValue("flankspeedBoost").isEmpty()) {
+                            moveValue = moveValue + 1;
+                        }
 
                         if (distance > moveValue && distance < 90) {
                             if (player.hasTech("gd")) {
-                                messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue + "), maybe used gravity drive)");
+                                messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue + "), probably used gravity drive)");
                             } else {
-                                messageBuilder.append(" ((Distance exceeds move value (" + distance + " > " + moveValue + "), did not have gravity drive)");
+                                messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue + "), did not have gravity drive)");
                             }
                         }
                     }
@@ -9605,6 +9611,9 @@ public class ButtonHelper {
         }
         if ("dspnvade".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveVadenTgForSpeed(player, game, event);
+        }
+        if ("crucible".equalsIgnoreCase(id)) {
+            game.setStoredValue("crucibleBoost", "2");
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(
