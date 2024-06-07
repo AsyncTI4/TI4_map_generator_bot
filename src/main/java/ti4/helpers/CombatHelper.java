@@ -140,7 +140,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
+            .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount(player, player.getGame()) > 0)
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -176,7 +176,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+            .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player, player.getGame()) > 0)
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
