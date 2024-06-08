@@ -138,7 +138,7 @@ public class ScorePublic extends StatusSubcommandData {
 		if (game.isFoWMode()) {
 			FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 		}
-		Helper.checkIfHeroUnlocked(event, game, player);
+		Helper.checkIfHeroUnlocked(game, player);
 		if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument")
 			|| poName.toLowerCase().contains("found a golden age")
 			|| poName.toLowerCase().contains("amass wealth")

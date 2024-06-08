@@ -53,6 +53,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
@@ -1419,14 +1420,14 @@ public class MapGenerator {
         return x + deltaX + (addedAbilities ? 20 : 0);
     }
 
-    private int reinforcements(Player player, int xDeltaFromRightSide, int y, Map<UnitKey, Integer> unitCount) {
+    private int reinforcements(Player player, int xDeltaFromRightSide, int y, Map<UnitKey, Integer> unitMapCount) {
         Map<String, Tile> tileMap = game.getTileMap();
         int x = width - 450 - xDeltaFromRightSide;
         drawPAImage(x, y, "pa_reinforcements.png");
-        if (unitCount.isEmpty()) {
+        if (unitMapCount.isEmpty()) {
             for (Tile tile : tileMap.values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    fillUnits(unitCount, unitHolder, false);
+                    fillUnits(unitMapCount, unitHolder, false);
                 }
             }
             for (Player player_ : game.getPlayers().values()) {
@@ -1434,94 +1435,55 @@ public class MapGenerator {
                 if (unitHolder == null) {
                     continue;
                 }
-                fillUnits(unitCount, unitHolder, true);
+                fillUnits(unitMapCount, unitHolder, true);
             }
         }
 
         String playerColor = player.getColor();
         for (String unitID : Mapper.getUnitIDList()) {
-            UnitKey unitColorID = Mapper.getUnitKey(unitID, playerColor);
-            if ("cff".equals(unitID)) {
-                unitColorID = Mapper.getUnitKey("ff", playerColor);
-            }
-            if ("cgf".equals(unitID)) {
-                unitColorID = Mapper.getUnitKey("gf", playerColor);
-            }
+            UnitKey unitKey = Mapper.getUnitKey(unitID, playerColor);
+            if ("csd".equals(unitID)) continue;
+            if ("cff".equals(unitID))
+                unitKey = Mapper.getUnitKey("ff", playerColor);
+            if ("cgf".equals(unitID))
+                unitKey = Mapper.getUnitKey("gf", playerColor);
 
-            Integer count = unitCount.get(unitColorID);
-            if ("csd".equals(unitID)) {
-                // if (!(player.ownsUnit("cabal_spacedock") ||
-                // player.ownsUnit("cabal_spacedock2"))) {
-                // continue;
-                // }
-                // unitColorID = Mapper.getUnitKey("sd", playerColor);
-                continue;
-            }
-
-            if (count == null) {
-                count = 0;
-            }
+            int count = unitMapCount.getOrDefault(unitKey, 0);
             if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && "sd".equals(unitID)) {
-                if (unitCount.get(Mapper.getUnitKey("csd", playerColor)) != null) {
-                    count = count + unitCount.get(Mapper.getUnitKey("csd", playerColor));
-                }
-
+                count += unitMapCount.getOrDefault(Mapper.getUnitKey("csd", playerColor), 0);
             }
+
             UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(unitID);
 
             if (reinforcementsPosition != null) {
-                int positionCount = player.getUnitCap(unitID);
-                boolean aboveCap = true;
-                if (positionCount == 0) {
-                    positionCount = reinforcementsPosition.getPositionCount(unitID);
-                    aboveCap = false;
+                int unitCap = player.getUnitCap(unitID);
+                boolean onlyPaintOneUnit = true;
+                if (unitCap == 0) {
+                    unitCap = reinforcementsPosition.getPositionCount(unitID);
+                    onlyPaintOneUnit = false;
                 }
-                int remainingReinforcements = positionCount - count;
-                if (remainingReinforcements > 0) {
-                    for (int i = 0; i < remainingReinforcements; i++) {
-                        Point position = reinforcementsPosition.getPosition(unitID);
-                        BufferedImage image = null;
-                        try {
-                            String unitPath = ResourceHelper.getInstance().getUnitFile(unitColorID);
-                            image = ImageHelper.read(unitPath);
-                        } catch (Exception e) {
-                            BotLogger.log("Could not parse unit file for reinforcements: " + unitID + " in game " + game.getName(), e);
-                        }
-                        BufferedImage decal = null;
-                        try {
-                            if (image != null && !"null".equals(player.getDecalSet())
-                                && Mapper.isValidDecalSet(player.getDecalSet())) {
-                                String decalFileName = String.format("%s_%s%s", player.getDecalSet(), unitID,
-                                    getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
-                                String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
-                                decal = ImageHelper.read(decalPath);
-                            }
-                        } catch (Exception e) {
-                            BotLogger.log("Could not parse decal file for reinforcements: " + player.getDecalSet(), e);
-                        }
-                        graphics.drawImage(image, x + position.x, y + position.y, null);
-                        graphics.drawImage(decal, x + position.x, y + position.y, null);
-                        if (aboveCap) {
-                            i = remainingReinforcements;
-                        }
-                    }
-                } else {
-                    if (remainingReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
-                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for "
-                            + ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID)) + ". Use buttons to remove";
-                        if (game.isFoWMode()) {
-                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage,
-                                ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game,
-                                    ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
-                        } else {
-                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), warningMessage,
-                                ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game,
-                                    ButtonHelper.getUnitName(AliasHandler.resolveUnit(unitID))));
-                        }
-                    }
+
+                int numInReinforcements = unitCap - count;
+                BufferedImage image = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
+                BufferedImage decal = null;
+                if (player != null) ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
+                for (int i = 0; i < numInReinforcements; i++) {
+                    Point position = reinforcementsPosition.getPosition(unitID);
+                    graphics.drawImage(image, x + position.x, y + position.y, null);
+                    graphics.drawImage(decal, x + position.x, y + position.y, null);
+                    if (onlyPaintOneUnit) break;
                 }
-                if (-5 <= remainingReinforcements)
-                    paintNumber(unitID, x, y, remainingReinforcements, playerColor);
+
+                String unitName = unitKey.getUnitType().humanReadableName();
+                if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
+                    String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
+                    List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitName);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warningMessage, removeButtons);
+                }
+
+                if (numInReinforcements > -10) {
+                    paintNumber(unitID, x, y, numInReinforcements, playerColor);
+                }
             }
         }
 
@@ -1549,24 +1511,19 @@ public class MapGenerator {
         return xDeltaFromRightSide + 450;
     }
 
-    private static void fillUnits(Map<UnitKey, Integer> unitCount, UnitHolder unitHolder,
-        boolean ignoreInfantryFighters) {
+    private static void fillUnits(Map<UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
         Map<UnitKey, Integer> units = unitHolder.getUnits();
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-            UnitKey unitKey = unitEntry.getKey();
-            Integer count = unitCount.get(unitKey);
-            if (count == null) {
-                count = 0;
-            }
-            if (unitKey.getUnitType() == UnitType.Infantry || unitKey.getUnitType() == UnitType.Fighter) {
-                if (ignoreInfantryFighters) {
-                    continue;
-                }
+            UnitKey uk = unitEntry.getKey();
+            int count = unitCount.getOrDefault(uk, 0);
+
+            if (uk.getUnitType() == UnitType.Infantry || uk.getUnitType() == UnitType.Fighter) {
+                if (ignoreInfantryFighters) continue;
                 count++;
             } else {
                 count += unitEntry.getValue();
             }
-            unitCount.put(unitKey, count);
+            unitCount.put(uk, count);
         }
     }
 
@@ -1666,6 +1623,7 @@ public class MapGenerator {
                 UnitKey unitKey = unitEntry.getKey();
                 Integer unitCount = unitEntry.getValue();
                 Integer bulkUnitCount = null;
+                Player p = game.getPlayerFromColorOrFaction(unitKey.getColor());
 
                 try {
                     String unitPath = Tile.getUnitPath(unitKey);
@@ -1716,28 +1674,12 @@ public class MapGenerator {
                     }
                 }
 
-                BufferedImage decal = null;
-                try {
-                    String color = AliasHandler.resolveColor(unitKey.getColorID());
-                    Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(color);
-                    if (decalPlayer != null && !"null".equals(decalPlayer.getDecalSet())
-                        && Mapper.isValidDecalSet(player.getDecalSet())) {
-                        String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), unitKey.asyncID(),
-                            getBlackWhiteFileSuffix(
-                                Mapper.getColorID(decalPlayer.getColor())));
-                        String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
-                        decal = ImageHelper.read(decalPath);
-                    }
-                } catch (Exception e) {
-                    BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
-                }
-
+                String decalFile = p != null ? p.getDecalFile(unitKey.asyncID()) : null;
+                BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFile));
                 BufferedImage spoopy = null;
                 if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
-
                     String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                     spoopy = ImageHelper.read(spoopypath);
-                    // BotLogger.log("SPOOPY TIME: " + spoopypath);
                 }
 
                 if (justNumber) {
@@ -2272,23 +2214,7 @@ public class MapGenerator {
     private int techFieldUnit(int x, int y, List<String> techs, int deltaX, Player player, Game game) {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
 
-        // Add faction icons for base units
-        for (String u : player.getUnitsOwned()) {
-            UnitModel unit = Mapper.getUnit(u);
-            if (unit == null) {
-                System.out.println("Invalid unitID found:" + u);
-            } else if (unit.getFaction().isPresent()) {
-                // ONLY PAINT FACTION IF IS FRANKEN OR IS NOT A UNIT THAT UPGRADES OR WAS
-                // UPGRADED TO (indicating faction tech)
-                if (game.isFrankenGame()
-                    || ((unit.getUpgradesFromUnitId().isPresent() && unit.getUpgradesFromUnitId().isPresent())
-                        || (unit.getUpgradesToUnitId().isPresent()
-                            && unit.getUpgradesToUnitId().isPresent()))) {
-                    Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
-                }
-            }
-        }
+        // Add unit upgrade images
         if (techs != null) {
             for (String tech : techs) {
                 TechnologyModel techInformation = Mapper.getTech(tech);
@@ -2297,18 +2223,28 @@ public class MapGenerator {
                 }
 
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
-
                 if (unit == null) {
                     BotLogger.log(game.getName() + " " + player.getUserName() + " Could not load unit associated with tech: " + techInformation.getAlias());
                     continue;
                 }
+
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+            }
+        }
 
-                if (techInformation.getFaction().isPresent()) {
+        // Add faction icons on top of upgraded or upgradable units
+        for (String u : player.getUnitsOwned()) {
+            UnitModel unit = Mapper.getUnit(u);
+            if (unit == null) {
+                System.out.println("Invalid unitID found:" + u);
+            } else if (unit.getFaction().isPresent()) {
+                boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent() || unit.getUpgradesToUnitId().isPresent();
+                if (game.isFrankenGame() || unitHasUpgrade || player.getFactionModel().getAlias().equals("echoes")) {
+                    // Always paint the faction icon in franken
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, techInformation.getFaction().get(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
+                    drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
         }
@@ -3297,7 +3233,7 @@ public class MapGenerator {
             graphics.drawString(text, x, y + 23);
 
             List<String> scoredPlayerID = scoredObjectives.get(key);
-            boolean multiScoring = Constants.CUSTODIAN.equals(key) || (isFoWPrivate != null && isFoWPrivate);
+            boolean multiScoring = Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || (isFoWPrivate != null && isFoWPrivate);
             if (scoredPlayerID != null) {
                 int tokenX = x + maxTextWidth + bufferBetweenTextAndTokens;
                 int tokenY = y;
@@ -4377,21 +4313,9 @@ public class MapGenerator {
             if (unitImage == null)
                 continue;
 
+            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             BufferedImage decal = null;
-            String color = AliasHandler.resolveColor(unitKey.getColorID());
-            Player player = game.getPlayerFromColorOrFaction(color);
-            try {
-                if (player != null && !"null".equals(player.getDecalSet())
-                    && Mapper.isValidDecalSet(player.getDecalSet())) {
-                    String decalFileName = String.format("%s_%s%s", player.getDecalSet(), unitKey.asyncID(),
-                        getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
-                    String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
-                    decal = ImageHelper.read(decalPath);
-                }
-            } catch (Exception e) {
-                String str = player.getDecalSet();
-                BotLogger.log("Could not parse decal file for reinforcements: " + str, e);
-            }
+            if (player != null) ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitKey.asyncID())));
 
             if (bulkUnitCount != null && bulkUnitCount > 0) {
                 unitCount = 1;
@@ -4556,7 +4480,7 @@ public class MapGenerator {
         g.drawString(text, x, y);
     }
 
-    private static String getBlackWhiteFileSuffix(String colorID) {
+    public static String getBlackWhiteFileSuffix(String colorID) {
         Set<String> lightColors = Set.of("ylw", "org", "pnk", "tan", "crm", "sns", "tqs", "gld", "lme", "lvn", "rse",
             "spr", "tea", "lgy", "eth");
         if (lightColors.contains(colorID)) {

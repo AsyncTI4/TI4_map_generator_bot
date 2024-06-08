@@ -17,8 +17,8 @@ public class UnitTokenPosition implements Serializable {
 
     @JsonCreator
     public UnitTokenPosition(@JsonProperty("unitHolderName") String unitHolderName,
-                             @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
-                             @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate) {
+        @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
+        @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate) {
         this.unitHolderName = unitHolderName;
         this.coordinateMap = coordinateMap;
         this.removeUnitCoordinate = removeUnitCoordinate;
@@ -33,22 +33,21 @@ public class UnitTokenPosition implements Serializable {
         this.removeUnitCoordinate = removeUnitCoordinate;
     }
 
-    public String getUnitHolderName() { return unitHolderName; }
-    public Map<String, List<Point>> getCoordinateMap() { return coordinateMap; }
+    public String getUnitHolderName() {
+        return unitHolderName;
+    }
 
-    /*public List<String> getUnitOrder() {
-        List<String> unitOrder = new ArrayList<>();
-        for (Map.Entry<String, List<Point>> entry : coordinateMap.entrySet()) {
-            unitOrder.add(entry.getKey());
-        }
-        return unitOrder;
-    }*/
+    public Map<String, List<Point>> getCoordinateMap() {
+        return coordinateMap;
+    }
 
-    public boolean getRemoveUnitCoordinate() { return removeUnitCoordinate; }
+    public boolean getRemoveUnitCoordinate() {
+        return removeUnitCoordinate;
+    }
+
     public int getPositionCount(String id) {
         return coordinateMap.get(id).size();
     }
-
 
     public void addPosition(String id, Point point) {
         List<Point> points = coordinateMap.computeIfAbsent(id, key -> new ArrayList<>());

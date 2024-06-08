@@ -334,6 +334,14 @@ public class Tile {
     }
 
     @JsonIgnore
+    @Nullable
+    public UnitHolder getSpaceUnitHolder() {
+        if (unitHolders.get("space") == null)
+            return null;
+        return unitHolders.get("space");
+    }
+
+    @JsonIgnore
     public String getRepresentation() {
         try {
             if (Mapper.getTileRepresentations().get(getTileID()) == null) {
