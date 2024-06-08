@@ -164,8 +164,7 @@ public class Units {
     }
 
     private static final String unitRegex() {
-        String allUnits = String.join("|", Arrays.asList(UnitType.values()).stream().map(x -> x.value).toList());
-        return "(?<color>[a-z]+)" + emdash + "(?<unit>(" + allUnits + "))";
+        return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
     }
 
     private static UnitType findUnitType(String unitType) {
@@ -190,7 +189,7 @@ public class Units {
         Matcher unitParser = Pattern.compile(unitRegex()).matcher(id);
         if (unitParser.matches()) {
             String colorID = unitParser.group("color");
-            String unitType = unitParser.group("unit");
+            String unitType = unitParser.group("unittype");
             return getUnitKey(unitType, colorID);
         }
         return null;

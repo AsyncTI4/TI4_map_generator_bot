@@ -2,7 +2,9 @@ package ti4.commands.special;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -73,7 +76,6 @@ public class SystemInfo extends SpecialSubcommandData {
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            Map<String, String> colorToId = Mapper.getColorToId();
             Boolean privateGame = FoWHelper.isPrivateGame(game, event);
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
@@ -95,7 +97,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Command Counters: ");
                         hasCC = true;
                     }
-                    addtFactionIcon(game, sb, colorToId, cc, privateGame);
+                    appendFactionIcon(game, sb, cc, privateGame);
                 }
                 if (hasCC) {
                     sb.append("\n");
@@ -125,7 +127,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Control Counters: ");
                         hasControl = true;
                     }
-                    addtFactionIcon(game, sb, colorToId, control, privateGame);
+                    appendFactionIcon(game, sb, control, privateGame);
                 }
                 if (hasControl) {
                     sb.append("\n");
@@ -185,21 +187,18 @@ public class SystemInfo extends SpecialSubcommandData {
         }
     }
 
-    private static void addtFactionIcon(Game game, StringBuilder sb, Map<String, String> colorToId, String key, Boolean privateGame) {
-
-        for (Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
-            String colorKey = colorEntry.getKey();
-            String color = colorEntry.getValue();
-            if (key.contains(colorKey)) {
-                for (Player player_ : game.getPlayers().values()) {
-                    if (Objects.equals(player_.getColor(), color)) {
-                        if (privateGame != null && privateGame) {
-                            sb.append(" (").append(color).append(") ");
-                        } else {
-                            sb.append(player_.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");
-                        }
-                    }
-                }
+    private static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
+        // parse IDs like "control_blk.png" and "command_red.png"
+        String colorTokenRegex = "[a-z]+_" + RegexHelper.colorRegex(game) + "\\.png";
+        Matcher tokenMatch = Pattern.compile(colorTokenRegex).matcher(key);
+        if (tokenMatch.matches()) {
+            String colorID = tokenMatch.group("color");
+            String color = Mapper.getColorName(colorID);
+            Player player = game.getPlayerFromColorOrFaction(color);
+            if (privateGame != null && privateGame) {
+                sb.append(" (").append(color).append(") ");
+            } else {
+                sb.append(player.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");
             }
         }
     }

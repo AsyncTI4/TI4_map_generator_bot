@@ -1,11 +1,47 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import ti4.helpers.Emojis;
 
 @Data
-public class ColorModel {
+public class ColorModel implements ModelInterface {
+
+    private String alias;
+    private String name;
+    private List<String> aliases;
+
+    public boolean isValid() {
+        return alias != null && name != null;
+    }
+
+    public Color primaryColor() {
+        return primaryColor(name);
+    }
+
+    public Color secondaryColor() {
+        return secondaryColor(name);
+    }
+
+    @JsonIgnore
+    public String getRepresentation(boolean includeName) {
+        if (includeName)
+            return Emojis.getColorEmojiWithName(name);
+        return Emojis.getColorEmoji(name);
+    }
+
+    @JsonIgnore
+    public Emoji getEmoji() {
+        String emoji = getRepresentation(false);
+        if (emoji != null)
+            return Emoji.fromFormatted(emoji);
+        return null;
+    }
 
     //For now these are hardcoded. TODO: add to json file
     public static Color primaryColor(String color) {
@@ -59,6 +95,7 @@ public class ColorModel {
             return null;
         }
         return switch (color) {
+            // gradient secondaries // TODO: do these
             // lightgray secondaries
             case "splitbloodred" -> primaryColor("lightgray");
             case "splitchocolate" -> primaryColor("lightgray");
@@ -83,14 +120,5 @@ public class ColorModel {
             case "splitblue" -> primaryColor("black");
             default -> null;
         };
-        //colors that don't exist in split variants
-        // case "splitgray" -> new Color(0, 0, 0);
-        // case "splitbrown" -> new Color(0, 0, 0);
-        // case "splitforest" -> new Color(0, 0, 0);
-        // case "splitchrome" -> new Color(0, 0, 0);
-        // case "splitsunset" -> new Color(0, 0, 0);
-        // case "splitlavender" -> new Color(0, 0, 0);
-        // case "splitrose" -> new Color(0, 0, 0);
-        // case "splitspring" -> new Color(0, 0, 0);
     }
 }
