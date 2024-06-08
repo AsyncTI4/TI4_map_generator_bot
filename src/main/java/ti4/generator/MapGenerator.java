@@ -1477,7 +1477,7 @@ public class MapGenerator {
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
                     String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
-                    List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitName);
+                    List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warningMessage, removeButtons);
                 }
 
