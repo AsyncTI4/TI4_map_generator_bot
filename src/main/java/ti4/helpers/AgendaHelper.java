@@ -3244,9 +3244,9 @@ public class AgendaHelper {
         if (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
             if (game.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
-                sb.append(" vote count (Rep Gov while controlling rex): **" + " ").append("2");
+                sb.append(" vote count (Rep Gov while controlling rex): **2**");
             } else {
-                sb.append(" vote count (Rep Gov): **" + " ").append("1");
+                sb.append(" vote count (Rep Gov): **1**");
             }
 
         }
