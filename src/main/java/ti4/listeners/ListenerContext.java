@@ -37,9 +37,9 @@ public abstract class ListenerContext {
         return event != null;
     }
 
-    public ListenerContext(GenericInteractionCreateEvent event, String componentID) {
+    public ListenerContext(GenericInteractionCreateEvent event, String compID) {
         this.event = event;
-        this.componentID = componentID;
+        this.componentID = compID;
 
         String userID = event.getUser().getId();
         MessageListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
