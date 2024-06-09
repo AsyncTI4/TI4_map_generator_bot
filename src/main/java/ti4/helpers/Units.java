@@ -167,7 +167,7 @@ public class Units {
         return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
     }
 
-    private static UnitType findUnitType(String unitType) {
+    public static UnitType findUnitType(String unitType) {
         for (UnitType t : UnitType.values()) {
             if (t.value.equalsIgnoreCase(unitType)) return t;
         }

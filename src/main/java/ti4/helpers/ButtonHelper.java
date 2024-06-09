@@ -3820,6 +3820,10 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.lizho)));
         }
 
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "ravencommander")) {
+            endButtons.add(Button.success(finChecker + "ravenMigration", "Use Migration").withEmoji(Emoji.fromFormatted(Emojis.raven)));
+        }
+
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
         return endButtons;
     }

@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -104,6 +102,13 @@ public class RegexHelper {
     public static String posRegex(Game game, String group) {
         Set<String> positions = game.getTileMap().keySet();
         return regexBuilder(group, positions);
+    }
+
+    public static String unitHolderRegex(Game game, String group) {
+        Set<String> unitholders = new HashSet<>();
+        unitholders.addAll(game.getPlanets());
+        unitholders.add("space");
+        return regexBuilder(group, unitholders);
     }
 
     public static String acRegex(Game game) {
