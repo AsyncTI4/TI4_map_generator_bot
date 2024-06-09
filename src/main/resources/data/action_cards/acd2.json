@@ -194,7 +194,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend trade goods equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
-    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked on what she was being ordered to do. \"What's left of her,\" said Kuuasi, not unkindly.",
+    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
   {
@@ -221,7 +221,7 @@
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
     "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if they have another choice.",
-    "flavorText": "\"It was their idea,\" Zo Cou shrugged. \"Or so they believe. Their mistake was a poison I fed them. Now we wait for them to choke on it.\"",
+    "flavorText": "\"It was their idea,\" Zo Cou shrugged. \"Or so they believe. Their mistake was a poison I fed them. Now they choke on it.\"",
     "source": "action_deck_2"
   },
   {
