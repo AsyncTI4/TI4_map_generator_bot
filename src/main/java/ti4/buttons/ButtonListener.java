@@ -1975,6 +1975,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("deployMykoSD_")) {
             ButtonHelperFactionSpecific.deployMykoSD(player, game, event, buttonID);
+        } else if (buttonID.startsWith("ravenMigration")) {
+            ButtonHelperCommanders.handleRavenCommander(context);
         } else if (buttonID.startsWith("jrResolution_")) {
             String faction2 = buttonID.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction2);
