@@ -738,7 +738,7 @@
     "source": "action_deck_2_old"
   },
   {
-    "alias": "`demoralization`",
+    "alias": "demoralization",
     "name": "Demoralization",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
