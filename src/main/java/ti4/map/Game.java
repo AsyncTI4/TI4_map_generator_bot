@@ -3856,8 +3856,19 @@ public class Game {
                 if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    Leader playerLeader = otherPlayer.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : otherPlayer.getLeaders()) {
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
+                            if (!playerLeader.getId().contains(otherPlayer.getFaction())) {
+                                continue;
+                            }
+                        }
+                        leaders.add(playerLeader);
+                    }
+
                 }
             }
         }
