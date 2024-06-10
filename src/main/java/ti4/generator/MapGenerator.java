@@ -2736,7 +2736,8 @@ public class MapGenerator {
                 Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
                 if (anchorProjectedPoint != null) {
                     Point playerStatsAnchorPoint = getTilePosition(playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y);
-                    int anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
+                    Integer anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
+                    anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
                     boolean isCorner = playerStatsAnchor.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
                     if (anchorLocationIndex == 0 && isCorner) { // North Corner
                         deltaX = playerStatsAnchorPoint.x + EXTRA_X + 80;
