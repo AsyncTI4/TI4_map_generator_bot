@@ -1,14 +1,14 @@
 {
     "id": "er106",
-    "name": "Vygar III",
+    "name": "Vygar II",
     "aliases": [
         "er106",
-        "vygariii",
+        "vygarii",
         "yncranti"
     ],
     "imagePath": "er_106_async.png",
     "planets": [
-        "vygariii",
+        "vygarii",
         "yncranti"
     ],
     "shipPositionsType": "TYPE05",
