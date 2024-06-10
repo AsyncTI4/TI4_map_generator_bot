@@ -728,7 +728,7 @@ public class MessageListener extends ListenerAdapter {
             msg.delete().queue();
         }
 
-        List<String> colors = Mapper.getColors();
+        List<String> colors = Mapper.getColorNames();
         colors.addAll(Mapper.getFactionIDs());
         String messageText = msg.getContentRaw();
         String messageLowerCase = messageText.toLowerCase();

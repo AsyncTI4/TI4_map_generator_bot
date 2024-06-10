@@ -1,7 +1,6 @@
 package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.helpers.Constants;
@@ -20,10 +19,10 @@ public class UnlockLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
-        unlockLeader(event, leaderID, game, player);
+        unlockLeader(leaderID, game, player);
     }
 
-    public static void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Game game, Player player) {
+    public static void unlockLeader(String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         MessageChannel channel = game.getMainGameChannel();
         if (game.isFoWMode())
