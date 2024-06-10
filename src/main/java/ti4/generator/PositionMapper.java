@@ -400,6 +400,7 @@ public class PositionMapper {
         return ring + String.format("%02d", 1 + ring * (side - 1) + position);
     }
 
+    @Nullable
     public static Integer getRingSideNumberOfTileID(String tileID) {
         if (!Helper.isInteger(tileID)) return null;
         int ringNumber = Integer.parseInt(tileID) / 100;

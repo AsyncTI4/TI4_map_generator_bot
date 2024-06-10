@@ -6,9 +6,7 @@
         "zetaepsilon"
     ],
     "imagePath": "er_33_async.png",
-    "planets": [
-        "."
-    ],
+    "planets": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -40,6 +38,5 @@
     "isSupernova": false,
     "isNebula": false,
     "isGravityRift": false,
-    "source": "eronous",
-    "valid": true
+    "source": "eronous"
 }
