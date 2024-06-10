@@ -34,7 +34,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
         showRemaining(event, over, game, player);
     }
 
-    public void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {
+    public static void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {
         List<String> allRelics = new ArrayList<>(game.getAllRelics());
 
         Integer deckCount = allRelics.size();

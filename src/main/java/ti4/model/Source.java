@@ -43,6 +43,13 @@ public class Source {
             return null;
         }
 
+        public boolean isOfficial() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3 -> true;
+                default -> false;
+            };
+        }
+
         public boolean isPok() {
             return switch (this) {
                 case base, pok, codex1, codex2, codex3 -> true;

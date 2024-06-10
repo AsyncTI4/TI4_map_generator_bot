@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.GenericCardModel.CardType;
 
 public class Mapper {
-    private static final Properties colors = new Properties();
+    //private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
@@ -45,6 +46,7 @@ public class Mapper {
     private static final Properties hyperlaneAdjacencies = new Properties();
 
     //TODO: Finish moving all files over from properties to json
+    private static final Map<String, ColorModel> colors = new HashMap<>();
     private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final Map<String, ExploreModel> explore = new HashMap<>();
     private static final Map<String, AbilityModel> abilities = new HashMap<>();
@@ -76,8 +78,9 @@ public class Mapper {
     }
 
     public static void loadData() throws Exception {
+        importJsonObjects("colors.json", colors, ColorModel.class);
         importJsonObjectsFromFolder("factions", factions, FactionModel.class);
-        readData("color.properties", colors);
+        //readData("color.properties", colors);
         readData("decals.properties", decals);
         readData("tokens.properties", tokens);
         readData("special_case.properties", special_case);
@@ -170,12 +173,12 @@ public class Mapper {
     private static <T extends ColorableModelInterface<T>> void duplicateObjectsForAllColors(Map<String, T> objectMap) {
         String mostRecentObject = "none";
         try {
-            List<String> colorsToCreate = getColors();
+            List<ColorModel> colorsToCreate = getColors();
             List<T> newObjects = new ArrayList<T>();
             for (T obj : objectMap.values()) {
                 mostRecentObject = obj.getAlias();
                 if (obj.isColorable()) {
-                    for (String color : colorsToCreate) {
+                    for (ColorModel color : colorsToCreate) {
                         T newObj = obj.duplicateAndSetColor(color);
                         newObjects.add(newObj);
                     }
@@ -242,20 +245,34 @@ public class Mapper {
     }
 
     public static boolean isValidColor(String color) {
-        String property = colors.getProperty(color);
-        return property != null && !"null".equals(property);
+        if (colors.containsKey(color))
+            return true;
+        for (ColorModel col : colors.values()) {
+            if (col.getName().equals(color)) return true;
+            if (col.getAliases().contains(color)) return true;
+        }
+        return false;
     }
 
     public static boolean isValidFaction(String faction) {
         return factions.containsKey(faction);
     }
 
-    public static String getTheFrickinColorID(String color) {
-        return colors.getProperty(color, color);
+    public static ColorModel getColor(String color) {
+        for (ColorModel col : colors.values()) {
+            if (col.getAlias().equals(color)) return col;
+            if (col.getName().equals(color)) return col;
+            if (col.getAliases().contains(color)) return col;
+        }
+        return null;
     }
 
     public static String getColorID(String color) {
-        return color != null ? colors.getProperty(color) : null;
+        return Optional.ofNullable(getColor(color)).map(ColorModel::getAlias).orElse(null);
+    }
+
+    public static String getColorName(String color) {
+        return Optional.ofNullable(getColor(color)).map(ColorModel::getName).orElse(null);
     }
 
     public static String getSpecialCaseValues(String id) {
@@ -347,14 +364,6 @@ public class Mapper {
             .orElse(null);
     }
 
-    public static Map<String, String> getColorToId() {
-        Map<String, String> unitMap = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : colors.entrySet()) {
-            unitMap.put((String) entry.getValue(), (String) entry.getKey());
-        }
-        return unitMap;
-    }
-
     public static Map<String, GenericCardModel> getGenericCards() {
         return new HashMap<>(genericCards);
     }
@@ -390,16 +399,6 @@ public class Mapper {
             .collect(Collectors.toSet());
     }
 
-    public static String getCCID(String color) {
-        String property = colors.getProperty(color);
-        return "command_" + property + ".png";
-    }
-
-    public static String getFleetCCID(String color) {
-        String property = colors.getProperty(color);
-        return "fleet_" + property + ".png";
-    }
-
     public static String getAttachmentImagePath(String tokenID) {
         AttachmentModel model = getAttachmentInfo(tokenID);
         if (model == null) return null;
@@ -414,25 +413,36 @@ public class Mapper {
         return factions.get(factionID);
     }
 
+    public static String getCCID(String color) {
+        return "command_" + getColorID(color) + ".png";
+    }
+
+    public static String getFleetCCID(String color) {
+        return "fleet_" + getColorID(color) + ".png";
+    }
+
     public static String getControlID(String color) {
-        String property = colors.getProperty(color);
-        return "control_" + property + ".png";
+        return "control_" + getColorID(color) + ".png";
     }
 
     public static String getPeekMarkerID(String color) {
-        return "peak_" + colors.getProperty(color) + ".png";
+        return "peak_" + getColorID(color) + ".png";
     }
 
     public static String getSweepID(String color) {
-        String property = colors.getProperty(color);
-        return "sweep_" + property + ".png";
+        return "sweep_" + getColorID(color) + ".png";
     }
 
-    public static List<String> getColors() {
-        return colors.keySet().stream().filter(String.class::isInstance)
-            .map(String.class::cast)
-            .sorted()
-            .collect(Collectors.toList());
+    public static List<ColorModel> getColors() {
+        return new ArrayList<>(colors.values());
+    }
+
+    public static List<String> getColorIDs() {
+        return new ArrayList<>(colors.values().stream().map(ColorModel::getAlias).toList());
+    }
+
+    public static List<String> getColorNames() {
+        return new ArrayList<>(colors.values().stream().map(ColorModel::getName).toList());
     }
 
     public static List<String> getTokens() {

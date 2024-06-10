@@ -1133,6 +1133,11 @@ public class AgendaHelper {
 
         Die d1 = new Die(6);
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian!";
+        if (d1.isSuccess()) {
+            msg += Emojis.Propulsion3 + " " + Emojis.Biotic3 + " " + Emojis.Cybernetic3 + " " + Emojis.Warfare3;
+        } else {
+            msg += "💥 💥 💥 💥";
+        }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         if (watchParty != null && publish) {
             String watchMsg = watchPartyPing + " " + game.getName() + " has finished rolling:\n" + msg;
@@ -2072,39 +2077,34 @@ public class AgendaHelper {
     public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
 
-        for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer()) {
-                String faction = player.getFaction();
-                if (faction != null && Mapper.isValidFaction(faction)) {
-                    Button button;
-                    if (!game.isFoWMode() && !faction.contains("franken")) {
-                        if (rider != null) {
-                            if (planetRes != null) {
-                                button = Button.secondary(planetRes + "_" + faction + "_" + rider, " ");
-                            } else {
-                                button = Button.secondary(prefix + "rider_player;" + faction + "_" + rider, " ");
-                            }
-
-                        } else {
-                            button = Button.secondary(prefix + "_" + faction, " ");
-                        }
-                        String factionEmojiString = player.getFactionEmoji();
-                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+        for (Player player : game.getRealPlayers()) {
+            String faction = player.getFaction();
+            Button button;
+            if (!game.isFoWMode() && !faction.contains("franken")) {
+                if (rider != null) {
+                    if (planetRes != null) {
+                        button = Button.secondary(planetRes + "_" + faction + "_" + rider, " ");
                     } else {
-                        if (rider != null) {
-                            if (planetRes != null) {
-                                button = Button.secondary(planetRes + "_" + player.getColor() + "_" + rider, " ");
-                            } else {
-                                button = Button.secondary(prefix + "rider_player;" + player.getColor() + "_" + rider,
-                                    player.getColor());
-                            }
-                        } else {
-                            button = Button.secondary(prefix + "_" + player.getColor(), player.getColor());
-                        }
+                        button = Button.secondary(prefix + "rider_player;" + faction + "_" + rider, " ");
                     }
-                    playerOutcomeButtons.add(button);
+                } else {
+                    button = Button.secondary(prefix + "_" + faction, " ");
+                }
+                String factionEmojiString = player.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+            } else {
+                if (rider != null) {
+                    if (planetRes != null) {
+                        button = Button.secondary(planetRes + "_" + player.getColor() + "_" + rider, " ");
+                    } else {
+                        button = Button.secondary(prefix + "rider_player;" + player.getColor() + "_" + rider,
+                            player.getColor());
+                    }
+                } else {
+                    button = Button.secondary(prefix + "_" + player.getColor(), player.getColor());
                 }
             }
+            playerOutcomeButtons.add(button);
         }
         return playerOutcomeButtons;
     }
@@ -2383,10 +2383,10 @@ public class AgendaHelper {
                             }
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
-                        if (specificVote.contains("Imperial Rider")) {
+                        if (specificVote.contains(Constants.IMPERIAL_RIDER)) {
                             String msg = identity + " due to having a winning Imperial Rider, you have scored a pt\n";
                             int poIndex;
-                            poIndex = game.addCustomPO("Imperial Rider", 1);
+                            poIndex = game.addCustomPO(Constants.IMPERIAL_RIDER, 1);
                             msg = msg + "Custom PO 'Imperial Rider' has been added.\n";
                             game.scorePublicObjective(winningR.getUserID(), poIndex);
                             msg = msg + winningR.getRepresentation() + " scored 'Imperial Rider'\n";
@@ -3244,9 +3244,9 @@ public class AgendaHelper {
         if (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
             if (game.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
-                sb.append(" vote count (Rep Gov while controlling rex): **" + " ").append("2");
+                sb.append(" vote count (Rep Gov while controlling rex): **2**");
             } else {
-                sb.append(" vote count (Rep Gov): **" + " ").append("1");
+                sb.append(" vote count (Rep Gov): **1**");
             }
 
         }

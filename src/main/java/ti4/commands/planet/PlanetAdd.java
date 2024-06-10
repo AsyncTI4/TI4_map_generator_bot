@@ -166,10 +166,8 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (p != null && p.getFactionHomeworld() != null && !player.hasLeader(p.getFactionHomeworld() + "commander")) {
                     String leaderID = p.getFactionHomeworld() + "commander";
                     player.addLeader(leaderID);
-                    if (!game.getStoredValue("minorFactionCommanders").contains(leaderID)) {
-                        game.setStoredValue("minorFactionCommanders", game.getStoredValue("minorFactionCommanders") + leaderID);
-                    }
-                    UnlockLeader.unlockLeader(event, leaderID, game, player);
+                    game.addFakeCommander(leaderID);
+                    UnlockLeader.unlockLeader(leaderID, game, player);
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2 == player) {
                             continue;

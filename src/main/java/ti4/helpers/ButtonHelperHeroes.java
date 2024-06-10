@@ -1930,7 +1930,7 @@ public class ButtonHelperHeroes {
         String hero = buttonID.split("_")[1];
         HeroPlay.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
         player.addLeader(hero);
-        UnlockLeader.unlockLeader(event, hero, game, player);
+        UnlockLeader.unlockLeader(hero, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), LeaderAdd.getAddLeaderText(player, hero));
         event.getMessage().delete().queue();
 

@@ -21,7 +21,7 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
         showDiscards(game, event);
     }
 
-    public void showDiscards(Game game, GenericInteractionCreateEvent event) {
+    public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
         sb.append("### __**Discarded Agendas:**__");

@@ -82,6 +82,7 @@ public class TechCommand implements Command {
         subcommands.add(new TechInfo());
         subcommands.add(new TechButton());
         subcommands.add(new TechChangeType());
+        subcommands.add(new TechShowDeck());
 
         return subcommands;
     }

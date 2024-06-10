@@ -102,9 +102,9 @@ public class AutoCompleteProvider {
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getColors().stream()
-                    .filter(color -> color.startsWith(enteredValue))
+                    .filter(color -> color.getName().startsWith(enteredValue) || color.getAliases().contains(enteredValue))
                     .limit(25)
-                    .map(color -> new Command.Choice(color, color))
+                    .map(color -> new Command.Choice(color.getName(), color.getName()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
@@ -127,7 +127,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (game.isFoWMode()) {
                     List<String> factionColors = new ArrayList<>(Mapper.getFactionIDs());
-                    factionColors.addAll(Mapper.getColors());
+                    factionColors.addAll(Mapper.getColorNames());
 
                     List<String> factionColorsRetain = new ArrayList<>();
                     boolean privateGame = FoWHelper.isPrivateGame(game, null, event.getChannel());

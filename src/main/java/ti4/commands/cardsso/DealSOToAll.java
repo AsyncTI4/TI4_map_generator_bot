@@ -28,7 +28,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
         dealSOToAll(event, count, game);
     }
 
-    public void dealSOToAll(GenericInteractionCreateEvent event, int count, Game game) {
+    public static void dealSOToAll(GenericInteractionCreateEvent event, int count, Game game) {
         if (count > 0) {
             for (Player player : game.getRealPlayers()) {
                 for (int i = 0; i < count; i++) {
@@ -59,7 +59,6 @@ public class DealSOToAll extends SOCardsSubcommandData {
             // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
             //     game.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
             Helper.setOrder(game);
-
         }
     }
 }

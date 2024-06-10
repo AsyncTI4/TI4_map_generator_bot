@@ -2,7 +2,6 @@ package ti4.commands.units;
 
 import com.amazonaws.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +33,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -111,14 +109,7 @@ abstract public class AddRemoveUnits implements Command {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
 
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
-            game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
-            Player neutral = game.getPlayer("572698679618568193");
-            neutral.setColor(color);
-            neutral.setFaction("neutral");
-            neutral.setDummy(true);
-            FactionModel setupInfo = neutral.getFactionSetupInfo();
-            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-            neutral.setUnitsOwned(playerOwnedUnits);
+            game.setupNeutralPlayer(color);
         }
 
         unitParsing(event, color, tile, unitList, game);
@@ -128,14 +119,7 @@ abstract public class AddRemoveUnits implements Command {
         Game game) {
 
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
-            game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
-            Player neutral = game.getPlayer("572698679618568193");
-            neutral.setColor(color);
-            neutral.setFaction("neutral");
-            neutral.setDummy(true);
-            FactionModel setupInfo = neutral.getFactionSetupInfo();
-            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-            neutral.setUnitsOwned(playerOwnedUnits);
+            game.setupNeutralPlayer(color);
         }
 
         commonUnitParsing(event, color, tile, unitList, game);
@@ -147,14 +131,7 @@ abstract public class AddRemoveUnits implements Command {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
 
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
-            game.addPlayer("572698679618568193", "Dicecord"); //Dicecord
-            Player neutral = game.getPlayer("572698679618568193");
-            neutral.setColor(color);
-            neutral.setFaction("neutral");
-            neutral.setDummy(true);
-            FactionModel setupInfo = neutral.getFactionSetupInfo();
-            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-            neutral.setUnitsOwned(playerOwnedUnits);
+            game.setupNeutralPlayer(color);
         }
 
         commonUnitParsing(event, color, tile, unitList, game);
