@@ -57,7 +57,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Tile To position: " + positionTo);
             return;
         } else {
-            game.removeTile(positionFrom);
+            //game.removeTile(positionFrom);
         }
 
         tile1.setPosition(positionTo);
