@@ -127,6 +127,26 @@ public class MiltyDraftManager {
         draftIndex++;
     }
 
+    public void replacePlayer(Game game, String oldUID, String newUID) {
+        // Update player list
+        List<String> newPlayers = new ArrayList<>();
+        players.forEach(p -> newPlayers.add(p.equals(oldUID) ? newUID : p));
+        players.clear();
+        players.addAll(newPlayers);
+
+        // Update draft order
+        List<String> newDraftOrder = new ArrayList<>();
+        draftOrder.forEach(p -> newDraftOrder.add(p.equals(oldUID) ? newUID : p));
+        draftOrder.clear();
+        draftOrder.addAll(newDraftOrder);
+
+        // Update player draft keys
+        Map<String, PlayerDraft> newDraft = new HashMap<>();
+        draft.forEach((k, v) -> newDraft.put(k.equals(oldUID) ? newUID : k, v));
+        draft.clear();
+        draft.putAll(newDraft);
+    }
+
     public List<MiltyDraftTile> getBlue() {
         return new ArrayList<>(blue);
     }
@@ -294,11 +314,11 @@ public class MiltyDraftManager {
             String fauxPlayerPick = null;
             Player nextDrafter = getCurrentDraftPlayer(game);
             PlayerDraft pd = getPlayerDraft(nextDrafter);
-            if (pd.getFaction() == null && pd.getSlice() == null) {
+            if (pd.getPosition() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getPositionButtons());
-            } else if (pd.getFaction() == null && pd.getPosition() == null) {
+            } else if (pd.getSlice() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getSliceButtons());
-            } else if (pd.getPosition() == null && pd.getSlice() == null) {
+            } else if (pd.getFaction() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getFactionButtons());
             }
 
