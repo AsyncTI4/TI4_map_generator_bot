@@ -42,6 +42,7 @@ import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -226,6 +227,12 @@ public class Player {
         return Mapper.getDecalName(getDecalSet());
     }
 
+    @JsonIgnore
+    public String getDecalFile(String unitType) {
+        if (getDecalSet() == null) return null;
+        return String.format("%s_%s%s", getDecalSet(), unitType, MapGenerator.getBlackWhiteFileSuffix(getColorID()));
+    }
+
     public Tile getNomboxTile() {
         return nomboxTile;
     }
@@ -397,7 +404,7 @@ public class Player {
     @JsonIgnore
     public boolean hasInf2Tech() {// "dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2")
-            || getTechs().contains("lw2") || getTechs().contains("dscymiinf")
+            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2")
             || getTechs().contains("dszeliinf");
     }
 
@@ -1587,7 +1594,7 @@ public class Player {
     }
 
     public String getColor() {
-        return color != null ? color : "null";
+        return color != null ? Mapper.getColorName(color) : "null";
     }
 
     public String getColorID() {
@@ -2717,10 +2724,11 @@ public class Player {
         if (getColor() != null && !getColor().equals("null")) {
             return getColor();
         }
-        return getPreferredColours().stream()
-            .filter(c -> getGame().getUnusedColours().contains(c))
+        String color = getPreferredColours().stream()
+            .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
             .findFirst()
-            .orElse(getGame().getUnusedColours().stream().findFirst().orElse(null));
+            .orElse(getGame().getUnusedColors().stream().findFirst().map(ColorModel::getName).orElse(null));
+        return Mapper.getColorName(color);
     }
 
     public Optional<String> getGlobalUserSetting(String setting) {

@@ -43,8 +43,10 @@ public class ListSetting<T> extends SettingInterface {
     @JsonIgnore
     private Set<String> defaultKeys;
     @Setter
+    @JsonIgnore
     private Function<T, String> show;
     @Setter
+    @JsonIgnore
     private Function<T, String> getEmoji;
     private String includeLang = "include";
     private String removeLang = "remove";

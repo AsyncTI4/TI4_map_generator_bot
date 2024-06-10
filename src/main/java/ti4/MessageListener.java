@@ -273,8 +273,8 @@ public class MessageListener extends ListenerAdapter {
         Game mapreference = GameManager.getInstance().getGame("finreference");
         int multiplier = 1000; // should be 1000
         if (mapreference != null
-            && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10 * 1 * multiplier) // 10
-                                                                                                                                         // minutes
+            && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10 * 60 * multiplier) // 10
+                                                                                                                                          // minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
             List<String> storedValues = new ArrayList<>();
@@ -305,7 +305,7 @@ public class MessageListener extends ListenerAdapter {
                                 }
                                 long twelveHrs = half * 60 * 60 * multiplier;
                                 long twentyFourhrs = twenty4 * 60 * 60 * multiplier;
-                                String scTime = game.getStoredValue("scPlayMsgTime" + sc);
+                                String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
                                     long timeDifference = (new Date().getTime()) - scPlayTime;
@@ -409,7 +409,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
                 if (game.getAutoPingStatus() && spacer != 0 && !game.getTemporaryPingDisable()) {
-                    if (playerID != null || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                    if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
 
                         if (player != null || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
                             long milliSinceLastPing = new Date().getTime()
@@ -652,9 +652,10 @@ public class MessageListener extends ListenerAdapter {
                         if (milliSinceLastPing > (60 * 60 * multiplier * game.getAutoPingSpacer())) {
                             if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
                                 AgendaHelper.pingMissingPlayers(game);
+                                game.setLastActivePlayerPing(new Date());
+                                GameSaveLoadManager.saveMap(game);
                             }
-                            game.setLastActivePlayerPing(new Date());
-                            GameSaveLoadManager.saveMap(game);
+
                         }
                     }
                 }
@@ -727,7 +728,7 @@ public class MessageListener extends ListenerAdapter {
             msg.delete().queue();
         }
 
-        List<String> colors = Mapper.getColors();
+        List<String> colors = Mapper.getColorNames();
         colors.addAll(Mapper.getFactionIDs());
         String messageText = msg.getContentRaw();
         String messageLowerCase = messageText.toLowerCase();
@@ -890,7 +891,7 @@ public class MessageListener extends ListenerAdapter {
                             .getStoredValue("futureMessageFor" + player.getFaction()) + "; ";
                     }
                     game.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", ""));
+                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummery) {
                     String previousThoughts = "";
@@ -921,7 +922,7 @@ public class MessageListener extends ListenerAdapter {
                     game.setStoredValue("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction(),
                         game.getStoredValue(
                             "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " "
-                            + messageContent.replace(":", "666fin"));
+                            + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent someone else a future message");
                 }
                 msg.delete().queue();

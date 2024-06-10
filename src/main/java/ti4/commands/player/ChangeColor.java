@@ -15,6 +15,7 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
@@ -29,6 +30,14 @@ public class ChangeColor extends PlayerSubcommandData {
         super(Constants.CHANGE_COLOR, "Player Color Change");
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+    }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        String userID = event.getUser().getId();
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
+        ShowGame.simpleShowGame(game, event);
     }
 
     @Override
@@ -59,12 +68,20 @@ public class ChangeColor extends PlayerSubcommandData {
         }
 
         String oldColor = player.getColor();
+        changePlayerColor(game, player, oldColor, newColor);
+    }
+
+    public void changePlayerColor(Game game, Player player, String oldColor, String newColor) {
+        StringBuilder sb = new StringBuilder(player.getRepresentation(false, false));
+        sb.append(" changed their color to ").append(Emojis.getColorEmojiWithName(newColor));
+
         String oldColorKey = oldColor + "_";
         String newColorKey = newColor + "_";
         player.changeColor(newColor);
         String oldColorID = Mapper.getColorID(oldColor);
         String newColorID = Mapper.getColorID(newColor);
 
+        Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             Map<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
 
@@ -129,14 +146,6 @@ public class ChangeColor extends PlayerSubcommandData {
         game.getPlayers().values().stream().map(Player::getNomboxTile)
             .flatMap(t -> t.getUnitHolders().values().stream())
             .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-        ShowGame.simpleShowGame(game, event);
     }
 
     private void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {

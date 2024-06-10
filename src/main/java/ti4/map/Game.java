@@ -9,6 +9,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,13 +70,16 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.ColorModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
+import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.Source.ComponentSource;
 
 public class Game {
 
@@ -410,6 +414,52 @@ public class Game {
                 + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
     }
 
+    @JsonIgnore
+    public Player setupNeutralPlayer(String color) {
+        addPlayer("572698679618568193", "Dicecord"); //Dicecord
+        Player neutral = getPlayer("572698679618568193");
+        neutral.setColor(color);
+        neutral.setFaction("neutral");
+        neutral.setDummy(true);
+        FactionModel setupInfo = neutral.getFactionSetupInfo();
+        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+        neutral.setUnitsOwned(playerOwnedUnits);
+
+        return neutral;
+    }
+
+    @JsonIgnore
+    public Player getNeutralPlayer(String fallbackColor) {
+        if (players.get("572698679618568193") != null)
+            return players.get("572698679618568193");
+        return setupNeutralPlayer(fallbackColor);
+    }
+
+    @JsonIgnore
+    public Player getNeutralPlayer() {
+        if (players.get("572698679618568193") != null)
+            return players.get("572698679618568193");
+        return null;
+    }
+
+    public String pickNeutralColorID(List<String> exclusions) {
+        // Start with the preferred colors, but then add all the colors to the list anyway
+        List<String> colorPriority = new ArrayList<>(List.of("gray", "red", "blue", "green", "orange", "yellow", "black", "pink", "purple", "rose", "lime", "brown", "teal", "spring", "petrol", "lightgray"));
+        colorPriority.addAll(Mapper.getColorNames());
+        List<String> preferredNeutralColors = new ArrayList<>(colorPriority.stream().map(Mapper::getColorID).toList());
+
+        // Build the full set of exclusions based on the argument plus the list of players
+        Set<String> excludedColorIDs = new HashSet<>(exclusions);
+        excludedColorIDs.addAll(getPlayers().values().stream().map(Player::getColorID).toList());
+
+        // Finally, pick a color
+        String neutralColorID = preferredNeutralColors.stream().filter(colorID -> !excludedColorIDs.contains(colorID)).findFirst().orElse(null);
+        if (neutralColorID == null) {
+            MessageHelper.sendMessageToChannel(getActionsChannel(), "Could not determine a good neutral unit color " + Constants.jazzPing());
+        }
+        return neutralColorID;
+    }
+
     public int getNumberOfSOsInTheDeck() {
         return secretObjectives.size();
     }
@@ -695,6 +745,11 @@ public class Game {
     }
 
     public boolean isAllianceMode() {
+        for (Player player : getRealPlayers()) {
+            if (player.getAllianceMembers() != null && !player.getAllianceMembers().replace(player.getFaction(), "").isEmpty()) {
+                allianceMode = true;
+            }
+        }
         return allianceMode;
     }
 
@@ -821,6 +876,8 @@ public class Game {
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
+                put("Minor Factions", isMinorFactionsMode());
+                put("Age of Exploration", isAgeOfExplorationMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFoWMode());
                 put("Franken", isFrankenGame());
@@ -1075,17 +1132,36 @@ public class Game {
             playerSC = 0;
         }
         for (int sc : orderedSCsBasic) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                sc = 0;
+            }
             if (sc > playerSC) {
                 orderedSCs.add(sc);
             }
         }
         for (int sc : orderedSCsBasic) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                sc = 0;
+            }
             if (sc < playerSC) {
                 orderedSCs.add(sc);
             }
         }
 
         return orderedSCs;
+    }
+
+    public Player getPlayerFromSC(int sc) {
+        for (Player player : getRealPlayersNDummies()) {
+            if (player.getSCs().contains(sc)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public DisplayType getDisplayTypeForced() {
@@ -1885,7 +1961,7 @@ public class Game {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            if (!Constants.CUSTODIAN.equals(id) && scoredPlayerList.contains(userID)) {
+            if (!Constants.CUSTODIAN.equals(id) && !Constants.IMPERIAL_RIDER.equals(id) && scoredPlayerList.contains(userID)) {
                 return false;
             }
             scoredPlayerList.add(userID);
@@ -3831,6 +3907,23 @@ public class Game {
         }
     }
 
+    public boolean leaderIsFake(String leaderID) {
+        return (getStoredValue("fakeCommanders").contains(leaderID) || getStoredValue("minorFactionCommanders").contains(leaderID));
+    }
+
+    public void addFakeCommander(String leaderID) {
+        if (leaderID.contains("commander")) {
+            String fakeString = getStoredValue("fakeCommanders");
+            if (StringUtils.isBlank(fakeString)) {
+                setStoredValue("fakeCommanders", leaderID);
+            } else {
+                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("|")));
+                leaders.add(leaderID);
+                setStoredValue("fakeCommanders", String.join("|", leaders));
+            }
+        }
+    }
+
     public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
         if (player.hasLeaderUnlocked(leaderID))
             return true;
@@ -3840,7 +3933,7 @@ public class Game {
         // check if player has any allainces with players that have the commander
         // unlocked
 
-        if (isMinorFactionsMode() && getStoredValue("minorFactionCommanders").contains(leaderID)) {
+        if (leaderIsFake(leaderID)) {
             return false;
         }
 
@@ -3879,8 +3972,16 @@ public class Game {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-                    Leader playerLeader = pnOwner.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : pnOwner.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())) {
+                            continue;
+                        }
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        leaders.add(playerLeader);
+                    }
                 }
             }
         }
@@ -3892,8 +3993,22 @@ public class Game {
                 if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    Leader playerLeader = otherPlayer.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : otherPlayer.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())) {
+                            continue;
+                        }
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
+                            if (!playerLeader.getId().contains(otherPlayer.getFaction())) {
+                                continue;
+                            }
+                        }
+                        leaders.add(playerLeader);
+                    }
+
                 }
             }
         }
@@ -4183,7 +4298,8 @@ public class Game {
 
                 }
                 if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
+                    Objects.equals(factionColor, player_.getColor()) ||
+                    Objects.equals(factionColor, player_.getColorID())) {
                     player = player_;
                     break;
                 }
@@ -4220,21 +4336,6 @@ public class Game {
         if (player == null)
             return null;
         return player.getUnitFromUnitKey(unitKey);
-    }
-
-    @Deprecated
-    public String getUnitNameFromImageName(String imageName) {
-        String colorID = StringUtils.substringBefore(imageName, "_");
-        String imageFileSuffix = StringUtils.substringAfter(imageName, colorID);
-        Player player = getPlayerFromColorOrFaction(colorID);
-        if (player == null)
-            return null;
-
-        return player.getUnitModels().stream()
-            .filter(unit -> unit.getImageFileSuffix().equals(imageFileSuffix))
-            .map(UnitModel::getName)
-            .findFirst()
-            .orElse(null);
     }
 
     public void swapInVariantUnits(String source) {
@@ -4355,6 +4456,34 @@ public class Game {
     @JsonIgnore
     public boolean hasHomebrew() {
         // needs to check for homebrew tiles still
+        // Decks
+        List<String> deckIDs = new ArrayList<>();
+        deckIDs.add(acDeckID);
+        deckIDs.add(soDeckID);
+        deckIDs.add(stage1PublicDeckID);
+        deckIDs.add(stage2PublicDeckID);
+        deckIDs.add(relicDeckID);
+        deckIDs.add(agendaDeckID);
+        deckIDs.add(explorationDeckID);
+        deckIDs.add(technologyDeckID);
+        deckIDs.add(eventDeckID);
+        boolean allDecksOfficial = deckIDs.stream().allMatch(id -> {
+            DeckModel deck = Mapper.getDeck(id);
+            if (id.equals("null")) return true;
+            if (deck == null) return false;
+            return deck.getSource().isOfficial();
+        });
+        StrategyCardSetModel scset = Mapper.getStrategyCardSets().get(scSetID);
+        if (scset == null || !scset.getSource().isOfficial()) allDecksOfficial = false;
+
+        // Tiles
+        boolean allTilesOfficial = getTileMap().values().stream().allMatch(tile -> {
+            ComponentSource tileSource = tile.getTileModel().getSource();
+            if (tile.getTileModel().getImagePath().endsWith("_Hyperlane.png"))
+                return true; //official hyperlane
+            return tileSource != null && tileSource.isOfficial();
+        });
+
         return isExtraSecretMode()
             || isHomeBrew()
             || isFoWMode()
@@ -4368,24 +4497,8 @@ public class Game {
             || isSpinMode()
             || isHomeBrewSCMode()
             || isCommunityMode()
-            || acDeckID != null && !List
-                .of("action_cards_pok", "action_cards_basegame", "action_cards_basegame_and_codex1", "null")
-                .contains(acDeckID)
-            || soDeckID != null
-                && !List.of("secret_objectives_pok", "secret_objectives_base", "null").contains(soDeckID)
-            || stage1PublicDeckID != null
-                && !List.of("public_stage_1_objectives_pok", "public_stage_1_objectives_base", "null")
-                    .contains(stage1PublicDeckID)
-            || stage2PublicDeckID != null
-                && !List.of("public_stage_2_objectives_pok", "public_stage_2_objectives_base", "null")
-                    .contains(stage2PublicDeckID)
-            || relicDeckID != null && !List.of("relics_pok", "relics_base").contains(relicDeckID)
-            || agendaDeckID != null && !List.of("agendas_pok", "agendas_base_game", "null").contains(agendaDeckID)
-            || explorationDeckID != null
-                && !List.of("explores_pok", "explores_base", "null").contains(explorationDeckID)
-            || technologyDeckID != null && !List.of("techs_pok", "techs_base", "null").contains(technologyDeckID)
-            || scSetID != null && !List.of("pok", "base_game", "base_game_codex1", "null").contains(scSetID)
-            || eventDeckID != null && !"null".equals(eventDeckID)
+            || !allDecksOfficial
+            || !allTilesOfficial
             || Mapper.getFactions().stream()
                 .filter(faction -> !faction.getSource().isPok())
                 .anyMatch(faction -> getFactions().contains(faction.getAlias()))
@@ -4406,15 +4519,19 @@ public class Game {
     public void setStrategyCardSet(String scSetID) {
         StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
         setHomeBrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID));
+
+        Map<Integer, Integer> oldTGs = getScTradeGoods();
         setScTradeGoods(new LinkedHashMap<>());
         setScSetID(strategyCardModel.getAlias());
-        strategyCardModel.getCardValues().keySet().forEach(scValue -> setScTradeGood(scValue, 0));
+        strategyCardModel.getStrategyCardModels().forEach(scModel -> {
+            setScTradeGood(scModel.getInitiative(), oldTGs.getOrDefault(scModel.getInitiative(), 0));
+        });
     }
 
     @JsonIgnore
-    public List<String> getUnusedColours() {
+    public List<ColorModel> getUnusedColors() {
         return Mapper.getColors().stream()
-            .filter(colour -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(colour)))
+            .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();
     }
 }

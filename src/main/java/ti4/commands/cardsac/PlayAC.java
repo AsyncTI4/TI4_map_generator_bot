@@ -484,6 +484,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
             codedName = "Sister Ship";
+            if (actionCardTitle.contains("Flank Speed")) {
+                game.setStoredValue("flankspeedBoost", "1");
+            }
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveSisterShip",
                     "Resolve " + codedName));

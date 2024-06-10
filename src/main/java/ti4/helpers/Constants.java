@@ -650,6 +650,7 @@ public class Constants {
     public static final String PO_NAME = "public_name";
     public static final String PO_VP_WORTH = "public_vp_worth";
     public static final String CUSTODIAN = "Custodian/Imperial";
+    public static final String IMPERIAL_RIDER = "Imperial Rider";
     public static final String REVEALED_PO = "revealedPublicObjectives";
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";
@@ -916,6 +917,7 @@ public class Constants {
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
+    public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
     public static final String AUTO_ARCHIVE_DURATION = "auto_archive_duration";
@@ -977,6 +979,8 @@ public class Constants {
     public static final String CLEAR_DEBT = "clear_debt";
 
     public static final String OBSERVER = "observer";
+    public static final String REMOVE_TITLE = "remove_title";
+    public static final String TITLE = "title";
     public static final String ADD_REMOVE = "add_remove";
 
     public static final String COMBAT = "combat";

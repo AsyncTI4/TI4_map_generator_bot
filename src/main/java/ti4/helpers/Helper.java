@@ -72,6 +72,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.ColorModel;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
@@ -2074,7 +2075,8 @@ public class Helper {
                 ccCount += player_.getFleetCC();
             } else if (player_.hasAbility("imperia") || player_.hasAbility("edict")) {
                 for (String color_ : player_.getMahactCC()) {
-                    if (player.getColor().equalsIgnoreCase(color_)) {
+                    ColorModel ccColor = Mapper.getColor(color_);
+                    if (player.getColor().equalsIgnoreCase(ccColor.getName())) {
                         ccCount++;
                     }
                 }
@@ -2714,7 +2716,7 @@ public class Helper {
         return agendaDetails.getRepresentation(uniqueID);
     }
 
-    public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void checkIfHeroUnlocked(Game game, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
         if (playerLeader != null && playerLeader.isLocked()) {
             int scoredSOCount = player.getSecretsScored().size();
@@ -2733,7 +2735,7 @@ public class Helper {
             int scoredObjectiveCount = scoredPOCount + scoredSOCount;
             if (scoredObjectiveCount >= 3) {
                 // UnlockLeader ul = new UnlockLeader();
-                UnlockLeader.unlockLeader(event, "hero", game, player);
+                UnlockLeader.unlockLeader("hero", game, player);
             }
         }
     }
@@ -2765,16 +2767,16 @@ public class Helper {
             unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
         }
         Collections.sort(hsLocations);
-        int lastNum = 0;
+        int ringWithHomes = 0;
         for (int location : hsLocations) {
-            int firstNum = location / 100;
-            if (lastNum == 0) {
-                lastNum = firstNum;
+            int ringNum = location / 100;
+            if (ringWithHomes == 0) {
+                ringWithHomes = ringNum;
             }
-            if (lastNum != firstNum) {
+            if (ringWithHomes != ringNum) {
                 different = true;
             }
-            lastNum = firstNum;
+            ringWithHomes = ringNum;
         }
         String msg = game.getPing() + " set order in the following way: \n";
         if (!different) {
@@ -2817,7 +2819,6 @@ public class Helper {
                 game.removeTile(tile.getPosition());
             }
         }
-
     }
 
     public static void checkEndGame(Game game, Player player) {

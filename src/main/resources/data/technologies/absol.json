@@ -114,7 +114,7 @@
     {
         "alias": "absol_techquantumcore",
         "name": "Quantumcore",
-        "types": ["CYBERNETIC"],
+        "types": ["CYBERNETIC", "WARFARE"],
         "source": "absol",
         "text": "After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10. [Note, this synergizes with absol plasma scoring]."
     },

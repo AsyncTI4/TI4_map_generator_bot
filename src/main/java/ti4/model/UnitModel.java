@@ -212,7 +212,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return getBombardDieCount();
         } else {
-            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+            if (getIsShip() && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
                 return 1;
             } else {
                 return getBombardDieCount();

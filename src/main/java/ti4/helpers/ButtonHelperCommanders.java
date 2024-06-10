@@ -2,11 +2,15 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowAllAC;
@@ -17,13 +21,16 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.ButtonContext;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
 
 public class ButtonHelperCommanders {
@@ -177,6 +184,112 @@ public class ButtonHelperCommanders {
         }
         msg = msg + " to cancel one hit";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+
+    public static void handleRavenCommander(ButtonContext context) {
+        Game game = context.game;
+        Player player = context.player;
+
+        String part1 = "ravenMigration";
+        String part2 = part1 + "_" + RegexHelper.posRegex(game, "posfrom");
+        String part3 = part2 + "_" + RegexHelper.unitHolderRegex(game, "planetfrom") + "_" + RegexHelper.unitTypeRegex();
+        String part4 = part3 + "_" + RegexHelper.posRegex(game, "posto");
+        String part5 = part4 + "_" + RegexHelper.unitHolderRegex(game, "planetto");
+
+        Matcher matcher;
+        String newMessage = null;
+        List<Button> newButtons = new ArrayList<>();
+        if ((matcher = Pattern.compile(part1).matcher(context.buttonID)).matches()) {
+            String message = player.getRepresentation() + " Choose a tile to migrate from:";
+            Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
+            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, context.buttonID, pred, false);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            ButtonHelper.deleteTheOneButton(context.getEvent());
+
+        } else if ((matcher = Pattern.compile(part2).matcher(context.buttonID)).matches()) {
+            Tile from = game.getTileByPosition(matcher.group("posfrom"));
+            newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Choose a unit you'd like to move:";
+            for (UnitHolder uh : from.getUnitHolders().values()) {
+                PlanetModel planet = Mapper.getPlanet(uh.getName());
+                String planetName = planet == null ? uh.getName() : planet.getName();
+
+                Set<UnitKey> keys = uh.getUnits().keySet().stream()
+                    .filter(unit -> uh.getUnits().get(unit) > 0)
+                    .filter(player::unitBelongsToPlayer)
+                    .collect(Collectors.toSet());
+                String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_" + uh.getName() + "_";
+                keys.stream().filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
+                    .map(uk -> Button.secondary(prefix + uk.asyncID(), uk.getUnitType().humanReadableName() + " " + planetName).withEmoji(Emoji.fromFormatted(uk.unitEmoji())))
+                    .forEach(newButtons::add);
+            }
+
+        } else if ((matcher = Pattern.compile(part3).matcher(context.buttonID)).matches()) {
+            Tile from = game.getTileByPosition(matcher.group("posfrom"));
+            String unitHolderFrom = matcher.group("planetfrom");
+            PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
+            String planetName = planet == null ? unitHolderFrom : planet.getName();
+            UnitType unitType = Units.findUnitType(matcher.group("unittype"));
+            boolean ship = player.getUnitFromAsyncID(unitType.getValue()).getIsShip();
+
+            String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_" + unitHolderFrom + "_" + unitType.value + "_";
+            String suffix = ship ? "_space" : "";
+
+            newMessage = player.getRepresentation() + " You are migrating a " + unitType.humanReadableName() + " from " + planetName + " in " + from.getRepresentationForButtons(game, player) + ".";
+            newMessage += "\nChoose your destination:";
+            for (Tile t : game.getTileMap().values()) {
+                boolean hasplanet = t.getPlanetUnitHolders().stream().anyMatch(uh -> player.hasPlanet(uh.getName()));
+                if (t.containsPlayersUnits(player) || hasplanet) {
+                    newButtons.add(Button.success(prefix + t.getPosition() + suffix, t.getRepresentationForButtons(game, player)));
+                }
+            }
+
+        } else if ((matcher = Pattern.compile(part4).matcher(context.buttonID)).matches()) {
+            Tile from = game.getTileByPosition(matcher.group("posfrom"));
+            String unitHolderFrom = matcher.group("planetfrom");
+            PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
+            String planetName = planet == null ? unitHolderFrom : planet.getName();
+            UnitType unitType = Units.findUnitType(matcher.group("unittype"));
+            Tile to = game.getTileByPosition(matcher.group("posto"));
+
+            String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_" + unitHolderFrom + "_" + unitType.value + "_" + to.getPosition() + "_";
+
+            newMessage = player.getRepresentation() + " You are migrating a " + unitType.humanReadableName() + " from " + planetName + " in " + from.getRepresentationForButtons(game, player) + ".";
+            newMessage += "\nYour destination is " + to.getRepresentationForButtons(game, player);
+            newMessage += "\nChoose the planet where your unit will go:";
+            for (UnitHolder uh : to.getUnitHolders().values()) {
+                PlanetModel planetTo = Mapper.getPlanet(uh.getName());
+                String planetNameTo = planetTo == null ? uh.getName() : planetTo.getName();
+                newButtons.add(Button.success(prefix + uh.getName(), planetNameTo));
+            }
+
+        } else if ((matcher = Pattern.compile(part5).matcher(context.buttonID)).matches()) {
+            Tile from = game.getTileByPosition(matcher.group("posfrom"));
+            String unitHolderFrom = matcher.group("planetfrom");
+            PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
+            String planetName = planet == null ? unitHolderFrom : planet.getName();
+            UnitType unitType = Units.findUnitType(matcher.group("unittype"));
+            Tile to = game.getTileByPosition(matcher.group("posto"));
+            String unitHolderTo = matcher.group("planetto");
+            PlanetModel planetTo = Mapper.getPlanet(unitHolderTo);
+            String planetNameTo = planetTo == null ? unitHolderFrom : planetTo.getName();
+
+            String unitStringFrom = unitType.value + " " + unitHolderFrom;
+            String unitStringTo = unitType.value + " " + unitHolderTo;
+            new RemoveUnits().unitParsing(context.getEvent(), player.getColor(), from, unitStringFrom, game);
+            new AddUnits().unitParsing(context.getEvent(), player.getColor(), to, unitStringTo, game);
+
+            String fromLang = "from " + planetName + (planetName.equals("space") ? " in " + from.getRepresentationForButtons(game, player) : "");
+            String toLang = planetNameTo.equals("space") ? "in space of tile " + to.getRepresentationForButtons(game, player) : "on " + planetNameTo;
+            String message = player.getRepresentation() + " your " + unitType.humanReadableName() + " successfully migrated " + fromLang + ", and has landed itself " + toLang;
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelper.deleteMessage(context.event);
+        }
+
+        if (newMessage != null) {
+            // edit the message with the new partX buttons
+            context.getEvent().getMessage().editMessage(newMessage).setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons)).queue();
+        }
     }
 
     public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game game,

@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -35,6 +36,7 @@ import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -123,6 +125,26 @@ public class MiltyDraftManager {
 
     public void setNextPlayerInDraft() {
         draftIndex++;
+    }
+
+    public void replacePlayer(Game game, String oldUID, String newUID) {
+        // Update player list
+        List<String> newPlayers = new ArrayList<>();
+        players.forEach(p -> newPlayers.add(p.equals(oldUID) ? newUID : p));
+        players.clear();
+        players.addAll(newPlayers);
+
+        // Update draft order
+        List<String> newDraftOrder = new ArrayList<>();
+        draftOrder.forEach(p -> newDraftOrder.add(p.equals(oldUID) ? newUID : p));
+        draftOrder.clear();
+        draftOrder.addAll(newDraftOrder);
+
+        // Update player draft keys
+        Map<String, PlayerDraft> newDraft = new HashMap<>();
+        draft.forEach((k, v) -> newDraft.put(k.equals(oldUID) ? newUID : k, v));
+        draft.clear();
+        draft.putAll(newDraft);
     }
 
     public List<MiltyDraftTile> getBlue() {
@@ -242,11 +264,12 @@ public class MiltyDraftManager {
             return;
         }
         if (!userId.equals(getCurrentDraftPlayer())) {
-            event.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue();
+            event.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
-        String draftPick = buttonID.replace("milty_", "");
+        boolean auto = buttonID.startsWith("miltyAuto_");
+        String draftPick = buttonID.replace("milty_", "").replace("miltyAuto_", "");
         String category = draftPick.substring(0, draftPick.indexOf("_"));
         String item = draftPick.substring(draftPick.indexOf("_") + 1);
 
@@ -259,13 +282,14 @@ public class MiltyDraftManager {
 
         //Oopsiedoops
         if (errorMessage != null) {
-            event.getHook().sendMessage(errorMessage).setEphemeral(true).queue();
+            event.getHook().sendMessage(errorMessage).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         // Send success message
+        String middle = auto ? " only had one option available to draft, so they were given " : " drafted ";
         try {
-            String drafted = player.getPing() + " drafted " + switch (category) {
+            String drafted = player.getPing() + middle + switch (category) {
                 case "slice" -> "Slice " + item;
                 case "faction" -> Mapper.getFaction(item).getFactionTitle();
                 case "order" -> StringHelper.ordinal(Integer.parseInt(item)) + " pick";
@@ -274,7 +298,7 @@ public class MiltyDraftManager {
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         } catch (Exception e) {
             // Shouldn't get errors here, but fallback to a boring message
-            String drafted = player.getPing() + " drafted " + item;
+            String drafted = player.getPing() + middle + item;
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         }
 
@@ -286,11 +310,32 @@ public class MiltyDraftManager {
         clearOldPing(game);
         setNextPlayerInDraft();
         if (draftIndex < draftOrder.size()) {
-            editPreviousDraftInfo(game, category);
+            // Check if the next player only has one option to pick
+            String fauxPlayerPick = null;
+            Player nextDrafter = getCurrentDraftPlayer(game);
+            PlayerDraft pd = getPlayerDraft(nextDrafter);
+            if (pd.getPosition() == null) {
+                fauxPlayerPick = getAutoButtonID(game, nextDrafter, getPositionButtons());
+            } else if (pd.getSlice() == null) {
+                fauxPlayerPick = getAutoButtonID(game, nextDrafter, getSliceButtons());
+            } else if (pd.getFaction() == null) {
+                fauxPlayerPick = getAutoButtonID(game, nextDrafter, getFactionButtons());
+            }
+
+            if (fauxPlayerPick != null) {
+                doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
+            } else {
+                editPreviousDraftInfo(game, category);
+            }
         } else {
             MessageHelper.sendMessageToChannel(mainGameChannel, game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
             finishDraft(game, event);
         }
+    }
+
+    private String getAutoButtonID(Game game, Player player, List<Button> buttons) {
+        if (buttons.size() == 1) return buttons.get(0).getId().replaceFirst("milty_", "miltyAuto_");
+        return null;
     }
 
     private void finishDraft(Game game, ButtonInteractionEvent event) {
@@ -302,7 +347,7 @@ public class MiltyDraftManager {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = getPlayerDraft(playerId);
                 String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId) && game.getUnusedColours().contains("lightgray")) {
+                if (playerId.equals(Constants.chassitId) && game.getUnusedColors().contains("lightgray")) {
                     color = "lightgray";
                 }
                 String faction = picks.getFaction();
@@ -394,7 +439,9 @@ public class MiltyDraftManager {
         String pingMsg = prevPingMessage;
         if (pingMsg == null) return;
         try {
-            game.getMainGameChannel().retrieveMessageById(pingMsg).queue(m -> m.delete().queue());
+            game.getMainGameChannel().retrieveMessageById(pingMsg).queue(m -> {
+                m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            }, BotLogger::catchRestError);
         } catch (Exception e) {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
@@ -412,17 +459,17 @@ public class MiltyDraftManager {
         try {
             game.getMainGameChannel().getHistoryAround(summaryMsg, 20).queue((history) -> {
                 Message m = history.getMessageById(summaryMsg);
-                if (m != null) m.delete().queue();
+                if (m != null) m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
                 m = history.getMessageById(sliceMsg);
-                if (m != null) m.delete().queue();
+                if (m != null) m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
                 m = history.getMessageById(factionMsg);
-                if (m != null) m.delete().queue();
+                if (m != null) m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
                 m = history.getMessageById(orderMsg);
-                if (m != null) m.delete().queue();
-            });
+                if (m != null) m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            }, BotLogger::catchRestError);
         } catch (Exception e) {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
@@ -458,7 +505,7 @@ public class MiltyDraftManager {
         return factionButtons;
     }
 
-    private List<Button> getOrderButtons() {
+    private List<Button> getPositionButtons() {
         List<Button> orderButtons = new ArrayList<>();
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
@@ -505,7 +552,7 @@ public class MiltyDraftManager {
         String slice = "**__Slices:__**", faction = "**__Factions:__**", speaker = "**__Speaker Order:__**";
         MessageHelper.splitAndSentWithAction(slice, chan, getSliceButtons(), (m) -> prevSliceMessage = m.getId());
         MessageHelper.splitAndSentWithAction(faction, chan, getFactionButtons(), (m) -> prevFactionMessage = m.getId());
-        MessageHelper.splitAndSentWithAction(speaker, chan, getOrderButtons(), (m) -> prevOrderMessage = m.getId());
+        MessageHelper.splitAndSentWithAction(speaker, chan, getPositionButtons(), (m) -> prevOrderMessage = m.getId());
         ping(game);
     }
 
@@ -525,7 +572,7 @@ public class MiltyDraftManager {
         switch (category) {
             case "slice" -> editMessage(game, prevSliceMessage, null, getSliceButtons());
             case "faction" -> editMessage(game, prevFactionMessage, null, getFactionButtons());
-            case "order" -> editMessage(game, prevOrderMessage, null, getOrderButtons());
+            case "order" -> editMessage(game, prevOrderMessage, null, getPositionButtons());
         }
         ping(game);
     }
@@ -541,12 +588,12 @@ public class MiltyDraftManager {
 
         game.getMainGameChannel().retrieveMessageById(messageId).queue((msg) -> {
             if (newMessage != null && newButtons != null)
-                msg.editMessage(summary).setComponents(newComponents).queue();
+                msg.editMessage(summary).setComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
             else if (newMessage != null)
-                msg.editMessage(summary).queue();
+                msg.editMessage(summary).queue(Consumers.nop(), BotLogger::catchRestError);
             else if (newButtons != null)
-                msg.editMessageComponents(newComponents).queue();
-        });
+                msg.editMessageComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
+        }, BotLogger::catchRestError);
     }
 
     //SAVE AND LOAD

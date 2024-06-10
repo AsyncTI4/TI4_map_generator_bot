@@ -200,7 +200,7 @@ public class ButtonHelperTacticalAction {
                     }
                 }
             }
-            String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove);
+            String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove, tile);
             List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, game,
                 game.getTileByPosition(pos), remove);
             event.getMessage().editMessage(message)
@@ -265,7 +265,7 @@ public class ButtonHelperTacticalAction {
         } else {
             game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
         }
-        String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove);
+        String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove, tile);
         List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, game,
             game.getTileByPosition(pos), remove);
         event.getMessage().editMessage(message)
@@ -472,7 +472,7 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "
             + tile.getRepresentationForButtons(game, player) + " (**"
             + CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem())
-            + " tiles away**)\n"
+            + " tile(s) away**)\n"
             + event.getMessage().getContentRaw());
         String message = "Choose a different system to move from, or finalize movement.";
         game.resetCurrentMovedUnitsFrom1System();
@@ -683,6 +683,8 @@ public class ButtonHelperTacticalAction {
             // buttons);
             // }
         }
+        game.setStoredValue("crucibleBoost", "");
+        game.setStoredValue("flankspeedBoost", "");
 
         event.getMessage().delete().queue();
 
