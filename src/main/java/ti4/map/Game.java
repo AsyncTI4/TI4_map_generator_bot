@@ -745,6 +745,11 @@ public class Game {
     }
 
     public boolean isAllianceMode() {
+        for (Player player : getRealPlayers()) {
+            if (player.getAllianceMembers() != null && !player.getAllianceMembers().replace(player.getFaction(), "").isEmpty()) {
+                allianceMode = true;
+            }
+        }
         return allianceMode;
     }
 
@@ -871,6 +876,8 @@ public class Game {
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
+                put("Minor Factions", isMinorFactionsMode());
+                put("Age of Exploration", isAgeOfExplorationMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFoWMode());
                 put("Franken", isFrankenGame());
@@ -1125,17 +1132,36 @@ public class Game {
             playerSC = 0;
         }
         for (int sc : orderedSCsBasic) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                sc = 0;
+            }
             if (sc > playerSC) {
                 orderedSCs.add(sc);
             }
         }
         for (int sc : orderedSCsBasic) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                sc = 0;
+            }
             if (sc < playerSC) {
                 orderedSCs.add(sc);
             }
         }
 
         return orderedSCs;
+    }
+
+    public Player getPlayerFromSC(int sc) {
+        for (Player player : getRealPlayersNDummies()) {
+            if (player.getSCs().contains(sc)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public DisplayType getDisplayTypeForced() {
@@ -3882,7 +3908,7 @@ public class Game {
     }
 
     public boolean leaderIsFake(String leaderID) {
-        return getStoredValue("fakeCommanders").contains(leaderID);
+        return (getStoredValue("fakeCommanders").contains(leaderID) || getStoredValue("minorFactionCommanders").contains(leaderID));
     }
 
     public void addFakeCommander(String leaderID) {
@@ -3946,8 +3972,16 @@ public class Game {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-                    Leader playerLeader = pnOwner.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : pnOwner.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())) {
+                            continue;
+                        }
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        leaders.add(playerLeader);
+                    }
                 }
             }
         }
@@ -3959,8 +3993,22 @@ public class Game {
                 if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    Leader playerLeader = otherPlayer.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : otherPlayer.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())) {
+                            continue;
+                        }
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
+                            if (!playerLeader.getId().contains(otherPlayer.getFaction())) {
+                                continue;
+                            }
+                        }
+                        leaders.add(playerLeader);
+                    }
+
                 }
             }
         }
