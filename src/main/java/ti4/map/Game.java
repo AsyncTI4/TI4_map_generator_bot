@@ -1134,20 +1134,22 @@ public class Game {
         for (int sc : orderedSCsBasic) {
             Player holder = getPlayerFromSC(sc);
             String scT = sc + "";
+            int judger = sc;
             if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
-                sc = 0;
+                judger = 0;
             }
-            if (sc > playerSC) {
+            if (judger > playerSC) {
                 orderedSCs.add(sc);
             }
         }
         for (int sc : orderedSCsBasic) {
             Player holder = getPlayerFromSC(sc);
             String scT = sc + "";
+            int judger = sc;
             if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
-                sc = 0;
+                judger = 0;
             }
-            if (sc < playerSC) {
+            if (judger < playerSC) {
                 orderedSCs.add(sc);
             }
         }
