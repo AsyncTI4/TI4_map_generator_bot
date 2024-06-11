@@ -448,10 +448,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     @Nullable
     private static Guild getNextAvailableServer() {
-        // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-
         List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
-
+        
+        // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
         Guild guild = AsyncTI4DiscordBot.jda
             .getGuildById(GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
@@ -460,8 +459,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         
         int index = guilds.indexOf(guild);
         if (index == -1) { // NOT FOUND
-            BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: Current guild is not in the list of available overflow servers: " + guild.getName());
-            return null;
+            BotLogger.log("`CreateGameChannels.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
         }
 
         // CHECK IF CURRENT GUILD HAS ROOM (INDEX = X)
