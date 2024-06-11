@@ -102,9 +102,11 @@ public class AsyncTI4DiscordBot {
     public static Guild guildTertiary;
     public static Guild guildQuaternary;
     public static Guild guildQuinary;
+    public static Guild guildSenary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
+    public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
@@ -239,6 +241,7 @@ public class AsyncTI4DiscordBot {
                 commandsD.queue();
                 BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSecondary.getName());
                 guilds.add(guildSecondary);
+                serversToCreateNewGamesOn.add(guildSecondary);
             }
         }
 
@@ -251,6 +254,7 @@ public class AsyncTI4DiscordBot {
                 commandsD.queue();
                 BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildTertiary.getName());
                 guilds.add(guildTertiary);
+                serversToCreateNewGamesOn.add(guildTertiary);
             }
         }
 
@@ -263,6 +267,7 @@ public class AsyncTI4DiscordBot {
                 commandsD.queue();
                 BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
                 guilds.add(guildQuaternary);
+                serversToCreateNewGamesOn.add(guildQuaternary);
             }
         }
 
@@ -275,6 +280,20 @@ public class AsyncTI4DiscordBot {
                 commandsD.queue();
                 BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuinary.getName());
                 guilds.add(guildQuinary);
+                serversToCreateNewGamesOn.add(guildQuinary);
+            }
+        }
+
+        // Async: Tommer Hawk
+        if (args.length >= 10) {
+            guildSenary = jda.getGuildById(args[9]);
+            if (guildSenary != null) {
+                CommandListUpdateAction commandsD = guildSenary.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+                commandsD.queue();
+                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSenary.getName());
+                guilds.add(guildSenary);
+                serversToCreateNewGamesOn.add(guildSenary);
             }
         }
 
