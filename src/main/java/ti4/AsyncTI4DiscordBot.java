@@ -365,6 +365,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1146511484264906814")); // Async Tertiary (Dreadn't)
         adminRoles.add(jda.getRoleById("1176104225978204167")); // Async Quaternary (War Sun Tzu)
         adminRoles.add(jda.getRoleById("1209956332380229678")); // Async Quinary (Fighter Club)
+        adminRoles.add(jda.getRoleById("1250131684393881616")); // Async Senary (Tommer Hawk)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
@@ -389,6 +390,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)
         developerRoles.add(jda.getRoleById("1176104225978204166")); // Async Quaternary (War Sun Tzu)
         developerRoles.add(jda.getRoleById("1209956332380229677")); // Async Quinary (Fighter Club)
+        developerRoles.add(jda.getRoleById("1250131684393881615")); // Async Senary (Tommer Hawk)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
         developerRoles.add(jda.getRoleById("1225597362186223746")); // ForlornGeas's Server
@@ -403,6 +405,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
         bothelperRoles.add(jda.getRoleById("1176104225978204164")); // Async Quaternary (War Sun Tzu)
         bothelperRoles.add(jda.getRoleById("1209956332380229675")); // Async Quinary (Fighter Club)
+        bothelperRoles.add(jda.getRoleById("1250131684393881613")); // Async Senary (Tommer Hawk)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
