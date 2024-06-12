@@ -1002,7 +1002,11 @@ public class Helper {
     }
 
     public static List<Button> getPlanetExhaustButtons(Player player, Game game, String whatIsItFor) {
-        player.resetSpentThings();
+        if (game.getStoredValue("resetSpend").isEmpty()) {
+            player.resetSpentThings();
+        } else {
+            game.setStoredValue("resetSpend", "");
+        }
         player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1242,18 +1246,24 @@ public class Helper {
     }
 
     public static void refreshPlanetsOnTheRespend(Player player, Game game) {
-        List<String> spentThings = player.getSpentThingsThisWindow();
+        List<String> spentThings = new ArrayList<>();
+        spentThings.addAll(player.getSpentThingsThisWindow());
         int tg = player.getSpentTgsThisWindow();
+
         player.setTg(player.getTg() + tg);
         for (String thing : spentThings) {
             if (thing.contains("_")) {
                 continue;
             }
+            if (thing.contains("tg_")) {
+                player.removeSpentThing(thing);
+            }
             if (player.getExhaustedPlanets().contains(thing)) {
                 player.refreshPlanet(thing);
+                player.removeSpentThing(thing);
             }
         }
-        player.resetSpentThings();
+        game.setStoredValue("resetSpend", "no");
 
     }
 
