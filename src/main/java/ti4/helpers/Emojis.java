@@ -884,6 +884,7 @@ public class Emojis {
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
     public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
     public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
+    public static final String UnchartedSpace = "<:UnchartedSpace:1250241051755544657>";
     public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
     public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff https://discord.com/channels/743629929484386395/1096820095470272582
     public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff

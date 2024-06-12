@@ -24,7 +24,8 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
             && name != null
             && type != null
             && description != null
-            && cardIDs != null;
+            && cardIDs != null
+            && source != null;
     }
 
     public String getAlias() {
@@ -108,7 +109,6 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     }
 
     public ComponentSource getSource() {
-        if (source == null) return ComponentSource.other;
         return source;
     }
 
