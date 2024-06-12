@@ -893,6 +893,7 @@ public class Game {
             .collect(Collectors.joining(", "));
     }
 
+    @JsonIgnore
     public boolean isNormalGame() {
         return !hasHomebrew();
     }
