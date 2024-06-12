@@ -1913,7 +1913,7 @@ public class ButtonHelper {
         updateMap(game, event, "");
     }
 
-    public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player, String messageID) {
+    public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player) {
         if (!player.getSCs().contains(5) || player.getFollowedSCs().contains(5)) {
             return;
         }

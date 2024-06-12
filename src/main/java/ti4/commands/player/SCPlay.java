@@ -179,9 +179,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            if (scModel.usesAutomationForSCID("pok5trade")) {
-                ButtonHelper.tradePrimary(game, event, player, message_.getId());
-            }
+
             Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
@@ -240,6 +238,9 @@ public class SCPlay extends PlayerSubcommandData {
             }
         });
 
+        if (scModel.usesAutomationForSCID("pok5trade")) {
+            ButtonHelper.tradePrimary(game, event, player);
+        }
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (scModel.usesAutomationForSCID("pok3politics")) {
             String assignSpeakerMessage = player.getRepresentation()

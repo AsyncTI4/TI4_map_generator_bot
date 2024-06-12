@@ -4459,6 +4459,7 @@ public class Game {
     public boolean hasHomebrew() {
         // needs to check for homebrew tiles still
         // Decks
+
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(acDeckID);
         deckIDs.add(soDeckID);
@@ -4472,11 +4473,14 @@ public class Game {
         boolean allDecksOfficial = deckIDs.stream().allMatch(id -> {
             DeckModel deck = Mapper.getDeck(id);
             if (id.equals("null")) return true;
-            if (deck == null) return false;
+            if (deck == null) return true;
             return deck.getSource().isOfficial();
         });
         StrategyCardSetModel scset = Mapper.getStrategyCardSets().get(scSetID);
-        if (scset == null || !scset.getSource().isOfficial()) allDecksOfficial = false;
+        if (scset == null || !scset.getSource().isOfficial()) {
+            allDecksOfficial = false;
+
+        }
 
         // Tiles
         boolean allTilesOfficial = getTileMap().values().stream().allMatch(tile -> {
@@ -4485,6 +4489,10 @@ public class Game {
                 return true; //official hyperlane
             return tileSource != null && tileSource.isOfficial();
         });
+
+        if (!allDecksOfficial) {
+            System.out.println("here4");
+        }
 
         return isExtraSecretMode()
             || isHomeBrew()
