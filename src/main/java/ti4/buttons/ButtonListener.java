@@ -3828,7 +3828,7 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 case "trade_primary" -> {
-                    ButtonHelper.tradePrimary(game, event, player, messageID);
+                    ButtonHelper.tradePrimary(game, event, player);
                 }
                 case "score_imperial" -> {
                     if (player == null || game == null) {
