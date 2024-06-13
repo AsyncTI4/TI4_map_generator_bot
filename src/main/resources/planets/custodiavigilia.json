@@ -23,5 +23,6 @@
     "unitPositions": null,
     "spaceCannonDieCount": 1,
     "spaceCannonHitsOn": 5,
-    "flavourText": "*Custodia Vigilia. The fully realized seat of the Keleres. A veritable fortress in the heart of Mecatol City. Ten thousand people come and go daily, and the Keleres see them all.*"
+    "flavourText": "*Custodia Vigilia. The fully realized seat of the Keleres. A veritable fortress in the heart of Mecatol City. Ten thousand people come and go daily, and the Keleres see them all.*",
+    "source": "codex3"
 }

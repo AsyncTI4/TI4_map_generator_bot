@@ -1,1 +1,16 @@
-{"id":"c08","name":"Alpert","aliases":["c08","alpert"],"imagePath":"C08_Alpert.png","shipPositionsType":"TYPE04","spaceTokenLocations":[],"wormholes":[],"planets":["alpert"]}
+{
+    "id": "c08",
+    "name": "Alpert",
+    "aliases": [
+        "c08",
+        "alpert"
+    ],
+    "imagePath": "C08_Alpert.png",
+    "shipPositionsType": "TYPE04",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "alpert"
+    ],
+    "source": "lost_star_charts_of_ixth"
+}

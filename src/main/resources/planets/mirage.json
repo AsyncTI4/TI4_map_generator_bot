@@ -47,5 +47,6 @@
     "removeUnitCoordinate": true
   },
   "contrastColor": "orange",
-  "flavourText": "*Exists on no known charts and appears deserted to those who stumble across it. However, secretive locals live in cloaked cities heavily defended by swarms of starfighters.*"
+  "flavourText": "*Exists on no known charts and appears deserted to those who stumble across it. However, secretive locals live in cloaked cities heavily defended by swarms of starfighters.*",
+  "source": "pok"
 }

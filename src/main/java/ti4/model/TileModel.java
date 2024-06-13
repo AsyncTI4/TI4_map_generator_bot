@@ -1,10 +1,12 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Point;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -33,7 +35,9 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @Override
     @JsonIgnore
     public boolean isValid() {
-        return id != null && imagePath != null;
+        return id != null 
+            && imagePath != null
+            && source != null;
     }
 
     @JsonIgnore

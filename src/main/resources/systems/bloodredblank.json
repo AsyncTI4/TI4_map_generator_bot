@@ -1,1 +1,10 @@
-{"id":"bloodredblank","name":"Bloodred, blank draft tile","aliases":["bloodredblank"],"imagePath":"draft_bloodredblank.png","tileBack":"black","source":"draft"}
+{
+    "id": "bloodredblank",
+    "name": "Bloodred, blank draft tile",
+    "aliases": [
+        "bloodredblank"
+    ],
+    "imagePath": "draft_bloodredblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

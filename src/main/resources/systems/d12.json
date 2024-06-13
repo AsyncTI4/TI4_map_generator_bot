@@ -16,5 +16,6 @@
         "gen",
         "zelian"
     ],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "source": "ds"
 }

@@ -57,12 +57,12 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
 
         files.forEach(file -> {
             try {
@@ -83,13 +83,13 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> file.exists())
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
+                .filter(file -> file.exists())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
@@ -105,7 +105,7 @@ public class TileHelper {
     }
 
     private static void duplicateDraftTiles(TileModel tile) {
-        String color = tile.getAlias().replaceAll("blank","");
+        String color = tile.getAlias().replaceAll("blank", "");
         String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
 
         for (int i = 0; i < 13; i++) {
@@ -116,6 +116,7 @@ public class TileHelper {
             newTile.setImagePath(tile.getImagePath());
             newTile.setWormholes(Collections.emptySet());
             newTile.setPlanets(Collections.emptyList());
+            newTile.setSource(tile.getSource());
             allTiles.put(newTile.getId(), newTile);
         }
     }

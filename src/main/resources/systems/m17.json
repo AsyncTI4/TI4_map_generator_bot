@@ -25,9 +25,9 @@
             "y": 205.0
         }
     ],
-    "wormholes": null,
     "planets": [
         "origin"
     ],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "source": "asteroid"
 }

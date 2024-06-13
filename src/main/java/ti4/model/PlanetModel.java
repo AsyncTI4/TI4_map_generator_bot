@@ -38,6 +38,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String legendaryAbilityName;
     private String legendaryAbilityText;
     private String legendaryAbilityFlavourText;
+    private String basicAbilityText;
     private String flavourText;
     private UnitTokenPosition unitPositions;
     private int spaceCannonDieCount;
@@ -48,8 +49,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isValid() {
-        return getId() != null
-            && name != null;
+        return id != null
+            && name != null
+            && source != null;
     }
 
     @JsonIgnore
@@ -86,6 +88,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
+        if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
         if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
@@ -194,7 +197,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
-            || (getSource() == null ? false : getSource().toString().contains(searchString))
+            || getSource().toString().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 

@@ -1,1 +1,21 @@
-{"id":"d06","name":"Alesna/Azle (Kolume)","aliases":["d06","azle","alesna","monks","kolume","DS_kolume"],"imagePath":"D06_Alesna.png","shipPositionsType":"TYPE02","spaceTokenLocations":[],"wormholes":[],"planets":["alesna","azle"]}
+{
+    "id": "d06",
+    "name": "Alesna/Azle (Kolume)",
+    "aliases": [
+        "d06",
+        "azle",
+        "alesna",
+        "monks",
+        "kolume",
+        "DS_kolume"
+    ],
+    "imagePath": "D06_Alesna.png",
+    "shipPositionsType": "TYPE02",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "alesna",
+        "azle"
+    ],
+    "source": "ds"
+}

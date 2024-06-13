@@ -1,1 +1,17 @@
-{"id":"s09","name":"Drobna","aliases":["s09","drobna","vorhalclone"],"imagePath":"S09_Drobna.png","shipPositionsType":"TYPE04","spaceTokenLocations":[],"wormholes":[],"planets":["drobna"]}
+{
+    "id": "s09",
+    "name": "Drobna",
+    "aliases": [
+        "s09",
+        "drobna",
+        "vorhalclone"
+    ],
+    "imagePath": "S09_Drobna.png",
+    "shipPositionsType": "TYPE04",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "drobna"
+    ],
+    "source": "somno"
+}
