@@ -24,7 +24,7 @@
         "requirements": "BB",
         "faction": "raven",
         "source": "pbd2000",
-        "text": "Secret"
+        "text": "After you activate a system, you may exhaust this card to treat the active system as if it contains every type of wormhole."
     },
     {
         "alias": "stco",
@@ -33,7 +33,7 @@
         "requirements": "BB",
         "faction": "raven",
         "source": "pbd2000",
-        "text": "Secret"
+        "text": "At the start of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
     },
     {
         "alias": "clmu",
