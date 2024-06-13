@@ -748,19 +748,33 @@ public class MapGenerator {
                     graphics.setColor(new Color(50, 230, 80));
                     graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
                 }
-
+                int xSpacer = 0;
                 // Unfollowed SCs
                 if (!player.getUnfollowedSCs().isEmpty()) {
-                    int xSpacer = 20;
+
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.RED);
                     graphics.drawString("Needs to Follow: ", x + 9, y + 125 + yDelta);
+                    xSpacer = 165;
                     for (int sc : player.getUnfollowedSCs()) {
                         graphics.setColor(getSCColor(sc, game, true));
                         String drawText = String.valueOf(sc);
                         int len = graphics.getFontMetrics().stringWidth(drawText);
-                        graphics.drawString(drawText, x + 9 + xSpacer + 145, y + 125 + yDelta);
+                        graphics.drawString(drawText, x + 9 + xSpacer, y + 125 + yDelta);
                         xSpacer += len + 8;
+                    }
+                }
+                if (!game.isFoWMode()) {
+                    graphics.setFont(Storage.getFont20());
+                    graphics.setColor(Color.RED);
+                    graphics.drawString("Neighbors: ", x + 9 + xSpacer, y + 125 + yDelta);
+                    xSpacer = xSpacer + 115;
+                    for (Player p2 : player.getNeighbouringPlayers()) {
+                        String faction2 = p2.getFaction();
+                        if (faction2 != null) {
+                            drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 15, 26, 26);
+                            xSpacer = xSpacer + 26;
+                        }
                     }
                 }
 
