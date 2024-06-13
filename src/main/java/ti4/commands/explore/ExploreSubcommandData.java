@@ -434,11 +434,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "mo1", "mo2", "mo3" -> {
                 if (tile != null && planetID != null) {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, game);
+                    Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planetID, game).getTokenList();
+                    boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
+                    if (!containsDMZ) {
+                        new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, game);
+                        message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry
+                            + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
+                            + ", however this placement *is* optional.";
+                    } else {
+                        message = "Planet had DMZ so no infantry was placed";
+                    }
+                } else {
+                    message = "Tile was null, no infantry placed";
                 }
-                message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry
-                    + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
-                    + ", however this placement *is* optional.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
             case "darkvisions" -> {

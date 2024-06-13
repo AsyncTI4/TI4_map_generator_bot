@@ -4789,14 +4789,15 @@ public class ButtonHelper {
         UnitType ff = UnitType.Fighter;
         UnitType fs = UnitType.Flagship;
 
-        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
+        for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
+            String name = unitHolder.getName();
             String representation = planetRepresentations.get(name);
             if (representation == null) {
                 representation = name;
             }
-            UnitHolder unitHolder = entry.getValue();
-            if (unitHolder instanceof Planet planet) {
+            Set<String> tokenList = unitHolder.getTokenList();
+            boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
+            if (unitHolder instanceof Planet planet && !containsDMZ) {
                 int limit;
 
                 if (tile.getUnitHolders().get("space").getUnits() != null
