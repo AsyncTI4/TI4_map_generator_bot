@@ -16,10 +16,10 @@ public class Source {
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth,
 
         // async homebrew
-        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
+        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio,
+        somno, ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma,
 
         // catchall
         other;

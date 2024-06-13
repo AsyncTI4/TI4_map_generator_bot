@@ -32,5 +32,6 @@
     "wormholes": null,
     "planets": [],
     "isAsteroidField": true,
-    "isNebula": true
+    "isNebula": true,
+    "source": "uncharted_space"
 }
