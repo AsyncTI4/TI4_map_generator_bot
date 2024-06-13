@@ -14,5 +14,6 @@
     "planets": [
         "eko"
     ],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "source": "lost_star_charts_of_ixth"
 }

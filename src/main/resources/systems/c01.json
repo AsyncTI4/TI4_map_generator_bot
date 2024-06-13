@@ -1,1 +1,16 @@
-{"id":"c01","name":"Widmore","aliases":["c01","widmore"],"imagePath":"C01_Widmore.png","shipPositionsType":"TYPE04","spaceTokenLocations":[],"wormholes":[],"planets":["widmore"]}
+{
+    "id": "c01",
+    "name": "Widmore",
+    "aliases": [
+        "c01",
+        "widmore"
+    ],
+    "imagePath": "C01_Widmore.png",
+    "shipPositionsType": "TYPE04",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "widmore"
+    ],
+    "source": "lost_star_charts_of_ixth"
+}

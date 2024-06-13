@@ -113,5 +113,6 @@
         },
         "removeUnitCoordinate": true
     },
-    "flavourText": "*Sky cities suspended in helium-rich atmosphere more noted for fantastic views than the small quantities of exotic elements harvested by their chemical mines.*"
+    "flavourText": "*Sky cities suspended in helium-rich atmosphere more noted for fantastic views than the small quantities of exotic elements harvested by their chemical mines.*",
+    "source": "base"
 }

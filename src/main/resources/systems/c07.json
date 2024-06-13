@@ -12,5 +12,6 @@
     "planets": [
         "desmond"
     ],
-    "isSupernova": true
+    "isSupernova": true,
+    "source": "lost_star_charts_of_ixth"
 }
