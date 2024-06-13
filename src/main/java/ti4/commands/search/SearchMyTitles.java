@@ -46,35 +46,37 @@ public class SearchMyTitles extends SearchSubcommandData {
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
-
+        HashMap<String, String> gameHist = new HashMap<>();
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
         Map<String, Integer> titles = new HashMap<String, Integer>();
         for (Game playerGame : games) {
-            String singularGameTiles = playerGame.getStoredValue("TitlesFor"+userID);
-            if(!singularGameTiles.isEmpty()){
-                for(String title : singularGameTiles.split("_")){
-                    if(titles.containsKey(title)){
-                        int amount = titles.get(title)+1;
+            String singularGameTiles = playerGame.getStoredValue("TitlesFor" + userID);
+            if (!singularGameTiles.isEmpty()) {
+                for (String title : singularGameTiles.split("_")) {
+                    if (titles.containsKey(title)) {
+                        int amount = titles.get(title) + 1;
                         titles.put(title, amount);
-                    }else{
+                        gameHist.put(title, gameHist.get(title) + ", " + playerGame.getName());
+                    } else {
                         titles.put(title, 1);
+                        gameHist.put(title, playerGame.getName());
                     }
+
                 }
             }
         }
-        for(String title : titles.keySet()){
+        for (String title : titles.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
-            sb.append("**"+title+"** x"+titles.get(title));
+            sb.append("**" + title + "** x" + titles.get(title) + " (" + gameHist.get(title) + ")");
             sb.append("\n");
             index++;
         }
-        if(titles.keySet().size() == 0){
+        if (titles.keySet().size() == 0) {
             sb = new StringBuilder("No titles yet");
         }
-       
+
         return sb;
     }
-
 
 }
