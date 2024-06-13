@@ -1252,12 +1252,13 @@ public class Helper {
 
         player.setTg(player.getTg() + tg);
         for (String thing : spentThings) {
-            if (thing.contains("_")) {
-                continue;
-            }
             if (thing.contains("tg_")) {
                 player.removeSpentThing(thing);
             }
+            if (thing.contains("_")) {
+                continue;
+            }
+
             if (player.getExhaustedPlanets().contains(thing)) {
                 player.refreshPlanet(thing);
                 player.removeSpentThing(thing);
