@@ -1480,7 +1480,7 @@ public class MapGenerator {
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
                 BufferedImage decal = null;
-                if (player != null) ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
+                if (player != null) decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
                 for (int i = 0; i < numInReinforcements; i++) {
                     Point position = reinforcementsPosition.getPosition(unitID);
                     graphics.drawImage(image, x + position.x, y + position.y, null);
@@ -4330,7 +4330,7 @@ public class MapGenerator {
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             BufferedImage decal = null;
-            if (player != null) ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitKey.asyncID())));
+            if (player != null) decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitKey.asyncID())));
 
             if (bulkUnitCount != null && bulkUnitCount > 0) {
                 unitCount = 1;
