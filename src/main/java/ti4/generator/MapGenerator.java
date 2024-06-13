@@ -772,7 +772,7 @@ public class MapGenerator {
                     for (Player p2 : player.getNeighbouringPlayers()) {
                         String faction2 = p2.getFaction();
                         if (faction2 != null) {
-                            drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 15, 26, 26);
+                            drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 20, 26, 26);
                             xSpacer = xSpacer + 26;
                         }
                     }
