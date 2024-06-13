@@ -1,1 +1,11 @@
-{"id":"fowc_purple","name":null,"aliases":null,"imagePath":"FOWc_fogofwarcorner_purple.png","shipPositionsType":null,"spaceTokenLocations":[],"wormholes":[],"planets":[]}
+{
+    "id": "fowc_purple",
+    "name": null,
+    "aliases": null,
+    "imagePath": "FOWc_fogofwarcorner_purple.png",
+    "shipPositionsType": null,
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [],
+    "source": "fow"
+}

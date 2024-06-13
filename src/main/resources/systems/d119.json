@@ -33,5 +33,6 @@
         "BETA"
     ],
     "planets": [],
-    "isNebula": true
+    "isNebula": true,
+    "source": "uncharted_space"
 }

@@ -1,1 +1,22 @@
-{"id":"d15","name":"Orad/Poh (Zealots)","aliases":["d15","poh","orad","zealots","zealot","rhodun","DS_rhodun"],"imagePath":"D15_Poh.png","shipPositionsType":"TYPE02","spaceTokenLocations":[],"wormholes":[],"planets":["poh","orad"]}
+{
+    "id": "d15",
+    "name": "Orad/Poh (Zealots)",
+    "aliases": [
+        "d15",
+        "poh",
+        "orad",
+        "zealots",
+        "zealot",
+        "rhodun",
+        "DS_rhodun"
+    ],
+    "imagePath": "D15_Poh.png",
+    "shipPositionsType": "TYPE02",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "poh",
+        "orad"
+    ],
+    "source": "ds"
+}

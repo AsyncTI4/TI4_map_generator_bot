@@ -114,5 +114,6 @@
         "removeUnitCoordinate": true
     },
     "contrastColor": "orange",
-    "flavourText": "*Distinctly seasonal, with the greatest variety of climates and ecologies in the galaxy. The Federation of Sol rules the Jord humans from the great city of New Moscow.*"
+    "flavourText": "*Distinctly seasonal, with the greatest variety of climates and ecologies in the galaxy. The Federation of Sol rules the Jord humans from the great city of New Moscow.*",
+    "source": "base"
 }

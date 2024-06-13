@@ -14,5 +14,6 @@
     "planets": [
         "bunker"
     ],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "source": "asteroid"
 }

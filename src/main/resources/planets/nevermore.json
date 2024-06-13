@@ -13,5 +13,6 @@
     "techSpecialties": null,
     "legendaryAbilityName": "Consortium's Resolve",
     "legendaryAbilityText": "When another player activates a system adjacent to Mecatol Rex, gain 1 trade good.\nGain 2 command tokens when another player draws a secret objective with the second clause of the 'Imperial' strategy card.",
-    "unitPositions": null
+    "unitPositions": null,
+    "source": "keleresplus"
 }

@@ -35,5 +35,6 @@
     "wormholes": null,
     "planets": [],
     "isAsteroidField": true,
-    "isGravityRift": true
+    "isGravityRift": true,
+    "source": "uncharted_space"
 }

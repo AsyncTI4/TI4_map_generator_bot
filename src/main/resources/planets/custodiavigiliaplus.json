@@ -21,5 +21,6 @@
     "legendaryAbilityText": "While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores a victory point with the second clause of the 'Imperial' strategy card.",
     "unitPositions": null,
     "spaceCannonDieCount": 1,
-    "spaceCannonHitsOn": 5
+    "spaceCannonHitsOn": 5,
+    "source": "keleresplus"
 }

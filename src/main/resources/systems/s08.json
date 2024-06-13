@@ -15,5 +15,6 @@
     "planets": [
         "phaeton"
     ],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "source": "somno"
 }

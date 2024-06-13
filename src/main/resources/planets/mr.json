@@ -52,5 +52,6 @@
     },
     "removeUnitCoordinate": true
   },
-  "flavourText": "*Once a splendid place, now a sad devasted wasteland. Only the radiation-shielded Mecatol city, the seat of the powerful Galactic Council, remains habitable.*"
+  "flavourText": "*Once a splendid place, now a sad devasted wasteland. Only the radiation-shielded Mecatol city, the seat of the powerful Galactic Council, remains habitable.*",
+  "source": "base"
 }
