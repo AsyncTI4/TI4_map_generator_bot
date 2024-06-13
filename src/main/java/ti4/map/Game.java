@@ -4473,7 +4473,7 @@ public class Game {
         deckIDs.add(eventDeckID);
         boolean allDecksOfficial = deckIDs.stream().allMatch(id -> {
             DeckModel deck = Mapper.getDeck(id);
-            if (id.equals("null")) return true;
+            if ("null".equals(id)) return true;
             if (deck == null) return true;
             return deck.getSource().isOfficial();
         });
