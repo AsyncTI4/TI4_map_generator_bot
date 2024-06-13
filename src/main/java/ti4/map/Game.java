@@ -4485,9 +4485,13 @@ public class Game {
 
         // Tiles
         boolean allTilesOfficial = getTileMap().values().stream().allMatch(tile -> {
+            if (tile == null || tile.getTileModel() == null) {
+                return true;
+            }
             ComponentSource tileSource = tile.getTileModel().getSource();
-            if (tile.getTileModel().getImagePath().endsWith("_Hyperlane.png"))
+            if (tile.getTileModel().getImagePath().endsWith("_Hyperlane.png")) {
                 return true; //official hyperlane
+            }
             return tileSource != null && tileSource.isOfficial();
         });
 
