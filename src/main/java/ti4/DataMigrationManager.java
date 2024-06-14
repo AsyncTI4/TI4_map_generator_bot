@@ -66,6 +66,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
+            runMigration("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -553,6 +554,26 @@ public class DataMigrationManager {
             }
         }
         return mapNeededMigrating;
+    }
+
+    // June 14th, 2024
+    public static boolean resetMinorFactionCommanders_130624(Game game) {
+        if (!game.isMinorFactionsMode()) return false;
+        boolean anyFound = false;
+        game.setStoredValue("fakeCommanders", "");
+        for (Tile t : game.getTileMap().values()) {
+            if (t.isHomeSystem()) {
+                String planet = t.getPlanetUnitHolders().isEmpty() ? null : t.getPlanetUnitHolders().get(0).getName();
+                String faction = planet == null ? null : Mapper.getPlanet(planet).getFactionHomeworld();
+                if (faction != null && game.getPlayerFromColorOrFaction(faction) == null) {
+                    anyFound = true;
+                    List<String> commanders = Mapper.getFaction(faction).getLeaders().stream()
+                        .filter(leader -> Mapper.getLeader(leader).getType().equals("commander")).toList();
+                    commanders.forEach(game::addFakeCommander);
+                }
+            }
+        }
+        return anyFound;
     }
 
     private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
