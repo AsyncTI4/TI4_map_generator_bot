@@ -3920,7 +3920,7 @@ public class Game {
             if (StringUtils.isBlank(fakeString)) {
                 setStoredValue("fakeCommanders", leaderID);
             } else {
-                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("|")));
+                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
                 leaders.add(leaderID);
                 setStoredValue("fakeCommanders", String.join("|", leaders));
             }
