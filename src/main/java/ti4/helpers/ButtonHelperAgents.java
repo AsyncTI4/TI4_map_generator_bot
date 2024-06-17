@@ -375,7 +375,7 @@ public class ButtonHelperAgents {
         } else {
             message = "Refreshed " + ButtonHelper.getIdentOrColor(p2, game) + "'s commodities";
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Carth of Golden Sands (Hacan Agent)");
-            ButtonHelperStats.replenishComms(event, game, player, true);
+            ButtonHelperStats.replenishComms(event, game, p2, true);
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
