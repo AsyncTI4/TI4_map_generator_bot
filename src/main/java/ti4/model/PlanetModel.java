@@ -51,12 +51,24 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return id != null
             && name != null
-            && source != null;
+            && source != null
+            && aliases != null
+            && aliases.contains(name.toLowerCase().replace(" ", "")); // Alias list must contain the lowercase'd name
     }
 
     @JsonIgnore
     public String getAlias() {
         return getId();
+    }
+
+    public PlanetTypeModel.PlanetType getPlanetType() {
+        if (planetType != null) {
+            return planetType;
+        }
+        if (planetTypes.size() > 0) {
+            return planetTypes.get(0);
+        }
+        return PlanetTypeModel.PlanetType.NONE;
     }
 
     @JsonIgnore
@@ -167,6 +179,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
                 case CYBERNETIC -> sb.append("Y");
                 case PROPULSION -> sb.append("B");
                 case WARFARE -> sb.append("R");
+                case UNITSKIP -> sb.append("U");
+                case NONUNITSKIP -> sb.append("?");
             }
         }
         return sb.toString();

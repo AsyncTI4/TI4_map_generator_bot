@@ -2,12 +2,13 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
-
 import ti4.commands.leaders.UnlockLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -43,6 +44,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if ("mirage".equals(planet)) {
             game.clearPlanetsCache();
         }
+        Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);
 
         if (unitHolder.getTokenList().contains("token_freepeople.png")) {
@@ -92,7 +94,6 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
-
                     }
                     player_.removePlanet(planet);
                     List<String> relics = new ArrayList<>();
@@ -153,8 +154,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
 
-        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png") && player.isRealPlayer()) {
-            Tile tile = game.getTileFromPlanet(unitHolder.getName());
+        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png") && player.isRealPlayer() && tile != null) {
             boolean ownsThemAll = true;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!player.getPlanets().contains(uH.getName())) {
@@ -198,6 +198,7 @@ public class PlanetAdd extends PlanetAddRemove {
             game.setStoredValue("planetsTakenThisRound",
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
+
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
             && player.hasAbility("scavenge") && !doubleCheck && event != null) {
             String fac = player.getFactionEmoji();
@@ -234,7 +235,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
-        Tile tile = game.getTileFromPlanet(planet);
+
         if (tile != null && game.getActivePlayer() == player
             && game.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !tile.isHomeSystem()
             && FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -335,8 +336,8 @@ public class PlanetAdd extends PlanetAddRemove {
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelper.fullCommanderUnlockCheck(p2, game, "freesystems", event);
         }
-        if ("mr".equalsIgnoreCase(planet) && player.getLeaderIDs().contains("winnucommander")
-            && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")) {
+        if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.getLeaderIDs().contains("winnucommander")
+            && !player.hasLeaderUnlocked("winnucommander") && player.controlsMecatol(true)) {
             ButtonHelper.commanderUnlockCheck(player, game, "winnu", event);
         }
     }

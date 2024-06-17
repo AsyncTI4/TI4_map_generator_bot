@@ -3,6 +3,10 @@ package ti4.helpers;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
+
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -97,6 +101,13 @@ public class ImageHelper {
     }
 
     @Nullable
+    public static BufferedImage readEmojiImageScaled(String emoji, int size) {
+        if (Emoji.fromFormatted(emoji) instanceof CustomEmoji e)
+            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
+        return null;
+    }
+
+    @Nullable
     public static BufferedImage readURLScaled(String imageURL, int width, int height) {
         if (imageURL == null) {
             return null;
@@ -112,7 +123,7 @@ public class ImageHelper {
             return scale(image, width, height);
         });
     }
-    
+
     public static BufferedImage scale(BufferedImage originalImage, float percent) {
         int scaledWidth = (int) (originalImage.getWidth() * percent);
         int scaledHeight = (int) (originalImage.getHeight() * percent);

@@ -2,6 +2,9 @@ package ti4.commands.status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -433,8 +436,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "make_history", "become_legend" -> {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && (tile.getTileID().equalsIgnoreCase("18")
-                        || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile, game))) {
+                    boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile, game);
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
                         counter++;
                     }
                 }
@@ -508,12 +511,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "intimidate" -> {
                 int count = 0;
-                Tile tile = game.getTileFromPlanet("mr");
-                if (tile == null) {
-                    return 2;
-                }
-                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player,
-                    false)) {
+                Tile mecatol = game.getMecatolTile();
+                if (mecatol == null) return 2;
+                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
                         count++;
@@ -593,10 +593,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "supremacy" -> {
                 int count = 0;
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship,
-                    UnitType.Warsun, UnitType.Lady)) {
-                    if ((tile.isHomeSystem() && tile != player.getHomeSystemTile())
-                        || tile.getTileID().equalsIgnoreCase("18")) {
+                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship, UnitType.Warsun, UnitType.Lady)) {
+                    if ((tile.isHomeSystem() && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
                     }
                 }
@@ -741,11 +739,11 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return count;
             }
             case "ose" -> {
-                Tile tile = game.getTileFromPlanet("mr");
-                if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile) || !player.getPlanets().contains("mr")) {
+                Tile mecatol = game.getMecatolTile();
+                if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !CollectionUtils.containsAny(player.getPlanetsAllianceMode(), Constants.MECATOLS)) {
                     return 0;
                 } else {
-                    return ButtonHelper.checkNumberShips(player, game, tile);
+                    return ButtonHelper.checkNumberShips(player, game, mecatol);
                 }
             }
             case "mrm" -> {

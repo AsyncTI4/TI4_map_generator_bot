@@ -3,9 +3,7 @@
     "tileId": "m17",
     "name": "Origin",
     "shortName": null,
-    "aliases": [
-        "m17"
-    ],
+    "aliases": ["origin", "m17"],
     "positionInTile": {
         "x": 160.0,
         "y": 160.0

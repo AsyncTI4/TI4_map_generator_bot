@@ -360,8 +360,7 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
     }
 
-    public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident, String trueIdentity) {
+    public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident, String trueIdentity) {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) {
@@ -371,27 +370,16 @@ public class ButtonHelperAgents {
         }
         String message;
         if (p2 == player) {
-            p2.setCommodities(p2.getCommodities() + 2);
             message = trueIdentity + "Increased your commodities by two";
+            ButtonHelperStats.gainComms(event, game, player, 2, false, true);
         } else {
-            p2.setCommodities(p2.getCommoditiesTotal());
-            ButtonHelper.resolveMinisterOfCommerceCheck(game, p2, event);
-            cabalAgentInitiation(game, p2);
             message = "Refreshed " + ButtonHelper.getIdentOrColor(p2, game) + "'s commodities";
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
-                p2.getRepresentation(true, true) + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Carth of Golden Sands (Hacan Agent)");
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Carth of Golden Sands (Hacan Agent)");
+            ButtonHelperStats.replenishComms(event, game, player, true);
         }
-        if (p2.hasAbility("military_industrial_complex")
-            && ButtonHelperAbilities.getBuyableAxisOrders(p2, game).size() > 1) {
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game),
-                p2.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                ButtonHelperAbilities.getBuyableAxisOrders(p2, game));
-        }
-        if (p2.getLeaderIDs().contains("mykomentoricommander") && !p2.hasLeaderUnlocked("mykomentoricommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-        }
+
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveMercerMove(String buttonID, ButtonInteractionEvent event, Game game, Player player,
@@ -1080,19 +1068,11 @@ public class ButtonHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            MessageChannel channel = ButtonHelper.getCorrectChannel(p2, game);
+            MessageChannel channel = p2.getCorrectChannel();
             String message = "Use buttons to select whether you want to place 1 cruiser or 1 destroyer in a system with your ships";
             List<Button> buttons = new ArrayList<>();
             if (p2 != player) {
-                player.setCommodities(player.getCommodities() + 2);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + "you gained 2 comms");
-                if (player.hasAbility("military_industrial_complex")
-                    && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                        ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-                }
+                ButtonHelperStats.gainComms(event, game, player, 2, false, true);
             }
             buttons.add(Button.success("step2axisagent_cruiser", "Place a cruiser"));
             buttons.add(Button.success("step2axisagent_destroyer", "Place a destroyer"));
@@ -1584,44 +1564,35 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveVadenAgentStep2(Player bentor, Game game, GenericInteractionCreateEvent event,
-        String buttonID) {
+    public static void resolveVadenAgentStep2(Player vaden, Game game, GenericInteractionCreateEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, game),
-                "Could not resolve target player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
-        int oldComm = player.getCommodities();
-        int count = 0;
+
+        String planetUsed = null;
+        int initComm = player.getCommodities();
+        int maxInfluence = 0;
         for (String planet : player.getPlanetsAllianceMode()) {
-            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
-                if (planet.toLowerCase().contains("custodia") && 3 > count) {
-                    count = 3;
-                }
-                continue;
-            }
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (p != null && p.getInfluence() > count) {
-                count = p.getInfluence();
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null && p.getInfluence() > maxInfluence) {
+                maxInfluence = p.getInfluence();
+                planetUsed = p.getName();
             }
         }
-        int tgGain = count + player.getCommodities() - player.getCommoditiesTotal();
-        tgGain = Math.max(tgGain, 0);
-        int commGain = count - tgGain;
-        player.setCommodities(player.getCommodities() + commGain);
-        String msg = ButtonHelper.getIdentOrColor(player, game) + " max influence planet had " + count
-            + " influence, so they gained " + commGain + " comms (" + oldComm + "->"
-            + player.getCommodities() + ") due to " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yudri Sukhov (Vaden Agent)";
+        ButtonHelperStats.gainComms(event, game, player, maxInfluence, false, true);
+        int finalComm = player.getCommodities();
+        int commGain = finalComm - initComm;
+
+        String msg = ButtonHelper.getIdentOrColor(player, game);
+        msg += String.format(" chose %s %s, and gained %i comms (%i->%i) due to %s Yudri Sukhov (Vaden Agent)",
+            planetUsed, Emojis.getInfluenceEmoji(maxInfluence), commGain, initComm, finalComm, player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever" : "");
+
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
-        }
-        if (player.hasAbility("military_industrial_complex")
-            && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1 && commGain > 0) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+        if (game.isFoWMode() && vaden != player) {
+            msg = ButtonHelper.getIdentOrColor(player, game) + " has finished resolving";
+            MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
         }
     }
 
@@ -1862,37 +1833,26 @@ public class ButtonHelperAgents {
         String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, game),
-                "Could not resolve target player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
-        int oldTg = player.getTg();
-        int numOfBPs = bentor.getNumberOfBluePrints();
-        int tgGain = numOfBPs + player.getCommodities() - player.getCommoditiesTotal();
-        if (tgGain < 0) {
-            tgGain = 0;
-        }
-        int commGain = numOfBPs - tgGain;
-        player.setCommodities(player.getCommodities() + commGain);
 
-        player.setTg(oldTg + tgGain);
+        int numOfBPs = bentor.getNumberOfBluePrints();
+        int oldTg = player.getTg();
+        int tgGain = numOfBPs + player.getCommodities() - player.getCommoditiesTotal();
+        if (tgGain < 0) tgGain = 0;
+        int commGain = numOfBPs - tgGain;
+
+        ButtonHelperStats.gainComms(event, game, player, commGain, false, true);
+        ButtonHelperStats.gainTGs(event, game, player, tgGain, true);
+
         String msg = ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "tg (" + oldTg + "->"
             + player.getTg() + ") and " + commGain + " commodities due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "C.O.O. Mgur (Bentor Agent)";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFoWMode() && bentor != player) {
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
+            msg = player.getRepresentation() + " has finished resolving.";
+            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
         }
-        if (tgGain > 0) {
-            ButtonHelperAbilities.pillageCheck(player, game);
-            resolveArtunoCheck(player, game, tgGain);
-        }
-        if (player.hasAbility("military_industrial_complex")
-            && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1 && commGain > 0) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-        }
-        // event.getMessage().delete().queue();
     }
 
     public static void fogAllianceAgentStep1(Game game, Player player, GenericInteractionCreateEvent event) {

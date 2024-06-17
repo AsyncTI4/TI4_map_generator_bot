@@ -3,10 +3,7 @@
     "tileId": "er88",
     "name": "Elan's Rest",
     "shortName": "E.'s Rest",
-    "aliases": [
-        "elansrest",
-        "elan"
-    ],
+    "aliases": ["elansrest", "elan'srest", "elan"],
     "positionInTile": {
         "x": 135.0,
         "y": 85.0

@@ -4,20 +4,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class AdminCommand implements Command {
@@ -70,6 +65,7 @@ public class AdminCommand implements Command {
         subcommands.add(new ResetEmojiCache());
         subcommands.add(new ResetImageCache());
         subcommands.add(new ReloadMap());
+        subcommands.add(new ReloadMapperObjects());
         subcommands.add(new RestoreGame());
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new UpdateThreadArchiveTime());

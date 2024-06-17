@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -776,6 +777,17 @@ public class Player {
 
     public List<String> getPromissoryNotesInPlayArea() {
         return promissoryNotesInPlayArea;
+    }
+
+    public boolean hasTheZeroToken() {
+        if (hasAbility("telepathic")) {
+            for (Player p : getGame().getPlayers().values())
+                if (p.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN))
+                    return false;
+            return true;
+        } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN))
+            return true;
+        return false;
     }
 
     public Set<String> getUnitsOwned() {
@@ -1947,6 +1959,12 @@ public class Player {
             }
         }
         return techs.contains(techID);
+    }
+
+    public boolean controlsMecatol(boolean includeAlliance) {
+        if (includeAlliance)
+            return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
+        return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
     }
 
     public boolean hasTechReady(String techID) {

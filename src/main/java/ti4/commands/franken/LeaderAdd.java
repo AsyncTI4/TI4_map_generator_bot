@@ -32,7 +32,7 @@ public class LeaderAdd extends LeaderAddRemove {
         for (String leaderID : leaderIDs) {
             sb.append(getAddLeaderText(player, leaderID));
             player.addLeader(leaderID);
-            if (fakeCommanders) {
+            if (fakeCommanders != null && fakeCommanders) {
                 player.getGame().addFakeCommander(leaderID);
             }
         }

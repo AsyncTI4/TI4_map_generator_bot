@@ -124,10 +124,8 @@ public class GameSaveLoadManager {
                 game.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
         } else {
-            if (keepModifiedDate && game.isHasEnded()
-                && "Last Command Unknown - No Event Provided".equals(game.getLatestCommand())) {
-                System.out.println("Skipped Saving Map: " + game.getName()
-                    + " - Game has ended and has no changes since last save");
+            if (keepModifiedDate && game.isHasEnded() && "Last Command Unknown - No Event Provided".equals(game.getLatestCommand())) {
+                //System.out.println("Skipped Saving Map: " + game.getName() + " - Game has ended and has no changes since last save");
                 return;
             }
             game.setLatestCommand("Last Command Unknown - No Event Provided");
@@ -1708,13 +1706,13 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.FOW_OPTIONS -> {
-                  StringTokenizer fowOptions = new StringTokenizer(info, ";");
-                  while (fowOptions.hasMoreTokens()) {
-                      StringTokenizer dataInfo = new StringTokenizer(fowOptions.nextToken(), ",");
-                      String optionName = dataInfo.nextToken();
-                      String optionValue = dataInfo.nextToken();
-                      game.setFowOption(optionName, optionValue);
-                  }
+                    StringTokenizer fowOptions = new StringTokenizer(info, ";");
+                    while (fowOptions.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(fowOptions.nextToken(), ",");
+                        String optionName = dataInfo.nextToken();
+                        String optionValue = dataInfo.nextToken();
+                        game.setFowOption(optionName, optionValue);
+                    }
                 }
                 case Constants.GAME_CUSTOM_NAME -> game.setCustomName(info);
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> game.setPlayersWhoHitPersistentNoAfter(info);
@@ -1804,7 +1802,7 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         if (value)
-                          game.setFowOption("hide_player_names", info);
+                            game.setFowOption("hide_player_names", info);
                     } catch (Exception e) {
                         // Do nothing
                     }

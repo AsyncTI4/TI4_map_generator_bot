@@ -3,7 +3,7 @@
     "tileId": "s06",
     "name": "Frincham",
     "shortName": null,
-    "aliases": null,
+    "aliases": ["frincham"],
     "positionInTile": {
         "x": 213.0,
         "y": 212.0

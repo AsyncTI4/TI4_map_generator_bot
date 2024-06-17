@@ -16,7 +16,7 @@ public class MapTemplateModel implements ModelInterface {
         // These three fields control if a particular tile is a placeholder for a milty draft tile.
         Integer playerNumber;
         Integer miltyTileIndex;
-        Boolean home; 
+        Boolean home;
 
         // This is the position the tile should be on the map
         String pos;
@@ -24,8 +24,10 @@ public class MapTemplateModel implements ModelInterface {
 
     String alias;
     String author;
+    String descr;
     Integer playerCount;
     Integer tilesPerPlayer;
+    boolean toroidal;
     // MECATOL REX IS NOT INCLUDED BY DEFAULT
     List<MapTemplateTile> templateTiles;
 

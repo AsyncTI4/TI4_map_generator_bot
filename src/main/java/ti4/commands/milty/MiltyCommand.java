@@ -71,7 +71,7 @@ public class MiltyCommand implements Command {
         Collection<MiltySubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DebugMilty());
         subcommands.add(new SetupMilty());
-        subcommands.add(new StartMilty());
+        // subcommands.add(new StartMilty()); // Disable in favor of /setup milty
         subcommands.add(new ShowMilty());
 
         return subcommands;

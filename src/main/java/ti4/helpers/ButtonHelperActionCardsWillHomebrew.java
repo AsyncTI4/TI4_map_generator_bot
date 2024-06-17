@@ -1,44 +1,23 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.SentACRandom;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExploreAndDiscard;
-import ti4.commands.special.NaaluCommander;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
-import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 
 public class ButtonHelperActionCardsWillHomebrew {
 
@@ -232,6 +211,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static void resolveArmsDealStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) return;
         List<Button> buttons = new ArrayList<>();
         buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Button.danger("deleteButtons", "Dont place"));
@@ -246,6 +226,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static void resolveAncientTradeRoutesStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
         event.getMessage().delete().queue();
@@ -260,13 +241,13 @@ public class ButtonHelperActionCardsWillHomebrew {
             ExploreModel card = Mapper.getExplore(cardID);
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-                sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
+                sb.append(Mapper.getExplore(cardID).getName()).append(System.lineSeparator());
                 sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
                 sb.append("Looked at the top of the " + type + " deck and saw that it was not a relic frag");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), new ExploreAndDiscard().displayExplore(cardID));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), Mapper.getExplore(cardID).getName());
             }
         }
         ButtonHelper.fullCommanderUnlockCheck(player, game, "kollecc", event);
@@ -325,7 +306,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile.isHomeSystem() || tile.getTileID().equalsIgnoreCase("18")) {
+            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile.isHomeSystem() || tile.isMecatol()) {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -344,7 +325,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         Tile tile1 = game.getTileByPosition(pos1);
         for (String tilePos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false, false)) {
             Tile tile = game.getTileByPosition(tilePos2);
-            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1 || tile.isHomeSystem() || tile.getTileID().equalsIgnoreCase("18")) {
+            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1 || tile.isHomeSystem() || tile.isMecatol()) {
                 continue;
             }
 

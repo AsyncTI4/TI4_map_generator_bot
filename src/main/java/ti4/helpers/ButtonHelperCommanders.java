@@ -23,7 +23,7 @@ import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.listeners.ButtonContext;
+import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -70,7 +70,7 @@ public class ButtonHelperCommanders {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if ("mr".equalsIgnoreCase(planet) || tile == null || tile.isHomeSystem()) {
+            if (Constants.MECATOLS.contains(planet) || tile == null || tile.isHomeSystem()) {
                 continue;
             }
             buttons.add(Button.success("olradinCommanderStep2_" + planet,

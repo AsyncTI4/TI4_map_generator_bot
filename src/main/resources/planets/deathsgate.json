@@ -3,11 +3,7 @@
     "tileId": "er03",
     "name": "Death's Gate",
     "shortName": "D. Gate",
-    "aliases": [
-        "death",
-        "dgate",
-        "deathsgate"
-    ],
+    "aliases": ["death", "dgate", "deathsgate", "death'sgate"],
     "positionInTile": {
         "x": 200.0,
         "y": 210.0

@@ -3,7 +3,7 @@
     "tileId": null,
     "name": "Nevermore",
     "shortName": null,
-    "aliases": [],
+    "aliases": ["nevermore"],
     "positionInTile": null,
     "resources": 2,
     "influence": 1,

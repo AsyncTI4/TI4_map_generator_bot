@@ -2,21 +2,15 @@
     "id": "taaldorn",
     "tileId": "er58",
     "name": "Taal'Dorn",
-    "aliases": [
-        "taaldorn"
-    ],
+    "aliases": ["taal'dorn", "taaldorn"],
     "positionInTile": {
         "x": 200.0,
         "y": 210.0
     },
     "resources": 1,
     "influence": 2,
-    "planetTypes": [
-        "INDUSTRIAL"
-    ],
-    "techSpecialties": [
-        "CYBERNETIC"
-    ],
+    "planetTypes": ["INDUSTRIAL"],
+    "techSpecialties": ["CYBERNETIC"],
     "unitPositions": {
         "unitHolderName": "taaldorn",
         "coordinateMap": {

@@ -41,6 +41,7 @@ public class Emojis {
     public static final String Lazax = "<:Lazax:946891797639073884>";
     public static final String Neutral = "<:neutral:1245950121485664276>";
     public static final String Keleres = "<:Keleres:1156670565793398875>";
+    public static final String RandomFaction = "<a:factions:1193971011633291284>";
 
     // FACTIONS - DISCORDANT STARS
     public static final String augers = "<:augurs:1082705489722363904>";

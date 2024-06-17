@@ -3,7 +3,7 @@ package ti4.selections;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
-import ti4.listeners.SelectionMenuContext;
+import ti4.listeners.context.SelectionMenuContext;
 import ti4.message.BotLogger;
 
 public class SelectionMenuListener extends ListenerAdapter {

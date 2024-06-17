@@ -82,8 +82,7 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, Collections.singletonList(embed), null);
 	}
 
-	public static void sendMessageToChannelWithEmbeds(MessageChannel channel, String messageText,
-		List<MessageEmbed> embeds) {
+	public static void sendMessageToChannelWithEmbeds(MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
 		splitAndSent(messageText, channel, embeds, null);
 	}
 
@@ -293,8 +292,7 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, null, null);
 	}
 
-	private static void splitAndSent(String messageText, MessageChannel channel, List<MessageEmbed> embeds,
-		List<Button> buttons) {
+	private static void splitAndSent(String messageText, MessageChannel channel, List<MessageEmbed> embeds, List<Button> buttons) {
 		splitAndSentWithAction(messageText, channel, null, embeds, buttons);
 	}
 
@@ -413,8 +411,7 @@ public class MessageHelper {
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Game game, MessageChannel feedbackChannel,
-		String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Game game, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
 		if (messageText == null || messageText.length() == 0)
 			return true; // blank message counts as a success
 		User user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());

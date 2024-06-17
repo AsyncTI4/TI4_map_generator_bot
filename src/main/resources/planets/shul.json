@@ -3,9 +3,7 @@
     "tileId": "er07",
     "name": "Shul",
     "shortName": null,
-    "aliases": [
-        "shu"
-    ],
+    "aliases": ["shul"],
     "positionInTile": {
         "x": 200.0,
         "y": 210.0
@@ -15,9 +13,7 @@
     "factionHomeworld": null,
     "planetType": "CULTURAL",
     "cardImagePath": null,
-    "techSpecialties": [
-        "PROPULSION"
-    ],
+    "techSpecialties": ["PROPULSION"],
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {

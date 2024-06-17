@@ -185,6 +185,12 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
+    public static void sendDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
+        List<Button> buttons = getDiscardActionCardButtons(game, player, doingAction);
+        String msg = player.getRepresentation(true, true) + " use buttons to discard";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
     public static List<Button> getDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();

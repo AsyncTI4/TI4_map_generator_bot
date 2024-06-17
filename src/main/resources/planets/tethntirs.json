@@ -2,18 +2,14 @@
     "id": "tethntirs",
     "tileId": "er54",
     "name": "Tethn'Tirs",
-    "aliases": [
-        "tethntirs"
-    ],
+    "aliases": ["tethn'tirs", "tethntirs"],
     "positionInTile": {
         "x": 200.0,
         "y": 210.0
     },
     "resources": 2,
     "influence": 2,
-    "planetTypes": [
-        "HAZARDOUS"
-    ],
+    "planetTypes": ["HAZARDOUS"],
     "unitPositions": {
         "unitHolderName": "tethntirs",
         "coordinateMap": {

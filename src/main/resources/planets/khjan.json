@@ -3,10 +3,7 @@
     "tileId": "er07",
     "name": "Khjan",
     "shortName": null,
-    "aliases": [
-        "kh",
-        "jan"
-    ],
+    "aliases": ["khjan", "kh", "jan"],
     "positionInTile": {
         "x": 135.0,
         "y": 85.0

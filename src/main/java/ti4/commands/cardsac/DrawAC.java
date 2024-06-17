@@ -35,13 +35,30 @@ public class DrawAC extends ACCardsSubcommandData {
                 count = 10;
             }
         }
+
+        drawActionCards(game, player, count, false);
+    }
+
+    public static void drawActionCards(Game game, Player player, int count, boolean addScheming) {
+        if (count > 10) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
+            return;
+        }
+        String message = player.getRepresentation() + " Drew " + count + " AC";
+        if (addScheming) {
+            message = "Drew [" + count + "+1=" + ++count + "] AC (Scheming)";
+        }
+
         for (int i = 0; i < count; i++) {
             game.drawActionCard(player.getUserID());
         }
         ACInfo.sendActionCardInfo(game, player);
-        ButtonHelper.checkACLimit(game, event, player);
+        ButtonHelper.checkACLimit(game, null, player);
+        if (addScheming) ACInfo.sendDiscardActionCardButtons(game, player, false);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", null);
         }
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 }

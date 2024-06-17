@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class Storage {
-    
+
     public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
     public static final String ENV_VAR_DB_PATH = "DB_PATH";
     public static final String MAPS_UNDO = "/maps/undo/";
@@ -17,7 +17,7 @@ public class Storage {
     public static final String MAPS_JSON = "/maps_json/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
-    
+
     private static String resourcePath = null;
     private static String storagePath = null;
 
@@ -38,6 +38,7 @@ public class Storage {
     private static Font TI_FONT_40;
     private static Font TI_FONT_50;
     private static Font TI_FONT_64;
+    private static Font TI_FONT_80;
     private static Font TI_FONT_90;
     private static Font TI_FONT_100;
     private static Font TI_FONT_110;
@@ -113,6 +114,7 @@ public class Storage {
         TI_FONT_26 = getFont(26f);
         return TI_FONT_26;
     }
+
     public static Font getFont28() {
         if (TI_FONT_28 != null) {
             return TI_FONT_28;
@@ -120,6 +122,7 @@ public class Storage {
         TI_FONT_28 = getFont(28f);
         return TI_FONT_28;
     }
+
     public static Font getFont30() {
         if (TI_FONT_30 != null) {
             return TI_FONT_30;
@@ -174,6 +177,14 @@ public class Storage {
         }
         TI_FONT_64 = getFont(64f);
         return TI_FONT_64;
+    }
+
+    public static Font getFont80() {
+        if (TI_FONT_80 != null) {
+            return TI_FONT_80;
+        }
+        TI_FONT_80 = getFont(80f);
+        return TI_FONT_80;
     }
 
     public static Font getFont90() {
@@ -266,7 +277,7 @@ public class Storage {
 
     public static void init() {
         String resource = getStoragePath();
-        if (resource!=null) {
+        if (resource != null) {
             createDirectory(resource, DELETED_MAPS);
             createDirectory(resource, MAPS);
             createDirectory(resource, MAPS_JSON);
@@ -309,7 +320,7 @@ public class Storage {
         if (resourcePath != null) {
             return resourcePath;
         }
-    
+
         return System.getenv(ENV_VAR_RESOURCE_PATH);
     }
 
@@ -317,7 +328,7 @@ public class Storage {
      * Allows for resource path overrides instead of using env var. Likely only useful
      * for testing.
      */
-    public static void setResourcePath(@Nullable String path){
+    public static void setResourcePath(@Nullable String path) {
         resourcePath = path;
     }
 }

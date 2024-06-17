@@ -380,8 +380,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void offerASNButtonsStep1(Game game, Player player, String warfareOrTactical) {
-        String msg = player.getRepresentation(true, true)
-            + " you may have the ability to use Agency Supply Network (ASN). Select the tile you want to build out of, or decline (please decline if you already used ASN)";
+        String msg = player.getRepresentation(true, true) + " you may have the ability to use Agency Supply Network (ASN). Select the tile you want to build out of, or decline (please decline if you already used ASN)";
         List<Button> buttons = new ArrayList<>();
         Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(player, game);
         for (Tile tile : tiles) {
@@ -1696,7 +1695,7 @@ public class ButtonHelperFactionSpecific {
         String message = " Use buttons to ready a non-rex planet.";
         buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
-            if (planet.equalsIgnoreCase("mr")) {
+            if (Constants.MECATOLS.contains(planet)) {
                 continue;
             }
             buttons.add(Button.secondary("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
@@ -2144,7 +2143,7 @@ public class ButtonHelperFactionSpecific {
             }
             Tile hs = game.getTile(AliasHandler.resolveTile(p2.getFaction()));
             if (hs == null) {
-                hs = ButtonHelper.getTileOfPlanetWithNoTrait(p2, game);
+                hs = p2.getHomeSystemTile();
             }
             if (hs != null && hs.getPosition().equalsIgnoreCase(tile.getPosition())) {
                 return false;

@@ -210,7 +210,7 @@ public class CombatHelper {
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
-        if (player.getPlanetsAllianceMode().contains("mr") && "mr".equalsIgnoreCase(planet.getName()) && player.hasTech("iihq")) {
+        if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasTech("iihq")) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -274,7 +274,7 @@ public class CombatHelper {
 
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet planet) {
-                if (player.getPlanetsAllianceMode().contains("mr") && "mr".equalsIgnoreCase(planet.getName()) && player.hasTech("iihq")) {
+                if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasTech("iihq")) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
                     planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());

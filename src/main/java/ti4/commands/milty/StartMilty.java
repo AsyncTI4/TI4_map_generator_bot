@@ -315,6 +315,8 @@ public class StartMilty extends MiltySubcommandData {
         allTiles.addAll(draftManager.getRed());
         int totalWHs = allTiles.stream().filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH()).toList().size();
         int extraWHs = Math.min(totalWHs, sliceCount * 2);
+        if (specs.playerIDs.size() == 1) extraWHs = 0; //disable the behavior if there's only 1 player
+        if (specs.playerIDs.size() == 2) extraWHs = 4; //lessen the behavior if there's 2 players
         if (!specs.extraWHs) extraWHs = 0;
 
         List<MiltyDraftTile> blue = draftManager.getBlue();
