@@ -266,6 +266,7 @@ public class Tile {
     }
 
     public boolean hasFog(Player player) {
+        if (player == null) return true;
         Boolean hasFog = fog.get(player);
 
         Game game = player.getGame();

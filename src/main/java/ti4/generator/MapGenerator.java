@@ -2819,7 +2819,7 @@ public class MapGenerator {
         if (convertToGeneric) {
             return;
         }
-                
+
         // Get the map positions for each of the "stat tiles"
         if (statTiles.size() < 3) return;
         Map<String, Point> points = new HashMap<>();
