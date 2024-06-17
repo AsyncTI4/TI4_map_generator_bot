@@ -2890,6 +2890,7 @@ public class Player {
         return ButtonHelper.getTileOfPlanetWithNoTrait(this, game);
     }
 
+    @JsonIgnore
     public List<Integer> getUnfollowedSCs() {
         List<Integer> unfollowedSCs = new ArrayList<>();
         for (int sc : getGame().getPlayedSCsInOrder(this)) {
