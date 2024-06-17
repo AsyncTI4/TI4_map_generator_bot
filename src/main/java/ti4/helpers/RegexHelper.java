@@ -111,6 +111,11 @@ public class RegexHelper {
         return regexBuilder(group, unitholders);
     }
 
+    public static String relicRegex(Game game) {
+        Set<String> relics = new HashSet<>(Mapper.getDeck(game.getRelicDeckID()).getNewDeck());
+        return regexBuilder("relic", relics);
+    }
+
     public static String acRegex(Game game) {
         Set<String> allACs = new HashSet<>();
         if (game != null) {

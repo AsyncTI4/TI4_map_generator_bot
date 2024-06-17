@@ -3,12 +3,7 @@
     "tileId": "er04",
     "name": "Su'Prima",
     "shortName": null,
-    "aliases": [
-        "su",
-        "suprima",
-        "prima",
-        "sup"
-    ],
+    "aliases": ["su", "suprima", "su'prima", "prima", "sup"],
     "positionInTile": {
         "x": 170.0,
         "y": 150.0

@@ -5,6 +5,7 @@
     "shortName": null,
     "aliases": [
         "sayensbeach",
+        "sayen'sbeach",
         "sayens_beach",
         "sayen_beach",
         "sayens",
@@ -26,9 +27,7 @@
     "factionHomeworld": null,
     "planetType": "CULTURAL",
     "cardImagePath": null,
-    "techSpecialties": [
-        "NONUNITSKIP"
-    ],
+    "techSpecialties": ["NONUNITSKIP"],
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {

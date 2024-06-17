@@ -3,11 +3,7 @@
     "tileId": "m05",
     "name": "Shanh",
     "shortName": null,
-    "aliases": [
-        "shan",
-        "m5",
-        "m05"
-    ],
+    "aliases": ["shan", "shanh", "m5", "m05"],
     "positionInTile": {
         "x": 135.0,
         "y": 85.0

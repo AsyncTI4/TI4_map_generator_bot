@@ -3,10 +3,7 @@
     "tileId": "m32",
     "name": "Apis",
     "shortName": null,
-    "aliases": [
-        "bees",
-        "bee"
-    ],
+    "aliases": ["apis", "bees", "bee"],
     "positionInTile": {
         "x": 200.0,
         "y": 210.0
@@ -16,9 +13,7 @@
     "factionHomeworld": null,
     "planetType": "INDUSTRIAL",
     "cardImagePath": null,
-    "techSpecialties": [
-        "CYBERNETIC"
-    ],
+    "techSpecialties": ["CYBERNETIC"],
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {

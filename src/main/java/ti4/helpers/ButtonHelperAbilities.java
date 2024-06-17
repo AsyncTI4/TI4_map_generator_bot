@@ -5,17 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
@@ -31,7 +26,6 @@ import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -133,7 +127,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game) || tile.isHomeSystem()
-                || ButtonHelper.isTileLegendary(tile, game) || "18".equals(tile.getTileID())) {
+                || ButtonHelper.isTileLegendary(tile, game) || tile.isMecatol()) {
                 continue;
             }
             buttons.add(Button.success("rallyToTheCauseStep2_" + tile.getPosition(),
@@ -703,7 +697,7 @@ public class ButtonHelperAbilities {
                             break;
                         }
                     }
-                    if (!alreadyOwned && !"mr".equalsIgnoreCase(planet)) {
+                    if (!alreadyOwned && !Constants.MECATOLS.contains(planet)) {
                         unitHolder.addToken("token_freepeople.png");
                     }
                 }
@@ -824,7 +818,7 @@ public class ButtonHelperAbilities {
             if (tile == null) {
                 continue;
             }
-            if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG) && !"mr".equalsIgnoreCase(planetName)
+            if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG) && !Constants.MECATOLS.contains(planetName)
                 && !tile.isHomeSystem()) {
                 buttons.add(Button.secondary("mantleCrack_" + planetName,
                     Helper.getPlanetRepresentation(planetName, game)));
@@ -1226,33 +1220,15 @@ public class ButtonHelperAbilities {
             }
             if (!player.hasAbility("council_patronage"))
                 continue;
-            MessageChannel channel = game.getActionsChannel();
-            if (game.isFoWMode()) {
-                channel = player.getPrivateChannel();
-            }
-            player.setTg(player.getTg() + 1);
-            player.setCommodities(player.getCommoditiesTotal());
-            MessageHelper.sendMessageToChannel(channel,
-                player.getRepresentation(true, true) + " your **Council Patronage** ability was triggered. Your "
-                    + Emojis.comm
-                    + " commodities have been replenished and you have gained 1 "
-                    + Emojis.getTGorNomadCoinEmoji(game) + " trade good (" + (player.getTg() - 1) + " -> "
-                    + (player.getTg()) + ")");
-            pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-            ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
-            ButtonHelperAgents.cabalAgentInitiation(game, player);
-            if (player.hasAbility("military_industrial_complex")
-                && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                    ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-            }
-            if (player.getLeaderIDs().contains("mykomentoricommander")
-                && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-            }
+
+            StringBuilder sb = new StringBuilder(player.getRepresentation(true, true));
+            sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm);
+            sb.append(" commodities have been replenished and you have gained 1 ").append(Emojis.getTGorNomadCoinEmoji(game));
+            sb.append(" trade good (").append(player.getTg() - 1).append(" -> ").append(player.getTg()).append(")");
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+            ButtonHelperStats.gainTGs(event, game, player, 1, true);
+            ButtonHelperStats.replenishComms(event, game, player, true);
         }
     }
 

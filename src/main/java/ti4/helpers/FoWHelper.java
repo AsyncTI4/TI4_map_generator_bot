@@ -230,7 +230,6 @@ public class FoWHelper {
 	 */
 	public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow) {
 		return getAdjacentTiles(game, position, player, toShow, true);
-
 	}
 
 	public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow, boolean includeTile) {
@@ -630,7 +629,7 @@ public class FoWHelper {
 		List<String> playerPlanets = player.getPlanets();
 		if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
 			return true;
-		} else if ("18".equals(tile.getTileID()) && player.hasTech("iihq")) {
+		} else if (tile.isMecatol() && player.hasTech("iihq")) {
 			return true;
 		} else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
 			return true;
@@ -811,8 +810,7 @@ public class FoWHelper {
 		feedbackMessage(event, succesfulCount, game.getPlayers().size());
 	}
 
-	public static void pingAllPlayersWithFullStats(Game game, GenericInteractionCreateEvent event,
-		Player playerWithChange, String message) {
+	public static void pingAllPlayersWithFullStats(Game game, GenericInteractionCreateEvent event, Player playerWithChange, String message) {
 		var playersToPing = game.getPlayers().values().stream()
 			.filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
 			.collect(Collectors.toSet());
@@ -826,12 +824,7 @@ public class FoWHelper {
 		feedbackMessage(event, succesfulCount, playersToPing.size());
 	}
 
-	public static void pingPlayersDifferentMessages(
-		Game game,
-		GenericInteractionCreateEvent event,
-		Player playerWithChange,
-		String messageForFullInfo,
-		String messageForAll) {
+	public static void pingPlayersDifferentMessages(Game game, GenericInteractionCreateEvent event, Player playerWithChange, String messageForFullInfo, String messageForAll) {
 		Set<Player> playersWithVisiblity = game.getPlayers().values().stream()
 			.filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
 			.collect(Collectors.toSet());

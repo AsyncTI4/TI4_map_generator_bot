@@ -3,7 +3,7 @@
     "tileId": null,
     "name": "Ghoti",
     "shortName": null,
-    "aliases": null,
+    "aliases": ["ghoti"],
     "positionInTile": null,
     "resources": 3,
     "influence": 3,

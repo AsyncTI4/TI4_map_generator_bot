@@ -3,9 +3,7 @@
     "tileId": "d05",
     "name": "Aysis' Rest",
     "shortName": null,
-    "aliases": [
-        "aysisrest"
-    ],
+    "aliases": ["aysisrest", "aysis'rest"],
     "positionInTile": {
         "x": 136.0,
         "y": 94.0

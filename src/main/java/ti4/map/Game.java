@@ -75,11 +75,11 @@ import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.model.Source.ComponentSource;
 
 public class Game {
 
@@ -1632,6 +1632,24 @@ public class Game {
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
+    public void incrementScTradeGoods() {
+        Set<Integer> scPickedList = new HashSet<>();
+        for (Player player_ : getRealPlayers()) {
+            scPickedList.addAll(player_.getSCs());
+        }
+
+        //ADD A TG TO UNPICKED SC
+        if (!islandMode()) {
+            for (Integer scNumber : scTradeGoods.keySet()) {
+                if (!scPickedList.contains(scNumber) && scNumber != 0) {
+                    Integer tgCount = scTradeGoods.get(scNumber);
+                    tgCount = tgCount == null ? 1 : tgCount + 1;
+                    setScTradeGood(scNumber, tgCount);
+                }
+            }
+        }
+    }
+
     public boolean addSC(Integer sc) {
         if (!scTradeGoods.containsKey(sc)) {
             setScTradeGood(sc, 0);
@@ -1947,7 +1965,7 @@ public class Game {
             custodiansTaken = true;
         }
         for (Player p : getRealPlayers()) {
-            if (p.getPlanets().contains("mr")) {
+            if (p.controlsMecatol(false)) {
                 return true;
             }
         }
@@ -3327,6 +3345,12 @@ public class Game {
         this.actionCards = actionCards;
     }
 
+    public boolean islandMode() {
+        boolean otherThings = getName().contains("island") || getMapTemplateID().equals("1pIsland");
+        if (otherThings) setStoredValue("IslandMode", "true");
+        return getStoredValue("IslandMode").equals("true");
+    }
+
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().val) setAbsolMode(true);
@@ -3338,6 +3362,11 @@ public class Game {
         setUpPeakableObjectives(settings.getStage2s().val, 2);
         setCompetitiveTIGLGame(settings.getTigl().val);
         setAllianceMode(settings.getAlliance().val);
+
+        if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
+            setStoredValue("IslandMode", "true");
+        }
+
         return validateAndSetAllDecks(event, miltySettings);
     }
 
@@ -3628,6 +3657,13 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayers() {
         return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getRealPlayersNNeutral() {
+        return getPlayers().values().stream()
+            .filter(p -> p.isRealPlayer() || p.getFaction().equals("neutral"))
+            .collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -4210,31 +4246,9 @@ public class Game {
     }
 
     public int getPlayersTurnSCInitiative(Player player) {
-        if ((player.hasAbility("telepathic") || player.ownsPromissoryNote("gift"))
-            && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { // Naalu
-                                                                                                                                                                                              // with
-                                                                                                                                                                                              // gift
-                                                                                                                                                                                              // in
-                                                                                                                                                                                              // their
-                                                                                                                                                                                              // hand
+        if (player.hasTheZeroToken())
             return 0;
-        } else if (player.getPromissoryNotesInPlayArea().contains("gift")) { // Someone with gift in their play area
-            return 0;
-        }
-
         return player.getLowestSC();
-    }
-
-    private boolean otherPlayerInGameHasGiftInPlayArea(Player player) {
-        if (player.ownsPromissoryNote("gift") && player.getPromissoryNotes().containsKey("gift"))
-            return false; // can't be in another play area if it's your card and in your hand
-        for (Player otherPlayer : getRealPlayers()) {
-            if (player.equals(otherPlayer))
-                continue; // don't check yourself
-            if (otherPlayer.getPromissoryNotesInPlayArea().contains("gift"))
-                return true;
-        }
-        return false;
     }
 
     @JsonIgnore
@@ -4263,6 +4277,16 @@ public class Game {
                 return true;
         }
         return false;
+    }
+
+    @JsonIgnore
+    public Tile getMecatolTile() {
+        for (String mr : Constants.MECATOL_SYSTEMS) {
+            Tile tile = getTile(mr);
+            if (tile != null)
+                return tile;
+        }
+        return null;
     }
 
     @Nullable
@@ -4431,22 +4455,8 @@ public class Game {
     }
 
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
-        if (player.hasAbility("telepathic")) { // naalu 0 token ability
-            boolean giftPlayed = false;
-            Collection<Player> activePlayers = getPlayers().values().stream().filter(Player::isRealPlayer).toList();
-            for (Player player_ : activePlayers) {
-                if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
-                    giftPlayed = true;
-                    break;
-                }
-            }
-            if (!giftPlayed) {
-                scText = "0/" + scText;
-            }
-        } else if (player.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
+        if (player.hasTheZeroToken()) // naalu 0 token ability
             scText = "0/" + scText;
-        }
-
         return scText;
     }
 
@@ -4454,6 +4464,26 @@ public class Game {
     public boolean isLittleOmega() {
         return stage1PublicDeckID.contains("little_omega") || stage2PublicDeckID.contains("little_omega")
             || agendaDeckID.contains("little_omega");
+    }
+
+    // Currently unused
+    // TODO: Jazz parse this better
+    public List<ComponentSource> getComponentSources() {
+        List<ComponentSource> sources = new ArrayList<>();
+        sources.add(ComponentSource.base);
+        sources.add(ComponentSource.codex1);
+        sources.add(ComponentSource.codex2);
+        sources.add(ComponentSource.codex3);
+
+        if (!isBaseGameMode())
+            sources.add(ComponentSource.pok);
+        if (isAbsolMode())
+            sources.add(ComponentSource.absol);
+        if (isMiltyModMode())
+            sources.add(ComponentSource.miltymod);
+        if (isDiscordantStarsMode())
+            sources.add(ComponentSource.ds);
+        return sources;
     }
 
     @JsonIgnore

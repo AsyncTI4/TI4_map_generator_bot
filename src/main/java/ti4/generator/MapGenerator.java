@@ -5,6 +5,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -21,6 +22,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -42,6 +45,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +68,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -83,6 +88,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.ColorModel;
 import ti4.model.EventModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
@@ -869,10 +875,8 @@ public class MapGenerator {
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
 
                 // SECOND ROW RIGHT SIDE
-                xDeltaSecondRowFromRightSide = reinforcements(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow,
-                    unitCount);
+                xDeltaSecondRowFromRightSide = reinforcements(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
                 xDeltaSecondRowFromRightSide = sleeperTokens(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
-
                 xDeltaSecondRowFromRightSide = speakerToken(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
 
                 if (player.hasAbility("ancient_blueprints")) {
@@ -937,29 +941,36 @@ public class MapGenerator {
         return xDeltaSecondRowFromRightSide;
     }
 
+    private int displayRemainingFactionTokens(List<Point> points, BufferedImage img, int tokensRemaining, int xDeltaFromRight, int yDelta) {
+        if (img != null) {
+            int maxOffset = 0;
+            for (int i = 0; i < tokensRemaining; i++)
+                maxOffset = Math.max(maxOffset, points.get(i).x);
+
+            xDeltaFromRight += maxOffset + img.getWidth() + 5;
+
+            for (int i = 0; i < tokensRemaining; i++) {
+                Point p = points.get(i);
+                graphics.drawImage(img, width - xDeltaFromRight + p.x, yDelta + p.y, null);
+            }
+        }
+        return xDeltaFromRight;
+    }
+
     private int sleeperTokens(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
         if (player.hasAbility("awaken")) {
-            xDeltaSecondRowFromRightSide += 200;
-            // paintNumber(unitID, x, y, remainingReinforcements, playerColor);
-
             String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
             BufferedImage bufferedImage = ImageHelper.read(sleeperFile);
-            if (bufferedImage != null) {
-                List<Point> points = new ArrayList<>() {
-                    {
-                        add(new Point(0, 15));
-                        add(new Point(50, 0));
-                        add(new Point(100, 25));
-                        add(new Point(50, 50));
-                        add(new Point(10, 40));
-                    }
-                };
-                for (int i = 0; i < 5 - game.getSleeperTokensPlacedCount(); i++) {
-                    Point point = points.get(i);
-                    graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide + point.x,
-                        yPlayAreaSecondRow + point.y, null);
-                }
-            }
+
+            List<Point> points = new ArrayList<>();
+            points.add(new Point(0, 15));
+            points.add(new Point(50, 0));
+            points.add(new Point(50, 50));
+            points.add(new Point(100, 25));
+            points.add(new Point(10, 40));
+
+            int numToDisplay = 5 - game.getSleeperTokensPlacedCount();
+            return displayRemainingFactionTokens(points, bufferedImage, numToDisplay, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
         }
         return xDeltaSecondRowFromRightSide;
     }
@@ -1329,8 +1340,7 @@ public class MapGenerator {
         deltaX += 24;
         deltaY += 2;
 
-        boolean hideFactionIcon = isFoWPrivate != null && isFoWPrivate
-            && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        boolean hideFactionIcon = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
 
         int tokenDeltaY = 0;
         int playerCount = 0;
@@ -1852,43 +1862,35 @@ public class MapGenerator {
 
                 graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
-                if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG) || unitHolder.getTokenList().contains("attachment_threetraits.png")) {
-                    String planetTypeName = "pc_attribute_titanspn.png";
-                    drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
-                } else {
-                    String originalPlanetType = planetHolder.getOriginalPlanetType();
-                    if (originalPlanetType == null) {
-                        originalPlanetType = "none";
-                    }
-                    if ("none".equals(originalPlanetType) && "mr".equals(planet)) {
-                        originalPlanetType = "mr";
-                    }
-                    if (Optional.ofNullable(originalPlanetType).isEmpty()) {
-                        originalPlanetType = "none";
-                    }
-                    if ("none".equals(originalPlanetType)) {
-                        originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
-                    }
-                    if ("faction".equals(originalPlanetType)) {
-                        originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
-                    }
-                    if (originalPlanetType == null) {
+                // Display planet traits
+                String originalPlanetType = planetHolder.getOriginalPlanetType();
+                if (Optional.ofNullable(originalPlanetType).isEmpty()) {
+                    originalPlanetType = "none";
+                }
+                if ("faction".equals(originalPlanetType)) {
+                    originalPlanetType = TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
+                    if (originalPlanetType == null) // fallback to current player's faction
                         originalPlanetType = player.getFaction();
+                }
+
+                Set<String> planetTypes = planetHolder.getPlanetTypes();
+                if (!planetTypes.isEmpty() && planetTypes.size() > 1) {
+                    originalPlanetType = "combo_";
+                    if (planetTypes.contains("cultural")) originalPlanetType += "C";
+                    if (planetTypes.contains("hazardous")) originalPlanetType += "H";
+                    if (planetTypes.contains("industrial")) originalPlanetType += "I";
+                }
+
+                if (!originalPlanetType.isEmpty()) {
+                    if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) || "xxcha".equals(originalPlanetType) || "argent".equals(originalPlanetType))) {
+                        originalPlanetType = "keleres";
                     }
 
-                    if (!originalPlanetType.isEmpty()) {
-                        if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
-                            "xxcha".equals(originalPlanetType) ||
-                            "argent".equals(originalPlanetType))) {
-                            originalPlanetType = "keleres";
-                        }
-
-                        if (Mapper.isValidFaction(originalPlanetType)) {
-                            drawFactionIconImage(graphics, originalPlanetType, x + deltaX - 2, y - 2, 52, 52);
-                        } else {
-                            String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                            drawPlanetImage(x + deltaX + 1, y + 2, planetTypeName, planet);
-                        }
+                    if (Mapper.isValidFaction(originalPlanetType)) {
+                        drawFactionIconImage(graphics, originalPlanetType, x + deltaX - 2, y - 2, 52, 52);
+                    } else {
+                        String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                        drawPlanetImage(x + deltaX + 1, y + 2, planetTypeName, planet);
                     }
                 }
 
@@ -2289,13 +2291,11 @@ public class MapGenerator {
         }
     }
 
-    private static void drawPlayerFactionIconImage(Graphics graphics, Player player, int x, int y, int width,
-        int height) {
+    private static void drawPlayerFactionIconImage(Graphics graphics, Player player, int x, int y, int width, int height) {
         drawPlayerFactionIconImageOpaque(graphics, player, x, y, width, height, null);
     }
 
-    private static void drawPlayerFactionIconImageOpaque(Graphics graphics, Player player, int x, int y, int width,
-        int height, Float opacity) {
+    private static void drawPlayerFactionIconImageOpaque(Graphics graphics, Player player, int x, int y, int width, int height, Float opacity) {
         if (player == null)
             return;
         try {
@@ -2657,226 +2657,584 @@ public class MapGenerator {
         return x;
     }
 
+    private int tileRing(String pos) {
+        if (pos.replaceAll("\\d", "").isEmpty())
+            return Integer.parseInt(pos) / 100;
+        return 100;
+    }
+
+    private List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken) {
+        String anchor = player.getPlayerStatsAnchorPosition();
+        if (anchor == null) anchor = player.getHomeSystemPosition();
+        if (anchor == null) return null;
+
+        Set<String> validPositions = PositionMapper.getTilePositions().stream()
+            .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
+            .filter(pos -> game.getTileByPosition(pos) == null)
+            .filter(pos -> taken == null || !taken.contains(pos))
+            .collect(Collectors.toSet());
+
+        // It might be better to actually just use the anchor position and not give a fk. Will test on PBD 10
+        Point anchorRaw = PositionMapper.getTilePosition(anchor);
+        if (anchorRaw == null) return null;
+        Point anchorPt = getTilePosition(anchor, anchorRaw.x, anchorRaw.y);
+
+        // BEGIN ALGORITHM
+        // 1. Make a Priority Queue sorting on distance
+        // 2. Take tiles from the PQ until we have a contiguous selection of 3 adj tiles
+        // 3. Use those tiles :)
+
+        // 1.
+        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
+            Point positionPoint = PositionMapper.getTilePosition(pos);
+            if (positionPoint == null) return 100000000f;
+            Point realPosition = getTilePosition(pos, positionPoint.x, positionPoint.y);
+            return realPosition.distance(anchorPt);
+        }));
+        pq.addAll(validPositions);
+
+        // 2. Take tiles from the PQ until we have 3 adj
+        // - - N*logN * 6
+        List<String> closestTiles = new ArrayList<>();
+        Map<String, Integer> numAdj = new HashMap<>();
+        String next;
+        while ((next = pq.poll()) != null) {
+            if (closestTiles.contains(next)) continue;
+            closestTiles.add(next);
+            numAdj.put(next, 0);
+
+            for (String pos : PositionMapper.getAdjacentTilePositions(next)) {
+                if (numAdj.containsKey(pos)) {
+                    numAdj.put(pos, numAdj.get(pos) + 1);
+                    numAdj.put(next, numAdj.get(next) + 1);
+                }
+            }
+            for (String pos : closestTiles) {
+                if (numAdj.get(pos) == 2) {
+                    List<String> adjOut = PositionMapper.getAdjacentTilePositions(pos);
+                    List<String> output = new ArrayList<>();
+                    output.add(pos);
+                    output.addAll(CollectionUtils.intersection(adjOut, closestTiles));
+                    return output;
+                }
+            }
+        }
+        return null;
+    }
+
     private void playerInfo(Game game) {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
-        Player speaker = game.getPlayer(game.getSpeaker());
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         if (isFoWPrivate != null && isFoWPrivate) {
             Collections.shuffle(players);
         }
 
-        int deltaX = mapWidth - EXTRA_X - (extraRow ? EXTRA_X : 0);
-        int deltaY = EXTRA_Y;
-
         int ringCount = game.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+
+        // highlightValidStatTiles(game);
+        boolean useNewSystem = true;
+        Set<String> statTilesInUse = new HashSet<>();
+        Map<Player, List<String>> playerStatTiles = new LinkedHashMap<>();
+        for (Player p : game.getRealPlayers()) {
+            List<String> myStatTiles = findThreeNearbyStatTiles(game, p, statTilesInUse);
+            if (myStatTiles == null) {
+                useNewSystem = false;
+                break;
+            }
+            statTilesInUse.addAll(myStatTiles);
+            playerStatTiles.put(p, myStatTiles);
+        }
 
         for (Player player : players) {
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
+            if (useNewSystem) {
+                List<String> tiles = playerStatTiles.get(player);
+                paintPlayerInfo(game, player, tiles);
+            } else {
+                paintPlayerInfoOld(game, player, ringCount);
+            }
+        }
+    }
 
-            int deltaSplitX = 0;
-            int deltaSplitY = 0;
+    private BufferedImage hexBorder(ColorModel color, List<Integer> openSides) {
+        BufferedImage img = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
 
-            String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
-            if (playerStatsAnchor != null) {
-                // String anchorProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
-                Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
-                if (anchorProjectedPoint != null) {
-                    Point playerStatsAnchorPoint = getTilePosition(playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y);
-                    Integer anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
-                    anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
-                    boolean isCorner = playerStatsAnchor.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
-                    if (anchorLocationIndex == 0 && isCorner) { // North Corner
-                        deltaX = playerStatsAnchorPoint.x + EXTRA_X + 80;
-                        deltaY = playerStatsAnchorPoint.y - 80;
-                        deltaSplitX = 200;
-                    } else if (anchorLocationIndex == 0) { // North East
-                        deltaX = playerStatsAnchorPoint.x + EXTRA_X + 300;
-                        deltaY = playerStatsAnchorPoint.y;
-                        deltaSplitX = 200;
-                    } else if (anchorLocationIndex == 1) { // East
-                        deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
-                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
-                    } else if (anchorLocationIndex == 2 && isCorner) { // South East Corner
-                        deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
-                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
-                    } else if (anchorLocationIndex == 2) { // South East
-                        deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
-                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y + 100;
-                    } else if (anchorLocationIndex == 3 && isCorner) { // South Corner
-                        deltaX = playerStatsAnchorPoint.x + EXTRA_X;
-                        deltaY = playerStatsAnchorPoint.y + 360 + EXTRA_Y;
-                        deltaSplitX = 200;
-                    } else if (anchorLocationIndex == 3) { // South West
-                        deltaX = playerStatsAnchorPoint.x;
-                        deltaY = playerStatsAnchorPoint.y + 250 + EXTRA_Y;
-                        deltaSplitX = 200;
-                    } else if (anchorLocationIndex == 4) { // West
-                        deltaX = playerStatsAnchorPoint.x + 10;
-                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
-                    } else if (anchorLocationIndex == 5 && isCorner) { // North West Corner
-                        deltaX = playerStatsAnchorPoint.x + 10;
-                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
-                    } else if (anchorLocationIndex == 5) { // North West
-                        deltaX = playerStatsAnchorPoint.x + 10;
-                        deltaY = playerStatsAnchorPoint.y - 100;
-                        deltaSplitX = 200;
-                    }
-                } else
-                    continue;
-            } else
-                continue;
+        // on, off, on, off, ....
+        float[] dash = { 30.0f, 17.0f, 30.0f, 1000.0f };
+        g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, dash, 0.0f));
 
+        Color primary = color.primaryColor();
+        Color secondary = color.secondaryColor();
+        if (secondary == null) secondary = primary;
+        if (color.getName().equals("black"))
+            primary = secondary = Color.darkGray;
+
+        List<Point> corners = List.of(
+            new Point(88, 2),
+            new Point(256, 2),
+            new Point(342, 149),
+            new Point(256, 296),
+            new Point(88, 296),
+            new Point(2, 149));
+        for (int i = 0; i < 6; i++) {
+            if (openSides.contains(i)) continue;
+            Point c1 = corners.get(i);
+            Point c2 = corners.get((i + 1) % 6);
+
+            GradientPaint gpOne = null, gpTwo = null;
+            if (color.getName().endsWith("rainbow")) { // special handling for rainbow
+                Point mid = new Point((c1.x + c2.x) / 2, (c1.y + c2.y) / 2);
+                if (i % 2 == 0) {
+                    gpOne = new GradientPaint(c1, Color.red, mid, Color.yellow);
+                    gpTwo = new GradientPaint(mid, Color.yellow, c2, Color.green);
+                } else {
+                    gpOne = new GradientPaint(c1, Color.green, mid, Color.blue);
+                    gpTwo = new GradientPaint(mid, Color.blue, c2, Color.red);
+                }
+            } else {
+                if (i % 2 == 0) {
+                    gpOne = new GradientPaint(c1, primary, c2, secondary);
+                } else {
+                    gpOne = new GradientPaint(c1, secondary, c2, primary);
+                }
+            }
+
+            // Draw lines both directions so the dash is symmetrical
+            g2.setPaint(gpOne);
+            g2.drawLine(c1.x + 10, c1.y + 10, c2.x + 10, c2.y + 10);
+            g2.setPaint(gpTwo);
+            g2.drawLine(c2.x + 10, c2.y + 10, c1.x + 10, c1.y + 10);
+        }
+
+        return img;
+    }
+
+    private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
+        // Get the map positions for each of the "stat tiles"
+        if (statTiles.size() < 3) return;
+        Map<String, Point> points = new HashMap<>();
+        for (String pos : statTiles) {
+            Point p = PositionMapper.getTilePosition(pos);
+            if (p == null) return;
+            p = getTilePosition(pos, p.x, p.y);
+            p.translate(EXTRA_X, EXTRA_Y);
+            points.put(pos, p);
+        }
+        Point statTileMid = points.get(statTiles.get(0));
+        Point statTile1 = points.get(statTiles.get(1));
+        Point statTile2 = points.get(statTiles.get(2));
+
+        int dir1 = 0, dir2 = 0, j = 0;
+        for (String p : PositionMapper.getAdjacentTilePositions(statTiles.get(0))) {
+            if (p.equals(statTiles.get(1))) dir1 = j;
+            if (p.equals(statTiles.get(2))) dir2 = j;
+            j++;
+        }
+
+        ColorModel playerColor = Mapper.getColor(player.getColor());
+        for (String pos : statTiles) {
+            Point p = points.get(pos);
+            List<Integer> adjDir = new ArrayList<>();
+            List<String> adjPos = PositionMapper.getAdjacentTilePositions(pos);
+            for (int i = 0; i < 6; i++)
+                if (statTiles.contains(adjPos.get(i)))
+                    adjDir.add(i);
+            BufferedImage hex = hexBorder(playerColor, adjDir);
+
+            graphics.drawImage(hex, p.x - 10, p.y - 10, null);
+        }
+
+        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        if (convertToGeneric) {
+            return;
+        }
+        Point miscTile; // To be used for speaker and other stuff
+        Point point, tile = statTileMid;
+        { // PAINT FACTION ICON
+            point = PositionMapper.getPlayerStats("factionicon");
+            int size = 275;
+            point.translate(statTileMid.x - (size / 2), statTileMid.y - (size / 2));
+            drawPlayerFactionIconImageOpaque(graphics, player, point.x, point.y, size, size, 0.45f);
+        }
+
+        { // PAINT USERNAME
+            graphics.setFont(Storage.getFont32());
             String userName = player.getUserName();
-
-            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
-                && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-            if (convertToGeneric) {
-                continue;
-            }
-
-            // PAINT USERNAME
-            Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
+            point = PositionMapper.getPlayerStats("newuserName");
             if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
-                graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
-                    point.y + deltaY);
+                String name = userName.substring(0, Math.min(userName.length(), 15));
+                superDrawString(graphics, name, tile.x + point.x, tile.y + point.y, Color.white, HorizontalAlign.Center, null, stroke5, Color.black);
             }
+        }
 
-            // PAINT FACTION
-            point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);
+        { // PAINT FACTION NAME ~AND~ COLOR STROTERS
+            graphics.setFont(Storage.getFont32());
+            point = PositionMapper.getPlayerStats("newfaction");
+            point.translate(statTileMid.x, statTileMid.y);
             String factionText = player.getFaction();
             if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
                 factionText = player.getDisplayName();
             }
-            graphics.drawString(StringUtils.capitalize(factionText), point.x + deltaX, point.y + deltaY);
+            factionText = StringUtils.capitalize(factionText);
+            superDrawString(graphics, factionText, point.x, point.y, Color.white, HorizontalAlign.Center, null, stroke5, Color.black);
 
-            // PAINT COLOR
-            point = PositionMapper.getPlayerStats(Constants.STATS_COLOR);
-            graphics.drawString(player.getColor(), point.x + deltaX, point.y + deltaY);
+            BufferedImage img = ImageHelper.readEmojiImageScaled(Emojis.getColorEmoji(player.getColor()), 30);
+            int offset = graphics.getFontMetrics().stringWidth(factionText) / 2 + 10;
+            point.translate(0, -25);
+            graphics.drawImage(img, point.x - offset - 30, point.y, null);
+            graphics.drawImage(img, point.x + offset, point.y, null);
+        }
 
-            // PAIN VICTORY POINTS
-            int vpCount = player.getTotalVictoryPoints();
-            point = PositionMapper.getPlayerStats(Constants.STATS_VP);
-            graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
+        { // PAINT VICTORY POINTS
+            graphics.setFont(Storage.getFont32());
+            String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
+            point = PositionMapper.getPlayerStats("newvp");
+            point.translate(statTileMid.x, statTileMid.y);
+            superDrawString(graphics, vpCount, point.x, point.y, Color.white, HorizontalAlign.Center, null, stroke5, Color.black);
+        }
 
-            // PAINT SO ICONS
-            int totalSecrets = player.getSecrets().keySet().size();
-            Set<String> soSet = player.getSecretsScored().keySet();
-            int soOffset = 0;
+        { // PAINT SO ICONS
+            List<String> soToPoList = game.getSoToPoList();
+            int unscoredSOs = player.getSecrets().keySet().size();
+            int scoredSOs = (int) player.getSecretsScored().keySet().stream().filter(so -> !soToPoList.contains(so)).count();
+            int secretsEmpty = player.getMaxSOCount() - unscoredSOs - scoredSOs;
+            int soOffset = (15 + 35 * player.getMaxSOCount()) / 2 - 50;
+
             String soHand = "pa_so-icon_hand.png";
             String soScored = "pa_so-icon_scored.png";
-            point = PositionMapper.getPlayerStats(Constants.STATS_SO);
-            for (int i = 0; i < totalSecrets; i++) {
-                drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soHand);
-                soOffset += 25;
+            String soEmpty = "pa_so-icon_empty.png";
+            point = PositionMapper.getPlayerStats("newso");
+            for (int i = 0; i < secretsEmpty; i++) {
+                drawPAImage((point.x + tile.x + soOffset), point.y + tile.y, soEmpty);
+                soOffset -= 35;
             }
-            List<String> soToPoList = game.getSoToPoList();
-            for (String soID : soSet) {
-                if (!soToPoList.contains(soID)) {
-                    drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soScored);
-                    soOffset += 25;
-                }
+            for (int i = 0; i < unscoredSOs; i++) {
+                drawPAImage((point.x + tile.x + soOffset), point.y + tile.y, soHand);
+                soOffset -= 35;
             }
+            for (int i = 0; i < scoredSOs; i++) {
+                drawPAImage((point.x + tile.x + soOffset), point.y + tile.y, soScored);
+                soOffset -= 35;
+            }
+        }
 
-            // PAINT SC#
+        { // PAINT SC#s
+            graphics.setFont(Storage.getFont80());
+            int scsize = 96;
+            int sctranslate = 72;
             List<Integer> playerSCs = new ArrayList<>(player.getSCs());
+            if (player.hasTheZeroToken()) playerSCs.add(0);
             Collections.sort(playerSCs);
-            int count = 0;
+
+            point = PositionMapper.getPlayerStats("newsc");
+            point.translate(statTileMid.x, statTileMid.y);
+            point.translate(-1 * (sctranslate / 2) * playerSCs.size(), -1 * (scsize / 2));
+
             for (int sc : playerSCs) {
-                String scText = sc == 0 ? " " : Integer.toString(sc);
-                scText = game.getSCNumberIfNaaluInPlay(player, scText);
-                graphics.setColor(getSCColor(sc, game));
-                graphics.setFont(Storage.getFont64());
-                point = PositionMapper.getPlayerStats(Constants.STATS_SC);
-                if (sc != 0) {
-                    graphics.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
-
+                if (sc == 0) {
+                    BufferedImage img = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource("pa_telepathic.png"), scsize, scsize);
+                    graphics.drawImage(img, point.x, point.y, null);
+                    point.translate(scsize, 0);
+                } else {
+                    int fontYoffset = (scsize / 2) + 25;
+                    String scStr = Integer.toString(sc);
+                    superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), null, VerticalAlign.Bottom, stroke6, Color.black);
+                    point.translate(graphics.getFontMetrics().stringWidth(scStr) + 10, 0);
                 }
-                count++;
             }
-
-            // PAINT CCs
             graphics.setColor(Color.WHITE);
+            graphics.setFont(Storage.getFont32());
+        }
+
+        { // PAINT CCs
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
             String fleetCCID = Mapper.getFleetCCID(player.getColor());
-            point = PositionMapper.getPlayerStats(Constants.STATS_CC);
-            int x = point.x + deltaX;
-            int y = point.y + deltaY;
-            if (deltaSplitX != 0) {
-                deltaSplitY = point.y;
+            point = PositionMapper.getPlayerStats("newcc");
+            int dir = dir1;
+            if (dir1 == 1 || dir1 == 2 || dir1 == 4 || dir1 == 5) {
+                point.translate(statTile1.x, statTile1.y);
+                miscTile = statTile2;
+            } else {
+                dir = dir2;
+                point.translate(statTile2.x, statTile2.y);
+                miscTile = statTile1;
             }
-
-            drawCCOfPlayer(graphics, ccID, x + deltaSplitX, y - deltaSplitY, player.getTacticalCC(), player, false);
-            drawFleetCCOfPlayer(graphics, fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player);
-            drawCCOfPlayer(graphics, ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), player,
-                false);
-
-            // PAINT SPEAKER
-            if (player == speaker) {
-                String speakerID = Mapper.getTokenID(Constants.SPEAKER);
-                String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
-                if (speakerFile != null) {
-                    BufferedImage bufferedImage = ImageHelper.read(speakerFile);
-                    point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
-                    int negativeDelta = 0;
-                    graphics.drawImage(bufferedImage, point.x + deltaX + deltaSplitX + negativeDelta,
-                        point.y + deltaY - deltaSplitY, null);
-                    graphics.setColor(Color.WHITE);
+            boolean rightAlign = false;
+            switch (dir) {
+                case 0, 1, 2, 3 -> point.translate(60, 45); // centered vertically, coming from the left side
+                case 4, 5 -> {
+                    point.translate(210, 45); // centered vertically
+                    rightAlign = true; // coming from the left side
                 }
             }
+
+            drawCCOfPlayer(graphics, ccID, point.x, point.y, player.getTacticalCC(), player, false, rightAlign);
+            drawFleetCCOfPlayer(graphics, fleetCCID, point.x, point.y + 65, player, rightAlign);
+            drawCCOfPlayer(graphics, ccID, point.x, point.y + 130, player.getStrategicCC(), player, false, rightAlign);
+
+            // Additional FS
+            int additionalFleetSupply = 0;
+            String addFS = "";
+            if (player.hasAbility("edict")) additionalFleetSupply += player.getMahactCC().size();
+            if (player.hasAbility("armada")) additionalFleetSupply += 2;
+            if (additionalFleetSupply > 0) addFS = "*";
+
+            // Draw Numbers
+            HorizontalAlign align = HorizontalAlign.Left;
+            List<String> reps = Arrays.asList(player.getCCRepresentation().split("/"));
+            graphics.setFont(Storage.getFont28());
+            point.translate(rightAlign ? 58 : -3, 32);
+            String fleetCCs = Integer.toString(player.getFleetCC() + additionalFleetSupply) + addFS;
+            superDrawString(graphics, reps.get(0), point.x, point.y, Color.white, align, null, stroke4, Color.black);
+            superDrawString(graphics, fleetCCs, point.x, point.y + 65, Color.white, align, null, stroke4, Color.black);
+            superDrawString(graphics, reps.get(2), point.x, point.y + 130, Color.white, align, null, stroke4, Color.black);
+        }
+
+        { // PAINT SPEAKER
+            if (player.isSpeaker()) {
+                String speakerID = Mapper.getTokenID(Constants.SPEAKER);
+                String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+                BufferedImage img = ImageHelper.read(speakerFile);
+                if (img != null) {
+                    point = PositionMapper.getPlayerStats("newspeaker");
+                    point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));
+                    graphics.drawImage(img, point.x, point.y, null);
+                }
+            }
+        }
+
+        { // PAINT PASSED/ACTIVE/AFK
             String activePlayerID = game.getActivePlayerID();
             String phase = game.getCurrentPhase();
             if (player.isPassed()) {
-                point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
-                graphics.setColor(new Color(238, 58, 80));
-                graphics.drawString("PASSED", point.x + deltaX, point.y + deltaY);
-                graphics.setColor(Color.WHITE);
+                point = PositionMapper.getPlayerStats("newpassed");
+                point.translate(miscTile.x, miscTile.y);
+                superDrawString(graphics, "PASSED", point.x, point.y, new Color(238, 58, 80), HorizontalAlign.Center, null, stroke4, Color.black);
             } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
-                point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
-                graphics.setColor(new Color(50, 230, 80));
-                graphics.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
-
-                if (player.isAFK()) {
-                    graphics.setColor(Color.GRAY);
-                    graphics.drawString("(AFK)", point.x + deltaX + 124, point.y + deltaY);
-                }
-                graphics.setColor(Color.WHITE);
-            } else if (player.isAFK()) {
-                point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
-                graphics.setColor(Color.GRAY);
-                graphics.drawString("AFK", point.x + deltaX + 4, point.y + deltaY);
-                graphics.setColor(Color.WHITE);
-
+                point = PositionMapper.getPlayerStats("newpassed");
+                point.translate(miscTile.x, miscTile.y);
+                superDrawString(graphics, "ACTIVE", point.x, point.y, new Color(50, 230, 80), HorizontalAlign.Center, null, stroke4, Color.black);
             }
-
-            deltaY += PLAYER_STATS_HEIGHT;
+            if (player.isAFK()) {
+                point = PositionMapper.getPlayerStats("newafk");
+                point.translate(miscTile.x, miscTile.y);
+                superDrawString(graphics, "AFK", point.x, point.y, Color.gray, HorizontalAlign.Center, null, stroke4, Color.black);
+            }
+            graphics.setColor(Color.white);
         }
     }
 
-    private static void drawCCOfPlayer(Graphics graphics, String ccID, int x, int y, int ccCount, Player player,
-        boolean hideFactionIcon) {
+    private void paintPlayerInfoOld(Game game, Player player, int ringCount) {
+        int deltaX = 0, deltaSplitX = 0;
+        int deltaY = 0, deltaSplitY = 0;
+
+        String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
+        if (playerStatsAnchor != null) {
+            // String anchorProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
+            Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
+            if (anchorProjectedPoint != null) {
+                Point playerStatsAnchorPoint = getTilePosition(playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y);
+                Integer anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
+                anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
+                boolean isCorner = playerStatsAnchor.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
+                if (anchorLocationIndex == 0 && isCorner) { // North Corner
+                    deltaX = playerStatsAnchorPoint.x + EXTRA_X + 80;
+                    deltaY = playerStatsAnchorPoint.y - 80;
+                    deltaSplitX = 200;
+                } else if (anchorLocationIndex == 0) { // North East
+                    deltaX = playerStatsAnchorPoint.x + EXTRA_X + 300;
+                    deltaY = playerStatsAnchorPoint.y;
+                    deltaSplitX = 200;
+                } else if (anchorLocationIndex == 1) { // East
+                    deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
+                    deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
+                } else if (anchorLocationIndex == 2 && isCorner) { // South East Corner
+                    deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
+                    deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
+                } else if (anchorLocationIndex == 2) { // South East
+                    deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
+                    deltaY = playerStatsAnchorPoint.y + EXTRA_Y + 100;
+                } else if (anchorLocationIndex == 3 && isCorner) { // South Corner
+                    deltaX = playerStatsAnchorPoint.x + EXTRA_X;
+                    deltaY = playerStatsAnchorPoint.y + 360 + EXTRA_Y;
+                    deltaSplitX = 200;
+                } else if (anchorLocationIndex == 3) { // South West
+                    deltaX = playerStatsAnchorPoint.x;
+                    deltaY = playerStatsAnchorPoint.y + 250 + EXTRA_Y;
+                    deltaSplitX = 200;
+                } else if (anchorLocationIndex == 4) { // West
+                    deltaX = playerStatsAnchorPoint.x + 10;
+                    deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
+                } else if (anchorLocationIndex == 5 && isCorner) { // North West Corner
+                    deltaX = playerStatsAnchorPoint.x + 10;
+                    deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
+                } else if (anchorLocationIndex == 5) { // North West
+                    deltaX = playerStatsAnchorPoint.x + 10;
+                    deltaY = playerStatsAnchorPoint.y - 100;
+                    deltaSplitX = 200;
+                } else
+                    return;
+            } else
+                return;
+        } else
+            return;
+
+        String userName = player.getUserName();
+
+        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
+            && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        if (convertToGeneric) {
+            return;
+        }
+
+        // PAINT USERNAME
+        Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
+        if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
+            graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX,
+                point.y + deltaY);
+        }
+
+        // PAINT FACTION
+        point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);
+        String factionText = player.getFaction();
+        if (player.getDisplayName() != null && !"null".equals(player.getDisplayName())) {
+            factionText = player.getDisplayName();
+        }
+        graphics.drawString(StringUtils.capitalize(factionText), point.x + deltaX, point.y + deltaY);
+
+        // PAINT COLOR
+        point = PositionMapper.getPlayerStats(Constants.STATS_COLOR);
+        graphics.drawString(player.getColor(), point.x + deltaX, point.y + deltaY);
+
+        // PAIN VICTORY POINTS
+        int vpCount = player.getTotalVictoryPoints();
+        point = PositionMapper.getPlayerStats(Constants.STATS_VP);
+        graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
+
+        // PAINT SO ICONS
+        int totalSecrets = player.getSecrets().keySet().size();
+        Set<String> soSet = player.getSecretsScored().keySet();
+        int soOffset = 0;
+        String soHand = "pa_so-icon_hand.png";
+        String soScored = "pa_so-icon_scored.png";
+        point = PositionMapper.getPlayerStats(Constants.STATS_SO);
+        for (int i = 0; i < totalSecrets; i++) {
+            drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soHand);
+            soOffset += 25;
+        }
+        List<String> soToPoList = game.getSoToPoList();
+        for (String soID : soSet) {
+            if (!soToPoList.contains(soID)) {
+                drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soScored);
+                soOffset += 25;
+            }
+        }
+
+        // PAINT SC#
+        List<Integer> playerSCs = new ArrayList<>(player.getSCs());
+        Collections.sort(playerSCs);
+        int count = 0;
+        for (int sc : playerSCs) {
+            String scText = sc == 0 ? " " : Integer.toString(sc);
+            scText = game.getSCNumberIfNaaluInPlay(player, scText);
+            graphics.setColor(getSCColor(sc, game));
+            graphics.setFont(Storage.getFont64());
+            point = PositionMapper.getPlayerStats(Constants.STATS_SC);
+            if (sc != 0) {
+                graphics.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
+
+            }
+            count++;
+        }
+
+        // PAINT CCs
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont32());
+        String ccID = Mapper.getCCID(player.getColor());
+        String fleetCCID = Mapper.getFleetCCID(player.getColor());
+        point = PositionMapper.getPlayerStats(Constants.STATS_CC);
+        int x = point.x + deltaX;
+        int y = point.y + deltaY;
+        if (deltaSplitX != 0) {
+            deltaSplitY = point.y;
+        }
+
+        drawCCOfPlayer(graphics, ccID, x + deltaSplitX, y - deltaSplitY, player.getTacticalCC(), player, false);
+        drawFleetCCOfPlayer(graphics, fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player);
+        drawCCOfPlayer(graphics, ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), player, false);
+
+        // PAINT SPEAKER
+        if (player.isSpeaker()) {
+            String speakerID = Mapper.getTokenID(Constants.SPEAKER);
+            String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+            if (speakerFile != null) {
+                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
+                point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
+                int negativeDelta = 0;
+                graphics.drawImage(bufferedImage, point.x + deltaX + deltaSplitX + negativeDelta,
+                    point.y + deltaY - deltaSplitY, null);
+                graphics.setColor(Color.WHITE);
+            }
+        }
+        String activePlayerID = game.getActivePlayerID();
+        String phase = game.getCurrentPhase();
+        if (player.isPassed()) {
+            point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+            graphics.setColor(new Color(238, 58, 80));
+            graphics.drawString("PASSED", point.x + deltaX, point.y + deltaY);
+            graphics.setColor(Color.WHITE);
+        } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
+            point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+            graphics.setColor(new Color(50, 230, 80));
+            graphics.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
+
+            if (player.isAFK()) {
+                graphics.setColor(Color.GRAY);
+                graphics.drawString("(AFK)", point.x + deltaX + 124, point.y + deltaY);
+            }
+            graphics.setColor(Color.WHITE);
+        } else if (player.isAFK()) {
+            point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+            graphics.setColor(Color.GRAY);
+            graphics.drawString("AFK", point.x + deltaX + 4, point.y + deltaY);
+            graphics.setColor(Color.WHITE);
+
+        }
+    }
+
+    private static void drawCCOfPlayer(Graphics graphics, String ccID, int x, int y, int ccCount, Player player, boolean hideFactionIcon) {
+        drawCCOfPlayer(graphics, ccID, x, y, ccCount, player, hideFactionIcon, true);
+    }
+
+    private static void drawCCOfPlayer(Graphics graphics, String ccID, int x, int y, int ccCount, Player player, boolean hideFactionIcon, boolean rightAlign) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);
+            BufferedImage blankCC = ImageHelper.read(Mapper.getCCPath("command_blank.png"));
 
             BufferedImage factionImage = null;
             int centreCustomTokenHorizontally = 0;
             if (!hideFactionIcon) {
                 factionImage = getPlayerFactionIconImageScaled(player, 45, 45);
-                centreCustomTokenHorizontally = ccImage != null ? ccImage.getWidth() / 2 - factionImage.getWidth() / 2
-                    : 0;
+                centreCustomTokenHorizontally = ccImage != null ? ccImage.getWidth() / 2 - factionImage.getWidth() / 2 : 0;
             }
 
-            int delta = 20;
+            int delta = rightAlign ? -20 : 20;
+            if (ccCount == 0 && player.getMahactCC().isEmpty()) {
+                ccCount = 1;
+                ccImage = blankCC;
+                hideFactionIcon = true;
+            }
             for (int i = 0; i < ccCount; i++) {
                 graphics.drawImage(ccImage, x + (delta * i), y, null);
                 if (!hideFactionIcon)
-                    graphics.drawImage(factionImage, x + (delta * i) + centreCustomTokenHorizontally, y + DELTA_Y,
-                        null);
+                    graphics.drawImage(factionImage, x + (delta * i) + centreCustomTokenHorizontally, y + DELTA_Y, null);
             }
         } catch (Exception e) {
             BotLogger.log("Ignored error during map generation", e);
@@ -2884,13 +3242,19 @@ public class MapGenerator {
     }
 
     private static void drawFleetCCOfPlayer(Graphics graphics, String ccID, int x, int y, Player player) {
+        drawFleetCCOfPlayer(graphics, ccID, x, y, player, true);
+    }
+
+    private static void drawFleetCCOfPlayer(Graphics graphics, String ccID, int x, int y, Player player, boolean rightAlign) {
         String ccPath = Mapper.getCCPath(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);
-            int delta = 20;
+            BufferedImage blankCC = ImageHelper.read(Mapper.getCCPath("command_blank.png"));
+            int delta = rightAlign ? -20 : 20;
             int lastCCPosition = -1;
+
             if (hasArmada) {
                 String armadaLowerCCID = Mapper.getCCID(player.getColor());
                 String armadaLowerCCPath = Mapper.getCCPath(armadaLowerCCID);
@@ -2904,7 +3268,7 @@ public class MapGenerator {
                     graphics.drawImage(armadaLowerCCImage, x + (delta * i), y, null);
                     graphics.drawImage(armadaCCImage, x + (delta * i), y, null);
                 }
-                x += 30;
+                x += (delta * 1.5f);
 
                 // DRAW FLEET TOKENS
                 for (int i = 2; i < ccCount + 2; i++) {
@@ -2912,6 +3276,10 @@ public class MapGenerator {
                     lastCCPosition = i;
                 }
             } else {
+                if (ccCount == 0 && (player.getMahactCC().isEmpty() || !player.hasAbility("edict"))) {
+                    ccCount = 1;
+                    ccImage = blankCC;
+                }
                 for (int i = 0; i < ccCount; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
                     lastCCPosition = i;
@@ -3583,8 +3951,7 @@ public class MapGenerator {
         }
     }
 
-    public static BufferedImage partialTileImage(Tile tile, Game game, TileStep step, Player frogPlayer,
-        Boolean isFrogPrivate) {
+    public static BufferedImage partialTileImage(Tile tile, Game game, TileStep step, Player frogPlayer, Boolean isFrogPrivate) {
         return new MapGenerator(game).partialTileImage(tile, step, frogPlayer, isFrogPrivate);
     }
 
@@ -3666,28 +4033,19 @@ public class MapGenerator {
                         textModifer = 0;
                     }
                     List<String> problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
+                    BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
                     if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
                         int xMod = -15;
                         int yMod = -290;
-                        BufferedImage gearImage = ImageHelper.readScaled(
-                            ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 25,
-                            TILE_PADDING + tilePositionPoint.y + yMod, null);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 29, TILE_PADDING + tilePositionPoint.y + yMod - 4, null);
                         tileGraphics.setFont(Storage.getFont35());
-                        tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25,
-                            TILE_PADDING + tilePositionPoint.y + yMod + 40);
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25, TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     } else {
                         int xMod = -155;
                         int yMod = -290;
-                        BufferedImage gearImage = ImageHelper.readScaled(
-                            ResourceHelper.getInstance().getTileFile("production_representation.png"), 0.175f);
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 25,
-                            TILE_PADDING + tilePositionPoint.y + yMod, null);
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 29, TILE_PADDING + tilePositionPoint.y + yMod - 4, null);
                         tileGraphics.setFont(Storage.getFont35());
-                        tileGraphics.drawString(prodInSystem + "",
-                            TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25,
-                            TILE_PADDING + tilePositionPoint.y + yMod + 40);
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25, TILE_PADDING + tilePositionPoint.y + yMod + 40);
                     }
                 }
                 // pa_unitimage.png
@@ -3990,7 +4348,7 @@ public class MapGenerator {
             if (unitHolder.getName().equalsIgnoreCase("elysium")) {
                 scale = 1.65f;
             }
-            if (unitHolder.getName().equalsIgnoreCase("mr")) {
+            if (Constants.MECATOLS.contains(unitHolder.getName())) {
                 scale = 1.9f;
             }
             tokenImage = ImageHelper.readScaled(tokenPath, scale);

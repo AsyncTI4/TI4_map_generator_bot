@@ -71,6 +71,7 @@ public class Mapper {
 
     public static void init() {
         try {
+            colors.clear();
             loadData();
         } catch (Exception e) {
             BotLogger.log("Could not load data", e);
@@ -111,6 +112,7 @@ public class Mapper {
     }
 
     private static void readData(String propertyFileName, Properties properties) throws IOException {
+        properties.clear();
         String propFile = ResourceHelper.getInstance().getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {

@@ -2,18 +2,14 @@
     "id": "hrancus",
     "tileId": "er122",
     "name": "Hr'an Cus",
-    "aliases": [
-        "hrancus"
-    ],
+    "aliases": ["hrancus", "hr'ancus"],
     "positionInTile": {
         "x": 135.0,
         "y": 85.0
     },
     "resources": 1,
     "influence": 1,
-    "planetTypes": [
-        "CULTURAL"
-    ],
+    "planetTypes": ["CULTURAL"],
     "unitPositions": {
         "unitHolderName": "hrancus",
         "coordinateMap": {

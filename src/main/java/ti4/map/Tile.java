@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -25,7 +26,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
+import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
@@ -324,17 +325,16 @@ public class Tile {
 
     @JsonIgnore
     @Nullable
-    public UnitHolder getUnitHolderFromPlanet(String planetName) {
+    public Planet getUnitHolderFromPlanet(String planetName) {
         for (Map.Entry<String, UnitHolder> unitHolderEntry : getUnitHolders().entrySet()) {
-            if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
-                return unitHolderEntry.getValue();
+            if (unitHolderEntry.getValue() instanceof Planet p && unitHolderEntry.getKey().equals(planetName)) {
+                return p;
             }
         }
         return null;
     }
 
     @JsonIgnore
-    @Nullable
     public UnitHolder getSpaceUnitHolder() {
         if (unitHolders.get("space") == null)
             return null;
@@ -485,6 +485,17 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isMecatol() {
+        if (Constants.MECATOL_SYSTEMS.contains(getTileID())) {
+            return true;
+        }
+        if (CollectionUtils.containsAny(unitHolders.keySet(), Constants.MECATOLS)) {
+            return true;
+        }
+        return false;
+    }
+
+    @JsonIgnore
     public boolean isEdgeOfBoard(Game game) {
         List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
@@ -552,9 +563,23 @@ public class Tile {
 
     @JsonIgnore
     public boolean isHomeSystem() {
-        boolean isHome = false;
-        if ("0g".equalsIgnoreCase(tileID) || "17".equalsIgnoreCase(tileID)) {
+        if ("0g".equalsIgnoreCase(tileID)) {
             return true;
+        }
+
+        TileModel model = getTileModel();
+        if (model != null) {
+            if (StringUtils.isNotBlank(model.getTileBack())) {
+                // if the tile back is defined, that is the source of truth
+                return "green".equals(model.getTileBack());
+            }
+            for (String p : model.getPlanets()) {
+                PlanetModel planet = Mapper.getPlanet(p);
+                if (StringUtils.isNotBlank(planet.getFactionHomeworld())) {
+                    return true;
+                }
+            }
+            return false;
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
@@ -562,13 +587,12 @@ public class Tile {
                     && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
-                if (!planetHolder.getName().toLowerCase().contains("rex")
-                    && !planetHolder.getName().equalsIgnoreCase("mr") && !oneOfThree) {
-                    isHome = true;
+                if (!Constants.MECATOLS.contains(planetHolder.getName()) && !oneOfThree) {
+                    return true;
                 }
             }
         }
-        return isHome;
+        return false;
     }
 
     public static Predicate<Tile> tileHasPlayerShips(Player player) {
