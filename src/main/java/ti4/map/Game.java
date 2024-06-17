@@ -1129,14 +1129,14 @@ public class Game {
         List<Integer> orderedSCs = new ArrayList<>();
         int playerSC = player.getLowestSC();
         String scText = playerSC + "";
-        if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
+        if (player != null && !scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
         }
         for (int sc : orderedSCsBasic) {
             Player holder = getPlayerFromSC(sc);
             String scT = sc + "";
             int judger = sc;
-            if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+            if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
             }
             if (judger > playerSC) {
@@ -1147,7 +1147,7 @@ public class Game {
             Player holder = getPlayerFromSC(sc);
             String scT = sc + "";
             int judger = sc;
-            if (!scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+            if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
             }
             if (judger < playerSC) {
