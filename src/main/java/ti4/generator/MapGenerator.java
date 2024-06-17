@@ -2751,7 +2751,7 @@ public class MapGenerator {
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
-            if (useNewSystem && isFoWPrivate != null && isFoWPrivate) { //TODO: Fix new system for FoW and remove extra bools
+            if (useNewSystem && !(isFoWPrivate != null && isFoWPrivate)) { //TODO: Fix new system for FoW and remove extra bools
                 List<String> tiles = playerStatTiles.get(player);
                 paintPlayerInfo(game, player, tiles);
             } else {
