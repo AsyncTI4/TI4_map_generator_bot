@@ -383,27 +383,6 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, buttons);
     }
 
-    public static void resolveHarnessEnergy(Game game, Player player, ButtonInteractionEvent event) {
-        String message = player.getFactionEmoji() + " Replenished Commodities (" + player.getCommodities() + "->"
-            + player.getCommoditiesTotal()
-            + ").";
-        player.setCommodities(player.getCommoditiesTotal());
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
-        ButtonHelperAgents.cabalAgentInitiation(game, player);
-        if (player.hasAbility("military_industrial_complex")
-            && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-        }
-        if (player.getLeaderIDs().contains("mykomentoricommander")
-            && !player.hasLeaderUnlocked("mykomentoricommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-        }
-        event.getMessage().delete().queue();
-    }
-
     public static void resolveRally(Game game, Player player, ButtonInteractionEvent event) {
         String message = player.getFactionEmoji() + " gained 2 fleet CC (" + player.getFleetCC() + "->"
             + (player.getFleetCC() + 2) + ") using rally";

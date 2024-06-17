@@ -237,7 +237,7 @@ public class HeroPlay extends LeaderAction {
             case "olradinhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, true) + " added 1 infantry to each planet");
-                new RiseOfMessiah().doRise(player, event, game);
+                RiseOfMessiah.doRise(player, event, game);
                 ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             }
             case "argenthero" -> {
@@ -291,7 +291,7 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " can resolve " + size
                     + " agendas cause thats how many sigils they got. After putting the agendas on top in the order you want (dont bottom any), please press the button to reveal an agenda");
-                new DrawAgenda().drawAgenda(event, size, game, player);
+                DrawAgenda.drawAgenda(event, size, game, player);
                 Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
@@ -323,12 +323,10 @@ public class HeroPlay extends LeaderAction {
                     AddCC.addCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()));
                     game.setStoredValue("vaylerianHeroActive", "true");
                 }
-                for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
-                    List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
-                        "vaylerianhero");
-                    if (buttons.size() > 0) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            "Use buttons to remove a token from the board", buttons);
+                List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
+                if (removeCCs.size() > 0) {
+                    for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

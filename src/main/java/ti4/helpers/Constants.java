@@ -118,6 +118,7 @@ public class Constants {
     public static final String TILE_WORMHOLES = "tile_wormholes";
     public static final String RESET_EMOJI_CACHE = "reset_emoji_cache";
     public static final String RESET_IMAGE_CACHE = "reset_image_cache";
+    public static final String RELOAD_MAPPER_OBJECTS = "reload_mapper_objects";
     public static final String STATISTICS = "statistics";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
@@ -285,6 +286,9 @@ public class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec");
+    public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec");
+
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172, 150);

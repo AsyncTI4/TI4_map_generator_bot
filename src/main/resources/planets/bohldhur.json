@@ -3,9 +3,7 @@
     "tileId": "d33",
     "name": "Bohl-Dhur",
     "shortName": null,
-    "aliases": [
-        "bohldhur"
-    ],
+    "aliases": ["bohldhur", "bohl-dhur"],
     "positionInTile": {
         "x": 177.0,
         "y": 131.0

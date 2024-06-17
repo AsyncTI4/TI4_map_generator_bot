@@ -3,9 +3,7 @@
     "tileId": "m09",
     "name": "Cyon",
     "shortName": null,
-    "aliases": [
-        "cy"
-    ],
+    "aliases": ["cy", "cyon"],
     "positionInTile": {
         "x": 220.0,
         "y": 200.0
@@ -15,9 +13,7 @@
     "factionHomeworld": null,
     "planetType": "INDUSTRIAL",
     "cardImagePath": null,
-    "techSpecialties": [
-        "CYBERNETIC"
-    ],
+    "techSpecialties": ["CYBERNETIC"],
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {

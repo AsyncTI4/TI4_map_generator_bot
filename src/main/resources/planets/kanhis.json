@@ -2,18 +2,14 @@
     "id": "kanhis",
     "tileId": "er122",
     "name": "Kan'His",
-    "aliases": [
-        "kanhis"
-    ],
+    "aliases": ["kan'his", "kanhis"],
     "positionInTile": {
         "x": 200.0,
         "y": 210.0
     },
     "resources": 0,
     "influence": 3,
-    "planetTypes": [
-        "INDUSTRIAL"
-    ],
+    "planetTypes": ["INDUSTRIAL"],
     "unitPositions": {
         "unitHolderName": "kanhis",
         "coordinateMap": {

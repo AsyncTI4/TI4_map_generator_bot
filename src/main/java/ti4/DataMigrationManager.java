@@ -37,7 +37,7 @@ public class DataMigrationManager {
     ///
     /// To add a new migration,
     /// 1. include a new static method below named
-    /// migration<Description>_<current-date>(Map map)
+    /// migration<Description>_<current-date-DDMMYY>(Map map)
     /// 2. Add a line at the bottom of runMigrations() below, including the name of
     /// your migration & the method itself
     ///
@@ -49,6 +49,9 @@ public class DataMigrationManager {
     /// migration code
     /// runs properly on all before deploying to the main server.
     ///
+    /// format: migrationName_DDMMYY
+    /// The migration will be run on any game created on or before that date
+    /// Migration will not be run on finished games
     public static void runMigrations() {
         try {
             runMigration("migrateRenameDSExplores_061023", DataMigrationManager::migrateRenameDSExplores_061023);
@@ -691,6 +694,23 @@ public class DataMigrationManager {
         BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    private static boolean replaceTokens(Game game, Map<String, String> replacements) {
+        boolean found = false;
+        for (Tile t : game.getTileMap().values()) {
+            for (UnitHolder uh : t.getUnitHolders().values()) {
+                Set<String> oldList = new HashSet<>(uh.getTokenList());
+                for (Entry<String, String> entry : replacements.entrySet()) {
+                    if (oldList.contains(entry.getKey())) {
+                        uh.removeToken(entry.getKey());
+                        uh.addToken(entry.getValue());
+                        found = true;
+                    }
+                }
+            }
+        }
+        return found;
     }
 
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {

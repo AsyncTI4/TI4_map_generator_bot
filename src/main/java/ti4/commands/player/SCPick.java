@@ -188,20 +188,13 @@ public class SCPick extends PlayerSubcommandData {
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, game, scpick);
         if (buttons.size() == 0) {
-            Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : game.getRealPlayers()) {
                 scPickedList.addAll(player_.getSCs());
             }
 
             //ADD A TG TO UNPICKED SC
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    tgCount = tgCount == null ? 1 : tgCount + 1;
-                    game.setScTradeGood(scNumber, tgCount);
-                }
-            }
+            game.incrementScTradeGoods();
 
             for (int sc : scPickedList) {
                 game.setScTradeGood(sc, 0);
@@ -285,21 +278,13 @@ public class SCPick extends PlayerSubcommandData {
             }
 
             msgExtra += "\nAll players picked SC";
-
-            Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
 
             //ADD A TG TO UNPICKED SC
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    tgCount = tgCount == null ? 1 : tgCount + 1;
-                    game.setScTradeGood(scNumber, tgCount);
-                }
-            }
+            game.incrementScTradeGoods();
 
             for (int sc : scPickedList) {
                 game.setScTradeGood(sc, 0);

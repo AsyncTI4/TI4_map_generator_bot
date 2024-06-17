@@ -57,8 +57,7 @@ public class ScorePublic extends StatusSubcommandData {
 		scorePO(event, event.getChannel(), game, player, poID);
 	}
 
-	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game game,
-		Player player, int poID) {
+	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
 		String both = getNameNEMoji(game, poID);
 		String poName = both.split("_")[0];
 		String id = "";

@@ -2,18 +2,14 @@
     "id": "tethnsekus",
     "tileId": "er54",
     "name": "Tethn'Sekus",
-    "aliases": [
-        "tethnsekus"
-    ],
+    "aliases": ["tethn'sekus", "tethnsekus"],
     "positionInTile": {
         "x": 135.0,
         "y": 85.0
     },
     "resources": 1,
     "influence": 1,
-    "planetTypes": [
-        "CULTURAL"
-    ],
+    "planetTypes": ["CULTURAL"],
     "unitPositions": {
         "unitHolderName": "tethnsekus",
         "coordinateMap": {

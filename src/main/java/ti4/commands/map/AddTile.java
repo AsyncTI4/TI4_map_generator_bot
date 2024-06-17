@@ -26,10 +26,11 @@ public class AddTile extends AddRemoveTile {
     }
 
     public static void addCustodianToken(Tile tile) {
-        if ("18".equals(tile.getTileID())) {
+        if (tile.isMecatol()) {
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-            for (UnitHolder unitHolder : unitHolders.values()) {
-                if (unitHolder instanceof Planet && "mr".equals(unitHolder.getName())) {
+            for (String mecatol : Constants.MECATOLS) {
+                UnitHolder unitHolder = unitHolders.get(mecatol);
+                if (unitHolder != null && unitHolder instanceof Planet && mecatol.equals(unitHolder.getName())) {
                     unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                 }
             }
