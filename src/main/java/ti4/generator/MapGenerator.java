@@ -2815,6 +2815,11 @@ public class MapGenerator {
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
+        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        if (convertToGeneric) {
+            return;
+        }
+                
         // Get the map positions for each of the "stat tiles"
         if (statTiles.size() < 3) return;
         Map<String, Point> points = new HashMap<>();
@@ -2849,10 +2854,6 @@ public class MapGenerator {
             graphics.drawImage(hex, p.x - 10, p.y - 10, null);
         }
 
-        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-        if (convertToGeneric) {
-            return;
-        }
         Point miscTile; // To be used for speaker and other stuff
         Point point, tile = statTileMid;
         { // PAINT FACTION ICON
