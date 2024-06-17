@@ -1920,7 +1920,7 @@ public class ButtonHelper {
         ButtonHelperAbilities.pillageCheck(player, game);
         if (event instanceof ButtonInteractionEvent e) {
             reacted = true;
-            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " and replenished commodities (" + player.getCommodities() + Emojis.comm + ")";
+            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " and replenished commodities (" + player.getCommoditiesTotal() + Emojis.comm + ")";
             ButtonHelper.addReaction(e, false, false, msg, "");
         }
         ButtonHelperStats.replenishComms(event, game, player, reacted);
