@@ -1,4 +1,7 @@
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 * * * *'
 name: ForceSaveFileBackup
 concurrency:
   group: "Start Bot"
