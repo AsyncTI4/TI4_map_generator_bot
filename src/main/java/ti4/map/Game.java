@@ -3392,7 +3392,7 @@ public class Game {
         }
         if (absolMode && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
-            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("relics_absol"));
+            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
