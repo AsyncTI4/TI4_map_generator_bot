@@ -799,5 +799,14 @@
     "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
     "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
     "source": "action_deck_2_old"
+  },
+  {
+    "alias": "final_mission",
+    "name": "Final Mission",
+    "phase": "Action",
+    "window": "After 1 of your mechs is destroyed during a ground combat",
+    "text": "Roll 1 die for each of up to 3 of your opponent's ground forces; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
+    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
+    "source": "action_deck_2_old"
   }
 ]

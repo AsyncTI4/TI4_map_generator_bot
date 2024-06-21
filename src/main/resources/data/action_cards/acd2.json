@@ -76,7 +76,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Purge up to 3 relic fragments and spend 9 resources to gain 1 relic; for each relic fragment purged, reduce the resources spent by 3.",
+    "text": "Purge 3 relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to purge by 1 for every 3 resources spent.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
     "source": "action_deck_2"
   },
@@ -306,21 +306,21 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "final_mission",
-    "name": "Final Mission",
-    "phase": "Action",
-    "window": "After 1 of your mechs is destroyed during a ground combat",
-    "text": "Roll 1 die for each of up to 3 of your opponent's ground forces; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
-    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "flawless_strategy",
     "name": "Flawless Strategy",
     "phase": "Action",
     "window": "After you exhaust your strategy card",
     "text": "Perform the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
     "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "foreign_aid",
+    "name": "Foreign Aid",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Spend 8 resources and choose up to 2 other players. You and each of those players gain 1 command token.",
+    "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
     "source": "action_deck_2"
   },
   {
@@ -625,7 +625,7 @@
     "name": "Reengineer",
     "phase": "Any",
     "window": "After you discard an action card",
-    "text": "Either take that card from the discard pile or draw 1 action card. Then, discard 1 action card.",
+    "text": "Either take that card from the discard pile or draw 2 action cards. Then, discard 1 action card.",
     "flavorText": "The artifact seemed to purr as Perdin laid his hand on it. It was a fount of ancient knowledge that even the Mahact had forgotten, and now it was his people's precious key to prosperity.",
     "source": "action_deck_2"
   },
@@ -699,6 +699,15 @@
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
     "flavorText": "R7-82's optic servo motors malfunctioned for a moment as the council discussed 'feeding' the Virus to satiate its hunger.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "shock_troops",
+    "name": "Shock Troops",
+    "phase": "Action",
+    "window": "At the start of a combat",
+    "text": "Apply +1 to the result of each of your unit's combat rolls during this combat.",
+    "flavorText": "\"Our training has borne the finest warriors in the galaxy,\" Jace promised. \"We are the rising of a new dawn. A day of death and reckoning. Now for wrath, now for ruin, and a red nightfall!\"",
     "source": "action_deck_2"
   },
   {
@@ -816,15 +825,6 @@
     "window": "Action",
     "text": "For each exploration deck, look at the top card of that deck; if it is a relic fragment, gain that card.",
     "flavorText": "As her hostages hurled insults, S'ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "true_grit",
-    "name": "True Grit",
-    "phase": "Action",
-    "window": "At the start of a combat",
-    "text": "Apply +1 to the result of each of your unit's combat rolls during this combat.",
-    "flavorText": "\"Our training has borne the finest warriors in the galaxy,\" Jace promised. \"We are the rising of a new dawn. A day of death and reckoning. Now for wrath, now for ruin, and a red nightfall!\"",
     "source": "action_deck_2"
   },
   {
