@@ -1,1 +1,21 @@
-{"id":"d09","name":"LastStop (Gledge)","aliases":["d09","laststop","last","stop","gledge","union","DS_gledge"],"imagePath":"D09_LastStop.png","shipPositionsType":"TYPE01","spaceTokenLocations":[],"wormholes":[],"planets":["laststop"]}
+{
+    "id": "d09",
+    "name": "LastStop (Gledge)",
+    "aliases": [
+        "d09",
+        "laststop",
+        "last",
+        "stop",
+        "gledge",
+        "union",
+        "DS_gledge"
+    ],
+    "imagePath": "D09_LastStop.png",
+    "shipPositionsType": "TYPE01",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "laststop"
+    ],
+    "source": "ds"
+}

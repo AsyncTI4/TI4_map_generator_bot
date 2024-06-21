@@ -10,16 +10,16 @@ public class Source {
         base, pok, codex1, codex2, codex3,
 
         //big homebrew
-        ds, absol, franken,
+        ds, absol, franken, uncharted_space,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral,
+        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth,
 
         // async homebrew
-        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000,
+        draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon,
+        somno, ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma,
 
         // catchall
         other;
@@ -59,7 +59,7 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, ds -> true;
+                case base, pok, codex1, codex2, codex3, ds, uncharted_space -> true;
                 default -> false;
             };
         }
@@ -69,6 +69,7 @@ public class Source {
                 case base, pok, codex1, codex2, codex3 -> "";
                 case absol -> Emojis.Absol;
                 case ds -> Emojis.DiscordantStars;
+                case uncharted_space -> Emojis.UnchartedSpace;
                 case eronous -> Emojis.Eronous;
                 case admins -> Emojis.AdminsFaction;
                 case ignis_aurora, pbd2000 -> Emojis.IgnisAurora;

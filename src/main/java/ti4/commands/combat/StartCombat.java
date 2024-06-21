@@ -236,11 +236,11 @@ public class StartCombat extends CombatSubcommandData {
                 return;
             }
         }
-        if ("18".equalsIgnoreCase(tile.getTileID()) && player1.getLeaderIDs().contains("winnucommander")
+        if (tile.isMecatol() && player1.getLeaderIDs().contains("winnucommander")
             && !player1.hasLeaderUnlocked("winnucommander")) {
             ButtonHelper.commanderUnlockCheck(player1, game, "winnu", event);
         }
-        if ("18".equalsIgnoreCase(tile.getTileID()) && player2.getLeaderIDs().contains("winnucommander")
+        if (tile.isMecatol() && player2.getLeaderIDs().contains("winnucommander")
             && !player2.hasLeaderUnlocked("winnucommander")) {
             ButtonHelper.commanderUnlockCheck(player2, game, "winnu", event);
         }

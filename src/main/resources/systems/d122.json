@@ -34,5 +34,6 @@
         "GAMMA"
     ],
     "planets": [],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "source": "uncharted_space"
 }

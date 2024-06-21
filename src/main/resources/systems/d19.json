@@ -1,1 +1,22 @@
-{"id":"d19","name":"Demis/Chrion (Augers)","aliases":["d19","demis","chrion","augurs","augers","ilyxum","DS_ilyxum"],"imagePath":"D19_Demis.png","shipPositionsType":"TYPE02","spaceTokenLocations":[],"wormholes":[],"planets":["demis","chrion"]}
+{
+    "id": "d19",
+    "name": "Demis/Chrion (Augers)",
+    "aliases": [
+        "d19",
+        "demis",
+        "chrion",
+        "augurs",
+        "augers",
+        "ilyxum",
+        "DS_ilyxum"
+    ],
+    "imagePath": "D19_Demis.png",
+    "shipPositionsType": "TYPE02",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "demis",
+        "chrion"
+    ],
+    "source": "ds"
+}

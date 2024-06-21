@@ -1,0 +1,111 @@
+{
+    "id": "kelgate",
+    "tileId": "er83",
+    "name": "Kelgate",
+    "aliases": [
+        "kelgate"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 130.0
+    },
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName": "Experimental Gate",
+    "legendaryAbilityText": "At the start of your turn, you may exhaust this card to treat this system as if it had an alpha and beta wormhole until the end of this tactical action.",
+    "unitPositions": {
+        "unitHolderName": "kelgate",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 129.0,
+                    "y": 117.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 100.0,
+                    "y": 152.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 134.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 151.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 168.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 143.0,
+                    "y": 155.0
+                },
+                {
+                    "x": 161.0,
+                    "y": 155.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 136.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 154.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 129.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 147.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 165.0,
+                    "y": 86.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 148.0,
+                    "y": 114.0
+                },
+                {
+                    "x": 115.0,
+                    "y": 114.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 67.0,
+                    "y": 121.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 75.0
+                },
+                {
+                    "x": 199.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 137.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "The site of the first non-Cruess wormhole generation device. Powered by the heat from the planet's core. The shifting gates have led to it become an important trade hub.",
+    "source": "eronous"
+}

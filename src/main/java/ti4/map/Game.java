@@ -75,11 +75,11 @@ import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-import ti4.model.Source.ComponentSource;
 
 public class Game {
 
@@ -745,6 +745,11 @@ public class Game {
     }
 
     public boolean isAllianceMode() {
+        for (Player player : getRealPlayers()) {
+            if (player.getAllianceMembers() != null && !player.getAllianceMembers().replace(player.getFaction(), "").isEmpty()) {
+                allianceMode = true;
+            }
+        }
         return allianceMode;
     }
 
@@ -871,6 +876,8 @@ public class Game {
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
+                put("Minor Factions", isMinorFactionsMode());
+                put("Age of Exploration", isAgeOfExplorationMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFoWMode());
                 put("Franken", isFrankenGame());
@@ -886,6 +893,7 @@ public class Game {
             .collect(Collectors.joining(", "));
     }
 
+    @JsonIgnore
     public boolean isNormalGame() {
         return !hasHomebrew();
     }
@@ -1121,21 +1129,42 @@ public class Game {
         List<Integer> orderedSCs = new ArrayList<>();
         int playerSC = player.getLowestSC();
         String scText = playerSC + "";
-        if (!scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
+        if (player != null && !scText.equalsIgnoreCase(getSCNumberIfNaaluInPlay(player, scText))) {
             playerSC = 0;
         }
         for (int sc : orderedSCsBasic) {
-            if (sc > playerSC) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            int judger = sc;
+            if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                judger = 0;
+            }
+            if (judger > playerSC) {
                 orderedSCs.add(sc);
             }
         }
         for (int sc : orderedSCsBasic) {
-            if (sc < playerSC) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            int judger = sc;
+            if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                judger = 0;
+            }
+            if (judger < playerSC) {
                 orderedSCs.add(sc);
             }
         }
 
         return orderedSCs;
+    }
+
+    public Player getPlayerFromSC(int sc) {
+        for (Player player : getRealPlayersNDummies()) {
+            if (player.getSCs().contains(sc)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public DisplayType getDisplayTypeForced() {
@@ -1603,6 +1632,24 @@ public class Game {
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
+    public void incrementScTradeGoods() {
+        Set<Integer> scPickedList = new HashSet<>();
+        for (Player player_ : getRealPlayers()) {
+            scPickedList.addAll(player_.getSCs());
+        }
+
+        //ADD A TG TO UNPICKED SC
+        if (!islandMode()) {
+            for (Integer scNumber : scTradeGoods.keySet()) {
+                if (!scPickedList.contains(scNumber) && scNumber != 0) {
+                    Integer tgCount = scTradeGoods.get(scNumber);
+                    tgCount = tgCount == null ? 1 : tgCount + 1;
+                    setScTradeGood(scNumber, tgCount);
+                }
+            }
+        }
+    }
+
     public boolean addSC(Integer sc) {
         if (!scTradeGoods.containsKey(sc)) {
             setScTradeGood(sc, 0);
@@ -1918,7 +1965,7 @@ public class Game {
             custodiansTaken = true;
         }
         for (Player p : getRealPlayers()) {
-            if (p.getPlanets().contains("mr")) {
+            if (p.controlsMecatol(false)) {
                 return true;
             }
         }
@@ -3298,6 +3345,12 @@ public class Game {
         this.actionCards = actionCards;
     }
 
+    public boolean islandMode() {
+        boolean otherThings = getName().contains("island") || getMapTemplateID().equals("1pIsland");
+        if (otherThings) setStoredValue("IslandMode", "true");
+        return getStoredValue("IslandMode").equals("true");
+    }
+
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().val) setAbsolMode(true);
@@ -3309,6 +3362,11 @@ public class Game {
         setUpPeakableObjectives(settings.getStage2s().val, 2);
         setCompetitiveTIGLGame(settings.getTigl().val);
         setAllianceMode(settings.getAlliance().val);
+
+        if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
+            setStoredValue("IslandMode", "true");
+        }
+
         return validateAndSetAllDecks(event, miltySettings);
     }
 
@@ -3334,7 +3392,7 @@ public class Game {
         }
         if (absolMode && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
-            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("relics_absol"));
+            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
@@ -3599,6 +3657,13 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayers() {
         return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getRealPlayersNNeutral() {
+        return getPlayers().values().stream()
+            .filter(p -> p.isRealPlayer() || p.getFaction().equals("neutral"))
+            .collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -3882,7 +3947,7 @@ public class Game {
     }
 
     public boolean leaderIsFake(String leaderID) {
-        return getStoredValue("fakeCommanders").contains(leaderID);
+        return (getStoredValue("fakeCommanders").contains(leaderID) || getStoredValue("minorFactionCommanders").contains(leaderID));
     }
 
     public void addFakeCommander(String leaderID) {
@@ -3891,7 +3956,7 @@ public class Game {
             if (StringUtils.isBlank(fakeString)) {
                 setStoredValue("fakeCommanders", leaderID);
             } else {
-                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("|")));
+                Set<String> leaders = new HashSet<>(Arrays.asList(fakeString.split("\\|")));
                 leaders.add(leaderID);
                 setStoredValue("fakeCommanders", String.join("|", leaders));
             }
@@ -3946,8 +4011,16 @@ public class Game {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-                    Leader playerLeader = pnOwner.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : pnOwner.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())) {
+                            continue;
+                        }
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        leaders.add(playerLeader);
+                    }
                 }
             }
         }
@@ -3959,8 +4032,22 @@ public class Game {
                 if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    Leader playerLeader = otherPlayer.getLeaderByType(Constants.COMMANDER).orElse(null);
-                    leaders.add(playerLeader);
+
+                    for (Leader playerLeader : otherPlayer.getLeaders()) {
+                        if (leaderIsFake(playerLeader.getId())) {
+                            continue;
+                        }
+                        if (!playerLeader.getId().contains("commander")) {
+                            continue;
+                        }
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
+                            if (!playerLeader.getId().contains(otherPlayer.getFaction())) {
+                                continue;
+                            }
+                        }
+                        leaders.add(playerLeader);
+                    }
+
                 }
             }
         }
@@ -4159,31 +4246,9 @@ public class Game {
     }
 
     public int getPlayersTurnSCInitiative(Player player) {
-        if ((player.hasAbility("telepathic") || player.ownsPromissoryNote("gift"))
-            && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { // Naalu
-                                                                                                                                                                                              // with
-                                                                                                                                                                                              // gift
-                                                                                                                                                                                              // in
-                                                                                                                                                                                              // their
-                                                                                                                                                                                              // hand
+        if (player.hasTheZeroToken())
             return 0;
-        } else if (player.getPromissoryNotesInPlayArea().contains("gift")) { // Someone with gift in their play area
-            return 0;
-        }
-
         return player.getLowestSC();
-    }
-
-    private boolean otherPlayerInGameHasGiftInPlayArea(Player player) {
-        if (player.ownsPromissoryNote("gift") && player.getPromissoryNotes().containsKey("gift"))
-            return false; // can't be in another play area if it's your card and in your hand
-        for (Player otherPlayer : getRealPlayers()) {
-            if (player.equals(otherPlayer))
-                continue; // don't check yourself
-            if (otherPlayer.getPromissoryNotesInPlayArea().contains("gift"))
-                return true;
-        }
-        return false;
     }
 
     @JsonIgnore
@@ -4212,6 +4277,16 @@ public class Game {
                 return true;
         }
         return false;
+    }
+
+    @JsonIgnore
+    public Tile getMecatolTile() {
+        for (String mr : Constants.MECATOL_SYSTEMS) {
+            Tile tile = getTile(mr);
+            if (tile != null)
+                return tile;
+        }
+        return null;
     }
 
     @Nullable
@@ -4380,22 +4455,8 @@ public class Game {
     }
 
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
-        if (player.hasAbility("telepathic")) { // naalu 0 token ability
-            boolean giftPlayed = false;
-            Collection<Player> activePlayers = getPlayers().values().stream().filter(Player::isRealPlayer).toList();
-            for (Player player_ : activePlayers) {
-                if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
-                    giftPlayed = true;
-                    break;
-                }
-            }
-            if (!giftPlayed) {
-                scText = "0/" + scText;
-            }
-        } else if (player.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
+        if (player.hasTheZeroToken()) // naalu 0 token ability
             scText = "0/" + scText;
-        }
-
         return scText;
     }
 
@@ -4405,10 +4466,31 @@ public class Game {
             || agendaDeckID.contains("little_omega");
     }
 
+    // Currently unused
+    // TODO: Jazz parse this better
+    public List<ComponentSource> getComponentSources() {
+        List<ComponentSource> sources = new ArrayList<>();
+        sources.add(ComponentSource.base);
+        sources.add(ComponentSource.codex1);
+        sources.add(ComponentSource.codex2);
+        sources.add(ComponentSource.codex3);
+
+        if (!isBaseGameMode())
+            sources.add(ComponentSource.pok);
+        if (isAbsolMode())
+            sources.add(ComponentSource.absol);
+        if (isMiltyModMode())
+            sources.add(ComponentSource.miltymod);
+        if (isDiscordantStarsMode())
+            sources.add(ComponentSource.ds);
+        return sources;
+    }
+
     @JsonIgnore
     public boolean hasHomebrew() {
         // needs to check for homebrew tiles still
         // Decks
+
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(acDeckID);
         deckIDs.add(soDeckID);
@@ -4421,20 +4503,31 @@ public class Game {
         deckIDs.add(eventDeckID);
         boolean allDecksOfficial = deckIDs.stream().allMatch(id -> {
             DeckModel deck = Mapper.getDeck(id);
-            if (id.equals("null")) return true;
-            if (deck == null) return false;
+            if ("null".equals(id)) return true;
+            if (deck == null) return true;
             return deck.getSource().isOfficial();
         });
         StrategyCardSetModel scset = Mapper.getStrategyCardSets().get(scSetID);
-        if (scset == null || !scset.getSource().isOfficial()) allDecksOfficial = false;
+        if (scset == null || !scset.getSource().isOfficial()) {
+            allDecksOfficial = false;
+
+        }
 
         // Tiles
         boolean allTilesOfficial = getTileMap().values().stream().allMatch(tile -> {
+            if (tile == null || tile.getTileModel() == null) {
+                return true;
+            }
             ComponentSource tileSource = tile.getTileModel().getSource();
-            if (tile.getTileModel().getImagePath().endsWith("_Hyperlane.png"))
+            if (tile.getTileModel().getImagePath().endsWith("_Hyperlane.png")) {
                 return true; //official hyperlane
+            }
             return tileSource != null && tileSource.isOfficial();
         });
+
+        if (!allDecksOfficial) {
+            System.out.println("here4");
+        }
 
         return isExtraSecretMode()
             || isHomeBrew()

@@ -310,8 +310,7 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName,
-        Game game) {
+    public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
         if (game == null) {

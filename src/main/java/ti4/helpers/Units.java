@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -167,7 +166,7 @@ public class Units {
         return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
     }
 
-    private static UnitType findUnitType(String unitType) {
+    public static UnitType findUnitType(String unitType) {
         for (UnitType t : UnitType.values()) {
             if (t.value.equalsIgnoreCase(unitType)) return t;
         }

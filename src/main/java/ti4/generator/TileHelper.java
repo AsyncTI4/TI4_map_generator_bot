@@ -57,21 +57,28 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
 
+        List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try {
                 PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
                 allPlanets.put(planet.getId(), planet);
+                if (!planet.isValid()) {
+                    badObjects.add(planet.getAlias());
+                }
             } catch (Exception e) {
                 BotLogger.log("Error reading planet from file:\n> " + file.getPath(), e);
             }
         });
+        if (!badObjects.isEmpty())
+            BotLogger.log("The following **PlanetModel** are improperly formatted, but were imported anyway:\n> "
+                + String.join("\n> ", badObjects));
     }
 
     public static void initTilesFromJson() {
@@ -83,17 +90,21 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> file.exists())
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
+                .filter(file -> file.exists())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
+        List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
+                if (!tile.isValid()) {
+                    badObjects.add(tile.getAlias());
+                }
 
                 if (isDraftTile(tile)) {
                     duplicateDraftTiles(tile);
@@ -102,10 +113,13 @@ public class TileHelper {
                 //BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
+        if (!badObjects.isEmpty())
+            BotLogger.log("The following **TileModel** are improperly formatted, but were imported anyway:\n> "
+                + String.join("\n> ", badObjects));
     }
 
     private static void duplicateDraftTiles(TileModel tile) {
-        String color = tile.getAlias().replaceAll("blank","");
+        String color = tile.getAlias().replaceAll("blank", "");
         String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
 
         for (int i = 0; i < 13; i++) {
@@ -116,6 +130,7 @@ public class TileHelper {
             newTile.setImagePath(tile.getImagePath());
             newTile.setWormholes(Collections.emptySet());
             newTile.setPlanets(Collections.emptyList());
+            newTile.setSource(tile.getSource());
             allTiles.put(newTile.getId(), newTile);
         }
     }

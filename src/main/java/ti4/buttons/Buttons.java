@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.Constants;
 
@@ -41,15 +42,31 @@ public class Buttons {
         return Button.primary(buttonID, buttonLabel);
     }
 
+    public static Button blue(String buttonID, String buttonLabel, String emoji) {
+        return Button.primary(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
+    }
+
     public static Button gray(String buttonID, String buttonLabel) {
         return Button.secondary(buttonID, buttonLabel);
+    }
+
+    public static Button gray(String buttonID, String buttonLabel, String emoji) {
+        return Button.secondary(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
     }
 
     public static Button green(String buttonID, String buttonLabel) {
         return Button.success(buttonID, buttonLabel);
     }
 
+    public static Button green(String buttonID, String buttonLabel, String emoji) {
+        return Button.success(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
+    }
+
     public static Button red(String buttonID, String buttonLabel) {
         return Button.danger(buttonID, buttonLabel);
+    }
+
+    public static Button red(String buttonID, String buttonLabel, String emoji) {
+        return Button.danger(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
     }
 }

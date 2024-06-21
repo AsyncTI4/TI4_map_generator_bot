@@ -3,6 +3,8 @@ package ti4.commands.tech;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,7 +17,6 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
@@ -86,7 +87,7 @@ public class TechExhaust extends TechAddRemove {
             case "dscymiy" -> {
                 List<Tile> tiles = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem() && !tile.getTileID().equalsIgnoreCase("18")) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem() && !tile.isMecatol()) {
                         tiles.add(tile);
                     }
                 }
@@ -258,9 +259,9 @@ public class TechExhaust extends TechAddRemove {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "lgf" -> { // Lazax Gate Folding
-                if (player.getPlanets().contains("mr")) {
+                if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), Constants.MECATOLS)) {
                     deleteIfButtonEvent(event);
-                    new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet("mr"), "inf mr", game);
+                    new AddUnits().unitParsing(event, player.getColor(), game.getMecatolTile(), "inf mr", game);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getFactionEmoji() + " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
                     sendNextActionButtonsIfButtonEvent(event, game, player);

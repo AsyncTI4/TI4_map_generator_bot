@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
 import ti4.commands.player.Setup;
 import ti4.generator.Mapper;
@@ -36,7 +37,6 @@ import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -127,6 +127,26 @@ public class MiltyDraftManager {
         draftIndex++;
     }
 
+    public void replacePlayer(Game game, String oldUID, String newUID) {
+        // Update player list
+        List<String> newPlayers = new ArrayList<>();
+        players.forEach(p -> newPlayers.add(p.equals(oldUID) ? newUID : p));
+        players.clear();
+        players.addAll(newPlayers);
+
+        // Update draft order
+        List<String> newDraftOrder = new ArrayList<>();
+        draftOrder.forEach(p -> newDraftOrder.add(p.equals(oldUID) ? newUID : p));
+        draftOrder.clear();
+        draftOrder.addAll(newDraftOrder);
+
+        // Update player draft keys
+        Map<String, PlayerDraft> newDraft = new HashMap<>();
+        draft.forEach((k, v) -> newDraft.put(k.equals(oldUID) ? newUID : k, v));
+        draft.clear();
+        draft.putAll(newDraft);
+    }
+
     public List<MiltyDraftTile> getBlue() {
         return new ArrayList<>(blue);
     }
@@ -160,6 +180,36 @@ public class MiltyDraftManager {
     public void setFactionDraft(List<String> factions) {
         factionDraft.clear();
         factionDraft.addAll(factions);
+    }
+
+    public List<FactionModel> remainingFactions() {
+        List<FactionModel> ls = new ArrayList<>();
+        for (String faction : factionDraft) {
+            FactionModel model = Mapper.getFaction(faction);
+            if (model == null || isFactionTaken(faction)) continue;
+            ls.add(model);
+        }
+        return ls;
+    }
+
+    public List<FactionModel> pickedFactions() {
+        List<FactionModel> ls = new ArrayList<>();
+        for (String faction : factionDraft) {
+            FactionModel model = Mapper.getFaction(faction);
+            if (model == null || !isFactionTaken(faction)) continue;
+            ls.add(model);
+        }
+        return ls;
+    }
+
+    public List<FactionModel> allFactions() {
+        List<FactionModel> ls = new ArrayList<>();
+        for (String faction : factionDraft) {
+            FactionModel model = Mapper.getFaction(faction);
+            if (model == null) continue;
+            ls.add(model);
+        }
+        return ls;
     }
 
     public void init(Game game) {
@@ -294,11 +344,11 @@ public class MiltyDraftManager {
             String fauxPlayerPick = null;
             Player nextDrafter = getCurrentDraftPlayer(game);
             PlayerDraft pd = getPlayerDraft(nextDrafter);
-            if (pd.getFaction() == null && pd.getSlice() == null) {
+            if (pd.getPosition() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getPositionButtons());
-            } else if (pd.getFaction() == null && pd.getPosition() == null) {
+            } else if (pd.getSlice() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getSliceButtons());
-            } else if (pd.getPosition() == null && pd.getSlice() == null) {
+            } else if (pd.getFaction() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getFactionButtons());
             }
 
@@ -540,9 +590,13 @@ public class MiltyDraftManager {
         clearOldPing(game);
         Player p = game.getPlayer(getCurrentDraftPlayer());
         String ping = p.getPing() + " is up to draft!";
-        List<Button> showAgain = Arrays.asList(Button.secondary("showMiltyDraft", "Show draft again"));
-        showAgain = MessageHelper.addUndoButtonToList(showAgain, game);
-        MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), showAgain, m -> prevPingMessage = m.getId());
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("showMiltyDraft", "Show draft again"));
+        buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
+        buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
+        buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
+        buttons = MessageHelper.addUndoButtonToList(buttons, game);
+        MessageHelper.splitAndSentWithAction(ping, game.getMainGameChannel(), buttons, m -> prevPingMessage = m.getId());
     }
 
     @JsonIgnore

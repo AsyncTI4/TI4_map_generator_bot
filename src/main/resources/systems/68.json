@@ -34,7 +34,7 @@
     "planets": [
         "everra"
     ],
-    "isNebula": true, 
-    "source": "pok", 
+    "isNebula": true,
+    "source": "pok",
     "tileBack": "red"
 }

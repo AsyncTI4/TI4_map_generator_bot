@@ -513,8 +513,12 @@ public class ButtonHelperModifyUnits {
                 if (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)) {
                     continue;
                 }
-
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                //handled this above
+                if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) {
+                    continue;
+                }
+
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
                     damagedUnits = unitHolder.getUnitDamage().get(unitKey);

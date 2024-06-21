@@ -20,6 +20,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
+
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetAdd;
@@ -32,6 +34,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -323,20 +326,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
                     + "). Reminder that this is optional, and that you can instead convert your existing comms.";
-                player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-                ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
-                ButtonHelperAgents.cabalAgentInitiation(game, player);
-                if (player.hasAbility("military_industrial_complex")
-                    && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                        ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-                }
-                if (player.getLeaderIDs().contains("mykomentoricommander")
-                    && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-                }
+                ButtonHelperStats.replenishComms(event, game, player, true);
             }
             case Constants.MIRAGE -> {
                 String mirageID = Constants.MIRAGE;
@@ -407,38 +398,31 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "aw1", "aw2", "aw3", "aw4" -> {
                 if (player.getCommodities() > 0) {
                     message = "Resolve explore using the buttons";
-                    Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG")
-                        .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-                    Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities")
-                        .withEmoji(Emoji.fromFormatted(Emojis.comm));
-                    List<Button> buttons = List.of(convert2CommButton, get2CommButton);
-                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message,
-                        buttons);
+                    Button convert = Buttons.green("convert_2_comms", "Convert 2 Commodities Into TG", Emojis.Wash);
+                    Button gain = Buttons.blue("gain_2_comms", "Gain 2 Commodities", Emojis.comm);
+                    List<Button> buttons = List.of(convert, gain);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
                 } else {
                     String message2 = "Gained 2 Commodities automatically due to having no comms to convert";
-                    player.setCommodities(player.getCommodities() + 2);
-                    if (player.hasAbility("military_industrial_complex")
-                        && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-                        MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
-                            ButtonHelperAbilities.getBuyableAxisOrders(player, game));
-                    }
-                    if (player.getLeaderIDs().contains("mykomentoricommander")
-                        && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-                    }
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getFactionEmoji() + " " + message2);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " " + message2);
+                    ButtonHelperStats.gainComms(event, game, player, 2, true, true);
                 }
             }
             case "mo1", "mo2", "mo3" -> {
                 if (tile != null && planetID != null) {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, game);
+                    Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planetID, game).getTokenList();
+                    boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
+                    if (!containsDMZ) {
+                        new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetID, game);
+                        message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry
+                            + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
+                            + ", however this placement *is* optional.";
+                    } else {
+                        message = "Planet had DMZ so no infantry was placed";
+                    }
+                } else {
+                    message = "Tile was null, no infantry placed";
                 }
-                message = player.getFactionEmoji() + Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry
-                    + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
-                    + ", however this placement *is* optional.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
             case "darkvisions" -> {

@@ -3,18 +3,12 @@
     "tileId": "rexmec",
     "name": "Rexatol Mec",
     "shortName": null,
-    "aliases": [
-        "rexmec",
-        "rm"
-    ],
-    "positionInTile": {
-        "x": 170.0,
-        "y": 150.0
-    },
+    "aliases": ["rexatolmec", "rexmec", "rm"],
+    "positionInTile": { "x": 170.0, "y": 150.0 },
     "resources": 1,
     "influence": 6,
     "factionHomeworld": null,
-    "planetType": "NONE",
+    "planetType": "MR",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
@@ -24,85 +18,30 @@
     "unitPositions": {
         "unitHolderName": "rexatolmec",
         "coordinateMap": {
-            "control": [
-                {
-                    "x": 131.0,
-                    "y": 135.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 100.0,
-                    "y": 170.0
-                }
-            ],
+            "control": [{ "x": 131.0, "y": 135.0 }],
+            "sd": [{ "x": 100.0, "y": 170.0 }],
             "pd": [
-                {
-                    "x": 137.0,
-                    "y": 162.0
-                },
-                {
-                    "x": 152.0,
-                    "y": 162.0
-                },
-                {
-                    "x": 170.0,
-                    "y": 162.0
-                },
-                {
-                    "x": 148.0,
-                    "y": 175.0
-                },
-                {
-                    "x": 165.0,
-                    "y": 175.0
-                }
+                { "x": 137.0, "y": 162.0 },
+                { "x": 152.0, "y": 162.0 },
+                { "x": 170.0, "y": 162.0 },
+                { "x": 148.0, "y": 175.0 },
+                { "x": 165.0, "y": 175.0 }
             ],
             "mf": [
-                {
-                    "x": 138.0,
-                    "y": 92.0
-                },
-                {
-                    "x": 156.0,
-                    "y": 92.0
-                },
-                {
-                    "x": 133.0,
-                    "y": 105.0
-                },
-                {
-                    "x": 150.0,
-                    "y": 105.0
-                },
-                {
-                    "x": 170.0,
-                    "y": 105.0
-                }
+                { "x": 138.0, "y": 92.0 },
+                { "x": 156.0, "y": 92.0 },
+                { "x": 133.0, "y": 105.0 },
+                { "x": 150.0, "y": 105.0 },
+                { "x": 170.0, "y": 105.0 }
             ],
             "tkn_gf": [
-                {
-                    "x": 151.0,
-                    "y": 133.0
-                },
-                {
-                    "x": 120.0,
-                    "y": 133.0
-                }
+                { "x": 151.0, "y": 133.0 },
+                { "x": 120.0, "y": 133.0 }
             ],
             "att": [
-                {
-                    "x": 71.0,
-                    "y": 139.0
-                },
-                {
-                    "x": 193.0,
-                    "y": 95.0
-                },
-                {
-                    "x": 200.0,
-                    "y": 125.0
-                }
+                { "x": 71.0, "y": 139.0 },
+                { "x": 193.0, "y": 95.0 },
+                { "x": 200.0, "y": 125.0 }
             ]
         },
         "removeUnitCoordinate": true
@@ -110,5 +49,5 @@
     "spaceCannonDieCount": 0,
     "spaceCannonHitsOn": 0,
     "searchTags": [],
-    "source": null
+    "source": "other"
 }

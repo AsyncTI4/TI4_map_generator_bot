@@ -55,7 +55,8 @@
             "terraforming_initiative",
             "miltymod_crown_of_emphidia",
             "miltymod_crown_of_thalnos"
-        ]
+        ],
+        "source": "miltymod"
     },
     {
         "alias": "action_cards_miltymod",
@@ -143,7 +144,8 @@
             "veto",
             "war_effort",
             "war_rider"
-        ]
+        ],
+        "source": "miltymod"
     },
     {
         "alias": "secret_objectives_miltymod",
@@ -171,7 +173,8 @@
             "te",
             "miltymod_ttfd",
             "uf"
-        ]
+        ],
+        "source": "miltymod"
     },
     {
         "alias": "public_stage_1_objectives_miltymod",
@@ -189,7 +192,8 @@
             "miltymod_bestow",
             "trade_routes",
             "sway_council"
-        ]
+        ],
+        "source": "miltymod"
     },
     {
         "alias": "public_stage_2_objectives_miltymod",
@@ -207,7 +211,8 @@
             "revolutionize",
             "subdue",
             "unify_colonies"
-        ]
+        ],
+        "source": "miltymod"
     },
     {
         "alias": "techs_miltymod",
@@ -274,6 +279,7 @@
             "miltymod_yso",
             "miltymod_ic",
             "tp"
-        ]
+        ],
+        "source": "miltymod"
     }
 ]

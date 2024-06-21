@@ -4,11 +4,12 @@
     "aliases": [
         "er82",
         "ako",
-        "ako.4.om"
+        "ako.4.om",
+        "ako40"
     ],
     "imagePath": "er_82_async.png",
     "planets": [
-        "ako.4.om"
+        "ako40m"
     ],
     "shipPositionsType": "TYPE10",
     "spaceTokenLocations": [

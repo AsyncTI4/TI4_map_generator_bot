@@ -3,7 +3,7 @@
     "tileId": null,
     "name": "Ghoti",
     "shortName": null,
-    "aliases": null,
+    "aliases": ["ghoti"],
     "positionInTile": null,
     "resources": 3,
     "influence": 3,
@@ -13,5 +13,6 @@
     "techSpecialties": null,
     "legendaryAbilityName": "Money From Nuthin N Fish-Points For Free",
     "legendaryAbilityText": "When you move 1 or more ships into a system that contains no planets, gain 1 commodity. You may score objectives if your home system contains no planets.",
-    "unitPositions": null
+    "unitPositions": null,
+    "source": "ds"
 }

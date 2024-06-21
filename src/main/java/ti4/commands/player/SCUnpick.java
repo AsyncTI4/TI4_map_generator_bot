@@ -3,7 +3,6 @@ package ti4.commands.player;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,20 +82,13 @@ public class SCUnpick extends PlayerSubcommandData {
         if (allPicked) {
             msgExtra += "\nAll players picked SC";
 
-            Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
 
             //ADD A TG TO UNPICKED SC
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    tgCount = tgCount == null ? 1 : tgCount + 1;
-                    game.setScTradeGood(scNumber, tgCount);
-                }
-            }
+            game.incrementScTradeGoods();
 
             Player nextPlayer = null;
             int lowestSC = 100;

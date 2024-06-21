@@ -38,6 +38,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String legendaryAbilityName;
     private String legendaryAbilityText;
     private String legendaryAbilityFlavourText;
+    private String basicAbilityText;
     private String flavourText;
     private UnitTokenPosition unitPositions;
     private int spaceCannonDieCount;
@@ -48,13 +49,26 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isValid() {
-        return getId() != null
-            && name != null;
+        return id != null
+            && name != null
+            && source != null
+            && aliases != null
+            && aliases.contains(name.toLowerCase().replace(" ", "")); // Alias list must contain the lowercase'd name
     }
 
     @JsonIgnore
     public String getAlias() {
         return getId();
+    }
+
+    public PlanetTypeModel.PlanetType getPlanetType() {
+        if (planetType != null) {
+            return planetType;
+        }
+        if (planetTypes.size() > 0) {
+            return planetTypes.get(0);
+        }
+        return PlanetTypeModel.PlanetType.NONE;
     }
 
     @JsonIgnore
@@ -86,6 +100,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
+        if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
         if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
@@ -164,6 +179,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
                 case CYBERNETIC -> sb.append("Y");
                 case PROPULSION -> sb.append("B");
                 case WARFARE -> sb.append("R");
+                case UNITSKIP -> sb.append("U");
+                case NONUNITSKIP -> sb.append("?");
             }
         }
         return sb.toString();
@@ -194,7 +211,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
-            || (getSource() == null ? false : getSource().toString().contains(searchString))
+            || getSource().toString().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 

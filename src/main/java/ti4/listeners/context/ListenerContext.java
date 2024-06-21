@@ -1,4 +1,4 @@
-package ti4.listeners;
+package ti4.listeners.context;
 
 import java.util.Date;
 
@@ -61,7 +61,7 @@ public abstract class ListenerContext {
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
                 event.getMessageChannel().sendMessage("You're not a player of the game").queue();
-                event = null;
+                this.event = null;
                 return;
             }
 
@@ -91,7 +91,7 @@ public abstract class ListenerContext {
         }
 
         if (!checkFinsFactionChecker(this)) {
-            event = null;
+            this.event = null;
             return;
         }
 
@@ -118,7 +118,7 @@ public abstract class ListenerContext {
             }
             game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
             GameSaveLoadManager.saveMap(game, event);
-            event = null;
+            this.event = null;
             return;
         }
 

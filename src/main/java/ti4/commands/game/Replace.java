@@ -18,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -26,8 +27,9 @@ public class Replace extends GameSubcommandData {
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
@@ -54,17 +56,26 @@ public class Replace extends GameSubcommandData {
         }
 
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
+        OptionMapping removePlayerOption = event.getOption(Constants.PLAYER);
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
-        if (removeOption == null || addOption == null) {
+        if ((removeOption == null && removePlayerOption == null) || addOption == null) {
             MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
             return;
         }
 
         Player removedPlayer = Helper.getPlayer(game, null, event);
-        if (removedPlayer == null) {
+        if (removedPlayer == null || (removePlayerOption == null && removedPlayer.getFaction() == null)) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
         }
+        String removedPlayerID = removedPlayer.getUserID();
+
+        boolean isNullFaction = removedPlayer.getFaction() == null || removedPlayer.getFaction().equals("null");
+        if (removePlayerOption == null && isNullFaction) {
+            MessageHelper.replyToMessage(event, "Cannot determine player if they are not set up. Specify `player` option instead.");
+            return;
+        }
+
         User addedUser = addOption.getAsUser();
         boolean notRealPlayer = players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()));
         if (!notRealPlayer) {
@@ -96,7 +107,6 @@ public class Replace extends GameSubcommandData {
         message = "Game: " + game.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
         Player player = game.getPlayer(removedPlayer.getUserID());
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
-
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(removedPlayer.getUserID());
@@ -104,6 +114,7 @@ public class Replace extends GameSubcommandData {
                 value.add(addedUser.getId());
             }
         }
+
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
         player.setTotalTurnTime(0);
@@ -120,12 +131,22 @@ public class Replace extends GameSubcommandData {
         if (game.getBotMapUpdatesThread() != null) {
             game.getBotMapUpdatesThread().addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
         }
+        game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, player.getUserID());
+
         GameSaveLoadManager.saveMap(game, event);
         GameSaveLoadManager.reload(game);
+
+        // Load the new game instance so that we can repost the milty draft
+        game = GameManager.getInstance().getGame(game.getName());
+        if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
+            game.getMiltyDraftManager().repostDraftInformation(game);
+        }
+
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
+
     }
 }

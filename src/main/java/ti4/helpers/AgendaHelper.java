@@ -272,7 +272,7 @@ public class AgendaHelper {
                                     .getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
                             }
                             if (tile == null) {
-                                tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, game);
+                                tile = player.getHomeSystemTile();
                             }
                             if (tile == null) {
                                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
@@ -322,7 +322,7 @@ public class AgendaHelper {
                 }
                 if ("nexus".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
-                        Tile tile = game.getTileFromPlanet("mr");
+                        Tile tile = game.getMecatolTile();
                         if (tile != null) {
                             String tokenFilename = Mapper.getTokenID("gamma");
                             tile.addToken(tokenFilename, Constants.SPACE);
@@ -757,7 +757,7 @@ public class AgendaHelper {
                 TextChannel watchParty = watchPartyChannel(game);
                 String watchPartyPing = watchPartyPing(game);
                 if (watchParty != null && !game.isFoWMode()) {
-                    Tile tile = game.getTileFromPlanet("mr");
+                    Tile tile = game.getMecatolTile();
                     if (tile != null) {
                         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 1,
                             tile.getPosition(), event);
@@ -1027,6 +1027,7 @@ public class AgendaHelper {
     }
 
     public static void offerEveryonePrepassOnShenanigans(Game game) {
+        if (game.islandMode()) return;
         for (Player player : game.getRealPlayers()) {
             if (playerDoesNotHaveShenanigans(player)) {
                 continue;
@@ -1237,7 +1238,7 @@ public class AgendaHelper {
             || game.getLaws().containsKey("absol_government"))) {
             minVotes = 1;
             maxVotes = 1;
-            if (game.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+            if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(true)) {
                 minVotes = 2;
                 maxVotes = 2;
             }
@@ -1572,6 +1573,7 @@ public class AgendaHelper {
     private static void handleShenanigans(GenericInteractionCreateEvent event, Game game, String winner) {
         List<Player> losers = getLosers(winner, game);
         boolean shenanigans = false;
+        if (game.islandMode()) return;
 
         if ((!game.isACInDiscard("Bribery") || !game.isACInDiscard("Deadly Plot")) && (losers.size() > 0 || game.isAbsolMode())) {
             StringBuilder message = new StringBuilder("You can hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans\n");
@@ -2546,7 +2548,7 @@ public class AgendaHelper {
         if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt")
             || game.getLaws().containsKey("absol_government"))) {
             voteCount = 1;
-            if (game.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+            if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(false)) {
                 voteCount = 2;
             }
         }
@@ -3243,7 +3245,7 @@ public class AgendaHelper {
             sb.append("**");
         if (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
-            if (game.getLaws().containsKey("absol_government") && player.getPlanets().contains("mr")) {
+            if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(false)) {
                 sb.append(" vote count (Rep Gov while controlling rex): **2**");
             } else {
                 sb.append(" vote count (Rep Gov): **1**");

@@ -80,10 +80,7 @@ public class ButtonHelperTacticalAction {
 
                 game.resetCurrentMovedUnitsFrom1System();
             } else {
-                Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
                 for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-                    String name = entry.getKey();
-                    String representation = planetRepresentations.get(name);
                     UnitHolder unitHolder = entry.getValue();
                     Map<UnitKey, Integer> units1 = unitHolder.getUnits();
                     Map<UnitKey, Integer> units = new HashMap<>(units1);
@@ -576,8 +573,7 @@ public class ButtonHelperTacticalAction {
                 if (!game.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction())
                     && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, game.getTileByPosition(pos))) {
-                    String msgA = player_.getRepresentation()
-                        + " has units in the system";
+                    String msgA = player_.getRepresentation() + " has units in the system";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
                 }
             }
@@ -657,8 +653,7 @@ public class ButtonHelperTacticalAction {
                     "Use buttons to select which unit to recycle", buttons);
             }
         }
-        if (player.hasRelic("absol_plenaryorbital") && !tile.isHomeSystem() && !tile.getUnitHolders().containsKey("mr")
-            && !player.hasUnit("plenaryorbital")) {
+        if (player.hasRelic("absol_plenaryorbital") && !tile.isHomeSystem() && !tile.isMecatol() && !player.hasUnit("plenaryorbital")) {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, player);
             if (buttons4.size() > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -667,10 +662,8 @@ public class ButtonHelperTacticalAction {
             }
         }
         if (!game.isFoWMode()) {
-            int abilities = 0;
             if (!game.getL1Hero()) {
-                abilities = ButtonHelper.resolveOnActivationEnemyAbilities(game,
-                    game.getTileByPosition(pos), player, false, event);
+                ButtonHelper.resolveOnActivationEnemyAbilities(game, game.getTileByPosition(pos), player, false, event);
             }
             // if (abilities > 0 ) {
             // List<Button> buttons = new ArrayList<>();

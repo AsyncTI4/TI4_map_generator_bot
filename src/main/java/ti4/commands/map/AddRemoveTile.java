@@ -2,8 +2,6 @@ package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -51,7 +49,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         }
 
         String tileName = Mapper.getTileID(planetTileName);
-        if(tileName == null){
+        if (tileName == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return null;
         }
@@ -62,8 +60,8 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         }
 
         Tile tile = new Tile(planetTileName, position);
-        if ("18".equals(planetTileName)) {
-            tile.addToken("token_custodian.png", "mr");
+        if (tile.isMecatol()) {
+            AddTile.addCustodianToken(tile);
         }
 
         Game userActiveGame = gameManager.getUserActiveGame(userID);

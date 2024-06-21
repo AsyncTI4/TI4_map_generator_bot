@@ -7,6 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -26,14 +30,13 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
-import ti4.helpers.Helper;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -443,48 +446,52 @@ public class CreateGameChannels extends BothelperSubcommandData {
         return pbdNumbers;
     }
 
+    @Nullable
     private static Guild getNextAvailableServer() {
+        List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
+        
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-
         Guild guild = AsyncTI4DiscordBot.jda
             .getGuildById(GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
                 AsyncTI4DiscordBot.guildPrimary.getId()));
 
-        // CURRENT SET GUILD HAS ROOM
-        if (serverHasRoomForNewFullCategory(guild))
-            return guild;
+        
+        int index = guilds.indexOf(guild);
+        if (index == -1) { // NOT FOUND
+            BotLogger.log("`CreateGameChannels.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
+        }
 
-        // CHECK IF SECONDARY SERVER HAS ROOM
-        guild = AsyncTI4DiscordBot.guildSecondary;
+        // CHECK IF CURRENT GUILD HAS ROOM (INDEX = X)
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
             return guild;
         }
 
-        // CHECK IF TERTIARY SERVER HAS ROOM
-        guild = AsyncTI4DiscordBot.guildTertiary;
-        if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-            return guild;
+        // CHECK NEXT GUILDS IN LINE STARTING AT CURRENT (INDEX = X+1 to ♾)
+        for (int i = index + 1; i < guilds.size(); i++) {
+            guild = guilds.get(i);
+            if (serverHasRoomForNewFullCategory(guild)) {
+                GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
+                return guild;
+            }
         }
 
-        // CHECK IF QUATERNARY SERVER HAS ROOM
-        guild = AsyncTI4DiscordBot.guildQuaternary;
-        if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-            return guild;
+        // CHECK STARTING FROM BEGINNING UP TO INDEX (INDEX = 0 to X-1)
+        for (int i = 0; i < index; i++) {
+            guild = guilds.get(i);
+            if (serverHasRoomForNewFullCategory(guild)) {
+                GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
+                return guild;
+            }
         }
 
-        // CHECK IF QUINARY SERVER HAS ROOM
-        guild = AsyncTI4DiscordBot.guildQuinary;
-        if (guild != null && serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-            return guild;
+        // ALL OVERFLOWS FULL, CHECK PRIMARY
+        if (serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
+            // Don't set GlobalSetting to check for new overflow each time
+            return AsyncTI4DiscordBot.guildPrimary;
         }
 
-        BotLogger.log(
-            "`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
+        BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
         return null;
     }
 

@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -162,7 +161,6 @@ public class SCPlay extends PlayerSubcommandData {
         baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
-        ActionRow actionRow = null;
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
         if (scModel.usesAutomationForSCID("pok7technology") && !game.isFoWMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
@@ -171,17 +169,14 @@ public class SCPlay extends PlayerSubcommandData {
         if (scModel.usesAutomationForSCID("pok4construction") && !game.isFoWMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
+
+        // set the action rows
         if (!scButtons.isEmpty()) {
-            actionRow = ActionRow.of(scButtons);
-        }
-        if (actionRow != null) {
-            baseMessageObject.addComponents(actionRow);
+            baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
         }
         player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            if (scModel.usesAutomationForSCID("pok5trade")) {
-                ButtonHelper.tradePrimary(game, event, player, message_.getId());
-            }
+
             Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
@@ -240,6 +235,9 @@ public class SCPlay extends PlayerSubcommandData {
             }
         });
 
+        if (scModel.usesAutomationForSCID("pok5trade")) {
+            ButtonHelper.tradePrimary(game, event, player);
+        }
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (scModel.usesAutomationForSCID("pok3politics")) {
             String assignSpeakerMessage = player.getRepresentation()
@@ -407,7 +405,7 @@ public class SCPlay extends PlayerSubcommandData {
             for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
                     || player.getSoScored() == player.getMaxSOCount()
-                    || (player == imperialHolder && player.getPlanets().contains("mr"))) {
+                    || (player == imperialHolder && player.controlsMecatol(true))) {
                     game.setStoredValue(key,
                         game.getStoredValue(key) + player.getFaction() + "*");
                 } else {

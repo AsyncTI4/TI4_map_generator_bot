@@ -55,6 +55,9 @@ public class ColorModel implements ModelInterface {
             color = "lightgray";
         }
         return switch (color) {
+            // Rainbow primary is red
+            case "rainbow" -> primaryColor("red");
+            // Normal colors
             case "black" -> new Color(5, 5, 5);
             case "blue" -> new Color(2, 63, 201);
             case "green" -> new Color(0, 173, 61);
@@ -82,7 +85,6 @@ public class ColorModel implements ModelInterface {
             case "lavender" -> new Color(154, 142, 230);
             case "rose" -> new Color(210, 149, 207);
             case "spring" -> new Color(221, 232, 146);
-            case "rainbow" -> new Color(16, 188, 20);
             case "ethereal" -> new Color(52, 85, 202);
             case "orca" -> primaryColor("black");
             default -> Color.WHITE;
@@ -96,6 +98,7 @@ public class ColorModel implements ModelInterface {
         }
         return switch (color) {
             // gradient secondaries // TODO: do these
+            case "rainbow" -> primaryColor("blue");
             // lightgray secondaries
             case "splitbloodred" -> primaryColor("lightgray");
             case "splitchocolate" -> primaryColor("lightgray");

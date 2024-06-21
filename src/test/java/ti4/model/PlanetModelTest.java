@@ -14,6 +14,7 @@ public class PlanetModelTest extends BaseTi4Test {
         for (PlanetModel model : TileHelper.getAllPlanets().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateTileId(model), model.getAlias() + ": invalid TileID: " + model.getTileId());
+            assertTrue(validateTileContainsPlanet(model), model.getAlias() + ": invalid TileID - tile does not contain planet: " + model.getTileId());
             assertTrue(validateFactionHomeworld(model), model.getAlias() + ": invalid Faction Homeworld: " + model.getTileId());
         }
     }
@@ -21,6 +22,11 @@ public class PlanetModelTest extends BaseTi4Test {
     private boolean validateTileId(PlanetModel model) {
         if (model.getTileId() == null) return true;
         return TileHelper.getAllTiles().containsKey(model.getTileId());
+    }
+
+    private boolean validateTileContainsPlanet(PlanetModel model) {
+        if (model.getTileId() == null) return true;
+        return TileHelper.getAllTiles().get(model.getTileId()).getPlanets().contains(model.getAlias());
     }
 
     private boolean validateFactionHomeworld(PlanetModel model) {

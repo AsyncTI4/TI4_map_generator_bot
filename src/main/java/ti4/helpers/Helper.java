@@ -1002,7 +1002,11 @@ public class Helper {
     }
 
     public static List<Button> getPlanetExhaustButtons(Player player, Game game, String whatIsItFor) {
-        player.resetSpentThings();
+        if (game.getStoredValue("resetSpend").isEmpty()) {
+            player.resetSpentThings();
+        } else {
+            game.setStoredValue("resetSpend", "");
+        }
         player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1242,18 +1246,25 @@ public class Helper {
     }
 
     public static void refreshPlanetsOnTheRespend(Player player, Game game) {
-        List<String> spentThings = player.getSpentThingsThisWindow();
+        List<String> spentThings = new ArrayList<>();
+        spentThings.addAll(player.getSpentThingsThisWindow());
         int tg = player.getSpentTgsThisWindow();
+
         player.setTg(player.getTg() + tg);
         for (String thing : spentThings) {
+            if (thing.contains("tg_")) {
+                player.removeSpentThing(thing);
+            }
             if (thing.contains("_")) {
                 continue;
             }
+
             if (player.getExhaustedPlanets().contains(thing)) {
                 player.refreshPlanet(thing);
+                player.removeSpentThing(thing);
             }
         }
-        player.resetSpentThings();
+        game.setStoredValue("resetSpend", "no");
 
     }
 
@@ -1508,11 +1519,10 @@ public class Helper {
                 productionValueTotal = productionValueTotal + productionValue * uH.getUnits().get(unit);
             }
         }
-        if ("mr".equalsIgnoreCase(uH.getName()) && player.hasTech("iihq")
-            && player.getPlanets().contains("mr")) {
+        String planet = uH.getName();
+        if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(false)) {
             productionValueTotal = productionValueTotal + 3;
         }
-        String planet = uH.getName();
         if (player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
             || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
             productionValueTotal = productionValueTotal + 1;
@@ -1565,9 +1575,9 @@ public class Helper {
 
     }
 
-    public static int getProductionValue(Player player, Game game, Tile tile, boolean warfare) {
+    public static int getProductionValue(Player player, Game game, Tile tile, boolean singleDock) {
         int productionValueTotal = 0;
-        if (!warfare) {
+        if (!singleDock) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal = productionValueTotal
                     + getProductionValueOfUnitHolder(player, game, tile, uH);
@@ -1711,8 +1721,7 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game game,
-        Tile tile, String warfareNOtherstuff, String placePrefix) {
+    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game game, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
         int resourcelimit = 100;
@@ -1918,8 +1927,7 @@ public class Helper {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
-            Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(),
-                "Done Producing Units");
+            Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(), "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
             unitButtons.add(Button.secondary("resetProducedThings", "Reset Build"));
         }
@@ -2755,7 +2763,7 @@ public class Helper {
         for (Player player : game.getRealPlayers()) {
             Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
             if (tile == null) {
-                tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, game);
+                tile = player.getHomeSystemTile();
             }
             boolean ghosty = player.getPlayerStatsAnchorPosition() != null
                 && game.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null

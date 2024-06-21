@@ -37,7 +37,7 @@ public class DataMigrationManager {
     ///
     /// To add a new migration,
     /// 1. include a new static method below named
-    /// migration<Description>_<current-date>(Map map)
+    /// migration<Description>_<current-date-DDMMYY>(Map map)
     /// 2. Add a line at the bottom of runMigrations() below, including the name of
     /// your migration & the method itself
     ///
@@ -49,6 +49,9 @@ public class DataMigrationManager {
     /// migration code
     /// runs properly on all before deploying to the main server.
     ///
+    /// format: migrationName_DDMMYY
+    /// The migration will be run on any game created on or before that date
+    /// Migration will not be run on finished games
     public static void runMigrations() {
         try {
             runMigration("migrateRenameDSExplores_061023", DataMigrationManager::migrateRenameDSExplores_061023);
@@ -66,6 +69,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
+            runMigration("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -555,6 +559,26 @@ public class DataMigrationManager {
         return mapNeededMigrating;
     }
 
+    // June 14th, 2024
+    public static boolean resetMinorFactionCommanders_130624(Game game) {
+        if (!game.isMinorFactionsMode()) return false;
+        boolean anyFound = false;
+        game.setStoredValue("fakeCommanders", "");
+        for (Tile t : game.getTileMap().values()) {
+            if (t.isHomeSystem()) {
+                String planet = t.getPlanetUnitHolders().isEmpty() ? null : t.getPlanetUnitHolders().get(0).getName();
+                String faction = planet == null ? null : Mapper.getPlanet(planet).getFactionHomeworld();
+                if (faction != null && game.getPlayerFromColorOrFaction(faction) == null) {
+                    anyFound = true;
+                    List<String> commanders = Mapper.getFaction(faction).getLeaders().stream()
+                        .filter(leader -> Mapper.getLeader(leader).getType().equals("commander")).toList();
+                    commanders.forEach(game::addFakeCommander);
+                }
+            }
+        }
+        return anyFound;
+    }
+
     private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
         String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
         DateFormat format = new SimpleDateFormat("ddMMyy");
@@ -670,6 +694,23 @@ public class DataMigrationManager {
         BotLogger.log(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    private static boolean replaceTokens(Game game, Map<String, String> replacements) {
+        boolean found = false;
+        for (Tile t : game.getTileMap().values()) {
+            for (UnitHolder uh : t.getUnitHolders().values()) {
+                Set<String> oldList = new HashSet<>(uh.getTokenList());
+                for (Entry<String, String> entry : replacements.entrySet()) {
+                    if (oldList.contains(entry.getKey())) {
+                        uh.removeToken(entry.getKey());
+                        uh.addToken(entry.getValue());
+                        found = true;
+                    }
+                }
+            }
+        }
+        return found;
     }
 
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {

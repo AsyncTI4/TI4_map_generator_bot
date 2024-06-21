@@ -1,0 +1,112 @@
+{
+    "id": "akhassi",
+    "tileId": "er57",
+    "name": "Akhassi",
+    "aliases": [
+        "akhassi"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 150.0
+    },
+    "resources": 0,
+    "influence": 2,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "techSpecialties": [
+        "WARFARE"
+    ],
+    "unitPositions": {
+        "unitHolderName": "akhassi",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 129.0,
+                    "y": 137.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 100.0,
+                    "y": 172.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 134.0,
+                    "y": 164.0
+                },
+                {
+                    "x": 151.0,
+                    "y": 164.0
+                },
+                {
+                    "x": 168.0,
+                    "y": 164.0
+                },
+                {
+                    "x": 143.0,
+                    "y": 175.0
+                },
+                {
+                    "x": 161.0,
+                    "y": 175.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 136.0,
+                    "y": 93.0
+                },
+                {
+                    "x": 154.0,
+                    "y": 93.0
+                },
+                {
+                    "x": 129.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 147.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 165.0,
+                    "y": 106.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 148.0,
+                    "y": 134.0
+                },
+                {
+                    "x": 115.0,
+                    "y": 134.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 67.0,
+                    "y": 141.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 95.0
+                },
+                {
+                    "x": 199.0,
+                    "y": 126.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 157.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "While its surface is barren, sprawling undergound cities house millions. It has served as a vault for valuable artifacts and data-matrices.",
+    "source": "eronous"
+}
