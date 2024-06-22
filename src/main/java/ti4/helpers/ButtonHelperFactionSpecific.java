@@ -677,6 +677,10 @@ public class ButtonHelperFactionSpecific {
         if (players.size() > 1) {
             StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, ButtonHelper.getUnitHolderFromPlanetName(planet, game), game.getTileFromPlanet(planet));
         }
+        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        options.add(Button.danger("deleteButtons", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getRepresentation(true, true) + " pay 3r for the mech", options);
     }
 
     public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event,
@@ -1961,7 +1965,7 @@ public class ButtonHelperFactionSpecific {
         boolean removed = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             int count = uH.getUnitCount(UnitType.Mech, player.getColor())
-                - uH.getUnitDamageCount(UnitType.Mech, player.getColor());
+                - uH.getUnitDamageCount(UnitType.Mech, player.getColorID());
 
             if (count > 0 && !removed) {
                 removed = true;

@@ -173,6 +173,29 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
+    public static String getDamagedUnits(Player player, UnitHolder unitHolder, Game game){
+        String duraniumMsg = "";
+        Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+            if (!player.unitBelongsToPlayer(unitEntry.getKey()))
+                continue;
+            UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+            if (unitModel == null)
+                continue;
+            UnitKey unitKey = unitEntry.getKey();
+            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            int damagedUnits = 0;
+            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+            }
+            if (damagedUnits > 0) {
+                duraniumMsg = duraniumMsg + unitName;
+            }
+        }
+
+        return duraniumMsg;
+    }
+
     public static int autoAssignGroundCombatHits(Player player, Game game, String planet, int hits,
         ButtonInteractionEvent event) {
         int sardakkMechHits = 0;
@@ -187,27 +210,12 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileFromPlanet(planet);
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
         boolean usedDuraniumAlready = true;
-        String duraniumMsg = "";
+        String duraniumMsg = getDamagedUnits(player, unitHolder, game);
         if (player.hasTech("da")) {
             usedDuraniumAlready = false;
-            for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                if (!player.unitBelongsToPlayer(unitEntry.getKey()))
-                    continue;
-                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null)
-                    continue;
-                UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
-                int damagedUnits = 0;
-                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
-                    damagedUnits = unitHolder.getUnitDamage().get(unitKey);
-                }
-                if (damagedUnits > 0) {
-                    duraniumMsg = duraniumMsg + unitName;
-                }
-            }
         }
-        if (hits < 1 && (usedDuraniumAlready || (unitHolder.getUnitDamageCount(UnitType.Mech, player.getColor()) < 1 && unitHolder.getUnitDamageCount(UnitType.Pds, player.getColor()) < 1))) {
+        if (hits < 1 && (usedDuraniumAlready || (duraniumMsg.isEmpty()))) {
+            System.out.println("boop");
             return 0;
         }
         if (numSustains > 0) {

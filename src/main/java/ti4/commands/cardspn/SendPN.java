@@ -98,7 +98,7 @@ public class SendPN extends PNCardsSubcommandData {
 		ButtonHelperAbilities.pillageCheck(targetPlayer, game);
 		targetPlayer.setPromissoryNote(id);
 
-		if (id.contains("dspnveld")) {
+		if (id.contains("dspnveld") && !targetPlayer.ownsPromissoryNote(id)) {
 			ButtonHelper.resolvePNPlay(id, targetPlayer, game, event);
 		}
 

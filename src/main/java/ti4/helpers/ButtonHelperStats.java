@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 public class ButtonHelperStats {
 
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
-        String message, ident = player.getFactionEmojiOrColor();
+        String message, ident = player.getRepresentation();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
