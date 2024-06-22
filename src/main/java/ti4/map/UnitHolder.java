@@ -196,9 +196,9 @@ abstract public class UnitHolder {
     }
 
     @NotNull
-    public Integer getUnitDamageCount(UnitType unitType, String color) {
+    public Integer getUnitDamageCount(UnitType unitType, String colorID) {
         return unitsDamage.entrySet().stream()
-            .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(color))
+            .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(colorID))
             .findFirst().map(Entry::getValue).orElse(0);
     }
 

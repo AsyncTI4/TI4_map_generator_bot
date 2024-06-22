@@ -1581,7 +1581,9 @@ public class AgendaHelper {
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
             if (!game.isFoWMode()) {
+                if(!game.isACInDiscard("Deadly Plot")){
                 message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
+                }
                 for (Player loser : losers) {
                     message.append("> ").append(loser.getRepresentation(true, true)).append("\n");
                 }

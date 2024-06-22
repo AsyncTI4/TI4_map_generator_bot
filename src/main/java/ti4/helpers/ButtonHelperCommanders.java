@@ -389,8 +389,8 @@ public class ButtonHelperCommanders {
         if (player.hasUnit("kolume_mech")) {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
-                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
-                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColorID()) > 0) {
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColorID()));
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
                     }
                 }
@@ -400,7 +400,7 @@ public class ButtonHelperCommanders {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
-                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColorID()));
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
                     }
                 }

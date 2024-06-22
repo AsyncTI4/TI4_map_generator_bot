@@ -1220,15 +1220,15 @@ public class ButtonHelperAbilities {
             }
             if (!player.hasAbility("council_patronage"))
                 continue;
-
+                ButtonHelperStats.gainTGs(event, game, player, 1, true);
+                ButtonHelperStats.replenishComms(event, game, player, true);
             StringBuilder sb = new StringBuilder(player.getRepresentation(true, true));
             sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm);
             sb.append(" commodities have been replenished and you have gained 1 ").append(Emojis.getTGorNomadCoinEmoji(game));
             sb.append(" trade good (").append(player.getTg() - 1).append(" -> ").append(player.getTg()).append(")");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
-            ButtonHelperStats.gainTGs(event, game, player, 1, true);
-            ButtonHelperStats.replenishComms(event, game, player, true);
+            
         }
     }
 
