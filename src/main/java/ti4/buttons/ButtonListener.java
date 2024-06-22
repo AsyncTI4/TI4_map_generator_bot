@@ -2539,6 +2539,9 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
+            if(msg.contains("Lightning")){
+                msg = msg + " Drives to boost the move value of each unit not transporting fighters or infantry by 1";
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("spyStep2_")) {
@@ -3411,15 +3414,15 @@ public class ButtonListener extends ListenerAdapter {
                             String reasons = "";
                             if (player.hasAbility("versatile")) {
                                 properGain = properGain + 1;
-                                reasons = "versatile ";
+                                reasons = "Versatile ";
                             }
                             if (player.hasTech("hm")) {
                                 properGain = properGain + 1;
-                                reasons = reasons + "hypermetabolism ";
+                                reasons = reasons + "Hypermetabolism ";
                             }
                             if (cyber) {
                                 properGain = properGain + 1;
-                                reasons = reasons + "cybernetics ";
+                                reasons = reasons + "Cybernetic Enhancements (L1 PN) ";
                             }
                             if (properGain > 2) {
                                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),

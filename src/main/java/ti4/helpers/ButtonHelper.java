@@ -159,7 +159,7 @@ public class ButtonHelper {
         String title = buttonID.split("_")[1];
         String msg = player.getRepresentation() + " choose the player you wish to give the title of " + title;
         List<Button> buttons = new ArrayList<>();
-        for (Player player2 : game.getRealPlayers()) {
+        for (Player player2 : game.getRealPlayersNDummies()) {
             if (player2 == player) {
                 continue;
             }
@@ -4663,8 +4663,8 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
             buttons.add(ghostButton);
         }
-        if (player.getTechs().contains("dsgledb") && !player.getExhaustedTechs().contains("dsgledb")) {
-            buttons.add(Button.success(finChecker + "exhaustTech_dsgledb", "Exhaust Lightning Drives").withEmoji(Emoji.fromFormatted(Emojis.gledge)));
+        if (player.getTechs().contains("dsgledb")) {
+            buttons.add(Button.success(finChecker + "declareUse_Lightning", "Declare Lightning Drives").withEmoji(Emoji.fromFormatted(Emojis.gledge)));
         }
         if (player.getTechs().contains("dsvadeb") && !player.getExhaustedTechs().contains("dsvadeb")) {
             buttons.add(Button.success(finChecker + "exhaustTech_dsvadeb", "Exhaust Midas Turbine").withEmoji(Emoji.fromFormatted(Emojis.vaden)));
@@ -5275,6 +5275,7 @@ public class ButtonHelper {
                             && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
                             moveValue++;
                         }
+                        
                         if (player.hasAbility("slipstream") && (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition()) || tile == player.getHomeSystemTile())) {
                             moveValue++;
                         }
@@ -5293,6 +5294,9 @@ public class ButtonHelper {
                                 messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue + "), probably used gravity drive)");
                             } else {
                                 messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue + "), did not have gravity drive)");
+                            }
+                            if (player.getTechs().contains("dsgledb")) {
+                                messageBuilder.append("(did have lightning drives for +1 if not transporting)");
                             }
                         }
                     }
@@ -7657,7 +7661,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, game),
             player.getRepresentation() + " purged Twilight Mirror to take one action.");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation()
                 + " Use the button to do an action. It is advised you avoid the end turn button at the end of it, and just delete it. ",
             TurnStart.getStartOfTurnButtons(player, game, false, event));
