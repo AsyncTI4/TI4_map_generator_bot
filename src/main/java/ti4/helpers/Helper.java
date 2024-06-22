@@ -1520,56 +1520,67 @@ public class Helper {
             }
         }
         String planet = uH.getName();
+        int planetUnitVal = 0;
         if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(false)) {
             productionValueTotal = productionValueTotal + 3;
+            planetUnitVal = 3;
         }
-        if (player.hasTech("ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
-            || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
-            productionValueTotal = productionValueTotal + 1;
-            if (player.hasRelic("boon_of_the_cerulean_god")) {
-                productionValueTotal++;
-            }
-        } else {
-            if (player.hasTech("absol_ie") && player.getPlanets().contains(uH.getName())) {
-                productionValueTotal = productionValueTotal + 1;
-                if (player.hasRelic("boon_of_the_cerulean_god")) {
-                    productionValueTotal++;
-                }
-            } else {
-                if (player.getPlanets().contains(uH.getName())
-                    && player.hasTech("dsbentg")
-                    && (!uH.getTokenList().isEmpty() || (Mapper.getPlanet(planet).getTechSpecialties() != null
-                        && Mapper.getPlanet(planet).getTechSpecialties().size() > 0))) {
-                    productionValueTotal = productionValueTotal + 1;
-                    if (player.hasRelic("boon_of_the_cerulean_god")) {
-                        productionValueTotal++;
-                    }
-                }
-            }
-        }
-        if (player.getPlanets().contains(uH.getName())
-            && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
-            productionValueTotal = productionValueTotal + 3;
-            if (player.hasRelic("boon_of_the_cerulean_god")) {
-                productionValueTotal++;
-            }
-        }
-
         for (String token : uH.getTokenList()) {
-            if (token.contains("orbital_foundries")) {
+            if (token.contains("orbital_foundries") && planetUnitVal < 2) {
                 productionValueTotal = productionValueTotal + 2;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                planetUnitVal = 2;
             }
 
-            if (token.contains("automatons")) {
+            if (token.contains("automatons")&& planetUnitVal < 3) {
+                productionValueTotal = productionValueTotal - planetUnitVal;
+                planetUnitVal = 3;
                 productionValueTotal = productionValueTotal + 3;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
             }
         }
+        if (player.hasTech("ah") && planetUnitVal < 1 && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+            || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+            productionValueTotal = productionValueTotal + 1;
+            planetUnitVal = 1;
+            if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
+            }
+        } else {
+            if (player.hasTech("absol_ie") && planetUnitVal < 1 && player.getPlanets().contains(uH.getName())) {
+                productionValueTotal = productionValueTotal + 1;
+                planetUnitVal = 1;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+            } else {
+                if (player.getPlanets().contains(uH.getName())
+                    && player.hasTech("dsbentg") && planetUnitVal < 1
+                    && (!uH.getTokenList().isEmpty() || (Mapper.getPlanet(planet).getTechSpecialties() != null
+                        && Mapper.getPlanet(planet).getTechSpecialties().size() > 0))) {
+                    productionValueTotal = productionValueTotal + 1;
+                    if (player.hasRelic("boon_of_the_cerulean_god")) {
+                        productionValueTotal++;
+                    }
+                    planetUnitVal = 1;
+                }
+            }
+        }
+        if (player.getPlanets().contains(uH.getName())
+            && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
+            productionValueTotal = productionValueTotal + 3;
+            productionValueTotal = productionValueTotal - planetUnitVal;
+            planetUnitVal = 3;
+            if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
+            }
+        }
+
+        
 
         return productionValueTotal;
 

@@ -42,6 +42,9 @@ public class RevealAgenda extends AgendaSubcommandData {
     }
 
     public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game game, MessageChannel channel) {
+        if(game.getMainGameChannel() != null){
+            channel = game.getMainGameChannel();
+        }
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
             && ((new Date().getTime()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
