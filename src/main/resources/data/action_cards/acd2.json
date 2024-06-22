@@ -608,7 +608,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome destroys 3 of their infantry on the game board.",
-    "flavorText": "A crowd formed outside the Senate Possessional. As they hurled objects towards those accessing the building, Ciel smiled, \"Nice dodge, Junn, quite agile for your age.\"",
+    "flavorText": "A crowd formed outside the Senate Possessional. As they hurled objects at those entering the building, Ciel smiled. \"Nice dodge, Junn, quite agile for your age.\"",
     "source": "action_deck_2"
   },
   {
@@ -644,7 +644,7 @@
     "phase": "Action",
     "window": "After 1 of your non-fighter ships is destroyed during a space combat",
     "text": "Place 3 fighters from your reinforcements in the active system.",
-    "flavorText": "Many researchers have questioned why the Naalu's prescience did not lead them toward a path of excessive caution. Ta Zern postulated that it was linked to their excessive confidence.",
+    "flavorText": "“We're too late!” the rookie pilot cried as a war sun tore through their fleets. \"No, sonny, this fight has just begun,\" Jace bellowed. \"4th Legion, with me! We're sending that hunk of scrap back to the void.\"",
     "source": "action_deck_2"
   },
   {
