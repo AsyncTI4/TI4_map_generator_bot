@@ -6,8 +6,8 @@ name: ForceSaveFileBackup
 concurrency:
   group: "Start Bot"
 jobs:
-  build:
-    name: Build
+  save:
+    name: Backup Game Saves
     runs-on: ubuntu-latest
     steps:
       - name: executing remote ssh commands using password
