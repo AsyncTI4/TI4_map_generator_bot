@@ -180,7 +180,7 @@ public class SCPlay extends PlayerSubcommandData {
             Emoji reactionEmoji = Helper.getPlayerEmoji(game, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
-                player.addFollowedSC(scToPlay);
+                player.addFollowedSC(scToPlay, event);
             }
             game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
             game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
@@ -325,10 +325,12 @@ public class SCPlay extends PlayerSubcommandData {
         Button endTurn = Button.danger(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
+        
         if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
             conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
         }
         conclusionButtons.add(deleteButton);
+        conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_"+scToPlay, "End turn When All Have Reacted"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomeBrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")

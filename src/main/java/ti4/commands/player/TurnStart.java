@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.uncategorized.CardsInfo;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -134,6 +135,10 @@ public class TurnStart extends PlayerSubcommandData {
                 game.setTileAsPinged(x, null);
             }
         } else {
+            //checkhere
+            if(game.getShowBanners()){
+                MapGenerator.drawBanner(player);
+            }
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);

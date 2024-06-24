@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,9 +37,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.player.TurnEnd;
 import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
@@ -1824,9 +1827,29 @@ public class Player {
     public void setFollowedSCs(Set<Integer> followedSCs) {
         this.followedSCs = followedSCs;
     }
-
     public void addFollowedSC(Integer sc) {
         followedSCs.add(sc);
+    }
+
+    public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event) {
+        Game game = getGame();
+        
+        followedSCs.add(sc);
+        if(game != null && game.getActivePlayer() != null){
+            if(game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc+game.getActivePlayer().getFaction())){    
+                for(Player p2 : game.getRealPlayers()){      
+                    if(!p2.hasFollowedSC(sc)){
+                        return;
+                    }
+                }
+                game.setStoredValue("endTurnWhenSCFinished", "");
+                Player p2 = game.getActivePlayer();
+                TurnEnd.pingNextPlayer(event, game, p2);
+                ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
+                        + game.getRound() + " for " + p2.getFactionEmoji());
+            }
+        }
+        
     }
 
     public void removeFollowedSC(Integer sc) {

@@ -105,6 +105,7 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         game.setTemporaryPingDisable(false);
         game.setStoredValue("lawsDisabled", "no");
+        game.setStoredValue("endTurnWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -155,7 +156,7 @@ public class TurnEnd extends PlayerSubcommandData {
                 //  Block of code to handle errors
             }
         }
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
         }

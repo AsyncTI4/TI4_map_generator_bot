@@ -237,7 +237,7 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
 
-            autoPingGames();
+            autoPingGames(event);
             handleFoWWhispersAndFowCombats(event, msg);
             mapLog(event, msg);
             saveJSONInTTPGExportsChannel(event);
@@ -269,7 +269,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private void autoPingGames() {
+    private void autoPingGames(MessageReceivedEvent event) {
         Game mapreference = GameManager.getInstance().getGame("finreference");
         int multiplier = 1000; // should be 1000
         if (mapreference != null
@@ -426,6 +426,17 @@ public class MessageListener extends ListenerAdapter {
                                         && milliSinceLastPing > (60 * 5 * multiplier) && (60 * 60 * multiplier * spacer) > milliSinceLastPing) {
                                         ping = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinance";
                                     }
+                                    String playersInCombat = game.getStoredValue("factionsInCombat");
+                                    if(playersInCombat.contains(player.getFaction())){
+                                        for(Player p2 : game.getRealPlayers()){
+                                            if(p2 == player){
+                                                continue;
+                                            }
+                                            if(playersInCombat.contains(p2.getFaction())){
+                                                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+                                            }
+                                        }
+                                    }
                                 }
                                 if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
                                     AgendaHelper.pingMissingPlayers(game);
@@ -445,23 +456,23 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 4)) {
                                         ping = realIdentity
-                                            + " this is a sternly worded letter from the bot regarding your noted absence. Do you know how much paperwork this creates? (none in reality but a lot in theory)";
+                                            + " this is a sternly worded letter from the bot regarding your noted absence.";
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 5)) {
                                         ping = realIdentity
-                                            + " this is a firm request from the bot that you do something to end this situation. At this rate you will never make the top 100 fastest players";
+                                            + " this is a firm request from the bot that you do something to end this situation.";
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 6)) {
                                         ping = realIdentity
-                                            + " Half dozen times the charm they say. I have it on good authority that if you move in the next 10 ms, you're guaranteed to win the next combat you have, bot's honor. Wait too long though and your dice get cursed. ";
+                                            + " Half dozen times the charm they say. ";
                                     }
                                     if (pingNumber == 7) {
                                         ping = realIdentity
-                                            + " I can write whatever I want here, not like it's likely that you've checked in to read any of it anyways.";
+                                            + " I can write whatever I want here, not like you've checked in to read any of it anyways.";
                                     }
                                     if (pingNumber == 8) {
                                         ping = realIdentity
-                                            + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the angry bear";
+                                            + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the bear";
                                     }
                                     if (pingNumber == 9) {
                                         ping = realIdentity

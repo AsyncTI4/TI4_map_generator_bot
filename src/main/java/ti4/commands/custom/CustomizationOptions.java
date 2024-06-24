@@ -37,6 +37,8 @@ public class CustomizationOptions extends CustomSubcommandData {
             "Show the bubbles around anti-bombardment planets"));
         addOptions(
             new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS,
             "Have the bot inject helpful links to rules within it's output"));
@@ -120,6 +122,10 @@ public class CustomizationOptions extends CustomSubcommandData {
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null)
             game.setShowGears(showG);
+
+        Boolean showBa = event.getOption(Constants.SHOW_BANNERS, null, OptionMapping::getAsBoolean);
+        if (showBa != null)
+            game.setShowBanners(showBa);
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null)
