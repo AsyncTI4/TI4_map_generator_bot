@@ -594,6 +594,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_GEARS + " " + game.getShowGears());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_BANNERS + " " + game.getShowBanners());
+        writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + game.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + game.getTemporaryPingDisable());
@@ -1867,6 +1869,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setShowGears(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.SHOW_BANNERS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setShowBanners(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

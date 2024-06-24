@@ -265,20 +265,10 @@ public class AgendaHelper {
                 if ("shared_research".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player player : game.getRealPlayers()) {
-                            Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
-                            if (player.hasAbility("mobile_command") && ButtonHelper
-                                .getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).size() > 0) {
-                                tile = ButtonHelper
-                                    .getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
-                            }
-                            if (tile == null) {
-                                tile = player.getHomeSystemTile();
-                            }
-                            if (tile == null) {
-                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                    "Could not find a HS, sorry bro");
-                            }
+                            Tile tile = player.getHomeSystemTile();
+                            if(tile != null){
                             AddCC.addCC(event, player.getColor(), tile);
+                            }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                             "Added player's CCs to their HS");

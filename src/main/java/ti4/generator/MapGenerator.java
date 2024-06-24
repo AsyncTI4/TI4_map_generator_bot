@@ -135,7 +135,6 @@ public class MapGenerator {
     private long debugTileTime;
     private long debugGameInfoTime;
     private long debugDiscordTime;
-
     private static final BasicStroke stroke1 = new BasicStroke(1.0f);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
@@ -486,6 +485,56 @@ public class MapGenerator {
         return null;
     }
 
+    public static void drawBanner(Player player){
+        Graphics bannerG;
+        BufferedImage bannerImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage backgroundImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("factionbanner_background.png"), 325, 50);
+        String pnColorFile = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
+        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pnColorFile),1.5f);
+        BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("factionbanner_gradient.png"));
+        BufferedImage smallFactionImage = getPlayerFactionIconImageScaled(player, 0.26f);
+        BufferedImage largeFactionImage = getPlayerFactionIconImageScaled(player, 1.4f);
+        bannerG = bannerImage.getGraphics();
+    
+        bannerG.drawImage(backgroundImage, 0, 0, null);
+        Graphics2D bannerG2d = (Graphics2D) bannerG;
+        bannerG2d.rotate(Math.toRadians(-90));
+        bannerG2d.drawImage(colorImage, -60, 0, null);
+        bannerG2d.rotate(Math.toRadians(90));
+        bannerG2d.drawImage(gradientImage, 0, 0, null);
+        bannerG2d.drawImage(smallFactionImage, 2, 24, null);
+        bannerG.drawImage(largeFactionImage, 180, -42, null);
+        bannerG.setFont(Storage.getFont16());
+        bannerG.setColor(Color.WHITE);
+        String name = Mapper.getFaction(player.getFaction()).getFactionName().toUpperCase();
+        if(name.contains("KELERES")){
+            name = "THE COUNCIL KELERES";
+        }
+        bannerG.drawString(name, 29, 44);
+        //superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke1, Color.BLACK);
+        FileUpload fileUpload = null;
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            // CONVERT PNG TO JPG
+            BufferedImage convertedImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_RGB);
+            convertedImage.createGraphics().drawImage(bannerImage, 0, 0, Color.black, null);
+            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
+            imageWriter.setOutput(ImageIO.createImageOutputStream(out));
+            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+            if (defaultWriteParam.canWriteCompressed()) {
+                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                defaultWriteParam.setCompressionQuality(1.0f);
+            }
+
+            imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
+
+            String fileName = player.getFaction()+player.getColor()+"banner.jpg";
+            fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
+        } catch (IOException e) {
+            BotLogger.log("Could not create FileUpload", e);
+        }
+        MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
+
+    }
     private void drawGame(GenericInteractionCreateEvent event) {
 
         boolean finRun = false;

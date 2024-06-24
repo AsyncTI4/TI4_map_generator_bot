@@ -953,7 +953,7 @@ public class ButtonHelper {
             message.append("\n Automatically added the Custodia Vigilia planet");
         }
         if ("cm".equalsIgnoreCase(techID) && game.getActivePlayerID() != null
-            && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+            && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
             if (!game.isFoWMode()) {
                 try {
                     if (game.getLatestTransactionMsg() != null && !"".equals(game.getLatestTransactionMsg())) {
@@ -1161,7 +1161,7 @@ public class ButtonHelper {
         if (!p2.getFollowedSCs().contains(5)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(p2, 5, game, event);
         }
-        p2.addFollowedSC(5);
+        p2.addFollowedSC(5, event);
         ButtonHelperStats.replenishComms(event, game, p2, true);
     }
 
@@ -7653,6 +7653,15 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
+    public static void endTurnWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID){
+        String sc = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),game.getPing() + " the active player has elected to end turn once everyone has resolved SC #"+sc+". Please resolve it as soon as possible so the game can progress");
+        game.setTemporaryPingDisable(true);
+        game.setStoredValue("endTurnWhenSCFinished", sc+player.getFaction());
+        ButtonHelper.deleteTheOneButton(event);
+        
+    }
+
     public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
         player.removeRelic("twilight_mirror");
         player.removeExhaustedRelic("twilight_mirror");
@@ -8885,7 +8894,7 @@ public class ButtonHelper {
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology") && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
-                player.addFollowedSC(scNum);
+                player.addFollowedSC(scNum, event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Tech");

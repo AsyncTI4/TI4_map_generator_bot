@@ -2026,7 +2026,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveWinnuPN(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String scNum = buttonID.split("_")[1];
         int sc = Integer.parseInt(scNum);
-        player.addFollowedSC(sc);
+        player.addFollowedSC(sc, event);
         ButtonHelper.resolvePNPlay("acq", player, game, event);
         String msg = player.getRepresentation(true, true) + " you will be marked as having followed " + sc
             + " without having needed to spend a CC. Please still use the SC buttons to resolve the SC effect";

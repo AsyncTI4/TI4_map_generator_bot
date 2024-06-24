@@ -191,7 +191,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         }
                     }
                     for (Leader lead : p2.getLeaders()) {
-                        messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed());
+                        messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
                     }
                     for (String tech : p2.getFactionTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -244,7 +244,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 case "agent", "commander", "hero" -> {
                     for (Leader lead : p2.getLeaders()) {
                         if (lead.getId().contains(category)) {
-                            messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed());
+                            messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
                         }
                     }
                 }
