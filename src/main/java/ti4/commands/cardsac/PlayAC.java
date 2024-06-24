@@ -217,9 +217,13 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if (actionCardTitle.contains("Planetary Rigs")) {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
+                
                 String msg = player.getRepresentation()
                     + " After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
+                if(acbuttons.size() == 0){
+                    msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
+                }
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
             }
 
             String codedName = "Plagiarize";

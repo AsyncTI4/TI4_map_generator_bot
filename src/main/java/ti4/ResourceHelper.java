@@ -208,6 +208,16 @@ public class ResourceHelper {
         tokenCache.put(name, token);
         return token;
     }
+    @Nullable
+    public String getExtraFile(String name) {
+        String tokenPath = tokenCache.get(name);
+        if (tokenPath != null) {
+            return tokenPath;
+        }
+        String token = getResourceFromFolder("extra/", name, "Could not find token file");
+        tokenCache.put(name, token);
+        return token;
+    }
 
     @Nullable
     public String getResourceFromFolder(String folder, String name, String errorDescription) {

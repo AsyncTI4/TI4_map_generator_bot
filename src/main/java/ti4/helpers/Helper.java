@@ -2939,6 +2939,9 @@ public class Helper {
         String inviteUrl = null;
         if (invites != null && !invites.isEmpty()) {
             inviteUrl = invites.get(0).getUrl();
+            if(inviteUrl.contains("VFNGGKZ9")){
+                inviteUrl = null;
+            }
         }
         if (inviteUrl == null) {
             inviteUrl = guild.getDefaultChannel().createInvite().complete().getUrl();

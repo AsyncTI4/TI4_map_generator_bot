@@ -149,6 +149,8 @@ public class Game {
     @ExportableField
     private boolean showGears = true;
     @ExportableField
+    private boolean showBanners = true;
+    @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
     private boolean dominusOrb;
@@ -1237,6 +1239,9 @@ public class Game {
     public boolean getShowGears() {
         return showGears;
     }
+    public boolean getShowBanners() {
+        return showBanners;
+    }
 
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
@@ -1284,6 +1289,9 @@ public class Game {
 
     public void setShowGears(boolean onStatus) {
         showGears = onStatus;
+    }
+    public void setShowBanners(boolean onStatus) {
+        showBanners = onStatus;
     }
 
     public void setTemporaryPingDisable(boolean onStatus) {
@@ -1473,13 +1481,15 @@ public class Game {
     public void updateActivePlayer(Player player) {
         /// update previous active player stats
         Date newTime = new Date();
+        String factionsInCombat = getStoredValue("factionsInCombat");
         if (activePlayer != null) {
             Player prevPlayer = getPlayer(activePlayer);
-            if (prevPlayer != null) {
+            if (prevPlayer != null && !factionsInCombat.contains(prevPlayer.getFaction()) && !getTemporaryPingDisable()) {
                 long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
                 prevPlayer.updateTurnStats(elapsedTime);
             }
         }
+        setStoredValue("factionsInCombat", "");
 
         // reset timers for ping and stats
         setActivePlayer(player == null ? null : player.getUserID());
