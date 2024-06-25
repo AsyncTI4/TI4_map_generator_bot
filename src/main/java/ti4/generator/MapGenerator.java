@@ -510,6 +510,9 @@ public class MapGenerator {
         if(name.contains("KELERES")){
             name = "THE COUNCIL KELERES";
         }
+        if(name.contains("FRANKEN") && player.getDisplayName() != null && !player.getDisplayName().isEmpty()){
+            name = player.getDisplayName().toUpperCase();
+        }
         bannerG.drawString(name, 29, 44);
         //superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke1, Color.BLACK);
         FileUpload fileUpload = null;

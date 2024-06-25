@@ -2510,6 +2510,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveSetupStep4And5(game, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep2_")) {
             ButtonHelperActionCards.resolveSignalJammingStep2(player, game, event, buttonID);
+        } else if (buttonID.startsWith("xxchaAgentRemoveInfantry_")) {
+            ButtonHelperAgents.resolveXxchaAgentInfantryRemoval(player, game, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep3_")) {
             ButtonHelperActionCards.resolveSignalJammingStep3(player, game, event, buttonID);
         } else if (buttonID.startsWith("edynAgendaStuffStep2_")) {
@@ -3618,7 +3620,7 @@ public class ButtonListener extends ListenerAdapter {
                             break;
                         }
                         if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
-                            message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear. ";
+                            message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear. They can cancel this by hitting 'No Follow'";
                             if (!game.isFoWMode()) {
                                 message = message + player2.getRepresentation(true, true)
                                     + " is the one the game is currently waiting on";

@@ -470,7 +470,7 @@ public class CombatHelper {
             totalMisses = totalMisses + misses;
 
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                extra = player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + " due to Thalnos misses";
+                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + " due to Thalnos misses";
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
