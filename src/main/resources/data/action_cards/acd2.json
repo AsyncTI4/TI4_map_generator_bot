@@ -81,8 +81,8 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "boarding_torpedoes",
-    "name": "Boarding Torpedoes",
+    "alias": "boarding_party",
+    "name": "Boarding Party",
     "phase": "Action",
     "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
     "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
@@ -427,7 +427,7 @@
     "name": "Mercenary Contract",
     "phase": "Action",
     "window": "After a player activates a system that contains your units",
-    "text": "Produce up to 2 ships that each have a cost of 4 or less in that system.",
+    "text": "Produce up to 2 ships in that system that have a combined cost of 4 or less.",
     "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
     "source": "action_deck_2"
   },
@@ -742,7 +742,7 @@
     "name": "Sister Ship",
     "phase": "Any",
     "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the cost of that unit by half, rounded up.",
+    "text": "Produce 1 ship of that type in a system that contains 1 of your units with Production; reduce the cost of that ship by up to 4.",
     "flavorText": "The production of the Van Hauge VI had finished in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },

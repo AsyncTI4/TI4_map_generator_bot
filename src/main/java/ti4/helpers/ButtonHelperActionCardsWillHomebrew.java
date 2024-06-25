@@ -54,7 +54,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put a pds on it");
     }
 
-    public static void resolveBoardingTorpedoes(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveBoardingParty(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
         String pos = game.getActiveSystem();

@@ -4659,8 +4659,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveSisterShip" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveSisterShip(player, game, event);
                 }
-                case "resolveBoardingTorpedoes" -> {
-                    ButtonHelperActionCardsWillHomebrew.resolveBoardingTorpedoes(player, game, event);
+                case "resolveBoardingParty" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveBoardingParty(player, game, event);
                 }
                 case "resolveMercenaryContract" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveMercenaryContract(player, game, event);
