@@ -47,6 +47,22 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperAgents {
 
+    public static void resolveXxchaAgentInfantryRemoval(Player player, Game game, ButtonInteractionEvent event,
+    String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, game);
+        event.getMessage().delete().queue();
+        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "1 infantry " +planet, game);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
+            player.getRepresentation(true, true) + " you removed an infantry from " + planetRep);
+    
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+            p2.getRepresentation(true, true) + " an infantry of yours on "+planetRep+" was removed via the Xxcha agent.");
+
+        
+    }
+
     public static List<Button> getTilesToArboAgent(Player player, Game game,
         GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -682,7 +698,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            String message = " Use buttons to ready a planet. Removing the infantry is not automated but is an option for you to do.";
+            String message = " Use buttons to ready a planet. Removing the infantry from your own planets is not automated but is an option for you to do.";
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getExhaustedPlanets()) {
                 buttons.add(Button.secondary("khraskHeroStep4Ready_" + p2.getFaction() + "_" + planet,
