@@ -496,9 +496,9 @@ public class PlayAC extends ACCardsSubcommandData {
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
-            codedName = "Boarding Torpedoes";
+            codedName = "Boarding Party";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveBoardingTorpedoes",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveBoardingParty",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
