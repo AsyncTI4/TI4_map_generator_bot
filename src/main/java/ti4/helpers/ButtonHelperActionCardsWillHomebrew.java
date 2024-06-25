@@ -70,7 +70,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         String pos = game.getActiveSystem();
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), type,
             "placeOneNDone_dontskip");
-        String message = player.getRepresentation() + " Use the buttons to place the 1 ship, you may spend influences as resources";
+        String message = player.getRepresentation() + " Use the buttons to place up to 2 ships that have a combined cost of 4 or less";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
@@ -90,7 +90,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Select which tile you would like to produce a ship in. The bot will not know that it is half price and limited to a specific ship type, but you know that. ", buttons);
+            "Select which tile you would like to produce a ship in. The bot will not know that it is reduced cost and limited to a specific ship type, but you know that. ", buttons);
     }
 
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
