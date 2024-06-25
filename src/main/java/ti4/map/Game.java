@@ -1646,6 +1646,14 @@ public class Game {
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
+            if(player_.getSCs().size() > 0){
+                String scs = "";
+                for(int SC : player_.getSCs()){
+                    scs = scs + SC + "_";
+                }
+                scs =scs.substring(0,scs.length()-1);
+                setStoredValue("Round"+getRound()+"SCPickFor"+player_.getFaction(), scs);
+            }
         }
 
         //ADD A TG TO UNPICKED SC

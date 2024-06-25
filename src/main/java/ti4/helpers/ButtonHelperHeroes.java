@@ -494,6 +494,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
             player.getRepresentation(true, true) + " select the planet you want to ready", buttons);
     }
+  
 
     public static void resolveKhraskHeroStep4Ready(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
@@ -507,7 +508,26 @@ public class ButtonHelperHeroes {
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
                 p2.getRepresentation(true, true) + " your planet " + planetRep + " was refreshed.");
+            if(player.hasLeader("xxchaagent")){
+                UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                if(uH != null && uH.getUnitCount(UnitType.Infantry, p2) > 0){
+                    Tile tile = game.getTileFromPlanet(planet);
+                    for(String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)){
+                        Tile tile2 = game.getTileByPosition(tilePos);
+                        if(FoWHelper.playerHasShipsInSystem(player,tile2)){
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Button.danger("xxchaAgentRemoveInfantry_"+p2.getFaction()+"_"+planet, "Remove Infantry"));
+                            buttons.add(Button.secondary("deleteButtons", "Decline"));
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" you have the opportunity to remove 1 of the infantry on the refreshed planet if you want", buttons);
+
+                            return;
+                        }
+                    }
+                    
+                }
+            }
         }
+        
     }
 
     public static List<Button> getAttachmentSearchButtons(Game game, Player player) {
