@@ -58,7 +58,7 @@
         "id": "hacanagent",
         "faction": "hacan",
         "type": "agent",
-        "name": "Carth of the Golden Sands",
+        "name": "Carth of Golden Sands",
         "title": "Tripartite Governor",
         "abilityWindow": "During the action phase:",
         "abilityText": "You may exhaust this card to gain 2 commodities or replenish another player's commodities.",
