@@ -179,6 +179,8 @@ public class MapGenerator {
 
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
         int playerY = playerCountForMap * 340;
+        int unrealPlayers = game.getNotRealPlayers().size();
+        playerY += unrealPlayers * 20;
 
         int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
         int heightStats = playerY + lawsY + objectivesY + 600;
