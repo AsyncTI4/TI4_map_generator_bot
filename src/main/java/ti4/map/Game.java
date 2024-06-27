@@ -3363,6 +3363,7 @@ public class Game {
         this.actionCards = actionCards;
     }
 
+    @JsonIgnore
     public boolean islandMode() {
         boolean otherThings = getName().contains("island") || getMapTemplateID().equals("1pIsland");
         if (otherThings) setStoredValue("IslandMode", "true");
