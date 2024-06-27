@@ -3681,7 +3681,7 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return getPlayers().values().stream()
-            .filter(p -> p.isRealPlayer() || p.getFaction().equals("neutral"))
+            .filter(p -> p.isRealPlayer() || (p.isDummy() && p.getFaction().equals("neutral")))
             .collect(Collectors.toList());
     }
 
@@ -4007,7 +4007,7 @@ public class Game {
         // check if player has Imperia and if any of the stolen CCs are owned by players
         // that have the leader unlocked
         if (player.hasAbility("imperia")) {
-            for (Player player_ : getRealPlayers()) {
+            for (Player player_ : getRealPlayersNDummies()) {
                 if (player_.equals(player))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
