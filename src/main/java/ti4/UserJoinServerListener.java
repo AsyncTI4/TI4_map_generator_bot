@@ -117,6 +117,8 @@ public class UserJoinServerListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
                 msg += "\n> " + g.getName() + " -> Link:" + g.getTableTalkChannel().getJumpUrl();
             }
+            reportUserLeftServer(msg);
+            
             String inviteBack = Helper.getGuildInviteURL(guild, 1);
             String primaryInvite = Helper.getGuildInviteURL(AsyncTI4DiscordBot.guildPrimary, 1, true);
             String usermsg = "It looks like you left a server while playing in `" + gamesQuit.size() + "` games.";
@@ -127,7 +129,6 @@ public class UserJoinServerListener extends ListenerAdapter {
             if (voluntary) {
                 MessageHelper.sendMessageToUser(usermsg, user);
             }
-            reportUserLeftServer(msg);
         }
     }
 

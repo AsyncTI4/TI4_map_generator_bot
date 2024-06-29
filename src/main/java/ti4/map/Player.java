@@ -799,6 +799,7 @@ public class Player {
         return unitsOwned;
     }
 
+    @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
         return unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
@@ -1396,6 +1397,7 @@ public class Player {
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
     }
 
+    @JsonIgnore
     public String getFactionEmojiOrColor() {
         if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
             return Emojis.getColorEmojiWithName(getColor());

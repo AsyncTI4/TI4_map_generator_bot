@@ -90,7 +90,7 @@ public class ChoiceSetting<T> extends SettingInterface {
             allValues.put(entry.getKey(), entry.getValue());
         }
         // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
-        if (!allValues.containsKey(defaultKey)) {
+        if (!allValues.containsKey(defaultKey) && allValues.size() > 0) {
             chosenKey = new ArrayList<>(allValues.keySet()).get(0);
             defaultKey = chosenKey;
         }
