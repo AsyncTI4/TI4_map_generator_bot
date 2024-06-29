@@ -3,9 +3,7 @@ package ti4.commands.cardsso;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
@@ -21,7 +19,6 @@ import ti4.message.MessageHelper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class SOCardsCommand implements Command {
 
@@ -77,7 +74,6 @@ public class SOCardsCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        SOCardsSubcommandData subCommandExecuted = null;
         for (SOCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
@@ -88,7 +84,6 @@ public class SOCardsCommand implements Command {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(game, event);
-        // MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 
     protected String getActionDescription() {

@@ -1940,11 +1940,11 @@ public class ButtonListener extends ListenerAdapter {
             int interval = Integer.parseInt(buttonID.split("_")[1]);
             player.setPersonalPingInterval(interval);
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-            for (Game activeGame2 : mapList.values()) {
-                for (Player player2 : activeGame2.getRealPlayers()) {
+            for (Game game2 : mapList.values()) {
+                for (Player player2 : game2.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                         player2.setPersonalPingInterval(interval);
-                        GameSaveLoadManager.saveMap(activeGame2);
+                        GameSaveLoadManager.saveMap(game2, event);
                     }
                 }
             }

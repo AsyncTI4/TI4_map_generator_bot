@@ -1239,6 +1239,7 @@ public class Game {
     public boolean getShowGears() {
         return showGears;
     }
+
     public boolean getShowBanners() {
         return showBanners;
     }
@@ -1290,6 +1291,7 @@ public class Game {
     public void setShowGears(boolean onStatus) {
         showGears = onStatus;
     }
+
     public void setShowBanners(boolean onStatus) {
         showBanners = onStatus;
     }
@@ -1646,13 +1648,13 @@ public class Game {
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
-            if(player_.getSCs().size() > 0){
+            if (player_.getSCs().size() > 0) {
                 String scs = "";
-                for(int SC : player_.getSCs()){
+                for (int SC : player_.getSCs()) {
                     scs = scs + SC + "_";
                 }
-                scs =scs.substring(0,scs.length()-1);
-                setStoredValue("Round"+getRound()+"SCPickFor"+player_.getFaction(), scs);
+                scs = scs.substring(0, scs.length() - 1);
+                setStoredValue("Round" + getRound() + "SCPickFor" + player_.getFaction(), scs);
             }
         }
 
@@ -3681,7 +3683,7 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return getPlayers().values().stream()
-            .filter(p -> p.isRealPlayer() || (p.isDummy() && p.getFaction().equals("neutral")))
+            .filter(p -> p.isRealPlayer() || (p.getFaction() != null && p.getFaction().equals("neutral")))
             .collect(Collectors.toList());
     }
 
@@ -3878,10 +3880,9 @@ public class Game {
         LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate
-                + " - the game flag `hasEnded` has been set to true");
+            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
-            GameSaveLoadManager.saveMap(this);
+            GameSaveLoadManager.saveMap(this, "Game ended");
         }
     }
 
