@@ -42,6 +42,7 @@ import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
@@ -147,11 +148,12 @@ public class GameSaveLoadManager {
         }
 
         try {
+            ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkSigil(game);
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
-            BotLogger.log("Error doing extra Discordant Stars stuff", e);
+            BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -2518,7 +2520,7 @@ public class GameSaveLoadManager {
     private static void readTokens(Tile tile, String data) {
         if (tile == null)
             return;
-        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+        // StringTokenizer tokenizer = new StringTokenizer(data, " ");
         // tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
         // todo implement token read
     }
