@@ -24,6 +24,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -3936,7 +3937,24 @@ public class ButtonHelper {
                 AddToken.addToken(event, tile, Constants.FRONTIER, game);
             }
         }
+    }
 
+    public static void addTokenToTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        //addtoken_(tokenname)_(pos)_(planet?)
+        String regex = "addToken_" + RegexHelper.tokenRegex() + "_" + RegexHelper.posRegex(game) + RegexHelper.optional("_" + RegexHelper.unitHolderRegex(game, "planet"));
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            String token = matcher.group("token");
+            String pos = matcher.group("pos");
+            String planet = matcher.group("planet");
+
+            Tile tile = game.getTileByPosition(pos);
+            if (planet == null) {
+                AddToken.addToken(event, tile, token, game);
+            } else {
+                tile.addToken(token, planet);
+            }
+        }
     }
 
     public static void checkForPrePassing(Game game, Player player) {
@@ -4338,7 +4356,7 @@ public class ButtonHelper {
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && game.getCurrentPhase().contains("agenda")) {
-                new PlanetRefresh().doAction(player, planetName, game);
+                PlanetRefresh.doAction(player, planetName, game);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Planet has been refreshed because of Florzen Commander");
                 ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
@@ -5074,8 +5092,7 @@ public class ButtonHelper {
 
         game.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + game.getActiveSystem(),
-            "Build in this system (" + Helper.getProductionValue(player, game, tile, false)
-                + " PRODUCTION Value)");
+            "Build in this system (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value)");
         buttons.add(buildButton);
         Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units")
             .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
@@ -5275,7 +5292,6 @@ public class ButtonHelper {
                             && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
                             moveValue++;
                         }
-                        
                         if (player.hasAbility("slipstream") && (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition()) || tile == player.getHomeSystemTile())) {
                             moveValue++;
                         }

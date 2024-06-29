@@ -32,11 +32,15 @@ public class PlanetAdd extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Game game) {
+    public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
+        doAction(player, planet, game, event);
+    }
+
+    public static void doAction(Player player, String planet, Game game) {
         doAction(player, planet, game, null);
     }
 
-    public void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event) {
+    public static void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
 

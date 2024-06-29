@@ -121,10 +121,24 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.context.ButtonContext;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Leader;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.*;
+import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.ExploreModel;
+import ti4.model.FactionModel;
+import ti4.model.RelicModel;
+import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -159,22 +173,25 @@ public class ButtonListener extends ListenerAdapter {
     public void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
-        Player player = context.player;
-        String buttonID = context.buttonID;
-        String messageID = context.messageID;
-        Game game = context.game;
-        MessageChannel privateChannel = context.privateChannel;
-        MessageChannel mainGameChannel = context.mainGameChannel;
-        MessageChannel actionsChannel = context.actionsChannel;
+        Player player = context.getPlayer();
+        String buttonID = context.getButtonID();
+        String messageID = context.getMessageID();
+        Game game = context.getGame();
+        MessageChannel privateChannel = context.getPrivateChannel();
+        MessageChannel mainGameChannel = context.getMainGameChannel();
+        MessageChannel actionsChannel = context.getActionsChannel();
+
+        // hacking
+        Player nullable = player;
 
         // Setup some additional helper values for buttons
         String buttonLabel = event.getButton().getLabel();
         String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
-        String finsFactionCheckerPrefix = player == null ? "FFCC_nullPlayer_" : player.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = nullable == null ? "FFCC_nullPlayer_" : nullable.getFinsFactionCheckerPrefix();
         String trueIdentity = null;
         String fowIdentity = null;
         String ident = null;
-        if (player != null) {
+        if (nullable != null) {
             trueIdentity = player.getRepresentation(true, true);
             fowIdentity = player.getRepresentation(false, true);
             ident = player.getFactionEmoji();
@@ -732,7 +749,7 @@ public class ButtonListener extends ListenerAdapter {
                     setStatus = false;
                 }
             }
-            if (player != null && player.getSCs().contains(scNum)) {
+            if (nullable != null && player.getSCs().contains(scNum)) {
                 String message = player.getRepresentation() + " you currently hold this SC card and therefore should not be spending a CC here.\nYou can override this protection by running `/player stats strategy_cc:-1`";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 return;
@@ -1003,7 +1020,7 @@ public class ButtonListener extends ListenerAdapter {
                 p2 = game.getPlayerFromColorOrFaction(faction);
             }
 
-            new PlanetRefresh().doAction(p2, planetName, game);
+            PlanetRefresh.doAction(p2, planetName, game);
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event.getMessage().getActionRows()) {
                 List<ItemComponent> buttonRow = row.getComponents();
@@ -1231,7 +1248,7 @@ public class ButtonListener extends ListenerAdapter {
             if (buttonID.split("_").length > 2) {
                 whatIsItFor = buttonID.split("_")[2];
             }
-            new PlanetExhaust().doAction(player, planetName, game);
+            PlanetExhaust.doAction(player, planetName, game);
             player.addSpentThing(planetName);
 
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
@@ -2173,7 +2190,7 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
         } else if (buttonID.startsWith("planetAbilityExhaust_")) {
             String planet = buttonID.replace("planetAbilityExhaust_", "");
-            PlanetExhaustAbility.doAction(player, planet, game, true);
+            PlanetExhaustAbility.doAction(event, player, planet, game, true);
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("garboziaAbilityExhaust_")) {
             String planet = "garbozia";
@@ -2230,7 +2247,7 @@ public class ButtonListener extends ListenerAdapter {
             game.getMiltyDraftManager().doMiltyPick(event, game, buttonID, player);
         } else if (buttonID.startsWith("showMiltyDraft")) {
             game.getMiltyDraftManager().repostDraftInformation(game);
-        } else if (player != null && buttonID.startsWith("miltyFactionInfo_")) {
+        } else if (nullable != null && buttonID.startsWith("miltyFactionInfo_")) {
             String remainOrPicked = buttonID.replace("miltyFactionInfo_", "");
             List<FactionModel> displayFactions = new ArrayList<>();
             switch (remainOrPicked) {
@@ -2509,7 +2526,7 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
-            if(msg.contains("Lightning")){
+            if (msg.contains("Lightning")) {
                 msg = msg + " Drives to boost the move value of each unit not transporting fighters or infantry by 1";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -4533,7 +4550,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
 
                     if (!failed) {
-                        new PlanetRefresh().doAction(player, planetName, game);
+                        PlanetRefresh.doAction(player, planetName, game);
                         message = message + "Readied " + planetName;
                         ButtonHelper.addReaction(event, false, false, message, "");
                         ButtonHelper.deleteMessage(event);
