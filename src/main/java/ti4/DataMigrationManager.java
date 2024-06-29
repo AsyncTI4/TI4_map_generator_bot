@@ -613,7 +613,7 @@ public class DataMigrationManager {
 
                 if (changesMade) {
                     migrationsAppliedThisTime.add(game.getName());
-                    GameSaveLoadManager.saveMap(game);
+                    GameSaveLoadManager.saveMap(game, "Data Migration - " + migrationName);
                 }
             }
         }
@@ -782,5 +782,4 @@ public class DataMigrationManager {
         }
         return false;
     }
-
 }

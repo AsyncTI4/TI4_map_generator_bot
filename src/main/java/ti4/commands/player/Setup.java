@@ -158,7 +158,7 @@ public class Setup extends PlayerSubcommandData {
                 continue;
             }
             String planetResolved = AliasHandler.resolvePlanet(planet.toLowerCase());
-            new PlanetAdd().doAction(player, planetResolved, game);
+            PlanetAdd.doAction(player, planetResolved, game, event);
             player.refreshPlanet(planetResolved);
         }
 

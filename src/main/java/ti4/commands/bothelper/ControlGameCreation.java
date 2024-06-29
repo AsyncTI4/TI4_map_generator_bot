@@ -31,7 +31,6 @@ public class ControlGameCreation extends BothelperSubcommandData {
             mapreference.setStoredValue("allowedButtonPress", "true");
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set game creation button presses as allowed");
         }
-        GameSaveLoadManager.saveMap(mapreference);
-
+        GameSaveLoadManager.saveMap(mapreference, "Updated Setting");
     }
 }
