@@ -812,8 +812,8 @@ public class Constants {
     public static final String HS_TILE_POSITION = "hs_tile_position";
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
-    public static final String ATTACHMENT_IIHQ_1 = "token_custodiavigilia_1.png";
-    public static final String ATTACHMENT_IIHQ_2 = "token_custodiavigilia_2.png";
+    public static final String ATTACHMENT_IIHQ_1 = "attachment_custodiavigilia_1.png";
+    public static final String ATTACHMENT_IIHQ_2 = "attachment_custodiavigilia_2.png";
     public static final String TERRAFORM = "terraform";
     public static final String CUSTODIAN_TOKEN = "custodian";
     public static final String CONSULATE_TOKEN = "consulate";

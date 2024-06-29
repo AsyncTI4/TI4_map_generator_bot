@@ -1233,7 +1233,7 @@ public class Player {
                     }
                 }
             }
-            if (hasUnit("bentor_mech")) {
+            if (hasUnit("bentor_mech") && firstTime > 0) {
                 int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true);
                 List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
                 String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
