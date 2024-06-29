@@ -39,6 +39,7 @@ public class SetHomeSystemPosition extends FrankenSubcommandData {
                 MessageHelper.sendMessageToEventChannel(event, "Invalid tile position.");
             } else {
                 player.setHomeSystemPosition(hsTileString);
+                player.setPlayerStatsAnchorPosition(hsTileString);
                 MessageHelper.sendMessageToEventChannel(event, "Home system set to " + hsTile.getRepresentation() + " for " + player.getRepresentation());
             }
         }
