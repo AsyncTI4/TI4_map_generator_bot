@@ -1266,6 +1266,8 @@ public class ButtonHelperFactionSpecific {
             if (Constants.MECATOLS.contains(mecatol.getName())) {
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_2);
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken("token_custodiavigilia_1.png");
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken("token_custodiavigilia_2.png");
 
                 for (Player player : game.getRealPlayers()) {
                     if (!player.hasTech("iihq")) continue;

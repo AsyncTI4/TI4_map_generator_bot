@@ -22,7 +22,7 @@ public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> stage1, stage2, secrets, actionCards, agendas, techs, relics, explores, scenarios;
+    private ChoiceSetting<DeckModel> stage1, stage2, secrets, actionCards, agendas, techs, relics, explores;
     private ChoiceSetting<StrategyCardSetModel> stratCards;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ public class DeckSettings extends SettingsMenu {
         techs = deckChoice("Techs", "Technology Deck", "technology", Emojis.NonUnitTechSkip);
         relics = deckChoice("Relics", "Relic Deck", "relic", Emojis.Relic);
         explores = deckChoice("Explores", "Explore Decks", "explore", Emojis.Frontier);
-        scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
+        //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
 
         // Initialize strat cards to default values
         stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "te");
@@ -74,7 +74,7 @@ public class DeckSettings extends SettingsMenu {
             techs.initialize(json.get("techs"));
             relics.initialize(json.get("relics"));
             explores.initialize(json.get("explores"));
-            scenarios.initialize(json.get("scenarios"));
+            //scenarios.initialize(json.get("scenarios"));
             stratCards.initialize(json.get("stratCards"));
         }
     }
