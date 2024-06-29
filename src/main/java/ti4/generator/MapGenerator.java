@@ -2025,7 +2025,7 @@ public class MapGenerator {
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             TechnologyModel techModel = Mapper.getTech(tech);
-            String techType = techModel.getType().toString();
+            String techType = techModel.getFirstType().toString();
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techType = game.getStoredValue("colorChange" + tech);
             }

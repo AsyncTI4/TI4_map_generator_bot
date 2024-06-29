@@ -873,6 +873,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
             writer.write(System.lineSeparator());
+            writer.write(Constants.TECH_PURGED + " " + String.join(",", player.getPurgedTechs()));
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
             writer.write(System.lineSeparator());
@@ -2342,6 +2344,7 @@ public class GameSaveLoadManager {
                 case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
+                case Constants.TECH_PURGED -> player.setPurgedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
                 case Constants.MAHACT_CC -> player.setMahactCC(getCardList(tokenizer.nextToken()));

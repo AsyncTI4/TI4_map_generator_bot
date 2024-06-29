@@ -8289,8 +8289,7 @@ public class ButtonHelper {
             }
             TechnologyModel techRep = Mapper.getTechs().get(tech);
             String techName = techRep.getName();
-            TechnologyType techType = techRep.getType();
-            String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+            String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
             if (techText.contains("ACTION") || (tech.equalsIgnoreCase("det") && game.isAgeOfExplorationMode())) {
@@ -9441,8 +9440,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID,
-        Game game) {
+    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID, Game game) {
         String trueOrFalse = buttonID.split("_")[1];
         String distanceOrAgenda = buttonID.split("_")[2];
         if ("true".equals(trueOrFalse)) {
@@ -9453,7 +9451,7 @@ public class ButtonHelper {
                     for (Player player2 : game2.getRealPlayers()) {
                         if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                             player2.setPreferenceForDistanceBasedTacticalActions(true);
-                            GameSaveLoadManager.saveMap(game2);
+                            GameSaveLoadManager.saveMap(game2, player2.getUserName() + " Updated Player Settings");
                         }
                     }
                 }
@@ -9468,7 +9466,7 @@ public class ButtonHelper {
                     for (Player player2 : game2.getRealPlayers()) {
                         if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                             player2.setPreferenceForDistanceBasedTacticalActions(false);
-                            GameSaveLoadManager.saveMap(game2);
+                            GameSaveLoadManager.saveMap(game2, player2.getUserName() + " Updated Player Settings");
                         }
                     }
                 }
