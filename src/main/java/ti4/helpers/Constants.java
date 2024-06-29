@@ -23,6 +23,10 @@ public class Constants {
         return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
     }
 
+    // Tourney Winners
+    public static final String cal1nos = "740848810749722646";
+    public static List<String> tourneyWinners = List.of(cal1nos);
+
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
