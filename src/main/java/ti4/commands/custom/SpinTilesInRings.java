@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -135,7 +134,6 @@ public class SpinTilesInRings extends CustomSubcommandData {
       game.setTile(tile);
     }
     game.rebuildTilePositionAutoCompleteList();
-    DisplayType displayType = DisplayType.map;
     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Spun the rings");
   }
 }

@@ -96,6 +96,9 @@ public class ImageHelper {
             if (image == null) {
                 return null;
             }
+            if (width == height) {
+                image = square(image);
+            }
             return scale(image, width, height);
         });
     }
@@ -144,6 +147,15 @@ public class ImageHelper {
         int newY = (newSize - originalImage.getHeight()) / 2;
         outputImage.getGraphics().drawImage(originalImage, newX, newY, null);
         return outputImage;
+    }
+
+    public static BufferedImage createOrLoadCalculatedImage(String key, Function<String, BufferedImage> loader) {
+        try {
+            return fileImageCache.get(key, loader);
+        } catch (Exception e) {
+            BotLogger.log("Unable to load from image cache.", e);
+        }
+        return null;
     }
 
     private static BufferedImage getOrLoadStaticImage(String key, Function<String, BufferedImage> loader) {

@@ -71,7 +71,7 @@ public class TechExhaust extends TechAddRemove {
                 game.setStoredValue(player.getFaction() + "graviton", "true");
                 deleteTheOneButtonIfButtonEvent(event);
             }
-            
+
             case "dsbenty" -> {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted merged replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
                 deleteTheOneButtonIfButtonEvent(event);
@@ -236,8 +236,7 @@ public class TechExhaust extends TechAddRemove {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
                 String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator

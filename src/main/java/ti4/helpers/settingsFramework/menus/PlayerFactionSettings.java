@@ -1,22 +1,21 @@
 package ti4.helpers.settingsFramework.menus;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import ti4.generator.Mapper;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
-import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.helpers.settingsFramework.settings.ListSetting;
+import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.FactionModel;
@@ -24,8 +23,6 @@ import ti4.model.Source.ComponentSource;
 
 // This is a sub-menu
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -35,16 +32,13 @@ public class PlayerFactionSettings extends SettingsMenu {
     private ListSetting<FactionModel> banFactions, priFactions;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // Overridden Implementation
+    // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    @Override
-    public void finishInitialization(Game game, SettingsMenu parent) {
-        this.menuId = "players";
-        this.menuName = "Players and Factions";
-        this.description = "Adjust which players are actually playing, draft order, and stuff like that";
+    public PlayerFactionSettings(Game game, JsonNode json, SettingsMenu parent) {
+        super("players", "Players and Factions", "Adjust which players are actually playing, draft order, and stuff like that", parent);
 
-        // Initialize defaults, including any values loaded from JSON
-        presetDraftOrder = new BooleanSetting("StaticOrder", "static draft order", false, presetDraftOrder);
+        // Initialize Settings to default values
+        presetDraftOrder = new BooleanSetting("StaticOrder", "static draft order", false);
 
         // Initialize values & keys for gamePlayers
         Set<Entry<String, Player>> allPlayers = game.getPlayers().entrySet();
@@ -53,32 +47,44 @@ public class PlayerFactionSettings extends SettingsMenu {
         gamePlayers = new ListSetting<>("Players", "Players playing", "Add player", "Remove player", allPlayers, players, defaultPlayers);
 
         // Initialize values & keys for ban/priority factions
-        List<ComponentSource> sources = new ArrayList<>(Arrays.asList(ComponentSource.pok, ComponentSource.base, ComponentSource.codex3));
-        Set<Entry<String, FactionModel>> allFactions = Mapper.getFactions().stream()
-            .filter(model -> sources.contains(model.getSource()))
-            .collect(Collectors.toMap(f -> f.getAlias(), f -> f)).entrySet();
-        Set<String> defaultFactions = new HashSet<>();
-        Set<String> bannedFactions = Optional.ofNullable(banFactions).map(ListSetting::getKeys).orElse(defaultFactions);
-        Set<String> priorityFactions = Optional.ofNullable(priFactions).map(ListSetting::getKeys).orElse(defaultFactions);
-        banFactions = new ListSetting<>("BanFactions", "Banned factions", "Ban faction", "Unban faction", allFactions, bannedFactions, defaultFactions);
-        priFactions = new ListSetting<>("PriFactions", "Prioritized factions", "Prioritize faction", "Unprioritize faction", allFactions, priorityFactions, defaultFactions);
+        Set<String> empty = new HashSet<>();
+        Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
+        banFactions = new ListSetting<>("BanFactions", "Banned factions", "Ban faction", "Unban faction", allFactions, empty, empty);
+        priFactions = new ListSetting<>("PriFactions", "Prioritized factions", "Prioritize faction", "Unprioritize faction", allFactions, empty, empty);
 
-        // Set up some other data
-        banFactions.setShow(FactionModel::getAlias);
-        gamePlayers.setShow(Player::getUserName);
-        priFactions.setShow(FactionModel::getAlias);
-
+        // Emojis
         banFactions.setGetEmoji(FactionModel::getFactionEmoji);
         priFactions.setGetEmoji(FactionModel::getFactionEmoji);
 
+        // Other Initialization
+        banFactions.setShow(FactionModel::getAlias);
+        gamePlayers.setShow(Player::getUserName);
+        priFactions.setShow(FactionModel::getAlias);
+        priFactions.setExtraInfo("These factions will be included in the draft first!");
         presetDraftOrder.setExtraInfo("Use `/game set_order` to change the draft order before starting");
 
-        super.finishInitialization(game, parent);
+        // Finish initializing transient settings here
+        updateTransientSettings();
+
+        // Get the correct JSON node for initialization if applicable.
+        // Add additional names here to support new generated JSON as needed.
+        if (json != null && json.has("playerSettings")) json = json.get("playerSettings");
+
+        // Verify this is the correct JSON node and continue initialization
+        List<String> historicIDs = new ArrayList<>(List.of("players"));
+        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+            presetDraftOrder.initialize(json.get("presetDraftOrder"));
+            gamePlayers.initialize(json.get("gamePlayers"));
+            banFactions.initialize(json.get("banFactions"));
+            priFactions.initialize(json.get("priFactions"));
+        }
     }
 
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Overridden Implementation
+    // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        updateTransientSettings();
         List<SettingInterface> ls = new ArrayList<SettingInterface>();
         ls.add(gamePlayers);
         ls.add(presetDraftOrder);
@@ -87,7 +93,8 @@ public class PlayerFactionSettings extends SettingsMenu {
         return ls;
     }
 
-    public void updateTransientSettings() {
+    @Override
+    protected void updateTransientSettings() {
         if (parent instanceof MiltySettings m) {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
             Map<String, FactionModel> allFactions = Mapper.getFactions().stream()

@@ -364,7 +364,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sb.append(
                 "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
-            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
+            sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 1)).append("\n");
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
@@ -449,14 +449,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
     @Nullable
     private static Guild getNextAvailableServer() {
         List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
-        
+
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
         Guild guild = AsyncTI4DiscordBot.jda
             .getGuildById(GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
                 AsyncTI4DiscordBot.guildPrimary.getId()));
 
-        
         int index = guilds.indexOf(guild);
         if (index == -1) { // NOT FOUND
             BotLogger.log("`CreateGameChannels.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");

@@ -1,9 +1,12 @@
 package ti4;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import lombok.NonNull;
+import net.dv8tion.jda.api.audit.ActionType;
+import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
@@ -32,7 +35,19 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@NonNull GuildMemberRemoveEvent event) {
         try {
-            checkIfUserLeftActiveGames(event.getGuild(), event.getUser());
+            event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
+                boolean voluntary = true;
+                for (AuditLogEntry log : logs) {
+                    if (log.getTargetIdLong() == event.getUser().getIdLong()) {
+                        if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
+                            voluntary = false;
+                            break;
+                        }
+                    }
+                }
+
+                checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
+            });
         } catch (Exception e) {
             BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
         }
@@ -41,22 +56,21 @@ public class UserJoinServerListener extends ListenerAdapter {
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Game> mapsJoined = new ArrayList<>();
         for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
-            if (game.getGuild() != null && game.getGuild().equals(guild) && game.getPlayers().containsKey(user.getId())) {
+            Guild gameGuild = game.getGuild();
+            if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
                 Helper.fixGameChannelPermissions(guild, game);
                 if (game.getBotMapUpdatesThread() != null) {
                     game.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
                 }
-                checkIfCanCloseGameLaunchThread(game);
             }
         }
         if (!mapsJoined.isEmpty()) {
             for (Game g : mapsJoined) {
                 String gameMessage = user.getAsMention() + " has joined the server!";
                 MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
+                checkIfCanCloseGameLaunchThread(g);
             }
-            // Should be obsolete now
-            // BotLogger.log("User: *" + user.getName() + "* joined server: **" + guild.getName() + "**. Maps joined: " + mapsJoined.stream().map(Game::getName).toList());
         }
     }
 
@@ -79,33 +93,46 @@ public class UserJoinServerListener extends ListenerAdapter {
         if (threadChannel == null) {
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "All users have now joined the server! Let the games begin!");
+        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), game.getPing() + " all users have now joined the server! Let the games begin!");
         MessageHelper.sendMessageToChannel(threadChannel, "All users have joined the game, this thread will now be closed.");
         threadChannel.getManager().setArchived(true).queue();
     }
 
-    private void checkIfUserLeftActiveGames(Guild guild, User user) {
+    private void checkIfUserLeftActiveGames(Guild guild, User user, boolean voluntary) {
         List<Game> gamesQuit = new ArrayList<>();
         for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
             if (game.isHasEnded()) continue;
-            if (game.getGuild() != null && game.getGuild().equals(guild) && game.getPlayers().containsKey(user.getId())) {
+            Guild gameGuild = game.getGuild();
+            if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 gamesQuit.add(game);
             }
         }
         if (!gamesQuit.isEmpty()) {
             String msg = "User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:";
             for (Game g : gamesQuit) {
-                String gameMessage = "Attention " + g.getPing() + ": " + user.getName() + " has left the server.";
+                String gameMessage = "Attention " + g.getPing() + ": " + user.getName();
+                if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you can make ";
+                if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
+                gameMessage += "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
                 MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
                 msg += "\n> " + g.getName() + " -> Link:" + g.getTableTalkChannel().getJumpUrl();
+            }
+            String inviteBack = Helper.getGuildInviteURL(guild, 1);
+            String primaryInvite = Helper.getGuildInviteURL(AsyncTI4DiscordBot.guildPrimary, 1, true);
+            String usermsg = "It looks like you left a server while playing in `" + gamesQuit.size() + "` games.";
+            usermsg += " Please consider making a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player.\n\n";
+            usermsg += "If this was a mistake, here is an invite back to the server you just left: " + inviteBack + "\n";
+            usermsg += "If you are just taking a break, here is an invite to the HUB server that will last until you're ready to come back: " + primaryInvite + "\n\n";
+            usermsg += "Take care!\n> - Async TI4 Admin Team";
+            if (voluntary) {
+                MessageHelper.sendMessageToUser(usermsg, user);
             }
             reportUserLeftServer(msg);
         }
     }
 
     private static void reportUserLeftServer(String message) {
-        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-            .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
         if (bothelperLoungeChannel == null)
             return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();

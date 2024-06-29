@@ -1220,15 +1220,14 @@ public class ButtonHelperAbilities {
             }
             if (!player.hasAbility("council_patronage"))
                 continue;
-                ButtonHelperStats.gainTGs(event, game, player, 1, true);
-                ButtonHelperStats.replenishComms(event, game, player, true);
+            ButtonHelperStats.gainTGs(event, game, player, 1, true);
+            ButtonHelperStats.replenishComms(event, game, player, true);
             StringBuilder sb = new StringBuilder(player.getRepresentation(true, true));
             sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm);
             sb.append(" commodities have been replenished and you have gained 1 ").append(Emojis.getTGorNomadCoinEmoji(game));
             sb.append(" trade good (").append(player.getTg() - 1).append(" -> ").append(player.getTg()).append(")");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
-            
         }
     }
 
@@ -1440,15 +1439,14 @@ public class ButtonHelperAbilities {
             player.getRepresentation(true, true) + " use buttons to resolve indoctrination", options);
     }
 
-    public static void resolveFollowUpIndoctrinationQuestion(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveFollowUpIndoctrinationQuestion(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 " + unit + " " + planet, game);
-        for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
-                continue;
+        for (Player p2 : game.getPlayers().values()) {
+            if (p2.getColor() == null || p2 == player) {
+                continue; // fix indoctrinate vs neutral
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
                 new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry " + planet, game);

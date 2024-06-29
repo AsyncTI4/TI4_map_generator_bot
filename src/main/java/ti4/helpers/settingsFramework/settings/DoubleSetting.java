@@ -3,63 +3,71 @@ package ti4.helpers.settingsFramework.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@JsonIncludeProperties({ "id", "val" })
 public class DoubleSetting extends SettingInterface {
-    // Will show up in json
-    public double val;
-    // Will not show up in json
-    private static double eps = 0.01;
+    private double val;
     private double defaultValue;
     private double min;
     private double max;
     private double delta;
+    private static final double eps = 0.01; // needed to deal with floating point errors
 
-    public DoubleSetting(String id, String name, double defaultValue, double min, double max, double delta, DoubleSetting value) {
-        this.val = value == null ? defaultValue : value.val;
+    public DoubleSetting(String id, String name, double defaultValue, double min, double max, double delta) {
+        super(id, name);
 
-        this.id = id;
-        this.name = name;
-        this.defaultValue = defaultValue;
+        this.defaultValue = this.val = defaultValue;
         this.min = min;
         this.max = max;
         this.delta = delta;
     }
 
-    // Abstract methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Abstract Methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    protected void init(JsonNode json) {
+        if (json.has("val")) val = json.get("val").asDouble(val);
+    }
+
     public String modify(GenericInteractionCreateEvent event, String action) {
         if (action.equals("inc" + id)) return increment();
         if (action.equals("dec" + id)) return decrement();
         return "[invalid action: " + action + "]";
     }
 
-    protected List<Button> buttons(String idPrefix) {
-        Button inc = Button.success(idPrefix + "inc" + id, "Increase " + name).withEmoji(emojiUp);
-        Button dec = Button.danger(idPrefix + "dec" + id, "Decrease " + name).withEmoji(emojiDown);
-        List<Button> ls = new ArrayList<>();
-        if (val - delta >= min - eps) ls.add(dec);
-        if (val + delta <= max + eps) ls.add(inc);
-        return ls;
-    }
-
     public void reset() {
         val = defaultValue;
     }
 
-    public String shortValue() {
+    protected String shortValue() {
         return "" + val;
     }
 
-    public String longValue() {
+    protected String longValue() {
         return val + " *(limits=[" + min + "-" + max + "], default=" + defaultValue + ")*";
     }
 
-    // Helper methods
+    protected List<Button> buttons(String idPrefix) {
+        Button inc = Button.success(idPrefix + "inc" + id, "Increase " + name).withEmoji(emojiUp);
+        Button dec = Button.danger(idPrefix + "dec" + id, "Decrease " + name).withEmoji(emojiDown);
+        List<Button> ls = new ArrayList<>();
+        if (val + delta <= max + eps) ls.add(inc);
+        if (val - delta >= min - eps) ls.add(dec);
+        return ls;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Helper Methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
     public String increment() {
         if (val + delta > max + eps) return String.format("[%s cannot go above %0.1f]", name, max);
         val += delta;
