@@ -20,10 +20,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -2887,19 +2887,12 @@ public class Helper {
             .collect(Collectors.toSet());
     }
 
-    public static String getGuildInviteURL(Guild guild) {
-        List<Invite> invites = guild.retrieveInvites().complete();
-        String inviteUrl = null;
-        if (invites != null && !invites.isEmpty()) {
-            inviteUrl = invites.get(0).getUrl();
-            if(inviteUrl.contains("VFNGGKZ9")){
-                inviteUrl = null;
-            }
-        }
-        if (inviteUrl == null) {
-            inviteUrl = guild.getDefaultChannel().createInvite().complete().getUrl();
-        }
-        return inviteUrl;
+    public static String getGuildInviteURL(Guild guild, int uses) {
+        return getGuildInviteURL(guild, uses, false);
+    }
+
+    public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
+        return guild.getDefaultChannel().createInvite().setMaxUses(uses).setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS).complete().getUrl();
     }
 
     public static String getTimeRepresentationToSeconds(long totalMillis) {

@@ -97,14 +97,16 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
         List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         boolean sendInviteLink = false;
+        int count = 0;
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
                 MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
                 sendInviteLink = true;
+                count++;
             }
         }
         if (sendInviteLink) {
-            MessageHelper.sendMessageToEventChannel(event, Helper.getGuildInviteURL(guild));
+            MessageHelper.sendMessageToEventChannel(event, Helper.getGuildInviteURL(guild, count + 1));
             return;
         }
 

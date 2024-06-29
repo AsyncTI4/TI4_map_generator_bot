@@ -6146,7 +6146,6 @@ public class ButtonHelper {
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
         ButtonHelper.offerEveryoneTitlePossibilities(game);
-        String name = game.getName();
         MapGenerator.saveImage(game, DisplayType.all, event)
             .thenAccept(fileUpload -> {
                 StringBuilder message = new StringBuilder();
@@ -6199,7 +6198,10 @@ public class ButtonHelper {
                     }
                 }
             });
+    }
 
+    public static void secondHalfOfRematch(GenericInteractionCreateEvent event, Game game) {
+        String name = game.getName();
         int charValue = name.charAt(name.length() - 1);
         String present = name.substring(name.length() - 1);
         String next = String.valueOf((char) (charValue + 1));
@@ -6219,6 +6221,9 @@ public class ButtonHelper {
                 }
             }
         }
+
+        TextChannel tableTalkChannel = game.getTableTalkChannel();
+        TextChannel actionsChannel = game.getMainGameChannel();
         if (gameRole != null) {
             gameRole.getManager().setName(newName).queue();
         } else {
@@ -6232,9 +6237,11 @@ public class ButtonHelper {
                     guild.addRoleToMember(member, gameRole).complete();
                 }
             }
+
+            Set<Permission> allow = Set.of(Permission.MESSAGE_MANAGE, Permission.VIEW_CHANNEL);
+            tableTalkChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
+            actionsChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
         }
-        TextChannel tableTalkChannel = game.getTableTalkChannel();
-        TextChannel actionsChannel = game.getMainGameChannel();
 
         // CLOSE THREADS IN CHANNELS
         if (tableTalkChannel != null) {
@@ -6329,9 +6336,7 @@ public class ButtonHelper {
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Button.danger("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(actionsChannel,
-            "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons",
-            buttons2);
+        MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons", buttons2);
         GameSaveLoadManager.saveMap(newGame, event);
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
@@ -7480,12 +7485,9 @@ public class ButtonHelper {
                     for (String techID : list.split("-")) {
                         buttons.add(Button.success("purgeTech_" + techID, "Purge " + Mapper.getTech(techID).getName()));
                     }
-                    String msg = p2.getRepresentation(true, true)
-                        + " due to zealots hero, you have to purge 2 techs. Use buttons to purge ";
-                    MessageHelper.sendMessageToChannel(getCorrectChannel(p2, game),
-                        msg + "the first tech", buttons);
-                    MessageHelper.sendMessageToChannel(getCorrectChannel(p2, game),
-                        msg + "the second tech", buttons);
+                    String msg = p2.getRepresentation(true, true) + " due to zealots hero, you have to purge 2 techs. Use buttons to purge ";
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg + "the first tech", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p2, game), msg + "the second tech", buttons);
                     p2.removeLeader("zealotshero");
                     game.setStoredValue("zealotsHeroTechs", "");
                 }
@@ -7518,8 +7520,7 @@ public class ButtonHelper {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "# Exhausted all tech skip planets due to that one agenda");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Exhausted all tech skip planets due to that one agenda");
         }
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             game.setStoredValue("agendaChecksNBalancesAgainst", "");
@@ -7653,13 +7654,12 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void endTurnWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID){
+    public static void endTurnWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String sc = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),game.getPing() + " the active player has elected to end turn once everyone has resolved SC #"+sc+". Please resolve it as soon as possible so the game can progress");
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " the active player has elected to end turn once everyone has resolved SC #" + sc + ". Please resolve it as soon as possible so the game can progress");
         game.setTemporaryPingDisable(true);
-        game.setStoredValue("endTurnWhenSCFinished", sc+player.getFaction());
+        game.setStoredValue("endTurnWhenSCFinished", sc + player.getFaction());
         ButtonHelper.deleteTheOneButton(event);
-        
     }
 
     public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
@@ -7802,7 +7802,7 @@ public class ButtonHelper {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                         player2.setHoursThatPlayerIsAFK(afkTimes);
-                        GameSaveLoadManager.saveMap(game);
+                        GameSaveLoadManager.saveMap(game, player2.getUserName() + " Updated Player Settings");
                     }
                 }
             }
@@ -8685,7 +8685,7 @@ public class ButtonHelper {
                 game.setStoredValue(messageId, player.getFaction());
             }
 
-            new ButtonListener().checkForAllReactions(event, game);
+            ButtonListener.checkForAllReactions(event, game);
             if (message == null || message.isEmpty()) {
                 return;
             }
@@ -8746,7 +8746,7 @@ public class ButtonHelper {
                     } else {
                         game.setStoredValue(messageId, player.getFaction());
                     }
-                    new ButtonListener().checkForAllReactions(messageId, game);
+                    ButtonListener.checkForAllReactions(messageId, game);
                     if (message == null || message.isEmpty()) {
                         return;
                     }
@@ -8889,7 +8889,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (sc) {
             game.setComponentAction(false);
-            boolean used = new ButtonListener().addUsedSCPlayer(messageID, game, player, event, "");
+            boolean used = ButtonListener.addUsedSCPlayer(messageID, game, player, event, "");
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology") && !player.getFollowedSCs().contains(scModel.getInitiative())) {
                 int scNum = scModel.getInitiative();
@@ -8898,7 +8898,7 @@ public class ButtonHelper {
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Tech");
                 }
-                String message = new ButtonListener().deductCC(player, event);
+                String message = ButtonListener.deductCC(player, event);
                 addReaction(event, false, false, message, "");
             }
         } else {

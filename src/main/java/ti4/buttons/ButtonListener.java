@@ -4579,7 +4579,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "getDiplomatsButtons" -> ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, game, player);
                 case "gameEnd" -> {
-                    GameEnd.secondHalfOfGameEnd(event, game, true, true);
+                    GameEnd.secondHalfOfGameEnd(event, game, true, true, false);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "rematch" -> {
