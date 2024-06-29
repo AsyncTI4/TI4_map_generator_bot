@@ -3,42 +3,50 @@ package ti4.helpers.settingsFramework.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@JsonIncludeProperties({ "id", "valLow", "valHigh" })
 public class IntegerRangeSetting extends SettingInterface {
-    // Will show up in json
-    public int valHigh;
-    public int valLow;
-    // Will not show up in json
+    private int valHigh;
     private int defaultHigh;
-    private int defaultLow;
     private int minHigh;
-    private int minLow;
     private int maxHigh;
+
+    private int valLow;
+    private int defaultLow;
+    private int minLow;
     private int maxLow;
+
     private int delta;
 
-    public IntegerRangeSetting(String id, String name, int valLow, int minLow, int maxLow, int valHigh, int minHigh, int maxHigh, int delta, IntegerRangeSetting value) {
-        this.valHigh = value == null ? valHigh : value.valHigh;
-        this.valLow = value == null ? valLow : value.valLow;
+    public IntegerRangeSetting(String id, String name, int valLow, int minLow, int maxLow, int valHigh, int minHigh, int maxHigh, int delta) {
+        super(id, name);
 
-        this.id = id;
-        this.name = name;
-        this.defaultHigh = valHigh;
+        this.defaultHigh = this.valHigh = valHigh;
+        this.defaultLow = this.valLow = valLow;
         this.minHigh = minHigh;
         this.maxHigh = maxHigh;
-        this.defaultLow = valLow;
         this.minLow = minLow;
         this.maxLow = maxLow;
         this.delta = delta;
     }
 
-    // Abstract methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Abstract Methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    protected void init(JsonNode json) {
+        if (json.has("valHigh")) valHigh = json.get("valHigh").asInt(valHigh);
+        if (json.has("valLow")) valLow = json.get("valLow").asInt(valLow);
+    }
+
     public String modify(GenericInteractionCreateEvent event, String action) {
         if (action.equals("incHigh" + id)) return incrementHigh();
         if (action.equals("decHigh" + id)) return decrementHigh();
@@ -47,38 +55,40 @@ public class IntegerRangeSetting extends SettingInterface {
         return "[invalid action: " + action + "]";
     }
 
-    protected List<Button> buttons(String idPrefix) {
-        Button decLow = Button.danger(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
-        Button incLow = Button.success(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
-        Button decHigh = Button.danger(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
-        Button incHigh = Button.success(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
-        List<Button> ls = new ArrayList<>();
-        if (valLow > minLow)
-            ls.add(decLow);
-        if (valLow < maxLow && valLow < valHigh)
-            ls.add(incLow);
-        if (valHigh > minHigh && valHigh > valLow)
-            ls.add(decHigh);
-        if (valHigh < maxHigh)
-            ls.add(incHigh);
-        return ls;
-    }
-
     public void reset() {
         valHigh = defaultHigh;
         valLow = defaultLow;
     }
 
-    public String shortValue() {
+    protected String shortValue() {
         return "[" + valLow + "-" + valHigh + "]";
     }
 
-    public String longValue() {
+    protected String longValue() {
         String def = "[" + defaultLow + "-" + defaultHigh + "]";
         return shortValue() + " *(limits=[" + minLow + "-" + maxHigh + "], default=" + def + ")*";
     }
 
-    // Helper methods
+    protected List<Button> buttons(String idPrefix) {
+        Button incLow = Button.success(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
+        Button decLow = Button.danger(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
+        Button incHigh = Button.success(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
+        Button decHigh = Button.danger(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
+        List<Button> ls = new ArrayList<>();
+        if (valLow < maxLow && valLow < valHigh)
+            ls.add(incLow);
+        if (valLow > minLow)
+            ls.add(decLow);
+        if (valHigh < maxHigh)
+            ls.add(incHigh);
+        if (valHigh > minHigh && valHigh > valLow)
+            ls.add(decHigh);
+        return ls;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Helper Methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
     public String incrementHigh() {
         if (valHigh + delta > maxHigh) return String.format("[max %s cannot go above %u]", name, maxHigh);
         valHigh += delta;

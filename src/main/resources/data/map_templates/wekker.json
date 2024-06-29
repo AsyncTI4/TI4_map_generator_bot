@@ -3,6 +3,7 @@
         "alias": "6pWekkerdraft",
         "author": "Wekker",
         "playerCount": 6,
+        "sliceEmulateTiles": ["310", "308", "309", "207", "208", "105"],
         "templateTiles": [
             { "pos": "000", "staticTileId": "18", "custodians": true },
             { "pos": "301", "playerNumber": 1, "home": true },

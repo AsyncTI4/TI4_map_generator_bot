@@ -82,6 +82,20 @@ public class Source {
                 default -> "";
             };
         }
+
+        public String prettyName() {
+            return switch (this) {
+                case base -> "Twilight Imperium 4th Edition (Base Game)";
+                case pok -> "Prophecy of Kings [Expansion]";
+                case codex1 -> "Codex 1 - Omega Techs";
+                case codex2 -> "Codex 2 - Relics";
+                case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
+                case ds -> "Discordant Stars [Homebrew]";
+                case absol -> "Absol's Mod [Homebrew]";
+                case franken -> "Franken Draft [Homebrew Game Mode]";
+                default -> toString();
+            };
+        }
     }
 
 }
