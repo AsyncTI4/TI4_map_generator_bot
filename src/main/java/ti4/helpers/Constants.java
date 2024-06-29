@@ -534,6 +534,7 @@ public class Constants {
     public static final String SPENT_THINGS = "spent_things";
     public static final String TEAMMATE_IDS = "teammate_ids";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
+    public static final String TECH_PURGED = "tech_purged";
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
