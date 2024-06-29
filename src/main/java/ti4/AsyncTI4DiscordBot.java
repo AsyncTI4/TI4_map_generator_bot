@@ -78,10 +78,10 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
+import ti4.listeners.ModalListener;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.modals.ModalListener;
 import ti4.selections.SelectionManager;
 import ti4.selections.SelectionMenuListener;
 

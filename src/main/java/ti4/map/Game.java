@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -66,6 +67,7 @@ import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -359,6 +361,9 @@ public class Game {
     @Getter
     @Setter
     private MiltySettings miltySettings = null;
+    @Getter
+    @Setter
+    private String miltyJson = null;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -368,8 +373,13 @@ public class Game {
     }
 
     public void finishImport() {
-        if (miltySettings != null) {
-            miltySettings.finishInitialization(this, null);
+        if (miltyJson != null) {
+            try {
+                JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
+                miltySettings = new MiltySettings(this, json);
+            } catch (Exception e) {
+                BotLogger.log("Loading milty settings failed " + Constants.jazzPing(), e);
+            }
         }
     }
 
@@ -583,8 +593,8 @@ public class Game {
 
     public MiltySettings initializeMiltySettings() {
         if (miltySettings == null) {
-            miltySettings = new MiltySettings();
-            miltySettings.finishInitialization(this, null);
+            miltySettings = new MiltySettings(this, null);
+            //miltySettings.finishInitialization(this, null);
         }
         return miltySettings;
     }
@@ -3374,15 +3384,15 @@ public class Game {
 
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
-        if (sources.getAbsol().val) setAbsolMode(true);
+        if (sources.getAbsol().isVal()) setAbsolMode(true);
 
         GameSettings settings = miltySettings.getGameSettings();
-        setVp(settings.getPointTotal().val);
-        setMaxSOCountPerPlayer(settings.getSecrets().val);
-        setUpPeakableObjectives(settings.getStage1s().val, 1);
-        setUpPeakableObjectives(settings.getStage2s().val, 2);
-        setCompetitiveTIGLGame(settings.getTigl().val);
-        setAllianceMode(settings.getAlliance().val);
+        setVp(settings.getPointTotal().getVal());
+        setMaxSOCountPerPlayer(settings.getSecrets().getVal());
+        setUpPeakableObjectives(settings.getStage1s().getVal(), 1);
+        setUpPeakableObjectives(settings.getStage2s().getVal(), 2);
+        setCompetitiveTIGLGame(settings.getTigl().isVal());
+        setAllianceMode(settings.getAlliance().isVal());
 
         if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
             setStoredValue("IslandMode", "true");
@@ -3411,11 +3421,12 @@ public class Game {
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
+
         if (absolMode && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
-            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
+            success &= validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"));
         } else {
-            success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
+            success &= validateAndSetRelicDeck(event, deckSettings.getRelics().getValue());
         }
 
         return success;

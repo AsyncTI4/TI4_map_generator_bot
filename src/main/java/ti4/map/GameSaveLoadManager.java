@@ -706,6 +706,10 @@ public class GameSaveLoadManager {
         if (miltySettings != null) {
             writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
             writer.write(System.lineSeparator());
+        } else if (game.getMiltyJson() != null) {
+            // default to the already stored value, if we failed to read it previously
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+            writer.write(System.lineSeparator());
         }
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
@@ -2157,14 +2161,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case Constants.MILTY_DRAFT_SETTINGS -> {
-                    try {
-                        MiltySettings settings = MiltySettings.readJson(info, MiltySettings.class);
-                        game.setMiltySettings(settings);
-                    } catch (Exception e) {
-                        // Do nothing
-                    }
-                }
+                case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
             }
         }
     }

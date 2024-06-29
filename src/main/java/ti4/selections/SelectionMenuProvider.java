@@ -29,7 +29,7 @@ public class SelectionMenuProvider {
 
     public static void resolveOtherSelectionMenu(SelectionMenuContext context) {
         if (context.menuID.startsWith("jmfN_") || context.menuID.startsWith("jmfA_")) {
-            context.game.initializeMiltySettings().parseSelectionInput(context.getEvent());
+            context.getGame().initializeMiltySettings().parseSelectionInput(context.getEvent());
             deleteMsg(context.getEvent());
         }
     }
