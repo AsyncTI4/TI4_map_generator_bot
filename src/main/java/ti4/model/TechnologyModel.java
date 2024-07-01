@@ -323,6 +323,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         case "dn2" -> output += Emojis.dreadnought;
                         case "ws" -> output += Emojis.warsun;
                         case "fs" -> output += Emojis.flagship;
+                        default -> output += Emojis.flagship;
                     }
                 }
                 default -> {
