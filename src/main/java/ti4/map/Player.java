@@ -137,6 +137,7 @@ public class Player {
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> spentThingsThisWindow = new ArrayList<>();
+    private List<String> transactionItems = new ArrayList<>();
     private List<String> teamMateIDs = new ArrayList<>();
     private Map<String, Integer> producedUnits = new HashMap<>();
     @Getter
@@ -257,6 +258,10 @@ public class Player {
         spentThingsThisWindow = new ArrayList<>();
     }
 
+    public void resetTransactionItems() {
+        transactionItems = new ArrayList<>();
+    }
+
     public Map<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
     }
@@ -265,12 +270,39 @@ public class Player {
         return spentThingsThisWindow;
     }
 
+    public List<String> getTransactionItems() {
+        return transactionItems;
+    }
+
+    public void clearTransactionItemsWith(Player p2) {
+        List<String> newTransactionItems = new ArrayList<>();
+        for (String item : transactionItems) {
+            if (!item.contains("ing" + p2.getFaction())) {
+                newTransactionItems.add(item);
+            }
+        }
+        transactionItems = newTransactionItems;
+    }
+
     public void addSpentThing(String thing) {
         spentThingsThisWindow.add(thing);
     }
 
+    public void addTransactionItem(String thing) {
+        transactionItems.add(thing);
+    }
+
     public void removeSpentThing(String thing) {
         spentThingsThisWindow.remove(thing);
+    }
+
+    public void removeTransactionItem(String thing) {
+        transactionItems.remove(thing);
+    }
+
+    public void replaceTransactionItem(String thingToRemove, String thingToAdd) {
+        removeTransactionItem(thingToRemove);
+        addTransactionItem(thingToAdd);
     }
 
     public int getSpentTgsThisWindow() {
@@ -311,6 +343,10 @@ public class Player {
 
     public void setSpentThings(List<String> things) {
         spentThingsThisWindow = things;
+    }
+
+    public void setTransactionItems(List<String> things) {
+        transactionItems = things;
     }
 
     public void setProducedUnit(String unit, int count) {
@@ -1357,8 +1393,13 @@ public class Player {
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
-                return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
-                    + Emojis.getColorEmojiWithName(getColor());
+                if (ping) {
+                    return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
+                        + Emojis.getColorEmojiWithName(getColor());
+                } else {
+                    return getFactionEmoji() + " " + roleForCommunity.getName() + " "
+                        + Emojis.getColorEmojiWithName(getColor());
+                }
             } else {
                 return getFactionEmoji() + " " + Emojis.getColorEmojiWithName(getColor());
             }
@@ -1827,29 +1868,32 @@ public class Player {
     public void setFollowedSCs(Set<Integer> followedSCs) {
         this.followedSCs = followedSCs;
     }
+
     public void addFollowedSC(Integer sc) {
         followedSCs.add(sc);
     }
 
     public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event) {
         Game game = getGame();
-        
+
         followedSCs.add(sc);
-        if(game != null && game.getActivePlayer() != null){
-            if(game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc+game.getActivePlayer().getFaction())){    
-                for(Player p2 : game.getRealPlayers()){      
-                    if(!p2.hasFollowedSC(sc)){
+        if (game != null && game.getActivePlayer() != null) {
+            if (game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!p2.hasFollowedSC(sc)) {
                         return;
                     }
                 }
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
                 TurnEnd.pingNextPlayer(event, game, p2);
-                ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
+                if (!game.isFoWMode()) {
+                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
                         + game.getRound() + " for " + p2.getFactionEmoji());
+                }
             }
         }
-        
+
     }
 
     public void removeFollowedSC(Integer sc) {

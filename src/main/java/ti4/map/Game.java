@@ -145,6 +145,8 @@ public class Game {
     @ExportableField
     private boolean queueSO = true;
     @ExportableField
+    private boolean newTransactionMethod = true;
+    @ExportableField
     private boolean showBubbles = true;
     @ExportableField
     private boolean showGears = true;
@@ -1236,9 +1238,14 @@ public class Game {
         return showBubbles;
     }
 
+    public boolean getWhetherNewTransactionMethod() {
+        return newTransactionMethod;
+    }
+
     public boolean getShowGears() {
         return showGears;
     }
+
     public boolean getShowBanners() {
         return showBanners;
     }
@@ -1287,9 +1294,14 @@ public class Game {
         showBubbles = onStatus;
     }
 
+    public void setTransactionMethod(boolean onStatus) {
+        newTransactionMethod = onStatus;
+    }
+
     public void setShowGears(boolean onStatus) {
         showGears = onStatus;
     }
+
     public void setShowBanners(boolean onStatus) {
         showBanners = onStatus;
     }
@@ -1646,13 +1658,13 @@ public class Game {
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
-            if(player_.getSCs().size() > 0){
+            if (player_.getSCs().size() > 0) {
                 String scs = "";
-                for(int SC : player_.getSCs()){
+                for (int SC : player_.getSCs()) {
                     scs = scs + SC + "_";
                 }
-                scs =scs.substring(0,scs.length()-1);
-                setStoredValue("Round"+getRound()+"SCPickFor"+player_.getFaction(), scs);
+                scs = scs.substring(0, scs.length() - 1);
+                setStoredValue("Round" + getRound() + "SCPickFor" + player_.getFaction(), scs);
             }
         }
 

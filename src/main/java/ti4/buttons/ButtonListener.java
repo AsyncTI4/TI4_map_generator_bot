@@ -1320,7 +1320,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("demandSomething_")) {
             String player2Color = buttonID.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(player2Color);
-            List<Button> buttons = ButtonHelper.getStuffToTransButtons(game, p2, player);
+            List<Button> buttons = ButtonHelper.getStuffToTransButtonsOld(game, p2, player);
             String message = p2.getRepresentation()
                 + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to " + ButtonHelper.getIdentOrColor(player, game);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
@@ -2543,7 +2543,7 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
-            if(msg.contains("Lightning")){
+            if (msg.contains("Lightning")) {
                 msg = msg + " Drives to boost the move value of each unit not transporting fighters or infantry by 1";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -2712,18 +2712,38 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveGreyfire(player, game, buttonID, event);
         } else if (buttonID.startsWith("concludeMove_")) {
             ButtonHelperTacticalAction.finishMovingForTacticalAction(player, game, event, buttonID);
-        } else if (buttonID.startsWith("transactWith_")) {
-            String faction = buttonID.replace("transactWith_", "");
+        } else if (buttonID.startsWith("transactWith_") || buttonID.startsWith("resetOffer_")) {
+            String faction = buttonID.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            List<Button> buttons = ButtonHelper.getStuffToTransButtons(game, player, p2);
+            player.clearTransactionItemsWith(p2);
+            List<Button> buttons = ButtonHelper.getStuffToTransButtonsOld(game, player, p2);
+            if (!game.isFoWMode() && game.getWhetherNewTransactionMethod()) {
+                buttons = ButtonHelper.getStuffToTransButtonsNew(game, player, player, p2);
+            }
             String message = player.getRepresentation()
-                + " Use the buttons to select what you want to transact";
+                + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             ButtonHelper.checkTransactionLegality(game, player, p2);
             ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("transact_")) {
-            ButtonHelper.resolveSpecificTransButtons(game, player, buttonID, event);
+        } else if (buttonID.startsWith("getNewTransaction_")) {
+            ButtonHelper.getNewTransaction(game, player, buttonID, event);
+        } else if (buttonID.startsWith("rejectOffer_")) {
+            Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+            MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to " + player.getRepresentation() + " has been rejected.");
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("acceptOffer_")) {
+            Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+            Helper.acceptTransactionOffer(p1, player, game, event);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("sendOffer_")) {
+            ButtonHelper.sendOffer(game, player, buttonID, event);
+        } else if (buttonID.startsWith("offerToTransact_")) {
+            ButtonHelper.resolveOfferToTransact(game, player, buttonID, event);
+        } else if (buttonID.startsWith("newTransact_")) {
+            ButtonHelper.resolveSpecificTransButtonsNew(game, player, buttonID, event);
             ButtonHelper.deleteMessage(event);
+        } else if (buttonID.startsWith("transact_")) {
+            ButtonHelper.resolveSpecificTransButtonsOld(game, player, buttonID, event);
         } else if (buttonID.startsWith("play_after_")) {
             String riderName = buttonID.replace("play_after_", "");
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
@@ -2918,7 +2938,7 @@ public class ButtonListener extends ListenerAdapter {
             }
 
         } else if (buttonID.startsWith("send_")) {
-            ButtonHelper.resolveSpecificTransButtonPress(game, player, buttonID, event);
+            ButtonHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("replacePDSWithFS_")) {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, game, player, ident);
@@ -3123,7 +3143,7 @@ public class ButtonListener extends ListenerAdapter {
                         + "You have " + val + " PRODUCTION value in this system";
                     if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                         message = message
-                            + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit";
+                            + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit. ";
                     }
                     if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
                         message = message
@@ -3145,7 +3165,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons = ButtonHelper.getPlayersToTransact(game, player);
                     String message = player.getRepresentation()
                         + " Use the buttons to select which player you wish to transact with";
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
 
                 }
                 case "combatDrones" -> ButtonHelperModifyUnits.offerCombatDroneButtons(event, game, player);

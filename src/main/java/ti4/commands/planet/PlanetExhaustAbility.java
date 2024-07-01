@@ -200,7 +200,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
         } else {
             String buttonID2 = "transact_ACs_" + p2.getFaction();
-            ButtonHelper.resolveSpecificTransButtons(game, player, buttonID2, event);
+            ButtonHelper.resolveSpecificTransButtonsOld(game, player, buttonID2, event);
         }
 
     }

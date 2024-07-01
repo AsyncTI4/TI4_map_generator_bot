@@ -343,7 +343,7 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that dont count towards production limit";
+                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that dont count towards production limit. ";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {

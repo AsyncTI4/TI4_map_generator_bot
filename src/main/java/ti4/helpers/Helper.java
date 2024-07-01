@@ -1268,6 +1268,238 @@ public class Helper {
 
     }
 
+    public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
+
+        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game);
+        List<String> transactionItems = p1.getTransactionItems();
+        List<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
+        for (Player sender : players) {
+            Player receiver = p2;
+            if (sender == p2) {
+                receiver = p1;
+            }
+            for (String item : transactionItems) {
+                if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
+                    String thingToTransact = item.split("_")[2];
+                    String furtherDetail = item.split("_")[3];
+                    int amountToTransact = 1;
+                    if (((thingToTransact.equalsIgnoreCase("ACs") || thingToTransact.equalsIgnoreCase("PNs")) && furtherDetail.contains("generic"))) {
+                        amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
+                        furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
+                    }
+                    String spoofedButtonID = "send_" + thingToTransact + "_" + receiver.getFaction() + "_" + furtherDetail;
+                    switch (thingToTransact) {
+                        case "ACs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    for (int x = 0; x < amountToTransact; x++) {
+                                        String buttonID = "transact_ACs_" + sender.getFaction();
+                                        ButtonHelper.resolveSpecificTransButtonsOld(game, sender, buttonID, event);
+                                    }
+                                }
+                                default -> {
+                                    ButtonHelper.resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                                }
+                            }
+                        }
+                        case "PNs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, p2);
+                                    String message = sender.getRepresentation(true, true)
+                                        + "Please select the PN you would like to send";
+                                    MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
+                                }
+                                default -> {
+                                    ButtonHelper.resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                                }
+                            }
+                        }
+
+                        case "Planets" -> {
+                            ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
+                        }
+                        case "AlliancePlanets" -> {
+                            String exhausted = "exhausted";
+                            if (!furtherDetail.contains(exhausted)) {
+                                exhausted = "refreshed";
+                                furtherDetail.replace(exhausted, "");
+
+                            }
+                            ButtonHelper.resolveAllianceMemberPlanetTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction() + "_" + exhausted);
+                        }
+                        case "dmz" -> {
+                            ButtonHelper.resolveDMZTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
+                        }
+                        default -> {
+                            ButtonHelper.resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                        }
+                    }
+
+                }
+            }
+        }
+        p1.clearTransactionItemsWith(p2);
+        ButtonHelperAbilities.pillageCheck(p2, game);
+        ButtonHelperAbilities.pillageCheck(p1, game);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
+    }
+
+    public static String buildTransactionOffer(Player p1, Player p2, Game game) {
+        List<String> transactionItems = p1.getTransactionItems();
+        String wholeSummary = "";
+        List<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+        for (Player sender : players) {
+            Player receiver = p2;
+            if (sender == p2) {
+                receiver = p1;
+            }
+            String summary = "**" + sender.getRepresentation(false, false) + " gives " + receiver.getRepresentation(false, false) + " the following:**\n";
+            for (String item : transactionItems) {
+                if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
+                    String thingToTransact = item.split("_")[2];
+                    String furtherDetail = item.split("_")[3];
+                    int amountToTransact = 1;
+                    if (thingToTransact.equalsIgnoreCase("tgs") || thingToTransact.contains("Debt") || thingToTransact.equalsIgnoreCase("comms")) {
+                        amountToTransact = Integer.parseInt(furtherDetail);
+                    }
+                    if (thingToTransact.equalsIgnoreCase("frags") || ((thingToTransact.equalsIgnoreCase("PNs") || thingToTransact.equalsIgnoreCase("ACs")) && furtherDetail.contains("generic"))) {
+                        amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
+                        furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
+                    }
+                    switch (thingToTransact) {
+                        case "TGs" -> {
+                            summary = summary + amountToTransact + " " + Emojis.tg + "\n";
+                        }
+                        case "SendDebt" -> {
+                            summary = summary + "Send " + amountToTransact + " debt\n";
+                        }
+                        case "ClearDebt" -> {
+                            summary = summary + "Clear " + amountToTransact + " debt\n";
+                        }
+                        case "Comms" -> {
+                            summary = summary + amountToTransact + " " + Emojis.comm + "\n";
+                        }
+                        case "shipOrders" -> {
+                            summary = summary + Mapper.getRelic(furtherDetail).getName() + Emojis.axis + "\n";
+                        }
+                        case "starCharts" -> {
+                            summary = summary + Mapper.getRelic(furtherDetail).getName() + Emojis.DiscordantStars + "\n";
+                        }
+                        case "ACs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    summary = summary + amountToTransact + " " + Emojis.ActionCard + " to be specified verbally\n";
+                                }
+                                default -> {
+                                    int acNum = Integer.parseInt(furtherDetail);
+                                    String acID = null;
+                                    if (!sender.getActionCards().containsValue(acNum)) {
+                                        continue;
+                                    }
+                                    for (Map.Entry<String, Integer> ac : sender.getActionCards().entrySet()) {
+                                        if (ac.getValue().equals(acNum)) {
+                                            acID = ac.getKey();
+                                        }
+                                    }
+                                    summary = summary + Emojis.ActionCard + " " + Mapper.getActionCard(acID).getName() + "\n";
+                                }
+                            }
+                        }
+                        case "PNs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    summary = summary + amountToTransact + " " + Emojis.PN + " to be specified verbally\n";
+                                }
+                                default -> {
+                                    String id = null;
+                                    int pnIndex;
+                                    try {
+                                        pnIndex = Integer.parseInt(furtherDetail);
+                                        for (Map.Entry<String, Integer> pn : sender.getPromissoryNotes().entrySet()) {
+                                            if (pn.getValue().equals(pnIndex)) {
+                                                id = pn.getKey();
+                                            }
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        id = furtherDetail.replace("fin9", "_");
+                                    }
+                                    if (id == null) {
+                                        continue;
+                                    }
+                                    summary = summary + Emojis.PN + " " + StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")) + " " + Mapper.getPromissoryNote(id).getName() + "\n";
+                                }
+                            }
+                        }
+                        case "Frags" -> {
+                            summary = summary + amountToTransact + " " + getFragEmoji(furtherDetail) + "\n";
+                        }
+                        case "Planets", "AlliancePlanets", "dmz" -> {
+                            summary = summary + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game) + "\n";
+                        }
+                        case "action" -> {
+                            summary = summary + "An in-game " + furtherDetail + " action\n";
+                        }
+                    }
+
+                }
+            }
+            if (StringUtils.countMatches(summary, "\n") > 1) {
+                wholeSummary = wholeSummary + "\n" + summary;
+            } else {
+                wholeSummary = wholeSummary + "\n" + summary + getNothingMessage() + "\n";
+            }
+        }
+
+        return wholeSummary;
+    }
+
+    public static String getFragEmoji(String frag) {
+        frag = frag.toLowerCase();
+        switch (frag) {
+            case "crf":
+                return Emojis.CFrag;
+            case "irf":
+                return Emojis.IFrag;
+            case "hrf":
+                return Emojis.HFrag;
+        }
+        return Emojis.UFrag;
+    }
+
+    public static String getNothingMessage() {
+        int result = ThreadLocalRandom.current().nextInt(1, 11);
+        switch (result) {
+            case 1:
+                return "Nothing";
+            case 2:
+                return "Pocket Lint";
+            case 3:
+                return "Sunshine and Rainbows";
+            case 4:
+                return "A Feeling of Accomplishment";
+            case 5:
+                return "A Crisp High Five";
+            case 6:
+                return "A Good Night Sleep";
+            case 7:
+                return "Heartfelt Thanks";
+            case 8:
+                return "The Best Vibes";
+            case 9:
+                return "A Stroter Blessing";
+            case 10:
+                return "Good Karma";
+        }
+        return "Nothing";
+    }
+
     public static String buildSpentThingsMessage(Player player, Game game, String resOrInfOrBoth) {
         List<String> spentThings = player.getSpentThingsThisWindow();
         String msg = player.getFactionEmoji() + " exhausted the following: \n";
@@ -1534,7 +1766,7 @@ public class Helper {
                 planetUnitVal = 2;
             }
 
-            if (token.contains("automatons")&& planetUnitVal < 3) {
+            if (token.contains("automatons") && planetUnitVal < 3) {
                 productionValueTotal = productionValueTotal - planetUnitVal;
                 planetUnitVal = 3;
                 productionValueTotal = productionValueTotal + 3;
@@ -1579,8 +1811,6 @@ public class Helper {
                 productionValueTotal++;
             }
         }
-
-        
 
         return productionValueTotal;
 
@@ -2939,7 +3169,7 @@ public class Helper {
         String inviteUrl = null;
         if (invites != null && !invites.isEmpty()) {
             inviteUrl = invites.get(0).getUrl();
-            if(inviteUrl.contains("VFNGGKZ9")){
+            if (inviteUrl.contains("VFNGGKZ9")) {
                 inviteUrl = null;
             }
         }
