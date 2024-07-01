@@ -1,5 +1,12 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -17,12 +24,14 @@ import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-
-import java.util.*;
 
 public class ButtonHelperModifyUnits {
 
@@ -173,7 +182,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
-    public static String getDamagedUnits(Player player, UnitHolder unitHolder, Game game){
+    public static String getDamagedUnits(Player player, UnitHolder unitHolder, Game game) {
         String duraniumMsg = "";
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -450,7 +459,10 @@ public class ButtonHelperModifyUnits {
         Player mentakHero = game
             .getPlayerFromColorOrFaction(game.getStoredValue("mentakHero"));
         if (spaceCannonOffence) {
-            cabal = null;
+            if (cabal != null && !ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) {
+                cabal = null;
+            }
+
             mentakHero = null;
         }
         boolean usedDuraniumAlready = true;
@@ -495,7 +507,7 @@ public class ButtonHelperModifyUnits {
                 if (player.hasTech("nes")) {
                     min = Math.min(totalUnits, (hits + 1) / 2);
                 }
-                if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) {
+                if (min > 0 && unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) {
                     hits = hits - min;
                     if (player.hasTech("nes")) {
                         hits = hits - min;
@@ -2078,7 +2090,9 @@ public class ButtonHelperModifyUnits {
             assignType = game.getStoredValue(player.getFaction() + "latestAssignHits");
         }
         if (!assignType.toLowerCase().contains("combat")) {
-            cabal = null;
+            if (cabal != null && !ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) {
+                cabal = null;
+            }
         }
         if (rest.contains("All")) {
             String cID = Mapper.getColorID(player.getColor());

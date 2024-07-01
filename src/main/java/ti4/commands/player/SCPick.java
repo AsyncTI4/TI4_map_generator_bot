@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -327,7 +328,7 @@ public class SCPick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = "# " + privatePlayer.getRepresentation(true, true) + " UP NEXT";
+                msgExtra = "" + privatePlayer.getRepresentation(true, true) + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
