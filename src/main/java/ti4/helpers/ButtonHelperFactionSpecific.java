@@ -534,7 +534,7 @@ public class ButtonHelperFactionSpecific {
         String buttonID = "transact_ACs_" + player.getFaction();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             "Sent Yssaril buttons so that they can send you an AC");
-        ButtonHelper.resolveSpecificTransButtons(game, yssaril, buttonID, event);
+        ButtonHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
 
@@ -714,7 +714,7 @@ public class ButtonHelperFactionSpecific {
                         "Relocate to " + Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
             hacan.getRepresentation(true, true) + "Choose which planet to relocate your units to", buttons);
         event.getMessage().delete().queue();
     }
@@ -945,15 +945,17 @@ public class ButtonHelperFactionSpecific {
         goAgainButtons.add(button);
         goAgainButtons.add(done);
         goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
-        if (game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(hacan.getPrivateChannel(), message2);
-            MessageHelper.sendMessageToChannelWithButtons(hacan.getPrivateChannel(),
-                ident + " Use Buttons To Complete Transaction", goAgainButtons);
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
-        } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message2);
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                ident + " Use Buttons To Complete Transaction", goAgainButtons);
+        MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message2);
+        if (game.isFoWMode() || !game.getWhetherNewTransactionMethod()) {
+            if (game.isFoWMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(hacan.getPrivateChannel(),
+                    ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+            } else {
+
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
+                    ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            }
         }
         event.getMessage().delete().queue();
     }

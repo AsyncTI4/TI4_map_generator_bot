@@ -1,8 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -26,6 +23,13 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -34,8 +38,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
-
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
@@ -607,6 +609,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BUBBLES + " " + game.getShowBubbles());
         writer.write(System.lineSeparator());
+        writer.write(Constants.TRANSACTION_METHOD + " " + game.getWhetherNewTransactionMethod());
+        writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_MODE + " " + game.isHomeBrew());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_GEARS + " " + game.getShowGears());
@@ -868,6 +872,8 @@ public class GameSaveLoadManager {
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.SPENT_THINGS + " " + String.join(",", player.getSpentThingsThisWindow()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TRANSACTION_ITEMS + " " + String.join(",", player.getTransactionItems()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
             writer.write(System.lineSeparator());
@@ -1888,6 +1894,14 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.TRANSACTION_METHOD -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setTransactionMethod(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
                 case Constants.SHOW_GEARS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -2337,6 +2351,7 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
                 case Constants.SPENT_THINGS -> player.setSpentThings(getCardList(tokenizer.nextToken()));
+                case Constants.TRANSACTION_ITEMS -> player.setTransactionItems(getCardList(tokenizer.nextToken()));
                 case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
                 case Constants.FACTION_TECH -> player.setFactionTechs(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
