@@ -13,8 +13,8 @@ import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.DeckModel;
-import ti4.model.StrategyCardSetModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardSetModel;
 
 // This is a sub-menu
 @Getter
@@ -54,7 +54,7 @@ public class DeckSettings extends SettingsMenu {
         //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
 
         // Initialize strat cards to default values
-        stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "te");
+        stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "pok");
         stratCards.setEmoji(Emojis.SC1);
         stratCards.setAllValues(Mapper.getStrategyCardSets());
         stratCards.setShow(StrategyCardSetModel::getName);
