@@ -970,7 +970,7 @@ public class ButtonHelper {
                     // Block of code to handle errors
                 }
             }
-            String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
+            String text = "" + player.getRepresentation(true, true) + " UP NEXT";
             String buttonText = "Use buttons to do your turn. ";
             List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), text);
@@ -4385,6 +4385,15 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation() + " used Absol Scanlink to decline explore and gained 1tg (tg went from "
                     + oldTg + "->" + player.getTg() + ")");
+            String planetID = buttonID.split("_")[2];
+            if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
+                && player.getPlanets().contains(planetID)) {
+                Button placeSleeper = Button.success("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID)
+                    .withEmoji(Emoji.fromFormatted(Emojis.Sleeper));
+                Button decline = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
+                List<Button> buttons = List.of(placeSleeper, decline);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Can Do Sleeper Things", buttons);
+            }
         }
         deleteMessage(event);
     }
@@ -7151,7 +7160,7 @@ public class ButtonHelper {
                 BotLogger.log(event, "`ButtonHelper.startMyTurn` privatePlayer is null");
                 return;
             }
-            msgExtra = "# " + privatePlayer.getRepresentation(true, true) + " UP NEXT";
+            msgExtra = "" + privatePlayer.getRepresentation(true, true) + " UP NEXT";
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
@@ -7272,7 +7281,7 @@ public class ButtonHelper {
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
             if (privatePlayer == null)
                 return;
-            msgExtra = "# " + privatePlayer.getRepresentation(true, true) + " UP NEXT";
+            msgExtra = "" + privatePlayer.getRepresentation(true, true) + " UP NEXT";
             game.updateActivePlayer(privatePlayer);
 
             if (!allPicked) {
