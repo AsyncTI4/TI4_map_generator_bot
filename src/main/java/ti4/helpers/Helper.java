@@ -951,7 +951,7 @@ public class Helper {
         ButtonHelperAbilities.pillageCheck(p2, game);
         ButtonHelperAbilities.pillageCheck(p1, game);
         MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
-        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
     }
 
     public static String buildTransactionOffer(Player p1, Player p2, Game game) {
@@ -1082,23 +1082,23 @@ public class Helper {
         int result = ThreadLocalRandom.current().nextInt(1, 11);
         switch (result) {
             case 1:
-                return "Nothing";
+                return "Nothing But Respect And Good Will";
             case 2:
-                return "Pocket Lint";
+                return "Some Pocket Lint";
             case 3:
                 return "Sunshine and Rainbows";
             case 4:
-                return "A Feeling of Accomplishment";
+                return "A Feeling Of Accomplishment";
             case 5:
                 return "A Crisp High Five";
             case 6:
-                return "A Good Night Sleep";
+                return "A Well Written Thank-You Note";
             case 7:
                 return "Heartfelt Thanks";
             case 8:
                 return "The Best Vibes";
             case 9:
-                return "A Stroter Blessing";
+                return "A Stroter's Blessing For Your Trouble";
             case 10:
                 return "Good Karma";
         }

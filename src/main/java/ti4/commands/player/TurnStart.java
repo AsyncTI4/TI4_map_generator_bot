@@ -88,7 +88,7 @@ public class TurnStart extends PlayerSubcommandData {
                 goingToPass = true;
             }
         }
-        String text = "# " + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
+        String text = "" + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
@@ -136,7 +136,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             //checkhere
-            if(game.getShowBanners()){
+            if (game.getShowBanners()) {
                 MapGenerator.drawBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);

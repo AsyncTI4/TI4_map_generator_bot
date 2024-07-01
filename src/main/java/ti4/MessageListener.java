@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,8 +30,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.bothelper.CreateGameChannels;
@@ -718,7 +719,7 @@ public class MessageListener extends ListenerAdapter {
                         if (roles.contains(player2.getRoleForCommunity())) {
                             player = player2;
                         }
-                        if (player.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
+                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
                             player = player2;
                         }
                     }
