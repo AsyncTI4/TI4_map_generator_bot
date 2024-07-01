@@ -5,21 +5,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.helpers.settingsFramework.settings.*;
+import ti4.helpers.settingsFramework.settings.BooleanSetting;
+import ti4.helpers.settingsFramework.settings.ChoiceSetting;
+import ti4.helpers.settingsFramework.settings.IntegerSetting;
+import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.MapTemplateModel;
 
 // This is a sub-menu
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class GameSettings extends SettingsMenu {
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -33,45 +34,59 @@ public class GameSettings extends SettingsMenu {
     private ChoiceSetting<MapTemplateModel> mapTemplate;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // Overridden Implementation
+    // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    @Override
-    public void finishInitialization(Game game, SettingsMenu parent) {
-        this.menuId = "game";
-        this.menuName = "General Game Settings";
-        this.description = "Adjust settings for the game such as point total";
+    public GameSettings(Game game, JsonNode json, SettingsMenu parent) {
+        super("game", "General Game Settings", "Adjust settings for the game such as point total", parent);
 
-        // finish initializing
-        if (decks == null) decks = new DeckSettings();
+        // Initialize Settings to default values
+        int defaultVP = game == null ? 10 : game.getVp();
+        pointTotal = new IntegerSetting("Points", "Point Total", defaultVP, 1, 20, 1);
+        stage1s = new IntegerSetting("Stage1s", "# of Stage 1's", 5, 1, 20, 1);
+        stage2s = new IntegerSetting("Stage2s", "# of Stage 2's", 5, 1, 20, 1);
+        secrets = new IntegerSetting("Secrets", "Max # of Secrets", 3, 1, 10, 1);
+        tigl = new BooleanSetting("TIGL", "TIGL Game", false);
+        alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
+        mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
 
-        // Initialize defaults, including any values loaded from JSON
-        pointTotal = new IntegerSetting("Points", "Point Total", 10, 1, 20, 1, pointTotal);
-        stage1s = new IntegerSetting("Stage1s", "# of Stage 1's", 5, 1, 20, 1, stage1s);
-        stage2s = new IntegerSetting("Stage2s", "# of Stage 2's", 5, 1, 20, 1, stage2s);
-        secrets = new IntegerSetting("Secrets", "Max # of Secrets", 3, 1, 10, 1, secrets);
-        tigl = new BooleanSetting("TIGL", "TIGL Game", false, tigl);
-        alliance = new BooleanSetting("Alliance", "Alliance Mode", false, alliance);
-        mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard", mapTemplate);
-
-        // initialize other data
+        // Emojis
         pointTotal.setEmoji(Emojis.CustodiansVP);
         stage1s.setEmoji(Emojis.Public1);
         stage2s.setEmoji(Emojis.Public2);
         secrets.setEmoji(Emojis.SecretObjective);
         tigl.setEmoji(Emojis.TIGL);
         alliance.setEmoji(Emojis.StrategicAlliance);
-
         mapTemplate.setEmoji(Emojis.sliceA);
+
+        // Other initialization
         mapTemplate.setAllValues(Mapper.getMapTemplates().stream().collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x)));
         mapTemplate.setShow(MapTemplateModel::getAlias);
+        mapTemplate.setGetExtraInfo(MapTemplateModel::getDescr);
 
-        super.finishInitialization(game, parent);
+        // Get the correct JSON node for initialization if applicable.
+        // Add additional names here to support new generated JSON as needed.
+        if (json != null && json.has("gameSettings")) json = json.get("gameSettings");
+
+        // Verify this is the correct JSON node and continue initialization
+        List<String> historicIDs = new ArrayList<>(List.of("game"));
+        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+            pointTotal.initialize(json.get("pointTotal"));
+            stage1s.initialize(json.get("stage1s"));
+            stage2s.initialize(json.get("stage2s"));
+            secrets.initialize(json.get("secrets"));
+            tigl.initialize(json.get("tigl"));
+            alliance.initialize(json.get("alliance"));
+            mapTemplate.initialize(json.get("mapTemplate"));
+        }
+
+        decks = new DeckSettings(game, json, this);
     }
 
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Overridden Implementation
+    // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
-    public List<SettingInterface> settings() {
-        updateTransientSettings();
-
+    protected List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<SettingInterface>();
         ls.add(pointTotal);
         ls.add(stage1s);
@@ -84,14 +99,14 @@ public class GameSettings extends SettingsMenu {
     }
 
     @Override
-    public List<SettingsMenu> categories() {
+    protected List<SettingsMenu> categories() {
         List<SettingsMenu> cats = new ArrayList<>();
         cats.add(decks);
         return cats;
     }
 
     @Override
-    public List<Button> specialButtons() {
+    protected List<Button> specialButtons() {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
         buttons.add(Button.danger(prefix + "preset14pt", "Long War (14pt)"));
@@ -100,7 +115,7 @@ public class GameSettings extends SettingsMenu {
     }
 
     @Override
-    public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
+    protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error = switch (action) {
             case "preset14pt" -> preset14vp();
             case "preset444" -> preset444();
@@ -109,10 +124,8 @@ public class GameSettings extends SettingsMenu {
         return (error == null ? "success" : error);
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    // Specific Implementation
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    private void updateTransientSettings() {
+    @Override
+    protected void updateTransientSettings() {
         if (parent instanceof MiltySettings m) {
             int players = m.getPlayerSettings().getGamePlayers().getKeys().size();
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
@@ -122,19 +135,22 @@ public class GameSettings extends SettingsMenu {
         }
     }
 
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Specific Implementation
+    // ---------------------------------------------------------------------------------------------------------------------------------
     private String preset444() {
-        this.pointTotal.val = 12;
-        this.stage1s.val = 4;
-        this.stage2s.val = 4;
-        this.secrets.val = 4;
+        this.pointTotal.setVal(12);
+        this.stage1s.setVal(4);
+        this.stage2s.setVal(4);
+        this.secrets.setVal(4);
         return null;
     }
 
     private String preset14vp() {
-        this.pointTotal.val = 14;
-        this.stage1s.val = 5;
-        this.stage2s.val = 5;
-        this.secrets.val = 3;
+        this.pointTotal.setVal(14);
+        this.stage1s.setVal(5);
+        this.stage2s.setVal(5);
+        this.secrets.setVal(3);
         return null;
     }
 }

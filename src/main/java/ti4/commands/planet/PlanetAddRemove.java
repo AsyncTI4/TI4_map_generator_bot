@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -68,7 +69,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Game game) {
         try {
             if (Mapper.isValidPlanet(planetID)) {
-                doAction(player, planetID, game);
+                doAction(event, player, planetID, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planetID));
             } else {
                 Set<String> planets = game.getPlanets();
@@ -82,7 +83,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 }
                 String planet = possiblePlanets.get(0);
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
-                doAction(player, planet, game);
+                doAction(event, player, planet, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
@@ -91,7 +92,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         }
     }
 
-    public abstract void doAction(Player player, String techID, Game game);
+    public abstract void doAction(GenericInteractionCreateEvent event, Player player, String techID, Game game);
 
     /**
      * Customize the initial header response depending on ActionID (which /player planet_* action is used)

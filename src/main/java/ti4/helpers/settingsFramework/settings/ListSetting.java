@@ -16,9 +16,9 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -30,58 +30,64 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import ti4.message.BotLogger;
 
-@AllArgsConstructor
+@Getter
+@Setter
+@JsonIncludeProperties({ "id", "keys" })
 public class ListSetting<T> extends SettingInterface {
-    // Will show up in json
-    @Getter
-    private Set<String> keys;
-    // Will not show up in json
-    @Getter
-    @JsonIgnore
-    private Map<String, T> allValues;
-    @Getter
-    @JsonIgnore
-    private Set<String> defaultKeys;
-    @Setter
-    @JsonIgnore
+    private Set<String> keys = new HashSet<>();
+    private Set<String> defaultKeys = new HashSet<>();
+    private Map<String, T> allValues = new HashMap<>();
     private Function<T, String> show;
-    @Setter
-    @JsonIgnore
     private Function<T, String> getEmoji;
     private String includeLang = "include";
     private String removeLang = "remove";
 
-    public ListSetting() {
-        this.allValues = new HashMap<>();
-        this.defaultKeys = new HashSet<>();
-        this.keys = new HashSet<>();
-    }
-
     public ListSetting(String id, String name, String include, String remove, Set<Entry<String, T>> allVals, Set<String> values, Set<String> defaults) {
-        this.allValues = new HashMap<>();
-        if (allVals != null) {
-            for (Map.Entry<String, T> entry : allVals) {
-                allValues.put(entry.getKey(), entry.getValue());
-            }
-        }
+        super(id, name);
 
-        this.defaultKeys = new HashSet<>();
-        if (defaults != null) defaultKeys.addAll(defaults);
-
-        this.keys = new HashSet<>();
-        if (values != null) this.keys.addAll(values);
-
-        this.id = id;
-        this.name = name;
         this.includeLang = include;
         this.removeLang = remove;
+        if (allVals != null) {
+            for (Map.Entry<String, T> entry : allVals)
+                allValues.put(entry.getKey(), entry.getValue());
+        }
+        if (defaults != null) defaultKeys.addAll(defaults);
+        if (values != null) this.keys.addAll(values);
     }
 
-    // Abstract methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Abstract Methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    protected void init(JsonNode json) {
+        if (json.has("keys") && json.get("keys").isArray()) {
+            keys.clear();
+            json.get("keys").forEach(j -> {
+                if (j.isTextual() && allValues.containsKey(j.asText()))
+                    keys.add(j.asText());
+            });
+        }
+    }
+
     public String modify(GenericInteractionCreateEvent event, String action) {
         if (action.startsWith("include" + id)) return includeValue(event, action);
         if (action.startsWith("remove" + id)) return removeValue(event, action);
         return "[invalid action: " + action + "]";
+    }
+
+    public void reset() {
+        keys = new HashSet<>(defaultKeys);
+    }
+
+    protected String shortValue() {
+        List<String> values = keys.stream().sorted()
+            .map(k -> show.apply(allValues.get(k))).toList();
+        return "[" + String.join(",", values) + "]";
+    }
+
+    protected String longValue() {
+        List<String> values = keys.stream().sorted()
+            .map(k -> show.apply(allValues.get(k))).toList();
+        return "[" + String.join(",", values) + "]";
     }
 
     protected List<Button> buttons(String idPrefix) {
@@ -93,23 +99,39 @@ public class ListSetting<T> extends SettingInterface {
         return ls;
     }
 
-    public void reset() {
-        keys = new HashSet<>(defaultKeys);
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Helper Methods
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    public void setAllValues(Map<String, T> values) {
+        allValues.clear();
+        for (Map.Entry<String, T> entry : values.entrySet()) {
+            allValues.put(entry.getKey(), entry.getValue());
+        }
+        // remove keys that no longer exist
+        keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
+        defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 
-    public String shortValue() {
-        List<String> values = keys.stream().sorted()
-            .map(k -> show.apply(allValues.get(k))).toList();
-        return "[" + String.join(",", values) + "]";
+    public void setKeys(List<String> keys) {
+        if (allValues == null || allValues.isEmpty()) {
+            // technically, this is bad, but it's just a workaround
+            this.keys.addAll(keys);
+            return;
+        }
+        // otherwise don't include keys that have no value
+        this.keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 
-    public String longValue() {
-        List<String> values = keys.stream().sorted()
-            .map(k -> show.apply(allValues.get(k))).toList();
-        return "[" + String.join(",", values) + "]";
+    public void setDefaultKeys(List<String> defaultKeys) {
+        if (allValues == null || allValues.isEmpty()) {
+            // technically, this is bad, but it's just a workaround
+            this.defaultKeys.addAll(defaultKeys);
+            return;
+        }
+        // otherwise don't include keys that have no value
+        this.defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 
-    // Helper methods
     private String includeValue(GenericInteractionCreateEvent event, String action) {
         String suffix = action.replace("include" + id, "");
         List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet().stream().filter(e -> !keys.contains(e.getKey())).toList());
@@ -178,35 +200,5 @@ public class ListSetting<T> extends SettingInterface {
             .addComponents(rows)
             .setEphemeral(true)
             .queue(Consumers.nop(), BotLogger::catchRestError);
-    }
-
-    public void setAllValues(Map<String, T> values) {
-        allValues.clear();
-        for (Map.Entry<String, T> entry : values.entrySet()) {
-            allValues.put(entry.getKey(), entry.getValue());
-        }
-        // remove keys that no longer exist
-        keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
-        defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
-    }
-
-    public void setKeys(List<String> keys) {
-        if (allValues == null || allValues.isEmpty()) {
-            // technically, this is bad, but it's just a workaround
-            this.keys.addAll(keys);
-            return;
-        }
-        // otherwise don't include keys that have no value
-        this.keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
-    }
-
-    public void setDefaultKeys(List<String> defaultKeys) {
-        if (allValues == null || allValues.isEmpty()) {
-            // technically, this is bad, but it's just a workaround
-            this.defaultKeys.addAll(defaultKeys);
-            return;
-        }
-        // otherwise don't include keys that have no value
-        this.defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
     }
 }

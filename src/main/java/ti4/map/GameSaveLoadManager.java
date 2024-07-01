@@ -28,10 +28,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +42,7 @@ import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
@@ -79,64 +80,80 @@ public class GameSaveLoadManager {
     public static final String PLAYER = "-player-";
     public static final String ENDPLAYER = "-endplayer-";
 
-    public static final boolean loadFromJSON = false; // TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100%
-                                                      // WORKING
+    // TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
+    public static final boolean loadFromJSON = false;
 
     public static void saveMaps() {
-        // TODO: add last command time/last save time to cut down on saves
+        // TODO: Make sure all commands and buttons and such actually save the game
+        //long loadTime = GameManager.getInstance().getLoadTime();
         GameManager.getInstance().getGameNameToGame().values().parallelStream()
             .forEach(game -> {
                 try {
-                    saveMap(game, true, null);
+                    // long time = game.getLastModifiedDate();
+                    // if (time > loadTime)
+                    saveMap(game, true, "Bot Reload");
                 } catch (Exception e) {
                     BotLogger.log("Error saving map: " + game.getName(), e);
                 }
             });
     }
 
-    public static void saveMap(Game game) {
-        saveMap(game, false, null);
+    public static void saveMap(Game game, String reason) {
+        saveMap(game, false, reason);
     }
 
     public static void saveMap(Game game, GenericInteractionCreateEvent event) {
         saveMap(game, false, event);
     }
 
-    public static void saveMap(Game game, boolean keepModifiedDate,
-        @Nullable GenericInteractionCreateEvent event) {
-        // ADD COMMAND/BUTTON FOR UNDO INFORMATION
+    public static void saveMap(Game game, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
+        String reason = null;
         if (event != null) {
             String username = event.getUser().getName();
-            if (event instanceof SlashCommandInteractionEvent) {
-                game.setLatestCommand(
-                    username + " used: " + ((CommandInteractionPayload) event).getCommandString());
+            if (event instanceof SlashCommandInteractionEvent slash) {
+                reason = username + " used: " + slash.getCommandString();
             } else if (event instanceof ButtonInteractionEvent button) {
-                if ((event.getMessageChannel() instanceof ThreadChannel
-                    && event.getMessageChannel().getName().contains("Cards Info")) || game.isFoWMode()
-                    || button.getButton().getId().contains("anonDeclare")) {
-                    game.setLatestCommand(username + " pressed button: [CLASSIFIED]");
+                boolean thread = button.getMessageChannel() instanceof ThreadChannel;
+                boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
+                boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
+                if (cardThread || draftThread || game.isFoWMode() || button.getButton().getId().contains("anonDeclare")) {
+                    reason = username + " pressed button: [CLASSIFIED]";
                 } else {
-                    game.setLatestCommand(
-                        username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- "
-                            + ((ButtonInteraction) event).getButton().getLabel());
+                    reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
                 }
+            } else if (event instanceof StringSelectInteractionEvent selectMenu) {
+                reason = username + " used string selection: " + selectMenu.getComponentId();
+            } else if (event instanceof ModalInteractionEvent modal) {
+                reason = username + " used modal: " + modal.getModalId();
             } else {
-                game.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
+                reason = "Last Command Unknown - No Event Provided";
             }
+        }
+        saveMap(game, keepModifiedDate, reason);
+    }
+
+    public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
+        // ADD COMMAND/BUTTON FOR UNDO INFORMATION
+        if (saveReason != null) {
+            game.setLatestCommand(saveReason);
         } else {
-            if (keepModifiedDate && game.isHasEnded() && "Last Command Unknown - No Event Provided".equals(game.getLatestCommand())) {
-                //System.out.println("Skipped Saving Map: " + game.getName() + " - Game has ended and has no changes since last save");
+            List<String> trivialSaveReasons = new ArrayList<>(List.of(
+                "Last Command Unknown - No Event Provided",
+                "Bot Reload",
+                "Auto Ping"));
+            if (keepModifiedDate && game.isHasEnded() && trivialSaveReasons.contains(game.getLatestCommand())) {
                 return;
             }
             game.setLatestCommand("Last Command Unknown - No Event Provided");
         }
 
         try {
+            ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkSigil(game);
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
-            BotLogger.log("Error doing extra Discordant Stars stuff", e);
+            BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -691,6 +708,10 @@ public class GameSaveLoadManager {
         if (miltySettings != null) {
             writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
             writer.write(System.lineSeparator());
+        } else if (game.getMiltyJson() != null) {
+            // default to the already stored value, if we failed to read it previously
+            writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + game.getMiltyJson());
+            writer.write(System.lineSeparator());
         }
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
@@ -855,6 +876,8 @@ public class GameSaveLoadManager {
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TECH_PURGED + " " + String.join(",", player.getPurgedTechs()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
@@ -2152,14 +2175,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case Constants.MILTY_DRAFT_SETTINGS -> {
-                    try {
-                        MiltySettings settings = MiltySettings.readJson(info, MiltySettings.class);
-                        game.setMiltySettings(settings);
-                    } catch (Exception e) {
-                        // Do nothing
-                    }
-                }
+                case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
             }
         }
     }
@@ -2341,6 +2357,7 @@ public class GameSaveLoadManager {
                 case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
+                case Constants.TECH_PURGED -> player.setPurgedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
                 case Constants.MAHACT_CC -> player.setMahactCC(getCardList(tokenizer.nextToken()));
@@ -2516,7 +2533,7 @@ public class GameSaveLoadManager {
     private static void readTokens(Tile tile, String data) {
         if (tile == null)
             return;
-        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+        // StringTokenizer tokenizer = new StringTokenizer(data, " ");
         // tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
         // todo implement token read
     }

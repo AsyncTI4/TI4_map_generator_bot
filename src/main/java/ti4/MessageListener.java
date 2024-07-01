@@ -271,11 +271,12 @@ public class MessageListener extends ListenerAdapter {
 
     private void autoPingGames(MessageReceivedEvent event) {
         Game mapreference = GameManager.getInstance().getGame("finreference");
+        if (mapreference == null) return;
         int multiplier = 1000; // should be 1000
-        if (mapreference != null
-            && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10 * 60 * multiplier) // 10
-                                                                                                                                          // minutes
-        {
+        int tenMin = 10 * 60 * multiplier; // 10 minutes
+        long timeSinceLast = (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime();
+
+        if (timeSinceLast > tenMin) {
             mapreference.setLastTimeGamesChecked(new Date());
             List<String> storedValues = new ArrayList<>();
             storedValues.addAll(mapreference.getMessagesThatICheckedForAllReacts().keySet());
@@ -284,7 +285,7 @@ public class MessageListener extends ListenerAdapter {
                     mapreference.removeStoredValue(value);
                 }
             }
-            GameSaveLoadManager.saveMap(mapreference);
+            GameSaveLoadManager.saveMap(mapreference, "Auto Ping");
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
             for (Game game : mapList.values()) {
@@ -427,12 +428,12 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinance";
                                     }
                                     String playersInCombat = game.getStoredValue("factionsInCombat");
-                                    if(playersInCombat.contains(player.getFaction())){
-                                        for(Player p2 : game.getRealPlayers()){
-                                            if(p2 == player){
+                                    if (playersInCombat.contains(player.getFaction())) {
+                                        for (Player p2 : game.getRealPlayers()) {
+                                            if (p2 == player) {
                                                 continue;
                                             }
-                                            if(playersInCombat.contains(p2.getFaction())){
+                                            if (playersInCombat.contains(p2.getFaction())) {
                                                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
                                             }
                                         }
@@ -655,7 +656,7 @@ public class MessageListener extends ListenerAdapter {
                                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                                 }
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game);
+                                GameSaveLoadManager.saveMap(game, "Auto Ping");
                             }
                         }
                     } else {
@@ -664,7 +665,7 @@ public class MessageListener extends ListenerAdapter {
                             if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
                                 AgendaHelper.pingMissingPlayers(game);
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game);
+                                GameSaveLoadManager.saveMap(game, "Auto Ping");
                             }
 
                         }

@@ -23,6 +23,10 @@ public class Constants {
         return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
     }
 
+    // Tourney Winners
+    public static final String cal1nos = "740848810749722646";
+    public static List<String> tourneyWinners = List.of(cal1nos);
+
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String TEN_MIN_REMINDER = "ten_min_reminder";
@@ -532,6 +536,7 @@ public class Constants {
     public static final String TRANSACTION_ITEMS = "transaction_items";
     public static final String TEAMMATE_IDS = "teammate_ids";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
+    public static final String TECH_PURGED = "tech_purged";
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
@@ -809,6 +814,8 @@ public class Constants {
     public static final String HS_TILE_POSITION = "hs_tile_position";
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
+    public static final String ATTACHMENT_IIHQ_1 = "attachment_custodiavigilia_1.png";
+    public static final String ATTACHMENT_IIHQ_2 = "attachment_custodiavigilia_2.png";
     public static final String TERRAFORM = "terraform";
     public static final String CUSTODIAN_TOKEN = "custodian";
     public static final String CONSULATE_TOKEN = "consulate";
