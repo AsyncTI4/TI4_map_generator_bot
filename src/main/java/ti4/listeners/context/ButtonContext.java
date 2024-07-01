@@ -1,20 +1,12 @@
 package ti4.listeners.context;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.map.GameSaveLoadManager;
 
-@Getter
 public class ButtonContext extends ListenerContext {
-    private String messageID;
-
-    @JsonIgnore
-    public String getButtonID() {
-        return componentID;
-    }
+    public String buttonID, messageID;
+    //public ButtonInteractionEvent event;
 
     public ButtonInteractionEvent getEvent() {
         if (event instanceof ButtonInteractionEvent button)
@@ -27,25 +19,21 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonContext(ButtonInteractionEvent event) {
-        // Most of the generic checks happen inside `super` constructor
-        // If something fails in super, it will set the valid flag to false, and we will quit immediately
         super(event, event.getButton().getId());
-        if (!isValid()) {
-            return;
-        }
+        if (!isValid()) return; // super failed
 
-        // Proceed with additional button things
+        // Proceed with additional context
+        this.buttonID = this.componentID; // ID after checking faction
         this.messageID = event.getMessageId();
 
-        boolean isUndo = componentID.contains("ultimateUndo");
-        boolean isShow = "showGameAgain".equalsIgnoreCase(componentID);
-        boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
-        if (game != null && !isUndo && !isShow && !isNoSabo) {
+        //additional button things
+        if (game != null && !buttonID.contains("ultimateUndo") && !"showGameAgain".equalsIgnoreCase(buttonID) && !"no_sabotage".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, game, player);
             GameSaveLoadManager.saveMap(game, event);
         }
 
-        if (componentID.contains("deleteThisButton")) {
+        if (buttonID.contains("deleteThisButton")) {
+            buttonID = buttonID.replace("deleteThisButton", "");
             componentID = componentID.replace("deleteThisButton", "");
             ButtonHelper.deleteTheOneButton(event);
         }

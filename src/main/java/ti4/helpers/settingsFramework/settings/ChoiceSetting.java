@@ -10,9 +10,9 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -25,48 +25,46 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import ti4.message.BotLogger;
 
-@Getter
-@Setter
-@JsonIncludeProperties({ "id", "chosenKey" })
+@AllArgsConstructor
 public class ChoiceSetting<T> extends SettingInterface {
+    // Will show up in json
+    @Getter
     private String chosenKey;
-    private String defaultKey;
+    // Will not show up in json
+    @Getter
+    @JsonIgnore
     private Map<String, T> allValues;
+    @Getter
+    @JsonIgnore
+    private String defaultKey;
+    @Setter
     private Function<T, String> show;
+    @Setter
     private Function<T, String> getEmoji;
-    private Function<T, String> getExtraInfo;
     private String lang = "pick";
 
-    public ChoiceSetting(String id, String name, String defaultKey) {
-        super(id, name);
+    public ChoiceSetting() {
+        this.allValues = new HashMap<>();
+    }
 
-        this.chosenKey = defaultKey;
+    public ChoiceSetting(String id, String name, String defaultKey, ChoiceSetting<T> choice) {
+        this.chosenKey = choice == null ? defaultKey : choice.chosenKey;
+
+        this.id = id;
+        this.name = name;
         this.defaultKey = defaultKey;
         this.allValues = new HashMap<>();
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    // Abstract Methods
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    protected void init(JsonNode json) {
-        if (json.has("chosenKey")) chosenKey = json.get("chosenKey").asText(chosenKey);
+    @JsonIgnore
+    public T getValue() {
+        return allValues.get(chosenKey);
     }
 
+    // Abstract methods
     public String modify(GenericInteractionCreateEvent event, String action) {
         if (action.startsWith("change" + id)) return changeValue(event, action);
         return "[invalid action: " + action + "]";
-    }
-
-    public void reset() {
-        chosenKey = defaultKey;
-    }
-
-    protected String shortValue() {
-        return show.apply(allValues.get(chosenKey));
-    }
-
-    protected String longValue() {
-        return show.apply(allValues.get(chosenKey));
     }
 
     protected List<Button> buttons(String idPrefix) {
@@ -77,39 +75,19 @@ public class ChoiceSetting<T> extends SettingInterface {
         return ls;
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    // Helper Methods
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    public T getValue() {
-        return allValues.get(chosenKey);
+    public void reset() {
+        chosenKey = defaultKey;
     }
 
-    public void setAllValues(Map<String, T> values) {
-        allValues.clear();
-        for (Map.Entry<String, T> entry : values.entrySet()) {
-            allValues.put(entry.getKey(), entry.getValue());
-        }
-        // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
-        if (!allValues.containsKey(defaultKey) && allValues.size() > 0) {
-            chosenKey = new ArrayList<>(allValues.keySet()).get(0);
-            defaultKey = chosenKey;
-        }
+    public String shortValue() {
+        return show.apply(allValues.get(chosenKey));
     }
 
-    public void setAllValues(Map<String, T> values, String newDefault) {
-        allValues.clear();
-        for (Map.Entry<String, T> entry : values.entrySet()) {
-            allValues.put(entry.getKey(), entry.getValue());
-        }
-        // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
-        if (!allValues.containsKey(chosenKey)) {
-            chosenKey = newDefault;
-        }
-        if (!allValues.containsKey(defaultKey)) {
-            defaultKey = newDefault;
-        }
+    public String longValue() {
+        return show.apply(allValues.get(chosenKey));
     }
 
+    // Helper methods
     private String changeValue(GenericInteractionCreateEvent event, String action) {
         String suffix = action.replace("change" + id, "");
         List<Map.Entry<String, T>> items = new ArrayList<>(allValues.entrySet());
@@ -130,7 +108,6 @@ public class ChoiceSetting<T> extends SettingInterface {
 
             if (allValues.containsKey(itemToChoose)) {
                 chosenKey = itemToChoose;
-                if (getGetExtraInfo() != null) setExtraInfo(getGetExtraInfo().apply(getValue()));
                 return null;
             }
             return itemToChoose + " is not an allowed value";
@@ -159,5 +136,31 @@ public class ChoiceSetting<T> extends SettingInterface {
             .addComponents(rows)
             .setEphemeral(true)
             .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public void setAllValues(Map<String, T> values) {
+        allValues.clear();
+        for (Map.Entry<String, T> entry : values.entrySet()) {
+            allValues.put(entry.getKey(), entry.getValue());
+        }
+        // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
+        if (!allValues.containsKey(defaultKey)) {
+            chosenKey = new ArrayList<>(allValues.keySet()).get(0);
+            defaultKey = chosenKey;
+        }
+    }
+
+    public void setAllValues(Map<String, T> values, String newDefault) {
+        allValues.clear();
+        for (Map.Entry<String, T> entry : values.entrySet()) {
+            allValues.put(entry.getKey(), entry.getValue());
+        }
+        // if the chosen/default keys no longer exist, replace with some random thing in the list I guess, idk
+        if (!allValues.containsKey(chosenKey)) {
+            chosenKey = newDefault;
+        }
+        if (!allValues.containsKey(defaultKey)) {
+            defaultKey = newDefault;
+        }
     }
 }

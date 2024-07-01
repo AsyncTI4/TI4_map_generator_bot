@@ -344,11 +344,11 @@ public class MiltyDraftManager {
             String fauxPlayerPick = null;
             Player nextDrafter = getCurrentDraftPlayer(game);
             PlayerDraft pd = getPlayerDraft(nextDrafter);
-            if (pd.getPosition() == null && pd.getFaction() != null && pd.getSlice() != null) {
+            if (pd.getPosition() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getPositionButtons());
-            } else if (pd.getSlice() == null && pd.getFaction() != null && pd.getPosition() != null) {
+            } else if (pd.getSlice() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getSliceButtons());
-            } else if (pd.getFaction() == null && pd.getPosition() != null && pd.getSlice() != null) {
+            } else if (pd.getFaction() == null) {
                 fauxPlayerPick = getAutoButtonID(game, nextDrafter, getFactionButtons());
             }
 
@@ -722,7 +722,7 @@ public class MiltyDraftManager {
         setMapTemplate(savedTemplate);
     }
 
-    public void loadSlicesFromString(String str) {
+    public void loadSlicesFromString(String str) throws Exception {
         int sliceIndex = 1;
         StringTokenizer sliceTokenizer = new StringTokenizer(str, ";");
         while (sliceTokenizer.hasMoreTokens()) {
@@ -731,8 +731,9 @@ public class MiltyDraftManager {
         }
     }
 
-    private void loadSliceFromString(String str, int index) {
+    private void loadSliceFromString(String str, int index) throws Exception {
         List<String> tiles = Arrays.asList(str.split(","));
+        if (tiles.size() != 5) throw new Exception("Slice does not have the right number of tiles.");
         List<MiltyDraftTile> draftTiles = tiles.stream().map(t -> findTile(t)).toList();
         MiltyDraftSlice slice = new MiltyDraftSlice();
         slice.setTiles(draftTiles);
@@ -750,7 +751,7 @@ public class MiltyDraftManager {
                 .filter(x -> x != null)
                 .collect(Collectors.toSet()));
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
-            if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.uncharted_space);
+            if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.ds);
             if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);
             MiltyDraftHelper.initDraftTiles(this, new ArrayList<>(currentsources));
             result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElseThrow();

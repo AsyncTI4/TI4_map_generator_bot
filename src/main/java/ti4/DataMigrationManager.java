@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +70,6 @@ public class DataMigrationManager {
             runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
             runMigration("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
-            runMigration("removeBadCVToken_290624", DataMigrationManager::removeBadCVToken_290624);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -581,14 +579,6 @@ public class DataMigrationManager {
         return anyFound;
     }
 
-    // June 29th, 2024
-    public static boolean removeBadCVToken_290624(Game game) {
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("token_custodiavigilia_1.png", "attachment_custodiavigilia_1.png");
-        tokens.put("token_custodiavigilia_2.png", "attachment_custodiavigilia_2.png");
-        return replaceTokens(game, tokens);
-    }
-
     private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
         String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
         DateFormat format = new SimpleDateFormat("ddMMyy");
@@ -623,7 +613,7 @@ public class DataMigrationManager {
 
                 if (changesMade) {
                     migrationsAppliedThisTime.add(game.getName());
-                    GameSaveLoadManager.saveMap(game, "Data Migration - " + migrationName);
+                    GameSaveLoadManager.saveMap(game);
                 }
             }
         }
@@ -792,4 +782,5 @@ public class DataMigrationManager {
         }
         return false;
     }
+
 }

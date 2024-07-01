@@ -2,7 +2,9 @@
     {
         "id": "biotic",
         "imagePath": "attachment_biotic.png",
-        "techSpeciality": ["biotic"]
+        "techSpeciality": [
+            "biotic"
+        ]
     },
     {
         "id": "bioticstat",
@@ -13,7 +15,9 @@
     {
         "id": "cybernetic",
         "imagePath": "attachment_cybernetic.png",
-        "techSpeciality": ["cybernetic"]
+        "techSpeciality": [
+            "cybernetic"
+        ]
     },
     {
         "id": "cyberneticstat",
@@ -59,7 +63,9 @@
     {
         "id": "propulsion",
         "imagePath": "attachment_propulsion.png",
-        "techSpeciality": ["propulsion"]
+        "techSpeciality": [
+            "propulsion"
+        ]
     },
     {
         "id": "propulsionstat",
@@ -86,12 +92,20 @@
         "imagePath": "attachment_titanspn.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
-        "planetTypes": ["cultural", "industrial", "hazardous"]
+        "planetTypes": [
+            "cultural",
+            "industrial",
+            "hazardous"
+        ]
     },
     {
         "id": "threetraits",
         "imagePath": "attachment_threetraits.png",
-        "planetTypes": ["cultural", "industrial", "hazardous"]
+        "planetTypes": [
+            "cultural",
+            "industrial",
+            "hazardous"
+        ]
     },
     {
         "id": "negativeinf",
@@ -141,7 +155,9 @@
     {
         "id": "warfare",
         "imagePath": "attachment_warfare.png",
-        "techSpeciality": ["warfare"]
+        "techSpeciality": [
+            "warfare"
+        ]
     },
     {
         "id": "warfarestat",
@@ -152,7 +168,12 @@
     {
         "id": "encryptionkey",
         "imagePath": "attachment_encryptionkey.png",
-        "techSpeciality": ["biotic", "cybernetic", "propulsion", "warfare"]
+        "techSpeciality": [
+            "biotic",
+            "cybernetic",
+            "propulsion",
+            "warfare"
+        ]
     },
     {
         "id": "gledgebase",
@@ -256,7 +277,9 @@
         "id": "lloyd_industrialboom",
         "imagePath": "attachment_industrialboom.png",
         "resourcesModifier": 2,
-        "planetTypes": ["industrial"]
+        "planetTypes": [
+            "industrial"
+        ]
     },
     {
         "id": "lloyd_orbitalslingshot",
@@ -280,7 +303,9 @@
         "id": "lloyd_culturalboom",
         "imagePath": "attachment_culturalboom.png",
         "influenceModifier": 2,
-        "planetTypes": ["cultural"]
+        "planetTypes": [
+            "cultural"
+        ]
     },
     {
         "id": "lloyd_interplanetaryhub",
@@ -323,29 +348,25 @@
     {
         "id": "cultural",
         "imagePath": "attachment_cultural.png",
-        "planetTypes": ["cultural"],
+        "planetTypes": [
+            "cultural"
+        ],
         "isFakeAttachment": true
     },
     {
         "id": "industrial",
         "imagePath": "attachment_industrial.png",
-        "planetTypes": ["industrial"],
+        "planetTypes": [
+            "industrial"
+        ],
         "isFakeAttachment": true
     },
     {
         "id": "hazardous",
         "imagePath": "attachment_hazardous.png",
-        "planetTypes": ["hazardous"],
-        "isFakeAttachment": true
-    },
-    {
-        "id": "custodiavigilia1",
-        "imagePath": "attachment_custodiavigilia_1.png",
-        "isFakeAttachment": true
-    },
-    {
-        "id": "custodiavigilia2",
-        "imagePath": "attachment_custodiavigilia_2.png",
+        "planetTypes": [
+            "hazardous"
+        ],
         "isFakeAttachment": true
     }
 ]

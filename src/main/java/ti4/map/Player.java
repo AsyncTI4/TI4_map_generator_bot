@@ -147,9 +147,6 @@ public class Player {
     private DraftBag currentDraftBag = new DraftBag();
     private final DraftBag draftItemQueue = new DraftBag();
     private List<String> exhaustedTechs = new ArrayList<>();
-    @Getter
-    @Setter
-    private List<String> purgedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
@@ -836,7 +833,6 @@ public class Player {
         return unitsOwned;
     }
 
-    @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
         return unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
@@ -1240,43 +1236,54 @@ public class Player {
         crf = irf = hrf = vrf = 0;
         for (String cardID : fragments) {
             String color = Mapper.getExplore(cardID).getType().toLowerCase();
-            int firstTime = 0;
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;
                     if (!hasFoundCulFrag) {
                         hasFoundCulFrag = true;
-                        firstTime++;
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
+                        }
                     }
                 }
                 case Constants.INDUSTRIAL -> {
                     irf++;
                     if (!hasFoundIndFrag) {
                         hasFoundIndFrag = true;
-                        firstTime++;
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
+                        }
                     }
                 }
                 case Constants.HAZARDOUS -> {
                     hrf++;
                     if (!hasFoundHazFrag) {
                         hasFoundHazFrag = true;
-                        firstTime++;
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
+                        }
                     }
                 }
                 case Constants.FRONTIER -> {
                     vrf++;
                     if (!hasFoundUnkFrag) {
                         hasFoundUnkFrag = true;
-                        firstTime++;
+                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
+                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
+                                "mech", "placeOneNDone_skipbuild"));
+                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
+                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
+                        }
                     }
-                }
-            }
-            if (hasUnit("bentor_mech") && firstTime > 0) {
-                int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true);
-                List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
-                String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
-                for (int i = 0; i < firstTime && i < mechsRemain; i++) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
                 }
             }
         }
@@ -1439,7 +1446,6 @@ public class Player {
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
     }
 
-    @JsonIgnore
     public String getFactionEmojiOrColor() {
         if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
             return Emojis.getColorEmojiWithName(getColor());
@@ -1863,7 +1869,6 @@ public class Player {
         this.followedSCs = followedSCs;
     }
 
-
     public void addFollowedSC(Integer sc) {
         followedSCs.add(sc);
     }
@@ -1871,12 +1876,7 @@ public class Player {
     public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event) {
         Game game = getGame();
 
-
         followedSCs.add(sc);
-        if (game != null && game.getActivePlayer() != null) {
-            if (game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
-                for (Player p2 : game.getRealPlayers()) {
-                    if (!p2.hasFollowedSC(sc)) {
         if (game != null && game.getActivePlayer() != null) {
             if (game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
@@ -2307,13 +2307,6 @@ public class Player {
         doAdditionalThingsWhenRemovingTech(tech);
     }
 
-    public void purgeTech(String tech) {
-        if (techs.contains(tech)) {
-            removeTech(tech);
-            purgedTechs.add(tech);
-        }
-    }
-
     public void addPlanet(String planet) {
         if (!planets.contains(planet)) {
             planets.add(planet);
@@ -2326,12 +2319,14 @@ public class Player {
         }
         Game game = getGame();
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null && game.isAbsolMode()
-            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList().contains("attachment_nanoforge.png")
+            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList()
+                .contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
+            MessageHelper.sendMessageToChannel(this.getCorrectChannel(),
+                getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
         }
     }
 

@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
@@ -28,6 +33,7 @@ import ti4.commands.player.SCPlay;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -42,7 +48,6 @@ import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
@@ -1059,25 +1064,34 @@ public class ButtonHelperHeroes {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            message.toString());
         game.setStoredValue("mentakHero", player.getFaction());
         ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void purgeTech(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String techID = buttonID.replace("purgeTech_", "");
-        player.purgeTech(techID);
+        player.removeTech(techID);
         String msg = player.getRepresentation(true, true) + " purged " + Mapper.getTech(techID).getName();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
+        event.getMessage().delete().queue();
+
     }
 
-    public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event,
+        String buttonID) {
         String planet = buttonID.split("_")[1];
-        Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Set<String> techTypes = unitHolder.getTechSpecialities();
-        if (techTypes.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No tech skips found");
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        String techType;
+        if (Mapper.getPlanet(planet).getTechSpecialties() != null
+            && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) {
+            techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
+        } else {
+            techType = ButtonHelper.getTechSkipAttachments(game, planet);
+        }
+        if ("none".equalsIgnoreCase(techType)) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), "No tech skips found");
             return;
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -1093,14 +1107,12 @@ public class ButtonHelperHeroes {
         int count = planetHolder.getResources() + planetHolder.getInfluence();
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
+            ButtonHelper.getIdent(player) + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         game.setComponentAction(true);
-        List<TechnologyModel> techs = new ArrayList<>();
-        for (String type : techTypes)
-            techs.addAll(Helper.getAllTechOfAType(game, type, player));
-        List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
+        List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techType, player);
+        List<Button> buttons = Helper.getTechButtons(techs, techType, player, "nekro");
         String message = player.getRepresentation() + " Use the buttons to get the tech you want";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
@@ -1661,27 +1673,30 @@ public class ButtonHelperHeroes {
     public static List<Button> getJolNarHeroSwapInOptions(Player player, Game game, String buttonID) {
         String tech = buttonID.replace("jnHeroSwapOut_", "");
         TechnologyModel techM = Mapper.getTech(tech);
-        List<TechnologyModel> techs = new ArrayList<>();
-        for (TechnologyType type : techM.getTypes())
-            techs.addAll(Helper.getAllTechOfAType(game, type.toString(), player));
-        return Helper.getTechButtons(techs, player, tech);
+        List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techM.getType().toString(), player);
+        return Helper.getTechButtons(techs, techM.getType().toString(), player, tech);
     }
 
-    public static void resolveAJolNarSwapStep1(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+    public static void resolveAJolNarSwapStep1(Player player, Game game, String buttonID,
+        ButtonInteractionEvent event) {
         List<Button> buttons = getJolNarHeroSwapInOptions(player, game, buttonID);
         String message = player.getRepresentation(true, true) + " select the tech you would like to acquire";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game), message,
+            buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    public static void resolveAJolNarSwapStep2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+    public static void resolveAJolNarSwapStep2(Player player, Game game, String buttonID,
+        ButtonInteractionEvent event) {
         String techOut = buttonID.split("__")[1];
         String techIn = buttonID.split("__")[2];
         TechnologyModel techM1 = Mapper.getTech(techOut);
         TechnologyModel techM2 = Mapper.getTech(techIn);
         player.addTech(techIn);
         player.removeTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " swapped the tech '" + techM1.getName() + "' for the tech '" + techM2.getName() + "'");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
+            ButtonHelper.getIdent(player) + " swapped the tech '" + techM1.getName() + "' for the tech '"
+                + techM2.getName() + "'");
         event.getMessage().delete().queue();
     }
 

@@ -2,7 +2,7 @@
     {
         "alias": "2pHyperlanes",
         "author": "Jazz",
-        "descr": "Minimal 2 player map",
+        "descr": "2 player map",
         "playerCount": 2,
         "tilesPerPlayer": 5,
         "toroidal": false,

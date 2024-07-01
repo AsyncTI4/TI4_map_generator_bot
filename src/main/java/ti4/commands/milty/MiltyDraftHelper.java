@@ -20,14 +20,16 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.milty.MiltyDraftManager.PlayerDraft;
 import ti4.generator.MapGenerator;
-import ti4.generator.MapGenerator.HorizontalAlign;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.generator.MapGenerator.HorizontalAlign;
 import ti4.helpers.Emojis;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.MapTemplateHelper;
@@ -41,9 +43,9 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
-import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
+import ti4.model.Source.ComponentSource;
 
 public class MiltyDraftHelper {
 
@@ -61,14 +63,13 @@ public class MiltyDraftHelper {
     private static FileUpload generateImage(Game game) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         List<MiltyDraftSlice> slices = manager.getSlices();
-        MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
 
         int sliceCount = slices.size();
         int spanW = (int) (Math.ceil(Math.sqrt(sliceCount)) + 0.01);
         int spanH = (sliceCount + spanW - 1) / spanW;
 
         float scale = 1f;
-        int scaled = (int) (mapTemplate.squareSliceImageSize() * scale);
+        int scaled = (int) (900 * scale);
         int width = scaled * spanW;
         int height = scaled * spanH;
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -82,14 +83,7 @@ public class MiltyDraftHelper {
                 .filter(player -> manager.getPlayerDraft(player) != null)
                 .filter(player -> slice.equals(manager.getPlayerDraft(player).getSlice()))
                 .findFirst().orElse(null);
-
-            BufferedImage sliceImage;
-            if (game.isFoWMode()) {
-                sliceImage = partialSliceImage(slice, mapTemplate, playerPicked != null);
-            } else {
-                sliceImage = sliceImageWithPlayerInfo(slice, manager, playerPicked);
-            }
-
+            BufferedImage sliceImage = generateSliceImage(slice, manager, playerPicked);
             BufferedImage resizedSlice = ImageHelper.scale(sliceImage, scale);
             graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
             index++;
@@ -106,7 +100,8 @@ public class MiltyDraftHelper {
 
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            String ext = "jpg";
+            boolean jpg = true;
+            String ext = jpg ? "jpg" : "png";
             BufferedImage jpgImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             jpgImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
@@ -116,7 +111,7 @@ public class MiltyDraftHelper {
                 defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
                 defaultWriteParam.setCompressionQuality(1.0f);
             }
-            imageWriter.write(null, new IIOImage(jpgImage, null, null), defaultWriteParam);
+            imageWriter.write(null, new IIOImage(jpg ? jpgImage : mainImage, null, null), defaultWriteParam);
             String fileName = game.getName() + "_miltydraft_" + MapGenerator.getTimeStamp() + "." + ext;
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
@@ -129,27 +124,33 @@ public class MiltyDraftHelper {
     private static final BasicStroke innerStroke = new BasicStroke(4.0f);
     private static final BasicStroke outlineStroke = new BasicStroke(9.0f);
 
-    private static BufferedImage partialSliceImage(MiltyDraftSlice slice, MapTemplateModel template, boolean taken) {
-        List<Point> tilePositions = template.tileDisplayCoords();
-        int imageSize = template.squareSliceImageSize();
-        Point hs = tilePositions.get(0);
+    private static BufferedImage generateSliceImage(MiltyDraftSlice slice, MiltyDraftManager manager, Player player) {
+        Point left = new Point(0, 450);
+        Point front = new Point(260, 300);
+        Point right = new Point(520, 450);
+        Point equidistant = new Point(0, 150);
+        Point farFront = new Point(260, 0);
+        Point hs = new Point(260, 600);
 
         List<String> tileStrings = new ArrayList<>();
-        tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
         tileStrings.addAll(slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
+        tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
+        List<Point> tilePositions = Arrays.asList(left, front, right, equidistant, farFront, hs);
 
         String fow = slice.getTiles().get(0).getTile().getFowTilePath(null);
         BufferedImage fogFilter = ImageHelper.read(fow);
 
-        BufferedImage sliceImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = sliceImage.getGraphics();
 
         int index = 0;
+        BufferedImage img = null;
         for (String tilePath : tileStrings) {
-            BufferedImage img = ImageHelper.read(tilePath);
+            img = ImageHelper.read(tilePath);
             Point p = tilePositions.get(index);
             graphics.drawImage(img, p.x, p.y, null);
-            if (taken) graphics.drawImage(fogFilter, p.x, p.y, null);
+            if (player != null) graphics.drawImage(fogFilter, p.x, p.y, null);
+
             index++;
         }
         List<BufferedImage> whs = new ArrayList<>();
@@ -203,6 +204,11 @@ public class MiltyDraftHelper {
 
         ((Graphics2D) graphics).setStroke(innerStroke);
 
+        HorizontalAlign hCenter = HorizontalAlign.Center;
+        graphics.setColor(Color.white);
+        graphics.setFont(Storage.getFont64());
+        MapGenerator.superDrawString(graphics, slice.getName(), hs.x + 172, hs.y + 50, Color.white, hCenter, null, outlineStroke, Color.black);
+
         index = 0;
         graphics.setColor(Color.black);
         for (BufferedImage featureImage : features) {
@@ -216,37 +222,16 @@ public class MiltyDraftHelper {
             if (index >= featurePoints.size()) break;
         }
 
-        HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont50());
         MapGenerator.superDrawString(graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
         MapGenerator.superDrawString(graphics, optimalString, hs.x + 172, hs.y + 165, Color.white, hCenter, null, outlineStroke, Color.black);
-
-        return sliceImage;
-    }
-
-    private static BufferedImage sliceImageWithPlayerInfo(MiltyDraftSlice slice, MiltyDraftManager manager, Player player) {
-        MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
-        List<Point> tilePositions = mapTemplate.tileDisplayCoords();
-        Point hs = tilePositions.get(0);
-
-        BufferedImage sliceImage = partialSliceImage(slice, mapTemplate, player != null);
-        Graphics graphics = sliceImage.getGraphics();
-
-        HorizontalAlign hCenter = HorizontalAlign.Center;
-        graphics.setColor(Color.white);
-        graphics.setFont(Storage.getFont64());
-        MapGenerator.superDrawString(graphics, slice.getName(), hs.x + 172, hs.y + 50, Color.white, hCenter, null, outlineStroke, Color.black);
-
         if (player != null) {
-            graphics.setColor(Color.white);
-            graphics.setFont(Storage.getFont50());
-
             PlayerDraft pd = manager.getPlayerDraft(player);
             String playerName = player.getUserName();
             String faction = pd.getFaction() == null ? "no faction" : pd.getFaction();
+            graphics.setFont(Storage.getFont50());
             MapGenerator.superDrawString(graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
-
             if (pd.getFaction() != null) {
                 FactionModel factionModel = Mapper.getFaction(faction);
                 String factionName = factionModel.getFactionName();
@@ -254,7 +239,7 @@ public class MiltyDraftHelper {
                     factionName = "The Council Keleres";
                 graphics.setFont(Storage.getFont35());
                 MapGenerator.superDrawString(graphics, factionName, hs.x + 172, hs.y + 270, Color.orange, hCenter, null, outlineStroke, Color.black);
-                BufferedImage img = getEmojiImage(factionModel.getFactionEmoji());
+                img = getEmojiImage(factionModel.getFactionEmoji());
                 int offset = graphics.getFontMetrics().stringWidth(factionName) / 2 + 10;
                 graphics.drawImage(img, hs.x + 172 - offset - 40, hs.y + 240, null);
                 graphics.drawImage(img, hs.x + 172 + offset, hs.y + 240, null);
@@ -265,7 +250,10 @@ public class MiltyDraftHelper {
     }
 
     private static BufferedImage getEmojiImage(String emojiString) {
-        return ImageHelper.readEmojiImageScaled(emojiString, 40);
+        int size = 40;
+        if (Emoji.fromFormatted(emojiString) instanceof CustomEmoji e)
+            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
+        return null;
     }
 
     public static void initDraftTiles(MiltyDraftManager manager, Game game) {

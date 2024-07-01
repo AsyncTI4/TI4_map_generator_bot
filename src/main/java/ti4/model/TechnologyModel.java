@@ -60,28 +60,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return types.get(0);
     }
 
-    @JsonIgnore
-    public TechnologyType getFirstType() {
-        List<TechnologyType> priority = List.of(
-            TechnologyType.PROPULSION,
-            TechnologyType.BIOTIC,
-            TechnologyType.CYBERNETIC,
-            TechnologyType.WARFARE,
-            TechnologyType.UNITUPGRADE);
-        for (TechnologyType t : priority)
-            if (types.contains(t)) return t;
-        return TechnologyType.NONE;
-    }
-
-    @JsonIgnore
-    public boolean isType(String type) {
-        for (TechnologyType techType : types) {
-            if (techType.toString().equalsIgnoreCase(type))
-                return true;
-        }
-        return false;
-    }
-
     public boolean isPropulsionTech() {
         return types.contains(TechnologyType.PROPULSION);
     }

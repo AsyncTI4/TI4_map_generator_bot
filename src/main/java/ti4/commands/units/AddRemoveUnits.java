@@ -126,7 +126,8 @@ abstract public class AddRemoveUnits implements Command {
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, game);
     }
 
-    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game game) {
+    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList,
+        Game game) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
 
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {

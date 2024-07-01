@@ -2,14 +2,11 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -19,6 +16,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreSubcommandData;
@@ -1261,28 +1260,6 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
-    public static void checkIihqAttachment(Game game) {
-        Tile tile = game.getMecatolTile();
-        if (tile == null) return; // no mecatol tile
-        for (Planet mecatol : tile.getPlanetUnitHolders()) {
-            if (Constants.MECATOLS.contains(mecatol.getName())) {
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_2);
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken("token_custodiavigilia_1.png");
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken("token_custodiavigilia_2.png");
-
-                for (Player player : game.getRealPlayers()) {
-                    if (!player.hasTech("iihq")) continue;
-                    if (player.controlsMecatol(true)) {
-                        mecatol.addToken(Constants.ATTACHMENT_IIHQ_1);
-                    } else {
-                        mecatol.addToken(Constants.ATTACHMENT_IIHQ_2);
-                    }
-                }
-            }
-        }
-    }
-
     public static void KeleresIIHQCCGainCheck(Player player, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -1302,6 +1279,7 @@ public class ButtonHelperFactionSpecific {
                 break;
             }
         }
+
     }
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game game) {
@@ -1449,7 +1427,8 @@ public class ButtonHelperFactionSpecific {
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String message = "Use buttons to select how to use the Kollecc AI Survey PN";
         // System.out.println(player.getFaction() + " is playing PN KOLLEC");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
+            buttons);
     }
 
     public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game game, Player player,

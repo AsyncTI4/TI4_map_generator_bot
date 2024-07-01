@@ -90,7 +90,7 @@ public class ButtonHelperCommanders {
         Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         count = Math.max(p.getInfluence(), p.getResources());
         player.setTg(oldTg + count);
-        PlanetExhaust.doAction(player, planet, game);
+        new PlanetExhaust().doAction(player, planet, game);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         String msg = player.getRepresentation(true, true) + " used Olradin Commander to exhaust "
@@ -187,9 +187,8 @@ public class ButtonHelperCommanders {
     }
 
     public static void handleRavenCommander(ButtonContext context) {
-        Game game = context.getGame();
-        Player player = context.getPlayer();
-        String buttonID = context.getButtonID();
+        Game game = context.game;
+        Player player = context.player;
 
         String part1 = "ravenMigration";
         String part2 = part1 + "_" + RegexHelper.posRegex(game, "posfrom");
@@ -200,14 +199,14 @@ public class ButtonHelperCommanders {
         Matcher matcher;
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
-        if ((matcher = Pattern.compile(part1).matcher(buttonID)).matches()) {
+        if ((matcher = Pattern.compile(part1).matcher(context.buttonID)).matches()) {
             String message = player.getRepresentation() + " Choose a tile to migrate from:";
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
-            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
+            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, context.buttonID, pred, false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteTheOneButton(context.getEvent());
 
-        } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part2).matcher(context.buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Choose a unit you'd like to move:";
             for (UnitHolder uh : from.getUnitHolders().values()) {
@@ -224,7 +223,7 @@ public class ButtonHelperCommanders {
                     .forEach(newButtons::add);
             }
 
-        } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part3).matcher(context.buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             String unitHolderFrom = matcher.group("planetfrom");
             PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
@@ -244,7 +243,7 @@ public class ButtonHelperCommanders {
                 }
             }
 
-        } else if ((matcher = Pattern.compile(part4).matcher(buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part4).matcher(context.buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             String unitHolderFrom = matcher.group("planetfrom");
             PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
@@ -263,7 +262,7 @@ public class ButtonHelperCommanders {
                 newButtons.add(Button.success(prefix + uh.getName(), planetNameTo));
             }
 
-        } else if ((matcher = Pattern.compile(part5).matcher(buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part5).matcher(context.buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             String unitHolderFrom = matcher.group("planetfrom");
             PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
@@ -284,7 +283,7 @@ public class ButtonHelperCommanders {
             String message = player.getRepresentation() + " your " + unitType.humanReadableName() + " successfully migrated " + fromLang + ", and has landed itself " + toLang;
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.deleteMessage(context.getEvent());
+            ButtonHelper.deleteMessage(context.event);
         }
 
         if (newMessage != null) {

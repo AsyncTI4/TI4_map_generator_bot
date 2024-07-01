@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -58,69 +57,53 @@ public class RegexHelper {
         return sb.toString();
     }
 
-    /**
-     * @param game if provided, only match colors present in this game
-     * @return group "color" matching any color in the bot
-     */
+    /* Provide a regex group that matches on any legal color in the bot */
+    /* If a game object is provided, only match on the colors present in that particular game */
     public static String colorRegex(Game game) {
         Set<String> colorNames = legalColors(game);
         return regexBuilder("color", colorNames);
     }
 
-    /**
-     * @param game if provided, only match factions present in this game
-     * @return group "faction" matching any faction in the bot
-     */
+    /* Provide a regex group that matches on any faction in the bot */
+    /* If a game object is provided, only match on the factions present in that particular game */
     public static String factionRegex(Game game) {
         Set<String> factionAliases = legalFactions(game);
         return regexBuilder("faction", factionAliases);
     }
 
-    /**
-     * @param game if provided, only match colors and factions present in this game
-     * @return group "factionorcolor" matching any faction/color in the bot
-     */
+    /* Provide a regex group that matches on any faction or legal color in the bot */
+    /* If a game object is provided, only match on the colors and factions present in that particular game */
     public static String factionOrColorRegex(Game game) {
         Set<String> matchers = legalFactions(game);
         matchers.addAll(legalColors(game));
         return regexBuilder("factionorcolor", matchers);
     }
 
-    /** @return group "unittype" */
-    public static String unitTypeRegex(String group) {
+    public static String unitTypeRegex() {
         Set<String> types = new HashSet<>();
         Arrays.asList(UnitType.values()).forEach(x -> types.add(x.getValue()));
-        return regexBuilder(group, types);
+        return regexBuilder("unittype", types);
     }
 
-    /** @return group "unittype" */
-    public static String unitTypeRegex() {
-        return unitTypeRegex("unittype");
-    }
-
-    /** @return group "genericcard" */
     public static String genericCardRegex() {
         Set<String> cards = Mapper.getGenericCards().keySet();
         return regexBuilder("genericcard", cards);
     }
 
-    /** @return group matching any number of digits 0-9 */
     public static String intRegex(String group) {
         return regexBuilder(group, "[0-9]+");
     }
 
-    /** @return group matching any legal tile position on the map */
+    public static String posRegex(Game game) {
+        Set<String> positions = game.getTileMap().keySet();
+        return regexBuilder("pos", positions);
+    }
+
     public static String posRegex(Game game, String group) {
         Set<String> positions = game.getTileMap().keySet();
         return regexBuilder(group, positions);
     }
 
-    /** @return group "pos" matching any tile position on the map */
-    public static String posRegex(Game game) {
-        return posRegex(game, "pos");
-    }
-
-    /** @return group matching any planet on the map, and also "space" */
     public static String unitHolderRegex(Game game, String group) {
         Set<String> unitholders = new HashSet<>();
         unitholders.addAll(game.getPlanets());
@@ -128,13 +111,11 @@ public class RegexHelper {
         return regexBuilder(group, unitholders);
     }
 
-    /** @return group "relic" */
     public static String relicRegex(Game game) {
         Set<String> relics = new HashSet<>(Mapper.getDeck(game.getRelicDeckID()).getNewDeck());
         return regexBuilder("relic", relics);
     }
 
-    /** @return group "ac" */
     public static String acRegex(Game game) {
         Set<String> allACs = new HashSet<>();
         if (game != null) {
@@ -146,29 +127,7 @@ public class RegexHelper {
         return regexBuilder("ac", allACs);
     }
 
-    /** @return group "page" */
     public static String pageRegex() {
-        return "page" + RegexHelper.intRegex("page") + "$";
-    }
-
-    /** @return group "token" */
-    public static String tokenRegex() {
-        Set<String> tokens = new HashSet<>(Mapper.getTokens());
-        return regexBuilder("token", tokens);
-    }
-
-    // TODO: Use this
-    /** format "__{Pfstkx}" @return groups ["type", "free", "swap", "tgsOnly", "share", "faction"] */
-    public static String techMenuSuffixRegex() {
-        String regex = "__\\{";
-        List<String> groups = new ArrayList<>();
-        groups.add(regexBuilder("type", "[PBCWUA]"));
-        groups.add(regexBuilder("free", "f?"));
-        groups.add(regexBuilder("swap", "s?"));
-        groups.add(regexBuilder("tgsOnly", "t?"));
-        groups.add(regexBuilder("share", "k?"));
-        regex += String.join("", groups);
-        regex += "\\}";
-        return regex;
+        return "page" + RegexHelper.intRegex("page") + "^";
     }
 }

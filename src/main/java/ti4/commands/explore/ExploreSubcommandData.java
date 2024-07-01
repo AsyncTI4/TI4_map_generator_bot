@@ -336,8 +336,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid planet: " + mirageID);
                     return;
                 }
-                PlanetAdd.doAction(player, mirageID, game);
-                PlanetRefresh.doAction(player, mirageID, game);
+                new PlanetAdd().doAction(player, mirageID, game);
+                new PlanetRefresh().doAction(player, mirageID, game);
                 String exploreID = game.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),

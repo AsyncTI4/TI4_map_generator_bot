@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.GlyphVector;
@@ -136,7 +135,6 @@ public class MapGenerator {
     private long debugTileTime;
     private long debugGameInfoTime;
     private long debugDiscordTime;
-
     private static final BasicStroke stroke1 = new BasicStroke(1.0f);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
@@ -469,6 +467,10 @@ public class MapGenerator {
         if (factionPath == null)
             return null;
 
+        if (width == 95 && height == 95) { // default faction image size is 95x95
+            return ImageHelper.read(factionPath);
+        }
+
         return ImageHelper.readScaled(factionPath, width, height);
     }
 
@@ -485,17 +487,17 @@ public class MapGenerator {
         return null;
     }
 
-    public static void drawBanner(Player player) {
+    public static void drawBanner(Player player){
         Graphics bannerG;
         BufferedImage bannerImage = new BufferedImage(325, 50, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("factionbanner_background.png"), 325, 50);
         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(player.getColor()) + ".png";
-        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pnColorFile), 1.5f);
+        BufferedImage colorImage = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource(pnColorFile),1.5f);
         BufferedImage gradientImage = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("factionbanner_gradient.png"));
         BufferedImage smallFactionImage = getPlayerFactionIconImageScaled(player, 0.26f);
         BufferedImage largeFactionImage = getPlayerFactionIconImageScaled(player, 1.4f);
         bannerG = bannerImage.getGraphics();
-
+    
         bannerG.drawImage(backgroundImage, 0, 0, null);
         Graphics2D bannerG2d = (Graphics2D) bannerG;
         bannerG2d.rotate(Math.toRadians(-90));
@@ -507,13 +509,14 @@ public class MapGenerator {
         bannerG.setFont(Storage.getFont16());
         bannerG.setColor(Color.WHITE);
         String name = Mapper.getFaction(player.getFaction()).getFactionName().toUpperCase();
-        if (name.contains("KELERES")) {
+        if(name.contains("KELERES")){
             name = "THE COUNCIL KELERES";
         }
-        if (name.contains("FRANKEN") && player.getDisplayName() != null && !player.getDisplayName().isEmpty()) {
+        if(name.contains("FRANKEN") && player.getDisplayName() != null && !player.getDisplayName().isEmpty()){
             name = player.getDisplayName().toUpperCase();
         }
-        superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
+        bannerG.drawString(name, 29, 44);
+        //superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke1, Color.BLACK);
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             // CONVERT PNG TO JPG
@@ -529,7 +532,7 @@ public class MapGenerator {
 
             imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
 
-            String fileName = player.getFaction() + player.getColor() + "banner.jpg";
+            String fileName = player.getFaction()+player.getColor()+"banner.jpg";
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload", e);
@@ -537,7 +540,6 @@ public class MapGenerator {
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
 
     }
-
     private void drawGame(GenericInteractionCreateEvent event) {
 
         boolean finRun = false;
@@ -642,7 +644,6 @@ public class MapGenerator {
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
             for (Player player : players) {
-                if (player == null) continue;
                 int baseY = y;
                 x = realX;
 
@@ -1168,7 +1169,7 @@ public class MapGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
-        List<String> relics = new ArrayList<>(player.getRelics());
+        List<String> relics = new ArrayList(player.getRelics());
         List<String> fakeRelics = relics.stream()
             .filter(relic -> Mapper.getRelic(relic).isFakeRelic())
             .filter(relic -> !relic.contains("axisorder"))
@@ -1433,13 +1434,8 @@ public class MapGenerator {
         return x + deltaX + 10;
     }
 
-    private static void getAndDrawControlToken(Graphics graphics, Player p, int x, int y, boolean hideFactionIcon, float scale) {
-        String colorID = p == null ? "gray" : p.getColor();
-        BufferedImage controlToken = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(colorID)), scale);
-        drawControlToken(graphics, controlToken, p, x, y, hideFactionIcon, scale);
-    }
-
-    private static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
+    private static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y,
+        boolean hideFactionIcon, float scale) {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
         if (hideFactionIcon)
@@ -2025,7 +2021,7 @@ public class MapGenerator {
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             TechnologyModel techModel = Mapper.getTech(tech);
-            String techType = techModel.getFirstType().toString();
+            String techType = techModel.getType().toString();
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techType = game.getStoredValue("colorChange" + tech);
             }
@@ -2141,13 +2137,14 @@ public class MapGenerator {
                 continue;
             }
 
-            int types = 0;
-            String techIcon = "";
-            if (techInformation.isPropulsionTech() && types++ < 2) techIcon += "propulsion";
-            if (techInformation.isCyberneticTech() && types++ < 2) techIcon += "cybernetic";
-            if (techInformation.isBioticTech() && types++ < 2) techIcon += "biotic";
-            if (techInformation.isWarfareTech() && types++ < 2) techIcon += "warfare";
-
+            String techIcon;
+            switch (techInformation.getType()) {
+                case WARFARE -> techIcon = Constants.WARFARE;
+                case PROPULSION -> techIcon = Constants.PROPULSION;
+                case CYBERNETIC -> techIcon = Constants.CYBERNETIC;
+                case BIOTIC -> techIcon = Constants.BIOTIC;
+                default -> techIcon = "";
+            }
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techIcon = game.getStoredValue("colorChange" + tech);
             }
@@ -2421,6 +2418,16 @@ public class MapGenerator {
         }
     }
 
+    private void drawPAImageScaledDown(int x, int y, String resourceName, float percent) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, percent);
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
         try {
             String path = Tile.getUnitPath(unitKey);
@@ -2500,11 +2507,9 @@ public class MapGenerator {
         Color origColor = g2.getColor();
         AffineTransform originalTileTransform = g2.getTransform();
         Stroke origStroke = g2.getStroke();
-        RenderingHints origHints = g2.getRenderingHints();
 
         GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), text);
         Shape textShape = gv.getOutline();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2.translate(x, y);
         g2.setColor(outlineColor);
@@ -2517,7 +2522,6 @@ public class MapGenerator {
         g2.setColor(origColor);
         g2.setStroke(origStroke);
         g2.setTransform(originalTileTransform);
-        g2.setRenderingHints(origHints);
     }
 
     private int drawScoreTrack(int y) {
@@ -2738,9 +2742,8 @@ public class MapGenerator {
         PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
             Point positionPoint = PositionMapper.getTilePosition(pos);
             if (positionPoint == null) return 100000000f;
-            int ring = tileRing(pos);
             Point realPosition = getTilePosition(pos, positionPoint.x, positionPoint.y);
-            return realPosition.distance(anchorPt) + (ring * 75);
+            return realPosition.distance(anchorPt);
         }));
         pq.addAll(validPositions);
 
@@ -2787,24 +2790,23 @@ public class MapGenerator {
         // highlightValidStatTiles(game);
         boolean useNewSystem = true;
         Set<String> statTilesInUse = new HashSet<>();
-        Map<String, List<String>> playerStatTiles = new LinkedHashMap<>();
+        Map<Player, List<String>> playerStatTiles = new LinkedHashMap<>();
         for (Player p : game.getRealPlayers()) {
-            if (p.getFaction() == null) continue;
             List<String> myStatTiles = findThreeNearbyStatTiles(game, p, statTilesInUse);
             if (myStatTiles == null) {
                 useNewSystem = false;
                 break;
             }
             statTilesInUse.addAll(myStatTiles);
-            playerStatTiles.put(p.getFaction(), myStatTiles);
+            playerStatTiles.put(p, myStatTiles);
         }
 
         for (Player player : players) {
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
-            if (useNewSystem) {
-                List<String> tiles = playerStatTiles.get(player.getFaction());
+            if (useNewSystem && !(isFoWPrivate != null && isFoWPrivate)) { //TODO: Fix new system for FoW and remove extra bools
+                List<String> tiles = playerStatTiles.get(player);
                 paintPlayerInfo(game, player, tiles);
             } else {
                 paintPlayerInfoOld(game, player, ringCount);
@@ -2833,8 +2835,6 @@ public class MapGenerator {
             new Point(256, 296),
             new Point(88, 296),
             new Point(2, 149));
-        //corners.forEach(c -> c.translate(10, 10)); // offset by 10 pixels so that our border can slightly overlap the bounds of the hex
-
         for (int i = 0; i < 6; i++) {
             if (openSides.contains(i)) continue;
             Point c1 = corners.get(i);
@@ -2860,21 +2860,12 @@ public class MapGenerator {
 
             // Draw lines both directions so the dash is symmetrical
             g2.setPaint(gpOne);
-            g2.drawLine(c1.x, c1.y, c2.x, c2.y);
+            g2.drawLine(c1.x + 10, c1.y + 10, c2.x + 10, c2.y + 10);
             g2.setPaint(gpTwo);
-            g2.drawLine(c2.x, c2.y, c1.x, c1.y);
+            g2.drawLine(c2.x + 10, c2.y + 10, c1.x + 10, c1.y + 10);
         }
 
         return img;
-    }
-
-    private BufferedImage hexBorderCache(ColorModel color, List<Integer> openSides) {
-        Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides);
-        Collections.sort(openSides);
-        String key = color.getName() + "-HexBorder";
-        for (int x : openSides)
-            key += "_" + x;
-        return ImageHelper.createOrLoadCalculatedImage(key, loader);
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
@@ -2912,8 +2903,9 @@ public class MapGenerator {
             for (int i = 0; i < 6; i++)
                 if (statTiles.contains(adjPos.get(i)))
                     adjDir.add(i);
-            BufferedImage hex = hexBorderCache(playerColor, adjDir);
-            graphics.drawImage(hex, p.x, p.y, null);
+            BufferedImage hex = hexBorder(playerColor, adjDir);
+
+            graphics.drawImage(hex, p.x - 10, p.y - 10, null);
         }
 
         Point miscTile; // To be used for speaker and other stuff
@@ -2922,7 +2914,7 @@ public class MapGenerator {
             point = PositionMapper.getPlayerStats("factionicon");
             int size = 275;
             point.translate(statTileMid.x - (size / 2), statTileMid.y - (size / 2));
-            drawPlayerFactionIconImageOpaque(graphics, player, point.x, point.y, size, size, 0.40f);
+            drawPlayerFactionIconImageOpaque(graphics, player, point.x, point.y, size, size, 0.45f);
         }
 
         { // PAINT USERNAME
@@ -3000,7 +2992,8 @@ public class MapGenerator {
 
             for (int sc : playerSCs) {
                 if (sc == 0) {
-                    drawPAImageScaled(point.x, point.y, "pa_telepathic.png", scsize);
+                    BufferedImage img = ImageHelper.readScaled(ResourceHelper.getInstance().getPAResource("pa_telepathic.png"), scsize, scsize);
+                    graphics.drawImage(img, point.x, point.y, null);
                     point.translate(scsize, 0);
                 } else {
                     int fontYoffset = (scsize / 2) + 25;
@@ -3311,45 +3304,51 @@ public class MapGenerator {
         String ccPath = Mapper.getCCPath(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
-        List<String> mahactCC = player.getMahactCC();
-        boolean hasMahactCCs = !player.getMahactCC().isEmpty() && player.hasAbility("edict");
-
         try {
             BufferedImage ccImage = ImageHelper.read(ccPath);
             BufferedImage blankCC = ImageHelper.read(Mapper.getCCPath("command_blank.png"));
             int delta = rightAlign ? -20 : 20;
+            int lastCCPosition = -1;
 
-            // DRAW TWO ARMADA TOKENS
             if (hasArmada) {
-                BufferedImage armadaLowerCCImage = ImageHelper.read(Mapper.getCCPath(Mapper.getCCID(player.getColor())));
-                BufferedImage armadaCCImage = ImageHelper.read(Mapper.getCCPath("fleet_armada.png"));
+                String armadaLowerCCID = Mapper.getCCID(player.getColor());
+                String armadaLowerCCPath = Mapper.getCCPath(armadaLowerCCID);
+                BufferedImage armadaLowerCCImage = ImageHelper.read(armadaLowerCCPath);
+                String armadaCCID = "fleet_armada.png";
+                String armadaCCPath = Mapper.getCCPath(armadaCCID);
+                BufferedImage armadaCCImage = ImageHelper.read(armadaCCPath);
+
+                // DRAW TWO ARMADA TOKENS
                 for (int i = 0; i < 2; i++) {
-                    graphics.drawImage(armadaLowerCCImage, x, y, null);
-                    graphics.drawImage(armadaCCImage, x, y, null);
-                    x += delta;
+                    graphics.drawImage(armadaLowerCCImage, x + (delta * i), y, null);
+                    graphics.drawImage(armadaCCImage, x + (delta * i), y, null);
                 }
-                x += delta;
-            }
+                x += (delta * 1.5f);
 
-            if (ccCount == 0 && !hasArmada && !hasMahactCCs) {
-                ccCount = 1;
-                ccImage = blankCC;
+                // DRAW FLEET TOKENS
+                for (int i = 2; i < ccCount + 2; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                    lastCCPosition = i;
+                }
+            } else {
+                if (ccCount == 0 && (player.getMahactCC().isEmpty() || !player.hasAbility("edict"))) {
+                    ccCount = 1;
+                    ccImage = blankCC;
+                }
+                for (int i = 0; i < ccCount; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                    lastCCPosition = i;
+                }
             }
-
-            // DRAW FLEET TOKENS
-            for (int i = 0; i < ccCount; i++) {
-                graphics.drawImage(ccImage, x, y, null);
-                x += delta;
-            }
-
-            if (hasMahactCCs) {
-                if (hasArmada || ccCount >= 1)
-                    x += delta;
+            List<String> mahactCC = player.getMahactCC();
+            if (!mahactCC.isEmpty() && player.hasAbility("edict")) {
+                x += 10;
                 for (String ccColor : mahactCC) {
+                    lastCCPosition++;
                     String fleetCCID = Mapper.getCCPath(Mapper.getFleetCCID(ccColor));
                     BufferedImage ccImageExtra = ImageHelper.readScaled(fleetCCID, 1.0f);
-                    graphics.drawImage(ccImageExtra, x, y, null);
-                    x += delta;
+                    graphics.drawImage(ccImageExtra, x + (delta * lastCCPosition), y, null);
+
                 }
             }
         } catch (Exception e) {
@@ -4002,7 +4001,8 @@ public class MapGenerator {
             BufferedImage tileImage = partialTileImage(tile, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
-            BotLogger.log("Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);
+            BotLogger.log("Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(),
+                exception);
         }
     }
 

@@ -1,6 +1,5 @@
 package ti4.commands.planet;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.map.Game;
@@ -13,15 +12,11 @@ public class PlanetExhaust extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
-        doAction(player, planet, game);
-    }
-
-    public static void doAction(Player player, String planet, Game game) {
+    public void doAction(Player player, String planet, Game game) {
         doAction(player, planet, game, true);
     }
 
-    public static void doAction(Player player, String planet, Game game, boolean triggerOlradin) {
+    public void doAction(Player player, String planet, Game game, boolean triggerOlradin) {
         if (!player.getPlanets().contains(planet)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " the bot doesnt think you have planet by the name of " + planet);
         }

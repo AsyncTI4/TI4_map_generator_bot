@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -174,7 +175,7 @@ public class Stats extends PlayerSubcommandData {
 				for (Player player2 : activeGame2.getRealPlayers()) {
 					if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
 						player2.setPersonalPingInterval(optionInterval.getAsInt());
-						GameSaveLoadManager.saveMap(activeGame2, event);
+						GameSaveLoadManager.saveMap(activeGame2);
 					}
 				}
 
@@ -189,7 +190,7 @@ public class Stats extends PlayerSubcommandData {
 				for (Player player2 : activeGame2.getRealPlayers()) {
 					if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
 						player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-						GameSaveLoadManager.saveMap(activeGame2, event);
+						GameSaveLoadManager.saveMap(activeGame2);
 					}
 				}
 			}

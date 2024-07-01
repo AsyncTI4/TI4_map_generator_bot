@@ -152,8 +152,9 @@ public class HeroPlay extends LeaderAction {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
-                    PlanetRefresh.doAction(player, "elysium", game);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Attachment added to Elysium and it has been readied");
+                    new PlanetRefresh().doAction(player, "elysium", game);
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "`Use the following command to add the attachment: /add_token token:titanshero`");

@@ -54,8 +54,7 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
 
     public static boolean userMayUseDecal(String userID, String decalID) {
         return switch (decalID) {
-            case "cb_10" -> userID.equals(Constants.jazzId); // jazz -> jazz
-            case "cb_11" -> Constants.tourneyWinners.contains(userID); // tournament winner decal
+            case "cb_10" -> userID.equals("228999251328368640"); // jazz -> jazz
             case "cb_52" -> userID.equals("214326507458396161"); // sigma -> void
             case "cb_12", "cb_34", "cb_35", "cb_36" -> false; // disable tech icons to prevent confusion
             case "cb_37", "cb_38", "cb_39", "cb_40" -> false; // disable trait icons to prevent confusion

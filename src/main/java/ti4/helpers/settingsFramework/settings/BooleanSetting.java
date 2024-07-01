@@ -3,66 +3,52 @@ package ti4.helpers.settingsFramework.settings;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
-@Getter
-@Setter
-@JsonIncludeProperties({ "id", "val" })
+@NoArgsConstructor
 public class BooleanSetting extends SettingInterface {
-    private boolean val;
+    // Will show up in json
+    public boolean val;
+    // Will not show up in json
     private String whenFalse;
     private String whenTrue;
     private boolean defaultValue;
 
-    public BooleanSetting(String id, String name, boolean val) {
-        super(id, name);
-
+    public BooleanSetting(String id, String name, boolean val, BooleanSetting value) {
+        this.id = id;
+        this.name = name;
         this.defaultValue = val;
-        this.val = val;
+        this.val = value == null ? val : value.val;
         this.whenFalse = "Enable";
         this.whenTrue = "Disable";
     }
 
-    public BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
-        super(id, name);
-
+    public BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue, BooleanSetting value) {
+        this.id = id;
+        this.name = name;
         this.defaultValue = val;
-        this.val = val;
+        this.val = value == null ? val : value.val;
         this.whenFalse = whenFalse;
         this.whenTrue = whenTrue;
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    // Abstract Methods
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    protected void init(JsonNode json) {
-        if (json.has("val")) val = json.get("val").asBoolean(val);
-    }
-
-    public String modify(GenericInteractionCreateEvent event, String action) {
-        if (action.equals("tog" + id)) return toggle();
-        return "[invalid action: " + action + "]";
-    }
-
-    public void reset() {
-        val = defaultValue;
-    }
-
-    protected String shortValue() {
+    public String shortValue() {
         return val ? "✅" : "❌";
     }
 
-    protected String longValue() {
+    public String longValue() {
         String val = shortValue();
         val += " *(default=" + (defaultValue ? "✅" : "❌") + ")*";
         return val;
+    }
+
+    // Abstract methods
+    public String modify(GenericInteractionCreateEvent event, String action) {
+        if (action.equals("tog" + id)) return toggle();
+        return "[invalid action: " + action + "]";
     }
 
     protected List<Button> buttons(String idPrefix) {
@@ -74,9 +60,11 @@ public class BooleanSetting extends SettingInterface {
         return new ArrayList<>(List.of(tog));
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    // Helper Methods
-    // ---------------------------------------------------------------------------------------------------------------------------------
+    public void reset() {
+        val = defaultValue;
+    }
+
+    // Helper methods
     public String toggle() {
         val = !val;
         return null;

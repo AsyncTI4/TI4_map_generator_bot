@@ -121,24 +121,10 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.context.ButtonContext;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.Leader;
-import ti4.map.Planet;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
-import ti4.model.AgendaModel;
-import ti4.model.ExploreModel;
-import ti4.model.FactionModel;
-import ti4.model.RelicModel;
-import ti4.model.StrategyCardModel;
-import ti4.model.TechnologyModel;
-import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.*;
 
 public class ButtonListener extends ListenerAdapter {
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
@@ -173,25 +159,22 @@ public class ButtonListener extends ListenerAdapter {
     public void resolveButtonInteractionEvent(ButtonContext context) {
         // pull values from context for easier access
         ButtonInteractionEvent event = context.getEvent();
-        Player player = context.getPlayer();
-        String buttonID = context.getButtonID();
-        String messageID = context.getMessageID();
-        Game game = context.getGame();
-        MessageChannel privateChannel = context.getPrivateChannel();
-        MessageChannel mainGameChannel = context.getMainGameChannel();
-        MessageChannel actionsChannel = context.getActionsChannel();
-
-        // hacking
-        Player nullable = player;
+        Player player = context.player;
+        String buttonID = context.buttonID;
+        String messageID = context.messageID;
+        Game game = context.game;
+        MessageChannel privateChannel = context.privateChannel;
+        MessageChannel mainGameChannel = context.mainGameChannel;
+        MessageChannel actionsChannel = context.actionsChannel;
 
         // Setup some additional helper values for buttons
         String buttonLabel = event.getButton().getLabel();
         String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
-        String finsFactionCheckerPrefix = nullable == null ? "FFCC_nullPlayer_" : nullable.getFinsFactionCheckerPrefix();
+        String finsFactionCheckerPrefix = player == null ? "FFCC_nullPlayer_" : player.getFinsFactionCheckerPrefix();
         String trueIdentity = null;
         String fowIdentity = null;
         String ident = null;
-        if (nullable != null) {
+        if (player != null) {
             trueIdentity = player.getRepresentation(true, true);
             fowIdentity = player.getRepresentation(false, true);
             ident = player.getFactionEmoji();
@@ -749,7 +732,7 @@ public class ButtonListener extends ListenerAdapter {
                     setStatus = false;
                 }
             }
-            if (nullable != null && player.getSCs().contains(scNum)) {
+            if (player != null && player.getSCs().contains(scNum)) {
                 String message = player.getRepresentation() + " you currently hold this SC card and therefore should not be spending a CC here.\nYou can override this protection by running `/player stats strategy_cc:-1`";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 return;
@@ -861,26 +844,60 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, true, false, "Looked at top of the Relic deck.", "");
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("explore_look_All")) {
-            List<String> order = List.of("cultural", "industrial", "hazardous");
-            for (String type : order) {
-                List<String> deck = game.getExploreDeck(type);
-                List<String> discard = game.getExploreDiscard(type);
-
-                String traitNameWithEmoji = Emojis.getEmojiFromDiscord(type) + type;
-                if (deck.isEmpty() && discard.isEmpty()) {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
-                    continue;
-                }
-
-                StringBuilder sb = new StringBuilder();
-                sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
-                ExploreModel exp = Mapper.getExplore(deck.get(0));
-                sb.append(exp.textRepresentation());
-                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
+            List<String> cdeck = game.getExploreDeck("cultural");
+            List<String> hdeck = game.getExploreDeck("hazardous");
+            List<String> ideck = game.getExploreDeck("industrial");
+            List<String> cdiscardPile = game.getExploreDiscard("cultural");
+            List<String> hdiscardPile = game.getExploreDiscard("hazardous");
+            List<String> idiscardPile = game.getExploreDiscard("industrial");
+            String trait = "cultural";
+            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
+            if (cdeck.isEmpty() && cdiscardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
 
-            String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Top of Cultural, Industrial, and Hazardous explore decks has been set to " + playerFactionNameWithEmoji + " Cards info thread.");
+            StringBuilder csb = new StringBuilder();
+            csb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String ctopCard = cdeck.get(0);
+            csb.append(ExploreSubcommandData.displayExplore(ctopCard));
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, csb.toString());
+            trait = "hazardous";
+            traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
+            if (hdeck.isEmpty() && hdiscardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            }
+
+            StringBuilder hsb = new StringBuilder();
+            hsb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String htopCard = hdeck.get(0);
+            hsb.append(ExploreSubcommandData.displayExplore(htopCard));
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, hsb.toString());
+            trait = "industrial";
+            traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
+            if (ideck.isEmpty() && idiscardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            }
+
+            StringBuilder isb = new StringBuilder();
+            isb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String itopCard = ideck.get(0);
+            isb.append(ExploreSubcommandData.displayExplore(itopCard));
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, isb.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "top of Hazardous, Cultural and Industrial explore decks has been set to "
+                    + playerFactionNameWithEmoji
+                    + " Cards info thread.");
+            ButtonHelper.addReaction(event, true, false, "Looked at top of Hazardous, Cultural and Industrial decks.",
+                "");
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperAbilities.distantSuns(buttonID, event, game, player);
@@ -1020,7 +1037,7 @@ public class ButtonListener extends ListenerAdapter {
                 p2 = game.getPlayerFromColorOrFaction(faction);
             }
 
-            PlanetRefresh.doAction(p2, planetName, game);
+            new PlanetRefresh().doAction(p2, planetName, game);
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event.getMessage().getActionRows()) {
                 List<ItemComponent> buttonRow = row.getComponents();
@@ -1211,7 +1228,7 @@ public class ButtonListener extends ListenerAdapter {
             List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techType, player);
             List<Button> buttons = Helper.getTechButtons(techs, techType, player);
             if (noPay) {
-                buttons = Helper.getTechButtons(techs, player, "nekro");
+                buttons = Helper.getTechButtons(techs, techType, player, "nekro");
             }
 
             if (game.getComponentAction()) {
@@ -1248,7 +1265,7 @@ public class ButtonListener extends ListenerAdapter {
             if (buttonID.split("_").length > 2) {
                 whatIsItFor = buttonID.split("_")[2];
             }
-            PlanetExhaust.doAction(player, planetName, game);
+            new PlanetExhaust().doAction(player, planetName, game);
             player.addSpentThing(planetName);
 
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
@@ -1923,11 +1940,11 @@ public class ButtonListener extends ListenerAdapter {
             int interval = Integer.parseInt(buttonID.split("_")[1]);
             player.setPersonalPingInterval(interval);
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-            for (Game game2 : mapList.values()) {
-                for (Player player2 : game2.getRealPlayers()) {
+            for (Game activeGame2 : mapList.values()) {
+                for (Player player2 : activeGame2.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                         player2.setPersonalPingInterval(interval);
-                        GameSaveLoadManager.saveMap(game2, event);
+                        GameSaveLoadManager.saveMap(activeGame2);
                     }
                 }
             }
@@ -2190,7 +2207,7 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
         } else if (buttonID.startsWith("planetAbilityExhaust_")) {
             String planet = buttonID.replace("planetAbilityExhaust_", "");
-            PlanetExhaustAbility.doAction(event, player, planet, game, true);
+            PlanetExhaustAbility.doAction(player, planet, game, true);
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("garboziaAbilityExhaust_")) {
             String planet = "garbozia";
@@ -2247,7 +2264,7 @@ public class ButtonListener extends ListenerAdapter {
             game.getMiltyDraftManager().doMiltyPick(event, game, buttonID, player);
         } else if (buttonID.startsWith("showMiltyDraft")) {
             game.getMiltyDraftManager().repostDraftInformation(game);
-        } else if (nullable != null && buttonID.startsWith("miltyFactionInfo_")) {
+        } else if (player != null && buttonID.startsWith("miltyFactionInfo_")) {
             String remainOrPicked = buttonID.replace("miltyFactionInfo_", "");
             List<FactionModel> displayFactions = new ArrayList<>();
             switch (remainOrPicked) {
@@ -3062,9 +3079,7 @@ public class ButtonListener extends ListenerAdapter {
             FrankenApplicator.resolveFrankenItemAddButton(event, buttonID, player);
         } else if (buttonID.startsWith("frankenItemRemove")) {
             FrankenApplicator.resolveFrankenItemRemoveButton(event, buttonID, player);
-        } else if (buttonID.startsWith("addToken_")) {
-            ButtonHelper.addTokenToTile(event, game, player, buttonID);
-        } else { // TODO: JAZZ convert everything
+        } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
                 case Constants.PO_NO_SCORING -> {
@@ -4570,7 +4585,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
 
                     if (!failed) {
-                        PlanetRefresh.doAction(player, planetName, game);
+                        new PlanetRefresh().doAction(player, planetName, game);
                         message = message + "Readied " + planetName;
                         ButtonHelper.addReaction(event, false, false, message, "");
                         ButtonHelper.deleteMessage(event);
@@ -4616,7 +4631,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "getDiplomatsButtons" -> ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, game, player);
                 case "gameEnd" -> {
-                    GameEnd.secondHalfOfGameEnd(event, game, true, true, false);
+                    GameEnd.secondHalfOfGameEnd(event, game, true, true);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "rematch" -> {
@@ -5557,7 +5572,7 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     @NotNull
-    public static String deductCC(Player player, @NotNull ButtonInteractionEvent event) {
+    public String deductCC(Player player, @NotNull ButtonInteractionEvent event) {
         int strategicCC = player.getStrategicCC();
         String message;
         if (strategicCC == 0) {
@@ -5582,7 +5597,7 @@ public class ButtonListener extends ListenerAdapter {
         // });
     }
 
-    public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
+    public void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
         String buttonID = event.getButton().getId();
 
         String messageId = event.getInteraction().getMessage().getId();
@@ -5641,7 +5656,7 @@ public class ButtonListener extends ListenerAdapter {
         }
     }
 
-    public static void checkForAllReactions(String messageId, Game game) {
+    public void checkForAllReactions(String messageId, Game game) {
         int matchingFactionReactions = 0;
         for (Player player : game.getRealPlayers()) {
 

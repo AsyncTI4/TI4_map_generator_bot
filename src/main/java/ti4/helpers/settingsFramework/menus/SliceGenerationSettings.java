@@ -2,10 +2,12 @@ package ti4.helpers.settingsFramework.menus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -18,76 +20,70 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 
 import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftSlice;
+import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
+import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
+import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 
 // This is a sub-menu
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private IntegerSetting numSlices, numFactions;
-    private BooleanSetting extraWorms;
-    private IntegerSetting minimumRes, minimumInf;
-    private IntegerRangeSetting totalValue, numLegends;
+    public IntegerSetting numSlices, numFactions;
+    public BooleanSetting extraWorms;
+    public IntegerSetting minimumRes, minimumInf;
+    public IntegerRangeSetting totalValue, numLegends;
+    public ChoiceSetting<MapTemplateModel> mapTemplate;
 
     // This is handled fully manually as there's a lot of validation to do
-    private String presetSlices = null;
-    private List<MiltyDraftSlice> parsedSlices;
+    public String presetSlices = null;
+    public List<MiltyDraftSlice> parsedSlices;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // Constructor & Initialization
+    // Overridden Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public SliceGenerationSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super("slice", "Slice value settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
+    @Override
+    public void finishInitialization(Game game, SettingsMenu parent) {
+        this.menuId = "slice";
+        this.menuName = "Slice value settings";
+        this.description = "Advanced settings to fine-tune how rich the galaxy will be";
 
-        // Initialize Settings to default values
-        int players = game != null ? game.getPlayers().size() : 6;
-        numSlices = new IntegerSetting("#Slices", "Number of Slices", players + 1, 2, 13, 1);
-        numFactions = new IntegerSetting("#Factions", "Number of Factions", players + 1, 2, 24, 1);
-        minimumRes = new IntegerSetting("MinRes", "Min Optimal Res", 2, 0, 4, 1);
-        minimumInf = new IntegerSetting("MinInf", "Min Optimal Inf", 3, 0, 5, 1);
-        totalValue = new IntegerRangeSetting("TotVal", "Total Optimal Value", 9, 0, 11, 13, 9, 20, 1);
-        extraWorms = new BooleanSetting("ExtraWH", "More Wormholes", true);
-        numLegends = new IntegerRangeSetting("Legends", "Legendary Count", 1, 0, 2, 2, 0, 20, 1);
+        // Initialize defaults, including any values loaded from JSON
+        numSlices = new IntegerSetting("#Slices", "Number of Slices", 7, 2, 13, 1, numSlices);
+        numFactions = new IntegerSetting("#Factions", "Number of Factions", 7, 2, 25, 1, numFactions);
+        minimumRes = new IntegerSetting("MinRes", "Min Optimal Res", 2, 0, 4, 1, minimumRes);
+        minimumInf = new IntegerSetting("MinInf", "Min Optimal Inf", 3, 0, 5, 1, minimumInf);
+        totalValue = new IntegerRangeSetting("TotVal", "Total Optimal Value", 9, 0, 11, 13, 9, 20, 1, totalValue);
+        extraWorms = new BooleanSetting("ExtraWH", "More Wormholes", true, extraWorms);
+        numLegends = new IntegerRangeSetting("Legends", "Legendary Count", 1, 0, 2, 2, 0, 20, 1, numLegends);
+        mapTemplate = new ChoiceSetting<>("MapLayout", "Map template", "6pStandard", mapTemplate);
 
-        // Emojis
+        // Emojis and stuff
         minimumRes.setEmoji(Emojis.resources);
         minimumInf.setEmoji(Emojis.influence);
         totalValue.setEmoji(Emojis.ResInf);
         extraWorms.setEmoji(Emojis.WHalpha);
         numLegends.setEmoji(Emojis.LegendaryPlanet);
-
-        // Other Initialization
         minimumRes.setExtraInfo("(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
         minimumInf.setExtraInfo("(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
 
-        // Get the correct JSON node for initialization if applicable.
-        // Add additional names here to support new generated JSON as needed.
-        if (json != null && json.has("sliceSettings")) json = json.get("sliceSettings");
+        Map<String, MapTemplateModel> mapTemplates = Mapper.getMapTemplates().stream().collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
+        mapTemplate.setAllValues(mapTemplates);
+        mapTemplate.setShow(MapTemplateModel::getAlias);
 
-        // Verify this is the correct JSON node and continue initialization
-        List<String> historicIDs = new ArrayList<>(List.of("slice"));
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
-            numSlices.initialize(json.get("numSlices"));
-            numFactions.initialize(json.get("numFactions"));
-            minimumRes.initialize(json.get("minimumRes"));
-            minimumInf.initialize(json.get("minimumInf"));
-            totalValue.initialize(json.get("totalValue"));
-            extraWorms.initialize(json.get("extraWorms"));
-            numLegends.initialize(json.get("numLegends"));
-        }
+        super.finishInitialization(game, parent);
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------------
-    // Overridden Implementation
-    // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<SettingInterface>();
@@ -149,30 +145,30 @@ public class SliceGenerationSettings extends SettingsMenu {
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     private String richGalaxy() {
-        numSlices.setVal(6);
-        numFactions.setVal(6);
-        minimumRes.setVal(4);
-        minimumInf.setVal(5);
-        totalValue.setValLow(11);
-        totalValue.setValHigh(20);
-        extraWorms.setVal(true);
-        //oneWormholePerTypePerSlice.setVal(true);
-        numLegends.setValLow(2);
-        numLegends.setValHigh(20);
+        numSlices.val = 6;
+        numFactions.val = 6;
+        minimumRes.val = 4;
+        minimumInf.val = 5;
+        totalValue.valLow = 11;
+        totalValue.valHigh = 20;
+        extraWorms.val = true;
+        //oneWormholePerTypePerSlice.val = true;
+        numLegends.valLow = 2;
+        numLegends.valHigh = 20;
         return null;
     }
 
     private String poorGalaxy() {
-        numSlices.setVal(6);
-        numFactions.setVal(6);
-        minimumRes.setVal(0);
-        minimumInf.setVal(0);
-        totalValue.setValLow(0);
-        totalValue.setValHigh(9);
-        extraWorms.setVal(false);
-        //oneWormholePerTypePerSlice.setVal(false);
-        numLegends.setValLow(0);
-        numLegends.setValHigh(1);
+        numSlices.val = 6;
+        numFactions.val = 6;
+        minimumRes.val = 0;
+        minimumInf.val = 0;
+        totalValue.valLow = 0;
+        totalValue.valHigh = 9;
+        extraWorms.val = false;
+        //oneWormholePerTypePerSlice.val = false;
+        numLegends.valLow = 0;
+        numLegends.valHigh = 1;
         return null;
     }
 

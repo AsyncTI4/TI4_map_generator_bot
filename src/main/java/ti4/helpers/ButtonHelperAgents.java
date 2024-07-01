@@ -47,14 +47,20 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperAgents {
 
-    public static void resolveXxchaAgentInfantryRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveXxchaAgentInfantryRemoval(Player player, Game game, ButtonInteractionEvent event,
+    String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         event.getMessage().delete().queue();
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "1 infantry " + planet, game);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation(true, true) + " you removed an infantry from " + planetRep);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " an infantry of yours on " + planetRep + " was removed via the Xxcha agent.");
+        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "1 infantry " +planet, game);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
+            player.getRepresentation(true, true) + " you removed an infantry from " + planetRep);
+    
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+            p2.getRepresentation(true, true) + " an infantry of yours on "+planetRep+" was removed via the Xxcha agent.");
+
+        
     }
 
     public static List<Button> getTilesToArboAgent(Player player, Game game,
@@ -473,7 +479,8 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
     }
 
-    public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game game, Player player, String ident) {
+    public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game game,
+        Player player, String ident) {
         String agent = buttonID.replace("exhaustAgent_", "");
         String rest = agent;
         String trueIdentity = player.getRepresentation(true, true);
@@ -1500,9 +1507,10 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveFreeSystemsAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveFreeSystemsAgentStep2(Player player, Game game, ButtonInteractionEvent event,
+        String buttonID) {
         String planet = buttonID.split("_")[1];
-        PlanetExhaustAbility.doAction(event, player, planet, game, false);
+        new PlanetExhaustAbility().doAction(player, planet, game, false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " chose to use " + Helper.getPlanetRepresentation(planet, game)
                 + " ability. This did not exhaust the ability since it was done with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Cordo Haved (Free Systems Agent).");

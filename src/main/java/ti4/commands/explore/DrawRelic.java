@@ -65,9 +65,9 @@ public class DrawRelic extends GenericRelicAction {
         if (player.hasAbility("a_new_edifice")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Due to A New Edifice Ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
             return;
         }
 

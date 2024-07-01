@@ -55,21 +55,13 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType().toLowerCase(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
     }
 
-    public String textRepresentation() {
-        StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
-        if (source != null) sb.append(source.emoji()).append(" ");
-        sb.append("**__").append(getName()).append("__**\n> ");
-        sb.append(getText().replaceAll("\n(> )?", "\n> "));
-        return sb.toString();
-    }
-
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) ||
-            getText().toLowerCase().contains(searchString) ||
-            getId().toLowerCase().contains(searchString) ||
-            getType().toLowerCase().contains(searchString) ||
-            getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || 
+                getText().toLowerCase().contains(searchString) ||
+                getId().toLowerCase().contains(searchString) ||
+                getType().toLowerCase().contains(searchString) ||
+                getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

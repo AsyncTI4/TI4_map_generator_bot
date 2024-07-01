@@ -100,8 +100,6 @@ public class MessageHelper {
 	}
 
 	public static List<Button> addUndoButtonToList(List<Button> buttons, Game game) {
-		if (game == null) return buttons;
-
 		boolean undoPresent = false;
 		List<Button> newButtons = new ArrayList<>(buttons);
 		for (Button button : buttons) {

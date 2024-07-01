@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.game.WeirdGameSetup;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -144,21 +143,21 @@ public class StartMilty extends MiltySubcommandData {
 
         // Load Slice Generation Specifications
         SliceGenerationSettings sliceSettings = settings.getSliceSettings();
-        specs.numFactions = sliceSettings.getNumFactions().getVal();
-        specs.numSlices = sliceSettings.getNumSlices().getVal();
+        specs.numFactions = sliceSettings.getNumFactions().val;
+        specs.numSlices = sliceSettings.getNumSlices().val;
         specs.anomaliesCanTouch = false;
-        specs.extraWHs = sliceSettings.getExtraWorms().isVal();
-        specs.minLegend = sliceSettings.getNumLegends().getValLow();
-        specs.maxLegend = sliceSettings.getNumLegends().getValHigh();
-        specs.minTot = sliceSettings.getTotalValue().getValLow();
-        specs.maxTot = sliceSettings.getTotalValue().getValHigh();
+        specs.extraWHs = sliceSettings.extraWorms.val;
+        specs.minLegend = sliceSettings.numLegends.valLow;
+        specs.maxLegend = sliceSettings.numLegends.valHigh;
+        specs.minTot = sliceSettings.getTotalValue().valLow;
+        specs.maxTot = sliceSettings.getTotalValue().valHigh;
 
         // Load Player & Faction Ban Specifications
         PlayerFactionSettings pfSettings = settings.getPlayerSettings();
         specs.bannedFactions.addAll(pfSettings.getBanFactions().getKeys());
         specs.priorityFactions.addAll(pfSettings.getPriFactions().getKeys());
         specs.setPlayerIDs(new ArrayList<>(pfSettings.getGamePlayers().getKeys()));
-        if (pfSettings.getPresetDraftOrder().isVal()) {
+        if (pfSettings.getPresetDraftOrder().val) {
             specs.playerDraftOrder = new ArrayList<>(game.getPlayers().keySet());
         }
 
@@ -167,10 +166,10 @@ public class StartMilty extends MiltySubcommandData {
         specs.setTileSources(sources.getTileSources());
         specs.setFactionSources(sources.getFactionSources());
 
-        if (sliceSettings.getParsedSlices() != null) {
-            if (sliceSettings.getParsedSlices().size() < specs.playerIDs.size())
+        if (sliceSettings.parsedSlices != null) {
+            if (sliceSettings.parsedSlices.size() < specs.playerIDs.size())
                 return "Not enough slices for the number of players. Please remove the preset slice string or include enough slices";
-            specs.presetSlices = sliceSettings.getParsedSlices();
+            specs.presetSlices = sliceSettings.parsedSlices;
         }
 
         return startFromSpecs(event, specs);
@@ -278,7 +277,6 @@ public class StartMilty extends MiltySubcommandData {
         int i = 0;
         List<String> output = new ArrayList<>();
         while (output.size() < factionCount) {
-            if (i > randomOrder.size()) return output;
             String f = randomOrder.get(i);
             i++;
             if (output.contains(f)) continue;
@@ -307,20 +305,6 @@ public class StartMilty extends MiltySubcommandData {
     private static boolean generateSlices(GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
         int sliceCount = specs.numSlices;
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
-
-        MapTemplateModel mapTemplate = specs.template;
-        int bluePerPlayer = mapTemplate.bluePerPlayer();
-        int redPerPlayer = mapTemplate.redPerPlayer();
-
-        List<List<Boolean>> adjMatrix = new ArrayList<>();
-        List<String> tilePositions = mapTemplate.emulatedTiles();
-        for (String pos1 : tilePositions) {
-            List<Boolean> row = new ArrayList<>();
-            List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
-            for (String pos2 : tilePositions)
-                row.add(adj.contains(pos2));
-            adjMatrix.add(row);
-        }
 
         boolean slicesCreated = false;
         int i = 0;
@@ -353,35 +337,30 @@ public class StartMilty extends MiltySubcommandData {
             int legends = 0, whs = 0, blueIndex = 0, redIndex = 0;
             for (int sliceNum = 1; sliceNum <= sliceCount; sliceNum++) {
                 MiltyDraftSlice miltyDraftSlice = new MiltyDraftSlice();
+                MiltyDraftTile red1 = red.get(redIndex++);
+                MiltyDraftTile red2 = red.get(redIndex++);
                 List<MiltyDraftTile> tiles = new ArrayList<>();
+                tiles.add(blue.get(blueIndex++));
+                tiles.add(blue.get(blueIndex++));
+                tiles.add(blue.get(blueIndex++));
+                tiles.add(red1);
+                tiles.add(red2);
 
-                for (int blues = 0; blues < bluePerPlayer; blues++)
-                    tiles.add(blue.get(blueIndex++));
-                for (int reds = 0; reds < redPerPlayer; reds++)
-                    tiles.add(red.get(redIndex++));
-
+                boolean needToCheckAnomalies = red1.getTierList() == TierList.anomaly && red2.getTierList() == TierList.anomaly;
                 Collections.shuffle(tiles);
-                List<Integer> ints = new ArrayList<>();
-                for (int k = 0; k < tiles.size(); k++)
-                    if (tiles.get(k).getTierList() == TierList.anomaly)
-                        ints.add(k + 1);
-                if (!anomaliesCanTouch && ints.size() == 2) { // just skip this if there's more than 2 anomalies tbh
-                    int turns = -4;
-                    boolean tryagain = true;
-                    while (tryagain && turns < mapTemplate.tilesPerPlayer()) {
-                        tryagain = false;
-                        for (int x : ints)
-                            for (int y : ints)
-                                if (x != y && adjMatrix.get(x).get(y))
-                                    tryagain = true;
-                        if (tryagain) {
-                            Collections.rotate(tiles, 1);
-                            if (turns == 0) Collections.shuffle(tiles);
-                            ints.clear();
-                            for (int k = 0; k < tiles.size(); k++)
-                                if (tiles.get(k).getTierList() == TierList.anomaly)
-                                    ints.add(k + 1);
+                if (!anomaliesCanTouch && needToCheckAnomalies) {
+                    int turns = 0;
+                    while (turns < 5) {
+                        boolean left = tiles.get(0).getTile().isAnomaly();
+                        boolean front = tiles.get(1).getTile().isAnomaly();
+                        boolean right = tiles.get(2).getTile().isAnomaly();
+                        boolean equi = tiles.get(3).getTile().isAnomaly();
+                        boolean meca = tiles.get(4).getTile().isAnomaly();
+                        if (!((front && (left || right || equi || meca)) || (equi && (meca || left)))) {
+                            break;
                         }
+                        //rotating the array will ALWAYS find an acceptable tile layout within 2 rotations
+                        Collections.rotate(tiles, 1);
                         turns++;
                     }
                 }

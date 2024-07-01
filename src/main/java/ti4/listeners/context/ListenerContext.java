@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,15 +17,13 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-@Getter
 public abstract class ListenerContext {
-    protected boolean contextIsValid = true;
-    protected String origComponentID, componentID;
-    protected boolean factionChecked = false;
-    protected Game game;
-    protected Player player;
-    protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
-    protected GenericInteractionCreateEvent event;
+    public String componentID;
+    public boolean factionChecked = false;
+    public Game game;
+    public Player player;
+    public MessageChannel privateChannel, mainGameChannel, actionsChannel;
+    public GenericInteractionCreateEvent event;
 
     public abstract GenericInteractionCreateEvent getEvent();
 
@@ -37,12 +34,12 @@ public abstract class ListenerContext {
     }
 
     public boolean isValid() {
-        return contextIsValid;
+        return event != null;
     }
 
     public ListenerContext(GenericInteractionCreateEvent event, String compID) {
         this.event = event;
-        this.componentID = this.origComponentID = compID;
+        this.componentID = compID;
 
         String userID = event.getUser().getId();
         MessageListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
@@ -64,7 +61,7 @@ public abstract class ListenerContext {
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
                 event.getMessageChannel().sendMessage("You're not a player of the game").queue();
-                contextIsValid = false;
+                this.event = null;
                 return;
             }
 
@@ -93,8 +90,8 @@ public abstract class ListenerContext {
             componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
         }
 
-        if (!checkFinsFactionChecker()) {
-            contextIsValid = false;
+        if (!checkFinsFactionChecker(this)) {
+            this.event = null;
             return;
         }
 
@@ -121,7 +118,7 @@ public abstract class ListenerContext {
             }
             game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
             GameSaveLoadManager.saveMap(game, event);
-            contextIsValid = false;
+            this.event = null;
             return;
         }
 
@@ -130,9 +127,11 @@ public abstract class ListenerContext {
         }
     }
 
-    public boolean checkFinsFactionChecker() {
-        GenericInteractionCreateEvent event = getEvent();
-        if (!factionChecked && componentID != null && componentID.startsWith("FFCC_")) {
+    public static boolean checkFinsFactionChecker(ListenerContext context) {
+        String componentID = context.componentID;
+        Player player = context.player;
+        GenericInteractionCreateEvent event = context.getEvent();
+        if (!context.factionChecked && componentID != null && componentID.startsWith("FFCC_")) {
             componentID = componentID.replace("FFCC_", "");
             String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
             if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
@@ -140,8 +139,8 @@ public abstract class ListenerContext {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 return false;
             }
-            componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
-            factionChecked = true;
+            context.componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
+            context.factionChecked = true;
         }
         return true;
     }

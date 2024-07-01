@@ -49,7 +49,7 @@ public class PingActivePlayer extends FOWSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
             game.setLastActivePlayerPing(new Date());
-            GameSaveLoadManager.saveMap(game, "Auto Ping");
+            GameSaveLoadManager.saveMap(game);
         }
         ButtonHelper.increasePingCounter(GameManager.getInstance().getGame("finreference"), player.getUserID());
     }
