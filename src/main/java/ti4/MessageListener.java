@@ -718,6 +718,9 @@ public class MessageListener extends ListenerAdapter {
                         if (roles.contains(player2.getRoleForCommunity())) {
                             player = player2;
                         }
+                        if (player.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
+                            player = player2;
+                        }
                     }
                 }
                 try {
@@ -782,6 +785,7 @@ public class MessageListener extends ListenerAdapter {
                     if (roles.contains(player2.getRoleForCommunity())) {
                         player3 = player2;
                     }
+
                 }
             }
 
@@ -854,6 +858,9 @@ public class MessageListener extends ListenerAdapter {
                     List<Role> roles = event.getMember().getRoles();
                     for (Player player2 : players) {
                         if (roles.contains(player2.getRoleForCommunity())) {
+                            player = player2;
+                        }
+                        if (player.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
                             player = player2;
                         }
                     }

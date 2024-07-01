@@ -495,10 +495,6 @@
             {
                 "type": "ability",
                 "alias": "unrelenting"
-            },
-            {
-                "type": "relic",
-                "alias": "absol_thalnos"
             }
         ],
         "forCombatAbility": "combatround"
