@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -146,6 +146,8 @@ public class Game {
     private boolean fastSCFollowMode;
     @ExportableField
     private boolean queueSO = true;
+    @ExportableField
+    private boolean newTransactionMethod = true;
     @ExportableField
     private boolean showBubbles = true;
     @ExportableField
@@ -1244,6 +1246,14 @@ public class Game {
 
     public boolean getShowBubbles() {
         return showBubbles;
+    }
+
+    public boolean getWhetherNewTransactionMethod() {
+        return newTransactionMethod;
+    }
+
+    public void setTransactionMethod(boolean onStatus) {
+        newTransactionMethod = onStatus;
     }
 
     public boolean getShowGears() {

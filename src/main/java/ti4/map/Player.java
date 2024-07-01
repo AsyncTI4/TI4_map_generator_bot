@@ -121,7 +121,7 @@ public class Player {
     private int totalExpenses;
 
     private Set<Integer> followedSCs = new HashSet<>();
-
+    private List<String> transactionItems = new ArrayList<>();
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
     private final Map<String, Integer> events = new LinkedHashMap<>();
     private final Map<String, Integer> trapCards = new LinkedHashMap<>();
@@ -282,6 +282,41 @@ public class Player {
             }
         }
         return 0;
+    }
+
+    public void resetTransactionItems() {
+        transactionItems = new ArrayList<>();
+    }
+
+    public List<String> getTransactionItems() {
+        return transactionItems;
+    }
+
+    public void clearTransactionItemsWith(Player p2) {
+        List<String> newTransactionItems = new ArrayList<>();
+        for (String item : transactionItems) {
+            if (!item.contains("ing" + p2.getFaction())) {
+                newTransactionItems.add(item);
+            }
+        }
+        transactionItems = newTransactionItems;
+    }
+
+    public void addTransactionItem(String thing) {
+        transactionItems.add(thing);
+    }
+
+    public void removeTransactionItem(String thing) {
+        transactionItems.remove(thing);
+    }
+
+    public void replaceTransactionItem(String thingToRemove, String thingToAdd) {
+        removeTransactionItem(thingToRemove);
+        addTransactionItem(thingToAdd);
+    }
+
+    public void setTransactionItems(List<String> things) {
+        transactionItems = things;
     }
 
     public int getSpentInfantryThisWindow() {
@@ -1349,8 +1384,13 @@ public class Player {
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
-                return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
-                    + Emojis.getColorEmojiWithName(getColor());
+                if (ping) {
+                    return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
+                        + Emojis.getColorEmojiWithName(getColor());
+                } else {
+                    return getFactionEmoji() + " " + roleForCommunity.getName() + " "
+                        + Emojis.getColorEmojiWithName(getColor());
+                }
             } else {
                 return getFactionEmoji() + " " + Emojis.getColorEmojiWithName(getColor());
             }
