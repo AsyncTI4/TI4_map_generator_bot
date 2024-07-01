@@ -1879,7 +1879,9 @@ public class Player {
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
                 TurnEnd.pingNextPlayer(event, game, p2);
-                ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round " + game.getRound() + " for " + p2.getFactionEmoji());
+                if (!game.isFoWMode()) {
+                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round " + game.getRound() + " for " + p2.getFactionEmoji());
+                }
             }
         }
     }
