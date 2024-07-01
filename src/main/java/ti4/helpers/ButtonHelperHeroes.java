@@ -1029,7 +1029,7 @@ public class ButtonHelperHeroes {
         if (Helper.getProductionValue(player, game, tile, false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit\n";
+                + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message.toString());

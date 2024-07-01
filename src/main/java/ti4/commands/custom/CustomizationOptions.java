@@ -38,7 +38,9 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(
             new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
+            new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
+        addOptions(
+            new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS,
             "Have the bot inject helpful links to rules within it's output"));
@@ -118,6 +120,10 @@ public class CustomizationOptions extends CustomSubcommandData {
         Boolean showB = event.getOption(Constants.SHOW_BUBBLES, null, OptionMapping::getAsBoolean);
         if (showB != null)
             game.setShowBubbles(showB);
+
+        Boolean transMethod = event.getOption(Constants.TRANSACTION_METHOD, null, OptionMapping::getAsBoolean);
+        if (transMethod != null)
+            game.setTransactionMethod(transMethod);
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null)
