@@ -4950,7 +4950,7 @@ public class ButtonHelper {
         if (player.getPromissoryNotes().containsKey("ragh")) {
             buttons.addAll(ButtonHelperFactionSpecific.getRaghsCallButtons(player, game, tile));
         }
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units")
+        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Units Flew Through Rift")
             .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
@@ -5099,7 +5099,7 @@ public class ButtonHelper {
         Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + game.getActiveSystem(),
             "Build in this system (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value)");
         buttons.add(buildButton);
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units")
+        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Units Flew Through Rift")
             .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
         if (player.hasUnexhaustedLeader("sardakkagent")) {
