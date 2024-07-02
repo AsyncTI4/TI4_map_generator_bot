@@ -713,9 +713,9 @@ public class MessageListener extends ListenerAdapter {
             if (game != null && game.getBotFactionReacts() && !game.isFoWMode()) {
                 Player player = game.getPlayer(event.getAuthor().getId());
                 if (game.isCommunityMode()) {
-                    Collection<Player> players = game.getPlayers().values();
+
                     List<Role> roles = event.getMember().getRoles();
-                    for (Player player2 : players) {
+                    for (Player player2 : game.getRealPlayers()) {
                         if (roles.contains(player2.getRoleForCommunity())) {
                             player = player2;
                         }
@@ -855,13 +855,12 @@ public class MessageListener extends ListenerAdapter {
             } else if (game != null) {
                 Player player = game.getPlayer(event.getAuthor().getId());
                 if (game.isCommunityMode()) {
-                    Collection<Player> players = game.getPlayers().values();
                     List<Role> roles = event.getMember().getRoles();
-                    for (Player player2 : players) {
+                    for (Player player2 : game.getRealPlayers()) {
                         if (roles.contains(player2.getRoleForCommunity())) {
                             player = player2;
                         }
-                        if (player.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
+                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
                             player = player2;
                         }
                     }
