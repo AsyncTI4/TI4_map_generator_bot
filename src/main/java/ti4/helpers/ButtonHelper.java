@@ -6228,6 +6228,7 @@ public class ButtonHelper {
                     }
                 }
             });
+        secondHalfOfRematch(event, game);
     }
 
     public static void secondHalfOfRematch(GenericInteractionCreateEvent event, Game game) {
