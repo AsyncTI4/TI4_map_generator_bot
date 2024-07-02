@@ -861,7 +861,7 @@ public class MessageListener extends ListenerAdapter {
                         if (roles.contains(player2.getRoleForCommunity())) {
                             player = player2;
                         }
-                        if (player.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
+                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
                             player = player2;
                         }
                     }
