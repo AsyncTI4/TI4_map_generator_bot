@@ -1728,6 +1728,18 @@ public class ButtonHelperModifyUnits {
                             "You can use your cloaked fleets ability to capture this produced ship",
                             shroadedFleets);
                     }
+                    if (tile2 != null && player.hasAbility("rally_to_the_cause")
+                        && player.getHomeSystemTile() == tile2
+                        && ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).size() > 0) {
+                        String msg = player.getRepresentation()
+                            + " due to your rally to the cause ability, if you just produced a ship in your HS, you can produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units. Press button to resolve";
+                        List<Button> buttons2 = new ArrayList<>();
+                        buttons2.add(Button.success("startRallyToTheCause", "Rally To The Cause"));
+                        buttons2.add(Button.danger("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
+                            buttons2);
+
+                    }
                 }
 
             }
