@@ -1098,7 +1098,7 @@ public class Helper {
             case 8:
                 return "The Best Vibes";
             case 9:
-                return "A Stroter's Blessing For Your Trouble";
+                return "A Bot's Blessing For Your Trouble";
             case 10:
                 return "Good Karma";
         }

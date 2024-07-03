@@ -134,6 +134,7 @@ public class ButtonHelper {
             buttons.add(Button.success("bestowTitleStep1_You Made The Game Better", "You Made The Game Better"));
             buttons.add(Button.success("bestowTitleStep1_A Kind Soul", "A Kind Soul"));
             buttons.add(Button.success("bestowTitleStep1_A Good Ally", "A Good Ally"));
+            buttons.add(Button.success("bestowTitleStep1_A Good Ally", "A Mahact Puppet Master"));
 
             buttons.add(Button.primary("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
             buttons.add(Button.primary("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
@@ -1525,27 +1526,7 @@ public class ButtonHelper {
                         + " Reminder that you have the active players ceasefire and this is the window for it");
                 }
             }
-            if (nonActivePlayer.getTechs().contains("vw")
-                && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
-                if (justChecking) {
-                    if (!game.isFoWMode()) {
-                        MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger voidwatch");
-                    }
-                    numberOfAbilities++;
-                } else {
-                    if (game.isFoWMode()) {
-                        MessageHelper.sendMessageToChannel(getCorrectChannel(nonActivePlayer, game),
-                            ident + " you triggered voidwatch");
-                        channel = player.getPrivateChannel();
-                    }
-                    List<Button> stuffToTransButtons = getForcedPNSendButtons(game, nonActivePlayer, player);
-                    String message = player.getRepresentation(true, true)
-                        + " You have triggered void watch. Please select the PN you would like to send";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message,
-                        stuffToTransButtons);
-                    MessageHelper.sendMessageToChannel(channel, activePlayerident + " you owe the defender one PN");
-                }
-            }
+
             if (AddCC.hasCC(nonActivePlayer, activeSystem)) {
                 if (nonActivePlayer.getActionCards().containsKey("counterstroke")
                     && !isPlayerElected(game, player, "censure")
@@ -2959,7 +2940,7 @@ public class ButtonHelper {
         }
         boolean success = game.removeLaw(game.getLaws().get("minister_peace"));
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Minister of War Law removed");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Minister of Peace Law removed");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
             return;
