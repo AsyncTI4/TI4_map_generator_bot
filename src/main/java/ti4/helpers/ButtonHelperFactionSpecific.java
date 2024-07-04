@@ -933,7 +933,7 @@ public class ButtonHelperFactionSpecific {
             new AddUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(newPlanet),
                 amount + " " + unitName + " " + newPlanet, game);
         }
-        new PlanetAdd().doAction(p2, origPlanet, game, event);
+        PlanetAdd.doAction(p2, origPlanet, game, event, false);
 
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
