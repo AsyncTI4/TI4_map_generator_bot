@@ -33,14 +33,14 @@ public class PlanetAdd extends PlanetAddRemove {
 
     @Override
     public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
-        doAction(player, planet, game, event);
+        doAction(player, planet, game, event, false);
     }
 
     public static void doAction(Player player, String planet, Game game) {
-        doAction(player, planet, game, null);
+        doAction(player, planet, game, null, false);
     }
 
-    public static void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event) {
+    public static void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setUP) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
 
@@ -185,7 +185,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setUP) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 Planet planetReal = unitHolder;
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
@@ -204,7 +204,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
-            && player.hasAbility("scavenge") && !doubleCheck && event != null) {
+            && player.hasAbility("scavenge") && !doubleCheck && !setUP) {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), fac
@@ -216,7 +216,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
-            && player.hasUnexhaustedLeader("vaylerianagent")) {
+            && player.hasUnexhaustedLeader("vaylerianagent") && !setUP) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_vaylerianagent_" + player.getFaction(),
                 "Use Vaylerian Agent")
@@ -228,7 +228,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
-            && player.hasAbility("scour")) {
+            && player.hasAbility("scour") && !setUP) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("scourPlanet_" + planet, "Use Scour")
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
