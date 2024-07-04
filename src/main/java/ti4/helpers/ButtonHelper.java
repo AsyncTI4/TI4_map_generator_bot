@@ -134,7 +134,7 @@ public class ButtonHelper {
             buttons.add(Button.success("bestowTitleStep1_You Made The Game Better", "You Made The Game Better"));
             buttons.add(Button.success("bestowTitleStep1_A Kind Soul", "A Kind Soul"));
             buttons.add(Button.success("bestowTitleStep1_A Good Ally", "A Good Ally"));
-            buttons.add(Button.success("bestowTitleStep1_A Good Ally", "A Mahact Puppet Master"));
+            buttons.add(Button.success("bestowTitleStep1_A Mahact Puppet Master", "A Mahact Puppet Master"));
 
             buttons.add(Button.primary("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
             buttons.add(Button.primary("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
@@ -767,7 +767,7 @@ public class ButtonHelper {
             return;
         }
         UnitHolder oriPlanet = getUnitHolderFromPlanetName(dmzPlanet, game);
-        new PlanetAdd().doAction(p2, dmzPlanet, game, event);
+        PlanetAdd.doAction(p2, dmzPlanet, game, event, true);
         if (!"exhausted".equalsIgnoreCase(exhausted)) {
             p2.refreshPlanet(dmzPlanet);
         }
@@ -805,7 +805,7 @@ public class ButtonHelper {
             return;
         }
         UnitHolder oriPlanet = getUnitHolderFromPlanetName(dmzPlanet, game);
-        new PlanetAdd().doAction(p2, dmzPlanet, game, event);
+        PlanetAdd.doAction(p2, dmzPlanet, game, event, false);
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
         Button done = Button.secondary("finishTransaction_" + p2.getColor(), "Done With This Transaction");
