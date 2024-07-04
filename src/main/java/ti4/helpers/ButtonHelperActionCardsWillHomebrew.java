@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -246,7 +247,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
-                sb.append("Looked at the top of the " + type + " deck and saw that it was not a relic frag");
+                sb.append("Looked at the top of the " + type + " deck and saw that it was not a relic frag.\n");
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), Mapper.getExplore(cardID).getName());
             }
         }

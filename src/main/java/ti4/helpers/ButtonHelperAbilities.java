@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.combat.StartCombat;
@@ -1421,7 +1422,7 @@ public class ButtonHelperAbilities {
             Tile tile = game.getTileFromPlanet("lockedmallice");
             tile = MoveUnits.flipMallice(event, tile, game);
         }
-        new PlanetAdd().doAction(player, planet, game, event);
+        PlanetAdd.doAction(player, planet, game, event, false);
         String planetRepresentation2 = Helper.getPlanetRepresentation(planet, game);
         String msg = ident + " claimed the planet " + planetRepresentation2 + " using the peace accords ability. ";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
