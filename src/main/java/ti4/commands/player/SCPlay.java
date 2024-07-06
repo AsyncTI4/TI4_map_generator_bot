@@ -181,8 +181,8 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
             }
-            game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
-            game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
+            game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl());
+            game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
             game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction())

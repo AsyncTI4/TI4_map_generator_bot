@@ -314,6 +314,17 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
         buttons.add(Buttons.REFRESH_INFO);
 
+        List<String> phasesBeforeAction = List.of("action", "strategy", "playerSetup");
+        boolean hasSummary = false;
+        for (int x = 1; x <= game.getRound(); ++x) {
+            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty())
+                hasSummary = true;
+        }
+        if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getCurrentPhase()) || hasSummary) {
+            // after the action phase round 1, show the edit summary button by default
+            buttons.add(Buttons.EDIT_SUMMARIES);
+        }
+
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             "You can use these buttons to do various things", buttons);
     }
