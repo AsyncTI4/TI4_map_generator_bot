@@ -880,6 +880,7 @@ public class Helper {
         List<Player> players = new ArrayList<Player>();
         players.add(p1);
         players.add(p2);
+        boolean debtOnly = true;
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
         for (Player sender : players) {
             Player receiver = p2;
@@ -896,6 +897,9 @@ public class Helper {
                         furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                     }
                     String spoofedButtonID = "send_" + thingToTransact + "_" + receiver.getFaction() + "_" + furtherDetail;
+                    if (!thingToTransact.toLowerCase().contains("debt")) {
+                        debtOnly = false;
+                    }
                     switch (thingToTransact) {
                         case "ACs" -> {
                             switch (furtherDetail) {
@@ -931,9 +935,9 @@ public class Helper {
                             String exhausted = "exhausted";
                             if (!furtherDetail.contains(exhausted)) {
                                 exhausted = "refreshed";
-                                furtherDetail.replace(exhausted, "");
-
                             }
+                            furtherDetail = furtherDetail.replace(exhausted, "");
+
                             ButtonHelper.resolveAllianceMemberPlanetTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction() + "_" + exhausted);
                         }
                         case "dmz" -> {
@@ -948,8 +952,10 @@ public class Helper {
             }
         }
         p1.clearTransactionItemsWith(p2);
-        ButtonHelperAbilities.pillageCheck(p2, game);
-        ButtonHelperAbilities.pillageCheck(p1, game);
+        if (!debtOnly) {
+            ButtonHelperAbilities.pillageCheck(p2, game);
+            ButtonHelperAbilities.pillageCheck(p1, game);
+        }
         MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
     }

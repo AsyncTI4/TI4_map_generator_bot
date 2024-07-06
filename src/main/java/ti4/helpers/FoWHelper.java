@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.combat.StartCombat;
 import ti4.generator.Mapper;
@@ -385,6 +386,10 @@ public class FoWHelper {
 	}
 
 	public static boolean doesTileHaveWHs(Game game, String position) {
+		return !getTileWHs(game, position).isEmpty();
+	}
+
+	public static Set<String> getTileWHs(Game game, String position) {
 		Tile tile = game.getTileByPosition(position);
 
 		String ghostFlagshipColor = null;
@@ -406,9 +411,8 @@ public class FoWHelper {
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
-						if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
-							wormholeIDs.add(wh.toString());
-						}
+						wormholeIDs.add(wh.toString());
+
 						break;
 					}
 				}
@@ -419,7 +423,7 @@ public class FoWHelper {
 			}
 		}
 
-		return !wormholeIDs.isEmpty();
+		return wormholeIDs;
 	}
 
 	public static boolean doesTileHaveAlphaOrBeta(Game game, String position) {
