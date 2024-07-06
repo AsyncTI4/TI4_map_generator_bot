@@ -312,6 +312,10 @@ public class MapGenerator {
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
             game.setTileDistances(new HashMap<>()); // clear distances after consuming them
         }
+        if (!game.getStoredValue("checkWHs").isEmpty()) {
+            game.setStoredValue("checkWHs", "");
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
+        }
         if (debug)
             debugTileTime = System.nanoTime() - debugStartTime;
     }
@@ -4022,7 +4026,7 @@ public class MapGenerator {
     }
 
     enum TileStep {
-        Setup, Tile, Extras, Units, Distance
+        Setup, Tile, Extras, Units, Distance, Wormholes
     }
 
     private void addTile(Tile tile, TileStep step) {
@@ -4240,8 +4244,42 @@ public class MapGenerator {
                     new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()),
                     Storage.getFont100());
             }
+            case Wormholes -> {
+                if (game.isFoWMode())
+                    break;
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                    break;
+
+                BufferedImage distanceColor = ImageHelper
+                    .read(ResourceHelper.getInstance().getTileFile(getColorFilterForWormhole(FoWHelper.doesTileHaveWHs(game, tile.getPosition()))));
+                if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+                    tileGraphics.drawImage(distanceColor, TILE_PADDING, TILE_PADDING, null);
+                }
+                if (FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+                    for (String wh : FoWHelper.getTileWHs(game, tile.getPosition())) {
+
+                        String whFile = ResourceHelper.getInstance().getTokenFile("token_wh" + wh + ".png");
+                        if (whFile == null) {
+                            whFile = ResourceHelper.getInstance().getTokenFile("token_custom_eronous_wh" + wh + ".png");
+                        }
+                        if (whFile != null) {
+                            BufferedImage bufferedImage = ImageHelper.readScaled(whFile, 3);
+                            tileGraphics.drawImage(bufferedImage, TILE_PADDING + 70, TILE_PADDING + 70, null);
+                        }
+                    }
+                }
+            }
         }
         return tileOutput;
+    }
+
+    public static String getColorFilterForWormhole(boolean hasWormhole) {
+        if (hasWormhole) {
+            return "Distance0.png";
+        }
+        return "Distance3.png";
     }
 
     public static String getColorFilterForDistance(int distance) {
@@ -4597,6 +4635,8 @@ public class MapGenerator {
                     }
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 70, TILE_PADDING + 45, null);
+                } else if (tokenPath.contains("custodiavigilia")) {
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + 140, TILE_PADDING + 185, null);
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
                     boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);

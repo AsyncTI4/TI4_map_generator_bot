@@ -1483,7 +1483,7 @@ public class ButtonHelperHeroes {
         }
         if (positivePolicies >= 2) {
             unitModelID = "olradin_mech_positive";
-        } else if (negativePolicies > 2) {
+        } else if (negativePolicies >= 2) {
             unitModelID = "olradin_mech_negative";
         } else {
             unitModelID = "olradin_mech";

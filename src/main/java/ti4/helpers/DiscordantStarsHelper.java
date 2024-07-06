@@ -3,8 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
@@ -61,10 +59,13 @@ public class DiscordantStarsHelper {
     public static void checkOlradinMech(Game activeMap) {
         for (Player player : activeMap.getPlayers().values()) {
             String tokenToAdd;
+            String tokenToRemove;
             if (player.ownsUnit("olradin_mech_positive")) {
                 tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
+                tokenToRemove = Constants.OLRADIN_MECH_RES_PNG;
             } else if (player.ownsUnit("olradin_mech_negative")) {
                 tokenToAdd = Constants.OLRADIN_MECH_RES_PNG;
+                tokenToRemove = Constants.OLRADIN_MECH_INF_PNG;
             } else {
                 continue;
             }
@@ -79,6 +80,7 @@ public class DiscordantStarsHelper {
                                 planet.removeToken(Constants.OLRADIN_MECH_RES_PNG);
                             } else if (oneMechCheck(planet.getName(), activeMap, player)) {
                                 planet.addToken(tokenToAdd);
+                                planet.removeToken(tokenToRemove);
                             }
                         }
                     }

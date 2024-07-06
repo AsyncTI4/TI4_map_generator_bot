@@ -2,6 +2,7 @@ package ti4.commands.uncategorized;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -298,6 +299,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
         Button listGames = Button.secondary("searchMyGames", "List All My Games");
         buttons.add(listGames);
         buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
+        if (!game.isFoWMode()) {
+            buttons.add(Button.secondary("checkWHView", "Check Wormholes"));
+        }
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {

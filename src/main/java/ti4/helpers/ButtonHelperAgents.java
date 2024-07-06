@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -15,7 +18,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
@@ -1188,6 +1190,7 @@ public class ButtonHelperAgents {
                         newActivePlayer.getRepresentation(true, true)
                             + " you can take 1 action now due to " + (edyn.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Allant (Edyn Agent)",
                         buttons);
+                    game.updateActivePlayer(newActivePlayer);
                     return true;
                 }
             }
@@ -1593,9 +1596,9 @@ public class ButtonHelperAgents {
         int finalComm = player.getCommodities();
         int commGain = finalComm - initComm;
 
-        String msg = ButtonHelper.getIdentOrColor(player, game);
-        msg += String.format(" chose %s %s, and gained %i comms (%i->%i) due to %s Yudri Sukhov (Vaden Agent)",
-            planetUsed, Emojis.getInfluenceEmoji(maxInfluence), commGain, initComm, finalComm, player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever" : "");
+        String msg = ButtonHelper.getIdentOrColor(player, game) + " max influence planet had " + maxInfluence
+            + " influence, so they gained " + commGain + " comms (" + initComm + "->"
+            + player.getCommodities() + ") due to " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yudri Sukhov (Vaden Agent)";
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFoWMode() && vaden != player) {

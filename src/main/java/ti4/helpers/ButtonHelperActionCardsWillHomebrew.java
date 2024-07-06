@@ -237,11 +237,14 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<String> types = new ArrayList<String>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
         for (String type : types) {
-            String cardID = game.drawExplore(type);
+            List<String> deck = game.getExploreDeck(type);
+            String topCard = deck.get(0);
+            String cardID = topCard;
 
             ExploreModel card = Mapper.getExplore(cardID);
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+                cardID = game.drawExplore(type);
                 sb.append(Mapper.getExplore(cardID).getName()).append(System.lineSeparator());
                 sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
                 player.addFragment(cardID);

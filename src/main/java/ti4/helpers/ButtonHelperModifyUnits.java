@@ -53,6 +53,10 @@ public class ButtonHelperModifyUnits {
             UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
             if (unitModel == null)
                 continue;
+
+            if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) {
+                continue;
+            }
             UnitKey unitKey = unitEntry.getKey();
             int damagedUnits = 0;
             if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
@@ -115,6 +119,9 @@ public class ButtonHelperModifyUnits {
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                 if (unitModel == null)
                     continue;
+                if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) {
+                    continue;
+                }
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
@@ -497,6 +504,9 @@ public class ButtonHelperModifyUnits {
                 if (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)) {
                     continue;
                 }
+                if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) {
+                    continue;
+                }
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
@@ -531,6 +541,9 @@ public class ButtonHelperModifyUnits {
                     continue;
                 UnitKey unitKey = unitEntry.getKey();
                 if (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey)) {
+                    continue;
+                }
+                if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) {
                     continue;
                 }
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
@@ -1728,7 +1741,7 @@ public class ButtonHelperModifyUnits {
                             "You can use your cloaked fleets ability to capture this produced ship",
                             shroadedFleets);
                     }
-                    if (tile2 != null && player.hasAbility("rally_to_the_cause")
+                    if (tile2 != null && !"skipbuild".equalsIgnoreCase(skipbuild) && player.hasAbility("rally_to_the_cause")
                         && player.getHomeSystemTile() == tile2
                         && ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).size() > 0) {
                         String msg = player.getRepresentation()
