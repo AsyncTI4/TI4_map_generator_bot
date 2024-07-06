@@ -7002,6 +7002,13 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static void showWormholes(GenericInteractionCreateEvent event, Game game) {
+        game.setStoredValue("checkWHs", "yes");
+
+        MapGenerator.saveImage(game, DisplayType.map, event, true)
+            .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+    }
+
     public static List<Player> tileHasPDS2Cover(Player player, Game game, String tilePos) {
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, player, false, true);
         for (Player p2 : game.getRealPlayers()) {
@@ -7686,6 +7693,7 @@ public class ButtonHelper {
             player.getRepresentation()
                 + " Use the button to do an action. It is advised you avoid the end turn button at the end of it, and just delete it. ",
             TurnStart.getStartOfTurnButtons(player, game, false, event));
+        game.updateActivePlayer(player);
         deleteMessage(event);
     }
 
@@ -8163,9 +8171,11 @@ public class ButtonHelper {
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " sent " + p2.getFactionEmoji() + " a transaction offer");
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully sent " + p2.getFactionEmoji() + " a transaction offer");
-        event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.danger("rescindOffer_" + p2.getFaction(), "Rescind Offer"));
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully sent " + p2.getFactionEmoji() + " a transaction offer. You can use this button to rescind the offer", buttons);
+        event.getMessage().delete().queue();
+        buttons = new ArrayList<>();
         buttons.add(Button.success("acceptOffer_" + player.getFaction(), "Accept"));
         buttons.add(Button.danger("rejectOffer_" + player.getFaction(), "Reject"));
         buttons.add(Button.danger("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));

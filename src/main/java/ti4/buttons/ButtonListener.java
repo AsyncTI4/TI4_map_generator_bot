@@ -2746,6 +2746,14 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to "
                 + player.getRepresentation(false, false) + " has been rejected.");
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("rescindOffer_")) {
+            Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from "
+                + player.getRepresentation(false, false) + " has been rescinded.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to "
+                + p2.getRepresentation(false, false));
+            player.clearTransactionItemsWith(p2);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("acceptOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             Helper.acceptTransactionOffer(p1, player, game, event);
@@ -4970,6 +4978,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
                 }
                 case "eraseMyRiders" -> AgendaHelper.reverseAllRiders(event, game, player);
+                case "checkWHView" -> ButtonHelper.showWormholes(event, game);
                 case "resetSpend" -> {
                     Helper.refreshPlanetsOnTheRevote(player, game);
                     String whatIsItFor = "both";
@@ -5005,9 +5014,9 @@ public class ButtonListener extends ListenerAdapter {
                         + AgendaHelper.getSummaryOfVotes(game, true);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), eraseMsg);
                     Button vote = Button.success(finsFactionCheckerPrefix + "vote",
-                        StringUtils.capitalize(player.getFaction()) + " Choose To Vote");
+                        player.getFlexibleDisplayName() + " Choose To Vote");
                     Button abstain = Button.danger(finsFactionCheckerPrefix + "resolveAgendaVote_0",
-                        StringUtils.capitalize(player.getFaction()) + " Choose To Abstain");
+                        player.getFlexibleDisplayName() + " Choose To Abstain");
                     Button forcedAbstain = Button.secondary("forceAbstainForPlayer_" + player.getFaction(),
                         "(For Others) Abstain for this player");
 

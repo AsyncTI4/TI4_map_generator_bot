@@ -1122,7 +1122,8 @@ public class ButtonHelperAbilities {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");
             String finChecker = "FFCC_" + pillager.getFaction() + "_";
             List<Button> buttons = new ArrayList<>();
-            String playerIdent = StringUtils.capitalize(player.getFaction());
+            String playerIdent = player.getFlexibleDisplayName();
+            player.getDisplayName();
             MessageChannel channel = game.getMainGameChannel();
             if (game.isFoWMode()) {
                 playerIdent = StringUtils.capitalize(player.getColor());

@@ -335,7 +335,7 @@ public class MessageHelper {
 						if (message.toLowerCase().contains("up next")) {
 							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
 								String id = game.getLatestUpNextMsg().split("_")[0];
-								String msg = game.getLatestUpNextMsg().split("_")[1];
+								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1);
 								// if (message.contains("# ")) {
 								// 	msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1).replace("#", "");
 								// }

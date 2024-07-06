@@ -14,6 +14,13 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -27,11 +34,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -266,8 +268,8 @@ public class AgendaHelper {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player player : game.getRealPlayers()) {
                             Tile tile = player.getHomeSystemTile();
-                            if(tile != null){
-                            AddCC.addCC(event, player.getColor(), tile);
+                            if (tile != null) {
+                                AddCC.addCC(event, player.getColor(), tile);
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -1475,10 +1477,15 @@ public class AgendaHelper {
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
                 String realIdentity;
                 realIdentity = nextInLine.getRepresentation(true, true);
-                String pFaction = StringUtils.capitalize(nextInLine.getFaction());
+                String pFaction = nextInLine.getFlexibleDisplayName();
                 String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
                 Button Vote = Button.success(finChecker + "vote", pFaction + " Choose To Vote");
-                Button Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+                Button Abstain;
+                if (nextInLine.hasAbility("future_sight")) {
+                    Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You have future sight)");
+                } else {
+                    Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+                }
                 Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_" + nextInLine.getFaction(),
                     "(For Others) Abstain for this player");
                 game.updateActivePlayer(nextInLine);
@@ -1571,8 +1578,8 @@ public class AgendaHelper {
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
             if (!game.isFoWMode()) {
-                if(!game.isACInDiscard("Deadly Plot")){
-                message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
+                if (!game.isACInDiscard("Deadly Plot")) {
+                    message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
                 }
                 for (Player loser : losers) {
                     message.append("> ").append(loser.getRepresentation(true, true)).append("\n");
@@ -1943,7 +1950,12 @@ public class AgendaHelper {
             message = realIdentity + message;
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Button.success(finChecker + "vote", pFaction + " Choose To Vote");
-            Button Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+            Button Abstain;
+            if (nextInLine.hasAbility("future_sight")) {
+                Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You have future sight)");
+            } else {
+                Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+            }
             Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_" + nextInLine.getFaction(),
                 "(For Others) Abstain for this player");
             try {
