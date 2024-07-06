@@ -252,11 +252,11 @@ public class ButtonHelperAbilities {
     }
 
     public static void resolveGrace(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String msg = player.getFactionEmoji() + " is resolving the grace ability";
+        String msg = player.getFactionEmoji() + " is resolving the Grace ability";
         int scPlayed = Integer.parseInt(buttonID.split("_")[1]);
         if (!player.hasAbility("grace")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "To " + player.getFactionEmoji() + ": This button aint for you ");
+                "To " + player.getFactionEmoji() + ": This button ain't for you ");
             return;
         }
         player.addExhaustedAbility("grace");
@@ -264,7 +264,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " use buttons to resolve grace, reminder you have to spend a strat CC if applicable, and that you can only do one of these.",
+                + " use buttons to resolve Grace, reminder you have to spend a strat CC if applicable, and that you can only do one of these.",
             getGraceButtons(game, player, scPlayed));
     }
 

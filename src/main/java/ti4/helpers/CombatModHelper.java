@@ -340,7 +340,7 @@ public class CombatModHelper {
     /// The amount of the mod is usually static (eg +2 fighters)
     /// But for some (mostly flagships), the value is scaled depending on game state
     /// like how many fragments you have
-    /// or how many POs the opponent has scored that you havent etc.
+    /// or how many POs the opponent has scored that you haven't etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
         Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {

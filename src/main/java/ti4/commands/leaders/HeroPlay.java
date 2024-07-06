@@ -291,7 +291,8 @@ public class HeroPlay extends LeaderAction {
                 int size = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " can resolve " + size
-                    + " agendas cause thats how many Sigils they got. After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
+                    + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
+                    + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
                 DrawAgenda.drawAgenda(event, size, game, player);
                 Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);

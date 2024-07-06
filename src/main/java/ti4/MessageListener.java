@@ -321,7 +321,7 @@ public class MessageListener extends ListenerAdapter {
                                             sb.append(p2.getRepresentation(true, true));
                                             sb.append(" You are getting this ping because SC #").append(sc)
                                                 .append(
-                                                    " has been played and now it has been half the alloted time and you havent reacted. Please do so, or after another half you will be marked as not following.");
+                                                    " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ")
                                                     .append(game.getStoredValue("scPlay" + sc)
@@ -345,7 +345,7 @@ public class MessageListener extends ListenerAdapter {
                                             sb.append(p2.getRepresentation(true, true));
                                             sb.append(" SC #").append(sc)
                                                 .append(
-                                                    " has been played and now it has been the allotted time and they havent reacted, so they have been marked as not following\n");
+                                                    " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n");
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
                                             ButtonHelper.sendMessageToRightStratThread(player, game, sb.toString(), ButtonHelper.getStratName(sc));
@@ -466,7 +466,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 6)) {
                                         ping = realIdentity
-                                            + " Half dozen times the charm they say. ";
+                                            + " Half dozen times the charm they say.";
                                     }
                                     if (pingNumber == 7) {
                                         ping = realIdentity
@@ -474,51 +474,51 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 8) {
                                         ping = realIdentity
-                                            + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the bear";
+                                            + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the bear.";
                                     }
                                     if (pingNumber == 9) {
                                         ping = realIdentity
-                                            + " There's a rumor going around that some game is looking for a replacement player. Not that the bot would know anything about that (who are we kidding, the bot knows everything, it just acts dumb sometimes to fool you into a state of compliance) ";
+                                            + " There's a rumor going around that some game is looking for a replacement player. Not that the bot would know anything about that (who are we kidding, the bot knows everything, it just acts dumb sometimes to fool you into a state of compliance).";
                                     }
                                     if (pingNumber == 10) {
                                         ping = realIdentity
-                                            + " Do you ever wonder what we're doing here? Such a short time here on earth, and here we are, spending some of it waiting for a TI4 game to move. Well, at least some of us probably are ";
+                                            + " Do you ever wonder what we're doing here? Such a short time here on earth, and here we are, spending some of it waiting for a TI4 game to move. Well, at least some of us probably are.";
                                     }
                                     if (pingNumber == 11) {
                                         ping = realIdentity
-                                            + " We should hire some monkeys to write these prompts. Then at least these reminders would be productive and maybe one day produce Shakespeare ";
+                                            + " We should hire some monkeys to write these prompts. Then at least these reminders would be productive and maybe one day produce Shakespeare.";
                                     }
                                     if (pingNumber == 12) {
                                         ping = realIdentity
-                                            + " This is lucky number 12. You wanna move now to avoid the bad luck of 13. Don't say we didn't warn you";
+                                            + " This is lucky number 12. You wanna move now to avoid the bad luck of 13. Don't say we didn't warn you.";
                                     }
                                     if (pingNumber == 13) {
                                         ping = realIdentity
-                                            + " All your troops decided it was holiday leave and they went home. Good luck getting them back into combat readiness by the time you need them. ";
+                                            + " All your troops decided it was holiday leave and they went home. Good luck getting them back into combat readiness by the time you need them.";
                                     }
                                     if (pingNumber == 14) {
                                         ping = realIdentity
-                                            + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish. ";
+                                            + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish.";
                                     }
                                     if (pingNumber == 15) {
                                         ping = realIdentity
-                                            + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish. ";
+                                            + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish.";
                                     }
                                     if (pingNumber == 17) {
                                         ping = realIdentity
-                                            + " Your name is gonna be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you don't wanna join em ";
+                                            + " Your name is gonna be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you don't wanna join em.";
                                     }
                                     if (pingNumber == 16) {
                                         ping = realIdentity
-                                            + " You thought the duplicate ping before meant that the bot had run out of things to say about how boring it is to wait this long. Shows how much you know.  ";
+                                            + " You thought the duplicate ping before meant that the bot had run out of things to say about how boring it is to wait this long. Shows how much you know.";
                                     }
                                     if (pingNumber == 18) {
                                         ping = realIdentity
-                                            + " The bot's decided to start training itself to take over your turn. At its current rate of development, you have -212 days until it knows the rules better than you ";
+                                            + " The bot's decided to start training itself to take over your turn. At its current rate of development, you have -212 days until it knows the rules better than you.";
                                     }
                                     if (pingNumber == 19) {
                                         ping = realIdentity
-                                            + " They say nice guys finish last, but clearly they havent seen your track record";
+                                            + " They say nice guys finish last, but clearly they haven't seen your track record.";
                                     }
                                     if (pingNumber == 20) {
                                         ping = realIdentity
@@ -526,16 +526,16 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 21) {
                                         ping = realIdentity
-                                            + " Supposedly great things come to those who wait. If thats true, you owe me something roughly the size of Mount Everest";
+                                            + " Supposedly great things come to those who wait. If that's true, you owe me something roughly the size of Mount Everest.";
                                     }
                                     if (pingNumber == 22) {
-                                        ping = realIdentity + " Knock knock";
+                                        ping = realIdentity + " Knock knock.";
                                     }
                                     if (pingNumber == 23) {
                                         ping = realIdentity + " Who's there?";
                                     }
                                     if (pingNumber == 24) {
-                                        ping = realIdentity + " It sure aint you";
+                                        ping = realIdentity + " It sure ain't you.";
                                     }
                                     if (pingNumber == 25) {
                                         ping = realIdentity
@@ -563,11 +563,11 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 31) {
                                         ping = realIdentity
-                                            + " When it started, I dreamed that this game was going to be a great one, full of exciting battles to record in the chronicles. Instead it looks doomed to the waste-bin, uncerimonously ended a few weeks from now. I guess most dreams end that way. ";
+                                            + " When it started, I dreamed that this game was going to be a great one, full of exciting battles to record in the chronicles. Instead it looks doomed to the waste-bin, unceremoniously ended a few weeks from now. I guess most dreams end that way.";
                                     }
                                     if (pingNumber == 32) {
                                         ping = realIdentity
-                                            + " Did I ever tell you about my Uncle Fred? He went missing once too. We eventually found him, cooped up in a some fog game, continuously pinging a player who wasnt there. Not a good way for a bot to go. ";
+                                            + " Did I ever tell you about my Uncle Fred? He went missing once too. We eventually found him, cooped up in a some fog game, continuously pinging a player who wasn't there. Not a good way for a bot to go.";
                                     }
                                     if (pingNumber == 33) {
                                         ping = realIdentity + " To-morrow, and to-morrow, and to-morrow,\n" + //
@@ -575,14 +575,14 @@ public class MessageListener extends ListenerAdapter {
                                             "To the last syllable of recorded time;\n" + //
                                             "And all our yesterdays have lighted fools\n" + //
                                             "The way to dusty death. Out, out, brief candle!\n" + //
-                                            "Life's but a walking shadow. ";
+                                            "Life's but a walking shadow.";
                                     }
                                     if (pingNumber == 34) {
                                         ping = realIdentity
-                                            + " Perhaps you're torn by indecision. Just remember what my grandma always used to say: When in doubt, go for the throat";
+                                            + " Perhaps you're torn by indecision. Just remember what my grandma always used to say: When in doubt, go for the throat.";
                                     }
                                     if (pingNumber == 35) {
-                                        ping = realIdentity + " Lifes but a walking shadow, a poor player\n" +
+                                        ping = realIdentity + " Life's but a walking shadow, a poor player\n" +
                                             "That struts and frets his hour upon the stage\n" +
                                             "And then is heard no more. It is a tale\n" +
                                             "Told by an idiot, full of sound and fury\n" +
@@ -590,14 +590,14 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 36) {
                                         ping = realIdentity
-                                            + " Life may not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience wont wait forever!";
+                                            + " Life may not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience won't wait forever!";
                                     }
                                     if (pingNumber == 37) {
                                         ping = realIdentity
-                                            + " I think you're supposed to forgive your enemies 7 times 70 times. Since I consider you only a mild acquiantance, I'll give you 2 times 20 times";
+                                            + " I think you're supposed to forgive your enemies 7 times 70 times. Since I consider you only a mild acquaintance, I'll give you 2 times 20 times.";
                                     }
                                     if (pingNumber == 38) {
-                                        ping = realIdentity + " I assure you that the winning move here is TO PLAY";
+                                        ping = realIdentity + " I assure you that the winning move here is TO PLAY.";
                                     }
                                     if (pingNumber == 39) {
                                         ping = realIdentity
@@ -609,7 +609,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 41) {
                                         ping = realIdentity
-                                            + " ||Can I do spoiler tag pings? Guess you'll never know. ||";
+                                            + " ||Can I do spoiler tag pings? Guess you'll never know.||";
                                     }
                                     if (pingNumber == 42) {
                                         ping = realIdentity
@@ -619,17 +619,17 @@ public class MessageListener extends ListenerAdapter {
                                     int maxSoFar = 42;
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * maxSoFar)) {
                                         ping = realIdentity
-                                            + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time. ";
+                                            + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time.";
                                     }
                                     if (pingNumber > maxSoFar + 1 && !game.isFoWMode()) {
                                         continue;
                                     }
                                     if (pingNumber == maxSoFar + 2 && !game.isFoWMode()) {
                                         ping = realIdentity
-                                            + " this is your final reminder. Stopping pinging now so we don't come back in 2 months and find 600+ messages";
+                                            + " this is your final reminder. Stopping pinging now so we don't come back in 2 months and find 600+ messages.";
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                             game.getPing()
-                                                + " the game has stalled on a player, and autoping will now stop pinging them. ");
+                                                + " the game has stalled on a player, and autoping will now stop pinging them.");
                                     }
 
                                     if (game.isFoWMode()) {
