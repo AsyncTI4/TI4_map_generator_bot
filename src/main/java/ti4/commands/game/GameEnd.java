@@ -151,8 +151,9 @@ public class GameEnd extends GameSubcommandData {
                                     for (int x = 1; x < game.getRound() + 1; x++) {
                                         String summary = "";
                                         for (Player player : game.getRealPlayers()) {
-                                            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
-                                                summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                                            String summaryKey = "endofround" + x + player.getFaction();
+                                            if (!game.getStoredValue(summaryKey).isEmpty()) {
+                                                summary += player.getFactionEmoji() + ": " + game.getStoredValue(summaryKey) + "\n";
                                             }
                                         }
                                         if (!summary.isEmpty()) {

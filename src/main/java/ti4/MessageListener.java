@@ -41,6 +41,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -323,10 +324,7 @@ public class MessageListener extends ListenerAdapter {
                                                 .append(
                                                     " has been played and now it has been half the alloted time and you havent reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                                                sb.append("Message link is: ")
-                                                    .append(game.getStoredValue("scPlay" + sc)
-                                                        .replace("666fin", ":"))
-                                                    .append("\n");
+                                                sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                                             }
                                             sb.append("You currently have ").append(p2.getStrategicCC())
                                                 .append(" CC in your strategy pool.");
@@ -906,24 +904,12 @@ public class MessageListener extends ListenerAdapter {
                 } else if (messageToMyself) {
                     String previousThoughts = "";
                     if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
-                        previousThoughts = game
-                            .getStoredValue("futureMessageFor" + player.getFaction()) + "; ";
+                        previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
                     }
-                    game.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
+                    game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummery) {
-                    String previousThoughts = "";
-                    if (!game.getStoredValue(messageBeginning.toLowerCase() + player.getFaction()).isEmpty()) {
-                        previousThoughts = game
-                            .getStoredValue(messageBeginning.toLowerCase() + player.getFaction()) + "; ";
-                    }
-                    game.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin").replace("\n", ". "));
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        player.getFactionEmoji() + " stored an end of round summary");
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Someone stored an end of round summary");
+                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true);
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);
@@ -938,10 +924,8 @@ public class MessageListener extends ListenerAdapter {
                             break;
                         }
                     }
-                    game.setStoredValue("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction(),
-                        game.getStoredValue(
-                            "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " "
-                            + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
+                    String futureMsgKey = "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction();
+                    game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent someone else a future message");
                 }
                 msg.delete().queue();
