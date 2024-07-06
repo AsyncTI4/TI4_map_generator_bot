@@ -4857,7 +4857,7 @@ public class ButtonHelper {
                         }
                         String buttonID = finChecker + "landUnits_" + tile.getPosition() + "_" + x + "mechdamaged_"
                             + representation;
-                        String buttonText = "Land " + x + " Damaged Mech(s) on "
+                        String buttonText = "Land " + x + " Damaged Mech" + (x == 1 ? "" : "s") + " on "
                             + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
                         Button validTile2 = Button.primary(buttonID, buttonText)
                             .withEmoji(Emoji.fromFormatted(Emojis.mech));
@@ -4870,7 +4870,7 @@ public class ButtonHelper {
                         }
                         String buttonID = finChecker + "landUnits_" + tile.getPosition() + "_" + x + "mech_"
                             + representation;
-                        String buttonText = "Land " + x + " Mech(s) on "
+                        String buttonText = "Land " + x + " Mech" + (x == 1 ? "" : "s") + " on "
                             + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
                         Button validTile2 = Button.primary(buttonID, buttonText)
                             .withEmoji(Emoji.fromFormatted(Emojis.mech));
@@ -4887,7 +4887,7 @@ public class ButtonHelper {
                         }
                         String buttonID = finChecker + "landUnits_" + tile.getPosition() + "_" + x + "ff_"
                             + representation;
-                        String buttonText = "Land " + x + " Fighter(s) on "
+                        String buttonText = "Land " + x + " Fighter" + (x == 1 ? "" : "s") + " on "
                             + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
                         Button validTile2 = Button.primary(buttonID, buttonText)
                             .withEmoji(Emoji.fromFormatted(Emojis.fighter));
@@ -4911,7 +4911,7 @@ public class ButtonHelper {
                         }
                         String buttonID = finChecker + "spaceUnits_" + tile.getPosition() + "_" + x + "mechdamaged_"
                             + representation;
-                        String buttonText = "Undo Landing of " + x + " Damaged Mech(s) on "
+                        String buttonText = "Undo Landing of " + x + " Damaged Mech" + (x == 1 ? "" : "s") + " on "
                             + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
                         Button validTile2 = Button.secondary(buttonID, buttonText)
                             .withEmoji(Emoji.fromFormatted(Emojis.mech));
@@ -4924,7 +4924,7 @@ public class ButtonHelper {
                         }
                         String buttonID = finChecker + "spaceUnits_" + tile.getPosition() + "_" + x + "mech_"
                             + representation;
-                        String buttonText = "Undo Landing of " + x + " Mech(s) on "
+                        String buttonText = "Undo Landing of " + x + " Mech" + (x == 1 ? "" : "s") + " on "
                             + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
                         Button validTile2 = Button.secondary(buttonID, buttonText)
                             .withEmoji(Emoji.fromFormatted(Emojis.mech));
@@ -5927,7 +5927,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (!game.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && h > 0
             && opponent != null && opponent != player) {
-            String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit(s)";
+            String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit" + (h == 1 ? "" : "s") + "";
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
             buttons.add(Button.success(finChecker + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h,
@@ -5938,7 +5938,7 @@ public class ButtonHelper {
             if (!game.isFoWMode() && rollType == CombatRollType.combatround && opponent != null
                 && opponent != player) {
                 String msg = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h
-                    + " hit(s)";
+                    + " hit" + (h == 1 ? "" : "s");
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();
                 if (h > 0) {

@@ -364,7 +364,7 @@ public class ButtonHelperModifyUnits {
                 int totalUnits = unitEntry.getValue();
                 int min = Math.min(totalUnits, hits);
                 if (unitName.equalsIgnoreCase("mech") && min > 0) {
-                    msg = msg + "> Destroyed " + min + " " + unitName + "(s)\n";
+                    msg = msg + "> Destroyed " + min + " " + unitName + (min == 1 ? "" : "s") + "\n";
                     hits = hits - min;
                     if (min + 1 > totalUnits) {
                         duraniumMsg = duraniumMsg.replace(unitName, "");
@@ -941,7 +941,7 @@ public class ButtonHelperModifyUnits {
                     }
                     Button validTile2 = Button.primary(
                         finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "mech_" + representation,
-                        "Retreat " + x + " Mech(s) on "
+                        "Retreat " + x + " Mech" + (x == 1 ? "" : "s") + " on "
                             + Helper.getPlanetRepresentation(representation.toLowerCase(), game))
                         .withEmoji(Emoji.fromFormatted(Emojis.mech));
                     buttons.add(validTile2);
@@ -987,13 +987,13 @@ public class ButtonHelperModifyUnits {
             }
             if (player != player2 && players.contains(player)) {
                 StartCombat.startGroundCombat(player, player2, game, event, unitHolder, tile);
-                if (player2.ownsUnit("keleres_mech")
-                    && unitHolder.getUnitCount(UnitType.Mech, player2.getColor()) > 0) {
+                int mechCount = unitHolder.getUnitCount(UnitType.Mech, player2.getColor());
+                if (player2.ownsUnit("keleres_mech") && mechCount > 0) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you must pay influence due to Keleres mech(s)");
+                        player.getRepresentation(true, true) + " you must pay influence due to Keleres mech" + (mechCount == 1 ? "" : "s"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         "Click the names of the planets you wish to exhaust", buttons);
                 }

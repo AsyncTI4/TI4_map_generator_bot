@@ -938,7 +938,7 @@ public class ButtonListener extends ListenerAdapter {
             buttons.add(
                 Button.danger("getDamageButtons_" + tile.getPosition() + "_groundcombat", "Manually Assign Hits"));
             buttons.add(Button.secondary("cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-            String msg2 = player.getRepresentation() + " you can autoassign " + h + " hit(s)";
+            String msg2 = player.getRepresentation() + " you can autoassign " + h + " hit" + (h==1 ? "" : "s");
             event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
                 .queue();
         } else if (buttonID.startsWith("cancelPdsOffenseHits_")) {

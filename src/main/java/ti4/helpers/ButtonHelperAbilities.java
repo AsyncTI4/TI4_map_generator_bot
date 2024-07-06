@@ -206,7 +206,7 @@ public class ButtonHelperAbilities {
         new RemoveUnits().unitParsing(event, player.getColor(), tile2, fighters + " fighters", game);
         new AddUnits().unitParsing(event, p2.getColor(), tile, fighters + " fighters", game);
         String msg = player.getRepresentation() + " used the mercenaries ability and transferred " + fighters
-            + " fighter(s) from " + tile2.getRepresentationForButtons(game, player) + " to "
+            + " fighter" + (fighters == 1 ? "" : "s") + " from " + tile2.getRepresentationForButtons(game, player) + " to "
             + tile.getRepresentationForButtons(game, player) + " and gave them to "
             + ButtonHelper.getIdentOrColor(p2, game);
         event.getMessage().delete().queue();
