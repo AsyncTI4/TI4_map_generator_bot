@@ -11,44 +11,28 @@ import ti4.map.Game;
 public class CustomizationOptions extends CustomSubcommandData {
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options");
-        addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)")
-            .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS,
-            "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT,
-            "Show full text of components when using/exhausting"));
-        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY,
-            "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT,
-            "Pings for exceeding limits. ON to turn on. OFF to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS,
-            "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE,
-            "Automatically spin inner three rings at status cleanup. ON to turn on. OFF to turn off"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
+        addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT, "Show full text of components when using/exhausting"));
+        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON to turn on. OFF to turn off"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE,
-            "Reveal all objectives and diplo gets the power to pre-reveal"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES,
-            "Show the bubbles around anti-bombardment planets"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
+        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS,
-            "Have the bot inject helpful links to rules within it's output"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW,
-            "Consider People To Pass on SCs if they dont respond with X hours. Set X to 0 to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
-            "Swap player's owned units to units from another source").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they dont respond with X hours. Set X to 0 to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
     }
 
     @Override

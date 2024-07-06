@@ -122,11 +122,11 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
-            new ButtonListener(),
-            new UserJoinServerListener(),
-            new AutoCompleteListener(),
+            ButtonListener.getInstance(),
+            ModalListener.getInstance(),
             new SelectionMenuListener(),
-            new ModalListener());
+            new UserJoinServerListener(),
+            new AutoCompleteListener());
 
         try {
             jda.awaitReady();

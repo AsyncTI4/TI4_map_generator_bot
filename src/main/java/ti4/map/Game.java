@@ -62,6 +62,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -1114,11 +1115,13 @@ public class Game {
     }
 
     public void setStoredValue(String key, String value) {
+        value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);
     }
 
     public String getStoredValue(String key) {
-        return getFactionsThatReactedToThis(key);
+        String value = getFactionsThatReactedToThis(key);
+        return StringHelper.unescape(value);
     }
 
     public void removeStoredValue(String key) {

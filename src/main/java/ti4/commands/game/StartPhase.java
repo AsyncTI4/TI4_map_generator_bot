@@ -57,7 +57,7 @@ public class StartPhase extends GameSubcommandData {
                     String summary = "";
                     for (Player player : game.getRealPlayers()) {
                         if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
-                            summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                            summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()) + "\n";
                         }
                     }
                     if (!summary.isEmpty()) {

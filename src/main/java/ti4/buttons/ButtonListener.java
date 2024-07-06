@@ -1,6 +1,8 @@
 package ti4.buttons;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +15,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -120,6 +124,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.async.RoundSummaryHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -141,8 +147,27 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 
 public class ButtonListener extends ListenerAdapter {
+    public static ButtonListener instance = null;
+
     public static final Map<Guild, Map<String, Emoji>> emoteMap = new HashMap<>();
     private static final Map<String, Set<Player>> playerUsedSC = new HashMap<>();
+    private final Map<String, Consumer<ButtonContext>> knownButtons = new HashMap<>();
+
+    public static ButtonListener getInstance() {
+        if (instance == null)
+            instance = new ButtonListener();
+        return instance;
+    }
+
+    private ButtonListener() {
+        try {
+            findKnownButtons();
+        } catch (SecurityException e) {
+            BotLogger.log(Constants.jazzPing() + " bot cannot read methods in the file.", e);
+        } catch (Exception e) {
+            BotLogger.log(Constants.jazzPing() + " some other issue registering buttons.", e);
+        }
+    }
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
@@ -168,6 +193,73 @@ public class ButtonListener extends ListenerAdapter {
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }
+    }
+
+    private List<Class<?>> knownButtonClasses() {
+        List<Class<?>> classesWithButtons = new ArrayList<>();
+        // Async
+        classesWithButtons.addAll(List.of(RoundSummaryHelper.class));// , WhisperHelper.class, NotepadHelper.class));
+
+        return classesWithButtons;
+    }
+
+    private void findKnownButtons() {
+        List<Class<?>> classesWithButtons = knownButtonClasses();
+
+        Function<Method, Consumer<ButtonContext>> transformer = method -> ctx -> {
+            String errorString = Constants.jazzPing() + " button handler failed. Please fix the configuration.";
+            try {
+                method.invoke(null, ctx);
+            } catch (IllegalAccessException e) {
+                BotLogger.log(errorString, e);
+            } catch (IllegalArgumentException e) {
+                BotLogger.log(errorString, e);
+            } catch (InvocationTargetException e) {
+                BotLogger.log(errorString, e);
+            }
+        };
+
+        // Find all the buttons
+        for (Class<?> c : classesWithButtons) {
+            List<Method> methods = Arrays.asList(c.getMethods());
+            if (methods == null) continue;
+
+            for (Method m : methods) {
+                List<ButtonHandler> handlers = Arrays.asList(m.getAnnotationsByType(ButtonHandler.class));
+                if (handlers == null || handlers.isEmpty()) continue;
+
+                List<Class<?>> methodParams = Arrays.asList(m.getParameterTypes());
+                if (methodParams.size() != 1 || !methodParams.get(0).equals(ButtonContext.class)) {
+                    BotLogger.log("Method " + m.getName() + " in class " + c.getName() + " is not a properly formatted button handler.");
+                    continue;
+                }
+
+                Consumer<ButtonContext> handler = transformer.apply(m);
+                for (ButtonHandler handleString : handlers) {
+                    knownButtons.put(handleString.value(), handler);
+                }
+            }
+        }
+    }
+
+    private boolean handleKnownButtons(ButtonContext context) {
+        String buttonID = context.getButtonID();
+        // Check for exact match first
+        if (knownButtons.containsKey(buttonID)) {
+            System.out.println("Found button " + buttonID);
+            knownButtons.get(buttonID).accept(context);
+            return true;
+        }
+
+        // Then check for prefix match
+        for (String key : knownButtons.keySet()) {
+            if (buttonID.startsWith(key)) {
+                System.out.println("Found button " + buttonID);
+                knownButtons.get(key).accept(context);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void resolveButtonInteractionEvent(ButtonContext context) {
@@ -197,6 +289,9 @@ public class ButtonListener extends ListenerAdapter {
             fowIdentity = player.getRepresentation(false, true);
             ident = player.getFactionEmoji();
         }
+
+        // Check the list of buttons first
+        if (handleKnownButtons(context)) return;
 
         // find the button
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
