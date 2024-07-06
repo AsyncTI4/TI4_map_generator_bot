@@ -216,7 +216,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             Button resolveExplore1 = Button.success("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
             Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1TG");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentation(true, true) + " You have Absol Scanlink, and thus can decline this explore to get 1TG.";
+            String message = player.getRepresentation(true, true) + " You have Scanlink Drone Network, and thus can decline this explore to get 1TG.";
             if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
@@ -235,7 +235,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planetName, game);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord FS. Technically happens after exploring");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord flagship. Technically happens after exploring");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getCurrentPhase().contains("agenda")) {
             new PlanetRefresh().doAction(player, planetName, game);
@@ -246,11 +246,11 @@ public class ExpPlanet extends ExploreSubcommandData {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             Tile tileWithPlanet = game.getTileFromPlanet(planetName);
             if (tileWithPlanet == null) {
-                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing an infantry. Resolve manually.");
+                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing 1 infantry. Resolve manually.");
                 return;
             }
             tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to planet because of Lanefir Commander");
         }
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + numExplores);

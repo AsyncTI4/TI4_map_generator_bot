@@ -42,7 +42,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you wish to exhaust and put a pds on",
+            player.getRepresentation(true, true) + " select the planet you wish to exhaust and put 1 PDS on",
             buttons);
     }
 
@@ -52,7 +52,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         new AddUnits().unitParsing(event, buttonID, game.getTileFromPlanet(planet), "pds " + planet, game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put a pds on it");
+            player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
     }
 
     public static void resolveBoardingTorpedoes(Player player, Game game, ButtonInteractionEvent event) {
@@ -113,9 +113,9 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         List<Button> buttons = new ArrayList<>();
         if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
-            buttons.add(Button.danger("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hits"));
+            buttons.add(Button.danger("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " your opponent needs to assign " + hits + " hits", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
     public static void resolveFlawlessStrategy(Player player, Game game, ButtonInteractionEvent event) {
@@ -131,8 +131,8 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         if (player.getSCs().contains(4)) {
             scButtons.add(
-                Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+                Button.success("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+            scButtons.add(Button.success("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
         }
         if (player.getSCs().contains(5)) {
             scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities")
@@ -205,7 +205,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which neighbor you want to get a cruiser+destroyer",
+            player.getRepresentation(true, true) + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
             buttons);
     }
 
@@ -276,7 +276,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a ghost ship in",
+            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a Ghost Ship in",
             buttons);
     }
 
@@ -287,7 +287,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " put a cruiser in " + tile.getRepresentation());
+            player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation());
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");

@@ -61,12 +61,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.add(Button.success("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {
-                output = "Use buttons to drop a mech on a planet or draw an AC";
+                output = "Use buttons to drop 1 mech on a planet or draw 1AC";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2ACs (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1AC"));
                 }
             }
             case "primor" -> {

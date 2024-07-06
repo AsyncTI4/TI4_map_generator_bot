@@ -297,7 +297,7 @@ public class ButtonHelperHeroes {
         // "dn,cv,dd,2 ff,mech a,2 inf g,sd a"
         buttons.addAll(Helper.getTileForCheiranHeroPlaceUnitButtons(player, game, "dreadnought",
             "placeOneNDone_skipbuild"));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 dreadnough", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 dreadnought", buttons);
         buttons = new ArrayList<>();
         buttons.addAll(
             Helper.getTileWithTrapsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
@@ -594,7 +594,7 @@ public class ButtonHelperHeroes {
         StringBuilder sb = new StringBuilder();
         MessageChannel channel = ButtonHelper.getCorrectChannel(player, game);
         if (!doesExploreDeckHaveAnAttachmentLeft(type, game)) {
-            MessageHelper.sendMessageToChannel(channel, "The " + type + " deck doesnt have any attachments left in it");
+            MessageHelper.sendMessageToChannel(channel, "The " + type + " deck doesn't have any attachments left in it.");
             return;
         } else {
             event.getMessage().delete().queue();
@@ -952,7 +952,7 @@ public class ButtonHelperHeroes {
 
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                         p2.getRepresentation()
-                            + " heads up, a tile with your units in it got hit with a saar hero, removing all fighters and infantry.");
+                            + " heads up, a tile with your units in it got Armageddon'd by the Saar hero, removing all fighters and infantry.");
                 }
 
             }
@@ -1017,13 +1017,13 @@ public class ButtonHelperHeroes {
             if (player.getPlanets().contains(uH.getName())) {
                 String planet = uH.getName();
                 Button sdButton = Button.success("winnuStructure_sd_" + planet,
-                    "Place A SD on " + Helper.getPlanetRepresentation(planet, game));
+                    "Place 1 space dock on " + Helper.getPlanetRepresentation(planet, game));
                 buttons.add(sdButton);
             }
         }
         buttons.add(tgButton);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " Use buttons to place a SD on a planet you control", buttons);
+            player.getRepresentation(true, true) + " Use buttons to place 1 space dock on a planet you control", buttons);
         List<Button> buttons2 = Helper.getPlaceUnitButtons(event, player, game, tile, "celdauriHero", "place");
         String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
         String message3 = "You have " + Helper.getProductionValue(player, game, tile, false)
@@ -1548,7 +1548,7 @@ public class ButtonHelperHeroes {
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                 "Cymiae hero gave " + Mapper.getActionCard(acID).getName()
-                    + " to you and you now have to discard an AC");
+                    + " to you and you now have to discard 1AC");
             String msg = p2.getRepresentation(true, true) + " use buttons to discard";
             List<Button> buttons = ACInfo.getDiscardActionCardButtons(game, p2, false);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
@@ -1571,7 +1571,7 @@ public class ButtonHelperHeroes {
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                + " Reminder that Yin Hero skips pds fire.");
+                + " Reminder that Yin Hero skips space cannon fire.");
             StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
@@ -1905,7 +1905,7 @@ public class ButtonHelperHeroes {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, game, game.getMainGameChannel(), player, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
-            + " reminder that the winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
+            + " reminder that the Winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
         event.getMessage().delete().queue();
     }
 
@@ -1992,8 +1992,8 @@ public class ButtonHelperHeroes {
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             scButtons.add(
-                Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+                Button.success("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+            scButtons.add(Button.success("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
             scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities")

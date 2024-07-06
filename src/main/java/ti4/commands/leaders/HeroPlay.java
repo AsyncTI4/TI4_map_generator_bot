@@ -219,7 +219,7 @@ public class HeroPlay extends LeaderAction {
             case "lizhohero" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                     "You can use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters",
-                    Button.success("lizhoHeroFighterResolution", "Distrubute 12 fighters"));
+                    Button.success("lizhoHeroFighterResolution", "Distribute 12 fighters"));
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -244,7 +244,9 @@ public class HeroPlay extends LeaderAction {
             }
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
-                    + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical CC from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they can't move into supernovas(or asteroid fields if you don't have Antimass.)";
+                    + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules."
+                    + " The game will know not to take a tactical CC from you, and will allow you to move out of locked systems."
+                    + " Reminder that you can carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have Antimass Deflectors).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
                 game.resetCurrentMovedUnitsFrom1TacticalAction();
@@ -254,7 +256,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a CC for resolving it.",
+                    + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay 1 CC for resolving it.",
                     buttons);
             }
             case "gheminaherolady" -> {
@@ -282,7 +284,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " use the buttons to select the system to remove all opposing ff and inf from",
+                        + " use the buttons to select the system to remove all opposing fighters and infantry from",
                     buttons);
             }
             case "edynhero" -> {
@@ -451,7 +453,7 @@ public class HeroPlay extends LeaderAction {
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " sent everyone a ping in their private threads with buttons to send you an AC");
+                        + " sent everyone a ping in their private threads with buttons to send you 1AC");
             }
             case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(game, player, event);
         }

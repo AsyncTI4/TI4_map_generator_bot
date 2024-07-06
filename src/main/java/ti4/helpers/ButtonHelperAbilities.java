@@ -284,8 +284,8 @@ public class ButtonHelperAbilities {
         }
         if (scPlayed > 4 && (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4))) {
             scButtons.add(
-                Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+                Button.success("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+            scButtons.add(Button.success("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
         }
         if (scPlayed > 5 && (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5))) {
             scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities")
@@ -495,7 +495,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("autoneticMemoryStep3a", "Pick A Card From the Discard"));
-        buttons.add(Button.primary("autoneticMemoryStep3b", "Drop an infantry"));
+        buttons.add(Button.primary("autoneticMemoryStep3b", "Drop 1 infantry"));
         String msg = player.getRepresentation(true, true)
             + " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -658,9 +658,9 @@ public class ButtonHelperAbilities {
 
     public static List<Button> getMitosisOptions(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("mitosisInf", "Place an Infantry"));
+        buttons.add(Button.success("mitosisInf", "Place 1 infantry"));
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
-            buttons.add(Button.primary("mitosisMech", "Replace an Infantry With a Mech (DEPLOY)"));
+            buttons.add(Button.primary("mitosisMech", "Remove 1 infantry to DEPLOY 1 mech"));
         }
         return buttons;
     }
@@ -735,7 +735,7 @@ public class ButtonHelperAbilities {
     public static void resolveMitosisMech(String buttonID, ButtonInteractionEvent event, Game game, Player player,
         String ident, String finChecker) {
         List<Button> buttons = new ArrayList<>(getPlanetPlaceUnitButtonsForMechMitosis(player, game, finChecker));
-        String message = player.getRepresentation(true, true) + " Use buttons to replace 1 infantry with a mech";
+        String message = player.getRepresentation(true, true) + " Use buttons to replace 1 infantry with 1 mech";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ident + " is resolving mitosis");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
@@ -771,7 +771,7 @@ public class ButtonHelperAbilities {
         String ident) {
         buttonID = buttonID.replace("putSleeperOnPlanet_", "");
         String planet = buttonID;
-        String message = ident + " put a sleeper on " + Helper.getPlanetRepresentation(planet, game);
+        String message = ident + " put a Sleeper on " + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         new SleeperToken().addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
@@ -782,7 +782,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             event.getMessage().getContentRaw());
         List<Button> startButtons = new ArrayList<>();
-        Button tacticalAction = Button.success("dropAMechToo", "Spend 3 resource to Drop a Mech Too");
+        Button tacticalAction = Button.success("dropAMechToo", "Spend 3 resource to drop 1 mech too");
         startButtons.add(tacticalAction);
         Button componentAction = Button.danger("finishComponentAction_spitItOut", "Decline Mech");
         startButtons.add(componentAction);
@@ -1182,7 +1182,7 @@ public class ButtonHelperAbilities {
         String ident) {
         buttonID = buttonID.replace("removeSleeperFromPlanet_", "");
         String planet = buttonID;
-        String message = ident + " removed a sleeper from " + planet;
+        String message = ident + " removed a Sleeper from " + planet;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         new SleeperToken().addOrRemoveSleeper(event, game, planet, player);
         event.getMessage().delete().queue();
@@ -1199,13 +1199,13 @@ public class ButtonHelperAbilities {
             new AddUnits().unitParsing(event, player.getColor(),
                 game.getTile(AliasHandler.resolveTile(planetName)),
                 "mech " + planetName + ", inf " + planetName, game);
-            message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName, game)
+            message = ident + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game)
                 + " with a " + Emojis.mech + " and "
                 + Emojis.infantry;
         } else {
             new AddUnits().unitParsing(event, player.getColor(),
                 game.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName, game);
-            message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName, game)
+            message = ident + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game)
                 + " with a " + Emojis.pds;
             if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
                 ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
@@ -1291,10 +1291,10 @@ public class ButtonHelperAbilities {
         String uH = buttonID.split("_")[2];
         String successMessage = "";
         if ("space".equalsIgnoreCase(uH)) {
-            successMessage = ident + " Replaced an infantry with a mech in the space area of "
+            successMessage = ident + " Replaced 1 infantry with 1 mech in the space area of "
                 + tile.getRepresentationForButtons(game, player) + ".";
         } else {
-            successMessage = ident + " Replaced an infantry with a mech on "
+            successMessage = ident + " Replaced 1 infantry with 1 mech on "
                 + Helper.getPlanetRepresentation(uH, game) + ".";
         }
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColor());
@@ -1434,8 +1434,8 @@ public class ButtonHelperAbilities {
         ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         List<Button> options = new ArrayList<>();
-        options.add(Button.success("indoctrinate_" + planet + "_infantry", "Indoctrinate to place an infantry"));
-        options.add(Button.success("indoctrinate_" + planet + "_mech", "Indoctrinate to place a mech"));
+        options.add(Button.success("indoctrinate_" + planet + "_infantry", "Indoctrinate to place 1 infantry"));
+        options.add(Button.success("indoctrinate_" + planet + "_mech", "Indoctrinate to place 1 mech"));
         options.add(Button.danger("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentation(true, true) + " use buttons to resolve indoctrination", options);

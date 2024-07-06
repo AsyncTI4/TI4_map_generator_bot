@@ -584,7 +584,7 @@ public class Helper {
             if (shouldDoIt || !canPlayerConceivablySabo(player, game)) {
                 for (String messageID : messageIDs) {
                     if (shouldPlayerLeaveAReact(player, game, messageID)) {
-                        String message = game.isFoWMode() ? "No sabotage" : null;
+                        String message = game.isFoWMode() ? "No Sabotage" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
                     }
                 }
@@ -1404,52 +1404,52 @@ public class Helper {
             msg = msg + "> ";
             switch (flavor) {
                 case "tg" -> {
-                    msg = msg + "Spent " + tg + " TG" + (tg == 1 ? "" : "s") + " for " + tg * 2 + " votes " + "\n";
+                    msg = msg + "Spent " + tg + " TG" + (tg == 1 ? "" : "s") + " for " + tg * 2 + " votes.\n";
                 }
                 case "infantry" -> {
                     msg = msg + "Spent " + player.getSpentInfantryThisWindow() + " infantry for "
-                        + player.getSpentInfantryThisWindow() + " votes " + "\n";
+                        + player.getSpentInfantryThisWindow() + " vote" + (player.getSpentInfantryThisWindow() == 1 ? "" : "s") + ".\n";
                 }
                 case "planet" -> {
-                    msg = msg + getPlanetRepresentation(secondHalf, game) + " for " + count + " votes " + "\n";
+                    msg = msg + getPlanetRepresentation(secondHalf, game) + " for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "absolShard" -> {
-                    msg = msg + "Used Absol Shard of the Throne for " + count + " votes " + "\n";
+                    msg = msg + "Used Absol Shard of the Throne for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "dsghotg" -> {
-                    msg = msg + "Exhausted some silly Ghoti Tech for " + count + " votes " + "\n";
+                    msg = msg + "Exhausted some silly Ghoti Tech for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "absolsyncretone" -> {
-                    msg = msg + "Used Absol Syncretone for " + count + " votes " + "\n";
+                    msg = msg + "Used Syncretone for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "augerscommander" -> {
-                    msg = msg + "Used Augurs Commander for " + count + " votes " + "\n";
+                    msg = msg + "Used Augurs Commander for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "zeal" -> {
-                    msg = msg + "Used Zeal Ability for " + count + " votes " + "\n";
+                    msg = msg + "Used Zeal Ability for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "predictive" -> {
-                    msg = msg + "Used Predictive Intelligence for " + count + " votes " + "\n";
+                    msg = msg + "Used Predictive Intelligence for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "specialVotes" -> {
-                    msg = msg + "Used Special Votes for " + count + " votes " + "\n";
+                    msg = msg + "Used Special Votes for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "representative" -> {
-                    msg = msg + "Got 1 vote for representative government " + "\n";
+                    msg = msg + "Got 1 vote for Representative Government.\n";
                 }
                 case "distinguished" -> {
-                    msg = msg + "Used the AC Distinguished Councillor for 5 votes " + "\n";
+                    msg = msg + "Used the AC Distinguished Councillor for 5 votes.\n";
                 }
                 case "absolRexControlRepresentative" -> {
-                    msg = msg + "Got 1 vote for controlling rex while representative government is in play" + "\n";
+                    msg = msg + "Got 1 vote for controlling Mecatol Rex while Representative Government is in play.\n";
                 }
                 case "bloodPact" -> {
-                    msg = msg + "Got 4 votes from voting the same way as another Blood Pact member" + "\n";
+                    msg = msg + "Got 4 votes from voting the same way as another Blood Pact member.\n";
                 }
 
             }
         }
-        msg = msg + "For a total of **" + votes + "** votes on the outcome "
+        msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
             + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
         if (justVoteTotal) {
             return "" + votes;
@@ -1606,7 +1606,7 @@ public class Helper {
                     res = res + 1;
                 }
                 if (thing.contains("aida")) {
-                    msg = msg + "> Exhausted AIDEV ";
+                    msg = msg + "> Exhausted AI Development Algorithm ";
                     if (thing.contains("_")) {
                         res = res + ButtonHelper.getNumberOfUnitUpgrades(player);
                         msg = msg + " for " + ButtonHelper.getNumberOfUnitUpgrades(player) + " resources ";
@@ -2090,7 +2090,7 @@ public class Helper {
                 || player.getActionCards().containsKey("war_machine4")
                 || player.getActionCards().containsKey("war_machine_ds")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                    + " Reminder that you have war machine and this is the window for it");
+                    + " Reminder that you have War Machine and this is the window for it");
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {

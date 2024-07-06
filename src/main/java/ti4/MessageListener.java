@@ -646,7 +646,7 @@ public class MessageListener extends ListenerAdapter {
                                                     "Disable Pings For Turn"));
                                                 buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
                                                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
-                                                    + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesnt annoy you. It will turn back on for the next turn.",
+                                                    + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                                                     buttons);
                                             }
                                         }
@@ -818,7 +818,7 @@ public class MessageListener extends ListenerAdapter {
                             String location = StringUtils.substringAfter(messageText, "rolls for");
                             location = StringUtils.substringBefore(messageText, "Combat");
                             newMessage = player.getRepresentation(true, true) + " Someone rolled dice for " + location
-                                + " and got a total of **" + hits + " hits";
+                                + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
                         }
                         if (!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()) {
                             newMessage = player.getRepresentation(true, true) + " "

@@ -449,7 +449,7 @@ public class CombatModHelper {
             }
             value = value * multiplier * scalingCount.doubleValue();
         }
-        value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesnt return 2.5 etc
+        value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;
     }
 

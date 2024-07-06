@@ -63,7 +63,7 @@ public class AbilityAdd extends AbilityAddRemove {
                 unitID = AliasHandler.resolveUnit("mech");
                 player.setUnitCap(unitID, 5);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                    "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                         + " due to the teeming ability");
             }
             if (abilityID.equalsIgnoreCase("diplomats")) {

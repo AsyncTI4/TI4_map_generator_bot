@@ -185,7 +185,7 @@ public class StartCombat extends CombatSubcommandData {
                 && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
                     || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
                 String msg2 = player2.getRepresentation()
-                    + " you may want to remove structures on " + unitHolder.getName() + " if your opponent is not playing infiltrate or using assimilate. Use buttons to resolve";
+                    + " you may want to remove structures on " + unitHolder.getName() + " if your opponent is not playing Infiltrate or using Assimilate. Use buttons to resolve.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
                     Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
@@ -358,7 +358,7 @@ public class StartCombat extends CombatSubcommandData {
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
         for (Player player : game.getRealPlayers()) {
             if (ButtonHelper.doesPlayerHaveFSHere("argent_flagship", player, tile)) {
-                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use space cannon offense against " + ButtonHelper.getIdentOrColor(player, game) + " due to their FS power");
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use space cannon offense against " + ButtonHelper.getIdentOrColor(player, game) + " due to their flagship power");
             }
         }
     }
@@ -388,7 +388,7 @@ public class StartCombat extends CombatSubcommandData {
                 buttons.add(Button.success("resolveSpyStep1", "Resolve Cymiae Flagship Ability"));
                 buttons.add(Button.danger("deleteButtons", "Delete These"));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + "if you win the combat, you have the opportuntiy to use the cymiae FS to force the other player to send you a random action card. It will send buttons to the other player to confirm",
+                    + "if you win the combat, you have the opportunity to use the Cymiae flagship to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                     buttons);
             }
             if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().keySet().contains("uf")
@@ -410,7 +410,7 @@ public class StartCombat extends CombatSubcommandData {
             }
             if (player.getSecretsUnscored().keySet().contains("btv") && tile.isAnomaly(game)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + " this is a reminder that you could potentially score brave the void in this combat");
+                    msg + " this is a reminder that you could potentially score Brave the Void in this combat");
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))
@@ -453,10 +453,10 @@ public class StartCombat extends CombatSubcommandData {
 
             if (type.equalsIgnoreCase("space") && player.hasTech("so")) {
                 buttons = new ArrayList<>();
-                buttons.add(Button.secondary("salvageOps_" + tile.getPosition(), "Salvage Ops")
+                buttons.add(Button.secondary("salvageOps_" + tile.getPosition(), "Salvage Operations")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if the combat does not end in a draw, you can use the button to resolve salvage ops",
+                    + " this is a reminder that if the combat does not end in a draw, you can use the button to resolve Salvage Operations.",
                     buttons);
             }
             if (type.equalsIgnoreCase("space")
@@ -992,13 +992,13 @@ public class StartCombat extends CombatSubcommandData {
         }
         if (p1.hasTechReady("absol_x89") && isGroundCombat && p1 != game.getActivePlayer()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.success(finChecker + "exhaustTech_absol_x89", "Absol X-89")
+            buttons.add(Button.success(finChecker + "exhaustTech_absol_x89", "X-89 Bacterial Weapon")
                 .withEmoji(Emoji.fromFormatted(Emojis.BioticTech)));
         }
         if (!game.isFoWMode() && p2.hasTechReady("absol_x89") && isGroundCombat
             && p2 != game.getActivePlayer()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.success(finChecker + "exhaustTech_absol_x89", "Absol X-89")
+            buttons.add(Button.success(finChecker + "exhaustTech_absol_x89", "X-89 Bacterial Weapon")
                 .withEmoji(Emoji.fromFormatted(Emojis.BioticTech)));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "kortalicommander")) {
@@ -1141,9 +1141,9 @@ public class StartCombat extends CombatSubcommandData {
         sb.append("Steps for Space Combat:\n");
         sb.append("> 1. End of movement abilities (Foresight, Stymie, etc.)\n");
         sb.append("> 2. Firing of PDS\n");
-        sb.append("> 3. Start of Combat (Skilled retreat, Morale boost, etc.)\n");
+        sb.append("> 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)\n");
         sb.append("> 4. Anti-Fighter Barrage\n");
-        sb.append("> 5. Declare Retreats (including rout)\n");
+        sb.append("> 5. Declare Retreats (including Rout)\n");
         sb.append("> 6. Roll Dice!\n");
         return sb.toString();
     }
@@ -1155,7 +1155,7 @@ public class StartCombat extends CombatSubcommandData {
         sb.append("> 2. Bombardment\n");
         sb.append("> 3. Commit Ground Forces\n");
         sb.append("> 4. After commit window (Parley, Ghost Squad, etc.)\n");
-        sb.append("> 5. Start of Combat (morale boost, etc.)\n");
+        sb.append("> 5. Start of Combat (Morale Boost, etc.)\n");
         sb.append("> 6. Roll Dice!\n");
         return sb.toString();
     }

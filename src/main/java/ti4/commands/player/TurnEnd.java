@@ -407,8 +407,9 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
             }
-            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts, to be shared at the end of the game. Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing). Simply start your message with endofround" + game.getRound()
-                + " (capitalization doesnt matter) and the rest of the message will get recorded. You can do multiple messages, and they'll all get added onto eachother.";
+            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts, to be shared at the end of the game."
+                + " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing). Simply start your message with endofround" + game.getRound()
+                + " (capitalization doesn't matter) and the rest of the message will get recorded. You can do multiple messages, and they'll all get added onto each other.";
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), endOfRoundMessage);
         }
 
@@ -452,7 +453,7 @@ public class TurnEnd extends PlayerSubcommandData {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = solPlayer.getRepresentation(true, true)
-                                + " an infantry was added to the space area of your flagship automatically.";
+                                + " 1 infantry was added to the space area of your flagship automatically.";
                             if (game.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
                             } else {

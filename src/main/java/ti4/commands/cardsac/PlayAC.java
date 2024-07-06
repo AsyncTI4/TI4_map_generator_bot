@@ -149,7 +149,7 @@ public class PlayAC extends ACCardsSubcommandData {
             empyButtons.add(refuse);
             MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 empy.getRepresentation(true, true)
-                    + "You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.",
+                    + "You have mech(s) adjacent to the player who played the AC. Use buttons to decide whether to cancel.",
                 empyButtons);
         }
         String instinctTrainingID = "it";
@@ -803,11 +803,11 @@ public class PlayAC extends ACCardsSubcommandData {
                         String ac_name = Mapper.getActionCard(key).getName();
                         if (ac_name != null) {
                             reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key)
-                                + "_reverse_" + actionCardTitle, "Reverse engineer " + actionCardTitle));
+                                + "_reverse_" + actionCardTitle, "Reverse Engineer " + actionCardTitle));
                         }
                         reverseButtons.add(Button.danger("deleteButtons", "Decline"));
                         String cyberMessage = "" + p2.getRepresentation(true, true)
-                            + " reminder that you can use reverse engineer on " + actionCardTitle;
+                            + " reminder that you can use Reverse Engineer on " + actionCardTitle;
                         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                             cyberMessage, reverseButtons);
                     }
@@ -828,7 +828,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw an AC",
+                player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw 1AC",
                 buttons2);
         }
 

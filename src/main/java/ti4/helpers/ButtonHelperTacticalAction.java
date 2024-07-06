@@ -301,7 +301,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
-                        + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2TGs/2comm",
+                        + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place 1 space dock for 2TGs/2comm",
                     buttons);
             }
         }
@@ -613,7 +613,7 @@ public class ButtonHelperTacticalAction {
                 .withEmoji(Emoji.fromFormatted(Emojis.comm));
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
-                + " you have Celdauri Commander and activated a system with your SD. Please hit button to get a commodity";
+                + " you have Celdauri Commander and activated a system with your space dock. Please hit button to get a commodity.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         }
 
@@ -646,7 +646,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
             && !game.getL1Hero()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Please resolve scanlink",
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", Please resolve Scanlink Drone Network.",
                 button2);
             if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, game, game.getTileByPosition(pos),

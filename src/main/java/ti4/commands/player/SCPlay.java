@@ -314,7 +314,7 @@ public class SCPlay extends PlayerSubcommandData {
                     empNMahButtons.add(0, emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentation(true, true) + " You can follow SC #" + scToPlay
-                            + " with the scepter of emelpar",
+                            + " with the Scepter of Emelpar",
                         empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
@@ -472,8 +472,8 @@ public class SCPlay extends PlayerSubcommandData {
 
     private static List<Button> getConstructionButtons(int sc) {
         Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
-        Button sdButton = Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-        Button pdsButton = Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds));
+        Button sdButton = Button.success("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+        Button pdsButton = Button.success("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds));
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }

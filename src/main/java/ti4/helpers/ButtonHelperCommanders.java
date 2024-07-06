@@ -103,7 +103,7 @@ public class ButtonHelperCommanders {
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1 AC to move or place a mech on "
+        String msg = player.getFactionEmoji() + " will discard 1AC to move or place 1 mech on "
             + Helper.getPlanetRepresentation(planet, game);
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
             game);
@@ -118,7 +118,7 @@ public class ButtonHelperCommanders {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             return;
         }
-        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice an infantry and ignore the pre-reqs for these techs (the bot did not check if you have the pre-reqs otherwise):\n";
+        String summary = player.getRepresentation() + " you could potentially use Yin Commander to sacrifice 1 infantry and ignore the pre-reqs for these techs (the bot did not check if you have the pre-reqs otherwise):\n";
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             for (String tech : p2.getTechs()) {
@@ -147,14 +147,14 @@ public class ButtonHelperCommanders {
                         .add(
                             Button.success(
                                 "yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(),
-                                "Remove Inf from "
+                                "Remove 1 infantry from "
                                     + ButtonHelper.getUnitHolderRep(unitHolder, tile, game)));
                 }
             }
         }
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentation(true, true) + " use buttons to remove an infantry", buttons);
+            player.getRepresentation(true, true) + " use buttons to remove 1 infantry", buttons);
     }
 
     public static void resolveYinCommanderRemoval(Player player, Game game, String buttonID,
@@ -415,9 +415,9 @@ public class ButtonHelperCommanders {
                 || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2ACs (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1AC"));
                 }
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
