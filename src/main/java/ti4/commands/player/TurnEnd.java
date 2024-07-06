@@ -25,6 +25,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
+import ti4.generator.MapGenerator;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -236,7 +237,11 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        String message = "All players passed. Please score objectives. " + game.getPing();
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
+        if (game.getShowBanners()) {
+            MapGenerator.drawPhaseBanner("status", game.getRound(), event);
+        }    
+        String message = "Please score objectives, " + game.getPing() + ".";
 
         game.setCurrentPhase("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", new Date().getTime() + "");

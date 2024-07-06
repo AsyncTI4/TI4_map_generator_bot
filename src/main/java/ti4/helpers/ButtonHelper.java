@@ -7226,7 +7226,6 @@ public class ButtonHelper {
                 }
             }
         }
-        msgExtra += "\nAll players picked SC";
         for (Player player_ : activePlayers) {
             int playersLowestSC = player_.getLowestSC();
             String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_,
@@ -7284,13 +7283,17 @@ public class ButtonHelper {
                     } else {
                         privatePlayer.setStasisInfantry(0);
                         MessageHelper.sendMessageToChannel(getCorrectChannel(privatePlayer, game), privatePlayer.getRepresentation()
-                            + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                            + " You had infantry2 to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
                     }
                 }
             }
 
         } else {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.");
+            if (game.getShowBanners()) {
+                MapGenerator.drawPhaseBanner("action", game.getRound(), event);
+            }
             ListTurnOrder.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
@@ -7469,16 +7472,19 @@ public class ButtonHelper {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
+        int round = game.getRound();
         if (game.getHasHadAStatusPhase()) {
-            int round = game.getRound();
             round++;
             game.setRound(round);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
+        if (game.getShowBanners()) {
+            MapGenerator.drawPhaseBanner("strategy", round, event);
         }
         if (game.getRealPlayers().size() == 6) {
             game.setStrategyCardsPerPlayer(1);
         }
         ButtonHelperFactionSpecific.checkForNaaluPN(game);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + game.getRound());
         for (Player p2 : game.getRealPlayers()) {
             if (game.getStoredValue("Summit") != null
                 && game.getStoredValue("Summit").contains(p2.getFaction())
