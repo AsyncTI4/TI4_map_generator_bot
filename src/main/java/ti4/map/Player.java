@@ -2838,6 +2838,14 @@ public class Player {
         }
     }
 
+    public String getFlexibleDisplayName() {
+        String name = faction;
+        if (displayName != null && !displayName.isEmpty()) {
+            name = displayName;
+        }
+        return StringUtils.capitalize(name);
+    }
+
     @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
